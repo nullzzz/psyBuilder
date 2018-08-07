@@ -3,9 +3,9 @@ from .ColumnDialog import ColumnDialog
 from NoDashDelegate import NoDashDelegate
 
 
-class Table(QTableWidget):
+class TimeLineTable(QTableWidget):
     def __init__(self, parent=None):
-        super(Table, self).__init__(parent)
+        super(TimeLineTable, self).__init__(parent)
         # 保存name及其默认值
         self.headers = ["Weight", "TimeLine"]
         self.values = ["", ""]

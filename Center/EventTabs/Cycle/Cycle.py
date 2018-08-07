@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QAction, QMainWindow, QInputDialog, QTableWidgetItem
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt, pyqtSignal
-from .Table import Table
+from .TimeLineTable import TimeLineTable
 from .ColumnDialog import ColumnDialog
 from .ColumnsDialog import ColumnsDialog
 from .Properties.Property import Property
@@ -15,7 +15,7 @@ class Cycle(QMainWindow):
     def __init__(self, parent=None, value=''):
         super(Cycle, self).__init__(parent)
 
-        self.table = Table(self)
+        self.table = TimeLineTable(self)
         self.properties = {"loadMethod": 0, "fileName": "", "orderCombo": 0, "noRepeatAfter": 0, "orderByCombo": 0}
         self.value = value
         # row : value
