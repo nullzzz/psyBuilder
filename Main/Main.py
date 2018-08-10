@@ -10,7 +10,7 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         # set UI
-        self.setWindowTitle("Demo")
+        self.setWindowTitle("PsyDemo")
 
         # 设置dock widgets
         # attributes及向其中添加数据
@@ -21,11 +21,12 @@ class MainWindow(QMainWindow):
         self.structure.setMaximumWidth(300)
         self.structure.setMinimumWidth(250)
         self.properties = Properties()
+        self.properties.setWindowTitle("Properties")
 
         self.center = Center()
-        self.center.setWindowTitle("3")
+        self.center.setWindowTitle("Main")
         self.window_4 = QDockWidget()
-        self.window_4.setWindowTitle("4")
+        self.window_4.setWindowTitle("Output")
 
         self.window_4.setWidget(QTextEdit())
 

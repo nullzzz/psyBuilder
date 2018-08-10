@@ -13,9 +13,9 @@ class Structure(QDockWidget):
     # 给eventTabs发信号
     getProperties = pyqtSignal(str)
 
-    def __init__(self, title="structure", parent=None):
+    def __init__(self, title="Structure", parent=None):
         super(Structure, self).__init__(title, parent)
-        self.setWindowTitle('structure')
+        self.setWindowTitle(title)
 
         # 键为value, 值为StructureItem, 后期考虑字典换成数据库
         self.nodes = {}

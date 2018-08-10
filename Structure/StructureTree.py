@@ -11,7 +11,7 @@ class StructureTree(QTreeWidget):
         item = self.itemAt(e.pos())
         if item and item.value != "TimeLine.10001":
             menu = QMenu()
-            delete = QAction("删除", menu)
+            delete = QAction("delete", menu)
             delete.triggered.connect(lambda : self.deleteItem(item))
             menu.addAction(delete)
             menu.exec(self.mapToGlobal(e.pos()))

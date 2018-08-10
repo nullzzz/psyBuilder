@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMenu, QAction
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeySequence
 from .ColumnDialog import ColumnDialog
 from NoDashDelegate import NoDashDelegate
 
@@ -9,6 +11,7 @@ class TimeLineTable(QTableWidget):
         # 保存name及其默认值
         self.headers = ["Weight", "TimeLine"]
         self.values = ["", ""]
+        # 其余组件
         self.dialog = ColumnDialog()
         # 隐藏竖直表头
         self.verticalHeader().setVisible(False)
@@ -18,14 +21,12 @@ class TimeLineTable(QTableWidget):
         self.setHorizontalHeaderLabels(self.headers)
         self.addRow()
 
+
     def addRow(self):
-        # id = QTableWidgetItem()
-        # id.setText(str(self.rowCount() + 1))
-        # id.setFlags(Qt.ItemIsEditable)
         self.insertRow(self.rowCount())
-        # self.setItem(self.rowCount() - 1, 0, id)
+        for col in range(0, len(self.values)):
+            self.setItem(self.rowCount() - 1, col, QTableWidgetItem(self.values[col]))
 
     def addColumn(self, name):
         self.insertColumn(self.columnCount())
         self.setHorizontalHeaderItem(self.columnCount() - 1, QTableWidgetItem(name))
-

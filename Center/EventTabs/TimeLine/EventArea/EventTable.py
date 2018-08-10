@@ -226,7 +226,7 @@ class EventTable(QTableWidget):
         col = self.columnAt(x)
         # 在末尾
         if col == self.columnCount() - 1:
-            return col - 1
+            return self.fillCount
         if col != -1:
             colTemp = self.columnAt(x - self.width)
             if not self.filled and colTemp > self.fillCount:
@@ -280,17 +280,18 @@ class EventTable(QTableWidget):
             menu.popup(self.mapToGlobal(e.pos()))
 
     def mouseDoubleClickEvent(self, e):
-        row = self.rowAt(e.pos().y())
-        col = self.columnAt(e.pos().x())
+        if e.buttons() == Qt.LeftButton:
+            row = self.rowAt(e.pos().y())
+            col = self.columnAt(e.pos().x())
 
-        # event
-        if row == 1 and col in range(1, self.fillCount + 1):
-            self.cellDoubleClicked.emit(row, col)
-        # text
-        elif row == 3 and col in range(1, self.fillCount + 1):
-            self.setFocus()
-            self.editItem(self.item(row, col))
-            self.editing = True
+            # event
+            if row == 1 and col in range(1, self.fillCount + 1):
+                self.cellDoubleClicked.emit(row, col)
+            # text
+            elif row == 3 and col in range(1, self.fillCount + 1):
+                self.setFocus()
+                self.editItem(self.item(row, col))
+                self.editing = True
 
     # 接受row, col
     def getValueName(self, row, col):

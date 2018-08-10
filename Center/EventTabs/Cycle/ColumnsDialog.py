@@ -80,7 +80,7 @@ class ColumnsDialog(QDialog):
                 data.append(self.values[i].text())
             else:
                 index = i
-                QMessageBox.information(self, "Tips", "第{}行name为空或重复值".format(index + 1))
+                QMessageBox.information(self, "Tips", "No.{} row's name is none or repeat".format(index + 1))
                 break
 
         if index == -1:
