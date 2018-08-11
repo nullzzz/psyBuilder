@@ -1,30 +1,7 @@
-import re
-from PyQt5.QtCore import Qt, QRegExp
-from PyQt5.QtGui import QFont, QTextCharFormat, QSyntaxHighlighter, QIcon
-from PyQt5.QtWidgets import QListWidgetItem, QWidget, QDialog, QApplication, QComboBox, QStackedWidget, QListWidget, \
-    QPushButton, QLabel, QLineEdit, QGroupBox, QHBoxLayout, QGridLayout, QVBoxLayout, QListView, \
-    QTextEdit, QFormLayout
-
-
-class Highlighter(QSyntaxHighlighter):
-    def __init__(self, parent=None):
-        super(Highlighter, self).__init__(parent)
-
-        self.highlightingRules = []
-
-        var = QTextCharFormat()
-        var.setForeground(Qt.darkBlue)
-        var.setFontWeight(QFont.Bold)
-        self.highlightingRules.append((QRegExp("\[[_\w]+\]"), var))
-
-    def highlightBlock(self, text):
-        for pattern, format in self.highlightingRules:
-            expression = QRegExp(pattern)
-            index = expression.indexIn(text)
-            while index >= 0:
-                length = expression.matchedLength()
-                self.setFormat(index, length, format)
-                index = expression.indexIn(text, index + length)
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QListWidgetItem, QWidget, QDialog, QComboBox, QStackedWidget, QListWidget, \
+    QPushButton, QLabel, QLineEdit, QGroupBox, QHBoxLayout, QGridLayout, QVBoxLayout, QListView, QFormLayout
 
 
 # 重写上方输出设备list widget的item
@@ -32,13 +9,12 @@ class DeviceOutItem(QListWidgetItem):
     def __init__(self, name=None, parent=None):
         super(DeviceOutItem, self).__init__(name, parent)
         self.name = name
+        self.devices = []
         self.pro = QWidget()
         self.value1 = QLineEdit()
-        self.value1.editingFinished.connect(self.changeEdit1)
-        self.value2 = QTextEdit()
-        self.value2.textChanged.connect(self.changeEdit2)
+        self.value1.textChanged.connect(self.findVar)
+        self.attributes = []
         self.value = ""
-        self.highlighter = Highlighter(self.value2.document())
         self.pulse_dur = QComboBox()
         self.pulse_dur.setEditable(True)
         self.pulse_dur.addItem("End of Duration")
@@ -46,14 +22,12 @@ class DeviceOutItem(QListWidgetItem):
 
     def setPro(self):
         layout = QGridLayout()
-        l1 = QLabel("Value:")
-        l1.setAlignment(Qt.AlignRight)
+        l1 = QLabel("Value or Message:")
+        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         layout.addWidget(l1, 0, 0)
         layout.addWidget(self.value1, 0, 1)
-        layout.addWidget(self.value2, 0, 1)
-        self.value2.hide()
         l2 = QLabel("Pulse Dur:")
-        l2.setAlignment(Qt.AlignRight)
+        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         layout.addWidget(l2, 1, 0)
         layout.addWidget(self.pulse_dur, 1, 1)
         layout.setVerticalSpacing(40)
@@ -61,24 +35,22 @@ class DeviceOutItem(QListWidgetItem):
         layout.setContentsMargins(10, 3, 10, 0)
         self.pro.setLayout(layout)
 
-    def changeEdit1(self):
+    def findVar(self):
         self.value = self.value1.text()
-        if re.search("\[[_\w]+\]", self.value):
-            self.value2.show()
-            self.value2.setText(self.value)
-            self.value1.hide()
+        if len(self.value) > 2 and self.value[0] == "[" and self.value[-1] == "]" and self.value[1:-1] in self.attributes:
+            print(self.value[1:-1])
+            self.value1.setStyleSheet("color:blue")
+        else:
+            self.value1.setStyleSheet("color:black")
 
-    def changeEdit2(self):
-        self.value = self.value2.document().toPlainText()
-        if not re.search("\[[_\w]+\]", self.value):
-            self.value2.hide()
-            self.value1.setText(self.value)
-            self.value1.show()
+    # 设置可选属性
+    def setAttributes(self, attributes):
+        self.attributes = attributes
 
     def getInfo(self):
         return {
             "Device name": self.name,
-            "value": self.value,
+            "Value or msg": self.value,
             "Pulse Duration": self.pulse_dur.currentText()
         }
 
@@ -88,33 +60,40 @@ class DeviceInItem(QListWidgetItem):
     def __init__(self, name=None, parent=None):
         super(DeviceInItem, self).__init__(name, parent)
         self.name = name
+        self.attributes = []
         self.pro1 = QWidget()
         self.device_label = QLabel(name)
         self.allowable = QLineEdit()
+        self.allowable.textChanged.connect(self.findVar1)
         self.correct = QLineEdit()
+        self.correct.textChanged.connect(self.findVar2)
         self.RT_window = QComboBox()
-        self.RT_window.addItems(["(same as action)",
-                                 "(until feedback)",
-                                 "(end of proc)",
-                                 "(infinite)",
+        self.RT_window.editTextChanged.connect(self.findVar3)
+        self.RT_window.addItems(["(Same as duration)",
+                                 "(End of timeline)",
                                  "1000",
                                  "2000",
                                  "3000",
                                  "4000",
                                  "5000"])
         self.end_action = QComboBox()
-        self.end_action.addItems(["(none)", "Terminate"])
+        self.end_action.addItems(["Terminate", "(None)"])
 
-        self.IOR1 = QComboBox()
-        self.IOR1.addItems(["Fixation", "Movement"])
-        self.IOR2 = QLineEdit()
-        self.IOR3 = QComboBox()
-        self.IOR3.addItems(["Outside", "Inside"])
+        self.action = QComboBox()
+        self.action.addItems(["Fixation", "Saccade"])
+        self.ROA = QLineEdit()
+        self.ROA.textChanged.connect(self.findVar4)
+        self.ROA2 = QComboBox()
+        self.ROA2.addItems(["Outside", "Inside"])
 
         self.pro2 = QWidget()
         self.right = QLineEdit()
+        self.right.textChanged.connect(self.findVar5)
         self.wrong = QLineEdit()
+        self.wrong.textChanged.connect(self.findVar6)
         self.ignore = QLineEdit()
+        self.ignore.textChanged.connect(self.findVar7)
+        self.resp_trigger_out = QComboBox()
         self.setPro()
 
     def setPro(self):
@@ -130,24 +109,24 @@ class DeviceInItem(QListWidgetItem):
         else:
             layout1 = QGridLayout()
             l1 = QLabel("Response:")
-            l1.setAlignment(Qt.AlignRight)
+            l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             layout1.addWidget(l1, 0, 0, 1, 1)
             layout1.addWidget(self.device_label, 0, 1, 1, 2)
-            l2 = QLabel("IOR:")
-            l2.setAlignment(Qt.AlignRight)
+            l2 = QLabel("Action:")
+            l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             layout1.addWidget(l2, 1, 0, 1, 1)
-            layout1.addWidget(self.IOR1, 1, 1, 1, 2)
-            l3 = QLabel("XXXX:")
-            l3.setAlignment(Qt.AlignRight)
+            layout1.addWidget(self.action, 1, 1, 1, 2)
+            l3 = QLabel("ROA:")
+            l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             layout1.addWidget(l3, 2, 0, 1, 1)
-            layout1.addWidget(self.IOR2, 2, 1, 1, 1)
-            layout1.addWidget(self.IOR3, 2, 2, 1, 1)
+            layout1.addWidget(self.ROA, 2, 1, 1, 1)
+            layout1.addWidget(self.ROA2, 2, 2, 1, 1)
             l4 = QLabel("Duration:")
-            l4.setAlignment(Qt.AlignRight)
+            l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             layout1.addWidget(l4, 3, 0, 1, 1)
             layout1.addWidget(self.RT_window, 3, 1, 1, 2)
-            l5 = QLabel("End Action")
-            l5.setAlignment(Qt.AlignRight)
+            l5 = QLabel("End Action:")
+            l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             layout1.addWidget(l5, 4, 0, 1, 1)
             layout1.addWidget(self.end_action, 4, 1, 1, 2)
         layout1.setVerticalSpacing(20)
@@ -162,6 +141,8 @@ class DeviceInItem(QListWidgetItem):
         layout2.addWidget(self.wrong, 1, 3)
         layout2.addWidget(QLabel("No resp:"), 1, 4)
         layout2.addWidget(self.ignore, 1, 5)
+        layout2.addWidget(QLabel("Device:"), 1, 6)
+        layout2.addWidget(self.resp_trigger_out, 1, 7)
         self.pro2.setLayout(layout2)
 
     def getInfo(self):
@@ -174,20 +155,82 @@ class DeviceInItem(QListWidgetItem):
                 "End action": self.end_action.currentText(),
                 "Right": self.right.text(),
                 "Wrong": self.wrong.text(),
-                "No resp": self.ignore.text()
+                "No resp": self.ignore.text(),
+                "Output device": self.resp_trigger_out
             }
         else:
             return {
                 "Device name": self.name,
-                "IOR": self.IOR1.currentText(),
-                "XX": self.IOR2.text(),
-                "XXX": self.IOR1.currentText(),
+                "Action": self.action.currentText(),
+                "XX": self.ROA.text(),
+                "IOA": self.action.currentText(),
                 "duration": self.RT_window.currentText(),
                 "End action": self.end_action.currentText(),
                 "Right": self.right.text(),
                 "Wrong": self.wrong.text(),
-                "No resp": self.ignore.text()
+                "No resp": self.ignore.text(),
+                "Output device": self.resp_trigger_out
             }
+
+    def findVar1(self):
+        value = self.allowable.text()
+        if value:
+            if value[0] == "[" and value[-1] == "]" and value[1:-1] in self.attributes:
+                self.allowable.setStyleSheet("color:blue")
+            else:
+                self.allowable.setStyleSheet("color:black")
+
+    def findVar2(self):
+        value = self.correct.text()
+        if value:
+            if value[0] == "[" and value[-1] == "]" and value[1:-1] in self.attributes:
+                self.correct.setStyleSheet("color:blue")
+            else:
+                self.correct.setStyleSheet("color:black")
+
+    def findVar3(self, e):
+        value = e
+        if value:
+            if value[0] == "[" and value[-1] == "]" and value[1:-1] in self.attributes:
+                self.RT_window.setStyleSheet("color:blue")
+
+        #     self.RT_window.setStyleSheet("color:black")
+
+    def findVar4(self):
+        value = self.ROA.text()
+        if value:
+            if value[0] == "[" and value[-1] == "]" and value[1:-1] in self.attributes:
+                self.ROA.setStyleSheet("color:blue")
+            else:
+                self.ROA.setStyleSheet("color:black")
+
+    def findVar5(self):
+        value = self.right.text()
+        if value:
+            if value[0] == "[" and value[-1] == "]" and value[1:-1] in self.attributes:
+                self.right.setStyleSheet("color:blue")
+            else:
+                self.right.setStyleSheet("color:black")
+
+    def findVar6(self):
+        value = self.wrong.text()
+        if value:
+            if value[0] == "[" and value[-1] == "]" and value[1:-1] in self.attributes:
+                self.wrong.setStyleSheet("color:blue")
+            else:
+                self.wrong.setStyleSheet("color:black")
+
+    def findVar7(self):
+        value = self.ignore.text()
+        if value:
+            if value[0] == "[" and value[-1] == "]" and value[1:-1] in self.attributes:
+                self.ignore.setStyleSheet("color:blue")
+            else:
+                self.ignore.setStyleSheet("color:black")
+
+    # 设置可选属性
+    def setAttributes(self, attributes):
+        self.attributes = attributes
 
 
 class Tab3(QWidget):
@@ -235,10 +278,10 @@ class Tab3(QWidget):
     def setUI(self):
         group0 = QGroupBox()
         self.duration.addItems(
-            ["(infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"])
+            ["(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"])
         self.duration.setEditable(True)
         layout0 = QHBoxLayout()
-        layout0.addWidget(QLabel("Duration"), 1)
+        layout0.addWidget(QLabel("Duration(ms):"), 1)
         layout0.addWidget(self.duration, 4)
         group0.setLayout(layout0)
 
@@ -255,13 +298,13 @@ class Tab3(QWidget):
         layout1.setVerticalSpacing(0)
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("Input Masks")
+        group2 = QGroupBox("Input Devices")
         layout2 = QGridLayout()
         self.in_add_bt.clicked.connect(self.showInDevices)
         self.in_del_bt.setEnabled(False)
         self.in_del_bt.clicked.connect(self.removeInDevices)
 
-        self.end_action.addItems(["(none)", "Terminate"])
+        self.end_action.addItems(["(None)", "Terminate"])
         self.in_devices.setStyleSheet("background-color: white;")
         layout2.addWidget(QLabel("Device(s)"), 0, 0, 1, 1)
         layout2.addWidget(self.in_devices, 1, 0, 3, 2)
@@ -296,6 +339,12 @@ class Tab3(QWidget):
             self.in_tip2.hide()
         item = DeviceInItem(device_name)
         self.in_devices.addItem(item)
+        for i in range(self.out_devices.count()):
+            try:
+                name = self.out_devices.item(i).name
+                self.in_devices.item(self.in_devices.count() - 1).resp_trigger_out.addItem(name)
+            except Exception as e:
+                print(e)
         self.in_stack1.addWidget(item.pro1)
         self.in_stack2.addWidget(item.pro2)
         if self.in_devices.count():
@@ -315,6 +364,11 @@ class Tab3(QWidget):
             self.out_tip.hide()
         item = DeviceOutItem(device_name)
         self.out_devices.addItem(item)
+        for i in range(self.in_devices.count()):
+            try:
+                self.in_devices.item(i).resp_trigger_out.addItem(device_name)
+            except Exception as e:
+                print(e)
         self.out_stack.addWidget(item.pro)
         if self.out_devices.count():
             self.out_del_bt.setEnabled(True)
@@ -339,6 +393,11 @@ class Tab3(QWidget):
         if index != -1:
             item = self.out_devices.takeItem(index)
             self.out_stack.removeWidget(item.pro)
+            for i in range(self.in_devices.count()):
+                try:
+                    self.in_devices.item(i).resp_trigger_out.removeItem(index)
+                except Exception as e:
+                    print(e)
             if self.out_devices.count() == 0:
                 self.out_del_bt.setEnabled(False)
                 self.out_tip.show()
@@ -399,13 +458,13 @@ class DeviceInDialog(QDialog):
         self.devices_list.setSpacing(20)
 
         item1 = QListWidgetItem("eye")
-        item1.setIcon(QIcon(".\\.\\image\\cartoon1.ico"))
+        item1.setIcon(QIcon(".\\.\\image\\1"))
         self.devices_list.addItem(item1)
         item2 = QListWidgetItem("device2")
-        item2.setIcon(QIcon(".\\.\\image\\cartoon2.ico"))
+        item2.setIcon(QIcon(".\\.\\image\\2"))
         self.devices_list.addItem(item2)
         item3 = QListWidgetItem("device1")
-        item3.setIcon(QIcon(".\\.\\image\\cartoon3.ico"))
+        item3.setIcon(QIcon(".\\.\\image\\3"))
         self.devices_list.addItem(item3)
 
         layout = QGridLayout()
@@ -439,13 +498,13 @@ class DeviceOutDialog(QDialog):
         self.devices_list.setSpacing(20)
 
         item1 = QListWidgetItem("eye")
-        item1.setIcon(QIcon(".\\.\\image\\cartoon1.ico"))
+        item1.setIcon(QIcon(".\\.\\image\\1"))
         self.devices_list.addItem(item1)
         item2 = QListWidgetItem("device2")
-        item2.setIcon(QIcon(".\\.\\image\\cartoon2.ico"))
+        item2.setIcon(QIcon(".\\.\\image\\2"))
         self.devices_list.addItem(item2)
         item3 = QListWidgetItem("device1")
-        item3.setIcon(QIcon(".\\.\\image\\cartoon3.ico"))
+        item3.setIcon(QIcon(".\\.\\image\\3"))
         self.devices_list.addItem(item3)
 
         layout = QGridLayout()

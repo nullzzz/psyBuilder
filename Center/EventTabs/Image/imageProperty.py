@@ -20,10 +20,10 @@ class ImageProperty(QWidget):
 
         self.mirrorUD = QCheckBox("Mirror up/down")
         self.mirrorLR = QCheckBox("Mirror left/right")
-        self.stretch = QCheckBox("stretch")
+        self.stretch = QCheckBox("Stretch")
         self.stretch_mode = QComboBox()
-        self.usck = QCheckBox("Use Source Color Key")
-        self.sck = ColorListEditor()
+        # self.usck = QCheckBox("Use Source Color Key")
+        # self.sck = ColorListEditor()
 
         self.align_h = QComboBox()
         self.align_v = QComboBox()
@@ -34,9 +34,9 @@ class ImageProperty(QWidget):
         self.setGeneral()
 
         self.frame = Tab2()
-        self.action = Tab3()
+        self.duration = Tab3()
         self.tab.addTab(self.frame, "frame")
-        self.tab.addTab(self.action, "action")
+        self.tab.addTab(self.duration, "duration")
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
@@ -82,15 +82,15 @@ class ImageProperty(QWidget):
         self.stretch.stateChanged.connect(self.stretchChecked)
         self.stretch_mode.setEnabled(False)
 
-        self.usck.stateChanged.connect(self.colorChecked)
-        self.sck.setEnabled(False)
+        # self.usck.stateChanged.connect(self.colorChecked)
+        # self.sck.setEnabled(False)
         ###
         layout1.addWidget(self.mirrorUD, 1, 0)
         layout1.addWidget(self.mirrorLR, 2, 0)
         layout1.addWidget(self.stretch, 3, 0)
-        layout1.addWidget(self.usck, 4, 0)
+        # layout1.addWidget(self.usck, 4, 0)
         layout1.addWidget(self.stretch_mode, 3, 2)
-        layout1.addWidget(self.sck, 4, 2)
+        # layout1.addWidget(self.sck, 4, 2)
         group1.setLayout(layout1)
 
         group2 = QGroupBox("")
@@ -172,11 +172,11 @@ class ImageProperty(QWidget):
         else:
             self.stretch_mode.setEnabled(False)
 
-    def colorChecked(self, e):
-        if e == 2:
-            self.sck.setEnabled(True)
-        else:
-            self.sck.setEnabled(False)
+    # def colorChecked(self, e):
+    #     if e == 2:
+    #         self.sck.setEnabled(True)
+    #     else:
+    #         self.sck.setEnabled(False)
 
     def getInfo(self):
         pass

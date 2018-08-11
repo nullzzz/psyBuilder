@@ -9,6 +9,7 @@ from .view import Preview
 
 class ImageDisplay(QMainWindow):
     propertiesChanged = pyqtSignal(dict)
+
     def __init__(self, parent=None):
         super(ImageDisplay, self).__init__(parent)
         self.label = QLabel()
@@ -124,8 +125,8 @@ class ImageDisplay(QMainWindow):
         self.h_size = int(self.pro.frame.height.currentText())
 
     def getInfo(self):
-        isUSCK = self.pro.usck.checkState()
-        source_color = self.pro.sck.currentText()
+        # isUSCK = self.pro.usck.checkState()
+        # source_color = self.pro.sck.currentText()
         align_h = self.pro.align_h.currentText()
         align_v = self.pro.align_v.currentText()
         clear_after = self.pro.clear_after.currentText()
@@ -134,17 +135,17 @@ class ImageDisplay(QMainWindow):
         border_color = self.pro.frame.border_color.currentText()
         border_width = self.pro.frame.border_width.value()
 
-        duration = self.pro.action.duration.currentText()
-        in_device, out_device = self.pro.action.getInfo()
+        duration = self.pro.duration.duration.currentText()
+        in_device, out_device = self.pro.duration.getInfo()
 
         return {
-            "file name": self.file,
+            "File name": self.file,
             "Mirror up/down": bool(self.isUD),
             "Mirror left/right": bool(self.isLR),
-            "stretch": bool(self.isStretch),
-            "stretch mode": self.stretch_mode,
-            "use source color key": bool(isUSCK),
-            "source color": source_color,
+            "Stretch": bool(self.isStretch),
+            "Stretch mode": self.stretch_mode,
+            # "use source color key": bool(isUSCK),
+            # "source color": source_color,
             "AlignHorizontal": align_h,
             "AlignVertical": align_v,
             "Clear after": clear_after,
