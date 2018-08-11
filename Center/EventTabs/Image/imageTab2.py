@@ -48,7 +48,7 @@ class Tab2(QWidget):
 
         group2 = QGroupBox("Border")
         layout2 = QFormLayout()
-        self.border_color.addItems(["black", "maroon", "green", "olive"])
+        # self.border_color.addItems(["black", "maroon", "green", "olive"])
         layout2.addRow(QLabel("Border Color"), self.border_color)
         layout2.addRow(QLabel("Border Width"), self.border_width)
         layout2.setVerticalSpacing(20)
