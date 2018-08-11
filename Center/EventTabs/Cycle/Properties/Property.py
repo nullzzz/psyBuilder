@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout, QDialog
+from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout, QDialog, QFrame
 
 from .General import General
 from .Selection import Selection
@@ -7,18 +7,19 @@ from .Selection import Selection
 class Property(QDialog):
     def __init__(self, parent=None):
         super(Property, self).__init__(parent)
-        self.tab = QTabWidget(self)
+        # self.tab = QTabWidget(self)
+        self.tab = QFrame(self)
         self.below = QWidget(self)
 
         self.ok_bt = QPushButton("Ok")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
 
-        self.general = General()
-        self.selection = Selection()
+        # self.general = General()
+        self.selection = Selection(self.tab)
 
-        self.tab.addTab(self.general, "General")
-        self.tab.addTab(self.selection, "Selection")
+        # self.tab.addTab(self.general, "General")
+        # self.tab.addTab(self.selection, "Selection")
 
         self.setButtons()
         self.setUI()

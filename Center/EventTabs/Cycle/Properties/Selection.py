@@ -1,11 +1,11 @@
-from PyQt5.QtWidgets import QWidget, QComboBox, QGroupBox, QHBoxLayout, QVBoxLayout, QFormLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QComboBox, QRunBox, QHBoxLayout, QVBoxLayout, QFormLayout, QLabel
 
 
 class Selection(QWidget):
     def __init__(self, parent=None):
         super(Selection, self).__init__(parent)
 
-        self.order = QGroupBox("Order")
+        self.order = QRunBox("Order")
 
         self.orderCombo = QComboBox(self.order)
         self.orderCombo.addItem("Sequential")
@@ -29,7 +29,7 @@ class Selection(QWidget):
 
         self.order.setLayout(form1)
 
-        self.orderBy = QGroupBox("Order By")
+        self.orderBy = QRunBox("Order By")
 
         self.orderByCombo = QComboBox(self.orderBy)
         self.orderByCombo.addItem("N/A")
@@ -46,6 +46,7 @@ class Selection(QWidget):
         hBox.addWidget(self.orderBy)
 
         self.setLayout(hBox)
+        self.setMinimumWidth(500)
 
         # 信号
         self.orderCombo.currentIndexChanged.connect(self.setComboEnable)
@@ -77,7 +78,7 @@ class Selection(QWidget):
             self.orderByCombo.addItem("N/A")
             self.orderByCombo.addItem("Subject")
             self.orderByCombo.addItem("Session")
-            self.orderByCombo.addItem("Group")
+            self.orderByCombo.addItem("Run")
             self.orderByCombo.setCurrentIndex(1)
 
 

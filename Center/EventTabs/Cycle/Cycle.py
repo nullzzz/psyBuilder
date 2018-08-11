@@ -17,7 +17,8 @@ class Cycle(QMainWindow):
         super(Cycle, self).__init__(parent)
 
         self.table = TimeLineTable(self)
-        self.properties = {"loadMethod": 0, "fileName": "", "orderCombo": 0, "noRepeatAfter": 0, "orderByCombo": 0}
+        # self.properties = {"loadMethod": 0, "fileName": "", "orderCombo": 0, "noRepeatAfter": 0, "orderByCombo": 0}
+        self.properties = {"orderCombo": 0, "noRepeatAfter": 0, "orderByCombo": 0}
         self.value = value
         # row : value
         self.timeLines = {}
@@ -146,20 +147,21 @@ class Cycle(QMainWindow):
 
     def setProperties(self):
         # general
-        general = self.property.tab.widget(0)
-        general.loadMethod.setCurrentIndex(self.properties["loadMethod"])
-        general.fileName.setText(self.properties["fileName"])
+        # general = self.property.general
+        # general.loadMethod.setCurrentIndex(self.properties["loadMethod"])
+        # general.fileName.setText(self.properties["fileName"])
         # selection
-        selection = self.property.tab.widget(1)
+        selection = self.property.selection
         selection.orderCombo.setCurrentIndex(self.properties["orderCombo"])
         selection.noRepeatAfter.setCurrentIndex(self.properties["noRepeatAfter"])
         selection.orderByCombo.setCurrentIndex(self.properties["orderByCombo"])
 
     def saveProperties(self):
-        general = self.property.tab.widget(0)
-        self.properties["loadMethod"] = general.loadMethod.currentIndex()
-        self.properties["fileName"] = general.fileName.text()
-        selection = self.property.tab.widget(1)
+        # general = self.property.general
+        # self.properties["loadMethod"] = general.loadMethod.currentIndex()
+        # self.properties["fileName"] = general.fileName.text()
+
+        selection = self.property.selection
         self.properties["orderCombo"] = selection.orderCombo.currentIndex()
         self.properties["noRepeatAfter"] = selection.noRepeatAfter.currentIndex()
         self.properties["orderByCombo"] = selection.orderByCombo.currentIndex()
@@ -172,12 +174,12 @@ class Cycle(QMainWindow):
         self.property.close()
 
     def getProperties(self):
-        general = self.property.tab.widget(0)
         res = {}
-        res["loadMethod"] = general.loadMethod.currentText()
-        res["fileName"] = general.fileName.text()
+        # general = self.property.general
+        # res["loadMethod"] = general.loadMethod.currentText()
+        # res["fileName"] = general.fileName.text()
 
-        selection = self.property.tab.widget(1)
+        selection = self.property.selection
         res["orderCombo"] = selection.orderCombo.currentText()
         res["noRepeatAfter"] = selection.noRepeatAfter.currentText()
         res["orderByCombo"] = selection.orderByCombo.currentText()
