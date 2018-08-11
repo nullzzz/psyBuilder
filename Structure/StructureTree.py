@@ -4,6 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 
 class StructureTree(QTreeWidget):
     itemDeleted = pyqtSignal(str)
+    timeLineDeleted = pyqtSignal(str, str)
     def __init__(self, parent=None):
         super(StructureTree, self).__init__(parent)
 
@@ -22,3 +23,9 @@ class StructureTree(QTreeWidget):
         if isinstance(parent, QTreeWidgetItem):
             parent.removeChild(item)
             self.itemDeleted.emit(value)
+            try:
+                # 如果时timeLine被删除要包括删除其所在cycle中的那一行
+                if value.startswith("TimeLine."):
+                    self.timeLineDeleted.emit(parent.value, value)
+            except Exception:
+                print("some errors happen in getting tree item's parent value.")

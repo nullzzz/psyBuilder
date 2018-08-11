@@ -62,12 +62,19 @@ class MainWindow(QMainWindow):
         self.structure.structureTree.itemDeleted.connect(self.center.eventTabs.deleteTab)
         # 关联timeLine中的event删除
         self.structure.structureTree.itemDeleted.connect(self.center.eventTabs.deleteEvent)
+        # 删除cycle中timeLine
+        self.structure.structureTree.timeLineDeleted.connect(self.center.eventTabs.deleteTimeLineInCycle)
 
+    # 当有新的cycle被打开时对其两个信号进行串接
     def cycleAdded(self, value):
-        # 新增timeLine
-        self.center.eventTabs.tabs[value].timelineAdded.connect(self.structure.addNode)
-        # 表格中timeLine name修改
-        self.center.eventTabs.tabs[value].nameChanged.connect(self.structure.changeEventName)
+        try:
+            self.center.eventTabs.tabs[value].timelineAdded.disconnect(self.structure.addNode)
+            self.center.eventTabs.tabs[value].timelineAdded.connect(self.structure.addNode)
+        except Exception:
+            # 新增timeLine
+            self.center.eventTabs.tabs[value].timelineAdded.connect(self.structure.addNode)
+            # 表格中timeLine name修改
+            self.center.eventTabs.tabs[value].nameChanged.connect(self.structure.changeEventName)
 
     def linkTimeLineSignal(self, value):
         try:

@@ -11,6 +11,8 @@ class TimeLineTable(QTableWidget):
         # 保存name及其默认值
         self.headers = ["Weight", "TimeLine"]
         self.values = ["", ""]
+        # value : row
+        self.rows = {}
         # 其余组件
         self.dialog = ColumnDialog()
         # 隐藏竖直表头

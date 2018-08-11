@@ -23,6 +23,8 @@ class Cycle(QMainWindow):
         self.timeLines = {}
         # row : name
         self.timeLineNames = {}
+        # value : row
+        self.rows = {}
 
         self.setCentralWidget(self.table)
 
@@ -189,8 +191,11 @@ class Cycle(QMainWindow):
                 if name:
                     event = Event(parent=None, name="TimeLine", pixmap=".\\.\\image\\timeLine.png")
                     self.timelineAdded.emit(self.value, name, event.pixmap(), event.value)
+                    self.table.rows[event.value] = row
+                    # 数据存储
                     self.timeLines[row] = event.value
                     self.timeLineNames[row] = name
+                    self.rows[event.value] = row
             else:
                 name = self.table.item(row, col).text()
                 if name:
@@ -199,6 +204,32 @@ class Cycle(QMainWindow):
                 else:
                     QMessageBox.information(self, "Tips", "TimeLine value can't be changed to none.")
                     self.table.setItem(row, col, QTableWidgetItem(self.timeLineNames[row]))
+
+    def deleteTimeLine(self, value):
+        try:
+            row = self.rows[value]
+            self.table.removeRow(row)
+            # 数据刷新
+            del self.rows[value]
+            del self.timeLines[row]
+            del self.timeLineNames[row]
+            # rows: value -> row
+            for key in self.rows:
+                if self.rows[key] > row:
+                    self.rows[key] -= 1
+            # timeLines: row -> value
+            # timeLineNames: row -> name
+            for key in self.timeLines:
+                if key > row:
+                    tempValue = self.timeLines[key]
+                    tempName = self.timeLineNames[key]
+                    tempKey = key - 1
+                    self.timeLines[tempKey] = tempValue
+                    self.timeLineNames[tempKey] = tempName
+                    del self.timeLineNames[key]
+                    del self.timeLines[key]
+        except Exception:
+            print("some errors happen in delete row (Cycle.py)")
 
     def contextMenuEvent(self, e):
         # 判断某些选项是否显示
