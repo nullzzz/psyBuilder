@@ -171,7 +171,7 @@ class DeviceInItem(QListWidgetItem):
                 "No resp": self.ignore.text(),
                 "Output device": self.resp_trigger_out
             }
-
+    # 我特么地还不会判断信号的sender
     def findVar1(self):
         value = self.allowable.text()
         if value:
@@ -236,6 +236,7 @@ class DeviceInItem(QListWidgetItem):
 class Tab3(QWidget):
     def __init__(self, parent=None):
         super(Tab3, self).__init__(parent)
+        self.attributes = []
         # up
         self.duration = QComboBox()
         self.out_stack = QStackedWidget()
@@ -421,6 +422,15 @@ class Tab3(QWidget):
     def add_devices(self, devices):
         pass
 
+    # 设置可选参数
+    def set_attributes(self, attributes):
+        self.attributes = attributes
+        for i in range(self.in_devices.count()):
+            self.in_devices.item(i).set_attributes(attributes)
+        for i in range(self.out_devices.count()):
+            self.out_devices.item(i).set_attributes(attributes)
+
+    # 返回参数
     def getInfo(self):
         in_info = {}
         out_info = {}
@@ -473,7 +483,7 @@ class DeviceInDialog(QDialog):
         layout.addWidget(self.cancel_bt, 1, 3, 1, 1)
         self.setLayout(layout)
 
-    # 从菜单栏添加待选设备
+    # TODO:从菜单栏添加待选设备
     def add_devices(self, devices):
         pass
 
