@@ -95,19 +95,20 @@ class ImageProperty(QWidget):
 
         group2 = QGroupBox("")
         layout2 = QGridLayout()
-        layout2.addWidget(QLabel("AlignHorizontal:"), 0, 0)
-        layout2.addWidget(self.align_h, 0, 1)
-        layout2.addWidget(QLabel("AlignVertical:"), 1, 0)
-        layout2.addWidget(self.align_v, 1, 1)
-        layout2.addWidget(QLabel("Clear After:"), 2, 0)
-        layout2.addWidget(self.clear_after, 2, 1)
-        layout2.addWidget(QLabel("Back Color:"), 0, 3)
-        layout2.addWidget(self.back_color, 0, 4)
+        # layout2.addWidget(QLabel("AlignHorizontal:"), 0, 0)
+        # layout2.addWidget(self.align_h, 0, 1)
+        # layout2.addWidget(QLabel("AlignVertical:"), 1, 0)
+        # layout2.addWidget(self.align_v, 1, 1)
 
-        layout2.addWidget(QLabel("Transparent:"), 1, 3)
-        layout2.addWidget(self.transparent, 1, 4)
-        layout2.addWidget(QLabel("Display Name:"), 2, 3)
-        layout2.addWidget(self.display_name, 2, 4)
+        layout2.addWidget(QLabel("Back Color:"), 0, 0)
+        layout2.addWidget(self.back_color, 0, 1)
+
+        layout2.addWidget(QLabel("Transparent:"), 0, 2)
+        layout2.addWidget(self.transparent, 0, 3)
+        layout2.addWidget(QLabel("Clear After:"), 1, 0)
+        layout2.addWidget(self.clear_after, 1, 1)
+        layout2.addWidget(QLabel("Display Name:"), 1, 2)
+        layout2.addWidget(self.display_name, 1, 3)
 
         group2.setLayout(layout2)
 
