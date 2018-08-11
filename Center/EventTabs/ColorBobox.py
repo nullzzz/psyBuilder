@@ -58,10 +58,11 @@ class ColorListEditor(QComboBox):
                         self.setCurrentIndex(1)
             # #ffffff格式rgb
             elif e[0] == "#" and len(e) == 7:
-                color = QColor(e)
-                self.insertItem(1, e)
-                self.setItemData(1, color, Qt.DecorationRole)
-                self.setCurrentIndex(1)
+                if self.findText(e) == -1:
+                    color = QColor(e)
+                    self.insertItem(1, e)
+                    self.setItemData(1, color, Qt.DecorationRole)
+                    self.setCurrentIndex(1)
                 self.setStyleSheet("background: {}".format(e))
             else:
                 self.setStyleSheet("background: {}".format(self.currentText()))
