@@ -20,10 +20,10 @@ class ImageProperty(QWidget):
 
         self.mirrorUD = QCheckBox("Mirror up/down")
         self.mirrorLR = QCheckBox("Mirror left/right")
-        self.stretch = QCheckBox("stretch")
+        self.stretch = QCheckBox("Stretch")
         self.stretch_mode = QComboBox()
-        self.usck = QCheckBox("Use Source Color Key")
-        self.sck = ColorListEditor()
+        # self.usck = QCheckBox("Use Source Color Key")
+        # self.sck = ColorListEditor()
 
         self.align_h = QComboBox()
         self.align_v = QComboBox()
@@ -34,9 +34,9 @@ class ImageProperty(QWidget):
         self.setGeneral()
 
         self.frame = Tab2()
-        self.action = Tab3()
+        self.duration = Tab3()
         self.tab.addTab(self.frame, "frame")
-        self.tab.addTab(self.action, "action")
+        self.tab.addTab(self.duration, "duration")
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
@@ -82,32 +82,33 @@ class ImageProperty(QWidget):
         self.stretch.stateChanged.connect(self.stretchChecked)
         self.stretch_mode.setEnabled(False)
 
-        self.usck.stateChanged.connect(self.colorChecked)
-        self.sck.setEnabled(False)
+        # self.usck.stateChanged.connect(self.colorChecked)
+        # self.sck.setEnabled(False)
         ###
         layout1.addWidget(self.mirrorUD, 1, 0)
         layout1.addWidget(self.mirrorLR, 2, 0)
         layout1.addWidget(self.stretch, 3, 0)
-        layout1.addWidget(self.usck, 4, 0)
+        # layout1.addWidget(self.usck, 4, 0)
         layout1.addWidget(self.stretch_mode, 3, 2)
-        layout1.addWidget(self.sck, 4, 2)
+        # layout1.addWidget(self.sck, 4, 2)
         group1.setLayout(layout1)
 
         group2 = QGroupBox("")
         layout2 = QGridLayout()
-        layout2.addWidget(QLabel("AlignHorizontal:"), 0, 0)
-        layout2.addWidget(self.align_h, 0, 1)
-        layout2.addWidget(QLabel("AlignVertical:"), 1, 0)
-        layout2.addWidget(self.align_v, 1, 1)
-        layout2.addWidget(QLabel("Clear After:"), 2, 0)
-        layout2.addWidget(self.clear_after, 2, 1)
-        layout2.addWidget(QLabel("Back Color:"), 0, 3)
-        layout2.addWidget(self.back_color, 0, 4)
+        # layout2.addWidget(QLabel("AlignHorizontal:"), 0, 0)
+        # layout2.addWidget(self.align_h, 0, 1)
+        # layout2.addWidget(QLabel("AlignVertical:"), 1, 0)
+        # layout2.addWidget(self.align_v, 1, 1)
 
-        layout2.addWidget(QLabel("Transparent:"), 1, 3)
-        layout2.addWidget(self.transparent, 1, 4)
-        layout2.addWidget(QLabel("Display Name:"), 2, 3)
-        layout2.addWidget(self.display_name, 2, 4)
+        layout2.addWidget(QLabel("Back Color:"), 0, 0)
+        layout2.addWidget(self.back_color, 0, 1)
+
+        layout2.addWidget(QLabel("Transparent:"), 0, 2)
+        layout2.addWidget(self.transparent, 0, 3)
+        layout2.addWidget(QLabel("Clear After:"), 1, 0)
+        layout2.addWidget(self.clear_after, 1, 1)
+        layout2.addWidget(QLabel("Display Name:"), 1, 2)
+        layout2.addWidget(self.display_name, 1, 3)
 
         group2.setLayout(layout2)
 
@@ -172,11 +173,11 @@ class ImageProperty(QWidget):
         else:
             self.stretch_mode.setEnabled(False)
 
-    def colorChecked(self, e):
-        if e == 2:
-            self.sck.setEnabled(True)
-        else:
-            self.sck.setEnabled(False)
+    # def colorChecked(self, e):
+    #     if e == 2:
+    #         self.sck.setEnabled(True)
+    #     else:
+    #         self.sck.setEnabled(False)
 
     def getInfo(self):
         pass
