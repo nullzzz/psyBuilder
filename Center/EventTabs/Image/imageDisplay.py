@@ -58,7 +58,7 @@ class ImageDisplay(QMainWindow):
     def pre_view(self):
         if self.file:
             try:
-                self.preview = Preview(self.pix, self.x_pos, self.y_pos, self.w_size, self.h_size)
+                self.preview = Preview(self.file, self.pix, self.x_pos, self.y_pos, self.w_size, self.h_size)
                 self.preview.setStyleSheet("background-color:{}".format(self.back_color))
                 self.preview.setTransparent(self.transparent_value)
                 self.preview.setWindowModality(Qt.ApplicationModal)
@@ -121,10 +121,10 @@ class ImageDisplay(QMainWindow):
         self.stretch_mode = self.pro.stretch_mode.currentText()
         self.back_color = self.pro.back_color.currentText()
         self.transparent_value = self.pro.transparent.value()
-        self.x_pos = int(self.pro.frame.xpos.currentText())
-        self.y_pos = int(self.pro.frame.ypos.currentText())
-        self.w_size = int(self.pro.frame.width.currentText())
-        self.h_size = int(self.pro.frame.height.currentText())
+        self.x_pos = self.pro.frame.xpos.currentText()
+        self.y_pos = self.pro.frame.ypos.currentText()
+        self.w_size = self.pro.frame.width.currentText()
+        self.h_size = self.pro.frame.height.currentText()
 
     # 返回设置参数
     def getInfo(self):
