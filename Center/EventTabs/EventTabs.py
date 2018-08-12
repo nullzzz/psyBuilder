@@ -171,6 +171,18 @@ class EventTabs(QTabWidget):
         del self.events[value]
 
     def deleteEvent(self, value):
-        parentValue = self.events[value]
-        timeLine = self.tabs[parentValue]
-        timeLine.eventArea.eventTable.removeEvent(value)
+        try:
+            if not value.startswith("TimeLine."):
+                parentValue = self.events[value]
+                timeLine = self.tabs[parentValue]
+                timeLine.eventArea.eventTable.removeEvent(value)
+        except Exception:
+            print("Some errors happen in delete event in timeLine.")
+
+    # 删除在cycle中的timeLine, 实质是删除其table中所在那行
+    def deleteTimeLineInCycle(self, parentValue, value):
+        try:
+            cycle = self.tabs[parentValue]
+            cycle.deleteTimeLine(value)
+        except Exception:
+            print("some errors happen in delete timeLine in cycle (EventTabs.py)")

@@ -17,12 +17,15 @@ class Cycle(QMainWindow):
         super(Cycle, self).__init__(parent)
 
         self.table = TimeLineTable(self)
-        self.properties = {"loadMethod": 0, "fileName": "", "orderCombo": 0, "noRepeatAfter": 0, "orderByCombo": 0}
+        # self.properties = {"loadMethod": 0, "fileName": "", "orderCombo": 0, "noRepeatAfter": 0, "orderByCombo": 0}
+        self.properties = {"orderCombo": 0, "noRepeatAfter": 0, "orderByCombo": 0}
         self.value = value
         # row : value
         self.timeLines = {}
         # row : name
         self.timeLineNames = {}
+        # value : row
+        self.rows = {}
 
         self.setCentralWidget(self.table)
 
@@ -144,20 +147,21 @@ class Cycle(QMainWindow):
 
     def setProperties(self):
         # general
-        general = self.property.tab.widget(0)
-        general.loadMethod.setCurrentIndex(self.properties["loadMethod"])
-        general.fileName.setText(self.properties["fileName"])
+        # general = self.property.general
+        # general.loadMethod.setCurrentIndex(self.properties["loadMethod"])
+        # general.fileName.setText(self.properties["fileName"])
         # selection
-        selection = self.property.tab.widget(1)
+        selection = self.property.selection
         selection.orderCombo.setCurrentIndex(self.properties["orderCombo"])
         selection.noRepeatAfter.setCurrentIndex(self.properties["noRepeatAfter"])
         selection.orderByCombo.setCurrentIndex(self.properties["orderByCombo"])
 
     def saveProperties(self):
-        general = self.property.tab.widget(0)
-        self.properties["loadMethod"] = general.loadMethod.currentIndex()
-        self.properties["fileName"] = general.fileName.text()
-        selection = self.property.tab.widget(1)
+        # general = self.property.general
+        # self.properties["loadMethod"] = general.loadMethod.currentIndex()
+        # self.properties["fileName"] = general.fileName.text()
+
+        selection = self.property.selection
         self.properties["orderCombo"] = selection.orderCombo.currentIndex()
         self.properties["noRepeatAfter"] = selection.noRepeatAfter.currentIndex()
         self.properties["orderByCombo"] = selection.orderByCombo.currentIndex()
@@ -170,12 +174,12 @@ class Cycle(QMainWindow):
         self.property.close()
 
     def getProperties(self):
-        general = self.property.tab.widget(0)
         res = {}
-        res["loadMethod"] = general.loadMethod.currentText()
-        res["fileName"] = general.fileName.text()
+        # general = self.property.general
+        # res["loadMethod"] = general.loadMethod.currentText()
+        # res["fileName"] = general.fileName.text()
 
-        selection = self.property.tab.widget(1)
+        selection = self.property.selection
         res["orderCombo"] = selection.orderCombo.currentText()
         res["noRepeatAfter"] = selection.noRepeatAfter.currentText()
         res["orderByCombo"] = selection.orderByCombo.currentText()
@@ -189,8 +193,11 @@ class Cycle(QMainWindow):
                 if name:
                     event = Event(parent=None, name="TimeLine", pixmap=".\\.\\image\\timeLine.png")
                     self.timelineAdded.emit(self.value, name, event.pixmap(), event.value)
+                    self.table.rows[event.value] = row
+                    # 数据存储
                     self.timeLines[row] = event.value
                     self.timeLineNames[row] = name
+                    self.rows[event.value] = row
             else:
                 name = self.table.item(row, col).text()
                 if name:
@@ -199,6 +206,32 @@ class Cycle(QMainWindow):
                 else:
                     QMessageBox.information(self, "Tips", "TimeLine value can't be changed to none.")
                     self.table.setItem(row, col, QTableWidgetItem(self.timeLineNames[row]))
+
+    def deleteTimeLine(self, value):
+        try:
+            row = self.rows[value]
+            self.table.removeRow(row)
+            # 数据刷新
+            del self.rows[value]
+            del self.timeLines[row]
+            del self.timeLineNames[row]
+            # rows: value -> row
+            for key in self.rows:
+                if self.rows[key] > row:
+                    self.rows[key] -= 1
+            # timeLines: row -> value
+            # timeLineNames: row -> name
+            for key in self.timeLines:
+                if key > row:
+                    tempValue = self.timeLines[key]
+                    tempName = self.timeLineNames[key]
+                    tempKey = key - 1
+                    self.timeLines[tempKey] = tempValue
+                    self.timeLineNames[tempKey] = tempName
+                    del self.timeLineNames[key]
+                    del self.timeLines[key]
+        except Exception:
+            print("some errors happen in delete row (Cycle.py)")
 
     def contextMenuEvent(self, e):
         # 判断某些选项是否显示
