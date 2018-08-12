@@ -1,23 +1,31 @@
 from PyQt5.QtGui import QPainter, QPixmap
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QDesktopWidget
 
 
 class Preview(QDialog):
-    def __init__(
-            self,
-            pix_file=None,
-            start_x=0,
-            start_y=0,
-            width=100,
-            height=100):
+    def __init__(self, file="", pix_file=None, start_x=0, start_y=0, width=100, height=100):
         super(Preview, self).__init__()
-        self.file = pix_file
-        self.start_x = start_x
-        self.start_y = start_y
-        self.width_factor = width / 100
-        self.height_factor = height / 100
+        self.file = file
+        self.pix = pix_file
+        screen = QDesktopWidget().screenGeometry()
+        if "%" in start_x:
+            self.start_x = int(start_x[0:-1]) * screen.width() / 100
+        else:
+            self.start_x = int(start_x)
+        if "%" in start_y:
+            self.start_y = int(start_y[0:-1]) * screen.height() / 100
+        else:
+            self.start_y = int(start_y)
+        if "%" in width:
+            self.width_factor = int(width[0:-1]) * screen.width() / 100
+        else:
+            self.width_factor = int(width)
+        if "%" in height:
+            self.height_factor = int(height[0:-1]) * screen.height() / 100
+        else:
+            self.height_factor = int(height)
 
-    def setTransparent(self, transparent_value=10):
+    def setTransparent(self, transparent_value=80):
         self.setWindowOpacity(transparent_value / 100)
 
     def setStartPos(self, x, y):
@@ -31,8 +39,8 @@ class Preview(QDialog):
         painter.drawPixmap(
             self.start_x,
             self.start_y,
-            self.width() * self.width_factor,
-            self.height() * self.height_factor,
-            self.file)
+            self.width_factor,
+            self.height_factor,
+            self.pix)
         painter.drawPixmap(0, 0, 400, 150, pix)
 

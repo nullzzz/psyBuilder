@@ -54,19 +54,19 @@ class ImageDisplay(QMainWindow):
         self.pro.setWindowModality(Qt.ApplicationModal)
         self.pro.show()
 
+    # 预览图片
     def pre_view(self):
         if self.file:
             try:
-                self.preview = Preview(self.pix, self.x_pos, self.y_pos, self.w_size, self.h_size)
+                self.preview = Preview(self.file, self.pix, self.x_pos, self.y_pos, self.w_size, self.h_size)
                 self.preview.setStyleSheet("background-color:{}".format(self.back_color))
                 self.preview.setTransparent(self.transparent_value)
                 self.preview.setWindowModality(Qt.ApplicationModal)
                 self.preview.showFullScreen()
                 self.t = QtCore.QTimer()
                 self.t.timeout.connect(self.preview.close)
-                self.t.start(3000)
+                self.t.start(10000)
                 self.t.setSingleShot(True)
-
             except AttributeError:
                 QMessageBox.warning(self, "No Image Error", "Please load image first!", QMessageBox.Ok)
             except Exception as e:
@@ -82,13 +82,14 @@ class ImageDisplay(QMainWindow):
     def apply(self):
         self.getPro()
         self.label.setStyleSheet("background-color:{}".format(self.back_color))
+        # 加载图片文件
         if self.file:
             if QFileInfo(self.file).isFile():
                 img = QImage(self.file)
                 image = img.mirrored(self.isLR, self.isUD)
                 pix = QPixmap.fromImage(image)
                 self.pix = pix
-
+                # 图片反转
                 if self.isStretch:
                     mode = self.pro.stretch_mode.currentText()
                     w = self.label.size().width()
@@ -111,6 +112,7 @@ class ImageDisplay(QMainWindow):
         # 发送信号
         self.propertiesChanged.emit(self.getInfo())
 
+    # 获取参数
     def getPro(self):
         self.file = self.pro.file_name.text()
         self.isUD = self.pro.mirrorUD.checkState()
@@ -119,11 +121,12 @@ class ImageDisplay(QMainWindow):
         self.stretch_mode = self.pro.stretch_mode.currentText()
         self.back_color = self.pro.back_color.currentText()
         self.transparent_value = self.pro.transparent.value()
-        self.x_pos = int(self.pro.frame.xpos.currentText())
-        self.y_pos = int(self.pro.frame.ypos.currentText())
-        self.w_size = int(self.pro.frame.width.currentText())
-        self.h_size = int(self.pro.frame.height.currentText())
+        self.x_pos = self.pro.frame.xpos.currentText()
+        self.y_pos = self.pro.frame.ypos.currentText()
+        self.w_size = self.pro.frame.width.currentText()
+        self.h_size = self.pro.frame.height.currentText()
 
+    # 返回设置参数
     def getInfo(self):
         # isUSCK = self.pro.usck.checkState()
         # source_color = self.pro.sck.currentText()
@@ -146,10 +149,10 @@ class ImageDisplay(QMainWindow):
             "Stretch mode": self.stretch_mode,
             # "use source color key": bool(isUSCK),
             # "source color": source_color,
-            "AlignHorizontal": align_h,
-            "AlignVertical": align_v,
-            "Clear after": clear_after,
-            "Back color": self.back_color,
+            # "AlignHorizontal": align_h,
+            # "AlignVertical": align_v,
+            # "Clear after": clear_after,
+            # "Back color": self.back_color,
             "Transparent": self.transparent_value,
             "Display Name": display_name,
             "X position": self.x_pos,

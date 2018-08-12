@@ -45,7 +45,7 @@ class VideoDisplay(QMainWindow):
         self.setFixedSize(1000, 618)
         self.label.setText("Your video will show here")
         self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        # self.setCentralWidget(self.label)
+        self.setCentralWidget(self.label)
 
         tool = QToolBar()
         open_pro = QAction(QIcon(".\\.\\image\\setting"), "open", self)
