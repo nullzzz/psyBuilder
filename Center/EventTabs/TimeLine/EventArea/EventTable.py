@@ -20,6 +20,8 @@ class EventTable(QTableWidget):
     eventRemove = pyqtSignal(str)
     # 和properties窗口关联, 先发送到tabs, 看是否创建过, 没有则返回默认值
     properties = pyqtSignal(str)
+    #
+    copyDragStart = pyqtSignal()
 
     # icon固定宽度
     width = 50
@@ -32,6 +34,7 @@ class EventTable(QTableWidget):
         self.fillCount = 0
         self.filled = False
         self.editing = False
+        self.copy = False
 
         # 隐藏表头
         self.horizontalHeader().setVisible(False)
@@ -105,9 +108,12 @@ class EventTable(QTableWidget):
 
     def mouseMoveEvent(self, e):
         if self.columnAt(e.pos().x()) in range(1, self.fillCount + 1) and self.rowAt(e.pos().y()) in (1, 3):
-            self.startDrag(Qt.MoveAction)
+            if not self.copy:
+                self.moveDrag(Qt.MoveAction)
+            else:
+                self.copyDrag()
 
-    def startDrag(self, dropActions):
+    def moveDrag(self, dropActions):
         # 获得拖拽的控件的column
         dragCol = self.currentColumn()
         if dragCol >= 1 and dragCol < self.fillCount + 1:
@@ -120,7 +126,21 @@ class EventTable(QTableWidget):
             drag = QDrag(self)
             drag.setMimeData(mimeData)
             drag.setHotSpot(QPoint(12, 12))
-            drag.exec(Qt.MoveAction)
+            drag.exec(dropActions)
+
+    def copyDrag(self):
+        col = self.currentColumn()
+        if col >= 1 and col < self.fillCount + 1:
+            # 将col传过去
+            data = QByteArray()
+            stream = QDataStream(data, QIODevice.WriteOnly)
+            stream.writeInt(col)
+            mimeData = QMimeData()
+            mimeData.setData("application/EventAreaTable-copy-col", data)
+            drag = QDrag(self)
+            drag.setMimeData(mimeData)
+            drag.setHotSpot(QPoint(12, 12))
+            drag.exec(Qt.CopyAction)
 
     def setText(self, row, col, text):
         item = QTableWidgetItem(text)
@@ -274,9 +294,17 @@ class EventTable(QTableWidget):
         row = self.rowAt(e.pos().y())
         if column in range(0, self.fillCount + 1) and row == 1:
             menu = QMenu(self)
-            delete = QAction("删除", menu)
-            menu.addAction(delete)
-            delete.triggered.connect(lambda: self.removeColumn(column, True))
+            if not self.copy:
+                # delete action
+                delete = QAction("delete", menu)
+                delete.triggered.connect(lambda : self.removeColumn(column, True))
+                menu.addAction(delete)
+                # copy action
+                copy = QAction("copy", menu)
+                copy.triggered.connect(self.copyEvent)
+                menu.addAction(copy)
+            else:
+                pass
             menu.popup(self.mapToGlobal(e.pos()))
 
     def mouseDoubleClickEvent(self, e):
@@ -325,3 +353,6 @@ class EventTable(QTableWidget):
 
         if index != -1:
             self.removeColumn(index, False)
+
+    def copyEvent(self):
+        self.copyDragStart.emit()

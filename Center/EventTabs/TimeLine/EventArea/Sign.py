@@ -20,6 +20,7 @@ class Sign(QTableWidget):
         self.setFrameShape(QFrame.NoFrame)
         self.setFocusPolicy(Qt.NoFocus)
         self.setSelectionMode(QAbstractItemView.NoSelection)
+        self.setStyleSheet("background-color:transparent")
         # 设置为一行
         self.setRowCount(1)
         self.setRowHeight(0, 35)

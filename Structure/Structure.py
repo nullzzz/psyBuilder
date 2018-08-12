@@ -21,7 +21,6 @@ class Structure(QDockWidget):
         self.nodes = {}
 
         self.structureTree = StructureTree()
-
         # 设置列数、头标签
         self.structureTree.setColumnCount(1)
         self.structureTree.setHeaderLabel("E-Object")

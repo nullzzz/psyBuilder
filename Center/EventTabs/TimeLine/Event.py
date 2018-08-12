@@ -8,6 +8,8 @@ class Event(QLabel):
     def __init__(self, parent=None, name="", pixmap=None, value=''):
         super(Event, self).__init__(parent)
 
+        self.setStyleSheet("background-color:transparent;")
+
         self.name = name
         self.setPixmap(QPixmap(pixmap))
         if not value:

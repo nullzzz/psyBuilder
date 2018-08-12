@@ -18,24 +18,22 @@ class MainWindow(QMainWindow):
 
         # other
         self.structure = Structure()
-        self.structure.setMaximumWidth(300)
-        self.structure.setMinimumWidth(250)
         self.properties = Properties()
         self.properties.setWindowTitle("Properties")
 
         self.center = Center()
         self.center.setWindowTitle("Main")
-        self.window_4 = QDockWidget()
-        self.window_4.setWindowTitle("Output")
+        self.output = QDockWidget()
+        self.output.setWindowTitle("Output")
 
-        self.window_4.setWidget(QTextEdit())
+        self.output.setWidget(QTextEdit())
 
         # 添加dock widget
         self.addDockWidget(Qt.LeftDockWidgetArea, self.structure)
         self.splitDockWidget(self.structure, self.center, Qt.Horizontal)
         self.splitDockWidget(self.center, self.attributes, Qt.Horizontal)
         self.splitDockWidget(self.structure, self.properties, Qt.Vertical)
-        self.splitDockWidget(self.center, self.window_4, Qt.Vertical)
+        self.splitDockWidget(self.center, self.output, Qt.Vertical)
 
         # 连接信号
         self.linkSignal()

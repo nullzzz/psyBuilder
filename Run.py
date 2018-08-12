@@ -315,7 +315,7 @@ pushButton = """
 tableView = """
     QTableView
     {
-        selection-background-color: #DCDCDC;
+        selection-background-color: rgba(204,232,255);
     }
 """
 
@@ -352,7 +352,47 @@ tree = """
         }
     """
 
-styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + lineEdit + pushButton + tree
+menu = """
+    QMenu {
+    background-color: white;
+    border: 1px solid gray;
+    margin: 2px; /* some spacing around the menu */
+}
+
+QMenu::item {
+    padding: 2px 25px 2px 20px;
+    border: 0.5px solid gray; /* reserve space for selection border */
+}
+
+QMenu::item:selected {
+    border-color: black;
+    background: rgba(135,206,250);
+}
+
+QMenu::icon:checked { /* appearance of a 'checked' icon */
+    background: gray;
+    border: 1px inset gray;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    left: 1px;
+}
+
+QMenu::separator {
+    height: 2px;
+    background: lightblue;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+QMenu::indicator {
+    width: 13px;
+    height: 13px;
+}
+"""
+
+styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + lineEdit + pushButton + tree + menu
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -363,6 +403,7 @@ if __name__ == '__main__':
     demo.show()
     demo.move((QApplication.desktop().width() - demo.width()) / 2,
               (QApplication.desktop().height() - demo.height()) / 2)
+    demo.properties.myWidget.setMaximumWidth(600)
 
     app.setStyleSheet(styleSheet)
     sys.exit(app.exec_())

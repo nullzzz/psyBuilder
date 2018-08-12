@@ -14,6 +14,7 @@ from .EyeTracker.startR import StartR
 from .EyeTracker.endR import EndR
 from .Quest.start import QuestStart
 from .Quest.update import QuestUpdate
+import copy
 
 
 class EventTabs(QTabWidget):
@@ -47,6 +48,7 @@ class EventTabs(QTabWidget):
         self.timeLine.eventArea.eventTable.eventNameChanged.connect(self.changeTabName)
         self.timeLine.eventArea.eventTable.eventRemove.connect(self.deleteTab)
         self.timeLine.eventArea.eventTable.properties.connect(self.getProperties)
+        self.timeLine.eventArea.eventCopy.connect(self.eventCopy)
 
         self.tabCloseRequested.connect(self.removeTab)
 
@@ -61,7 +63,7 @@ class EventTabs(QTabWidget):
 
     # 添加新的tab, 如果存在过,直接取出, 不存在则新增
     # 新增连接信号propertiesChanged
-    def addNewTab(self, value, name):
+    def addNewTab(self, value, name, flag=False):
         widgetType = value.split('.')[0]
         if value in self.tabs:
             widget = self.tabs[value]
@@ -116,8 +118,8 @@ class EventTabs(QTabWidget):
 
             if widgetType == "Cycle":
                 self.cycleAdded.emit(value)
-
-            self.setCurrentIndex(self.addTab(widget, name))
+            if not flag:
+                self.setCurrentIndex(self.addTab(widget, name))
 
     def changeTabName(self, value, name):
         if value in self.tabs:
@@ -186,3 +188,12 @@ class EventTabs(QTabWidget):
             cycle.deleteTimeLine(value)
         except Exception:
             print("some errors happen in delete timeLine in cycle (EventTabs.py)")
+
+    def eventCopy(self, oldValue, newValue, text):
+        self.events[newValue] = self.events[oldValue]
+        self.addNewTab(newValue, text, True)
+        try:
+            if oldValue in self.tabs:
+                self.tabs[newValue] = copy.deepcopy(self.tabs[oldValue])
+        except Exception:
+            print("some errors happen in copy event. (EventTabs.py)")
