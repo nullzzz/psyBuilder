@@ -5,6 +5,7 @@ from PyQt5.QtCore import pyqtSignal
 class StructureTree(QTreeWidget):
     itemDeleted = pyqtSignal(str)
     timeLineDeleted = pyqtSignal(str, str)
+
     def __init__(self, parent=None):
         super(StructureTree, self).__init__(parent)
 

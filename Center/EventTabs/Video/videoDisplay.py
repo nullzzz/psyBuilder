@@ -84,7 +84,6 @@ class VideoDisplay(QMainWindow):
     def apply(self):
         self.getPro()
         if self.file:
-            print(self.file)
             self.setCentralWidget(self.videoWidget)
             if QFileInfo(self.file).isFile():
                 try:

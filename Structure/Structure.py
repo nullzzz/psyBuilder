@@ -24,6 +24,8 @@ class Structure(QDockWidget):
         # 设置列数、头标签
         self.structureTree.setColumnCount(1)
         self.structureTree.setHeaderLabel("E-Object")
+        # 隐藏头标签
+        self.structureTree.setHeaderHidden(True)
 
         root = StructureItem(self.structureTree, 'TimeLine.10001')
         root.setText(0, "TimeLine")

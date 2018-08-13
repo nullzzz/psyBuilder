@@ -453,7 +453,7 @@ class DeviceInDialog(QDialog):
     def __init__(self, parent=None):
         super(DeviceInDialog, self).__init__(parent)
         self.devices_list = QListWidget()
-        self.ok_bt = QPushButton("OK")
+        self.ok_bt = QPushButton("Ok")
         self.cancel_bt = QPushButton("Cancel")
         self.setUI()
 
