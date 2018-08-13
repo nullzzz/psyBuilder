@@ -3,6 +3,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel
+
 from .videoProperty import VideoProperty
 
 
@@ -54,7 +55,7 @@ class VideoDisplay(QMainWindow):
         tool.addAction(open_pro)
 
         play_video = QAction(QIcon(".\\.\\image\\start_video"), "start", self)
-        play_video.triggered.connect(self.play_video)
+        play_video.triggered.connect(self.playVideo)
         tool.addAction(play_video)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
@@ -64,7 +65,7 @@ class VideoDisplay(QMainWindow):
         self.pro.setWindowModality(Qt.ApplicationModal)
         self.pro.show()
 
-    def play_video(self):
+    def playVideo(self):
         if self.file:
             if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
                 self.sender().setIcon(QIcon(".\\.\\image\\start_video"))
