@@ -1,10 +1,9 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QFrame, QLineEdit, QPushButton, QCheckBox, QComboBox, QSpinBox,
-                             QVBoxLayout, QHBoxLayout, QFileDialog, QDesktopWidget, QInputDialog, QGroupBox,
-                             QGridLayout, QLabel)
+                             QVBoxLayout, QHBoxLayout, QFileDialog, QDesktopWidget, QGroupBox, QGridLayout, QLabel)
 
-from ..ColorBobox import ColorListEditor
 from .imageTab2 import Tab2
 from .imageTab3 import Tab3
+from ..ColorBobox import ColorListEditor
 
 
 class ImageProperty(QWidget):
@@ -30,7 +29,7 @@ class ImageProperty(QWidget):
         self.clear_after = QComboBox()
         self.back_color = ColorListEditor()
         self.transparent = QSpinBox()
-        self.display_name = QComboBox()
+        self.screen_name = QComboBox()
         self.setGeneral()
 
         self.frame = Tab2()
@@ -44,7 +43,7 @@ class ImageProperty(QWidget):
         self.setButtons()
 
         self.setUI()
-        self.center()
+        # self.center()
 
     # 生成主界面
     def setUI(self):
@@ -63,14 +62,14 @@ class ImageProperty(QWidget):
         self.stretch_mode.addItems(["Both", "LeftRight", "UpDown"])
         # self.sck.addItems(["black", "maroon", "green", "olive"])
 
-        self.align_h.addItems(["center", "left", "right"])
-        self.align_v.addItems(["center", "left", "right"])
+        # self.align_h.addItems(["center", "left", "right"])
+        # self.align_v.addItems(["center", "left", "right"])
         self.clear_after.addItems(["Yes", "No"])
 
         self.transparent.setMaximum(100)
         self.transparent.setSuffix("%")
         self.transparent.setValue(100)
-        self.display_name.addItems(["Display"])
+        self.screen_name.addItems(["Display"])
 
         group1 = QGroupBox("")
         layout1 = QGridLayout()
@@ -108,7 +107,7 @@ class ImageProperty(QWidget):
         layout2.addWidget(QLabel("Clear After:"), 1, 0)
         layout2.addWidget(self.clear_after, 1, 1)
         layout2.addWidget(QLabel("Display Name:"), 1, 2)
-        layout2.addWidget(self.display_name, 1, 3)
+        layout2.addWidget(self.screen_name, 1, 3)
 
         group2.setLayout(layout2)
 
@@ -144,28 +143,28 @@ class ImageProperty(QWidget):
         self.move((screen.width() - size.width()) / 2,
                   (screen.height() - size.height()) / 2)
 
-    # 弹出设备选择框
-    def showDevices(self):
-        items = ("Mouse", "Keyboard")
-        item, ok = QInputDialog.getItem(
-            self, "Choose device", "Device:", items, 0, False)
-        if ok and item:
-            self.devices.addItem(item)
-        if self.devices.count():
-            self.devices_bt2.setEnabled(True)
-
-    # 移除设备
-    def removeDevices(self):
-        item = self.devices.takeItem(self.devices.currentRow())
-        if not self.devices.count():
-            self.devices_bt2.setEnabled(False)
-
-    # 选中设备改变
-    def deviceChanged(self, e):
-        if e:
-            self.device_label.setText(e.text())
-        else:
-            self.device_label.clear()
+    # # 弹出设备选择框
+    # def showDevices(self):
+    #     items = ("Mouse", "Keyboard")
+    #     item, ok = QInputDialog.getItem(
+    #         self, "Choose device", "Device:", items, 0, False)
+    #     if ok and item:
+    #         self.devices.addItem(item)
+    #     if self.devices.count():
+    #         self.devices_bt2.setEnabled(True)
+    #
+    # # 移除设备
+    # def removeDevices(self):
+    #     item = self.devices.takeItem(self.devices.currentRow())
+    #     if not self.devices.count():
+    #         self.devices_bt2.setEnabled(False)
+    #
+    # # 选中设备改变
+    # def deviceChanged(self, e):
+    #     if e:
+    #         self.device_label.setText(e.text())
+    #     else:
+    #         self.device_label.clear()
 
     def stretchChecked(self, e):
         if e == 2:

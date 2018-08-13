@@ -30,7 +30,7 @@ class Close(QWidget):
         self.setWindowTitle("Close")
         self.resize(500, 750)
         self.tip1.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
-        self.tip1.setText("log")
+        self.tip1.setText("Log")
         self.tip1.setFont(QFont("Timers", 20,  QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip2.setText("Writes information to the eye-tracker logfile")

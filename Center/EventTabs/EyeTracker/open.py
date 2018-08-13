@@ -50,7 +50,7 @@ class Open(QWidget):
         self.isFirst = True
 
     def setUI(self):
-        self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        # self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.setWindowTitle("Open")
         self.resize(500, 750)
         self.tip1.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
@@ -78,6 +78,17 @@ class Open(QWidget):
         self.SMI_receive_port_number.setMaximum(99999)
         self.tobii_glasses_ipv46_address.setText("192.168.71.50")
         self.tobii_glasses_UDP_port_number.setMaximum(99999)
+
+        self.select_tracker_type.setMaximumWidth(300)
+        self.eye_tracker_datafile.setMaximumWidth(300)
+        self.saccade_velocity_threshold.setMaximumWidth(300)
+        self.saccade_acceleration_threshold.setMaximumWidth(300)
+        self.pupil_size_mode.setMaximumWidth(300)
+        self.SMI_IP_address.setMaximumWidth(300)
+        self.SMI_send_port_number.setMaximumWidth(300)
+        self.SMI_receive_port_number.setMaximumWidth(300)
+        self.tobii_glasses_ipv46_address.setMaximumWidth(300)
+        self.tobii_glasses_UDP_port_number.setMaximumWidth(300)
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
@@ -119,6 +130,7 @@ class Open(QWidget):
         layout.addLayout(layout2)
         # layout.setContentsMargins(30, 50, 30, 0)
         self.setLayout(layout)
+        self.select_tracker_type.setCurrentIndex(1)
 
     def ok(self):
         self.apply()
@@ -133,6 +145,7 @@ class Open(QWidget):
         self.propertiesChanged.emit(self.getProperties())
 
     def typeChanged(self, index):
+        print(index)
         self.hideAll()
         if index == 2:
             self.force_drift_correction.show()

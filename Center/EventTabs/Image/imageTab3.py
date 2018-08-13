@@ -171,6 +171,7 @@ class DeviceInItem(QListWidgetItem):
                 "No resp": self.ignore.text(),
                 "Output device": self.resp_trigger_out
             }
+
     # 我特么地还不会判断信号的sender
     def findVar1(self):
         value = self.allowable.text()
@@ -237,8 +238,9 @@ class Tab3(QWidget):
     def __init__(self, parent=None):
         super(Tab3, self).__init__(parent)
         self.attributes = []
-        # up
+        # top
         self.duration = QComboBox()
+
         self.out_stack = QStackedWidget()
         self.out_stack.setStyleSheet("{border: 2px; background-color: white}")
         self.out_devices = QListWidget()
@@ -250,9 +252,9 @@ class Tab3(QWidget):
         self.out_del_bt.setEnabled(False)
         self.out_tip = QLabel("Add output device(s) first")
         self.out_tip.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.outDevices = DeviceOutDialog()
-        self.outDevices.ok_bt.clicked.connect(self.selectOut)
-        self.outDevices.cancel_bt.clicked.connect(self.outDevices.close)
+        self.out_devices_dialog = DeviceOutDialog()
+        self.out_devices_dialog.ok_bt.clicked.connect(self.selectOut)
+        self.out_devices_dialog.cancel_bt.clicked.connect(self.out_devices_dialog.close)
         # down
         self.in_stack1 = QStackedWidget()
         self.in_stack2 = QStackedWidget()
@@ -264,9 +266,9 @@ class Tab3(QWidget):
         self.in_devices.currentItemChanged.connect(self.deviceInChanged)
         self.in_add_bt = QPushButton("&Add...")
         self.in_del_bt = QPushButton("&Remove...")
-        self.inDevices = DeviceInDialog()
-        self.inDevices.ok_bt.clicked.connect(self.selectIn)
-        self.inDevices.cancel_bt.clicked.connect(self.inDevices.close)
+        self.in_devices_dialog = DeviceInDialog()
+        self.in_devices_dialog.ok_bt.clicked.connect(self.selectIn)
+        self.in_devices_dialog.cancel_bt.clicked.connect(self.in_devices_dialog.close)
         # bottom
         self.allowable = QLineEdit()
         self.correct = QLineEdit()
@@ -275,7 +277,7 @@ class Tab3(QWidget):
         self.device_label = QLabel("——")
         self.setUI()
 
-    # 生成action页面
+    # 生成duration页面
     def setUI(self):
         group0 = QGroupBox()
         self.duration.addItems(
@@ -328,12 +330,12 @@ class Tab3(QWidget):
 
     # 弹出输入设备选择框
     def showInDevices(self):
-        self.inDevices.setWindowModality(Qt.ApplicationModal)
-        self.inDevices.show()
+        self.in_devices_dialog.setWindowModality(Qt.ApplicationModal)
+        self.in_devices_dialog.show()
 
     # 添加输入设备
     def selectIn(self, e):
-        temp = self.inDevices.devices_list.currentItem()
+        temp = self.in_devices_dialog.devices_list.currentItem()
         device_name = temp.text()
         if self.in_devices.count() == 0:
             self.in_tip1.hide()
@@ -350,16 +352,16 @@ class Tab3(QWidget):
         self.in_stack2.addWidget(item.pro2)
         if self.in_devices.count():
             self.in_del_bt.setEnabled(True)
-        self.inDevices.close()
+        self.in_devices_dialog.close()
 
     # 弹出输出设备选择框
     def showOutDevices(self):
-        self.outDevices.setWindowModality(Qt.ApplicationModal)
-        self.outDevices.show()
+        self.out_devices_dialog.setWindowModality(Qt.ApplicationModal)
+        self.out_devices_dialog.show()
 
     # 添加输出设备
     def selectOut(self, e):
-        temp = self.outDevices.devices_list.currentItem()
+        temp = self.out_devices_dialog.devices_list.currentItem()
         device_name = temp.text()
         if self.out_devices.count() == 0:
             self.out_tip.hide()
@@ -373,7 +375,7 @@ class Tab3(QWidget):
         self.out_stack.addWidget(item.pro)
         if self.out_devices.count():
             self.out_del_bt.setEnabled(True)
-        self.outDevices.close()
+        self.out_devices_dialog.close()
         self.getInfo()
 
     # 移除输入设备
@@ -418,17 +420,13 @@ class Tab3(QWidget):
             index = self.out_devices.row(e)
             self.out_stack.setCurrentIndex(index)
 
-    # 从菜单栏添加待选设备
-    def add_devices(self, devices):
-        pass
-
     # 设置可选参数
-    def set_attributes(self, attributes):
+    def setAttributes(self, attributes):
         self.attributes = attributes
         for i in range(self.in_devices.count()):
-            self.in_devices.item(i).set_attributes(attributes)
+            self.in_devices.item(i).setAttributes(attributes)
         for i in range(self.out_devices.count()):
-            self.out_devices.item(i).set_attributes(attributes)
+            self.out_devices.item(i).setAttributes(attributes)
 
     # 返回参数
     def getInfo(self):
@@ -483,9 +481,14 @@ class DeviceInDialog(QDialog):
         layout.addWidget(self.cancel_bt, 1, 3, 1, 1)
         self.setLayout(layout)
 
-    # TODO:从菜单栏添加待选设备
-    def add_devices(self, devices):
-        pass
+    # 从菜单栏添加待选设备
+    # devices: list or tuple
+    # 图片名与设备名相同
+    def addDevices(self, devices):
+        for device in devices:
+            item = QListWidgetItem(device)
+            item.setIcon(QIcon(".\\.\\image\\{}".format(device)))
+            self.devices_list.addItem(item)
 
 
 # 重写输出设备选择弹窗
@@ -522,3 +525,12 @@ class DeviceOutDialog(QDialog):
         layout.addWidget(self.ok_bt, 1, 2, 1, 1)
         layout.addWidget(self.cancel_bt, 1, 3, 1, 1)
         self.setLayout(layout)
+
+    # 从菜单栏添加待选设备
+    # devices: list or tuple
+    # 图片名与设备名相同
+    def addDevices(self, devices):
+        for device in devices:
+            item = QListWidgetItem(device)
+            item.setIcon(QIcon(".\\.\\image\\{}".format(device)))
+            self.devices_list.addItem(item)

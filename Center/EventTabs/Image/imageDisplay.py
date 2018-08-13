@@ -1,7 +1,7 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
-from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel, QApplication
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel
 
 from .imageProperty import ImageProperty
 from .view import Preview
@@ -41,21 +41,21 @@ class ImageDisplay(QMainWindow):
 
         tool = QToolBar()
         open_pro = QAction(QIcon(".\\.\\image\\setting"), "open", self)
-        open_pro.triggered.connect(self.open_pro)
+        open_pro.triggered.connect(self.openPro)
         pre_view = QAction(QIcon(".\\.\\image\\preview"), "view", self)
-        pre_view.triggered.connect(self.pre_view)
+        pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
         tool.addAction(pre_view)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
-    def open_pro(self):
+    def openPro(self):
         # 阻塞原窗口
         self.pro.setWindowModality(Qt.ApplicationModal)
         self.pro.show()
 
     # 预览图片
-    def pre_view(self):
+    def preView(self):
         if self.file:
             try:
                 self.preview = Preview(self.file, self.pix, self.x_pos, self.y_pos, self.w_size, self.h_size)
@@ -133,7 +133,7 @@ class ImageDisplay(QMainWindow):
         align_h = self.pro.align_h.currentText()
         align_v = self.pro.align_v.currentText()
         clear_after = self.pro.clear_after.currentText()
-        display_name = self.pro.display_name.currentText()
+        display_name = self.pro.screen_name.currentText()
 
         border_color = self.pro.frame.border_color.currentText()
         border_width = self.pro.frame.border_width.value()
@@ -166,3 +166,14 @@ class ImageDisplay(QMainWindow):
             "In devices": in_device
         }
 
+    def setDevices(self, in_devices, out_devices):
+        self.setInDevices(in_devices)
+        self.setOutDevices(out_devices)
+
+    # 设置输出设备
+    def setOutDevices(self, devices):
+        self.pro.duration.out_devices_dialog.addDevices(devices)
+
+    # 设置输入设备
+    def setInDevices(self, devices):
+        self.pro.duration.in_devices_dialog.addDevices(devices)
