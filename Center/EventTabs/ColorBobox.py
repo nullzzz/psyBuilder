@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QRegExp, Qt
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QColorDialog
 from PyQt5.QtWidgets import QComboBox
@@ -26,6 +26,7 @@ class ColorListEditor(QComboBox):
             self.insertItem(i, colorName)
             self.setItemData(i, color, Qt.DecorationRole)
         self.insertItem(0, "More...", Qt.DecorationRole)
+        self.setItemIcon(0, QIcon(".\\.\\image\more_color.png"))
 
     def changeColor(self, e):
         if e:
