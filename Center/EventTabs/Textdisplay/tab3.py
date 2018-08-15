@@ -1,138 +1,63 @@
-import sys
-
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QWidget, QComboBox, QStackedWidget, QListWidget, QPushButton, QLabel, QLineEdit, \
+    QGroupBox, \
+    QHBoxLayout, QGridLayout, QVBoxLayout
 
-
-# 重写上方输出设备list widget的item
-class DeviceOutItem(QListWidgetItem):
-    def __init__(self, parent=None):
-        super(DeviceOutItem, self).__init__(parent)
-        self.pro = QWidget()
-
-        self.value = QComboBox()
-        self.value.setEditable(True)
-        self.tri_dur = QComboBox()
-        self.tri_dur.setEditable(True)
-        self.tri_dur.addItem("End of Duration")
-        self.setPro()
-
-    def setPro(self):
-        layout = QFormLayout()
-        layout.addRow("Value:", self.value)
-        layout.addRow("Pulse Dur:", self.tri_dur)
-        layout.setLabelAlignment(Qt.AlignRight)
-        layout.setVerticalSpacing(40)
-        # 左、上、右、下
-        layout.setContentsMargins(10, 40, 10, 0)
-        self.pro.setLayout(layout)
-
-
-# 下部list widget的item重写
-class DeviceInItem(QListWidgetItem):
-    def __init__(self, text=None, parent=None):
-        super(DeviceInItem, self).__init__(text, parent)
-        self.pro1 = QWidget()
-        self.device_label = QLabel(text)
-        self.allowable = QLineEdit()
-        self.correct = QLineEdit()
-        self.RT_window = QComboBox()
-        self.RT_window.addItems(["(same as action)",
-                                 "(until feedback)",
-                                 "(end of proc)",
-                                 "(infinite)",
-                                 "1000",
-                                 "2000",
-                                 "3000",
-                                 "4000",
-                                 "5000"])
-        self.end_action = QComboBox()
-
-        self.pro2 = QWidget()
-        self.device = QComboBox()
-        self.right = QLineEdit()
-        self.wrong = QLineEdit()
-        self.ignore = QLineEdit()
-        self.setPro()
-
-    def setPro(self):
-        layout1 = QFormLayout()
-        layout1.addRow("Response:", self.device_label)
-        layout1.addRow("Allowable:", self.allowable)
-        layout1.addRow("Correct:", self.correct)
-        layout1.addRow("RT window:", self.RT_window)
-        layout1.addRow("End action:", self.end_action)
-        layout1.setLabelAlignment(Qt.AlignRight)
-        layout1.setVerticalSpacing(20)
-        layout1.setContentsMargins(10, 0, 0, 0)
-        self.pro1.setLayout(layout1)
-
-        layout2 = QGridLayout()
-        layout2.addWidget(QLabel("Resp Trigger"), 0, 0, 1, 2)
-        layout2.addWidget(QLabel("Right:"), 1, 0)
-        layout2.addWidget(self.right, 1, 1)
-        layout2.addWidget(QLabel("Wrong:"), 1, 2)
-        layout2.addWidget(self.wrong, 1, 3)
-        layout2.addWidget(QLabel("No resp:"), 1, 4)
-        layout2.addWidget(self.ignore, 1, 5)
-        self.pro2.setLayout(layout2)
+from Center.EventTabs.deviceItem import DeviceOutItem, DeviceInItem
+from ..deviceChooseDialog import DeviceOutDialog, DeviceInDialog
 
 
 class Tab3(QWidget):
     def __init__(self, parent=None):
         super(Tab3, self).__init__(parent)
-        # action
-        # up
+        self.attributes = []
+        # top
         self.duration = QComboBox()
+
         self.out_stack = QStackedWidget()
         self.out_stack.setStyleSheet("{border: 2px; background-color: white}")
-        self.up_list = QListWidget()
-        self.up_list.currentItemChanged.connect(self.deviceOutChanged)
-        self.up_add_bt1 = QPushButton("+")
-        self.up_add_bt1.clicked.connect(self.showOutDevices)
-        self.up_del_bt2 = QPushButton("-")
-        self.up_del_bt2.clicked.connect(self.removeOutDevices)
-        self.up_del_bt2.setEnabled(False)
-        self.up_tip = QLabel("Add output device(s) first")
-        self.up_tip.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-
+        self.out_devices = QListWidget()
+        self.out_devices.currentItemChanged.connect(self.deviceOutChanged)
+        self.out_add_bt = QPushButton("+")
+        self.out_add_bt.clicked.connect(self.showOutDevices)
+        self.out_del_bt = QPushButton("-")
+        self.out_del_bt.clicked.connect(self.removeOutDevices)
+        self.out_del_bt.setEnabled(False)
+        self.out_tip = QLabel("Add output device(s) first")
+        self.out_tip.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.out_devices_dialog = DeviceOutDialog()
+        self.out_devices_dialog.ok_bt.clicked.connect(self.selectOut)
+        self.out_devices_dialog.cancel_bt.clicked.connect(self.out_devices_dialog.close)
         # down
         self.in_stack1 = QStackedWidget()
         self.in_stack2 = QStackedWidget()
-        self.down_tip = QLabel("Add input device(s) first")
-        self.down_tip2 = QLabel("Resp Trigger:")
-        self.down_tip.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.down_tip2.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.devices = QListWidget()
-        self.devices.currentItemChanged.connect(self.deviceInChanged)
-        self.devices_bt1 = QPushButton("&Add...")
-        self.devices_bt2 = QPushButton("&Remove...")
-
+        self.in_tip1 = QLabel("Add input device(s) first")
+        self.in_tip2 = QLabel("Resp Trigger:")
+        self.in_tip1.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.in_tip2.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.in_devices = QListWidget()
+        self.in_devices.currentItemChanged.connect(self.deviceInChanged)
+        self.in_add_bt = QPushButton("&Add...")
+        self.in_del_bt = QPushButton("&Remove...")
+        self.in_devices_dialog = DeviceInDialog()
+        self.in_devices_dialog.ok_bt.clicked.connect(self.selectIn)
+        self.in_devices_dialog.cancel_bt.clicked.connect(self.in_devices_dialog.close)
+        # bottom
         self.allowable = QLineEdit()
         self.correct = QLineEdit()
         self.RT_window = QComboBox()
         self.end_action = QComboBox()
         self.device_label = QLabel("——")
-        self.setAction()
+        self.setUI()
 
-        a = """
-        QPushButton:hover{
-        border: 4px solid forestgreen;
-        border-radius: 10px;
-        padding: 2px;
-        background-color: beige;
-        }
-        """
-        self.setStyleSheet(a)
-
-    # 生成action页面
-    def setAction(self):
+    # 生成duration页面
+    def setUI(self):
         group0 = QGroupBox()
-        self.duration.addItems(
-            ["(infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"])
+        self.duration.addItems(["(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"])
         self.duration.setEditable(True)
+
         layout0 = QHBoxLayout()
-        layout0.addWidget(QLabel("Duration"), 1)
+        layout0.addWidget(QLabel("Duration(ms):"), 1)
         layout0.addWidget(self.duration, 4)
         group0.setLayout(layout0)
 
@@ -140,35 +65,32 @@ class Tab3(QWidget):
         layout1 = QGridLayout()
         layout1.addWidget(QLabel("Output Devices"), 0, 0, 1, 2)
         layout1.addWidget(QLabel("Trigger Info"), 0, 2, 1, 1)
-        layout1.addWidget(self.up_list, 1, 0, 2, 2)
-        layout1.addWidget(self.up_add_bt1, 3, 0, 1, 1)
-        layout1.addWidget(self.up_del_bt2, 3, 1, 1, 1)
+        layout1.addWidget(self.out_devices, 1, 0, 2, 2)
+        layout1.addWidget(self.out_add_bt, 3, 0, 1, 1)
+        layout1.addWidget(self.out_del_bt, 3, 1, 1, 1)
         layout1.addWidget(QListWidget(), 1, 2, 3, 2)
-        layout1.addWidget(self.up_tip, 1, 2, 2, 2)
+        layout1.addWidget(self.out_tip, 1, 2, 2, 2)
         layout1.addWidget(self.out_stack, 1, 2, 2, 2)
         layout1.setVerticalSpacing(0)
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("Input Masks")
+        group2 = QGroupBox("Input Devices")
         layout2 = QGridLayout()
-        self.devices_bt1.clicked.connect(self.showInDevices)
-        self.devices_bt2.setEnabled(False)
-        self.devices_bt2.clicked.connect(self.removeInDevices)
+        self.in_add_bt.clicked.connect(self.showInDevices)
+        self.in_del_bt.setEnabled(False)
+        self.in_del_bt.clicked.connect(self.removeInDevices)
 
-        self.end_action.addItems(["(none)", "Terminate"])
-        self.devices.setStyleSheet("background-color: white;")
+        self.end_action.addItems(["(None)", "Terminate"])
+        self.in_devices.setStyleSheet("background-color: white;")
         layout2.addWidget(QLabel("Device(s)"), 0, 0, 1, 1)
-        layout2.addWidget(self.devices, 1, 0, 3, 2)
-        layout2.addWidget(self.devices_bt1, 4, 0, 1, 1)
-        layout2.addWidget(self.devices_bt2, 4, 1, 1, 1)
-        # layout2.addWidget(QListWidget(), 1, 2, 5, 2)
-        layout2.addWidget(self.down_tip, 1, 2, 5, 2)
+        layout2.addWidget(self.in_devices, 1, 0, 3, 2)
+        layout2.addWidget(self.in_add_bt, 4, 0, 1, 1)
+        layout2.addWidget(self.in_del_bt, 4, 1, 1, 1)
+        layout2.addWidget(self.in_tip1, 1, 2, 5, 2)
 
         layout2.addWidget(self.in_stack1, 0, 2, 5, 2)
-        layout2.addWidget(self.down_tip2, 5, 0, 2, 4)
+        layout2.addWidget(self.in_tip2, 5, 0, 2, 4)
         layout2.addWidget(self.in_stack2, 5, 0, 2, 4)
-        # self.in_stack1.setStyleSheet("background-color: black;")
-        # self.in_stack2.setStyleSheet("background-color: black;")
 
         layout2.setVerticalSpacing(0)
         group2.setLayout(layout2)
@@ -181,84 +103,114 @@ class Tab3(QWidget):
 
     # 弹出输入设备选择框
     def showInDevices(self):
-        items = ("Mouse", "Keyboard")
-        text, ok = QInputDialog.getItem(
-            self, "Choose device", "Device:", items, 0, False)
-        if ok and text:
-            if self.devices.count() == 0:
-                self.down_tip.hide()
-                self.down_tip2.hide()
-            item = DeviceInItem(text)
-            self.devices.addItem(item)
-            self.in_stack1.addWidget(item.pro1)
-            self.in_stack2.addWidget(item.pro2)
-        if self.devices.count():
-            self.devices_bt2.setEnabled(True)
+        self.in_devices_dialog.setWindowModality(Qt.ApplicationModal)
+        self.in_devices_dialog.show()
 
+    # 添加输入设备
+    def selectIn(self, e):
+        temp = self.in_devices_dialog.devices_list.currentItem()
+        device_name = temp.text()
+        if self.in_devices.count() == 0:
+            self.in_tip1.hide()
+            self.in_tip2.hide()
+        item = DeviceInItem(device_name)
+        self.in_devices.addItem(item)
+        for i in range(self.out_devices.count()):
+            name = self.out_devices.item(i).name
+            self.in_devices.item(self.in_devices.count() - 1).resp_trigger_out.addItem(name)
+        self.in_stack1.addWidget(item.pro1)
+        self.in_stack2.addWidget(item.pro2)
+        if self.in_devices.count():
+            self.in_del_bt.setEnabled(True)
+        self.in_devices_dialog.close()
+
+    # 弹出输出设备选择框
     def showOutDevices(self):
-        items = ("Mouse", "Keyboard")
-        text, ok = QInputDialog.getItem(
-            self, "Choose device", "Device:", items, 0, False)
-        if ok and text:
-            if self.up_list.count() < 4:
-                print(self.up_list.count())
-                if self.up_list.count() == 0:
-                    self.up_tip.hide()
-                    print("remove")
-                item = DeviceOutItem(text)
-                self.up_list.addItem(item)
-                self.out_stack.addWidget(item.pro)
-                if self.up_list.count() == 4:
-                    self.up_add_bt1.setEnabled(False)
-        if self.up_list.count():
-            self.up_del_bt2.setEnabled(True)
+        self.out_devices_dialog.setWindowModality(Qt.ApplicationModal)
+        self.out_devices_dialog.show()
+
+    # 添加输出设备
+    def selectOut(self, e):
+        temp = self.out_devices_dialog.devices_list.currentItem()
+        device_name = temp.text()
+        if self.out_devices.count() == 0:
+            self.out_tip.hide()
+        item = DeviceOutItem(device_name)
+        self.out_devices.addItem(item)
+        for i in range(self.in_devices.count()):
+            try:
+                self.in_devices.item(i).resp_trigger_out.addItem(device_name)
+            except Exception as e:
+                print(e)
+        self.out_stack.addWidget(item.pro)
+        if self.out_devices.count():
+            self.out_del_bt.setEnabled(True)
+        self.out_devices_dialog.close()
+        self.getInfo()
 
     # 移除输入设备
     def removeInDevices(self):
-        index = self.devices.currentRow()
+        index = self.in_devices.currentRow()
         if index != -1:
-            item = self.devices.takeItem(index)
+            item = self.in_devices.takeItem(index)
             self.in_stack1.removeWidget(item.pro1)
             self.in_stack2.removeWidget(item.pro2)
-            if not self.devices.count():
-                self.devices_bt2.setEnabled(False)
-                self.down_tip.show()
-                self.down_tip2.show()
+            if not self.in_devices.count():
+                self.in_del_bt.setEnabled(False)
+                self.in_tip1.show()
+                self.in_tip2.show()
 
     # 移除输出设备
     def removeOutDevices(self):
-        index = self.up_list.currentRow()
+        index = self.out_devices.currentRow()
         if index != -1:
-            item = self.up_list.takeItem(index)
+            item = self.out_devices.takeItem(index)
             self.out_stack.removeWidget(item.pro)
-            if self.up_list.count() == 0:
-                self.up_del_bt2.setEnabled(False)
-                self.up_tip.show()
-            elif self.up_list.count() < 4:
-                self.up_add_bt1.setEnabled(True)
+            for i in range(self.in_devices.count()):
+                try:
+                    self.in_devices.item(i).resp_trigger_out.removeItem(index)
+                except Exception as e:
+                    print(e)
+            if self.out_devices.count() == 0:
+                self.out_del_bt.setEnabled(False)
+                self.out_tip.show()
+            elif self.out_devices.count() < 4:
+                self.out_add_bt.setEnabled(True)
 
-    # 选中设备改变
+    # 选中输入设备改变
     def deviceInChanged(self, e):
         if e:
-            index = self.devices.row(e)
+            index = self.in_devices.row(e)
             self.in_stack1.setCurrentIndex(index)
             self.in_stack2.setCurrentIndex(index)
 
-    # 选择输出设备改变
-
+    # 选中输出设备改变
     def deviceOutChanged(self, e):
         if e:
-            index = self.up_list.row(e)
+            index = self.out_devices.row(e)
             self.out_stack.setCurrentIndex(index)
 
-# TODO：重写设备选择弹窗
+    # 设置可选参数
+    def setAttributes(self, attributes):
+        self.attributes = attributes
+        for i in range(self.in_devices.count()):
+            self.in_devices.item(i).setAttributes(attributes)
+        for i in range(self.out_devices.count()):
+            self.out_devices.item(i).setAttributes(attributes)
 
+    # 返回参数
+    def getInfo(self):
+        in_info = {}
+        out_info = {}
+        for i in range(self.in_devices.count()):
+            key = self.in_devices.item(i).text()
+            if key in in_info.keys():
+                key += "_another"
+            in_info[key] = self.in_devices.item(i).getInfo()
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-
-    t = Tab3()
-
-    t.show()
-
-    sys.exit(app.exec())
+        for i in range(self.out_devices.count()):
+            key = self.out_devices.item(i).text()
+            if key in out_info.keys():
+                key += "_another"
+            out_info[key] = self.out_devices.item(i).getInfo()
+        return in_info, out_info
