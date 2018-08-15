@@ -127,7 +127,7 @@ class DeviceInItem(QListWidgetItem):
             layout1.addRow("Correct:", self.correct)
             layout1.addRow("RT window:", self.RT_window)
             layout1.addRow("End action:", self.end_action)
-            layout1.setLabelAlignment(Qt.AlignRight)
+            layout1.setLabelAlignment(Qt.AlignRight | Qt.AlignVCenter)
         else:
             layout1 = QGridLayout()
             l1 = QLabel("Response:")

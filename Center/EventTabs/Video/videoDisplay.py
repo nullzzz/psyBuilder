@@ -50,7 +50,7 @@ class VideoDisplay(QMainWindow):
         self.setCentralWidget(self.label)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(".\\.\\image\\setting"), "open", self)
+        open_pro = QAction(QIcon(".\\.\\image\\setting"), "setting", self)
         open_pro.triggered.connect(self.open_pro)
         tool.addAction(open_pro)
 

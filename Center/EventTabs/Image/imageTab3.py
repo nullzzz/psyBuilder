@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import QWidget, QComboBox, QStackedWidget, QListWidget, QPu
     QGroupBox, \
     QHBoxLayout, QGridLayout, QVBoxLayout
 
-from .deviceChooseDialog import DeviceOutDialog, DeviceInDialog
-from .deviceItem import DeviceOutItem, DeviceInItem
+from Center.EventTabs.deviceItem import DeviceOutItem, DeviceInItem
+from ..deviceChooseDialog import DeviceOutDialog, DeviceInDialog
 
 
 class Tab3(QWidget):
@@ -56,6 +56,7 @@ class Tab3(QWidget):
         self.duration.addItems(
             ["(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"])
         self.duration.setEditable(True)
+
         layout0 = QHBoxLayout()
         layout0.addWidget(QLabel("Duration(ms):"), 1)
         layout0.addWidget(self.duration, 4)
@@ -116,11 +117,8 @@ class Tab3(QWidget):
         item = DeviceInItem(device_name)
         self.in_devices.addItem(item)
         for i in range(self.out_devices.count()):
-            try:
-                name = self.out_devices.item(i).name
-                self.in_devices.item(self.in_devices.count() - 1).resp_trigger_out.addItem(name)
-            except Exception as e:
-                print(e)
+            name = self.out_devices.item(i).name
+            self.in_devices.item(self.in_devices.count() - 1).resp_trigger_out.addItem(name)
         self.in_stack1.addWidget(item.pro1)
         self.in_stack2.addWidget(item.pro2)
         if self.in_devices.count():

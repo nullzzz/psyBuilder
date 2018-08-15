@@ -35,10 +35,10 @@ class ColorListEditor(QComboBox):
                 self.setStyleSheet("background: white;")
                 color_rgb = QColorDialog.getColor(Qt.white, self)
                 if color_rgb.isValid():
-                    colorName = color_rgb.name()
+                    color_name = color_rgb.name()
                     try:
-                        self.setStyleSheet("background: {}".format(colorName))
-                        self.insertItem(1, colorName)
+                        self.setStyleSheet("background: {}".format(color_name))
+                        self.insertItem(1, color_name)
                         self.setItemData(1, color_rgb, Qt.DecorationRole)
                         self.setCurrentIndex(1)
                     except Exception as e:
@@ -81,6 +81,3 @@ class ColorListEditor(QComboBox):
         else:
             self.setStyleSheet("background: {};".format(color))
         QComboBox.hidePopup(self)
-
-
-

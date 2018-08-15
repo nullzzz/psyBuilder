@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout, QApplication
+from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
 from .VideoTab3 import VideoTab3
 from .videoTab1 import VideoTab1
@@ -19,7 +19,7 @@ class VideoProperty(QWidget):
 
         self.tab.addTab(self.tab1, "general")
         self.tab.addTab(self.tab2, "frame")
-        self.tab.addTab(self.tab3, "action")
+        self.tab.addTab(self.tab3, "duration")
         self.setButtons()
         self.setUI()
 
@@ -27,17 +27,17 @@ class VideoProperty(QWidget):
     def setUI(self):
         self.setWindowTitle("Video property")
         self.resize(600, 800)
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(self.tab, 6)
-        mainLayout.addWidget(self.below, 1)
-        mainLayout.setSpacing(0)
-        self.setLayout(mainLayout)
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.tab, 6)
+        main_layout.addWidget(self.below, 1)
+        main_layout.setSpacing(0)
+        self.setLayout(main_layout)
 
     def setButtons(self):
-        belowLayout = QHBoxLayout()
-        belowLayout.addStretch(10)
-        belowLayout.addWidget(self.ok_bt, 1)
-        belowLayout.addWidget(self.cancel_bt, 1)
-        belowLayout.addWidget(self.apply_bt, 1)
-        belowLayout.setContentsMargins(0, 0, 0, 0)
-        self.below.setLayout(belowLayout)
+        below_layout = QHBoxLayout()
+        below_layout.addStretch(10)
+        below_layout.addWidget(self.ok_bt, 1)
+        below_layout.addWidget(self.cancel_bt, 1)
+        below_layout.addWidget(self.apply_bt, 1)
+        below_layout.setContentsMargins(0, 0, 0, 0)
+        self.below.setLayout(below_layout)

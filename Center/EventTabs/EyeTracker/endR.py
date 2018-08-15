@@ -1,7 +1,7 @@
 import sys
 
-from PyQt5.QtGui import QFont
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout
 
 
@@ -34,7 +34,7 @@ class EndR(QWidget):
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip2.setText("Ends recording of eye tracking data")
         # self.tip2.setFocusPolicy(Qt.NoFocus)
-
+        self.statue_msg.setMaximumWidth(300)
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)

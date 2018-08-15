@@ -1,8 +1,7 @@
 import sys
 
-from PyQt5.QtGui import QFont
-
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout
 
 
@@ -33,7 +32,7 @@ class StartR(QWidget):
         self.tip1.setFont(QFont("Timers", 20,  QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip2.setText("Start recording of eye tracking data")
-
+        self.statue_msg.setMaximumWidth(300)
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
         layout1.addWidget(self.tip2, 1, 0, 1, 4)

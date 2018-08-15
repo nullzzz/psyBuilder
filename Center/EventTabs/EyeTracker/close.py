@@ -70,10 +70,9 @@ class Close(QWidget):
 
     def getProperties(self):
         pause = self.pause_between_msg.value()
-        isAuto = self.automatically_log_all_variables.checkState()
+        is_auto = self.automatically_log_all_variables.checkState()
         text = self.log_msg.toPlainText()
         return {
-            "Pause between message": "{}ms".format(pause),
-            "Automatically log all variables": bool(isAuto),
+            "Pause between message": "{}ms".format(pause), "Automatically log all variables": bool(is_auto),
             "log message": text
         }
