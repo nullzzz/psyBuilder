@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 from PyQt5.QtCore import Qt
-from NoDashDelegate import NoDashDelegate
+from noDash import NoDash
 
 
 class PropertiesTable(QTableWidget):
@@ -10,7 +10,7 @@ class PropertiesTable(QTableWidget):
         # 美化
         self.horizontalHeader().setVisible(False)
         self.verticalHeader().setVisible(False)
-        self.setItemDelegate(NoDashDelegate())
+        self.setItemDelegate(NoDash())
         self.horizontalHeader().setStretchLastSection(True)
 
         # 两列
@@ -19,14 +19,15 @@ class PropertiesTable(QTableWidget):
     def addProperty(self, name, property):
         self.insertRow(self.rowCount())
 
-        nameItem = QTableWidgetItem(name)
-        nameItem.setTextAlignment(Qt.AlignCenter)
-        nameItem.setFlags(Qt.ItemIsEditable)
-        nameItem.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        propertyItem = QTableWidgetItem(property)
-        propertyItem.setTextAlignment(Qt.AlignCenter)
-        propertyItem.setFlags(Qt.ItemIsEditable)
-        propertyItem.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        name_item = QTableWidgetItem(name)
+        name_item.setTextAlignment(Qt.AlignCenter)
+        name_item.setFlags(Qt.ItemIsEditable)
+        name_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
-        self.setItem(self.rowCount() - 1, 0, nameItem)
-        self.setItem(self.rowCount() - 1, 1, propertyItem)
+        property_item = QTableWidgetItem(property)
+        property_item.setTextAlignment(Qt.AlignCenter)
+        property_item.setFlags(Qt.ItemIsEditable)
+        property_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+        self.setItem(self.rowCount() - 1, 0, name_item)
+        self.setItem(self.rowCount() - 1, 1, property_item)

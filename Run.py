@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication
-from Main.Main import MainWindow
+from main.main import MainWindow
 import sys
 
 tabBar = """
@@ -9,32 +9,32 @@ tabBar = """
         left: 5px; /* move to the right by 5px */
         border-radius: 3px;
     }
-     
+
     QTabBar:focus
     {
         border: 0px transparent black;
     }
-    
-    QTabWidget::tab-bar {
+
+    QTabWidget::iconTabs-bar {
         text-align: left;
     }
-    
-    QTabBar::tab{
+
+    QTabBar::iconTabs{
         min-height: 30px; 
         min-width: 100px;
     }
-     
+
     QTabBar::close-button  {
         image: url(image/close.png);
         background: transparent;
     }
-     
+
     QTabBar::close-button:hover
     {
         image: url(image/close-hover.png);
         background: transparent;
     }
-     
+
     QTabBar::close-button:pressed {
         image: url(image/close-pressed.png);
         background: transparent;
@@ -47,27 +47,27 @@ dockWidget = """
         titlebar-close-icon: url(image/close.png);
         titlebar-normal-icon: url(image/undock.png);
     }
-     
+
     QDockWidget::close-button, QDockWidget::float-button {
         border: 1px solid transparent;
         border-radius: 2px;
         background: transparent;
     }
-     
+
     QDockWidget::close-button:hover {
         image: url(image/close-hover.png);
         background: transparent;
     }
-    
+
     QDockWidget::float-button:hover {
         background: rgba(255, 255, 255, 10);
     }
-     
+
     QDockWidget::close-button:pressed {
         image: url(image/close-pressed.png);
         background: transparent;
     }
-    
+
     QDockWidget::float-button:pressed {
         padding: 1px -1px -1px 1px;
         background: rgba(255, 255, 255, 10);
@@ -82,7 +82,7 @@ mainWindow = """
         spacing: 2px;
         border: 1px  #76797C;
     }
-     
+
     QMainWindow::separator:hover
     {
         background-color: #787876;
@@ -91,7 +91,7 @@ mainWindow = """
         border: 1px solid #76797C;
         spacing: 2px;
     }
-     
+
     QMenu::separator
     {
         height: 1px;
@@ -111,14 +111,14 @@ scrollBar = """
         border-radius: 4px;
         background-color: lightGray;
     }
-     
+
     QScrollBar::handle:horizontal
     {
         background-color: Gray;
         min-width: 5px;
         border-radius: 4px;
     }
-     
+
     QScrollBar::add-line:horizontal
     {
         margin: 0px 3px 0px 3px;
@@ -128,7 +128,7 @@ scrollBar = """
         subcontrol-position: right;
         subcontrol-origin: margin;
     }
-     
+
     QScrollBar::sub-line:horizontal
     {
         margin: 0px 3px 0px 3px;
@@ -138,7 +138,7 @@ scrollBar = """
         subcontrol-position: left;
         subcontrol-origin: margin;
     }
-     
+
     QScrollBar::add-line:horizontal:hover,QScrollBar::add-line:horizontal:on
     {
         border-image: url(image/right_arrow.png);
@@ -147,8 +147,8 @@ scrollBar = """
         subcontrol-position: right;
         subcontrol-origin: margin;
     }
-     
-     
+
+
     QScrollBar::sub-line:horizontal:hover, QScrollBar::sub-line:horizontal:on
     {
         border-image: url(image/left_arrow.png);
@@ -157,18 +157,18 @@ scrollBar = """
         subcontrol-position: left;
         subcontrol-origin: margin;
     }
-     
+
     QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal
     {
         background: none;
     }
-     
-     
+
+
     QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
     {
         background: none;
     }
-     
+
     QScrollBar:vertical
     {
         background-color: lightGray;
@@ -177,14 +177,14 @@ scrollBar = """
         border: 1px transparent #2A2929;
         border-radius: 4px;
     }
-     
+
     QScrollBar::handle:vertical
     {
         background-color: gray;
         min-height: 5px;
         border-radius: 4px;
     }
-     
+
     QScrollBar::sub-line:vertical
     {
         margin: 3px 0px 3px 0px;
@@ -194,7 +194,7 @@ scrollBar = """
         subcontrol-position: top;
         subcontrol-origin: margin;
     }
-     
+
     QScrollBar::add-line:vertical
     {
         margin: 3px 0px 3px 0px;
@@ -204,18 +204,18 @@ scrollBar = """
         subcontrol-position: bottom;
         subcontrol-origin: margin;
     }
-     
+
     QScrollBar::sub-line:vertical:hover,QScrollBar::sub-line:vertical:on
     {
-     
+
         border-image: url(image/up_arrow.png);
         height: 10px;
         width: 10px;
         subcontrol-position: top;
         subcontrol-origin: margin;
     }
-     
-     
+
+
     QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on
     {
         border-image: url(image/down_arrow.png);
@@ -224,12 +224,12 @@ scrollBar = """
         subcontrol-position: bottom;
         subcontrol-origin: margin;
     }
-     
+
     QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
     {
         background: none;
     }
-     
+
     QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
     {
         background: none;
@@ -242,19 +242,19 @@ toolBar = """
     font-weight: bold;
     spacing: 15px;
     }
-    
+
     QToolBar::handle:horizontal {
         image: url(image/Hmovetoolbar.png);
     }
-    
+
     QToolBar::handle:vertical {
         image: url(image/Vmovetoolbar.png);
     }
-    
+
     QToolBar::separator:horizontal {
         image: url(image/Hsepartoolbar.png);
     }
-    
+
     QToolBar::separator:vertical {
         image: url(image/Vsepartoolbars.png);
     }"""
@@ -269,12 +269,12 @@ lineEdit = """
         selection-border-color: darkGray;
         min-height: 30px
     }
-    
+
     QLineEdit:focus {
     border-width:2px;
     border-color:rgb(51, 133, 255);
     }
-    
+
     QLineEdit:!enabled {
         background-color: LightGray;
     }
@@ -288,25 +288,25 @@ pushButton = """
         min-width: 80px;
         min-height: 28px;
     }
-    
+
     QPushButton:pressed {
         border-color: blue;
         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #dadbde, stop: 1 #f6f7fa);
     }
-    
+
     QPushButton:flat {
         border: none;
     }
-    
+
     QPushButton:default {  
         border-color: gray;
         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #dadbde, stop: 1 #f6f7fa);
     }
-    
+
     QPushButton:!enabled {
         background-color: LightGray;
     }
-    
+
     QPushButton:enabled {
         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #dadbde, stop: 1 #f6f7fa);
     }
@@ -330,21 +330,21 @@ tree = """
     QTreeWidget::branch:has-siblings:!adjoins-item{
         border-image: url(./image/vline.png) 0;
         }
-        
+
     QTreeWidget::branch:has-siblings:adjoins-item{
         border-image: url(./image/branch-more.png) 0;
         }
-        
+
     QTreeWidget::branch:!has-children:!has-siblings:adjoins-item{
         border-image: url(./image/branch-end.png) 0;
         }
-        
+
     QTreeWidget::branch:has-children:!has-siblings:closed, 
     QTreeWidget::branch:has-children:has-siblings:closed{
         border-image: none;
         image: url(./image/branch-closed.png);
         }
-        
+
     QTreeWidget::branch:has-children:!has-siblings:open,
     QTreeWidget::branch:has-children:has-siblings:open{
         border-image: none;
@@ -401,9 +401,9 @@ if __name__ == '__main__':
     demo.resize(1600, 900)
 
     demo.show()
-    demo.move((QApplication.desktop().width() - demo.width()) / 2,
-              (QApplication.desktop().height() - demo.height()) / 2)
-    demo.properties.myWidget.setMaximumWidth(600)
+    demo.move((app.desktop().width() - demo.width()) / 2,
+              (app.desktop().height() - demo.height()) / 2)
+    demo.properties.my_widget.setMaximumWidth(600)
 
     app.setStyleSheet(styleSheet)
     sys.exit(app.exec_())

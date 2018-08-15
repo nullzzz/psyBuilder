@@ -1,9 +1,9 @@
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTextEdit
 from PyQt5.QtCore import Qt
-from Attributes.Attributes import Attributes
-from Center.Center import Center
-from Structure.Structure import Structure
-from Properties.Properties import Properties
+from attributes.main import Attributes
+from center.main import Center
+from structure.main import Structure
+from properties.main import Properties
 
 
 class MainWindow(QMainWindow):
@@ -18,8 +18,9 @@ class MainWindow(QMainWindow):
 
         # other
         self.structure = Structure()
+        self.structure.setWindowTitle("Structure")
         self.properties = Properties()
-        self.properties.setWindowTitle("Properties")
+        self.properties.setWindowTitle("properties")
 
         self.center = Center()
         self.center.setWindowTitle("Main")
@@ -36,51 +37,44 @@ class MainWindow(QMainWindow):
         self.splitDockWidget(self.center, self.output, Qt.Vertical)
 
         # 连接信号
-        self.linkSignal()
+        self.linkSignals()
 
-    def linkSignal(self):
-        # TimeLine
-        self.center.eventTabs.timeLine.eventAdd.connect(self.structure.addNode)
-        self.center.eventTabs.timeLine.eventArea.eventTable.eventNameChanged.connect(self.structure.changeEventName)
-        # 接受structure的信号到eventTabs来打开新tab
-        self.structure.sendTabToEventTabs.connect(self.center.eventTabs.openTab)
-        # 接受eventTable的信号
-        self.center.eventTabs.timeLine.eventRemove.connect(self.structure.removeNode)
-        self.center.eventTabs.timeLine.eventMove.connect(self.structure.moveNode)
-        #
-        self.center.eventTabs.properties.connect(self.properties.setProperties)
-        # 从structure得value得properties
-        self.structure.getProperties.connect(self.center.eventTabs.getProperties)
-        # 新增cycle, 要对于他的timelineAdded信号串接到structure
-        self.center.eventTabs.cycleAdded.connect(self.cycleAdded)
-        # 对于cycle中的新增timeLine, 要对其进行相应信号串接, 其打开只能通过structure
-        self.structure.timeLineAdd.connect(self.linkTimeLineSignal)
-        self.structure.timeLineAdd.connect(self.center.eventTabs.linkNewSignal)
-        # structure中item删除关联eventTabs中的tab删除
-        self.structure.structureTree.itemDeleted.connect(self.center.eventTabs.deleteTab)
-        # 关联timeLine中的event删除
-        self.structure.structureTree.itemDeleted.connect(self.center.eventTabs.deleteEvent)
-        # 删除cycle中timeLine
-        self.structure.structureTree.timeLineDeleted.connect(self.center.eventTabs.deleteTimeLineInCycle)
+    def linkSignals(self):
+        # icon tabs
+        self.center.icon_tabs.cycleAdd.connect(self.linkCycleSignals)
+        self.center.icon_tabs.propertiesShow.connect(self.properties.showProperties)
+        # 将timeline中icon的变更与structure相连
+        self.linkTimelineSignals('Timeline.10001')
+        # structure中信号
+        self.structure.nodeDoubleClick.connect(self.center.icon_tabs.openTab)
+        self.structure.timelineAdd.connect(self.linkTimelineSignals)
+        self.structure.structure_tree.itemDelete.connect(self.center.icon_tabs.deleteTab)
+        self.structure.structure_tree.itemDelete.connect(self.center.icon_tabs.deleteIcon)
+        self.structure.structure_tree.timelineDelete.connect(self.center.icon_tabs.deleteTimeline)
+        self.structure.propertiesShow.connect(self.center.icon_tabs.getWidgetProperties)
 
-    # 当有新的cycle被打开时对其两个信号进行串接
-    def cycleAdded(self, value):
+
+    def linkTimelineSignals(self, value):
         try:
-            self.center.eventTabs.tabs[value].timelineAdded.disconnect(self.structure.addNode)
-            self.center.eventTabs.tabs[value].timelineAdded.connect(self.structure.addNode)
+            try:
+                self.center.icon_tabs.value_widget[value].iconAdd.disconnect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].iconAdd.connect(self.structure.addNode)
+            except Exception:
+                self.center.icon_tabs.value_widget[value].iconAdd.connect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].iconRemove.connect(self.structure.removeNode)
+                self.center.icon_tabs.value_widget[value].iconMove.connect(self.structure.moveNode)
+                self.center.icon_tabs.value_widget[value].icon_area.icon_table.iconNameChange.connect(
+                    self.structure.changeNodeName)
         except Exception:
-            # 新增timeLine
-            self.center.eventTabs.tabs[value].timelineAdded.connect(self.structure.addNode)
-            # 表格中timeLine name修改
-            self.center.eventTabs.tabs[value].nameChanged.connect(self.structure.changeEventName)
+            print("error happens in link timeline signals to structure. [main/main.py]")
 
-    def linkTimeLineSignal(self, value):
+    def linkCycleSignals(self, value):
         try:
-            self.center.eventTabs.tabs[value].eventAdd.disconnect(self.structure.addNode)
-            self.center.eventTabs.tabs[value].eventAdd.connect(self.structure.addNode)
+            try:
+                self.center.icon_tabs.value_widget[value].timelineAdd.disconnect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].timelineAdd.connect(self.structure.addNode)
+            except Exception:
+                self.center.icon_tabs.value_widget[value].timelineAdd.connect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].timelineNameChange.connect(self.structure.changeNodeName)
         except Exception:
-            self.center.eventTabs.tabs[value].eventAdd.connect(self.structure.addNode)
-            self.center.eventTabs.tabs[value].eventArea.eventTable.eventNameChanged.connect(
-                self.structure.changeEventName)
-            self.center.eventTabs.tabs[value].eventRemove.connect(self.structure.removeNode)
-            self.center.eventTabs.tabs[value].eventMove.connect(self.structure.moveNode)
+            print("error happens in link cycle signals to structure. [main/main.py]")
