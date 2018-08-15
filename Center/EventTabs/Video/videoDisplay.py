@@ -15,6 +15,7 @@ class VideoDisplay(QMainWindow):
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.videoWidget = QVideoWidget()
+
         self.mediaPlayer.setVideoOutput(self.videoWidget)
 
         self.label = QLabel()

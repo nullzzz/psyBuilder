@@ -32,6 +32,7 @@ class VideoTab1(QWidget):
         self.setUI()
 
     def setUI(self):
+        # self.open_bt.setIcon(QIcon(".\\.\\image\\folder.png"))
         valid_pos = QRegExp("\d{1,2}:\d{1,2}:\d{2}\.\d{3}")
         self.startPos.setText("00:00:00.000")
         self.startPos.setMinimumWidth(120)
