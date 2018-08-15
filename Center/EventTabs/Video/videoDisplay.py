@@ -118,7 +118,7 @@ class VideoDisplay(QMainWindow):
             self.stretch = False
         self.stretch_mode = self.pro.tab1.stretch_mode.currentText()
         # self.end_video_action = self.pro.tab1.end_video_action.currentText()
-        self.screen_name = self.pro.tab1.display_name.currentText()
+        self.screen_name = self.pro.tab1.screen_name.currentText()
         isClearText = self.pro.tab1.clear_after.currentText()
         if isClearText == "Yes":
             self.clear_after = True
@@ -141,30 +141,4 @@ class VideoDisplay(QMainWindow):
             return 0
 
     def getInfo(self):
-        border_color = self.pro.tab2.border_color.currentText()
-        border_width = self.pro.tab2.border_width.value()
-        duration = self.pro.tab3.duration.currentText()
-        in_device, out_device = self.pro.tab3.getInfo()
-        return {
-            "file name": self.file,
-            "start position": self.startPos,
-            "end position": self.endPos,
-            "back color": self.back_color,
-            "transparent": self.transparent_value,
-            # "stop after": self.stop_after,
-            # "stop after mode": self.stop_after_mode,
-            "stretch": self.stretch,
-            "stretch mode": self.stretch_mode,
-            # "end video mode": self.end_video_action,
-            "screen name": self.screen_name,
-            "X position": self.x_pos,
-            "Y position": self.y_pos,
-            "width": self.w_size,
-            "height": self.h_size,
-            "clear after": self.clear_after,
-            "Border color": border_color,
-            "Border width": border_width,
-            "Duration": duration,
-            "Out devices": out_device,
-            "In devices": in_device
-        }
+        return {**self.pro.tab1.getInfo(), **self.pro.tab2.getInfo(), **self.pro.tab3.getInfo()}

@@ -1,14 +1,15 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QWidget, QComboBox, QStackedWidget, QListWidget, QPushButton, QLabel, QLineEdit, QGroupBox,
-                             QHBoxLayout, QGridLayout, QVBoxLayout)
+from PyQt5.QtWidgets import QWidget, QComboBox, QStackedWidget, QListWidget, QPushButton, QLabel, QLineEdit, \
+    QGroupBox, \
+    QHBoxLayout, QGridLayout, QVBoxLayout
 
-from ..deviceChooseDialog import DeviceOutDialog, DeviceInDialog
-from ..deviceItem import DeviceOutItem, DeviceInItem
+from Center.EventTabs.deviceChooseDialog import DeviceOutDialog, DeviceInDialog
+from Center.EventTabs.deviceItem import DeviceOutItem, DeviceInItem
 
 
-class VideoTab3(QWidget):
+class Tab3(QWidget):
     def __init__(self, parent=None):
-        super(VideoTab3, self).__init__(parent)
+        super(Tab3, self).__init__(parent)
         self.attributes = []
         # top
         self.duration = QComboBox()
@@ -49,10 +50,11 @@ class VideoTab3(QWidget):
         self.device_label = QLabel("——")
         self.setUI()
 
-    # 生成action页面
+    # 生成duration页面
     def setUI(self):
         group0 = QGroupBox()
-        self.duration.addItems(["(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"])
+        self.duration.addItems(
+            ["(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"])
         self.duration.setEditable(True)
 
         layout0 = QHBoxLayout()
@@ -212,4 +214,4 @@ class VideoTab3(QWidget):
             if key in out_info.keys():
                 key += "_another"
             out_info[key] = self.out_devices.item(i).getInfo()
-        return in_info, out_info
+        return {"duration": self.duration.currentText(), "input devices": in_info, "output device": out_info}

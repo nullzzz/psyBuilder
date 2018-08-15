@@ -91,7 +91,7 @@ class ImageDisplay(QMainWindow):
                 self.pix = pix
                 # 图片反转
                 if self.isStretch:
-                    mode = self.pro.stretch_mode.currentText()
+                    mode = self.pro.general.stretch_mode.currentText()
                     w = self.label.size().width()
                     h = self.label.size().height()
                     if mode == "Both":
@@ -114,13 +114,13 @@ class ImageDisplay(QMainWindow):
 
     # 获取参数
     def getPro(self):
-        self.file = self.pro.file_name.text()
-        self.isUD = self.pro.mirrorUD.checkState()
-        self.isLR = self.pro.mirrorLR.checkState()
-        self.isStretch = self.pro.stretch.checkState()
-        self.stretch_mode = self.pro.stretch_mode.currentText()
-        self.back_color = self.pro.back_color.currentText()
-        self.transparent_value = self.pro.transparent.value()
+        self.file = self.pro.general.file_name.text()
+        self.isUD = self.pro.general.mirrorUD.checkState()
+        self.isLR = self.pro.general.mirrorLR.checkState()
+        self.isStretch = self.pro.general.stretch.checkState()
+        self.stretch_mode = self.pro.general.stretch_mode.currentText()
+        self.back_color = self.pro.general.back_color.currentText()
+        self.transparent_value = self.pro.general.transparent.value()
         self.x_pos = self.pro.frame.xpos.currentText()
         self.y_pos = self.pro.frame.ypos.currentText()
         self.w_size = self.pro.frame.width.currentText()
@@ -130,41 +130,30 @@ class ImageDisplay(QMainWindow):
     def getInfo(self):
         # isUSCK = self.pro.usck.checkState()
         # source_color = self.pro.sck.currentText()
-        align_h = self.pro.align_h.currentText()
-        align_v = self.pro.align_v.currentText()
-        clear_after = self.pro.clear_after.currentText()
-        display_name = self.pro.screen_name.currentText()
+        # align_h = self.pro.align_h.currentText()
+        # align_v = self.pro.align_v.currentText()
+        # clear_after = self.pro.clear_after.currentText()
+        # display_name = self.pro.screen_name.currentText()
 
-        border_color = self.pro.frame.border_color.currentText()
-        border_width = self.pro.frame.border_width.value()
+        # border_color = self.pro.frame.border_color.currentText()
+        # border_width = self.pro.frame.border_width.value()
+        #
+        # duration = self.pro.duration.duration.currentText()
+        # in_device, out_device = self.pro.duration.getInfo()
 
-        duration = self.pro.duration.duration.currentText()
-        in_device, out_device = self.pro.duration.getInfo()
+        # general_info = {
+        #     "File name": self.file,
+        #     "Mirror up/down": bool(self.isUD),
+        #     "Mirror left/right": bool(self.isLR),
+        #     "Stretch": bool(self.isStretch),
+        #     "Stretch mode": self.stretch_mode,
+        #     "Back color": self.back_color,
+        #     "Transparent": self.transparent_value,
+        #     "Clear after": clear_after,
+        #     "Display Name": display_name,
+        # }
 
-        return {
-            "File name": self.file,
-            "Mirror up/down": bool(self.isUD),
-            "Mirror left/right": bool(self.isLR),
-            "Stretch": bool(self.isStretch),
-            "Stretch mode": self.stretch_mode,
-            # "use source color key": bool(isUSCK),
-            # "source color": source_color,
-            # "AlignHorizontal": align_h,
-            # "AlignVertical": align_v,
-            # "Clear after": clear_after,
-            # "Back color": self.back_color,
-            "Transparent": self.transparent_value,
-            "Display Name": display_name,
-            "X position": self.x_pos,
-            "Y position": self.y_pos,
-            "width": self.w_size,
-            "height": self.h_size,
-            "Border color": border_color,
-            "Border width": border_width,
-            "Duration": duration,
-            "Out devices": out_device,
-            "In devices": in_device
-        }
+        return {**self.pro.general.getInfo(), **self.pro.frame.getInfo(), **self.pro.duration.getInfo()}
 
     def setDevices(self, in_devices, out_devices):
         self.setInDevices(in_devices)

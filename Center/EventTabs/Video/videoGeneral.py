@@ -12,7 +12,7 @@ class VideoTab1(QWidget):
         # general
         self.file_name = QLineEdit()
         self.open_bt = QPushButton("open file")
-        self.open_bt.clicked.connect(self.setExistingDirectory)
+        self.open_bt.clicked.connect(self.openFile)
 
         self.startPos = QLineEdit()
         self.endPos = QLineEdit()
@@ -88,12 +88,12 @@ class VideoTab1(QWidget):
         self.setLayout(layout)
 
     # 打开文件夹
-    def setExistingDirectory(self):
+    def openFile(self):
         options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getOpenFileName(self, "Find the video file)", self.file_name.text(
-        ), "Video File (*)", options=options)
-        if fileName:
-            self.file_name.setText(fileName)
+        file_name, _ = QFileDialog.getOpenFileName(self, "Find the video file)", self.file_name.text(),
+                                                   "Video File (*)", options=options)
+        if file_name:
+            self.file_name.setText(file_name)
 
     def changed1(self, e):
         if e == "Yes":
@@ -106,3 +106,10 @@ class VideoTab1(QWidget):
             self.stretch_mode.setEnabled(True)
         else:
             self.stretch_mode.setEnabled(False)
+
+    def getInfo(self):
+        return {"File name": self.file_name.text(), "Start position": self.startPos.text(), "End position":
+            self.endPos.text(), "Stretch": self.stretch.currentText(), "Stretch mode": self.stretch_mode.currentText(
+
+        ), "Back color": self.back_color.currentText(), "Transparent": f"{self.transparent.value()}%", "Clear after":
+            self.clear_after.currentText(), "Screen name": self.screen_name.currentText()}

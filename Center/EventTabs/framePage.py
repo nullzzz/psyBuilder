@@ -1,13 +1,15 @@
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import (QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QComboBox, QWidget,
-                             QSpinBox, QLabel)
-from ..ColorBobox import ColorListEditor
+from PyQt5.QtWidgets import QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QComboBox, QWidget, QSpinBox, QLabel, \
+    QMessageBox
+
+from Center.EventTabs.ColorBobox import ColorListEditor
 
 
-class VideoTab2(QWidget):
+class Tab2(QWidget):
     def __init__(self, parent=None):
-        super(VideoTab2, self).__init__(parent)
+        super(Tab2, self).__init__(parent)
+        self.attributes = []
         # up
         self.width = QComboBox()
         self.height = QComboBox()
@@ -20,23 +22,31 @@ class VideoTab2(QWidget):
 
     # 生成frame页面
     def setUI(self):
-        group1 = QGroupBox("Geometry")
-        layout1 = QGridLayout()
-
         self.xpos.addItems(["0", "25", "50", "75", "100"])
         self.xpos.setEditable(True)
         self.ypos.addItems(["0", "25", "50", "75", "100"])
         self.ypos.setEditable(True)
-        valid_num = QRegExp("\d+%?")
+        valid_num = QRegExp("\[\w+\]|\d+%?")
         self.xpos.setValidator(QRegExpValidator(valid_num))
         self.ypos.setValidator(QRegExpValidator(valid_num))
+        self.xpos.setInsertPolicy(QComboBox.NoInsert)
+        self.xpos.lineEdit().returnPressed.connect(self.finalCheck)
+        self.ypos.setInsertPolicy(QComboBox.NoInsert)
+        self.ypos.lineEdit().returnPressed.connect(self.finalCheck)
 
         self.width.addItems(["100%", "75%", "50%", "25%"])
         self.width.setEditable(True)
         self.width.setValidator(QRegExpValidator(valid_num))
+        self.width.setInsertPolicy(QComboBox.NoInsert)
+        self.width.lineEdit().returnPressed.connect(self.finalCheck)
         self.height.addItems(["100%", "75%", "50%", "25%"])
         self.height.setEditable(True)
         self.height.setValidator(QRegExpValidator(valid_num))
+        self.height.setInsertPolicy(QComboBox.NoInsert)
+        self.height.lineEdit().returnPressed.connect(self.finalCheck)
+
+        group1 = QGroupBox("Geometry")
+        layout1 = QGridLayout()
         layout1.addWidget(QLabel("Width"), 0, 2)
         layout1.addWidget(self.width, 0, 3)
         layout1.addWidget(QLabel("Height"), 1, 2)
@@ -58,3 +68,19 @@ class VideoTab2(QWidget):
         layout.addWidget(group1)
         layout.addWidget(group2)
         self.setLayout(layout)
+
+    def finalCheck(self):
+        temp = self.sender()
+        text = temp.text()
+        if (len(text) > 2 and text[0] == "[" and (text[-1] != "]" or text[1:-1] not in self.attributes)) or text == "[":
+            QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+            temp.clear()
+
+    # 设置可选属性
+    def setAttributes(self, attributes):
+        self.attributes = attributes
+
+    def getInfo(self):
+        return {"X position": self.xpos.currentText(), "Y position": self.ypos.currentText(),
+                "Width": self.width.currentText(), "Height": self.height.currentText(), "Border color":
+                    self.border_color.currentText(), "Border width": self.border_width.value()}

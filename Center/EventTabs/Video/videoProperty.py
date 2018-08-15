@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
-from .VideoTab3 import VideoTab3
-from .videoTab1 import VideoTab1
-from .videoTab2 import VideoTab2
+from .videoGeneral import VideoTab1
+from ..durationPage import Tab3
+from ..framePage import Tab2
 
 
 class VideoProperty(QWidget):
@@ -14,8 +14,11 @@ class VideoProperty(QWidget):
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
         self.tab1 = VideoTab1()
-        self.tab2 = VideoTab2()
-        self.tab3 = VideoTab3()
+        try:
+            self.tab2 = Tab2()
+            self.tab3 = Tab3()
+        except Exception as e:
+            print(e)
 
         self.tab.addTab(self.tab1, "general")
         self.tab.addTab(self.tab2, "frame")
