@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from Main.main import MainWindow
+from main.main import MainWindow
 
 tabBar = """
     QTabBar

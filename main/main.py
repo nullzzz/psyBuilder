@@ -1,10 +1,10 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTextEdit
 
-from Attributes.main import Attributes
-from Center.main import Center
-from Properties.main import Properties
-from Structure.main import Structure
+from attributes.main import Attributes
+from center.main import Center
+from properties.main import Properties
+from structure.main import Structure
 
 
 class MainWindow(QMainWindow):
@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         self.structure = Structure()
         self.structure.setWindowTitle("Structure")
         self.properties = Properties()
-        self.properties.setWindowTitle("properties")
+        self.properties.setWindowTitle("Properties")
 
         self.center = Center()
         self.center.setWindowTitle("Main")

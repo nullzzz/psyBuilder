@@ -8,5 +8,5 @@
 <ul>
     <li>变量设置接口：setAttributes</li>
     <li>参数返回接口：getInfo/getProperties</li>
-    <li>颜色框直接用：from center.icon_tabs.colorBobox import ColorListEditor</li>
+    <li>颜色框直接用：from center.iconTabs.colorBobox import ColorListEditor</li>
 </ul>

@@ -1,14 +1,11 @@
 import math
 
-from PyQt5.QtCore import (pyqtSignal, QLineF, QPointF, QRect, QRectF, QSize,
-                          QSizeF, Qt)
-from PyQt5.QtGui import (QBrush, QColor, QFont, QIcon, QIntValidator, QPainter,
-                         QPainterPath, QPen, QPixmap, QPolygonF)
-from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QGraphicsItem, QGraphicsLineItem, QGraphicsPolygonItem,
-                             QGraphicsScene, QGraphicsTextItem, QGraphicsView, QGridLayout, QHBoxLayout, QLabel, QMainWindow, QMenu, QMessageBox, QSizePolicy,
-                             QToolBox, QToolButton, QWidget)
-
-import Center.EventTabs.Slider.Slider_RC
+from PyQt5.QtCore import (pyqtSignal, QLineF, QPointF, QRect, QRectF, QSize, QSizeF, Qt)
+from PyQt5.QtGui import (QBrush, QColor, QFont, QIcon, QIntValidator, QPainter, QPainterPath, QPen, QPixmap, QPolygonF)
+from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QGraphicsItem, QGraphicsLineItem,
+                             QGraphicsPolygonItem, QGraphicsScene, QGraphicsTextItem, QGraphicsView, QGridLayout,
+                             QHBoxLayout, QLabel, QMainWindow, QMenu, QMessageBox, QSizePolicy, QToolBox, QToolButton,
+                             QWidget)
 
 
 class Arrow(QGraphicsLineItem):

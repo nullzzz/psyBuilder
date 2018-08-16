@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QDockWidget
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QDockWidget
+
 from .structureItem import StructureItem
 from .structureTree import StructureTree
 
@@ -23,7 +24,8 @@ class Structure(QDockWidget):
         # 设置列数、头标签
         self.structure_tree.setColumnCount(1)
         self.structure_tree.setHeaderLabel("E-Object")
-
+        # 隐藏头标签
+        self.structure_tree.setHeaderHidden(True)
         root = StructureItem(self.structure_tree, 'Timeline.10001')
         root.setText(0, "Timeline")
         root.setIcon(0, QIcon(".\\image\\timeLine.png"))

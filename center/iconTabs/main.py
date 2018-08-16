@@ -3,7 +3,7 @@ import copy
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTabWidget, QTabBar
 
-from Center.iconTabs.timeline.main import Timeline
+from center.iconTabs.timeline.main import Timeline
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
 from .events.soundOut.main import SoundOut

@@ -2,7 +2,7 @@ from PyQt5 import QtGui
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import *
 
-from Center.iconTabs.events.durationPage import Tab3
+from center.iconTabs.events.durationPage import Tab3
 from .textdisplay1 import Ui_Dialog
 
 
@@ -14,9 +14,9 @@ class MyDialog(QtWidgets.QDialog, Ui_Dialog):
         self.Color = ['black']
         self.QTabWidget.addTab(tab3, "Duration")
         self.comboBox_AlignH.activated[str].connect(self.SetAlignH)
-        self.comboBox_AlignH.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("^Left|Right|Center|left|right|center$")))
+        self.comboBox_AlignH.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("^Left|Right|center|left|right|center$")))
         self.comboBox_AlignV.activated[str].connect(self.SetAlignV)
-        self.comboBox_AlignV.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("^Left|Right|Center|left|right|center$")))
+        self.comboBox_AlignV.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("^Left|Right|center|left|right|center$")))
         self.checkBox.stateChanged.connect(self.WordWrap)
         self.comboBox.activated[str].connect(self.SetFcolor)
         self.comboBox_2.activated[str].connect(self.SetBcolor)
@@ -38,13 +38,13 @@ class MyDialog(QtWidgets.QDialog, Ui_Dialog):
             self.textEdit.setAlignment(QtCore.Qt.AlignLeft)
         elif text == "Right":
             self.textEdit.setAlignment(QtCore.Qt.AlignRight)
-        elif text == "Center":
+        elif text == "center":
             self.textEdit.setAlignment(QtCore.Qt.AlignCenter)
 
     def SetAlignV(self, text):
         if text == "Top":
             self.textEdit.setAlignment(QtCore.Qt.AlignTop)
-        elif text == "Center":
+        elif text == "center":
             self.textEdit.setAlignment(QtCore.Qt.AlignVCenter)
         elif text == "Bottom":
             self.textEdit.setAlignment(QtCore.Qt.AlignBottom)
@@ -102,8 +102,8 @@ class MyDialog(QtWidgets.QDialog, Ui_Dialog):
                 self.msg_box.show()
 
     # def validator(self):
-    #     x = ['Left', 'Right', 'Center']
-    #     y = ['Top', 'Center', 'Bottom']
+    #     x = ['Left', 'Right', 'center']
+    #     y = ['Top', 'center', 'Bottom']
     #     m = ['Yes', 'No']
     #     n = ['transparent', 'opaque']
     #     if (self.comboBox_AlignH.currentText() in x) and (self.comboBox_AlignV.currentText() in y) and \
