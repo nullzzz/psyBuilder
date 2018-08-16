@@ -1,11 +1,12 @@
-from PyQt5.QtWidgets import QAction, QMainWindow, QInputDialog, QTableWidgetItem, QMessageBox, QMenu, QApplication
-from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
 from PyQt5.QtCore import Qt, pyqtSignal
-from .timelineTable import TimelineTable
+from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
+from PyQt5.QtWidgets import QAction, QMainWindow, QInputDialog, QTableWidgetItem, QMessageBox, QMenu, QApplication
+
+from Center.iconTabs.timeline.icon import Icon
 from .colAdd import ColAdd
 from .colsAdd import ColsAdd
 from .properties.property import Property
-from center.iconTabs.timeline.icon import Icon
+from .timelineTable import TimelineTable
 
 
 class Cycle(QMainWindow):

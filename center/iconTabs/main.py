@@ -1,25 +1,23 @@
-from PyQt5.QtWidgets import QTabWidget, QTabBar
+import copy
+
 from PyQt5.QtCore import pyqtSignal
-from center.iconTabs.timeline.main import Timeline
+from PyQt5.QtWidgets import QTabWidget, QTabBar
 
+from Center.iconTabs.timeline.main import Timeline
 from .events.cycle.main import Cycle
-from .events.text.main import TextDisplay
-from .events.soundOut.main import SoundOut
 from .events.image.imageDisplay import ImageDisplay
+from .events.soundOut.main import SoundOut
+from .events.text.main import TextDisplay
 from .events.video.videoDisplay import VideoDisplay
-
-from .eyeTracker.endR import EndR
-from .eyeTracker.startR import StartR
-from .eyeTracker.setup import SetUp
-from .eyeTracker.open import Open
 from .eyeTracker.DC import EyeDC
 from .eyeTracker.close import Close
-
+from .eyeTracker.endR import EndR
+from .eyeTracker.open import Open
+from .eyeTracker.setup import SetUp
+from .eyeTracker.startR import StartR
 # from .quest.close import
 from .quest.start import QuestStart
 from .quest.update import QuestUpdate
-
-import copy
 
 
 class IconTabs(QTabWidget):

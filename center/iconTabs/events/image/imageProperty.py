@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
 
-from ...durationPage import Tab3
-from ...framePage import Tab2
+from Center.iconTabs.events.durationPage import Tab3
+from Center.iconTabs.events.framePage import Tab2
 from .imageGenearl import ImageTab1
 
 

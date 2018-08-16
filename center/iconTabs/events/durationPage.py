@@ -53,8 +53,7 @@ class Tab3(QWidget):
     # 生成duration页面
     def setUI(self):
         group0 = QGroupBox()
-        self.duration.addItems(
-            ["(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"])
+        self.duration.addItems(["(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"])
         self.duration.setEditable(True)
 
         layout0 = QHBoxLayout()

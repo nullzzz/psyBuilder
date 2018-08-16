@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTextEdit
 from PyQt5.QtCore import Qt
-from attributes.main import Attributes
-from center.main import Center
-from structure.main import Structure
-from properties.main import Properties
+from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTextEdit
+
+from Attributes.main import Attributes
+from Center.main import Center
+from Properties.main import Properties
+from Structure.main import Structure
 
 
 class MainWindow(QMainWindow):

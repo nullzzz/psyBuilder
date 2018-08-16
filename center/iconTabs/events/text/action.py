@@ -2,8 +2,8 @@ from PyQt5 import QtGui
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import *
 
+from Center.iconTabs.events.durationPage import Tab3
 from .textdisplay1 import Ui_Dialog
-from ...durationPage import Tab3
 
 
 class MyDialog(QtWidgets.QDialog, Ui_Dialog):

@@ -3,7 +3,7 @@ from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QComboBox, QWidget, QSpinBox, QLabel, \
     QMessageBox
 
-from .colorBobox import ColorListEditor
+from Center.iconTabs.colorBobox import ColorListEditor
 
 
 class Tab2(QWidget):
@@ -11,10 +11,10 @@ class Tab2(QWidget):
         super(Tab2, self).__init__(parent)
         self.attributes = []
         # up
-        self.width = QComboBox()
-        self.height = QComboBox()
         self.xpos = QComboBox()
         self.ypos = QComboBox()
+        self.width = QComboBox()
+        self.height = QComboBox()
         # down
         self.border_color = ColorListEditor()
         self.border_width = QSpinBox()
