@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QLineEdit, QPushButton, QCheckBox, \
-    QComboBox, QSpinBox, QApplication, QFileDialog
+    QComboBox, QSpinBox, QApplication, QFileDialog, QCompleter, QMessageBox
 
 from ...colorBobox import ColorListEditor
 
@@ -11,6 +11,8 @@ class ImageTab1(QWidget):
     def __init__(self, parent=None):
         super(ImageTab1, self).__init__(parent)
         self.file_name = QLineEdit()
+        self.file_name.textChanged.connect(self.findVar)
+        self.file_name.returnPressed.connect(self.finalCheck)
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
@@ -77,7 +79,7 @@ class ImageTab1(QWidget):
         layout2.addWidget(self.transparent, 0, 3)
         layout2.addWidget(QLabel("Clear After:"), 1, 0)
         layout2.addWidget(self.clear_after, 1, 1)
-        layout2.addWidget(QLabel("Display Name:"), 1, 2)
+        layout2.addWidget(QLabel("Screen Name:"), 1, 2)
         layout2.addWidget(self.screen_name, 1, 3)
 
         group2.setLayout(layout2)
@@ -100,6 +102,25 @@ class ImageTab1(QWidget):
             self.stretch_mode.setEnabled(True)
         else:
             self.stretch_mode.setEnabled(False)
+
+    # 检查变量
+    def findVar(self, text):
+        if text in self.attributes:
+            self.sender().setStyleSheet("color: blue")
+        else:
+            self.sender().setStyleSheet("color:black")
+
+    def finalCheck(self):
+        temp = self.sender()
+        text = temp.text()
+        if text not in self.attributes:
+            if text and text[0] == "[":
+                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                temp.clear()
+
+    def setAttributes(self, attributes):
+        self.attributes = attributes
+        self.file_name.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         return {"File name": self.file_name.text(), "Mirror up/down": bool(

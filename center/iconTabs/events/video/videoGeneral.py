@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import (QLineEdit, QPushButton, QComboBox, QSpinBox, QGridLayout, QLabel, QFileDialog)
+from PyQt5.QtWidgets import (QLineEdit, QPushButton, QComboBox, QSpinBox, QGridLayout, QLabel, QFileDialog, QMessageBox,
+                             QCompleter)
 from PyQt5.QtWidgets import QWidget
 
 from ...colorBobox import ColorListEditor
@@ -11,6 +12,8 @@ class VideoTab1(QWidget):
         super(VideoTab1, self).__init__(parent)
         # general
         self.file_name = QLineEdit()
+        self.file_name.textChanged.connect(self.findVar)
+        self.file_name.returnPressed.connect(self.finalCheck)
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
@@ -33,18 +36,22 @@ class VideoTab1(QWidget):
 
     def setUI(self):
         # self.open_bt.setIcon(QIcon(".\\.\\image\\folder.png"))
-        valid_pos = QRegExp("\d{1,2}:\d{1,2}:\d{2}\.\d{3}")
+        valid_pos = QRegExp("(\d{1,2}:\d{1,2}:\d{2}\.\d{3})|(\[\w+\])")
         self.startPos.setText("00:00:00.000")
         self.startPos.setMinimumWidth(120)
         self.endPos.setText("00:00:00.000")
         self.startPos.setValidator(QRegExpValidator(valid_pos, self))
         self.endPos.setValidator(QRegExpValidator(valid_pos, self))
+        self.startPos.textChanged.connect(self.findVar)
+        self.startPos.returnPressed.connect(self.finalCheck)
+        self.endPos.textChanged.connect(self.findVar)
+        self.endPos.returnPressed.connect(self.finalCheck)
         # self.stop_after.addItems(["No", "Yes"])
         # self.stop_after.currentTextChanged.connect(self.changed1)
         # self.stop_after_mode.addItems(["NextOnsetTime", "OffsetTime"])
         # self.stop_after_mode.setEnabled(False)
         self.stretch.addItems(["No", "Yes"])
-        self.stretch.currentTextChanged.connect(self.changed2)
+        self.stretch.currentTextChanged.connect(self.stretchChange)
         self.stretch_mode.addItems(["Both", "LeftRight", "UpDown"])
         self.stretch_mode.setEnabled(False)
         self.transparent.setMaximum(100)
@@ -91,7 +98,7 @@ class VideoTab1(QWidget):
     # 打开文件夹
     def openFile(self):
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Find the video file)", self.file_name.text(),
+        file_name, _ = QFileDialog.getOpenFileName(self, "Find the video file", self.file_name.text(),
                                                    "Video File (*)", options=options)
         if file_name:
             self.file_name.setText(file_name)
@@ -102,15 +109,41 @@ class VideoTab1(QWidget):
         else:
             self.stop_after_mode.setEnabled(False)
 
-    def changed2(self, e):
+    def stretchChange(self, e):
         if e == "Yes":
             self.stretch_mode.setEnabled(True)
         else:
             self.stretch_mode.setEnabled(False)
 
-    def getInfo(self):
-        return {"File name": self.file_name.text(), "Start position": self.startPos.text(), "End position":
-            self.endPos.text(), "Stretch": self.stretch.currentText(), "Stretch mode": self.stretch_mode.currentText(
+    # 检查变量
+    def findVar(self, text):
+        if text in self.attributes:
+            self.sender().setStyleSheet("color: blue")
+        else:
+            self.sender().setStyleSheet("color:black")
 
-        ), "Back color": self.back_color.currentText(), "Transparent": "{}%".format(self.transparent.value()), "Clear after":
-                    self.clear_after.currentText(), "Screen name": self.screen_name.currentText()}
+    def finalCheck(self):
+        temp = self.sender()
+        text = temp.text()
+        if text not in self.attributes:
+            if text and text[0] == "[":
+                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                temp.clear()
+
+    def setAttributes(self, attributes):
+        self.attributes = attributes
+        self.file_name.setCompleter(QCompleter(self.attributes))
+        self.startPos.setCompleter(QCompleter(self.attributes))
+        self.endPos.setCompleter(QCompleter(self.attributes))
+
+    def getInfo(self):
+        return {
+            "File name": self.file_name.text(),
+            "Start position": self.startPos.text(),
+            "End position": self.endPos.text(),
+            "Stretch": self.stretch.currentText(),
+            "Stretch mode": self.stretch_mode.currentText(),
+            "Back color": self.back_color.currentText(),
+            "Transparent": "{}%".format(self.transparent.value()),
+            "Clear after": self.clear_after.currentText(),
+            "Screen name": self.screen_name.currentText()}

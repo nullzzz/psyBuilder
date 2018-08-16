@@ -42,6 +42,7 @@ class VideoDisplay(QMainWindow):
         self.w_size = 100
         self.h_size = 100
         self.setUI()
+        self.setAttributes(["test"])
 
     def setUI(self):
         self.setWindowTitle("Video")
@@ -101,34 +102,34 @@ class VideoDisplay(QMainWindow):
         self.propertiesChange.emit(self.getInfo())
 
     def getPro(self):
-        self.file = self.pro.tab1.file_name.text()
-        self.startPos = self.pro.tab1.startPos.text()
-        self.endPos = self.pro.tab1.endPos.text()
-        self.back_color = self.pro.tab1.back_color.currentText()
-        self.transparent_value = self.pro.tab1.transparent.value()
+        self.file = self.pro.general.file_name.text()
+        self.startPos = self.pro.general.startPos.text()
+        self.endPos = self.pro.general.endPos.text()
+        self.back_color = self.pro.general.back_color.currentText()
+        self.transparent_value = self.pro.general.transparent.value()
         # isStopText = self.pro.tab1.stop_after.currentText()
         # if isStopText == "Yes":
         #     self.stop_after = True
         # else:
         #     self.stop_after = False
         # self.stop_after_mode = self.pro.tab1.stop_after_mode.currentText()
-        isStretchText = self.pro.tab1.stretch.currentText()
+        isStretchText = self.pro.general.stretch.currentText()
         if isStretchText == "Yes":
             self.stretch = True
         else:
             self.stretch = False
-        self.stretch_mode = self.pro.tab1.stretch_mode.currentText()
+        self.stretch_mode = self.pro.general.stretch_mode.currentText()
         # self.end_video_action = self.pro.tab1.end_video_action.currentText()
-        self.screen_name = self.pro.tab1.screen_name.currentText()
-        isClearText = self.pro.tab1.clear_after.currentText()
+        self.screen_name = self.pro.general.screen_name.currentText()
+        isClearText = self.pro.general.clear_after.currentText()
         if isClearText == "Yes":
             self.clear_after = True
         else:
             self.clear_after = False
-        self.x_pos = self.pro.tab2.xpos.currentText()
-        self.y_pos = self.pro.tab2.ypos.currentText()
-        self.w_size = self.pro.tab2.width.currentText()
-        self.h_size = self.pro.tab2.height.currentText()
+        self.x_pos = self.pro.frame.xpos.currentText()
+        self.y_pos = self.pro.frame.ypos.currentText()
+        self.w_size = self.pro.frame.width.currentText()
+        self.h_size = self.pro.frame.height.currentText()
 
     @staticmethod
     def getStartTime(str_time):
@@ -141,5 +142,9 @@ class VideoDisplay(QMainWindow):
         except ValueError:
             return 0
 
+    def setAttributes(self, attributes):
+        format_attributes = [f"[{attribute}]" for attribute in attributes]
+        self.pro.setAttributes(format_attributes)
+
     def getInfo(self):
-        return {**self.pro.tab1.getInfo(), **self.pro.tab2.getInfo(), **self.pro.tab3.getInfo()}
+        return {**self.pro.general.getInfo(), **self.pro.frame.getInfo(), **self.pro.duration.getInfo()}

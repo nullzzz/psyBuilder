@@ -394,7 +394,8 @@ QMenu::indicator {
 }
 """
 
-styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + lineEdit + pushButton + tree + menu
+styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + pushButton + tree + menu
+# styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + lineEdit + pushButton + tree + menu
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

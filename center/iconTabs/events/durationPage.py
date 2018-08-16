@@ -115,6 +115,7 @@ class Tab3(QWidget):
             self.in_tip2.hide()
         item = DeviceInItem(device_name)
         self.in_devices.addItem(item)
+        item.setAttributes(self.attributes)
         for i in range(self.out_devices.count()):
             name = self.out_devices.item(i).name
             self.in_devices.item(self.in_devices.count() - 1).resp_trigger_out.addItem(name)
@@ -137,16 +138,15 @@ class Tab3(QWidget):
             self.out_tip.hide()
         item = DeviceOutItem(device_name)
         self.out_devices.addItem(item)
+        # 设置可选变量
+        item.setAttributes(self.attributes)
+        # 设置trigger输出设备
         for i in range(self.in_devices.count()):
-            try:
-                self.in_devices.item(i).resp_trigger_out.addItem(device_name)
-            except Exception as e:
-                print(e)
+            self.in_devices.item(i).resp_trigger_out.addItem(device_name)
         self.out_stack.addWidget(item.pro)
         if self.out_devices.count():
             self.out_del_bt.setEnabled(True)
         self.out_devices_dialog.close()
-        self.getInfo()
 
     # 移除输入设备
     def removeInDevices(self):

@@ -9,9 +9,11 @@ from .view import Preview
 
 class ImageDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
+    # parameter: self.attributes
 
     def __init__(self, parent=None):
         super(ImageDisplay, self).__init__(parent)
+        self.attributes = []
         self.label = QLabel()
         self.pro = ImageProperty()
         self.pro.ok_bt.clicked.connect(self.ok)
@@ -31,6 +33,7 @@ class ImageDisplay(QMainWindow):
         self.w_size = 100
         self.h_size = 100
         self.setUI()
+        self.setAttributes(["test", "var"])
 
     def setUI(self):
         self.setWindowTitle("Image")
@@ -155,6 +158,7 @@ class ImageDisplay(QMainWindow):
 
         return {**self.pro.general.getInfo(), **self.pro.frame.getInfo(), **self.pro.duration.getInfo()}
 
+    # 设置输入输出设备
     def setDevices(self, in_devices, out_devices):
         self.setInDevices(in_devices)
         self.setOutDevices(out_devices)
@@ -166,3 +170,8 @@ class ImageDisplay(QMainWindow):
     # 设置输入设备
     def setInDevices(self, devices):
         self.pro.duration.in_devices_dialog.addDevices(devices)
+
+    # 设置可选参数
+    def setAttributes(self, attributes):
+        format_attributes = [f"[{attribute}]" for attribute in attributes]
+        self.pro.setAttributes(format_attributes)

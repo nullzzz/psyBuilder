@@ -14,7 +14,7 @@ class ColorListEditor(QComboBox):
         self.setStyleSheet("background: {}".format(self.currentText()))
         # 支持输入255,255,255及#ffffff格式rgb
         valid_rgb = QRegExp(
-            "((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{6}")
+            "((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{6}|white|gray|black|red|orange|yellow|green|blue|purple")
         self.setValidator(QRegExpValidator(valid_rgb, self))
         self.setInsertPolicy(QComboBox.NoInsert)
 
@@ -54,7 +54,6 @@ class ColorListEditor(QComboBox):
                     if self.findText(e) == -1:
                         color = QColor(int(color_rgb[0]), int(color_rgb[1]), int(color_rgb[2]))
                         self.insertItem(1, e)
-                        print("add")
                         self.setItemData(1, color, Qt.DecorationRole)
                         self.setCurrentIndex(1)
             # #ffffff格式rgb

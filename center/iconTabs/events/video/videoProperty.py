@@ -13,16 +13,13 @@ class VideoProperty(QWidget):
         self.ok_bt = QPushButton("Ok")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
-        self.tab1 = VideoTab1()
-        try:
-            self.tab2 = Tab2()
-            self.tab3 = Tab3()
-        except Exception as e:
-            print(e)
+        self.general = VideoTab1()
+        self.frame = Tab2()
+        self.duration = Tab3()
 
-        self.tab.addTab(self.tab1, "general")
-        self.tab.addTab(self.tab2, "frame")
-        self.tab.addTab(self.tab3, "duration")
+        self.tab.addTab(self.general, "general")
+        self.tab.addTab(self.frame, "frame")
+        self.tab.addTab(self.duration, "duration")
         self.setButtons()
         self.setUI()
 
@@ -44,3 +41,8 @@ class VideoProperty(QWidget):
         below_layout.addWidget(self.apply_bt, 1)
         below_layout.setContentsMargins(0, 0, 0, 0)
         self.below.setLayout(below_layout)
+
+    def setAttributes(self, attributes):
+        self.general.setAttributes(attributes)
+        self.frame.setAttributes(attributes)
+        self.duration.setAttributes(attributes)

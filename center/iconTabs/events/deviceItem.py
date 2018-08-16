@@ -1,6 +1,19 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox, QLineEdit, QListWidgetItem, QWidget, QComboBox, QGridLayout, QLabel, \
-    QFormLayout
+    QFormLayout, QCompleter
+
+# todo: 这个样式表要怎么写呢
+lineEdit = """
+    QLineEdit {
+        border: 1px:
+        border-radius: 1px;
+        min-height: 10px;
+    }
+    QLineEdit:focus {
+        border-width:1px;
+        border-color: black;
+    }
+    """
 
 
 # 重写上方输出设备list widget的item
@@ -12,40 +25,45 @@ class DeviceOutItem(QListWidgetItem):
         self.name = name
         self.devices = []
         self.pro = QWidget()
-        self.value1 = QLineEdit()
-        self.value1.textChanged.connect(self.findVar)
-        self.value1.returnPressed.connect(self.finalCheck)
-        self.attributes = []
-        self.value = ""
+        self.value = QLineEdit()
+        self.value.textChanged.connect(self.findVar)
+        self.value.returnPressed.connect(self.finalCheck)
         self.pulse_dur = QComboBox()
         self.pulse_dur.setEditable(True)
         self.pulse_dur.setInsertPolicy(QComboBox.NoInsert)
-        self.pulse_dur.addItem("End of Duration")
-        # self.pulse_dur.lineEdit().textChanged.connect(self.findVar)
+        self.pulse_dur.addItems(["End of Duration", "0", "100", "200", "300", "400", "500"])
+
+        self.pulse_dur.lineEdit().textChanged.connect(self.findVar)
         self.pulse_dur.lineEdit().returnPressed.connect(self.finalCheck)
 
+        # self.pulse_dur = QLineEdit()
+        # self.pulse_dur.setText("End of Duration")
+        # self.pulse_dur.textChanged.connect(self.findVar)
+        # self.pulse_dur.returnPressed.connect(self.finalCheck)
         self.setPro()
 
     def setPro(self):
-        layout = QGridLayout()
-        l1 = QLabel("Value or Message:")
-        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        layout.addWidget(l1, 0, 0)
-        layout.addWidget(self.value1, 0, 1)
-        l2 = QLabel("Pulse Dur:")
-        l2.setAlignment(Qt.AlignRight)
-        layout.addWidget(l2, 1, 0)
-        layout.addWidget(self.pulse_dur, 1, 1)
+        # layout = QGridLayout()
+        # l1 = QLabel("Value or Message:")
+        # l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # layout.addWidget(l1, 0, 0)
+        # layout.addWidget(self.value, 0, 1)
+        # l2 = QLabel("Pulse Dur:")
+        # l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # layout.addWidget(l2, 1, 0)
+        # layout.addWidget(self.pulse_dur, 1, 1)
+        # layout.setVerticalSpacing(40)
+        layout = QFormLayout()
+        layout.addRow("Value or Msg:", self.value)
+        layout.addRow("Pulse Dur:", self.pulse_dur)
+        layout.setLabelAlignment(Qt.AlignRight | Qt.AlignVCenter)
         layout.setVerticalSpacing(40)
         # 左、上、右、下
-        layout.setContentsMargins(10, 3, 10, 0)
+        layout.setContentsMargins(10, 20, 10, 0)
         self.pro.setLayout(layout)
 
     def findVar(self, text):
-        self.value = text
-        if len(self.value) > 2 and self.value[0] == "[" and self.value[-1] == "]" and self.value[
-                                                                                      1:-1] in self.attributes:
-            print(self.value[1:-1])
+        if text in self.attributes:
             self.pro.sender().setStyleSheet("color:{}".format(DeviceOutItem.varColor))
         else:
             self.pro.sender().setStyleSheet("color:black")
@@ -56,20 +74,27 @@ class DeviceOutItem(QListWidgetItem):
             text = temp.text()
         else:
             text = temp.currentText()
-        if (len(text) > 2 and text[0] == "[" and (text[-1] != "]" or text[1:-1] not in self.attributes)) or "[" in text:
-            QMessageBox.warning(self.pro, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-            temp.clear()
+        if text not in self.attributes:
+            if text and text[0] == "[":
+                QMessageBox.warning(self.pro, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                temp.clear()
 
     # 设置可选属性
     def setAttributes(self, attributes):
         self.attributes = attributes
+        self.value.setCompleter(QCompleter(self.attributes))
+        self.pulse_dur.setCompleter(QCompleter(self.attributes))
 
     @staticmethod
     def setVarColor(self, color):
         DeviceOutItem.varColor = color
 
     def getInfo(self):
-        return {"Device name": self.name, "Value or msg": self.value, "Pulse Duration": self.pulse_dur.currentText()}
+        return {
+            "Device name": self.name,
+            "Value or msg": self.value.text(),
+            "Pulse Duration": self.pulse_dur.currentText()
+        }
 
 
 # 重写下方输入设备
@@ -79,7 +104,6 @@ class DeviceInItem(QListWidgetItem):
     def __init__(self, name=None, parent=None):
         super(DeviceInItem, self).__init__(name, parent)
         self.name = name
-        self.attributes = []
         self.pro1 = QWidget()
         self.device_label = QLabel(name)
         self.allowable = QLineEdit()
@@ -89,9 +113,10 @@ class DeviceInItem(QListWidgetItem):
         self.correct.textChanged.connect(self.findVar)
         self.correct.returnPressed.connect(self.finalCheck)
         self.RT_window = QComboBox()
+        self.RT_window.addItems(["(Same as duration)", "(End of timeline)", "1000", "2000", "3000", "4000", "5000"])
         self.RT_window.setEditable(True)
         self.RT_window.setInsertPolicy(QComboBox.NoInsert)
-        # self.RT_window.editTextChanged.connect(self.findVar)
+        self.RT_window.lineEdit().textChanged.connect(self.findVar)
         self.RT_window.lineEdit().returnPressed.connect(self.finalCheck)
         self.end_action = QComboBox()
         self.end_action.setInsertPolicy(QComboBox.NoInsert)
@@ -117,7 +142,6 @@ class DeviceInItem(QListWidgetItem):
         self.setPro()
 
     def setPro(self):
-        self.RT_window.addItems(["(Same as duration)", "(End of timeline)", "1000", "2000", "3000", "4000", "5000"])
         self.end_action.addItems(["Terminate", "(None)"])
         self.action.addItems(["Fixation", "Saccade"])
         if "eye" not in self.name:
@@ -169,11 +193,10 @@ class DeviceInItem(QListWidgetItem):
 
     # 检查变量
     def findVar(self, text):
-        if text:
-            if text[0] == "[" and text[-1] == "]" and text[1:-1] in self.attributes:
-                self.pro1.sender().setStyleSheet("color:{}".format(DeviceInItem.varColor))
-            else:
-                self.pro1.sender().setStyleSheet("color:black")
+        if text in self.attributes:
+            self.pro1.sender().setStyleSheet("color:{}".format(DeviceInItem.varColor))
+        else:
+            self.pro1.sender().setStyleSheet("color:black")
 
     def finalCheck(self):
         temp = self.pro1.sender()
@@ -181,13 +204,21 @@ class DeviceInItem(QListWidgetItem):
             text = temp.text()
         else:
             text = temp.currentText()
-        if (len(text) > 2 and text[0] == "[" and (text[-1] != "]" or text[1:-1] not in self.attributes)) or text == "[":
-            QMessageBox.warning(self.pro1, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-            temp.clear()
+        if text not in self.attributes:
+            if text and text[0] == "[":
+                QMessageBox.warning(self.pro1, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                temp.clear()
 
     # 设置可选变量
     def setAttributes(self, attributes):
         self.attributes = attributes
+        self.allowable.setCompleter(QCompleter(self.attributes))
+        self.correct.setCompleter(QCompleter(self.attributes))
+        self.RT_window.setCompleter(QCompleter(self.attributes))
+        self.ROA.setCompleter(QCompleter(self.attributes))
+        self.right.setCompleter(QCompleter(self.attributes))
+        self.wrong.setCompleter(QCompleter(self.attributes))
+        self.ignore.setCompleter(QCompleter(self.attributes))
 
     @staticmethod
     def setVarColor(self, color):
@@ -195,12 +226,27 @@ class DeviceInItem(QListWidgetItem):
 
     def getInfo(self):
         if "eye" not in self.name:
-            return {"Device name": self.name, "Allowable": self.allowable.text(), "Correct": self.correct.text(),
-                    "RT window": self.RT_window.currentText(), "End action": self.end_action.currentText(),
-                    "Right": self.right.text(), "Wrong": self.wrong.text(), "No resp": self.ignore.text(),
-                    "Output device": self.resp_trigger_out}
+            return {
+                "Device name": self.name,
+                "Allowable": self.allowable.text(),
+                "Correct": self.correct.text(),
+                "RT window": self.RT_window.currentText(),
+                "End action": self.end_action.currentText(),
+                "Right": self.right.text(),
+                "Wrong": self.wrong.text(),
+                "No resp": self.ignore.text(),
+                "Output device": self.resp_trigger_out
+            }
         else:
-            return {"Device name": self.name, "Action": self.action.currentText(), "ROA": self.ROA.text(),
-                    "ROA action": self.action.currentText(), "duration": self.RT_window.currentText(), "End action":
-                        self.end_action.currentText(), "Right": self.right.text(), "Wrong": self.wrong.text(),
-                    "No resp": self.ignore.text(), "Output device": self.resp_trigger_out}
+            return {
+                "Device name": self.name,
+                "Action": self.action.currentText(),
+                "ROA": self.ROA.text(),
+                "ROA action": self.action.currentText(),
+                "duration": self.RT_window.currentText(),
+                "End action": self.end_action.currentText(),
+                "Right": self.right.text(),
+                "Wrong": self.wrong.text(),
+                "No resp": self.ignore.text(),
+                "Output device": self.resp_trigger_out
+            }

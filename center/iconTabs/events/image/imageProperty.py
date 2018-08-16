@@ -56,3 +56,8 @@ class ImageProperty(QWidget):
 
     def getInfo(self):
         pass
+
+    def setAttributes(self, attributes):
+        self.general.setAttributes(attributes)
+        self.frame.setAttributes(attributes)
+        self.duration.setAttributes(attributes)
