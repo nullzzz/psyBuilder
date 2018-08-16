@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction, QTreeWidgetItem
+from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction
 from PyQt5.QtCore import pyqtSignal
 from .structureItem import StructureItem
 

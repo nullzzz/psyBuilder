@@ -1,5 +1,3 @@
-import copy
-
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTabWidget, QTabBar
 
@@ -200,8 +198,6 @@ class IconTabs(QTabWidget):
             # 从一个widget复制到另一个widget, 本来采用deepcopy, 但是无法使用, 很奇怪, 只能自己处理
             if old_value in self.value_widget:
                 self.copyWidget(old_value, new_value)
-        except copy.error:
-            print("the copy module happens some errors. [iconTabs/main.py]")
         except Exception:
             print("some errors happen in copy icon. [iconTabs/main.py]")
 
