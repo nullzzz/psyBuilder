@@ -1,4 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTabWidget, QTabBar
 
 from center.iconTabs.timeline.main import Timeline
@@ -37,7 +38,8 @@ class IconTabs(QTabWidget):
 
         self.timeline = Timeline(self)
         self.value_widget['Timeline.10001'] = self.timeline
-        self.addTab(self.timeline, "Timeline")
+        tab_icon = QIcon(".\\.\\image\\timeLine.png")
+        self.addTab(self.timeline, tab_icon, "Timeline")
         self.tabBar().setShape(QTabBar.TriangularNorth)
 
         # 连接信号
@@ -80,40 +82,54 @@ class IconTabs(QTabWidget):
                     self.setCurrentIndex(self.addTab(widget, name))
             else:
                 widget = None
+                tab_icon = None
                 # 生成相应widget
                 if widget_type == "Cycle":
                     widget = Cycle(value=value)
+                    tab_icon = QIcon(".\\.\\image\\cycle.png")
                 elif widget_type == "SoundOut":
                     widget = SoundOut()
+                    tab_icon = QIcon(".\\.\\image\\sound.png")
                 elif widget_type == "Text":
                     widget = TextDisplay()
+                    tab_icon = QIcon(".\\.\\image\\text.png")
                 elif widget_type == "Image":
                     widget = ImageDisplay()
+                    tab_icon = QIcon(".\\.\\image\\imageDisplay.png")
                 elif widget_type == "Video":
                     widget = VideoDisplay()
+                    tab_icon = QIcon(".\\.\\image\\video.png")
                 elif widget_type == "Close":
                     widget = Close()
+                    tab_icon = QIcon(".\\.\\image\\close_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "DC":
                     widget = EyeDC()
+                    tab_icon = QIcon(".\\.\\image\\DC_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "EndR":
                     widget = EndR()
+                    tab_icon = QIcon(".\\.\\image\\end_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Open":
                     widget = Open()
+                    tab_icon = QIcon(".\\.\\image\\open_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "SetUp":
                     widget = SetUp()
+                    tab_icon = QIcon(".\\.\\image\\setup_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "StartR":
                     widget = StartR()
+                    tab_icon = QIcon(".\\.\\image\\start_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestStart":
                     widget = QuestStart()
+                    tab_icon = QIcon(".\\.\\image\\start_quest.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestUpdate":
                     widget = QuestUpdate()
+                    tab_icon = QIcon(".\\.\\image\\update_quest.png")
                     widget.tabClose.connect(self.closeTab)
                 else:
                     pass
@@ -130,7 +146,7 @@ class IconTabs(QTabWidget):
                         self.linkTimelineSignals(value)
 
                     if can_open:
-                        self.setCurrentIndex(self.addTab(widget, name))
+                        self.setCurrentIndex(self.addTab(widget, tab_icon, name))
         except Exception:
             print("error happens in open tab. [iconTabs/main.py]")
 
@@ -192,11 +208,10 @@ class IconTabs(QTabWidget):
 
     def copyIcon(self, old_value, new_value, text):
         try:
-            print(self.value_parent[old_value])
             self.value_parent[new_value] = self.value_parent[old_value]
-            self.openTab(new_value, text, False)
-            # 从一个widget复制到另一个widget, 本来采用deepcopy, 但是无法使用, 很奇怪, 只能自己处理
+            # cycle 不能使用 deepcopy
             if old_value in self.value_widget:
+                self.openTab(new_value, text, False)
                 self.copyWidget(old_value, new_value)
         except Exception:
             print("some errors happen in copy icon. [iconTabs/main.py]")
@@ -204,11 +219,12 @@ class IconTabs(QTabWidget):
     def copyWidget(self, old_value, new_value):
         try:
             old_widget = self.value_widget[old_value]
-            new_widget = self.value_widget[new_value]
             widget_type = old_value.split('.')[0]
             if widget_type == 'Cycle':
+                # properties
+                # new_widget.properties = old_widget.properties
                 pass
             else:
-                pass
+                self.value_widget[new_value] = old_widget
         except Exception:
             print("error happens in copy widget. [iconTabs/main.py]")

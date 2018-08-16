@@ -9,7 +9,6 @@ class Attributes(QDockWidget):
     def __init__(self, parent=None):
         super(Attributes, self).__init__(parent)
         # set UI
-        self.setWindowTitle("Attributes")
         self.setMaximumWidth(200)
         self.setMinimumWidth(150)
         self.attributes_table = AttributesTable()

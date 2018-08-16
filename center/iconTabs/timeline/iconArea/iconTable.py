@@ -307,6 +307,9 @@ class IconTable(QTableWidget):
                     # copy action
                     copy = QAction("copy", menu)
                     copy.triggered.connect(lambda : self.copyDragBegin.emit())
+                    item_value = self.cellWidget(row, column).value
+                    if item_value.startswith("Cycle"):
+                        copy.setDisabled(True)
                     menu.addAction(copy)
                 else:
                     pass

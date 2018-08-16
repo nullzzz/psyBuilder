@@ -14,20 +14,21 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("PsyDemo")
 
         # 设置dock widgets
-        # attributes及向其中添加数据
+        # attributes
         self.attributes = Attributes(self)
-
-        # other
+        self.attributes.setWindowTitle("Attributes")
+        # structure
         self.structure = Structure()
         self.structure.setWindowTitle("Structure")
+        # properties
         self.properties = Properties()
         self.properties.setWindowTitle("Properties")
-
+        # center
         self.center = Center()
         self.center.setWindowTitle("Main")
+        # output
         self.output = QDockWidget()
         self.output.setWindowTitle("Output")
-
         self.output.setWidget(QTextEdit())
 
         # 添加dock widget

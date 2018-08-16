@@ -1,8 +1,10 @@
-from PyQt5.QtWidgets import QVBoxLayout, QFrame
+from PyQt5.QtWidgets import QVBoxLayout, QFrame, QTableWidgetItem
 from PyQt5.QtCore import Qt, QDataStream, QIODevice
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import pyqtSignal
 from .iconTable import IconTable
+
+import time
 
 
 class IconArea(QFrame):
@@ -70,8 +72,8 @@ class IconArea(QFrame):
             text = stream.readQString()
             stream >> pixmap
             # 保证行高度
-            if self.row_height < pixmap.size().height():
-                self.row_height = pixmap.size().height()
+            if self.row_height < pixmap.size().height() + 10:
+                self.row_height = pixmap.size().height() + 10
                 self.icon_table.setRowHeight(1, self.row_height)
 
             # 插入一列
@@ -181,16 +183,19 @@ class IconArea(QFrame):
         self.becomeWhite()
         e.ignore()
 
-    def moveToTarget(self, dragCol, targetCol):
-        # 将dragCol数据保存
-        event = self.icon_table.cellWidget(1, dragCol)
-        text = self.icon_table.item(3, dragCol).text()
-        # 将dragCol抹掉
-        self.icon_table.removeColumn(dragCol)
-        # 插入新列
-        self.icon_table.insertColumn(targetCol)
-        self.icon_table.setIcon(row=1, col=targetCol, name=event.name, pixmap=event.pixmap(), value=event.value)
-        self.icon_table.setText(row=3, col=targetCol, text=text)
+    def moveToTarget(self, drag_col, target_col):
+        try:
+            # 将drag_col数据保存
+            event = self.icon_table.cellWidget(1, drag_col)
+            text = self.icon_table.item(3, drag_col).text()
+            # 将drag_col抹掉
+            self.icon_table.removeColumn(drag_col)
+            # 插入新列
+            self.icon_table.insertColumn(target_col)
+            self.icon_table.setIcon(row=1, col=target_col, name=event.name, pixmap=event.pixmap(), value=event.value)
+            self.icon_table.setText(row=3, col=target_col, text=text)
+        except Exception:
+            print("error happens in move icon to target. [iconArea/main.py]")
 
     def becomeWhite(self):
         # pass
