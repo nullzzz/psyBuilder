@@ -124,38 +124,13 @@ class ImageDisplay(QMainWindow):
         self.stretch_mode = self.pro.general.stretch_mode.currentText()
         self.back_color = self.pro.general.back_color.currentText()
         self.transparent_value = self.pro.general.transparent.value()
-        self.x_pos = self.pro.frame.xpos.currentText()
-        self.y_pos = self.pro.frame.ypos.currentText()
+        self.x_pos = self.pro.frame.x_pos.currentText()
+        self.y_pos = self.pro.frame.y_pos.currentText()
         self.w_size = self.pro.frame.width.currentText()
         self.h_size = self.pro.frame.height.currentText()
 
     # 返回设置参数
     def getInfo(self):
-        # isUSCK = self.pro.usck.checkState()
-        # source_color = self.pro.sck.currentText()
-        # align_h = self.pro.align_h.currentText()
-        # align_v = self.pro.align_v.currentText()
-        # clear_after = self.pro.clear_after.currentText()
-        # display_name = self.pro.screen_name.currentText()
-
-        # border_color = self.pro.frame.border_color.currentText()
-        # border_width = self.pro.frame.border_width.value()
-        #
-        # duration = self.pro.duration.duration.currentText()
-        # in_device, out_device = self.pro.duration.getInfo()
-
-        # general_info = {
-        #     "File name": self.file,
-        #     "Mirror up/down": bool(self.isUD),
-        #     "Mirror left/right": bool(self.isLR),
-        #     "Stretch": bool(self.isStretch),
-        #     "Stretch mode": self.stretch_mode,
-        #     "Back color": self.back_color,
-        #     "Transparent": self.transparent_value,
-        #     "Clear after": clear_after,
-        #     "Display Name": display_name,
-        # }
-
         return {**self.pro.general.getInfo(), **self.pro.frame.getInfo(), **self.pro.duration.getInfo()}
 
     # 设置输入输出设备

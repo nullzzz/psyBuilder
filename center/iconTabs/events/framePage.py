@@ -11,8 +11,8 @@ class Tab2(QWidget):
         super(Tab2, self).__init__(parent)
         self.attributes = []
         # up
-        self.xpos = QComboBox()
-        self.ypos = QComboBox()
+        self.x_pos = QComboBox()
+        self.y_pos = QComboBox()
         self.width = QComboBox()
         self.height = QComboBox()
         # down
@@ -22,21 +22,21 @@ class Tab2(QWidget):
 
     # 生成frame页面
     def setUI(self):
-        self.xpos.addItems(["0", "25", "50", "75", "100"])
-        self.xpos.setEditable(True)
-        self.ypos.addItems(["0", "25", "50", "75", "100"])
-        self.ypos.setEditable(True)
+        self.x_pos.addItems(["0", "25", "50", "75", "100"])
+        self.x_pos.setEditable(True)
+        self.y_pos.addItems(["0", "25", "50", "75", "100"])
+        self.y_pos.setEditable(True)
         valid_num = QRegExp("\[\w+\]|\d+%?")
-        self.xpos.setValidator(QRegExpValidator(valid_num))
-        self.ypos.setValidator(QRegExpValidator(valid_num))
-        self.xpos.setInsertPolicy(QComboBox.NoInsert)
-        self.xpos.lineEdit().returnPressed.connect(self.finalCheck)
-        self.ypos.setInsertPolicy(QComboBox.NoInsert)
-        self.ypos.lineEdit().returnPressed.connect(self.finalCheck)
-        self.xpos.lineEdit().textChanged.connect(self.findVar)
-        self.xpos.lineEdit().returnPressed.connect(self.finalCheck)
-        self.ypos.lineEdit().textChanged.connect(self.findVar)
-        self.ypos.lineEdit().returnPressed.connect(self.finalCheck)
+        self.x_pos.setValidator(QRegExpValidator(valid_num))
+        self.y_pos.setValidator(QRegExpValidator(valid_num))
+        self.x_pos.setInsertPolicy(QComboBox.NoInsert)
+        self.x_pos.lineEdit().returnPressed.connect(self.finalCheck)
+        self.y_pos.setInsertPolicy(QComboBox.NoInsert)
+        self.y_pos.lineEdit().returnPressed.connect(self.finalCheck)
+        self.x_pos.lineEdit().textChanged.connect(self.findVar)
+        self.x_pos.lineEdit().returnPressed.connect(self.finalCheck)
+        self.y_pos.lineEdit().textChanged.connect(self.findVar)
+        self.y_pos.lineEdit().returnPressed.connect(self.finalCheck)
 
         self.width.addItems(["100%", "75%", "50%", "25%"])
         self.width.setEditable(True)
@@ -54,9 +54,9 @@ class Tab2(QWidget):
         group1 = QGroupBox("Geometry")
         layout1 = QGridLayout()
         layout1.addWidget(QLabel("X position"), 0, 0)
-        layout1.addWidget(self.xpos, 0, 1)
+        layout1.addWidget(self.x_pos, 0, 1)
         layout1.addWidget(QLabel("Y position"), 1, 0)
-        layout1.addWidget(self.ypos, 1, 1)
+        layout1.addWidget(self.y_pos, 1, 1)
         layout1.addWidget(QLabel("Width"), 0, 2)
         layout1.addWidget(self.width, 0, 3)
         layout1.addWidget(QLabel("Height"), 1, 2)
@@ -93,16 +93,17 @@ class Tab2(QWidget):
     # 设置可选属性
     def setAttributes(self, attributes):
         self.attributes = attributes
-        self.xpos.setCompleter(QCompleter(self.attributes))
-        self.ypos.setCompleter(QCompleter(self.attributes))
+        self.x_pos.setCompleter(QCompleter(self.attributes))
+        self.y_pos.setCompleter(QCompleter(self.attributes))
         self.width.setCompleter(QCompleter(self.attributes))
         self.height.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         return {
-            "X position": self.xpos.currentText(),
-            "Y position": self.ypos.currentText(),
+            "X position": self.x_pos.currentText(),
+            "Y position": self.y_pos.currentText(),
             "Width": self.width.currentText(),
             "Height": self.height.currentText(),
             "Border color:": self.border_color.currentText(),
-            "Border width:": self.border_width.value()}
+            "Border width:": self.border_width.value()
+        }
