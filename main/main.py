@@ -54,7 +54,7 @@ class MainWindow(QMainWindow):
         self.structure.structure_tree.itemDelete.connect(self.center.icon_tabs.deleteIcon)
         self.structure.structure_tree.timelineDelete.connect(self.center.icon_tabs.deleteTimeline)
         self.structure.propertiesShow.connect(self.center.icon_tabs.getWidgetProperties)
-
+        self.structure.nodeNameChange.connect(self.center.icon_tabs.changeTabName)
 
     def linkTimelineSignals(self, value):
         try:

@@ -33,8 +33,11 @@ class IconTabs(QTabWidget):
         # 用一个字典存放所有tab, 每个tab有一个随机的特征值
         # 键为特征值, 值为widget
         self.value_widget = {}
-        # value : parentValue
+        # value : parentValue, 仅仅限于timeline和其中icon, 不包含cycle和其中的timeline
         self.value_parent = {}
+        # timeline属性及父节点timeline
+        self.timeline_parent = {'Timeline.10001' : None}
+        self.timeline_attributes = {'Timeline.10001' : None}
 
         self.timeline = Timeline(self)
         self.value_widget['Timeline.10001'] = self.timeline
@@ -50,6 +53,8 @@ class IconTabs(QTabWidget):
         self.tabCloseRequested.connect(self.removeTab)
         # timeline
         self.linkTimelineSignals('Timeline.10001')
+        # cycle
+        self.cycleAdd.connect(self.linkCycleSignals)
 
     def linkTimelineSignals(self, value):
         try:
@@ -64,11 +69,31 @@ class IconTabs(QTabWidget):
             self.value_widget[value].icon_area.icon_table.iconRemove.connect(self.deleteTab)
             self.value_widget[value].icon_area.icon_table.propertiesShow.connect(self.getWidgetProperties)
 
+    def linkCycleSignals(self, value):
+        try:
+            cycle = self.value_widget[value]
+            try:
+                cycle.timelineAdd.disconnect(self.addTimeline)
+                cycle.timelineAdd.connect(self.addTimeline)
+            except Exception:
+                cycle.timelineAdd.connect(self.addTimeline)
+        except Exception:
+            print("error happens in link cycle signals. [iconTabs\main.py]")
+
     def addIcon(self, parent_value, name, pixmap, value):
         self.value_parent[value] = parent_value
 
+    # 单纯的保存所有timeline中的icon增减
     def removeIcon(self, parent_value, value):
         del self.value_parent[value]
+
+    def addTimeline(self, cycle_value, timeline_name, timeline_pixmap, timeline_value):
+        timeline_parent = self.value_parent[cycle_value]
+        self.timeline_parent[timeline_value] = timeline_parent
+        print(self.timeline_parent)
+
+    def removeTimeline(self):
+        pass
 
     def openTab(self, value, name, can_open=True):
         try:
@@ -87,6 +112,9 @@ class IconTabs(QTabWidget):
                 if widget_type == "Cycle":
                     widget = Cycle(value=value)
                     tab_icon = QIcon(".\\.\\image\\cycle.png")
+                elif widget_type == "Timeline":
+                    widget = Timeline(value=value)
+                    tab_icon = QIcon(".\\.\\image\\timeLine.png")
                 elif widget_type == "SoundOut":
                     widget = SoundOut()
                     tab_icon = QIcon(".\\.\\image\\sound.png")
@@ -140,7 +168,13 @@ class IconTabs(QTabWidget):
                     if widget_type == 'Cycle':
                         self.cycleAdd.emit(value)
                     # 各种widget的propertiesChange信号
-                    widget.propertiesChange.connect(self.getChangedProperties)
+                    try:
+                        widget.propertiesChange.connect(self.getChangedProperties)
+                    except Exception:
+                        if widget_type == "Timeline":
+                            pass
+                        else:
+                            print("error happens in connect propertiesChange. [iconTabs/main.py]")
 
                     if value != 'Timeline.10001' and value.startswith('Timeline.'):
                         self.linkTimelineSignals(value)
@@ -181,30 +215,64 @@ class IconTabs(QTabWidget):
                 tab_index = self.indexOf(self.value_widget[value])
                 if tab_index != -1:
                     self.removeTab(tab_index)
+                # 如果是cycle, 要级联删除其中的timeline及timeline中的一切
+                if value.startswith("Cycle."):
+                    cycle = self.value_widget[value]
+                    for row in range(0, cycle.timeline_table.rowCount()):
+                        try:
+                            timeline_value = cycle.row_value[row]
+                            self.deleteTimeline(value, timeline_value)
+                        except Exception:
+                            pass
+                # 如果是timeline, 要删除其中所有的icon
+                elif value.startswith("Timeline."):
+                    timeline = self.value_widget[value]
+                    for col in range(1, timeline.icon_area.icon_table.fill_count + 1):
+                        try:
+                            icon_value = timeline.icon_area.icon_table.cellWidget(1, col).value
+                            self.deleteTab(icon_value)
+                        except Exception:
+                            print("row may be out. [iconTabs/main.py]")
+                # 删除该tab相关属性
+                if not value.startswith("Timeline.") and value in self.value_parent:
+                    del self.value_parent[value]
                 del self.value_widget[value]
         except Exception:
-            print("error happens delete tab. [iconTabs/main.py]")
+            print("error happens delete {} tab. [iconTabs/main.py]".format(value.split('.')[0]))
+
+    # 删除cycle中的timeline, timeline只能通过在structure中删除
+    def deleteTimeline(self, parent_value, value):
+        try:
+            # 删除timeline所在cycle中那一行
+            cycle = self.value_widget[parent_value]
+            cycle.deleteTimeline(value)
+
+            try:
+                del self.timeline_parent[value]
+                # del self.timeline_attributes[value]
+                # 关闭timeline的tab及其所有icon的tab
+                self.deleteTab(value)
+            except Exception:
+                print("some error happens in delete timeline in icon tabs. [iconTabs/main.py]")
+        except Exception:
+            print("some errors happen in delete timeline in cycle. [iconTabs/main.py]")
 
     def closeTab(self, widget):
         tab_index = self.indexOf(widget)
         if tab_index != -1:
             self.removeTab(tab_index)
 
+    # 删除某个icon, 感觉和之前的removeIcon有点重复造成浪费
     def deleteIcon(self, value):
         try:
-            if not value.startswith("Timeline."):
+            if not value.startswith("Timeline.") and value in self.value_parent:
                 parent_value = self.value_parent[value]
                 timeline = self.value_widget[parent_value]
                 timeline.icon_area.icon_table.removeIcon(value)
-        except Exception:
-            print("Some errors happen in delete icon in timeLine. [iconTabs/main.py]")
+        except Exception as e:
+            print(e)
+            print("some errors happen in delete icon in timeLine. [iconTabs/main.py]")
 
-    def deleteTimeline(self, parent_value, value):
-        try:
-            cycle = self.value_widget[parent_value]
-            cycle.deleteTimeline(value)
-        except Exception:
-            print("some errors happen in delete timeLine in cycle. [iconTabs/main.py]")
 
     def copyIcon(self, old_value, new_value, text):
         try:
