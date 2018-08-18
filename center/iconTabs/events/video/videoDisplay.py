@@ -91,8 +91,7 @@ class VideoDisplay(QMainWindow):
             if QFileInfo(self.file).isFile():
                 try:
                     self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
-                    self.mediaPlayer.setPosition(self.getStartTime
-                        (self.startPos))
+                    self.mediaPlayer.setPosition(self.getStartTime(self.startPos))
                 except Exception as e:
                     print(e)
             else:
@@ -126,8 +125,8 @@ class VideoDisplay(QMainWindow):
             self.clear_after = True
         else:
             self.clear_after = False
-        self.x_pos = self.pro.frame.xpos.currentText()
-        self.y_pos = self.pro.frame.ypos.currentText()
+        self.x_pos = self.pro.frame.x_pos.currentText()
+        self.y_pos = self.pro.frame.y_pos.currentText()
         self.w_size = self.pro.frame.width.currentText()
         self.h_size = self.pro.frame.height.currentText()
 

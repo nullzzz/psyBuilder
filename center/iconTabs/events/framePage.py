@@ -104,6 +104,6 @@ class Tab2(QWidget):
             "Y position": self.y_pos.currentText(),
             "Width": self.width.currentText(),
             "Height": self.height.currentText(),
-            "Border color:": self.border_color.currentText(),
-            "Border width:": self.border_width.value()
+            "Border color": self.border_color.currentText(),
+            "Border width": self.border_width.value()
         }
