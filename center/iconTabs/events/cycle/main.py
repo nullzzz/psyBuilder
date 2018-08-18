@@ -97,18 +97,21 @@ class Cycle(QMainWindow):
         self.timeline_table.cellChanged.connect(self.addTimeline)
 
     def addRows(self):
-        dialog = QInputDialog()
-        # 不可点击其他界面
-        dialog.setModal(True)
+        try:
+            dialog = QInputDialog()
+            # 不可点击其他界面
+            dialog.setModal(True)
 
-        dialog.setWindowFlag(Qt.WindowCloseButtonHint)
+            dialog.setWindowFlag(Qt.WindowCloseButtonHint)
 
-        rows, flag = dialog.getInt(self, "Add Rows", "Input rows you want to add.", 1, 1, 10, 1)
+            rows, flag = dialog.getInt(self, "Add Rows", "Input rows you want to add.", 1, 1, 10, 1)
 
-        if flag:
-            while rows:
-                self.timeline_table.addRow()
-                rows -= 1
+            if flag:
+                while rows:
+                    self.timeline_table.addRow()
+                    rows -= 1
+        except Exception:
+            print("error happens in add row. [cycle/main.py]")
 
     def addColumn(self):
         dialog = ColAdd(self)
@@ -121,11 +124,14 @@ class Cycle(QMainWindow):
         dialog.exec()
 
     def setNameAndValue(self, col):
-        name = self.timeline_table.horizontalHeaderItem(col).text()
+        try:
+            name = self.timeline_table.horizontalHeaderItem(col).text()
 
-        dialog = ColAdd(None, name, self.timeline_table.values[col], col)
-        dialog.data.connect(self.getData)
-        dialog.exec()
+            dialog = ColAdd(None, name, self.timeline_table.values[col], col)
+            dialog.data.connect(self.getData)
+            dialog.exec()
+        except Exception:
+            print("error happens in set col name and default value. [cycle/main.py]")
 
     def getData(self, data):
         if not len(data) % 2:

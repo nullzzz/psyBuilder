@@ -11,6 +11,8 @@ class Structure(QDockWidget):
     nodeDoubleClick = pyqtSignal(str, str)
     # 发送到main窗口串联和structure相关及icon tabs串联和tabs相关, 在其中为新增timeline串接信号 (value)
     timelineAdd = pyqtSignal(str)
+    # 发送到icon tabs (value, name)
+    nodeNameChange = pyqtSignal(str, str)
     # 单击node, 显示properties
     propertiesShow = pyqtSignal(str)
 
@@ -87,6 +89,7 @@ class Structure(QDockWidget):
     def changeNodeName(self, value, name):
         if value in self.value_node:
             self.value_node[value].setText(0, name)
+            self.nodeNameChange.emit(value, name)
 
     def openTab(self):
         try:

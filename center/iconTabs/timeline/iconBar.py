@@ -8,13 +8,13 @@ class IconList(QListWidget):
         super(IconList, self).__init__(parent)
         # 以Icon为主进行展示
         self.setViewMode(QListView.IconMode)
-        self.setResizeMode(QListView.Adjust)
-        self.setSpacing(20)
+        # self.setResizeMode(QListView.Adjust)
         # 设置横向
         self.setFlow(QListView.LeftToRight)
         self.setWrapping(False)
         self.setMovement(QListView.Static)
         self.setSpacing(10)
+
         self.setFrameStyle(QFrame.NoFrame)
         # 允许拖拽
         self.setDragEnabled(True)

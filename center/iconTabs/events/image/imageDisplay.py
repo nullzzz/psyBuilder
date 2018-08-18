@@ -148,5 +148,5 @@ class ImageDisplay(QMainWindow):
 
     # 设置可选参数
     def setAttributes(self, attributes):
-        format_attributes = [f"[{attribute}]" for attribute in attributes]
+        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro.setAttributes(format_attributes)

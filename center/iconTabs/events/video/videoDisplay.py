@@ -142,7 +142,7 @@ class VideoDisplay(QMainWindow):
             return 0
 
     def setAttributes(self, attributes):
-        format_attributes = [f"[{attribute}]" for attribute in attributes]
+        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro.setAttributes(format_attributes)
 
     def getInfo(self):

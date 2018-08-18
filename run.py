@@ -17,11 +17,11 @@ tabBar = """
         border: 0px transparent black;
     }
 
-    QTabWidget::iconTabs-bar {
+    QTabWidget::tab {
         text-align: left;
     }
 
-    QTabBar::iconTabs{
+    QTabBar::tab{
         min-height: 30px; 
         min-width: 100px;
     }
@@ -45,7 +45,7 @@ tabBar = """
 dockWidget = """
     QDockWidget {
         background: #F5F5F5;
-        border: 1px solid #403F3F;
+        border: 1px solid #d3d3d3;
         titlebar-close-icon: url(image/close.png);
         titlebar-normal-icon: url(image/undock.png);
     }
@@ -87,7 +87,7 @@ mainWindow = """
 
     QMainWindow::separator:hover
     {
-        background-color: #787876;
+        background-color: #d3d3d3;
         color: white;
         padding-left: 4px;
         border: 1px solid #76797C;
@@ -321,6 +321,21 @@ tableView = """
     }
 """
 
+listView = """
+    QListView {
+    show-decoration-selected: 1; /* make the selection span the entire width of the view */
+    }
+    
+    QListView::item {
+        min-width:80px;
+    }
+    
+    QListView::item:hover {
+        background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                    stop: 0 #FAFBFE, stop: 1 #aad4fe);
+    }
+"""
+
 headerView = """
     QHeaderView::section
     {
@@ -394,7 +409,7 @@ QMenu::indicator {
 }
 """
 
-styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + pushButton + tree + menu
+styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + pushButton + tree + menu + listView
 # styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + lineEdit + pushButton + tree + menu
 
 if __name__ == '__main__':
