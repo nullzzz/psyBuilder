@@ -6,14 +6,14 @@ from PyQt5.QtGui import QFont
 class ColsAdd(QDialog):
     data = pyqtSignal(list)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, exist_name=[]):
         super(ColsAdd, self).__init__(parent)
 
         self.setFixedWidth(320)
         self.setWindowTitle("Add Columns")
         self.names = []
         self.values = []
-
+        self.exist_name = exist_name
         self.form = QFormLayout(self)
         tip = QLabel("Set Names and it's default value.")
         font = QFont()
@@ -41,8 +41,8 @@ class ColsAdd(QDialog):
         cancelButton.clicked.connect(self.close)
 
         hBox = QHBoxLayout()
-        hBox.addWidget(addButton)
         hBox.addWidget(okButton)
+        hBox.addWidget(addButton)
         hBox.addWidget(cancelButton)
 
         self.form.addRow(hBox)
@@ -74,7 +74,7 @@ class ColsAdd(QDialog):
         index = -1
         for i in range(0, len(self.values)):
             name = self.names[i].text()
-            if name and name not in names:
+            if name and name not in names and name not in self.exist_name:
                 names.append(name)
                 data.append(name)
                 data.append(self.values[i].text())

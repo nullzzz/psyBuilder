@@ -16,6 +16,10 @@ class Cycle(QMainWindow):
     timelineAdd = pyqtSignal(str, str, QPixmap, str)
     # 某行的timeline名称修改 (value, name)
     timelineNameChange = pyqtSignal(str, str)
+    # 新增attribute (value, name, default_value)
+    attributeAdd = pyqtSignal(str, str, str)
+    # attribute修改 (value, name, attribute_value)
+    attributeChange = pyqtSignal(str, str, str)
 
     def __init__(self, parent=None, value=''):
         super(Cycle, self).__init__(parent)
@@ -30,6 +34,7 @@ class Cycle(QMainWindow):
         self.row_name = {}
         # value : row
         self.value_row = {}
+        self.timeline_count = 0
 
         self.setCentralWidget(self.timeline_table)
 
@@ -94,7 +99,8 @@ class Cycle(QMainWindow):
         self.timeline_table.horizontalHeader().sectionDoubleClicked.connect(self.setNameAndValue)
         self.property.ok_bt.clicked.connect(self.savePropertiesClose)
         self.property.apply_bt.clicked.connect(self.saveProperties)
-        self.timeline_table.cellChanged.connect(self.addTimeline)
+        self.timeline_table.cellChanged.connect(self.addOrChangeTimeline)
+        self.timeline_table.cellChanged.connect(self.changeAttribute)
 
     def addRows(self):
         try:
@@ -114,12 +120,12 @@ class Cycle(QMainWindow):
             print("error happens in add row. [cycle/main.py]")
 
     def addColumn(self):
-        dialog = ColAdd(self)
+        dialog = ColAdd(self, exist_name=self.timeline_table.col_header)
         dialog.data.connect(self.getData)
         dialog.exec()
 
     def addColumns(self):
-        dialog = ColsAdd(self)
+        dialog = ColsAdd(self, exist_name=self.timeline_table.col_header)
         dialog.data.connect(self.getData)
         dialog.exec()
 
@@ -127,29 +133,47 @@ class Cycle(QMainWindow):
         try:
             name = self.timeline_table.horizontalHeaderItem(col).text()
 
-            dialog = ColAdd(None, name, self.timeline_table.values[col], col)
+            dialog = ColAdd(None, name, self.timeline_table.col_value[col], col)
             dialog.data.connect(self.getData)
             dialog.exec()
         except Exception:
             print("error happens in set col name and default value. [cycle/main.py]")
 
     def getData(self, data):
+        # 新增attributes
         if not len(data) % 2:
             for i in range(0, len(data), 2):
-                self.timeline_table.headers.append(data[i])
-                self.timeline_table.values.append(data[i + 1])
+                self.timeline_table.col_header.append(data[i])
+                self.timeline_table.col_value.append(data[i + 1])
                 self.timeline_table.insertColumn(self.timeline_table.columnCount())
                 for row in range(0, self.timeline_table.rowCount()):
-                    self.timeline_table.setItem(row, self.timeline_table.columnCount() - 1, QTableWidgetItem(data[i + 1]))
+                    self.timeline_table.setItem(row, self.timeline_table.columnCount() - 1,
+                                                QTableWidgetItem(data[i + 1]))
+                # 每次新增一个属性, 给icon tabs发送一个信号, 给此cycle中的timeline增加属性
+                self.attributeAdd.emit(self.value, data[i], data[i + 1])
         else:
             col = data[-1]
-            default = self.timeline_table.values[col]
-            self.timeline_table.headers[col] = data[0]
-            self.timeline_table.values[col] = data[1]
+            default = self.timeline_table.col_value[col]
+            self.timeline_table.col_header[col] = data[0]
+            self.timeline_table.col_value[col] = data[1]
             for row in range(0, self.timeline_table.rowCount()):
-                if self.timeline_table.item(row, col) == None or self.timeline_table.item(row, col).text() in ['', default]:
+                if self.timeline_table.item(row, col) == None or self.timeline_table.item(row, col).text() in ['',
+                                                                                                               default]:
                     self.timeline_table.setItem(row, col, QTableWidgetItem(data[1]))
-        self.timeline_table.setHorizontalHeaderLabels(self.timeline_table.headers)
+        self.timeline_table.setHorizontalHeaderLabels(self.timeline_table.col_header)
+
+    def changeAttribute(self, row, col):
+        try:
+            # col > 1的列才是attribute
+            if col > 1:
+                # 如果此行存在有效的timeline
+                if row in self.row_value:
+                    attribute_name = self.timeline_table.col_header[col]
+                    attribute_value = self.timeline_table.item(row, col).text()
+                    timeline_value = self.row_value[row]
+                    self.attributeChange.emit(timeline_value, attribute_name, attribute_value)
+        except Exception:
+            print("error happens in change timeline attribute. [cycle/main.py]")
 
     def setting(self):
         self.setProperties()
@@ -196,18 +220,19 @@ class Cycle(QMainWindow):
 
         return res
 
-    def addTimeline(self, row, col):
+    def addOrChangeTimeline(self, row, col):
         if col == 1:
             if row not in self.row_value:
                 name = self.timeline_table.item(row, col).text()
                 if name:
-                    event = Icon(parent=None, name="Timeline", pixmap=".\\.\\image\\timeLine.png")
-                    self.timelineAdd.emit(self.value, name, event.pixmap(), event.value)
-                    self.timeline_table.value_row[event.value] = row
-                    # 数据存储
-                    self.row_value[row] = event.value
+                    timeline_icon = Icon(parent=None, name="Timeline", pixmap=".\\.\\image\\timeLine.png")
+                    # 相关数据存储
+                    self.row_value[row] = timeline_icon.value
                     self.row_name[row] = name
-                    self.value_row[event.value] = row
+                    self.value_row[timeline_icon.value] = row
+                    # 给
+                    self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
+                    self.timeline_count += 1
             else:
                 name = self.timeline_table.item(row, col).text()
                 if name:
@@ -221,6 +246,7 @@ class Cycle(QMainWindow):
         try:
             row = self.value_row[value]
             self.timeline_table.removeRow(row)
+            self.timeline_count -= 1
             # 数据刷新
             del self.value_row[value]
             del self.row_value[row]

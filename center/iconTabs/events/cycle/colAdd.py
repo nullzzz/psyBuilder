@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSignal, Qt
 class ColAdd(QDialog):
     data = pyqtSignal(list)
 
-    def __init__(self, parent=None, name="", value="", col=-1):
+    def __init__(self, parent=None, name="", value="", col=-1, exist_name=[]):
         super(ColAdd, self).__init__(parent)
 
         self.setWindowTitle("Add Column")
@@ -14,6 +14,7 @@ class ColAdd(QDialog):
 
         self.col = col
         self.name = QLineEdit(name, self)
+        self.exist_name = exist_name
         if col in [0, 1]:
             self.name.setEnabled(False)
         self.value = QLineEdit(value, self)
@@ -44,7 +45,11 @@ class ColAdd(QDialog):
     def submitData(self):
         name = self.name.text()
         value = self.value.text()
-        if name:
+        if not name:
+            QMessageBox.information(self, "Tips", "Name can't be none.")
+        elif name in self.exist_name:
+            QMessageBox.information(self, "Tips", "Name already exists.")
+        else:
             data = []
             data.append(name)
             data.append(value)
@@ -52,5 +57,3 @@ class ColAdd(QDialog):
             if self.col != -1:
                 data.append(self.col)
             self.data.emit(data)
-        else:
-            QMessageBox.information(self, "Tips", "Name不能为空")

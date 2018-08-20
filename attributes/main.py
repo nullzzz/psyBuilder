@@ -3,6 +3,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTableWidgetItem, QDockWidget
 
 from .attributesTable import AttributesTable
+from .attributeItem import AttributeItem
 
 
 class Attributes(QDockWidget):
@@ -16,12 +17,22 @@ class Attributes(QDockWidget):
         self.setAllowedAreas(Qt.LeftDockWidgetArea)
         self.setWidget(self.attributes_table)
 
-        self.setItem(0, 0, QTableWidgetItem(QIcon(".\\Image\\arrows_up.png"), "2"))
-        self.setItem(1, 0, QTableWidgetItem(QIcon(".\\Image\\arrows_up.png"), "1"))
-        self.setItem(2, 0, QTableWidgetItem(QIcon(".\\Image\\arrows_up.png"), "4"))
-        self.setItem(3, 0, QTableWidgetItem(QIcon(".\\Image\\arrows_up.png"), "3"))
+    def setAttributeItem(self, row, col, attribute_name, attribute_value):
+        try:
+            # set Row Count
+            attribute = AttributeItem(attribute_name, attribute_value)
+            if row == self.attributes_table.rowCount():
+                self.attributes_table.setRowCount(self.attributes_table.rowCount() + 1)
+            self.attributes_table.setItem(row, col, attribute)
+        except Exception:
+            print("error happens in set attribute")
 
-    def setItem(self, row, col, QTableWidgetItem):
-        # set Row Count
-        self.attributes_table.setRowCount(self.attributes_table.rowCount() + 1)
-        self.attributes_table.setItem(row, col, QTableWidgetItem)
+    def showAttributes(self, attributes):
+        try:
+            # 讲attribute table初始化
+            for row in range(0, self.attributes_table.rowCount()):
+                self.attributes_table.removeRow(0)
+            for name in attributes:
+                self.setAttributeItem(self.attributes_table.rowCount(), 0, name, attributes[name])
+        except Exception:
+            print("error happens show timeline attributes. [attributes/main.py]")

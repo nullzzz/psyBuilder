@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
         # icon tabs
         self.center.icon_tabs.cycleAdd.connect(self.linkCycleSignals)
         self.center.icon_tabs.propertiesShow.connect(self.properties.showProperties)
+        self.center.icon_tabs.attributesShow.connect(self.attributes.showAttributes)
         # 将timeline中icon的变更与structure相连
         self.linkTimelineSignals('Timeline.10001')
         # structure中信号
