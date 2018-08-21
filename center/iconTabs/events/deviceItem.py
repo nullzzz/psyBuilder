@@ -22,6 +22,7 @@ class DeviceOutItem(QListWidgetItem):
 
     def __init__(self, name=None, parent=None):
         super(DeviceOutItem, self).__init__(name, parent)
+        self.attributes = []
         self.name = name
         self.devices = []
         self.pro = QWidget()
@@ -103,6 +104,7 @@ class DeviceInItem(QListWidgetItem):
 
     def __init__(self, name=None, parent=None):
         super(DeviceInItem, self).__init__(name, parent)
+        self.attributes = []
         self.name = name
         self.pro1 = QWidget()
         self.device_label = QLabel(name)

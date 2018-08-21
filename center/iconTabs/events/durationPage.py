@@ -9,6 +9,7 @@ from .deviceItem import DeviceOutItem, DeviceInItem
 class Tab3(QWidget):
     def __init__(self, parent=None):
         super(Tab3, self).__init__(parent)
+        self.attributes = []
         # top
         self.duration = QComboBox()
         # output device
