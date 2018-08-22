@@ -2,10 +2,10 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTabWidget, QTabBar
 
+from center.iconTabs.events.soundOut.soundDisplay import SoundDisplay
 from center.iconTabs.timeline.main import Timeline
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
-from .events.soundOut.main import SoundOut
 from .events.text.main import TextDisplay
 from .events.video.videoDisplay import VideoDisplay
 from .eyeTracker.DC import EyeDC
@@ -38,7 +38,7 @@ class IconTabs(QTabWidget):
         # value : parentValue, 仅仅限于timeline和其中icon, 不包含cycle和其中的timeline
         self.value_parent = {}
         # timeline属性及父节点timeline
-        self.timeline_parent = {'Timeline.10001' : None}
+        self.timeline_parent = {'Timeline.10001': None}
 
         self.timeline = Timeline(self)
         self.value_widget['Timeline.10001'] = self.timeline
@@ -209,7 +209,7 @@ class IconTabs(QTabWidget):
                     widget = Timeline(value=value)
                     tab_icon = QIcon(".\\.\\image\\timeLine.png")
                 elif widget_type == "SoundOut":
-                    widget = SoundOut()
+                    widget = SoundDisplay()
                     tab_icon = QIcon(".\\.\\image\\sound.png")
                 elif widget_type == "Text":
                     widget = TextDisplay()

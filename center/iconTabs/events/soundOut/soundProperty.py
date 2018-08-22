@@ -1,24 +1,21 @@
-from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
+from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget, QApplication)
 
 from center.iconTabs.events.durationPage import Tab3
-from center.iconTabs.events.framePage import Tab2
-from .imageGeneral import ImageTab1
+from center.iconTabs.events.soundOut.soundGeneral import SoundTab1
 
 
-class ImageProperty(QWidget):
+class SoundProperty(QWidget):
     def __init__(self, parent=None):
-        super(ImageProperty, self).__init__(parent)
+        super(SoundProperty, self).__init__(parent)
         self.tab = QTabWidget()
         self.below = QWidget()
 
-        self.general = ImageTab1()
-        self.frame = Tab2()
+        self.general = SoundTab1()
         self.duration = Tab3()
         self.tab.addTab(self.general, "general")
-        self.tab.addTab(self.frame, "frame")
         self.tab.addTab(self.duration, "duration")
         # bottom
-        self.ok_bt = QPushButton("OK")
+        self.ok_bt = QPushButton("Ok")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
         self.setButtons()
@@ -27,7 +24,7 @@ class ImageProperty(QWidget):
 
     # 生成主界面
     def setUI(self):
-        self.setWindowTitle("Image property")
+        self.setWindowTitle("Sound property")
         self.resize(600, 800)
         # self.setFixedSize(600, 800)
         main_layout = QVBoxLayout()
@@ -59,5 +56,16 @@ class ImageProperty(QWidget):
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
-        self.frame.setAttributes(attributes)
         self.duration.setAttributes(attributes)
+
+
+if __name__ == "__main__":
+    import sys
+
+    app = QApplication(sys.argv)
+
+    t = SoundProperty()
+
+    t.show()
+
+    sys.exit(app.exec())
