@@ -1,10 +1,13 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTextEdit
+from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTextEdit, QAction, QApplication
 
 from attributes.main import Attributes
 from center.main import Center
 from properties.main import Properties
 from structure.main import Structure
+from output.main import Output
+
+import json
 
 
 class MainWindow(QMainWindow):
@@ -12,6 +15,22 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(parent)
         # set UI
         self.setWindowTitle("PsyDemo")
+        # menuBar
+        menu_bar = self.menuBar()
+        # file menu
+        file_menu = menu_bar.addMenu("&File")
+
+        new_file_action = QAction("&New", self)
+        open_file_action = QAction("&Open", self)
+        save_file_action = QAction("&Save", self)
+        save_file_action.triggered.connect(self.getData)
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(QApplication.exit)
+
+        file_menu.addAction(new_file_action)
+        file_menu.addAction(open_file_action)
+        file_menu.addAction(save_file_action)
+        file_menu.addAction(exit_action)
 
         # 设置dock widgets
         # attributes
@@ -27,9 +46,8 @@ class MainWindow(QMainWindow):
         self.center = Center()
         self.center.setWindowTitle("Main")
         # output
-        self.output = QDockWidget()
+        self.output = Output()
         self.output.setWindowTitle("Output")
-        self.output.setWidget(QTextEdit())
 
         # 添加dock widget
         self.addDockWidget(Qt.LeftDockWidgetArea, self.structure)
@@ -81,3 +99,9 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].timelineNameChange.connect(self.structure.changeNodeName)
         except Exception:
             print("error happens in link cycle signals to structure. [main/main.py]")
+
+    def getData(self):
+        node_value = self.structure.getNodeValue()
+        self.output.text_area.setText(
+            "Only show structure data, attributes or properties will be show in next version.\n" + json.dumps(
+                node_value))

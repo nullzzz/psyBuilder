@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QDockWidget
 from .structureItem import StructureItem
 from .structureTree import StructureTree
 
+from collections import OrderedDict
+
 
 class Structure(QDockWidget):
     # 打开tab (value, name)
@@ -21,20 +23,21 @@ class Structure(QDockWidget):
 
         # 键为value, 值为StructureItem
         self.value_node = {}
+        self.data = OrderedDict()
 
         self.structure_tree = StructureTree()
         # 设置列数、头标签
         self.structure_tree.setColumnCount(1)
         self.structure_tree.setHeaderLabel("E-Object")
         # 隐藏头标签
-        self.structure_tree.setHeaderHidden(True)
-        root = StructureItem(self.structure_tree, 'Timeline.10001')
-        root.setText(0, "Timeline")
-        root.setIcon(0, QIcon(".\\image\\timeLine.png"))
-        self.value_node['Timeline.10001'] = root
+        self.structure_tree.setHeaderHidden(False)
+        self.root = StructureItem(self.structure_tree, 'Timeline.10001')
+        self.root.setText(0, "Timeline")
+        self.root.setIcon(0, QIcon(".\\image\\timeLine.png"))
+        self.value_node['Timeline.10001'] = self.root
         # 添加根节点
-        self.structure_tree.addTopLevelItem(root)
-        self.structure_tree.collapseItem(root)
+        self.structure_tree.addTopLevelItem(self.root)
+        self.structure_tree.collapseItem(self.root)
 
         self.structure_tree.expandAll()
 
@@ -101,3 +104,24 @@ class Structure(QDockWidget):
                 self.timelineAdd.emit(value)
         except Exception:
             print("error happens in open tab. [structure/main.py]")
+
+    def getNodeValue(self):
+        # 广度优先遍历
+        node_value = OrderedDict()
+        for i in range(0, self.structure_tree.topLevelItemCount()):
+            root = self.structure_tree.topLevelItem(i)
+            node_value[root.value] = self.do_getNodeValue(root, [])
+
+        return node_value
+
+    def do_getNodeValue(self, node: StructureItem, data: list):
+        for i in range(0, node.childCount()):
+            child = node.child(i)
+            if child.value.startswith("Cycle.") or child.value.startswith("Timeline."):
+                grand_child_data = OrderedDict()
+                grand_child_data[child.value] = self.do_getNodeValue(child, [])
+                data.append(grand_child_data)
+            else:
+                data.append(child.value)
+
+        return data
