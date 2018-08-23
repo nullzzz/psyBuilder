@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout
 
 
 class EndR(QWidget):
@@ -55,11 +55,11 @@ class EndR(QWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.closed.emit(self)
+        self.tabClose.emit(self)
 
     def cancel(self):
         self.close()
-        self.closed.emit(self)
+        self.tabClose.emit(self)
 
     def apply(self):
         self.msg = self.statue_msg.text()

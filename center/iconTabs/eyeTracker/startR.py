@@ -52,15 +52,16 @@ class StartR(QWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.closed.emit(self)
+        self.tabClose.emit(self)
 
     def cancel(self):
         self.close()
-        self.closed.emit(self)
+        self.tabClose.emit(self)
 
     def apply(self):
         self.msg = self.statue_msg.text()
         self.propertiesChange.emit(self.getProperties())
+
 
     def getProperties(self):
         return {"Statue Message": self.msg}
