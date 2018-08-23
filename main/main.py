@@ -36,7 +36,40 @@ class MainWindow(QMainWindow):
         file_menu.addAction(new_file_action)
         file_menu.addAction(open_file_action)
         file_menu.addAction(save_file_action)
+        file_menu.addSeparator()
         file_menu.addAction(exit_action)
+        # view menu
+        view_menu = menu_bar.addMenu("&View")
+
+        attribute_action = QAction("&Attribute", self)
+        structure_action = QAction("&Structure", self)
+        main_action = QAction("&Main", self)
+        property_action = QAction("&Property", self)
+        output_action = QAction("&Output", self)
+        default_action = QAction("&Default", self)
+
+        view_menu.addAction(attribute_action)
+        view_menu.addAction(structure_action)
+        view_menu.addAction(main_action)
+        view_menu.addAction(property_action)
+        view_menu.addAction(output_action)
+        view_menu.addSeparator()
+        view_menu.addAction(default_action)
+
+        # devices menu
+        devices_menu = menu_bar.addMenu("&Devices")
+
+        output_devices_action = QAction("&Output Devices", self)
+        input_devices_action = QAction("&Input Devices", self)
+
+        devices_menu.addAction(output_devices_action)
+        devices_menu.addAction(input_devices_action)
+
+        # help menu
+        help_menu = menu_bar.addMenu("&Help")
+        about_action = QAction("&About", self)
+
+        help_menu.addAction(about_action)
 
         # 设置dock widgets
         # attributes
