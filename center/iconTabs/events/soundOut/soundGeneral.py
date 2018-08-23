@@ -156,10 +156,10 @@ class SoundTab1(QWidget):
     def getInfo(self):
         return {
             "File name": self.file_name.text(),
-            "Buffer size": f"{self.buffer_size.text()}ms",
+            "Buffer size": "{}ms".format(self.buffer_size.text()),
             "Buffer mode": self.buffer_mode.currentText(),
-            "Start offset": f"{self.start_offset.text()}ms",
-            "Stop offset": f"{self.stop_offset.text()}ms",
+            "Start offset": "{}ms".format(self.start_offset.text()),
+            "Stop offset": "{}ms".format(self.stop_offset.text()),
             "Loop": self.loop.currentText(),
             "Volume control": bool(self.volume_control.checkState()),
             "Volume": self.volume.value(),

@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
-from PyQt5.QtWidgets import QAction, QMainWindow, QInputDialog, QTableWidgetItem, QMessageBox, QMenu, QApplication
+from PyQt5.QtWidgets import QAction, QMainWindow, QInputDialog, QTableWidgetItem, QMessageBox, QMenu, QApplication, \
+    QShortcut
 
 from center.iconTabs.timeline.icon import Icon
 from .colAdd import ColAdd
@@ -40,7 +41,14 @@ class Cycle(QMainWindow):
 
         self.property = Property()
         self.property.setWindowModality(Qt.ApplicationModal)
+        # tool bar
+        self.setToolbar()
+        # right button menu
+        self.setMenuAndShortcut()
+        # 信号
+        self.linkSignals()
 
+    def setToolbar(self):
         setting = QAction(QIcon(".\\.\\image\\setting.png"), "Setting", self)
         add_row = QAction(QIcon(".\\.\\image\\addRow.png"), "Add Row", self)
         add_rows = QAction(QIcon(".\\.\\image\\addRows.png"), "Add Rows", self)
@@ -61,41 +69,36 @@ class Cycle(QMainWindow):
         self.toolbar.addAction(add_rows)
         self.toolbar.addAction(add_column)
         self.toolbar.addAction(add_columns)
-        # 菜单
-        self.menu = QMenu(self)
 
+    def setMenuAndShortcut(self):
+        self.right_button_menu = QMenu(self)
         # copy action
         self.copy_data = []
         self.is_copy_disabled = False
-        # 在toolbar中设置copy以使用快捷键
-        self.copy_toolbar = QAction("&Copy", self)
-        self.copy_toolbar.triggered.connect(self.mergeForCopy)
-        self.copy_toolbar.setShortcut(QKeySequence(QKeySequence.Copy))
-        # self.copyForToolbar.setVisible(False)
-        self.toolbar.addAction(self.copy_toolbar)
+        # copy shortcut
+        copy_shortcut = QShortcut(QKeySequence("Ctrl+C"), self)
+        copy_shortcut.activated.connect(self.mergeForCopy)
         # copy for menu
-        self.copy_menu = QAction("Copy", self.menu)
-        self.copy_menu.triggered.connect(self.copyFromTable)
-        self.copy_menu.setShortcut(QKeySequence(QKeySequence.Copy))
-        self.menu.addAction(self.copy_menu)
+        self.copy_action = QAction("Copy", self.right_button_menu)
+        self.copy_action.triggered.connect(self.copyFromTable)
+        self.copy_action.setShortcut(QKeySequence(QKeySequence.Copy))
+        self.right_button_menu.addAction(self.copy_action)
 
         # paste action
         self.is_paste_disabled = True
         self.paste_row = 0
         self.paste_col = 0
         self.paste_data = []
-        # paste for tool bar
-        self.paste_toolbar = QAction("Paste", self)
-        self.paste_toolbar.setShortcut(QKeySequence(QKeySequence.Paste))
-        self.paste_toolbar.triggered.connect(self.mergeForPaste)
-        self.toolbar.addAction(self.paste_toolbar)
+        # paste shortcut
+        paste_shortcut = QShortcut(QKeySequence("Ctrl+V"), self)
+        paste_shortcut.activated.connect(self.mergeForPaste)
         # paste for menu
-        self.paste_menu = QAction("Paste", self)
-        self.paste_menu.setShortcut(QKeySequence(QKeySequence.Paste))
-        self.paste_menu.triggered.connect(self.pasteToTable)
-        self.menu.addAction(self.paste_menu)
+        self.paste_action = QAction("Paste", self)
+        self.paste_action.setShortcut(QKeySequence(QKeySequence.Paste))
+        self.paste_action.triggered.connect(self.pasteToTable)
+        self.right_button_menu.addAction(self.paste_action)
 
-        # 信号
+    def linkSignals(self):
         self.timeline_table.horizontalHeader().sectionDoubleClicked.connect(self.setNameAndValue)
         self.property.ok_bt.clicked.connect(self.savePropertiesClose)
         self.property.apply_bt.clicked.connect(self.saveProperties)
@@ -274,7 +277,7 @@ class Cycle(QMainWindow):
         self.getDataFromSelection()
         self.pasteSelection()
 
-        self.menu.exec(self.mapToGlobal(e.pos()))
+        self.right_button_menu.exec(self.mapToGlobal(e.pos()))
         # 初始化
         self.copy_data.clear()
         self.is_copy_disabled = False
@@ -311,9 +314,9 @@ class Cycle(QMainWindow):
                 self.copy_data.append(temp)
         # 根据判断结果来决定是否显示copy
         if self.is_copy_disabled or not self.copy_data:
-            self.copy_menu.setDisabled(True)
+            self.copy_action.setDisabled(True)
         else:
-            self.copy_menu.setEnabled(True)
+            self.copy_action.setEnabled(True)
 
     def mergeForCopy(self):
         self.getDataFromSelection()
@@ -351,7 +354,7 @@ class Cycle(QMainWindow):
                 self.is_paste_disabled = True
 
         # 根据判断结果来决定是否显示paste
-        self.paste_menu.setDisabled(self.is_paste_disabled)
+        self.paste_action.setDisabled(self.is_paste_disabled)
 
     def mergeForPaste(self):
         self.pasteSelection()

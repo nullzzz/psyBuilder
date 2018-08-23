@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTextEdit, QAction, QApplication
 
 from attributes.main import Attributes
@@ -10,9 +10,16 @@ from output.main import Output
 import json
 
 
+
+
 class MainWindow(QMainWindow):
+    AUTO_SAVE_TIME = 300000
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        # auto save
+        self.auto_save = QTimer(self)
+        self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
+        self.auto_save.timeout.connect(self.getData)
         # set UI
         self.setWindowTitle("PsyDemo")
         # menuBar
@@ -105,3 +112,5 @@ class MainWindow(QMainWindow):
         self.output.text_area.setText(
             "Only show structure data, attributes or properties will be show in next version.\n" + json.dumps(
                 node_value))
+        # reset timer
+        self.auto_save.start(MainWindow.AUTO_SAVE_TIME)

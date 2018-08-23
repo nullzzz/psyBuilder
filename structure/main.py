@@ -50,7 +50,7 @@ class Structure(QDockWidget):
 
     def linkSignal(self):
         self.structure_tree.doubleClicked.connect(self.openTab)
-        self.structure_tree.clicked.connect(lambda :self.propertiesShow.emit(self.structure_tree.currentItem().value))
+        self.structure_tree.clicked.connect(lambda: self.propertiesShow.emit(self.structure_tree.currentItem().value))
 
     def addRoot(self, text="root", pixmap=None, value=""):
         root = StructureItem(self.structure_tree, value)
@@ -70,7 +70,7 @@ class Structure(QDockWidget):
             node = StructureItem(parent, value)
             node.setText(0, text)
             node.setIcon(0, QIcon(pixmap))
-            node.setExpanded(True)
+            parent.setExpanded(True)
             # 往字典中加入
             self.value_node[value] = node
 
@@ -106,22 +106,28 @@ class Structure(QDockWidget):
             print("error happens in open tab. [structure/main.py]")
 
     def getNodeValue(self):
-        # 广度优先遍历
-        node_value = OrderedDict()
-        for i in range(0, self.structure_tree.topLevelItemCount()):
-            root = self.structure_tree.topLevelItem(i)
-            node_value[root.value] = self.do_getNodeValue(root, [])
+        try:
+            # 广度优先遍历
+            node_value = OrderedDict()
+            for i in range(0, self.structure_tree.topLevelItemCount()):
+                root = self.structure_tree.topLevelItem(i)
+                node_value[root.value] = self.do_getNodeValue(root, [])
 
-        return node_value
+            return node_value
+        except Exception:
+            print("error happens in get node_value. [structure/main.py]")
 
     def do_getNodeValue(self, node: StructureItem, data: list):
-        for i in range(0, node.childCount()):
-            child = node.child(i)
-            if child.value.startswith("Cycle.") or child.value.startswith("Timeline."):
-                grand_child_data = OrderedDict()
-                grand_child_data[child.value] = self.do_getNodeValue(child, [])
-                data.append(grand_child_data)
-            else:
-                data.append(child.value)
+        try:
+            for i in range(0, node.childCount()):
+                child = node.child(i)
+                if child.value.startswith("Cycle.") or child.value.startswith("Timeline."):
+                    grand_child_data = OrderedDict()
+                    grand_child_data[child.value] = self.do_getNodeValue(child, [])
+                    data.append(grand_child_data)
+                else:
+                    data.append(child.value)
 
-        return data
+            return data
+        except Exception:
+            print("error happens in do get node_value. [structure/main.py]")
