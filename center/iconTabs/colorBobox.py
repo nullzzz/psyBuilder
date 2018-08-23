@@ -12,6 +12,7 @@ class ColorListEditor(QComboBox):
         self.isValid = True
         self.isShow = False
         self.isChoose = False
+        self.default_color = ("white", "gray", "black", "red", "orange", "yellow", "green", "blue", "purple")
         self.populateList()
         self.currentTextChanged.connect(self.changeColor)
         self.setStyleSheet("background: {}".format(self.currentText()))
@@ -23,8 +24,7 @@ class ColorListEditor(QComboBox):
 
     # 添加默认颜色，白灰黑、红橙黄绿蓝紫
     def populateList(self):
-        for i, colorName in enumerate(
-                ("white", "gray", "black", "red", "orange", "yellow", "green", "blue", "purple")):
+        for i, colorName in enumerate(self.default_color):
             color = QColor(colorName)
             self.insertItem(i, colorName)
             self.setItemData(i, color, Qt.DecorationRole)
@@ -73,7 +73,7 @@ class ColorListEditor(QComboBox):
                     self.setCurrentIndex(1)
                 self.setStyleSheet("background: {}".format(e))
                 self.isValid = True
-            elif e in ("white", "gray", "black", "red", "orange", "yellow", "green", "blue", "purple"):
+            elif e in self.default_color:
                 self.isValid = True
                 self.setStyleSheet("background: {}".format(self.currentText()))
             else:
@@ -110,3 +110,10 @@ class ColorListEditor(QComboBox):
                 else:
                     pass
         QComboBox.focusOutEvent(self, e)
+
+    # 返回当前QColor对象
+    def getColor(self):
+        if self.isValid:
+            return QColor(self.currentText())
+        else:
+            return Qt.white
