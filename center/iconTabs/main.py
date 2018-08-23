@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QTabWidget, QTabBar
+from PyQt5.QtGui import QIcon, QKeySequence, QCursor
+from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
 from center.iconTabs.events.soundOut.soundDisplay import SoundDisplay
 from center.iconTabs.timeline.main import Timeline
@@ -45,7 +45,8 @@ class IconTabs(QTabWidget):
         tab_icon = QIcon(".\\.\\image\\timeLine.png")
         self.addTab(self.timeline, tab_icon, "Timeline")
         self.tabBar().setShape(QTabBar.TriangularNorth)
-
+        # 右键菜单及快捷键
+        self.setMenuAndShortcut()
         # 连接信号
         self.linkSignals()
 
@@ -83,6 +84,17 @@ class IconTabs(QTabWidget):
                 cycle.attributeChange.connect(self.changeTimelineAttribute)
         except Exception:
             print("error happens in link cycle signals. [iconTabs\main.py]")
+
+    def setMenuAndShortcut(self):
+        # right button menu
+        self.right_button_menu = QMenu(self)
+        self.close_action = QAction("Close", self)
+        self.close_other_action = QAction("Close Other", self)
+        self.close_all_action = QAction("Close All", self)
+        self.close_all_action.triggered.connect(self.closeAllTab)
+        # short cut
+        self.close_shortcut = QShortcut(QKeySequence("Ctrl+W"), self)
+        self.close_shortcut.activated.connect(lambda :self.removeTab(self.currentIndex()))
 
     def addIcon(self, parent_value, name, pixmap, value):
         self.value_parent[value] = parent_value
@@ -347,10 +359,16 @@ class IconTabs(QTabWidget):
         except Exception:
             print("some errors happen in delete timeline in cycle. [iconTabs/main.py]")
 
-    def closeTab(self, widget):
-        tab_index = self.indexOf(widget)
-        if tab_index != -1:
-            self.removeTab(tab_index)
+    def closeTab(self, widget=None, index=-1):
+        try:
+            if widget and index == -1:
+                tab_index = self.indexOf(widget)
+                if tab_index != -1:
+                    self.removeTab(tab_index)
+            elif index != -1 and not widget:
+                self.removeTab(index)
+        except Exception:
+            print("error happens in close tab.")
 
     # 删除某个icon, 感觉和之前的removeIcon有点重复造成浪费
     def deleteIcon(self, value):
@@ -387,3 +405,20 @@ class IconTabs(QTabWidget):
                 self.value_widget[new_value] = old_widget
         except Exception:
             print("error happens in copy widget. [iconTabs/main.py]")
+
+    def contextMenuEvent(self, e):
+        print("---------------start---------------------")
+        self.close_action.triggered.connect(lambda :self.closeTab(index=self.currentIndex()))
+        self.close_other_action.triggered.connect(lambda :self.closeOtherTab(index=self.currentIndex()))
+        self.right_button_menu.exec_(QCursor.pos())
+        print("----------------end----------------------")
+
+
+    def closeAllTab(self):
+        for i in range(0, self.count()):
+            self.removeTab(i)
+
+    def closeOtherTab(self, index):
+        for i in range(0, self.count()):
+            if i != index:
+                self.removeTab(i)

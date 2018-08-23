@@ -63,7 +63,7 @@ class Close(QWidget):
 
     def cancel(self):
         self.close()
-        self.tabClose.emit(self)
+        self.tabClosesed.emit(self)
 
     def apply(self):
         self.propertiesChange.emit(self.getProperties())
