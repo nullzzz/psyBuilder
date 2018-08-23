@@ -37,9 +37,6 @@ class SoundDisplay(QMainWindow):
 
     def setUI(self):
         self.setWindowTitle("SoundDisplay")
-        self.setFixedSize(1000, 618)
-        # self.label.setText("Your image will show here")
-        # self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.play_bt.setFixedSize(120, 120)
         self.play_bt.setMaximumHeight(120)
         self.play_bt.setMinimumHeight(120)
@@ -93,9 +90,10 @@ class SoundDisplay(QMainWindow):
     def apply(self):
         self.file = self.pro.general.file_name.text()
         if self.file:
+            self.play_bt.setIcon(QIcon(".\\.\\image\\start_video"))
             if QFileInfo(self.file).isFile():
                 try:
-                    file_name = self.file.split("/")[-1].split(".")[0]
+                    file_name = ".".join(self.file.split("/")[-1].split(".")[0:-1])
                 except Exception:
                     file_name = "audio"
                 self.player.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
@@ -107,9 +105,9 @@ class SoundDisplay(QMainWindow):
         else:
             self.play_bt.setEnabled(False)
             self.tip.setText("Load your audio first!")
-            self.tip1.setText("00:00")
-            self.tip2.setText("00:00")
-            self.progress_bar.setRange(0, 0)
+        self.tip1.setText("00:00")
+        self.tip2.setText("00:00")
+        self.progress_bar.setRange(0, 0)
 
     def setLabel(self):
         m = int(self.player.duration() / (1000 * 60))

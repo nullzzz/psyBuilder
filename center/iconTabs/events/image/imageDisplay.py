@@ -37,7 +37,7 @@ class ImageDisplay(QMainWindow):
 
     def setUI(self):
         self.setWindowTitle("Image")
-        self.setFixedSize(1000, 618)
+
         self.label.setText("Your image will show here")
         self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.setCentralWidget(self.label)

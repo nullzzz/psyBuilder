@@ -37,7 +37,6 @@ class TextDisplay(QMainWindow):
 
     def setUI(self):
         self.setWindowTitle("Text")
-        self.setFixedSize(1000, 618)
         self.text_label.setText("Your text will show here")
         self.text_label.setAlignment(Qt.AlignCenter)
         self.setCentralWidget(self.text_label)

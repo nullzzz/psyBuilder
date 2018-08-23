@@ -10,6 +10,7 @@ from ...colorBobox import ColorListEditor
 class ImageTab1(QWidget):
     def __init__(self, parent=None):
         super(ImageTab1, self).__init__(parent)
+        self.attributes = []
         self.file_name = QLineEdit()
         self.file_name.textChanged.connect(self.findVar)
         self.file_name.returnPressed.connect(self.finalCheck)
@@ -123,11 +124,17 @@ class ImageTab1(QWidget):
         self.file_name.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
-        return {"File name": self.file_name.text(), "Mirror up/down": bool(
-            self.mirrorUD.checkState()), "Mirror left/right": bool(self.mirrorLR.checkState()), "Stretch": bool(
-            self.stretch.checkState()), "Stretch mode": self.stretch_mode.currentText(), "Back color":
-            self.back_color.currentText(), "Transparent": "{}%".format(self.transparent.value()), "Clear after":
-            self.clear_after.currentText(), "Screen name": self.screen_name.currentText()}
+        return {
+            "File name": self.file_name.text(),
+            "Mirror up/down": bool(self.mirrorUD.checkState()),
+            "Mirror left/right": bool(self.mirrorLR.checkState()),
+            "Stretch": bool(self.stretch.checkState()),
+            "Stretch mode": self.stretch_mode.currentText(),
+            "Back color": self.back_color.currentText(),
+            "Transparent": "{}%".format(self.transparent.value()),
+            "Clear after": self.clear_after.currentText(),
+            "Screen name": self.screen_name.currentText()
+        }
 
 
 if __name__ == "__main__":

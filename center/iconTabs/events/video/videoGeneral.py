@@ -10,6 +10,7 @@ from ...colorBobox import ColorListEditor
 class VideoTab1(QWidget):
     def __init__(self, parent=None):
         super(VideoTab1, self).__init__(parent)
+        self.attributes = []
         # general
         self.file_name = QLineEdit()
         self.file_name.textChanged.connect(self.findVar)
@@ -84,7 +85,7 @@ class VideoTab1(QWidget):
         # layout.addWidget(self.stop_after_mode, 5, 3, 1, 1)
         layout.addWidget(QLabel("Stretch:"), 6, 0, 1, 1)
         layout.addWidget(self.stretch, 6, 1, 1, 1)
-        layout.addWidget(QLabel("Stretch mode:"), 6, 2, 1, 1)
+        layout.addWidget(QLabel("Stretch Mode:"), 6, 2, 1, 1)
         layout.addWidget(self.stretch_mode, 6, 3, 1, 1)
         # layout.addWidget(QLabel("End Video Action:"), 7, 0, 1, 1)
         # layout.addWidget(self.end_video_action, 7, 1, 1, 1)

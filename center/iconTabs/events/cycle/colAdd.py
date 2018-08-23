@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import (QDialog, QLabel,QPushButton, QLineEdit, QFormLayout, QMessageBox, QHBoxLayout)
 from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtWidgets import (QDialog, QLabel, QPushButton, QLineEdit, QFormLayout, QMessageBox, QHBoxLayout)
 
 
 class ColAdd(QDialog):
@@ -50,9 +50,7 @@ class ColAdd(QDialog):
         elif name in self.exist_name:
             QMessageBox.information(self, "Tips", "Name already exists.")
         else:
-            data = []
-            data.append(name)
-            data.append(value)
+            data = [name, value]
             self.close()
             if self.col != -1:
                 data.append(self.col)

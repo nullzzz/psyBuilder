@@ -26,10 +26,10 @@ class TextTab1(QWidget):
     def setGeneral(self):
         l1 = QLabel("Text:")
         l2 = QLabel("Alignment:")
-        l3 = QLabel("Screen name:")
-        l4 = QLabel("Fore color:")
-        l5 = QLabel("Back color:")
-        l6 = QLabel("Clear after:")
+        l3 = QLabel("Screen Name:")
+        l4 = QLabel("Fore Color:")
+        l5 = QLabel("Back Color:")
+        l6 = QLabel("Clear After:")
         l7 = QLabel("Transparent:")
         # l8 = QLabel("Word wrap:")
 
@@ -98,7 +98,6 @@ class TextTab1(QWidget):
 
     def setAttributes(self, attributes):
         self.attributes = attributes
-
 
     def getInfo(self):
         return {

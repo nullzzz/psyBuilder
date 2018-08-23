@@ -78,6 +78,10 @@ class ColorListEditor(QComboBox):
                 self.setStyleSheet("background: {}".format(self.currentText()))
             else:
                 self.isValid = False
+                self.setStyleSheet("background: white")
+        else:
+            self.isValid = False
+            self.setStyleSheet("background: white")
 
     # 重写下拉菜单展开
     def showPopup(self):

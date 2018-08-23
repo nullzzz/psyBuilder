@@ -46,7 +46,6 @@ class VideoDisplay(QMainWindow):
 
     def setUI(self):
         self.setWindowTitle("Video")
-        self.setFixedSize(1000, 618)
         self.label.setText("Your video will show here")
         self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.setCentralWidget(self.label)

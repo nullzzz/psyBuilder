@@ -1,19 +1,18 @@
+import json
+
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTextEdit, QAction, QApplication
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication
 
 from attributes.main import Attributes
 from center.main import Center
+from output.main import Output
 from properties.main import Properties
 from structure.main import Structure
-from output.main import Output
-
-import json
-
-
 
 
 class MainWindow(QMainWindow):
     AUTO_SAVE_TIME = 300000
+
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         # auto save

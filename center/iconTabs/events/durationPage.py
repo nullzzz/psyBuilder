@@ -227,7 +227,7 @@ class Tab3(QWidget):
             out_info[key] = self.out_devices.item(i).getInfo()
 
         return {
-            "duration": self.duration.currentText(), 
-            "input devices": in_info, 
-            "output device": out_info
+            "Duration": self.duration.currentText(),
+            "Input devices": in_info,
+            "Output device": out_info
         }
