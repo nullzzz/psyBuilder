@@ -107,11 +107,13 @@ class SoundDisplay(QMainWindow):
         else:
             self.play_bt.setEnabled(False)
             self.tip.setText("Load your audio first!")
+            self.tip1.setText("00:00")
+            self.tip2.setText("00:00")
+            self.progress_bar.setRange(0, 0)
 
     def setLabel(self):
         m = int(self.player.duration() / (1000 * 60))
         s = int(self.player.duration() / 1000 - m * 60)
-        print(m, s)
         self.tip2.setText('{:0>2d}:{:0>2d}'.format(m, s))
 
     def play(self):

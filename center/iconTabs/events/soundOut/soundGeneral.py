@@ -99,9 +99,9 @@ class SoundTab1(QWidget):
         group2 = QGroupBox()
         layout2 = QFormLayout()
         layout2.addRow(self.volume_control)
-        layout2.addRow("volume:", self.volume)
+        layout2.addRow("\tvolume:", self.volume)
         layout2.addRow(self.pan_control)
-        layout2.addRow("pan", self.pan)
+        layout2.addRow("\tpan", self.pan)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()

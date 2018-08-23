@@ -6,7 +6,7 @@ from center.iconTabs.events.soundOut.soundDisplay import SoundDisplay
 from center.iconTabs.timeline.main import Timeline
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
-from .events.text.main import TextDisplay
+from .events.text.textDisplay import TextDisplay
 from .events.video.videoDisplay import VideoDisplay
 from .eyeTracker.DC import EyeDC
 from .eyeTracker.close import Close

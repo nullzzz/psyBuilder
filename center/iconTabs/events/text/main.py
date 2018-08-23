@@ -1,9 +1,6 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
-from .textdisplay import Ui_MainWindow
-from .textdisplay1 import Ui_Dialog
-from .action import MyDialog
 from .Preview import *
-import time
+from .action import MyDialog
+from .textdisplay2 import Ui_MainWindow
 
 
 class TextDisplay(QtWidgets.QMainWindow, Ui_MainWindow):
