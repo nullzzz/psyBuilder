@@ -15,6 +15,8 @@ class IconArea(QFrame):
     iconAdd = pyqtSignal(str, QPixmap, str)
     iconMove = pyqtSignal(int, int, str)
     iconCopy = pyqtSignal(str, str, str)
+    # copy drag finish ()
+    copyDragFinish = pyqtSignal()
 
     def __init__(self, parent=None):
         super(IconArea, self).__init__(parent)
@@ -35,13 +37,14 @@ class IconArea(QFrame):
     def linkSignals(self):
         self.signShow.connect(self.icon_table.showSign)
         self.dragFinish.connect(lambda : self.icon_table.signHide.emit())
+        self.copyDragFinish.connect(self.icon_table.copyDragFinish)
         self.icon_table.copyDragBegin.connect(self.copyDrag)
 
     def dragEnterEvent(self, e):
         if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
                 e.mimeData().hasFormat("application/IconTable-col") or \
                 e.mimeData().hasFormat("application/IconTable-copy-col"):
-            if not self.icon_table.is_copy:
+            if not self.icon_table.is_copy_module:
                 self.becomeLightGray()
             else:
                 self.becomeGray()
@@ -102,6 +105,7 @@ class IconArea(QFrame):
             # 移动信号
             self.iconMove.emit(dragCol, targetCol, value)
             self.becomeWhite()
+            self.copyDragFinish.emit()
         # move from icon table
         elif e.mimeData().hasFormat("application/IconTable-col"):
             data = e.mimeData().data("application/IconTable-col")
@@ -128,6 +132,7 @@ class IconArea(QFrame):
             # 移动信号
             self.iconMove.emit(dragCol, targetCol, value)
             self.becomeWhite()
+            self.copyDragFinish.emit()
         # copy from icon table
         elif e.mimeData().hasFormat("application/IconTable-copy-col"):
             data = e.mimeData().data("application/IconTable-copy-col")
@@ -171,7 +176,7 @@ class IconArea(QFrame):
             self.iconCopy.emit(oldValue, newValue, text)
 
             self.becomeWhite()
-            self.icon_table.is_copy = False
+            self.copyDragFinish.emit()
         else:
             # 发射结束信号
             self.dragFinish.emit()
@@ -226,11 +231,11 @@ class IconArea(QFrame):
 
     def copyDrag(self):
         # 改变模式
-        self.icon_table.is_copy = True
+        self.icon_table.is_copy_module = True
         self.becomeGray()
 
     def keyPressEvent(self, e):
-        if self.icon_table.is_copy:
+        if self.icon_table.is_copy_module:
             if e.key() == Qt.Key_Escape:
-                self.icon_table.is_copy = False
+                self.icon_table.is_copy_module = False
                 self.becomeWhite()

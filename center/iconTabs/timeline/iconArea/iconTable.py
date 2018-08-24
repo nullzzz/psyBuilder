@@ -37,7 +37,9 @@ class IconTable(QTableWidget):
         # text是否可以被编辑
         self.is_edit = False
         # 是否是copy模式
-        self.is_copy = False
+        self.is_copy_module = False
+        # 可以被复制的列
+        self.can_copy_col = -1
 
         # 隐藏表头
         self.horizontalHeader().setVisible(False)
@@ -183,11 +185,12 @@ class IconTable(QTableWidget):
     def mouseMoveEvent(self, e):
         if self.columnAt(e.pos().x()) in range(1, self.fill_count + 1) and self.rowAt(e.pos().y()) in (1, 3):
             # move模式
-            if not self.is_copy:
+            if not self.is_copy_module:
                 self.moveDrag(Qt.MoveAction)
             # copy模式
             else:
-                self.copyDrag()
+                if self.can_copy_col != -1 and self.columnAt(e.pos().x()) == self.can_copy_col:
+                    self.copyDrag()
 
     def moveDrag(self, dropActions):
         drag_col = self.currentColumn()
@@ -205,7 +208,7 @@ class IconTable(QTableWidget):
 
     def copyDrag(self):
         col = self.currentColumn()
-        if col >= 1 and col < self.fill_count + 1:
+        if col >= 1 and col < self.fill_count + 1 and col == self.can_copy_col:
             # 将col传过去
             data = QByteArray()
             stream = QDataStream(data, QIODevice.WriteOnly)
@@ -299,14 +302,14 @@ class IconTable(QTableWidget):
             row = self.rowAt(e.pos().y())
             if column in range(0, self.fill_count + 1) and row == 1:
                 menu = QMenu(self)
-                if not self.is_copy:
+                if not self.is_copy_module:
                     # delete action
                     delete = QAction("delete", menu)
                     delete.triggered.connect(lambda : self.removeColumn(column, True))
                     menu.addAction(delete)
                     # copy action
                     copy = QAction("copy", menu)
-                    copy.triggered.connect(lambda : self.copyDragBegin.emit())
+                    copy.triggered.connect(lambda :self.copyDragStart(column))
                     item_value = self.cellWidget(row, column).value
                     if item_value.startswith("Cycle"):
                         copy.setDisabled(True)
@@ -359,3 +362,12 @@ class IconTable(QTableWidget):
 
         if index != -1:
             self.removeColumn(index)
+
+    def copyDragStart(self, col):
+        self.copyDragBegin.emit()
+        self.can_copy_col = col
+
+    def copyDragFinish(self):
+        self.can_copy_col = -1
+        self.is_copy_module = False
+
