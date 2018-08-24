@@ -94,7 +94,7 @@ class IconTabs(QTabWidget):
         self.close_all_action.triggered.connect(self.closeAllTab)
         # short cut
         self.close_shortcut = QShortcut(QKeySequence("Ctrl+W"), self)
-        self.close_shortcut.activated.connect(lambda :self.removeTab(self.currentIndex()))
+        self.close_shortcut.activated.connect(lambda: self.removeTab(self.currentIndex()))
 
     def addIcon(self, parent_value, name, pixmap, value):
         self.value_parent[value] = parent_value
@@ -412,7 +412,6 @@ class IconTabs(QTabWidget):
         self.close_other_action.triggered.connect(lambda :self.closeOtherTab(index=self.currentIndex()))
         self.right_button_menu.exec_(QCursor.pos())
         print("----------------end----------------------")
-
 
     def closeAllTab(self):
         for i in range(0, self.count()):

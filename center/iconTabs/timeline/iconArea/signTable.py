@@ -1,10 +1,11 @@
-from PyQt5.QtWidgets import QFrame, QTableWidget, QAbstractItemView, QLabel
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QFrame, QTableWidget, QAbstractItemView, QLabel
 
 
 class SignTable(QTableWidget):
     clicked = pyqtSignal()
+
     def __init__(self, parent=None, sign=""):
         super(SignTable, self).__init__(parent)
         self.sign = sign

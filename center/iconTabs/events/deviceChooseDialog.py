@@ -41,9 +41,9 @@ class DeviceInDialog(QDialog):
     # devices: list or tuple
     # 图片名与设备名相同
     def addDevices(self, devices):
-        for device in devices:
-            item = QListWidgetItem(device)
-            item.setIcon(QIcon(".\\.\\image\\{}".format(device)))
+        for device_name, device_type in devices.items():
+            item = QListWidgetItem(device_name)
+            item.setIcon(QIcon(".\\.\\image\\{}_device".format(device_name)))
             self.devices_list.addItem(item)
 
 
@@ -86,7 +86,7 @@ class DeviceOutDialog(QDialog):
     # devices: list or tuple
     # 图片名与设备名相同
     def addDevices(self, devices):
-        for device in devices:
-            item = QListWidgetItem(device)
-            item.setIcon(QIcon(".\\.\\image\\{}".format(device)))
+        for device_name, device_type in devices:
+            item = QListWidgetItem(device_name)
+            item.setIcon(QIcon(".\\.\\image\\{}_device".format(device_name)))
             self.devices_list.addItem(item)

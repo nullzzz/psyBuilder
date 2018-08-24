@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QApplication
 
 from attributes.main import Attributes
 from center.main import Center
+from main.globalDevices import GlobalDevice
 from output.main import Output
 from properties.main import Properties
 from structure.main import Structure
@@ -61,6 +62,9 @@ class MainWindow(QMainWindow):
 
         output_devices_action = QAction("&Output Devices", self)
         input_devices_action = QAction("&Input Devices", self)
+        output_devices_action.triggered.connect(lambda: self.showDevices(1))
+        input_devices_action.triggered.connect(lambda: self.showDevices(0))
+
 
         devices_menu.addAction(output_devices_action)
         devices_menu.addAction(input_devices_action)
@@ -146,3 +150,8 @@ class MainWindow(QMainWindow):
                 node_value))
         # reset timer
         self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
+
+    def showDevices(self, device_type):
+        self.devices = GlobalDevice(device_type)
+        self.devices.setWindowModality(Qt.ApplicationModal)
+        self.devices.show()
