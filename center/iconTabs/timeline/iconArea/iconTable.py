@@ -89,12 +89,12 @@ class IconTable(QTableWidget):
 
         self.setMinimumHeight(400)
 
-        self.lastPos = [-1, -1]
-
         self.setDragEnabled(True)
 
         # 连接信号
         self.linkSignals()
+        # menu and shortcut
+        self.setMenuAndShortcut()
 
     def linkSignals(self):
         # 显示sign
@@ -109,6 +109,16 @@ class IconTable(QTableWidget):
         self.cellDoubleClicked.connect(self.openTab)
         # 单击显示properties
         self.cellClicked.connect(self.getProperties)
+
+    def setMenuAndShortcut(self):
+        self.right_button_menu = QMenu(self)
+        # delete action
+        self.delete_action = QAction("delete", self.right_button_menu)
+        # copy action
+        self.copy_action = QAction("copy", self.right_button_menu)
+
+        self.right_button_menu.addAction(self.delete_action)
+        self.right_button_menu.addAction(self.copy_action)
 
     def setText(self, row, col, text):
         item = QTableWidgetItem(text)
@@ -142,27 +152,30 @@ class IconTable(QTableWidget):
             self.down_sign.setColumnWidth(i, self.WIDTH * 2)
 
     def removeColumn(self, col, sendFlag=False):
-        if sendFlag:
-            value = self.cellWidget(1, col).value
-            self.iconRemove.emit(value)
-        if self.fill_count > 8:
-            super().removeColumn(col)
-            self.up_sign.removeColumn(self.columnCount() - 1)
-            self.down_sign.removeColumn(self.columnCount() - 1)
-        else:
-            super().insertColumn(9)
-            self.setPixmap(2, 9, QPixmap(".\\.\\image\\line.png"))
-            self.setColumnWidth(9, self.WIDTH * 2)
-            item = QTableWidgetItem("")
-            item.setFlags(Qt.ItemIsSelectable)
-            self.setItem(1, 9, item)
-            item1 = QTableWidgetItem("")
-            item1.setFlags(Qt.ItemIsSelectable)
-            self.setItem(3, 9, item1)
-            super().removeColumn(col)
-        self.fill_count -= 1
-        if self.fill_count < 8:
-            self.is_fill = False
+        try:
+            if sendFlag:
+                value = self.cellWidget(1, col).value
+                self.iconRemove.emit(value)
+            if self.fill_count > 8:
+                super().removeColumn(col)
+                self.up_sign.removeColumn(self.columnCount() - 1)
+                self.down_sign.removeColumn(self.columnCount() - 1)
+            else:
+                super().insertColumn(9)
+                self.setPixmap(2, 9, QPixmap(".\\.\\image\\line.png"))
+                self.setColumnWidth(9, self.WIDTH * 2)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsSelectable)
+                self.setItem(1, 9, item)
+                item1 = QTableWidgetItem("")
+                item1.setFlags(Qt.ItemIsSelectable)
+                self.setItem(3, 9, item1)
+                super().removeColumn(col)
+            self.fill_count -= 1
+            if self.fill_count < 8:
+                self.is_fill = False
+        except Exception:
+            print("error happens in remove icon table column. [iconArea/iconTable.py]")
 
     def insertColumn(self, col):
         if self.fill_count >= 8:
@@ -301,22 +314,22 @@ class IconTable(QTableWidget):
             column = self.columnAt(e.pos().x())
             row = self.rowAt(e.pos().y())
             if column in range(0, self.fill_count + 1) and row == 1:
-                menu = QMenu(self)
+                # 非copy模式才能有菜单
                 if not self.is_copy_module:
                     # delete action
-                    delete = QAction("delete", menu)
-                    delete.triggered.connect(lambda : self.removeColumn(column, True))
-                    menu.addAction(delete)
+                    self.delete_action.disconnect()
+                    self.delete_action.triggered.connect(lambda : self.removeColumn(column, True))
                     # copy action
-                    copy = QAction("copy", menu)
-                    copy.triggered.connect(lambda :self.copyDragStart(column))
+                    self.copy_action.disconnect()
+                    self.copy_action.triggered.connect(lambda :self.copyDragStart(column))
                     item_value = self.cellWidget(row, column).value
                     if item_value.startswith("Cycle"):
-                        copy.setDisabled(True)
-                    menu.addAction(copy)
+                        self.copy_action.setDisabled(True)
+                    else:
+                        self.copy_action.setEnabled(True)
+                    self.right_button_menu.popup(self.mapToGlobal(e.pos()))
                 else:
                     pass
-                menu.popup(self.mapToGlobal(e.pos()))
         except Exception:
             print("error happens in generate menu. [iconTable.py]")
 

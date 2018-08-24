@@ -42,5 +42,10 @@ class Timeline(QWidget):
     def moveIcon(self, dragCol, targetCol, value):
         self.iconMove.emit(dragCol, targetCol, self.value, value)
 
+    def changeIconName(self, value, name):
+        for col in range(1, self.icon_area.icon_table.fill_count + 1):
+            if self.icon_area.icon_table.cellWidget(1, col).value == value:
+                self.icon_area.icon_table.item(3, col).setText(name)
+
     def getProperties(self):
         return {"properties" : "None"}

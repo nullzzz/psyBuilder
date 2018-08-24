@@ -88,9 +88,9 @@ class IconTabs(QTabWidget):
     def setMenuAndShortcut(self):
         # right button menu
         self.right_button_menu = QMenu(self)
-        self.close_action = QAction("Close", self)
-        self.close_other_action = QAction("Close Other", self)
-        self.close_all_action = QAction("Close All", self)
+        self.close_action = QAction("Close", self.right_button_menu)
+        self.close_other_action = QAction("Close Other", self.right_button_menu)
+        self.close_all_action = QAction("Close All", self.right_button_menu)
         self.close_all_action.triggered.connect(self.closeAllTab)
         # short cut
         self.close_shortcut = QShortcut(QKeySequence("Ctrl+W"), self)
@@ -408,9 +408,9 @@ class IconTabs(QTabWidget):
 
     def contextMenuEvent(self, e):
         print("---------------start---------------------")
-        self.close_action.triggered.connect(lambda :self.closeTab(index=self.currentIndex()))
-        self.close_other_action.triggered.connect(lambda :self.closeOtherTab(index=self.currentIndex()))
-        self.right_button_menu.exec_(QCursor.pos())
+        # self.close_action.triggered.connect(lambda :self.closeTab(index=self.currentIndex()))
+        # self.close_other_action.triggered.connect(lambda :self.closeOtherTab(index=self.currentIndex()))
+        self.right_button_menu.popup(self.mapToGlobal(e.pos()))
         print("----------------end----------------------")
 
     def closeAllTab(self):

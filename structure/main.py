@@ -29,11 +29,12 @@ class Structure(QDockWidget):
         # 设置列数、头标签
         self.structure_tree.setColumnCount(1)
         self.structure_tree.setHeaderLabel("E-Object")
-        # 隐藏头标签
         self.structure_tree.setHeaderHidden(False)
+
         self.root = StructureItem(self.structure_tree, 'Timeline.10001')
         self.root.setText(0, "Timeline")
         self.root.setIcon(0, QIcon(".\\image\\timeLine.png"))
+
         self.value_node['Timeline.10001'] = self.root
         # 添加根节点
         self.structure_tree.addTopLevelItem(self.root)
@@ -51,6 +52,7 @@ class Structure(QDockWidget):
     def linkSignal(self):
         self.structure_tree.doubleClicked.connect(self.openTab)
         self.structure_tree.clicked.connect(lambda: self.propertiesShow.emit(self.structure_tree.currentItem().value))
+        self.structure_tree.itemNameChange.connect(self.changeNodeName)
 
     def addRoot(self, text="root", pixmap=None, value=""):
         root = StructureItem(self.structure_tree, value)
