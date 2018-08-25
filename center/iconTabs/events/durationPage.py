@@ -41,7 +41,6 @@ class DurationPage(QWidget):
         self.in_add_bt = QPushButton("&Add...")
         self.in_del_bt = QPushButton("&Remove...")
 
-
         self.setUI()
 
     # 生成duration页面
@@ -121,24 +120,25 @@ class DurationPage(QWidget):
     def selectIn(self, e):
         # 选中设备，默认为0号位置
         temp = self.in_devices_dialog.devices_list.currentItem()
-        device_name = temp.text()
-        # 占位提示
-        if self.in_devices.count() == 0:
-            self.in_tip1.hide()
-            self.in_tip2.hide()
-        item = DeviceInItem(device_name)
-        self.in_devices.addItem(item)
-        # 设置可选变量
-        item.setAttributes(self.attributes)
-        # 添加可选trigger输出设备
-        for i in range(self.out_devices.count()):
-            name = self.out_devices.item(i).name
-            self.in_devices.item(self.in_devices.count() - 1).resp_trigger_out.addItem(name)
-        self.in_stack1.addWidget(item.pro1)
-        self.in_stack2.addWidget(item.pro2)
-        # 设置remove按钮可用性
-        if self.in_devices.count():
-            self.in_del_bt.setEnabled(True)
+        if temp:
+            device_name = temp.text()
+            # 占位提示
+            if self.in_devices.count() == 0:
+                self.in_tip1.hide()
+                self.in_tip2.hide()
+            item = DeviceInItem(device_name)
+            self.in_devices.addItem(item)
+            # 设置可选变量
+            item.setAttributes(self.attributes)
+            # 添加可选trigger输出设备
+            for i in range(self.out_devices.count()):
+                name = self.out_devices.item(i).name
+                self.in_devices.item(self.in_devices.count() - 1).resp_trigger_out.addItem(name)
+            self.in_stack1.addWidget(item.pro1)
+            self.in_stack2.addWidget(item.pro2)
+            # 设置remove按钮可用性
+            if self.in_devices.count():
+                self.in_del_bt.setEnabled(True)
         self.in_devices_dialog.close()
 
     # 弹出输出设备选择框
@@ -152,19 +152,20 @@ class DurationPage(QWidget):
     # 添加输出设备
     def selectOut(self, e):
         temp = self.out_devices_dialog.devices_list.currentItem()
-        device_name = temp.text()
-        if self.out_devices.count() == 0:
-            self.out_tip.hide()
-        item = DeviceOutItem(device_name)
-        self.out_devices.addItem(item)
-        # 设置可选变量
-        item.setAttributes(self.attributes)
-        # 设置trigger输出设备
-        for i in range(self.in_devices.count()):
-            self.in_devices.item(i).resp_trigger_out.addItem(device_name)
-        self.out_stack.addWidget(item.pro)
-        if self.out_devices.count():
-            self.out_del_bt.setEnabled(True)
+        if temp:
+            device_name = temp.text()
+            if self.out_devices.count() == 0:
+                self.out_tip.hide()
+            item = DeviceOutItem(device_name)
+            self.out_devices.addItem(item)
+            # 设置可选变量
+            item.setAttributes(self.attributes)
+            # 设置trigger输出设备
+            for i in range(self.in_devices.count()):
+                self.in_devices.item(i).resp_trigger_out.addItem(device_name)
+            self.out_stack.addWidget(item.pro)
+            if self.out_devices.count():
+                self.out_del_bt.setEnabled(True)
         self.out_devices_dialog.close()
 
     # 移除输入设备

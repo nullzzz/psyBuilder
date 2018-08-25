@@ -64,6 +64,7 @@ class ColorListEditor(QComboBox):
                     self.isValid = True
                 else:
                     self.isValid = False
+                    self.setStyleSheet("background: white")
             # #ffffff格式rgb
             elif e[0] == "#" and len(e) == 7:
                 if self.findText(e) == -1:
