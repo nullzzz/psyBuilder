@@ -6,9 +6,12 @@ from .deviceChooseDialog import DeviceOutDialog, DeviceInDialog
 from .deviceItem import DeviceOutItem, DeviceInItem
 
 
-class Tab3(QWidget):
+class DurationPage(QWidget):
+    OUTPUT_DEVICES = {}
+    INPUT_DEVICES = {}
     def __init__(self, parent=None):
-        super(Tab3, self).__init__(parent)
+        super(DurationPage, self).__init__(parent)
+
         self.attributes = []
         # top
         self.duration = QComboBox()

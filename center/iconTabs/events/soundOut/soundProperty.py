@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget, QApplication)
 
-from center.iconTabs.events.durationPage import Tab3
+from center.iconTabs.events.durationPage import DurationPage
 from center.iconTabs.events.soundOut.soundGeneral import SoundTab1
 
 
@@ -11,7 +11,7 @@ class SoundProperty(QWidget):
         self.below = QWidget()
 
         self.general = SoundTab1()
-        self.duration = Tab3()
+        self.duration = DurationPage()
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.duration, "duration")
         # bottom

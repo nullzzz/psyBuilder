@@ -2,14 +2,14 @@ from PyQt5 import QtGui
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import *
 
-from center.iconTabs.events.durationPage import Tab3
+from center.iconTabs.events.durationPage import DurationPage
 from .textdisplay1 import Ui_Dialog
 
 
 class MyDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self):
         super().__init__()
-        tab3 = Tab3()
+        tab3 = DurationPage()
         self.setupUi(self)
         self.Color = ['black']
         self.QTabWidget.addTab(tab3, "Duration")

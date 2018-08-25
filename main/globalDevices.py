@@ -20,12 +20,13 @@ out_device = {
 class GlobalDevice(QWidget):
     InputDevice = 0
     outputDevice = 1
-    selected = pyqtSignal(dict)
+    # 发送到duration的类变量中最为合适 (device_type, devices: name->type)
+    deviceSelect = pyqtSignal(int, dict)
 
-    def __init__(self, device=0, parent=None):
+    def __init__(self, device_type=0, parent=None):
         super(GlobalDevice, self).__init__(parent)
-
-        if device:
+        self.device_type = device_type
+        if device_type:
             self.devices = out_device
             self.setWindowTitle("Output Devices")
         else:
@@ -79,7 +80,7 @@ class GlobalDevice(QWidget):
         self.close()
 
     def apply(self):
-        self.selected.emit(self.selected_devices.getInfo())
+        self.deviceSelect.emit(self.device_type, self.selected_devices.getInfo())
 
 
 class DeviceItem(QListWidgetItem):
@@ -97,6 +98,7 @@ class DeviceItem(QListWidgetItem):
 
 
 class DropDemo(QListWidget):
+
     def __init__(self, parent=None):
         super(DropDemo, self).__init__(parent)
         # 拖动的图标

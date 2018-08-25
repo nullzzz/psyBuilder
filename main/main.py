@@ -10,6 +10,8 @@ from output.main import Output
 from properties.main import Properties
 from structure.main import Structure
 
+from center.iconTabs.events.durationPage import DurationPage
+
 
 class MainWindow(QMainWindow):
     AUTO_SAVE_TIME = 300000
@@ -58,13 +60,16 @@ class MainWindow(QMainWindow):
         view_menu.addAction(default_action)
 
         # devices menu
+        self.input_devices = GlobalDevice(device_type=0)
+        self.input_devices.setWindowModality(Qt.ApplicationModal)
+        self.output_devices = GlobalDevice(device_type=1)
+        self.output_devices.setWindowModality(Qt.ApplicationModal)
         devices_menu = menu_bar.addMenu("&Devices")
 
         output_devices_action = QAction("&Output Devices", self)
         input_devices_action = QAction("&Input Devices", self)
         output_devices_action.triggered.connect(lambda: self.showDevices(1))
         input_devices_action.triggered.connect(lambda: self.showDevices(0))
-
 
         devices_menu.addAction(output_devices_action)
         devices_menu.addAction(input_devices_action)
@@ -103,6 +108,9 @@ class MainWindow(QMainWindow):
         self.linkSignals()
 
     def linkSignals(self):
+        # self
+        self.input_devices.deviceSelect.connect(self.changeDevices)
+        self.output_devices.deviceSelect.connect(self.changeDevices)
         # icon tabs
         self.center.icon_tabs.cycleAdd.connect(self.linkCycleSignals)
         self.center.icon_tabs.propertiesShow.connect(self.properties.showProperties)
@@ -153,6 +161,14 @@ class MainWindow(QMainWindow):
         self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
 
     def showDevices(self, device_type):
-        self.devices = GlobalDevice(device_type)
-        self.devices.setWindowModality(Qt.ApplicationModal)
-        self.devices.show()
+        if device_type:
+            self.output_devices.show()
+        else:
+            self.input_devices.show()
+
+    def changeDevices(self, device_type, devices):
+        # output device
+        if device_type:
+            DurationPage.OUTPUT_DEVICES = devices
+        else:
+            DurationPage.INPUT_DEVICES = devices
