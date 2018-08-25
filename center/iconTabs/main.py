@@ -88,10 +88,15 @@ class IconTabs(QTabWidget):
     def setMenuAndShortcut(self):
         # right button menu
         self.right_button_menu = QMenu(self)
+
         self.close_action = QAction("Close", self.right_button_menu)
         self.close_other_action = QAction("Close Other", self.right_button_menu)
         self.close_all_action = QAction("Close All", self.right_button_menu)
         self.close_all_action.triggered.connect(self.closeAllTab)
+
+        self.right_button_menu.addAction(self.close_action)
+        self.right_button_menu.addAction(self.close_all_action)
+        self.right_button_menu.addAction(self.close_other_action)
         # short cut
         self.close_shortcut = QShortcut(QKeySequence("Ctrl+W"), self)
         self.close_shortcut.activated.connect(lambda: self.removeTab(self.currentIndex()))
@@ -408,17 +413,23 @@ class IconTabs(QTabWidget):
             print("error happens in copy widget. [iconTabs/main.py]")
 
     def contextMenuEvent(self, e):
-        print("---------------start---------------------")
-        # self.close_action.triggered.connect(lambda :self.closeTab(index=self.currentIndex()))
-        # self.close_other_action.triggered.connect(lambda :self.closeOtherTab(index=self.currentIndex()))
-        self.right_button_menu.popup(self.mapToGlobal(e.pos()))
-        print("----------------end----------------------")
+        try:
+            tab_index = self.tabBar().tabAt(e.pos())
+            if tab_index != -1:
+                self.close_action.disconnect()
+                self.close_action.triggered.connect(lambda :self.closeTab(index=tab_index))
+                self.close_other_action.disconnect()
+                self.close_other_action.triggered.connect(lambda :self.closeOtherTab(index=tab_index))
+                self.right_button_menu.exec(self.mapToGlobal(e.pos()))
+        except Exception:
+            print("error happens in showing tab bar right button menu. [iconTabs/main.py]")
 
     def closeAllTab(self):
         for i in range(0, self.count()):
-            self.removeTab(i)
+            self.removeTab(0)
 
     def closeOtherTab(self, index):
-        for i in range(0, self.count()):
-            if i != index:
-                self.removeTab(i)
+        for i in range(index + 1, self.count()):
+            self.removeTab(index + 1)
+        for i in range(0, index):
+            self.removeTab(0)
