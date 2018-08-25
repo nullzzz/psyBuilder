@@ -425,9 +425,10 @@ class IconTabs(QTabWidget):
 
     def closeAllTab(self):
         for i in range(0, self.count()):
-            self.removeTab(i)
+            self.removeTab(0)
 
     def closeOtherTab(self, index):
-        for i in range(0, self.count()):
-            if i != index:
-                self.removeTab(i)
+        for i in range(index + 1, self.count()):
+            self.removeTab(index + 1)
+        for i in range(0, index):
+            self.removeTab(0)
