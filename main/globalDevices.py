@@ -162,7 +162,6 @@ class DropDemo(QListWidget):
         dic = {}
         for i in range(self.count()):
             dic[self.item(i).text()] = self.item(i).item_type
-        print(dic)
         return dic
 
 

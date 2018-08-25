@@ -18,18 +18,18 @@ class DeviceInDialog(QDialog):
         self.devices_list.setSortingEnabled(True)
         self.devices_list.setAcceptDrops(False)
         self.devices_list.setAutoFillBackground(True)
-        self.devices_list.setWrapping(False)
+        # self.devices_list.setWrapping(False)
         self.devices_list.setSpacing(20)
 
-        item1 = QListWidgetItem("eye")
-        item1.setIcon(QIcon(".\\.\\image\\ff"))
-        self.devices_list.addItem(item1)
-        item2 = QListWidgetItem("device2")
-        item2.setIcon(QIcon(".\\.\\image\\ff"))
-        self.devices_list.addItem(item2)
-        item3 = QListWidgetItem("device1")
-        item3.setIcon(QIcon(".\\.\\image\\ff"))
-        self.devices_list.addItem(item3)
+        # item1 = QListWidgetItem("eye")
+        # item1.setIcon(QIcon(".\\.\\image\\ff"))
+        # self.devices_list.addItem(item1)
+        # item2 = QListWidgetItem("device2")
+        # item2.setIcon(QIcon(".\\.\\image\\ff"))
+        # self.devices_list.addItem(item2)
+        # item3 = QListWidgetItem("device1")
+        # item3.setIcon(QIcon(".\\.\\image\\ff"))
+        # self.devices_list.addItem(item3)
 
         layout = QGridLayout()
         layout.addWidget(self.devices_list, 0, 0, 1, 4)
@@ -43,7 +43,8 @@ class DeviceInDialog(QDialog):
     def addDevices(self, devices):
         for device_name, device_type in devices.items():
             item = QListWidgetItem(device_name)
-            item.setIcon(QIcon(".\\.\\image\\{}_device".format(device_name)))
+            item.setData(0, device_type)
+            item.setIcon(QIcon(".\\.\\image\\{}_device".format(device_type)))
             self.devices_list.addItem(item)
 
 
@@ -88,5 +89,6 @@ class DeviceOutDialog(QDialog):
     def addDevices(self, devices):
         for device_name, device_type in devices:
             item = QListWidgetItem(device_name)
-            item.setIcon(QIcon(".\\.\\image\\{}_device".format(device_name)))
+
+            item.setIcon(QIcon(".\\.\\image\\{}_device".format(device_type)))
             self.devices_list.addItem(item)

@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QIcon, QKeySequence, QCursor
+from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
 from center.iconTabs.events.soundOut.soundDisplay import SoundDisplay
@@ -286,7 +286,8 @@ class IconTabs(QTabWidget):
 
                     if can_open:
                         self.setCurrentIndex(self.addTab(widget, tab_icon, name))
-        except Exception:
+        except Exception as e:
+            print(e)
             print("error happens in open tab. [iconTabs/main.py]")
 
     def getWidgetProperties(self, value):

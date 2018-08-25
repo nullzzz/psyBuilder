@@ -1,7 +1,5 @@
-import sys
-
-from PyQt5.QtGui import QFont
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, \
     QGridLayout, QComboBox
 
@@ -73,9 +71,12 @@ class EyeDC(QWidget):
 
 
 if __name__ == '__main__':
+    import sys
+
     app = QApplication(sys.argv)
+
     pro = EyeDC()
+
     pro.show()
+
     sys.exit(app.exec())
-
-

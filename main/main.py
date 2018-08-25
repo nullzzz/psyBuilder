@@ -4,13 +4,12 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication
 
 from attributes.main import Attributes
+from center.iconTabs.events.durationPage import DurationPage
 from center.main import Center
 from main.globalDevices import GlobalDevice
 from output.main import Output
 from properties.main import Properties
 from structure.main import Structure
-
-from center.iconTabs.events.durationPage import DurationPage
 
 
 class MainWindow(QMainWindow):
@@ -108,7 +107,7 @@ class MainWindow(QMainWindow):
         self.linkSignals()
 
     def linkSignals(self):
-        # self
+        # devices
         self.input_devices.deviceSelect.connect(self.changeDevices)
         self.output_devices.deviceSelect.connect(self.changeDevices)
         # icon tabs
@@ -166,7 +165,8 @@ class MainWindow(QMainWindow):
         else:
             self.input_devices.show()
 
-    def changeDevices(self, device_type, devices):
+    @staticmethod
+    def changeDevices(device_type, devices):
         # output device
         if device_type:
             DurationPage.OUTPUT_DEVICES = devices

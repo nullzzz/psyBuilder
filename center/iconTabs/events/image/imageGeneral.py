@@ -5,8 +5,6 @@ from ...colorBobox import ColorListEditor
 
 
 # image event专属页面
-
-
 class ImageTab1(QWidget):
     def __init__(self, parent=None):
         super(ImageTab1, self).__init__(parent)

@@ -9,6 +9,7 @@ from .deviceItem import DeviceOutItem, DeviceInItem
 class DurationPage(QWidget):
     OUTPUT_DEVICES = {}
     INPUT_DEVICES = {}
+
     def __init__(self, parent=None):
         super(DurationPage, self).__init__(parent)
 
@@ -27,9 +28,7 @@ class DurationPage(QWidget):
         self.out_del_bt.setEnabled(False)
         self.out_tip = QLabel("Add output device(s) first")
         self.out_tip.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.out_devices_dialog = DeviceOutDialog()
-        self.out_devices_dialog.ok_bt.clicked.connect(self.selectOut)
-        self.out_devices_dialog.cancel_bt.clicked.connect(self.out_devices_dialog.close)
+
         # input device
         self.in_stack1 = QStackedWidget()
         self.in_stack2 = QStackedWidget()
@@ -41,9 +40,7 @@ class DurationPage(QWidget):
         self.in_devices.currentItemChanged.connect(self.deviceInChanged)
         self.in_add_bt = QPushButton("&Add...")
         self.in_del_bt = QPushButton("&Remove...")
-        self.in_devices_dialog = DeviceInDialog()
-        self.in_devices_dialog.ok_bt.clicked.connect(self.selectIn)
-        self.in_devices_dialog.cancel_bt.clicked.connect(self.in_devices_dialog.close)
+
 
         self.setUI()
 
@@ -113,6 +110,10 @@ class DurationPage(QWidget):
 
     # 弹出输入设备选择框
     def showInDevices(self):
+        self.in_devices_dialog = DeviceInDialog()
+        self.in_devices_dialog.addDevices(DurationPage.INPUT_DEVICES)
+        self.in_devices_dialog.ok_bt.clicked.connect(self.selectIn)
+        self.in_devices_dialog.cancel_bt.clicked.connect(self.in_devices_dialog.close)
         self.in_devices_dialog.setWindowModality(Qt.ApplicationModal)
         self.in_devices_dialog.show()
 
@@ -142,6 +143,9 @@ class DurationPage(QWidget):
 
     # 弹出输出设备选择框
     def showOutDevices(self):
+        self.out_devices_dialog = DeviceOutDialog()
+        self.out_devices_dialog.ok_bt.clicked.connect(self.selectOut)
+        self.out_devices_dialog.cancel_bt.clicked.connect(self.out_devices_dialog.close)
         self.out_devices_dialog.setWindowModality(Qt.ApplicationModal)
         self.out_devices_dialog.show()
 

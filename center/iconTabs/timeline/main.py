@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QWidget, QGridLayout
 from PyQt5.QtCore import pyqtSignal
-from .iconBar import IconBar
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QWidget, QGridLayout
+
 from .iconArea.main import IconArea
+from .iconBar import IconBar
 
 
 class Timeline(QWidget):
@@ -48,4 +49,4 @@ class Timeline(QWidget):
                 self.icon_area.icon_table.item(3, col).setText(name)
 
     def getProperties(self):
-        return {"properties" : "None"}
+        return {"properties": "None"}
