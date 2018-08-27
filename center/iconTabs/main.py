@@ -214,7 +214,7 @@ class IconTabs(QTabWidget):
                         tab_icon = QIcon(".\\.\\image\\get_value.png")
                     elif widget_type == "QuestUpdate":
                         tab_icon = QIcon(".\\.\\image\\update_quest.png")
-                    elif widget_type == "IfElse":
+                    elif widget_type == "If_else":
                         tab_icon = QIcon(".\\.\\image\\if_else.png")
                     elif widget_type == "Switch":
                         tab_icon = QIcon(".\\.\\image\\switch.png")
@@ -441,9 +441,9 @@ class IconTabs(QTabWidget):
             tab_index = self.tabBar().tabAt(e.pos())
             if tab_index != -1:
                 self.close_action.disconnect()
-                self.close_action.triggered.connect(lambda :self.closeTab(index=tab_index))
+                self.close_action.triggered.connect(lambda: self.closeTab(index=tab_index))
                 self.close_other_action.disconnect()
-                self.close_other_action.triggered.connect(lambda :self.closeOtherTab(index=tab_index))
+                self.close_other_action.triggered.connect(lambda: self.closeOtherTab(index=tab_index))
                 self.right_button_menu.exec(self.mapToGlobal(e.pos()))
         except Exception:
             print("error happens in showing tab bar right button menu. [iconTabs/main.py]")
