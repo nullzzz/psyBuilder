@@ -201,7 +201,7 @@ class IconTabs(QTabWidget):
                         tab_icon = QIcon(".\\.\\image\\end_eye.png")
                     elif widget_type == "Open":
                         tab_icon = QIcon(".\\.\\image\\open_eye.png")
-                    elif widget_type == "SetUp":
+                    elif widget_type == "Action":
                         tab_icon = QIcon(".\\.\\image\\setup_eye.png")
                     elif widget_type == "StartR":
                         tab_icon = QIcon(".\\.\\image\\start_eye.png")
@@ -241,9 +241,9 @@ class IconTabs(QTabWidget):
                     widget = Close()
                     tab_icon = QIcon(".\\.\\image\\close_eye.png")
                     widget.tabClose.connect(self.closeTab)
-                elif widget_type == "DC":
+                elif widget_type == "Action":
                     widget = EyeDC()
-                    tab_icon = QIcon(".\\.\\image\\DC_eye.png")
+                    tab_icon = QIcon(".\\.\\image\\setup_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "EndR":
                     widget = EndR()
@@ -253,9 +253,9 @@ class IconTabs(QTabWidget):
                     widget = Open()
                     tab_icon = QIcon(".\\.\\image\\open_eye.png")
                     widget.tabClose.connect(self.closeTab)
-                elif widget_type == "SetUp":
+                elif widget_type == "DC":
                     widget = SetUp()
-                    tab_icon = QIcon(".\\.\\image\\setup_eye.png")
+                    tab_icon = QIcon(".\\.\\image\\DC.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "StartR":
                     widget = StartR()

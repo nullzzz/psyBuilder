@@ -18,7 +18,7 @@ class ImageProperty(QWidget):
         self.tab.addTab(self.frame, "frame")
         self.tab.addTab(self.duration, "duration")
         # bottom
-        self.ok_bt = QPushButton("OK")
+        self.ok_bt = QPushButton("Ok")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
         self.setButtons()

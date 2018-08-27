@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QDataStream, QByteArray, QIODevice, QMimeData, QPoint, QSize
-from PyQt5.QtWidgets import QListView, QListWidget, QListWidgetItem, QTabWidget, QFrame
 from PyQt5.QtGui import QDrag, QIcon
+from PyQt5.QtWidgets import QListView, QListWidget, QListWidgetItem, QTabWidget, QFrame
 
 
 class IconList(QListWidget):
@@ -55,8 +55,8 @@ class IconBar(QTabWidget):
         self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\video.png"), "Video"))
 
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\open_eye.png"), "Open"))
-        self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\setup_eye.png"), "SetUp"))
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\DC_eye.png"), "DC"))
+        self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\setup_eye.png"), "Action"))
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\start_eye.png"), "StartR"))
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\end_eye.png"), "EndR"))
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\close_eye.png"), "Close"))
