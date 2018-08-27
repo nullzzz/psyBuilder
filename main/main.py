@@ -1,6 +1,8 @@
 import json
+import sys
+import os
 
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QSettings
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication
 
 from attributes.main import Attributes
@@ -13,6 +15,7 @@ from structure.main import Structure
 
 
 class MainWindow(QMainWindow):
+    # 每隔五分钟自动保存
     AUTO_SAVE_TIME = 300000
 
     def __init__(self, parent=None):
@@ -29,10 +32,11 @@ class MainWindow(QMainWindow):
         file_menu = menu_bar.addMenu("&File")
 
         new_file_action = QAction("&New", self)
+        new_file_action.triggered.connect(self.newFile)
         open_file_action = QAction("&Open", self)
         save_file_action = QAction("&Save", self)
         save_file_action.triggered.connect(self.getData)
-        exit_action = QAction("Exit", self)
+        exit_action = QAction("&Exit", self)
         exit_action.triggered.connect(QApplication.exit)
 
         file_menu.addAction(new_file_action)
@@ -49,6 +53,7 @@ class MainWindow(QMainWindow):
         property_action = QAction("&Property", self)
         output_action = QAction("&Output", self)
         default_action = QAction("&Default", self)
+        default_action.triggered.connect(self.resetView)
 
         view_menu.addAction(attribute_action)
         view_menu.addAction(structure_action)
@@ -103,6 +108,8 @@ class MainWindow(QMainWindow):
         self.splitDockWidget(self.structure, self.properties, Qt.Vertical)
         self.splitDockWidget(self.center, self.output, Qt.Vertical)
 
+        
+
         # 连接信号
         self.linkSignals()
 
@@ -151,6 +158,10 @@ class MainWindow(QMainWindow):
         except Exception:
             print("error happens in link cycle signals to structure. [main/main.py]")
 
+    def newFile(self):
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
+
     def getData(self):
         node_value = self.structure.getNodeValue()
         self.output.text_area.setText(
@@ -158,6 +169,12 @@ class MainWindow(QMainWindow):
                 node_value))
         # reset timer
         self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
+
+    def resetView(self):
+        try:
+            print("I can't finish it, AHHh.")
+        except Exception:
+            print("error happens in reset view. [main/main.py]")
 
     def showDevices(self, device_type):
         if device_type:
@@ -172,3 +189,6 @@ class MainWindow(QMainWindow):
             DurationPage.OUTPUT_DEVICES = devices
         else:
             DurationPage.INPUT_DEVICES = devices
+
+    def contextMenuEvent(self, QContextMenuEvent):
+        super().contextMenuEvent(QContextMenuEvent)

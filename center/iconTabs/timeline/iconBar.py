@@ -47,6 +47,7 @@ class IconBar(QTabWidget):
         self.events = IconList()
         self.eye_tracker = IconList()
         self.quest = IconList()
+        self.condition = IconList()
 
         self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\cycle.png"), "Cycle"))
         self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\sound.png"), "SoundOut"))
@@ -66,6 +67,10 @@ class IconBar(QTabWidget):
         self.quest.addItem(QListWidgetItem(QIcon(".\\.\\Image\\update_quest.png"), "QuestUpdate"))
         self.quest.addItem(QListWidgetItem(QIcon(".\\.\\Image\\get_value.png"), "QuestGetValue"))
 
+        self.condition.addItem(QListWidgetItem(QIcon(".\\.\\image\\if_else.png"), "If_else"))
+        self.condition.addItem(QListWidgetItem(QIcon(".\\.\\image\\switch.png"), "Switch"))
+
         self.addTab(self.events, "Events")
         self.addTab(self.eye_tracker, "Eye Tracker")
         self.addTab(self.quest, "Quest")
+        self.addTab(self.condition, "Condition")

@@ -18,6 +18,8 @@ from .eyeTracker.startR import StartR
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
+from .condition.ifElse import IfElse
+from .condition.switch import Switch
 
 
 class IconTabs(QTabWidget):
@@ -181,7 +183,7 @@ class IconTabs(QTabWidget):
                     self.setCurrentIndex(tab_index)
                 else:
                     tab_icon = None
-                    # 生成相应widget
+                    # 生成相应icon
                     if widget_type == "Cycle":
                         tab_icon = QIcon(".\\.\\image\\cycle.png")
                     elif widget_type == "Timeline":
@@ -205,13 +207,17 @@ class IconTabs(QTabWidget):
                     elif widget_type == "Open":
                         tab_icon = QIcon(".\\.\\image\\open_eye.png")
                     elif widget_type == "Action":
-                        tab_icon = QIcon(".\\.\\image\\setup_eye.png")
+                        tab_icon = QIcon(".\\.\\image\\action_eye.png")
                     elif widget_type == "StartR":
                         tab_icon = QIcon(".\\.\\image\\start_eye.png")
                     elif widget_type == "QuestGetValue":
-                        tab_icon = QIcon(".\\.\\image\\start_quest.png")
+                        tab_icon = QIcon(".\\.\\image\\get_value.png")
                     elif widget_type == "QuestUpdate":
                         tab_icon = QIcon(".\\.\\image\\update_quest.png")
+                    elif widget_type == "IfElse":
+                        tab_icon = QIcon(".\\.\\image\\if_else.png")
+                    elif widget_type == "Switch":
+                        tab_icon = QIcon(".\\.\\image\\switch.png")
                     else:
                         pass
                     self.setCurrentIndex(self.addTab(widget, tab_icon, name))
@@ -280,6 +286,14 @@ class IconTabs(QTabWidget):
                     widget = QuestGetValue()
                     tab_icon = QIcon(".\\.\\image\\get_value.png")
                     widget.tabClose.connect(self.closeTab)
+                elif widget_type == "If_else":
+                    widget = IfElse()
+                    tab_icon = QIcon(".\\.\\image\\if_else.png")
+                    widget.tabClose.connect(self.closeTab)
+                elif widget_type == "Switch":
+                    widget = Switch()
+                    tab_icon = QIcon(".\\.\\image\\switch.png")
+                    widget.tabClose.connect(self.closeTab)
                 else:
                     pass
 
@@ -303,8 +317,7 @@ class IconTabs(QTabWidget):
                     if can_open:
                         self.setCurrentIndex(self.addTab(widget, tab_icon, name))
         except Exception as e:
-            print(e)
-            print("error happens in open tab. [iconTabs/main.py]")
+            print("error {} happens in open tab. [iconTabs/main.py]".format(e))
 
     def getWidgetProperties(self, value):
         properties = {"state": "not initialized"}
