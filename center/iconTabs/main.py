@@ -2,20 +2,21 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
-from center.iconTabs.events.soundOut.soundDisplay import SoundDisplay
 from center.iconTabs.timeline.main import Timeline
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
+from .events.soundOut.soundDisplay import SoundDisplay
 from .events.text.textDisplay import TextDisplay
 from .events.video.videoDisplay import VideoDisplay
 from .eyeTracker.DC import EyeDC
+from .eyeTracker.action import EyeAction
+from .eyeTracker.calibrate import EyeCalibrate
 from .eyeTracker.close import Close
 from .eyeTracker.endR import EndR
 from .eyeTracker.open import Open
-from .eyeTracker.setup import SetUp
 from .eyeTracker.startR import StartR
-# from .quest.close import
-from .quest.start import QuestStart
+from .quest.getvalue import QuestGetValue
+from .quest.start import QuestInit
 from .quest.update import QuestUpdate
 
 
@@ -197,6 +198,8 @@ class IconTabs(QTabWidget):
                         tab_icon = QIcon(".\\.\\image\\close_eye.png")
                     elif widget_type == "DC":
                         tab_icon = QIcon(".\\.\\image\\DC_eye.png")
+                    elif widget_type == "Calibration":
+                        tab_icon = QIcon(".\\.\\image\\calibration_eye.png")
                     elif widget_type == "EndR":
                         tab_icon = QIcon(".\\.\\image\\end_eye.png")
                     elif widget_type == "Open":
@@ -205,7 +208,7 @@ class IconTabs(QTabWidget):
                         tab_icon = QIcon(".\\.\\image\\setup_eye.png")
                     elif widget_type == "StartR":
                         tab_icon = QIcon(".\\.\\image\\start_eye.png")
-                    elif widget_type == "QuestStart":
+                    elif widget_type == "QuestGetValue":
                         tab_icon = QIcon(".\\.\\image\\start_quest.png")
                     elif widget_type == "QuestUpdate":
                         tab_icon = QIcon(".\\.\\image\\update_quest.png")
@@ -242,8 +245,12 @@ class IconTabs(QTabWidget):
                     tab_icon = QIcon(".\\.\\image\\close_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Action":
-                    widget = EyeDC()
-                    tab_icon = QIcon(".\\.\\image\\setup_eye.png")
+                    widget = EyeAction()
+                    tab_icon = QIcon(".\\.\\image\\action_eye.png")
+                    widget.tabClose.connect(self.closeTab)
+                elif widget_type == "Calibration":
+                    widget = EyeCalibrate()
+                    tab_icon = QIcon(".\\.\\image\\calibration_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "EndR":
                     widget = EndR()
@@ -254,20 +261,24 @@ class IconTabs(QTabWidget):
                     tab_icon = QIcon(".\\.\\image\\open_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "DC":
-                    widget = SetUp()
+                    widget = EyeDC()
                     tab_icon = QIcon(".\\.\\image\\DC.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "StartR":
                     widget = StartR()
                     tab_icon = QIcon(".\\.\\image\\start_eye.png")
                     widget.tabClose.connect(self.closeTab)
-                elif widget_type == "QuestStart":
-                    widget = QuestStart()
+                elif widget_type == "QuestInit":
+                    widget = QuestInit()
                     tab_icon = QIcon(".\\.\\image\\start_quest.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestUpdate":
                     widget = QuestUpdate()
                     tab_icon = QIcon(".\\.\\image\\update_quest.png")
+                    widget.tabClose.connect(self.closeTab)
+                elif widget_type == "QuestGetValue":
+                    widget = QuestGetValue()
+                    tab_icon = QIcon(".\\.\\image\\get_value.png")
                     widget.tabClose.connect(self.closeTab)
                 else:
                     pass

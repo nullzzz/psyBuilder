@@ -4,12 +4,12 @@ from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBox
                              QComboBox, QFormLayout)
 
 
-class QuestStart(QWidget):
+class QuestInit(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
     def __init__(self, parent=None):
-        super(QuestStart, self).__init__(parent)
+        super(QuestInit, self).__init__(parent)
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
 
@@ -22,7 +22,7 @@ class QuestStart(QWidget):
         self.method = QComboBox()
         self.minimum = QLineEdit()
         self.maximum = QLineEdit()
-        self.experimental = QLineEdit()
+        self.is_log10_transform = QLineEdit()
 
         self.bt_ok = QPushButton("Ok")
         self.bt_ok.clicked.connect(self.ok)
@@ -50,7 +50,7 @@ class QuestStart(QWidget):
         self.method.addItems(["quantile", "mean", "mode"])
         self.minimum.setText("0")
         self.maximum.setText("1")
-        self.experimental.setText("quest_test_value")
+        self.is_log10_transform.setText("quest_test_value")
 
         layout1 = QFormLayout()
         layout1.addRow(self.tip1)
@@ -64,7 +64,8 @@ class QuestStart(QWidget):
         layout1.addRow("Method to determine optimal test value", self.method)
         layout1.addRow("Minimum test value", self.minimum)
         layout1.addRow("Maximum test value", self.maximum)
-        layout1.addRow("Experimental variable for test value", self.experimental)
+        # layout1.addRow("Experimental variable for test value", self.experimental)
+        layout1.addRow("Is log10 transform", self.is_log10_transform)
         layout1.setLabelAlignment(Qt.AlignRight)
 
         layout2 = QHBoxLayout()
@@ -104,5 +105,5 @@ class QuestStart(QWidget):
             "Method to determine optimal test value": self.method.currentText(),
             "Minimum test value": self.minimum.text(),
             "Maximum test value": self.maximum.text(),
-            "Experimental variable for test value": self.experimental.text(),
+            "Is log10 transform": self.is_log10_transform.text(),
         }

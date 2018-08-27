@@ -9,7 +9,9 @@ in_device = {
     "response box": 0
 }
 out_device = {
-
+    "serial_port": 0,
+    "parallel_port": 0,
+    "network_port": 0,
 }
 
 # 暂时只考虑输出设备的选择
@@ -42,7 +44,7 @@ class GlobalDevice(QWidget):
         self.devices_list.setFrameStyle(QFrame.NoFrame)
         self.devices_list.setIconSize(QSize(40, 40))
 
-        self.selected_devices = DropDemo()
+        self.selected_devices = DropDemo(self.device_type)
         self.describe = QTextEdit()
         self.describe.setText("此处留白\n\t设备描述\n\t参数设置")
 
@@ -99,8 +101,9 @@ class DeviceItem(QListWidgetItem):
 
 class DropDemo(QListWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, device_type=0, parent=None):
         super(DropDemo, self).__init__(parent)
+        self.device_type = device_type
         # 拖动的图标
         self.dragItem = None
         # self.setViewMode(QListView.IconMode)
@@ -111,10 +114,16 @@ class DropDemo(QListWidget):
     def dropEvent(self, e):
         source = e.source()
         item_type = source.currentItem().item_type
-        in_device[item_type] += 1
         drop_item = source.currentItem().clone()
-        if in_device[item_type] > 1:
-            drop_item.setText("{}{}".format(drop_item.text(), in_device[item_type]))
+        if self.device_type:
+            out_device[item_type] += 1
+            if out_device[item_type] > 1:
+                drop_item.setText("{}{}".format(drop_item.text(), out_device[item_type]))
+        else:
+            in_device[item_type] += 1
+            if in_device[item_type] > 1:
+                drop_item.setText("{}{}".format(drop_item.text(), in_device[item_type]))
+
         # 当前位置item
         item = self.itemAt(e.pos())
         insert_pos = self.row(item)

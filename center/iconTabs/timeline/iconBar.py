@@ -56,13 +56,15 @@ class IconBar(QTabWidget):
 
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\open_eye.png"), "Open"))
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\DC_eye.png"), "DC"))
-        self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\setup_eye.png"), "Action"))
+        self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\calibration_eye.png"), "Calibration"))
+        self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\action_eye.png"), "Action"))
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\start_eye.png"), "StartR"))
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\end_eye.png"), "EndR"))
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\close_eye.png"), "Close"))
 
-        self.quest.addItem(QListWidgetItem(QIcon(".\\.\\Image\\start_quest.png"), "QuestStart"))
+        self.quest.addItem(QListWidgetItem(QIcon(".\\.\\Image\\start_quest.png"), "QuestInit"))
         self.quest.addItem(QListWidgetItem(QIcon(".\\.\\Image\\update_quest.png"), "QuestUpdate"))
+        self.quest.addItem(QListWidgetItem(QIcon(".\\.\\Image\\get_value.png"), "QuestGetValue"))
 
         self.addTab(self.events, "Events")
         self.addTab(self.eye_tracker, "Eye Tracker")

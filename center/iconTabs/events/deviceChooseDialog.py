@@ -57,6 +57,7 @@ class DeviceInDialog(QDialog):
 class DeviceOutDialog(QDialog):
     def __init__(self, parent=None):
         super(DeviceOutDialog, self).__init__(parent)
+        self.tip = QLabel("Please choose output device(s) from menu bar first!")
         self.devices_list = QListWidget()
         self.ok_bt = QPushButton("Ok")
         self.cancel_bt = QPushButton("Cancel")
@@ -72,18 +73,19 @@ class DeviceOutDialog(QDialog):
         self.devices_list.setWrapping(False)
         self.devices_list.setSpacing(20)
 
-        item1 = QListWidgetItem("eye")
-        item1.setIcon(QIcon(".\\.\\image\\ff"))
-        self.devices_list.addItem(item1)
-        item2 = QListWidgetItem("device2")
-        item2.setIcon(QIcon(".\\.\\image\\ff"))
-        self.devices_list.addItem(item2)
-        item3 = QListWidgetItem("device1")
-        item3.setIcon(QIcon(".\\.\\image\\ff"))
-        self.devices_list.addItem(item3)
+        # item1 = QListWidgetItem("eye")
+        # item1.setIcon(QIcon(".\\.\\image\\ff"))
+        # self.devices_list.addItem(item1)
+        # item2 = QListWidgetItem("device2")
+        # item2.setIcon(QIcon(".\\.\\image\\ff"))
+        # self.devices_list.addItem(item2)
+        # item3 = QListWidgetItem("device1")
+        # item3.setIcon(QIcon(".\\.\\image\\ff"))
+        # self.devices_list.addItem(item3)
 
         layout = QGridLayout()
         layout.addWidget(self.devices_list, 0, 0, 1, 4)
+        layout.addWidget(self.tip, 0, 0, 1, 4)
         layout.addWidget(self.ok_bt, 1, 2, 1, 1)
         layout.addWidget(self.cancel_bt, 1, 3, 1, 1)
         self.setLayout(layout)
@@ -92,7 +94,9 @@ class DeviceOutDialog(QDialog):
     # devices: list or tuple
     # 图片名与设备名相同
     def addDevices(self, devices):
-        for device_name, device_type in devices:
+        for device_name, device_type in devices.items():
+            self.tip.hide()
             item = QListWidgetItem(device_name)
+            item.setData(0, device_type)
             item.setIcon(QIcon(".\\.\\image\\{}_device".format(device_type)))
             self.devices_list.addItem(item)
