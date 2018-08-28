@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QObject
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGroupBox, QComboBox, QLineEdit, QPushButton, QGridLayout, QApplication, QLabel, \
     QVBoxLayout, QHBoxLayout
@@ -82,20 +82,21 @@ class IfBranch(QWidget):
         layout3.addWidget(self.f_event_image, Qt.AlignHCenter)
         group3.setLayout(layout3)
 
-        group4 = QWidget()
+        layout23 = QHBoxLayout()
+        layout23.addWidget(group2)
+        layout23.addWidget(group3)
+
         layout4 = QHBoxLayout()
         layout4.addStretch(10)
         layout4.addWidget(self.bt_ok)
         layout4.addWidget(self.bt_cancel)
         layout4.addWidget(self.bt_apply)
         layout4.setContentsMargins(0, 0, 0, 0)
-        group4.setLayout(layout4)
 
-        layout = QGridLayout()
-        layout.addWidget(group1, 0, 0, 1, 2)
-        layout.addWidget(group2, 1, 0, 2, 1)
-        layout.addWidget(group3, 1, 1, 2, 1)
-        layout.addWidget(group4, 3, 0, 1, 2)
+        layout = QVBoxLayout()
+        layout.addWidget(group1, 1)
+        layout.addLayout(layout23, 2)
+        layout.addLayout(layout4, 1)
         self.setLayout(layout)
 
     # 改变下方label的图标
@@ -128,16 +129,17 @@ class IfBranch(QWidget):
     # 1、直接跳出properties设置的弹窗
     def showProperty(self):
         if self.sender() == self.t_event_image:
-
             self.t_pro.show()
+            self.t_pro.setWindowModality(Qt.ApplicationModal)
             # 这里或许还有别的事要做
             self.t_pro.ok_bt.clicked.connect(self.t_pro.close)
             self.t_pro.cancel_bt.clicked.connect(self.t_pro.close)
             # self.t_pro.apply_bt.clicked.connect(self.t_pro.close)
         else:
             self.f_pro.show()
-            self.f_pro.ok_bt.clicked.connect(self.t_pro.close)
-            self.f_pro.cancel_bt.clicked.connect(self.t_pro.close)
+            self.f_pro.setWindowModality(Qt.ApplicationModal)
+            self.f_pro.ok_bt.clicked.connect(self.f_pro.close)
+            self.f_pro.cancel_bt.clicked.connect(self.f_pro.close)
 
     def addCondition(self):
         if self.cnt <= 6:
@@ -182,11 +184,11 @@ class MyLabel(QLabel):
         self.double_click.emit()
 
 
-class OneCondition(QWidget):
+class OneCondition(QObject):
     add_condition = pyqtSignal()
 
-    def __init__(self, parent=None):
-        super(OneCondition, self).__init__(parent)
+    def __init__(self):
+        super(OneCondition, self).__init__()
         self.and_or = QComboBox()
         self.var = QComboBox()
         self.compare = QComboBox()
@@ -198,13 +200,6 @@ class OneCondition(QWidget):
     def setUI(self):
         self.and_or.addItems(["and", "or"])
         self.compare.addItems([">", "<", "="])
-        layout = QGridLayout()
-        layout.addWidget(self.and_or, 0, 0)
-        layout.addWidget(self.var, 0, 1)
-        layout.addWidget(self.compare, 0, 2)
-        layout.addWidget(self.value, 0, 3)
-        layout.addWidget(self.add, 0, 4)
-        self.setLayout(layout)
 
     # 返回当前条件的真值
     def getBool(self):
