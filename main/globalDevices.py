@@ -6,7 +6,8 @@ from PyQt5.QtWidgets import QWidget, QListWidget, QListWidgetItem, QTextEdit, QV
 in_device = {
     "mouse": 0,
     "keyboard": 0,
-    "response box": 0
+    "response box": 0,
+    "game pad": 0
 }
 out_device = {
     "serial_port": 0,

@@ -112,7 +112,7 @@ class SoundTab1(QWidget):
     # 打开文件夹
     def openFile(self):
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Find the sound file)", self.file_name.text(),
+        file_name, _ = QFileDialog.getOpenFileName(self, "Find the sound file", self.file_name.text(),
                                                    "Sound File (*)", options=options)
         if file_name:
             self.file_name.setText(file_name)

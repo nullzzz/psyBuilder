@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
 from center.iconTabs.timeline.main import Timeline
-from .condition.ifElse import IfElse
+from .condition.ifBranch import IfBranch
 from .condition.switch import Switch
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
@@ -20,7 +20,6 @@ from .eyeTracker.startR import StartR
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
-
 from .tabIcon import TabIcon
 
 
@@ -236,7 +235,8 @@ class IconTabs(QTabWidget):
                     widget = QuestGetValue()
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "If_else":
-                    widget = IfElse()
+                    # widget = IfElse()
+                    widget = IfBranch()
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Switch":
                     widget = Switch()

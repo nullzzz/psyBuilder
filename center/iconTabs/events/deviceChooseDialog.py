@@ -48,7 +48,7 @@ class DeviceInDialog(QDialog):
         for device_name, device_type in devices.items():
             self.tip.hide()
             item = QListWidgetItem(device_name)
-            item.setData(0, device_type)
+            item.setData(1, device_type)
             item.setIcon(QIcon(".\\.\\image\\{}_device".format(device_type)))
             self.devices_list.addItem(item)
 
@@ -73,16 +73,6 @@ class DeviceOutDialog(QDialog):
         self.devices_list.setWrapping(False)
         self.devices_list.setSpacing(20)
 
-        # item1 = QListWidgetItem("eye")
-        # item1.setIcon(QIcon(".\\.\\image\\ff"))
-        # self.devices_list.addItem(item1)
-        # item2 = QListWidgetItem("device2")
-        # item2.setIcon(QIcon(".\\.\\image\\ff"))
-        # self.devices_list.addItem(item2)
-        # item3 = QListWidgetItem("device1")
-        # item3.setIcon(QIcon(".\\.\\image\\ff"))
-        # self.devices_list.addItem(item3)
-
         layout = QGridLayout()
         layout.addWidget(self.devices_list, 0, 0, 1, 4)
         layout.addWidget(self.tip, 0, 0, 1, 4)
@@ -97,6 +87,6 @@ class DeviceOutDialog(QDialog):
         for device_name, device_type in devices.items():
             self.tip.hide()
             item = QListWidgetItem(device_name)
-            item.setData(0, device_type)
+            item.setData(1, device_type)
             item.setIcon(QIcon(".\\.\\image\\{}_device".format(device_type)))
             self.devices_list.addItem(item)

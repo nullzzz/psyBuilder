@@ -46,3 +46,6 @@ class VideoProperty(QWidget):
         self.general.setAttributes(attributes)
         self.frame.setAttributes(attributes)
         self.duration.setAttributes(attributes)
+
+    def getInfo(self):
+        return {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}

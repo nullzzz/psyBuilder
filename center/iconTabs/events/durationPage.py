@@ -145,6 +145,8 @@ class DurationPage(QWidget):
     def showOutDevices(self):
         self.out_devices_dialog = DeviceOutDialog()
         self.out_devices_dialog.addDevices(DurationPage.OUTPUT_DEVICES)
+        print("d")
+        print(DurationPage.OUTPUT_DEVICES)
         self.out_devices_dialog.ok_bt.clicked.connect(self.selectOut)
         self.out_devices_dialog.cancel_bt.clicked.connect(self.out_devices_dialog.close)
         self.out_devices_dialog.setWindowModality(Qt.ApplicationModal)
