@@ -51,7 +51,6 @@ class SoundDisplay(QMainWindow):
         center = QWidget()
 
         layout = QVBoxLayout()
-        layout = QVBoxLayout()
         layout.addWidget(QLabel(""), 2)
         layout.addWidget(self.play_bt, 2, Qt.AlignHCenter)
         layout.addWidget(self.tip, 1, Qt.AlignCenter)
@@ -61,7 +60,6 @@ class SoundDisplay(QMainWindow):
         layout2.addWidget(self.tip1, 0, 0, 1, 1)
         layout2.addWidget(self.tip2, 0, 5, 1, 1)
         layout2.setHorizontalSpacing(10)
-
 
         layout.addLayout(layout2)
         layout.addWidget(QLabel(), 2)
@@ -100,7 +98,7 @@ class SoundDisplay(QMainWindow):
                 self.play_bt.setEnabled(True)
                 self.tip.setText(file_name)
             else:
-                QMessageBox.warning(self, "Warning", "The file path is invalid!")
+                QMessageBox.warning(self, "Warning", "The file path is invalid!", QMessageBox.Ok)
             self.propertiesChange.emit(self.getInfo())
         else:
             self.play_bt.setEnabled(False)

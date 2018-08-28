@@ -3,6 +3,8 @@ from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
 from center.iconTabs.timeline.main import Timeline
+from .condition.ifElse import IfElse
+from .condition.switch import Switch
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
 from .events.soundOut.soundDisplay import SoundDisplay
@@ -18,8 +20,6 @@ from .eyeTracker.startR import StartR
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
-from .condition.ifElse import IfElse
-from .condition.switch import Switch
 
 
 class IconTabs(QTabWidget):
@@ -189,11 +189,11 @@ class IconTabs(QTabWidget):
                     elif widget_type == "Timeline":
                         tab_icon = QIcon(".\\.\\image\\timeLine.png")
                     elif widget_type == "SoundOut":
-                        tab_icon = QIcon(".\\.\\image\\sound.png")
+                        tab_icon = QIcon(".\\.\\image\\soundOut.png")
                     elif widget_type == "Text":
                         tab_icon = QIcon(".\\.\\image\\text.png")
                     elif widget_type == "Image":
-                        tab_icon = QIcon(".\\.\\image\\imageDisplay.png")
+                        tab_icon = QIcon(".\\.\\image\\image.png")
                     elif widget_type == "Video":
                         tab_icon = QIcon(".\\.\\image\\video.png")
                     elif widget_type == "Close":
@@ -236,13 +236,13 @@ class IconTabs(QTabWidget):
                     tab_icon = QIcon(".\\.\\image\\timeLine.png")
                 elif widget_type == "SoundOut":
                     widget = SoundDisplay()
-                    tab_icon = QIcon(".\\.\\image\\sound.png")
+                    tab_icon = QIcon(".\\.\\image\\soundOut.png")
                 elif widget_type == "Text":
                     widget = TextDisplay()
                     tab_icon = QIcon(".\\.\\image\\text.png")
                 elif widget_type == "Image":
                     widget = ImageDisplay()
-                    tab_icon = QIcon(".\\.\\image\\imageDisplay.png")
+                    tab_icon = QIcon(".\\.\\image\\image.png")
                 elif widget_type == "Video":
                     widget = VideoDisplay()
                     tab_icon = QIcon(".\\.\\image\\video.png")

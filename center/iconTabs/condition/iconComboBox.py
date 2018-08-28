@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QComboBox
 
 
 class IconComboBox(QComboBox):
@@ -85,11 +85,11 @@ class IconComboBox(QComboBox):
         elif widget_type == "Timeline":
             tab_icon = QIcon(".\\.\\image\\timeLine.png")
         elif widget_type == "SoundOut":
-            tab_icon = QIcon(".\\.\\image\\sound.png")
+            tab_icon = QIcon(".\\.\\image\\soundOut.png")
         elif widget_type == "Text":
             tab_icon = QIcon(".\\.\\image\\text.png")
         elif widget_type == "Image":
-            tab_icon = QIcon(".\\.\\image\\imageDisplay.png")
+            tab_icon = QIcon(".\\.\\image\\image.png")
         elif widget_type == "Video":
             tab_icon = QIcon(".\\.\\image\\video.png")
         elif widget_type == "Close":

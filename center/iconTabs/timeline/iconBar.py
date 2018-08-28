@@ -50,9 +50,9 @@ class IconBar(QTabWidget):
         self.condition = IconList()
 
         self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\cycle.png"), "Cycle"))
-        self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\sound.png"), "SoundOut"))
+        self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\soundOut.png"), "SoundOut"))
         self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\text.png"), "Text"))
-        self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\imageDisplay.png"), "Image"))
+        self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\image.png"), "Image"))
         self.events.addItem(QListWidgetItem(QIcon(".\\.\\Image\\video.png"), "Video"))
 
         self.eye_tracker.addItem(QListWidgetItem(QIcon(".\\.\\Image\\open_eye.png"), "Open"))
