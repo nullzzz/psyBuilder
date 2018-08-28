@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QComboBox
+from ..tabIcon import TabIcon
 
 
 class IconComboBox(QComboBox):
@@ -12,7 +13,7 @@ class IconComboBox(QComboBox):
                 border-radius: 3px;
                 padding: 1px 18px 1px 3px;
                 min-width: 200px;
-                max-width: 100px;
+                max-width: 200px;
                 min-height: 50px;
             }
             
@@ -50,71 +51,16 @@ class IconComboBox(QComboBox):
                 border-bottom-right-radius: 3px;
             }
             
-            QComboBox::down-arrow {
-                image: url(/usr/share/icons/crystalsvg/16x16/actions/1downarrow.png);
-            }
-            
             QComboBox::down-arrow:on { /* shift the arrow when popup is open */
                 top: 1px;
                 left: 1px;
             }""")
 
         self.addItem("None")
-        self.addIcon("Timeline")
-        self.addIcon("Cycle")
         self.addIcon("SoundOut")
         self.addIcon("Text")
         self.addIcon("Image")
         self.addIcon("Video")
-        self.addIcon("Close")
-        self.addIcon("DC")
-        self.addIcon("Calibration")
-        self.addIcon("EndR")
-        self.addIcon("Open")
-        self.addIcon("Action")
-        self.addIcon("StartR")
-        self.addIcon("QuestGetValue")
-        self.addIcon("QuestUpdate")
-        self.addIcon("IfElse")
-        self.addIcon("Switch")
 
     def addIcon(self, widget_type):
-        tab_icon = None
-        if widget_type == "Cycle":
-            tab_icon = QIcon(".\\.\\image\\cycle.png")
-        elif widget_type == "Timeline":
-            tab_icon = QIcon(".\\.\\image\\timeLine.png")
-        elif widget_type == "SoundOut":
-            tab_icon = QIcon(".\\.\\image\\soundOut.png")
-        elif widget_type == "Text":
-            tab_icon = QIcon(".\\.\\image\\text.png")
-        elif widget_type == "Image":
-            tab_icon = QIcon(".\\.\\image\\image.png")
-        elif widget_type == "Video":
-            tab_icon = QIcon(".\\.\\image\\video.png")
-        elif widget_type == "Close":
-            tab_icon = QIcon(".\\.\\image\\close_eye.png")
-        elif widget_type == "DC":
-            tab_icon = QIcon(".\\.\\image\\DC_eye.png")
-        elif widget_type == "Calibration":
-            tab_icon = QIcon(".\\.\\image\\calibration_eye.png")
-        elif widget_type == "EndR":
-            tab_icon = QIcon(".\\.\\image\\end_eye.png")
-        elif widget_type == "Open":
-            tab_icon = QIcon(".\\.\\image\\open_eye.png")
-        elif widget_type == "Action":
-            tab_icon = QIcon(".\\.\\image\\action_eye.png")
-        elif widget_type == "StartR":
-            tab_icon = QIcon(".\\.\\image\\start_eye.png")
-        elif widget_type == "QuestGetValue":
-            tab_icon = QIcon(".\\.\\image\\get_value.png")
-        elif widget_type == "QuestUpdate":
-            tab_icon = QIcon(".\\.\\image\\update_quest.png")
-        elif widget_type == "IfElse":
-            tab_icon = QIcon(".\\.\\image\\if_else.png")
-        elif widget_type == "Switch":
-            tab_icon = QIcon(".\\.\\image\\switch.png")
-        else:
-            pass
-
-        self.addItem(tab_icon, widget_type)
+        self.addItem(TabIcon(widget_type), widget_type)

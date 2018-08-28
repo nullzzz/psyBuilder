@@ -21,6 +21,8 @@ from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
 
+from .tabIcon import TabIcon
+
 
 class IconTabs(QTabWidget):
     # widget发送给properties窗口 (properties)
@@ -182,117 +184,62 @@ class IconTabs(QTabWidget):
                 if tab_index != -1:
                     self.setCurrentIndex(tab_index)
                 else:
-                    tab_icon = None
-                    # 生成相应icon
-                    if widget_type == "Cycle":
-                        tab_icon = QIcon(".\\.\\image\\cycle.png")
-                    elif widget_type == "Timeline":
-                        tab_icon = QIcon(".\\.\\image\\timeLine.png")
-                    elif widget_type == "SoundOut":
-                        tab_icon = QIcon(".\\.\\image\\soundOut.png")
-                    elif widget_type == "Text":
-                        tab_icon = QIcon(".\\.\\image\\text.png")
-                    elif widget_type == "Image":
-                        tab_icon = QIcon(".\\.\\image\\image.png")
-                    elif widget_type == "Video":
-                        tab_icon = QIcon(".\\.\\image\\video.png")
-                    elif widget_type == "Close":
-                        tab_icon = QIcon(".\\.\\image\\close_eye.png")
-                    elif widget_type == "DC":
-                        tab_icon = QIcon(".\\.\\image\\DC_eye.png")
-                    elif widget_type == "Calibration":
-                        tab_icon = QIcon(".\\.\\image\\calibration_eye.png")
-                    elif widget_type == "EndR":
-                        tab_icon = QIcon(".\\.\\image\\end_eye.png")
-                    elif widget_type == "Open":
-                        tab_icon = QIcon(".\\.\\image\\open_eye.png")
-                    elif widget_type == "Action":
-                        tab_icon = QIcon(".\\.\\image\\action_eye.png")
-                    elif widget_type == "StartR":
-                        tab_icon = QIcon(".\\.\\image\\start_eye.png")
-                    elif widget_type == "QuestGetValue":
-                        tab_icon = QIcon(".\\.\\image\\get_value.png")
-                    elif widget_type == "QuestUpdate":
-                        tab_icon = QIcon(".\\.\\image\\update_quest.png")
-                    elif widget_type == "If_else":
-                        tab_icon = QIcon(".\\.\\image\\if_else.png")
-                    elif widget_type == "Switch":
-                        tab_icon = QIcon(".\\.\\image\\switch.png")
-                    else:
-                        pass
+                    tab_icon = TabIcon(widget_type)
                     self.setCurrentIndex(self.addTab(widget, tab_icon, name))
                 # 我在cycle中生成timeline时, 就已经生成了timeline实体
                 if value.startswith("Timeline."):
                     self.attributesShow.emit(self.getTimelineAttributes(value))
             else:
                 widget = None
-                tab_icon = None
+                tab_icon = TabIcon(widget_type)
                 # 生成相应widget
                 if widget_type == "Cycle":
                     widget = Cycle(value=value)
-                    tab_icon = QIcon(".\\.\\image\\cycle.png")
                 elif widget_type == "Timeline":
                     widget = Timeline(value=value)
-                    tab_icon = QIcon(".\\.\\image\\timeLine.png")
                 elif widget_type == "SoundOut":
                     widget = SoundDisplay()
-                    tab_icon = QIcon(".\\.\\image\\soundOut.png")
                 elif widget_type == "Text":
                     widget = TextDisplay()
-                    tab_icon = QIcon(".\\.\\image\\text.png")
                 elif widget_type == "Image":
                     widget = ImageDisplay()
-                    tab_icon = QIcon(".\\.\\image\\image.png")
                 elif widget_type == "Video":
                     widget = VideoDisplay()
-                    tab_icon = QIcon(".\\.\\image\\video.png")
                 elif widget_type == "Close":
                     widget = Close()
-                    tab_icon = QIcon(".\\.\\image\\close_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Action":
                     widget = EyeAction()
-                    tab_icon = QIcon(".\\.\\image\\action_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Calibration":
                     widget = EyeCalibrate()
-                    tab_icon = QIcon(".\\.\\image\\calibration_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "EndR":
                     widget = EndR()
-                    tab_icon = QIcon(".\\.\\image\\end_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Open":
                     widget = Open()
-                    tab_icon = QIcon(".\\.\\image\\open_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "DC":
                     widget = EyeDC()
-                    tab_icon = QIcon(".\\.\\image\\DC.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "StartR":
                     widget = StartR()
-                    tab_icon = QIcon(".\\.\\image\\start_eye.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestInit":
                     widget = QuestInit()
-                    tab_icon = QIcon(".\\.\\image\\start_quest.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestUpdate":
                     widget = QuestUpdate()
-                    tab_icon = QIcon(".\\.\\image\\update_quest.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestGetValue":
                     widget = QuestGetValue()
-                    tab_icon = QIcon(".\\.\\image\\get_value.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "If_else":
                     widget = IfElse()
-                    tab_icon = QIcon(".\\.\\image\\if_else.png")
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Switch":
                     widget = Switch()
-                    tab_icon = QIcon(".\\.\\image\\switch.png")
                     widget.tabClose.connect(self.closeTab)
                 else:
                     pass
