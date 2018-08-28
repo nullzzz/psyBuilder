@@ -70,18 +70,17 @@ class IfBranch(QWidget):
 
     def clickOk(self):
         self.clickApply()
-        self.tabClose.emit()
         self.close()
+        self.tabClose.emit()
 
     def clickCancel(self):
-        self.tabClose.emit()
         self.close()
+        self.tabClose.emit()
 
     def clickApply(self):
         try:
             # add node
             icon_true_value = self.true_icon_choose.icon.value
-            print(icon_true_value)
             if not icon_true_value.startswith('Other') and icon_true_value != self.type_value['T']:
                 icon_true_name = "[T]" + self.true_icon_choose.icon_name.text()
                 self.nodeChange.emit(self.value, icon_true_name, getImage(icon_true_value.split('.')[0], 'pixmap'), icon_true_value, 'T')
