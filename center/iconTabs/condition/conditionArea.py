@@ -3,6 +3,7 @@ from noDash import NoDash
 
 
 class ConditionArea(QTableWidget):
+    MAX_CONDITION_COUNT = 6
     def __init__(self, parent=None):
         super(ConditionArea, self).__init__(parent)
 
@@ -59,27 +60,27 @@ class ConditionArea(QTableWidget):
 
     def addCondition(self):
         try:
-            index = self.getIndex(self.sender())
-            if index != -1:
-                print(index)
-                self.insertRow(index + 1)
+            if self.rowCount() < ConditionArea.MAX_CONDITION_COUNT:
+                index = self.getIndex(self.sender())
+                if index != -1:
+                    self.insertRow(index + 1)
 
-                and_or = QComboBox()
-                and_or.addItems(("and", "or"))
-                var = QComboBox()
-                compare_operator = QComboBox()
-                compare_operator.addItems((">", "<", "=="))
-                compare_value = QLineEdit()
-                add_button = QPushButton("Add")
-                add_button.clicked.connect(self.addCondition)
+                    and_or = QComboBox()
+                    and_or.addItems(("and", "or"))
+                    var = QComboBox()
+                    compare_operator = QComboBox()
+                    compare_operator.addItems((">", "<", "=="))
+                    compare_value = QLineEdit()
+                    add_button = QPushButton("Add")
+                    add_button.clicked.connect(self.addCondition)
 
-                self.add_buttons.insert(index + 1, add_button)
+                    self.add_buttons.insert(index + 1, add_button)
 
-                self.setCellWidget(index + 1, 0, and_or)
-                self.setCellWidget(index + 1, 2, var)
-                self.setCellWidget(index + 1, 4, compare_operator)
-                self.setCellWidget(index + 1, 6, compare_value)
-                self.setCellWidget(index + 1, 8, add_button)
+                    self.setCellWidget(index + 1, 0, and_or)
+                    self.setCellWidget(index + 1, 2, var)
+                    self.setCellWidget(index + 1, 4, compare_operator)
+                    self.setCellWidget(index + 1, 6, compare_value)
+                    self.setCellWidget(index + 1, 8, add_button)
         except Exception as e:
             print("error {} happens in add condition. [condition/conditionArea.py]".format(e))
 
