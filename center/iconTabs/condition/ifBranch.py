@@ -8,7 +8,7 @@ from ..image import getImage
 
 
 class IfBranch(QWidget):
-    tabClose = pyqtSignal()
+    tabClose = pyqtSignal(QWidget)
     propertiesChange = pyqtSignal(dict)
     # 发送给structure (self.value, value, name, type)
     nodeChange = pyqtSignal(str, str, QPixmap, str, str)
@@ -71,11 +71,11 @@ class IfBranch(QWidget):
     def clickOk(self):
         self.clickApply()
         self.close()
-        self.tabClose.emit()
+        self.tabClose.emit(self)
 
     def clickCancel(self):
         self.close()
-        self.tabClose.emit()
+        self.tabClose.emit(self)
 
     def clickApply(self):
         try:
