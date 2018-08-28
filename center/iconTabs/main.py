@@ -20,7 +20,8 @@ from .eyeTracker.startR import StartR
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
-from .tabIcon import TabIcon
+
+from .image import getImage
 
 
 class IconTabs(QTabWidget):
@@ -28,6 +29,8 @@ class IconTabs(QTabWidget):
     propertiesShow = pyqtSignal(dict)
     # 新增cycle, 对于其信号要在main窗口中进行相应串接
     cycleAdd = pyqtSignal(str)
+    # 同上
+    ifBranchAdd = pyqtSignal(str)
     # 发送到attributes窗口 (attributes)
     attributesShow = pyqtSignal(dict)
 
@@ -183,14 +186,14 @@ class IconTabs(QTabWidget):
                 if tab_index != -1:
                     self.setCurrentIndex(tab_index)
                 else:
-                    tab_icon = TabIcon(widget_type)
+                    tab_icon = getImage(widget_type, "icon")
                     self.setCurrentIndex(self.addTab(widget, tab_icon, name))
                 # 我在cycle中生成timeline时, 就已经生成了timeline实体
                 if value.startswith("Timeline."):
                     self.attributesShow.emit(self.getTimelineAttributes(value))
             else:
                 widget = None
-                tab_icon = TabIcon(widget_type)
+                tab_icon = getImage(widget_type, "icon")
                 # 生成相应widget
                 if widget_type == "Cycle":
                     widget = Cycle(value=value)
@@ -235,8 +238,7 @@ class IconTabs(QTabWidget):
                     widget = QuestGetValue()
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "If_else":
-                    # widget = IfElse()
-                    widget = IfBranch()
+                    widget = IfBranch(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Switch":
                     widget = Switch()
@@ -249,6 +251,8 @@ class IconTabs(QTabWidget):
                     self.value_widget[value] = widget
                     if widget_type == 'Cycle':
                         self.cycleAdd.emit(value)
+                    elif widget_type == "If_else":
+                        self.ifBranchAdd.emit(value)
                     # 各种widget的propertiesChange信号
                     try:
                         widget.propertiesChange.connect(self.getChangedProperties)

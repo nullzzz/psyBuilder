@@ -7,5 +7,3 @@ class Switch(QMainWindow):
 
     def __init__(self, parent=None):
         super(Switch, self).__init__(parent)
-
-        self.setWindowTitle("Switch")

@@ -119,6 +119,7 @@ class MainWindow(QMainWindow):
         self.output_devices.deviceSelect.connect(self.changeDevices)
         # icon tabs
         self.center.icon_tabs.cycleAdd.connect(self.linkCycleSignals)
+        self.center.icon_tabs.ifBranchAdd.connect(self.linkIFBranchSignals)
         self.center.icon_tabs.propertiesShow.connect(self.properties.showProperties)
         self.center.icon_tabs.attributesShow.connect(self.attributes.showAttributes)
         # 将timeline中icon的变更与structure相连
@@ -155,6 +156,17 @@ class MainWindow(QMainWindow):
             except Exception:
                 self.center.icon_tabs.value_widget[value].timelineAdd.connect(self.structure.addNode)
                 self.center.icon_tabs.value_widget[value].timelineNameChange.connect(self.structure.changeNodeName)
+        except Exception:
+            print("error happens in link cycle signals to structure. [main/main.py]")
+
+    def linkIFBranchSignals(self, value):
+        try:
+            try:
+                self.center.icon_tabs.value_widget[value].nodeChange.disconnect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].nodeChange.connect(self.structure.addNode)
+            except Exception:
+                self.center.icon_tabs.value_widget[value].nodeChange.connect(self.structure.addNode)
+                # self.center.icon_tabs.value_widget[value].nodeDelete.connect(self.structure.changeNodeName)
         except Exception:
             print("error happens in link cycle signals to structure. [main/main.py]")
 
