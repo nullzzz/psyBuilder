@@ -340,6 +340,13 @@ class IconTabs(QTabWidget):
         except Exception:
             print("some errors happen in delete timeline in cycle. [iconTabs/main.py]")
 
+    def deleteItemInIfBranch(self, parent_value, value):
+        try:
+            if_branch = self.value_widget[parent_value]
+            if_branch.deleteItem(value)
+        except Exception as e:
+            print("error {} happens in delete condition item. [iconTabs/main.py]".format(e))
+
     def closeTab(self, widget=None, index=-1):
         try:
             if widget and index == -1:

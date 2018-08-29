@@ -10,10 +10,15 @@ from ..image import getImage
 class IfBranch(QWidget):
     tabClose = pyqtSignal(QWidget)
     propertiesChange = pyqtSignal(dict)
-    # 发送给structure (self.value, value, name, type)
+    # 发送给structure (self.value, name, pixmap, value, type)
     nodeChange = pyqtSignal(str, str, QPixmap, str, str)
     # (self.value, value)
-    # nodeDelete = pyqtSignal(str, str)
+    nodeDelete = pyqtSignal(str, str)
+    # (value, name)
+    nodeNameChange = pyqtSignal(str, str)
+    #
+    iconPropertiesChange = pyqtSignal(dict)
+
     def __init__(self, parent=None, value=''):
         super(IfBranch, self).__init__(parent)
 
@@ -22,8 +27,8 @@ class IfBranch(QWidget):
         self.false_icon_choose = IconChoose(self)
 
         self.value = value
-
-        self.type_value = {'T' : '', 'F' : ''}
+        # [value, name, properties]
+        self.type_value = {'T': ['Other.10001', '', {}], 'F': ['Other.10002', '', {}]}
 
         condition_group = QGroupBox("Condition")
         layout1 = QVBoxLayout()
@@ -65,7 +70,7 @@ class IfBranch(QWidget):
 
     def getInfo(self):
         return {
-            "properties" : "none"
+            "properties": "none"
         }
 
     def clickOk(self):
@@ -79,19 +84,59 @@ class IfBranch(QWidget):
 
     def clickApply(self):
         try:
-            # add node
-            icon_true_value = self.true_icon_choose.icon.value
-            if not icon_true_value.startswith('Other') and icon_true_value != self.type_value['T']:
-                icon_true_name = "[T]" + self.true_icon_choose.icon_name.text()
-                self.nodeChange.emit(self.value, icon_true_name, getImage(icon_true_value.split('.')[0], 'pixmap'), icon_true_value, 'T')
-                self.type_value['T'] = icon_true_value
+            self.disposeNode('T')
+            self.disposeNode('F')
 
-            icon_false_value = self.false_icon_choose.icon.value
-            if not icon_false_value.startswith('Other') and icon_false_value != self.type_value['F']:
-                icon_false_name = "[F]" + self.false_icon_choose.icon_name.text()
-                self.nodeChange.emit(self.value, icon_false_name, getImage(icon_false_value.split('.')[0], 'pixmap'), icon_false_value, 'F')
-                self.type_value['F'] = icon_false_value
             # properties
             self.propertiesChange.emit(self.getInfo())
         except Exception as e:
             print("error {} happens in apple if-else. [condition/ifBranch.py]".format(e))
+
+    def disposeNode(self, condition_type='T'):
+        # 获取当前的icon的value
+        if condition_type == 'T':
+            current_value = self.true_icon_choose.icon.value
+            current_name = self.true_icon_choose.icon_name.text()
+        else:
+            current_value = self.false_icon_choose.icon.value
+            current_name = self.false_icon_choose.icon_name.text()
+
+        # node delete
+        if not self.type_value[condition_type][0].startswith("Other.") and current_value.startswith("Other"):
+            self.nodeDelete.emit(self.value, self.type_value[condition_type][0])
+            self.type_value[condition_type] = ['Other.10001' if condition_type == 'T' else "Other.10002", '', {}]
+        elif not current_value.startswith("Other."):
+            # new node
+            if current_value != self.type_value[condition_type][0]:
+                # delete old
+                if not self.type_value[condition_type][0].startswith("Other"):
+                    self.nodeDelete.emit(self.value, self.type_value[condition_type][0])
+                    self.type_value[condition_type] = ['Other.10001' if condition_type == 'T' else "Other.10002", '',
+                                                       {}]
+                # add new
+                self.nodeChange.emit(self.value, "[" + condition_type + "] " + current_name,
+                                     getImage(current_value.split('.')[0], 'pixmap'),
+                                     current_value, condition_type)
+                self.type_value[condition_type][0] = current_value
+                self.type_value[condition_type][1] = self.true_icon_choose.icon_name.text()
+            # change node
+            else:
+                # name change
+                if current_name != self.type_value[condition_type][1]:
+                    self.nodeNameChange.emit(current_value, '[{}] '.format(condition_type) + current_name)
+                # properties change
+                pass
+
+    def deleteItem(self, value):
+        try:
+            # true
+            if value == self.type_value['T'][0]:
+                self.true_icon_choose.icon_comboBox.setCurrentIndex(0)
+                self.type_value['T'] = ['Other.10001', '', {}]
+            # false
+            elif value == self.type_value['F'][0]:
+                self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
+                self.type_value['F'] = ['Other.10001', '', {}]
+
+        except Exception as e:
+            print("error {} happens in delete item. [condition/ifBranch.py]".format(e))

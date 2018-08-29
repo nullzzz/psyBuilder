@@ -130,6 +130,7 @@ class MainWindow(QMainWindow):
         self.structure.structure_tree.itemDelete.connect(self.center.icon_tabs.deleteTab)
         self.structure.structure_tree.itemDelete.connect(self.center.icon_tabs.deleteIcon)
         self.structure.structure_tree.timelineDelete.connect(self.center.icon_tabs.deleteTimeline)
+        self.structure.structure_tree.itemInIfBranchDelete.connect(self.center.icon_tabs.deleteItemInIfBranch)
         self.structure.propertiesShow.connect(self.center.icon_tabs.getWidgetProperties)
         self.structure.nodeNameChange.connect(self.center.icon_tabs.changeTabName)
 
@@ -166,6 +167,8 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].nodeChange.connect(self.structure.addNode)
             except Exception:
                 self.center.icon_tabs.value_widget[value].nodeChange.connect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].nodeNameChange.connect(self.structure.changeNodeName)
+                self.center.icon_tabs.value_widget[value].nodeDelete.connect(self.structure.removeNode)
                 # self.center.icon_tabs.value_widget[value].nodeDelete.connect(self.structure.changeNodeName)
         except Exception:
             print("error happens in link cycle signals to structure. [main/main.py]")
