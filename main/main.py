@@ -127,12 +127,17 @@ class MainWindow(QMainWindow):
         # structure中信号
         self.structure.nodeDoubleClick.connect(self.center.icon_tabs.openTab)
         self.structure.timelineAdd.connect(self.linkTimelineSignals)
+        self.structure.propertiesShow.connect(self.center.icon_tabs.getWidgetProperties)
         self.structure.structure_tree.itemDelete.connect(self.center.icon_tabs.deleteTab)
         self.structure.structure_tree.itemDelete.connect(self.center.icon_tabs.deleteIcon)
         self.structure.structure_tree.timelineDelete.connect(self.center.icon_tabs.deleteTimeline)
         self.structure.structure_tree.itemInIfBranchDelete.connect(self.center.icon_tabs.deleteItemInIfBranch)
-        self.structure.propertiesShow.connect(self.center.icon_tabs.getWidgetProperties)
-        self.structure.nodeNameChange.connect(self.center.icon_tabs.changeTabName)
+        self.structure.iconNameChange.connect(self.center.icon_tabs.changeTabName)
+        self.structure.iconNameChange.connect(self.center.icon_tabs.changeIconName)
+        self.structure.timelineNameChange.connect(self.center.icon_tabs.changeTabName)
+        self.structure.timelineNameChange.connect(self.center.icon_tabs.changeTimelineName)
+        self.structure.itemInIfBranchNameChange.connect(self.center.icon_tabs.changeTabName)
+        self.structure.itemInIfBranchNameChange.connect(self.center.icon_tabs.changeItemInIfBranchName)
 
     def linkTimelineSignals(self, value):
         try:
@@ -145,7 +150,6 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].iconMove.connect(self.structure.moveNode)
                 self.center.icon_tabs.value_widget[value].icon_area.icon_table.iconNameChange.connect(
                     self.structure.changeNodeName)
-                self.structure.nodeNameChange.connect(self.center.icon_tabs.value_widget[value].changeIconName)
         except Exception:
             print("error happens in link timeline signals to structure. [main/main.py]")
 

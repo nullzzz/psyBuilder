@@ -140,3 +140,14 @@ class IfBranch(QWidget):
 
         except Exception as e:
             print("error {} happens in delete item. [condition/ifBranch.py]".format(e))
+
+    def changeItemName(self, value, name):
+        try:
+            # true
+            if value == self.type_value['T'][0]:
+                self.true_icon_choose.icon_name.setText(name[4:])
+            # false
+            elif value == self.type_value['F'][0]:
+                self.false_icon_choose.icon_name.setText(name[4:])
+        except Exception as e:
+            print("error {} happens in change item name. [condition/ifBranch.py]".format(e))

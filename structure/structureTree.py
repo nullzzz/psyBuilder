@@ -48,6 +48,13 @@ class StructureTree(QTreeWidget):
         dialog = QInputDialog()
         dialog.setModal(True)
         dialog.setWindowFlag(Qt.WindowCloseButtonHint)
-        text, flag = dialog.getText(None, "Rename", "Rename {} to :".format(item.text(0)), QLineEdit.Normal, item.text(0))
+        name = item.text(0)
+        extend = ''
+        if item.parent().value.startswith('If_else'):
+            extend = name[0:4]
+            name = name[4:]
+        text, flag = dialog.getText(None, "Rename", "Rename {} to :".format(name), QLineEdit.Normal, name)
+
         if flag and text:
+            text = extend + text
             self.itemNameChange.emit(item.value, text)

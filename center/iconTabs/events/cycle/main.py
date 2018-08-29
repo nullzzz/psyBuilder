@@ -272,6 +272,13 @@ class Cycle(QMainWindow):
         except Exception:
             print("some errors happen in delete row [main.py]")
 
+    def changeTimelineName(self, value, name):
+        try:
+            row = self.value_row[value]
+            self.timeline_table.item(row, 1).setText(name)
+        except Exception as e:
+            print("error {} happens in change timeline name. [cycle/main.py]".format(e))
+
     def contextMenuEvent(self, e):
         # 判断某些选项是否显示
         self.getDataFromSelection()

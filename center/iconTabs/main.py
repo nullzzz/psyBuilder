@@ -289,7 +289,7 @@ class IconTabs(QTabWidget):
     def getChangedProperties(self, properties):
         self.propertiesShow.emit(properties)
 
-    def changeTabName(self, value, name):
+    def changeTabName(self, parent_value, value, name):
         if value in self.value_widget:
             tab_index = self.indexOf(self.value_widget[value])
             if tab_index != -1:
@@ -340,12 +340,26 @@ class IconTabs(QTabWidget):
         except Exception:
             print("some errors happen in delete timeline in cycle. [iconTabs/main.py]")
 
+    def changeTimelineName(self, parent_value, value, name):
+        try:
+            cycle = self.value_widget[parent_value]
+            cycle.changeTimelineName(value, name)
+        except Exception as e:
+            print("error {} happens in change timeline name. [iconTabs/main.py]".format(e))
+
     def deleteItemInIfBranch(self, parent_value, value):
         try:
             if_branch = self.value_widget[parent_value]
             if_branch.deleteItem(value)
         except Exception as e:
             print("error {} happens in delete condition item. [iconTabs/main.py]".format(e))
+
+    def changeItemInIfBranchName(self, parent_value, value, name):
+        try:
+            if_branch = self.value_widget[parent_value]
+            if_branch.changeItemName(value, name)
+        except Exception as e:
+            print("error {} happens in change condition item name. [iconTabs/main.py]".format(e))
 
     def closeTab(self, widget=None, index=-1):
         try:
@@ -370,6 +384,13 @@ class IconTabs(QTabWidget):
                     del self.value_parent[value]
         except Exception as e:
             print("some errors happen in delete icon in timeLine. [iconTabs/main.py]")
+
+    def changeIconName(self, parent_value, value, name):
+        try:
+            timeline = self.value_widget[parent_value]
+            timeline.changeIconName(value, name)
+        except Exception as e:
+            print("error {} happens in change icon name. [iconTabs/main.py]".format(e))
 
     def copyIcon(self, old_value, new_value, text):
         try:
