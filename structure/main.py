@@ -136,7 +136,7 @@ class Structure(QDockWidget):
         try:
             for i in range(0, node.childCount()):
                 child = node.child(i)
-                if child.value.startswith("Cycle.") or child.value.startswith("Timeline."):
+                if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith('If_else.'):
                     grand_child_data = OrderedDict()
                     grand_child_data[child.value] = self.do_getNodeValue(child, [])
                     data.append(grand_child_data)

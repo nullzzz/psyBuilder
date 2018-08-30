@@ -108,8 +108,6 @@ class MainWindow(QMainWindow):
         self.splitDockWidget(self.structure, self.properties, Qt.Vertical)
         self.splitDockWidget(self.center, self.output, Qt.Vertical)
 
-        
-
         # 连接信号
         self.linkSignals()
 
@@ -171,10 +169,10 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].nodeChange.connect(self.structure.addNode)
             except Exception:
                 self.center.icon_tabs.value_widget[value].nodeChange.connect(self.structure.addNode)
-                self.center.icon_tabs.value_widget[value].nodeChange.connect(self.center.icon_tabs.createTabForItemInIfBranch)
+                self.center.icon_tabs.value_widget[value].nodeChange.connect(
+                    self.center.icon_tabs.createTabForItemInIfBranch)
                 self.center.icon_tabs.value_widget[value].nodeNameChange.connect(self.structure.changeNodeName)
                 self.center.icon_tabs.value_widget[value].nodeDelete.connect(self.structure.removeNode)
-                # self.center.icon_tabs.value_widget[value].nodeDelete.connect(self.structure.changeNodeName)
         except Exception:
             print("error happens in link cycle signals to structure. [main/main.py]")
 
