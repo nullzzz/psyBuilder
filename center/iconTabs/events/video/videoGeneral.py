@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QRegExpValidator
+from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtWidgets import (QLineEdit, QPushButton, QComboBox, QSpinBox, QGridLayout, QLabel, QFileDialog, QMessageBox,
                              QCompleter)
 from PyQt5.QtWidgets import QWidget
@@ -120,8 +120,10 @@ class VideoTab1(QWidget):
     def findVar(self, text):
         if text in self.attributes:
             self.sender().setStyleSheet("color: blue")
+            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
         else:
-            self.sender().setStyleSheet("color:black")
+            self.sender().setStyleSheet("color: black")
+            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
 
     def finalCheck(self):
         temp = self.sender()

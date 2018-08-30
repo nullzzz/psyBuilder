@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMessageBox, QLineEdit, QListWidgetItem, QWidget, QComboBox, QGridLayout, QLabel, \
     QFormLayout, QCompleter
 
@@ -66,8 +67,10 @@ class DeviceOutItem(QListWidgetItem):
     def findVar(self, text):
         if text in self.attributes:
             self.pro.sender().setStyleSheet("color:{}".format(DeviceOutItem.varColor))
+            self.pro.sender().setFont(QFont("Timers", 9, QFont.Bold))
         else:
             self.pro.sender().setStyleSheet("color:black")
+            self.pro.sender().setFont(QFont("宋体", 9, QFont.Normal))
 
     def finalCheck(self):
         temp = self.pro.sender()

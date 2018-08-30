@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QLineEdit, QPushButton, QCheckBox, \
     QComboBox, QSpinBox, QApplication, QFileDialog, QCompleter, QMessageBox
 
@@ -106,8 +107,10 @@ class ImageTab1(QWidget):
     def findVar(self, text):
         if text in self.attributes:
             self.sender().setStyleSheet("color: blue")
+            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
         else:
-            self.sender().setStyleSheet("color:black")
+            self.sender().setStyleSheet("color: black")
+            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
 
     def finalCheck(self):
         temp = self.sender()
