@@ -10,14 +10,14 @@ from ..image import getImage
 class IfBranch(QWidget):
     tabClose = pyqtSignal(QWidget)
     propertiesChange = pyqtSignal(dict)
-    # 发送给structure (self.value, name, pixmap, value, type)
-    nodeChange = pyqtSignal(str, str, QPixmap, str, str)
+    # 发送给structure, iconTabs (self.value, name, pixmap, value, properties window)
+    nodeChange = pyqtSignal(str, str, QPixmap, str, QWidget)
     # (self.value, value)
     nodeDelete = pyqtSignal(str, str)
     # (value, name)
     nodeNameChange = pyqtSignal(str, str)
-    #
-    iconPropertiesChange = pyqtSignal(dict)
+    # 直接借助深拷贝的机制(properties widget)
+    iconPropertiesChange = pyqtSignal(QWidget)
 
     def __init__(self, parent=None, value=''):
         super(IfBranch, self).__init__(parent)
@@ -97,9 +97,11 @@ class IfBranch(QWidget):
         if condition_type == 'T':
             current_value = self.true_icon_choose.icon.value
             current_name = self.true_icon_choose.icon_name.text()
+            current_properties_window = self.true_icon_choose.properties_window
         else:
             current_value = self.false_icon_choose.icon.value
             current_name = self.false_icon_choose.icon_name.text()
+            current_properties_window = self.false_icon_choose.properties_window
 
         # node delete
         if not self.type_value[condition_type][0].startswith("Other.") and current_value.startswith("Other"):
@@ -116,7 +118,7 @@ class IfBranch(QWidget):
                 # add new
                 self.nodeChange.emit(self.value, "[" + condition_type + "] " + current_name,
                                      getImage(current_value.split('.')[0], 'pixmap'),
-                                     current_value, condition_type)
+                                     current_value, current_properties_window)
                 self.type_value[condition_type][0] = current_value
                 self.type_value[condition_type][1] = self.true_icon_choose.icon_name.text()
             # change node

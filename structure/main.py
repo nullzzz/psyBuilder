@@ -70,7 +70,7 @@ class Structure(QDockWidget):
             # 往字典中加入
             self.value_node[value] = root
 
-    def addNode(self, parentValue='Timeline.10001', text="node", pixmap=None, value="", type=""):
+    def addNode(self, parentValue='Timeline.10001', text="node", pixmap=None, value="", properties_window=None):
         if parentValue in self.value_node:
             parent = self.value_node[parentValue]
             node = StructureItem(parent, value)

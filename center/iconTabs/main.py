@@ -281,8 +281,9 @@ class IconTabs(QTabWidget):
                 properties = widget.getProperties()
             elif hasattr(widget, "getInfo"):
                 properties = widget.getInfo()
-        except Exception:
+        except Exception as e:
             properties = {"error": "can't get properties"}
+            print("error {} happens in get properties. [iconTabs/main.py]".format(e))
 
         self.propertiesShow.emit(properties)
 
@@ -360,6 +361,21 @@ class IconTabs(QTabWidget):
             if_branch.changeItemName(value, name)
         except Exception as e:
             print("error {} happens in change condition item name. [iconTabs/main.py]".format(e))
+
+    def createTabForItemInIfBranch(self, parent_value, name,  pixmap, value, properties_window):
+        try:
+            self.openTab(value, name, False)
+            widget = self.value_widget[value]
+            if value.startswith('Video'):
+                widget.pro = properties_window
+            elif value.startswith('SoundOut'):
+                widget.dia = properties_window
+            elif value.startswith('Text'):
+                widget.dia = properties_window
+            elif value.startswith('Image'):
+                widget.pro = properties_window
+        except Exception as e:
+            print("error {} happens in create tab for item in if branch.[iconTabs/main.py]".format(e))
 
     def closeTab(self, widget=None, index=-1):
         try:
