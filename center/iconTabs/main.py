@@ -368,12 +368,24 @@ class IconTabs(QTabWidget):
             widget = self.value_widget[value]
             if value.startswith('Video'):
                 widget.pro = properties_window
+                widget.pro.ok_bt.clicked.connect(widget.ok)
+                widget.pro.cancel_bt.clicked.connect(widget.pro.close)
+                widget.pro.apply_bt.clicked.connect(widget.apply)
             elif value.startswith('SoundOut'):
-                widget.dia = properties_window
+                widget.pro = properties_window
+                widget.pro.ok_bt.clicked.connect(widget.ok)
+                widget.pro.cancel_bt.clicked.connect(widget.pro.close)
+                widget.pro.apply_bt.clicked.connect(widget.apply)
             elif value.startswith('Text'):
                 widget.dia = properties_window
+                widget.dia.pushButton_6.clicked.connect(widget.OK)
+                widget.dia.pushButton_5.clicked.connect(widget.Cancel)
+                widget.dia.pushButton_4.clicked.connect(widget.Apply)
             elif value.startswith('Image'):
                 widget.pro = properties_window
+                widget.pro.ok_bt.clicked.connect(widget.ok)
+                widget.pro.cancel_bt.clicked.connect(widget.pro.close)
+                widget.pro.apply_bt.clicked.connect(widget.apply)
         except Exception as e:
             print("error {} happens in create tab for item in if branch.[iconTabs/main.py]".format(e))
 

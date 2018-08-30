@@ -107,6 +107,8 @@ class SoundDisplay(QMainWindow):
         self.tip2.setText("00:00")
         self.progress_bar.setRange(0, 0)
 
+        self.propertiesChange.emit(self.getInfo())
+
     def setLabel(self):
         m = int(self.player.duration() / (1000 * 60))
         s = int(self.player.duration() / 1000 - m * 60)
