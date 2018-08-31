@@ -122,7 +122,7 @@ class Structure(QDockWidget):
 
     def getNodeValue(self):
         try:
-            # 广度优先遍历
+            # 深度优先遍历
             node_value = OrderedDict()
             for i in range(0, self.structure_tree.topLevelItemCount()):
                 root = self.structure_tree.topLevelItem(i)

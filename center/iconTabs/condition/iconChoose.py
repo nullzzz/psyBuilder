@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QComboBox, QWidget, QLineEdit, QVBoxLayout
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 
 from center.iconTabs.events.image.imageProperty import ImageProperty
 from center.iconTabs.events.soundOut.soundProperty import SoundProperty
@@ -12,6 +12,8 @@ from ..image import getImage
 
 
 class IconChoose(QWidget):
+    # 发送到上一层, 由上一层再转至iconTabs (value)
+    propertiesShow = pyqtSignal(str)
     def __init__(self, parent=None):
         super(IconChoose, self).__init__(parent)
 
@@ -73,10 +75,20 @@ class IconChoose(QWidget):
         except Exception as e:
             print("error {} happens in change icon. [condition/iconChoose.py]".format(e))
 
-    def mouseDoubleClickEvent(self, e):
+    def checkPosInIcon(self, e):
         x = e.pos().x()
         y = e.pos().y()
         if x <= self.icon.rect().right() and x >= self.icon.rect().left() \
-            and y >= self.icon_name.rect().top() and y <= self.icon.rect().bottom():
+                and y >= self.icon_name.rect().top() and y <= self.icon.rect().bottom():
+            return True
+        return False
+
+    def mouseDoubleClickEvent(self, e):
+        if self.checkPosInIcon(e):
             if self.properties_window:
                 self.properties_window.show()
+
+    def mousePressEvent(self, e):
+        if self.checkPosInIcon(e):
+            if self.properties_window:
+                self.propertiesShow.emit(self.icon.value)

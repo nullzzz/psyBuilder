@@ -65,6 +65,8 @@ class IconTabs(QTabWidget):
         self.linkTimelineSignals('Timeline.10001')
         # cycle
         self.cycleAdd.connect(self.linkCycleSignals)
+        # if branch
+        self.ifBranchAdd.connect(self.linkIFBranchSignals)
 
     def linkTimelineSignals(self, value):
         try:
@@ -91,6 +93,16 @@ class IconTabs(QTabWidget):
                 cycle.attributeChange.connect(self.changeTimelineAttribute)
         except Exception:
             print("error happens in link cycle signals. [iconTabs\main.py]")
+
+    def linkIFBranchSignals(self, value):
+        try:
+            try:
+                self.value_widget[value].iconPropertiesShow.disconnect(self.showItemInIfBranchProperties)
+                self.value_widget[value].iconPropertiesShow.connect(self.showItemInIfBranchProperties)
+            except Exception:
+                self.value_widget[value].iconPropertiesShow.connect(self.showItemInIfBranchProperties)
+        except Exception:
+            print("error happens in link if branch signals to structure. [main/main.py]")
 
     def setMenuAndShortcut(self):
         # right button menu
@@ -362,6 +374,9 @@ class IconTabs(QTabWidget):
         except Exception as e:
             print("error {} happens in change condition item name. [iconTabs/main.py]".format(e))
 
+    def showItemInIfBranchProperties(self, value):
+        self.getWidgetProperties(value)
+
     def createTabForItemInIfBranch(self, parent_value, name,  pixmap, value, properties_window):
         try:
             self.openTab(value, name, False)
@@ -377,10 +392,10 @@ class IconTabs(QTabWidget):
                 widget.pro.cancel_bt.clicked.connect(widget.pro.close)
                 widget.pro.apply_bt.clicked.connect(widget.apply)
             elif value.startswith('Text'):
-                widget.dia = properties_window
-                widget.dia.pushButton_6.clicked.connect(widget.OK)
-                widget.dia.pushButton_5.clicked.connect(widget.Cancel)
-                widget.dia.pushButton_4.clicked.connect(widget.Apply)
+                widget.pro = properties_window
+                widget.pro.ok_bt.clicked.connect(widget.ok)
+                widget.pro.cancel_bt.clicked.connect(widget.pro.close)
+                widget.pro.apply_bt.clicked.connect(widget.apply)
             elif value.startswith('Image'):
                 widget.pro = properties_window
                 widget.pro.ok_bt.clicked.connect(widget.ok)
