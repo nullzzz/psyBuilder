@@ -12,8 +12,8 @@ from ..image import getImage
 
 
 class IconChoose(QWidget):
-    # 发送到上一层, 由上一层再转至iconTabs (value)
-    propertiesShow = pyqtSignal(str)
+    # 发送到上一层, 由上一层再转至properties (properties)
+    propertiesShow = pyqtSignal(dict)
     def __init__(self, parent=None):
         super(IconChoose, self).__init__(parent)
 
@@ -63,12 +63,24 @@ class IconChoose(QWidget):
 
                 if name == "Image":
                     self.properties_window = ImageProperty()
+                    self.properties_window.ok_bt.clicked.connect(self.ok)
+                    self.properties_window.cancel_bt.clicked.connect(self.properties_window.close)
+                    self.properties_window.apply_bt.clicked.connect(self.apply)
                 elif name == "SoundOut":
                     self.properties_window = SoundProperty()
+                    self.properties_window.ok_bt.clicked.connect(self.ok)
+                    self.properties_window.cancel_bt.clicked.connect(self.properties_window.close)
+                    self.properties_window.apply_bt.clicked.connect(self.apply)
                 elif name == "Text":
                     self.properties_window = TextProperty()
+                    self.properties_window.ok_bt.clicked.connect(self.ok)
+                    self.properties_window.cancel_bt.clicked.connect(self.properties_window.close)
+                    self.properties_window.apply_bt.clicked.connect(self.apply)
                 elif name == "Video":
                     self.properties_window = VideoProperty()
+                    self.properties_window.ok_bt.clicked.connect(self.ok)
+                    self.properties_window.cancel_bt.clicked.connect(self.close)
+                    self.properties_window.apply_bt.clicked.connect(self.apply)
 
                 self.icon_name.setText(name)
                 self.icon_name.setEnabled(True)
@@ -91,4 +103,17 @@ class IconChoose(QWidget):
     def mousePressEvent(self, e):
         if self.checkPosInIcon(e):
             if self.properties_window:
-                self.propertiesShow.emit(self.icon.value)
+                self.propertiesShow.emit(self.properties_window.getInfo())
+
+    def ok(self):
+        self.apply()
+        self.properties_window.close()
+
+    def apply(self):
+        try:
+            self.propertiesShow.emit(self.properties_window.getInfo())
+        except Exception as e:
+            print("error {} happens in apply properties window in iconChoose. [condition/iconChoose.py]".format(e))
+
+    def cancel(self):
+        self.properties_window.close()

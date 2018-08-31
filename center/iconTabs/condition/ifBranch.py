@@ -18,8 +18,8 @@ class IfBranch(QWidget):
     nodeNameChange = pyqtSignal(str, str)
     # 直接借助深拷贝的机制(properties widget)
     iconPropertiesChange = pyqtSignal(QWidget)
-    # 将icon的value, 发送iconTabs (value)
-    iconPropertiesShow = pyqtSignal(str)
+    # 将icon的value, 发送iconTabs (properties)
+    iconPropertiesShow = pyqtSignal(dict)
 
     def __init__(self, parent=None, value=''):
         super(IfBranch, self).__init__(parent)
@@ -158,5 +158,5 @@ class IfBranch(QWidget):
         except Exception as e:
             print("error {} happens in change item name. [condition/ifBranch.py]".format(e))
 
-    def showIconProperties(self, value):
-        self.iconPropertiesShow.emit(value)
+    def showIconProperties(self, properties):
+        self.iconPropertiesShow.emit(properties)

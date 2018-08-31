@@ -374,8 +374,8 @@ class IconTabs(QTabWidget):
         except Exception as e:
             print("error {} happens in change condition item name. [iconTabs/main.py]".format(e))
 
-    def showItemInIfBranchProperties(self, value):
-        self.getWidgetProperties(value)
+    def showItemInIfBranchProperties(self, properties):
+        self.propertiesShow.emit(properties)
 
     def createTabForItemInIfBranch(self, parent_value, name,  pixmap, value, properties_window):
         try:
