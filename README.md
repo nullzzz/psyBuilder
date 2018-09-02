@@ -10,10 +10,3 @@
     <li>参数返回接口：getInfo/getProperties</li>
     <li>颜色框直接用：from center.iconTabs.colorBobox import ColorListEditor</li>
 </ul>
-
-<p><big>再不给钱的话</big></p>
-<ul>
-    <li>不写了</li>
-    <li>注释掉功能</li>
-    <li>加无数个bug</li>
-</ul>
