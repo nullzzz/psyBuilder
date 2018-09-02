@@ -95,10 +95,9 @@ class Structure(QDockWidget):
             parent.removeChild(node)
             parent.insertChild(targetCol - 1, node)
 
-    def changeNodeName(self, value, name):
+    def changeNodeName(self, parent_value, value, name):
         if value in self.value_node:
             self.value_node[value].setText(0, name)
-            parent_value = self.value_node[value].parent().value
             # timeline中icon
             if parent_value.startswith('Timeline.'):
                 self.iconNameChange.emit(parent_value, value, name)

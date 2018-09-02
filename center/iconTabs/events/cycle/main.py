@@ -15,8 +15,8 @@ class Cycle(QMainWindow):
     propertiesChange = pyqtSignal(dict)
     # 新增timeline (Cycle.value, name, pixmap, value)
     timelineAdd = pyqtSignal(str, str, QPixmap, str)
-    # 某行的timeline名称修改 (value, name)
-    timelineNameChange = pyqtSignal(str, str)
+    # 某行的timeline名称修改 (parent_value, value, name)
+    timelineNameChange = pyqtSignal(str, str, str)
     # 新增attribute (value, name, default_value)
     attributeAdd = pyqtSignal(str, str, str)
     # attribute修改 (value, name, attribute_value)
@@ -240,7 +240,7 @@ class Cycle(QMainWindow):
                 name = self.timeline_table.item(row, col).text()
                 if name:
                     value = self.row_value[row]
-                    self.timelineNameChange.emit(value, name)
+                    self.timelineNameChange.emit(self.value, value, name)
                 else:
                     QMessageBox.information(self, "Tips", "Timeline value can't be changed to none.")
                     self.timeline_table.setItem(row, col, QTableWidgetItem(self.row_name[row]))

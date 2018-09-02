@@ -9,8 +9,8 @@ class StructureTree(QTreeWidget):
     # 发送到main(parent.value, value)
     timelineDelete = pyqtSignal(str, str)
     itemInIfBranchDelete = pyqtSignal(str, str)
-    # (value, name)
-    itemNameChange = pyqtSignal(str, str)
+    # (parent_value, value, name)
+    itemNameChange = pyqtSignal(str, str, str)
 
     def __init__(self, parent=None):
         super(StructureTree, self).__init__(parent)
@@ -57,4 +57,4 @@ class StructureTree(QTreeWidget):
 
         if flag and text:
             text = extend + text
-            self.itemNameChange.emit(item.value, text)
+            self.itemNameChange.emit(item.parent().value, item.value, text)

@@ -146,8 +146,7 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].iconAdd.connect(self.structure.addNode)
                 self.center.icon_tabs.value_widget[value].iconRemove.connect(self.structure.removeNode)
                 self.center.icon_tabs.value_widget[value].iconMove.connect(self.structure.moveNode)
-                self.center.icon_tabs.value_widget[value].icon_area.icon_table.iconNameChange.connect(
-                    self.structure.changeNodeName)
+                self.center.icon_tabs.value_widget[value].iconNameChange.connect(self.structure.changeNodeName)
         except Exception:
             print("error happens in link timeline signals to structure. [main/main.py]")
 

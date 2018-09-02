@@ -79,7 +79,7 @@ class IconChoose(QWidget):
                 elif name == "Video":
                     self.properties_window = VideoProperty()
                     self.properties_window.ok_bt.clicked.connect(self.ok)
-                    self.properties_window.cancel_bt.clicked.connect(self.close)
+                    self.properties_window.cancel_bt.clicked.connect(self.properties_window.close)
                     self.properties_window.apply_bt.clicked.connect(self.apply)
 
                 self.icon_name.setText(name)

@@ -75,9 +75,9 @@ class IconTabs(QTabWidget):
         except Exception:
             self.value_widget[value].iconAdd.connect(self.addIcon)
             self.value_widget[value].iconRemove.connect(self.removeIcon)
+            self.value_widget[value].iconNameChange.connect(self.changeTabName)
             self.value_widget[value].icon_area.iconCopy.connect(self.copyIcon)
             self.value_widget[value].icon_area.icon_table.iconDoubleClicked.connect(self.openTab)
-            self.value_widget[value].icon_area.icon_table.iconNameChange.connect(self.changeTabName)
             self.value_widget[value].icon_area.icon_table.iconRemove.connect(self.deleteTab)
             self.value_widget[value].icon_area.icon_table.propertiesShow.connect(self.getWidgetProperties)
 

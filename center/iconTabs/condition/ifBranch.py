@@ -14,8 +14,8 @@ class IfBranch(QWidget):
     nodeChange = pyqtSignal(str, str, QPixmap, str, QWidget)
     # (self.value, value)
     nodeDelete = pyqtSignal(str, str)
-    # (value, name)
-    nodeNameChange = pyqtSignal(str, str)
+    # (parent_value, value, name)
+    nodeNameChange = pyqtSignal(str, str, str)
     # 直接借助深拷贝的机制(properties widget)
     iconPropertiesChange = pyqtSignal(QWidget)
     # 将icon的value, 发送iconTabs (properties)
@@ -129,7 +129,7 @@ class IfBranch(QWidget):
             else:
                 # name change
                 if current_name != self.type_value[condition_type][1]:
-                    self.nodeNameChange.emit(current_value, '[{}] '.format(condition_type) + current_name)
+                    self.nodeNameChange.emit(self.value, current_value, '[{}] '.format(condition_type) + current_name)
                 # properties change
                 pass
 
