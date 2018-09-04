@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QDockWidget
 from .structureItem import StructureItem
 from .structureTree import StructureTree
 
+from center.iconTabs.timeline.icon import Icon
+
 from collections import OrderedDict
 
 
@@ -22,12 +24,12 @@ class Structure(QDockWidget):
     # 单击node, 显示properties
     propertiesShow = pyqtSignal(str)
 
+    name_value = {}
     def __init__(self, parent=None):
         super(Structure, self).__init__(parent)
 
         # 键为value, 值为StructureItem
         self.value_node = {}
-        self.data = OrderedDict()
 
         self.structure_tree = StructureTree()
         # 设置列数、头标签
@@ -79,6 +81,7 @@ class Structure(QDockWidget):
             parent.setExpanded(True)
             # 往字典中加入
             self.value_node[value] = node
+            Structure.name_value[text] = value
 
     def removeNode(self, parentValue, value):
         if parentValue in self.value_node and value in self.value_node:
@@ -96,17 +99,24 @@ class Structure(QDockWidget):
             parent.insertChild(targetCol - 1, node)
 
     def changeNodeName(self, parent_value, value, name):
-        if value in self.value_node:
-            self.value_node[value].setText(0, name)
-            # timeline中icon
-            if parent_value.startswith('Timeline.'):
-                self.iconNameChange.emit(parent_value, value, name)
-            # cycle中timeline
-            elif parent_value.startswith('Cycle.'):
-                self.timelineNameChange.emit(parent_value, value, name)
-            # if branch中的icon
-            elif parent_value.startswith('If_else.'):
-                self.itemInIfBranchNameChange.emit(parent_value, value, name)
+        try:
+            if value in self.value_node:
+                old_name = self.value_node[value].text(0)
+                del Structure.name_value[old_name]
+                Structure.name_value[name] = value
+                self.value_node[value].setText(0, name)
+
+                # timeline中icon
+                if parent_value.startswith('Timeline.'):
+                    self.iconNameChange.emit(parent_value, value, name)
+                # cycle中timeline
+                elif parent_value.startswith('Cycle.'):
+                    self.timelineNameChange.emit(parent_value, value, name)
+                # if branch中的icon
+                elif parent_value.startswith('If_else.'):
+                    self.itemInIfBranchNameChange.emit(parent_value, value, name)
+        except Exception as e:
+            print("error {} happens in change node name. [structure/main.py]".format(e))
 
     def openTab(self):
         try:
@@ -135,7 +145,8 @@ class Structure(QDockWidget):
         try:
             for i in range(0, node.childCount()):
                 child = node.child(i)
-                if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith('If_else.'):
+                if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith(
+                        'If_else.'):
                     grand_child_data = OrderedDict()
                     grand_child_data[child.value] = self.do_getNodeValue(child, [])
                     data.append(grand_child_data)
@@ -147,11 +158,18 @@ class Structure(QDockWidget):
             print("error happens in do get node_value. [structure/main.py]")
 
     @staticmethod
-    def getName(old_name):
-        name = old_name
-        print("I am producing a valid name.")
-        return name
+    def getName(value, name, is_copy = False, old_name = ''):
+        count = 0
+        while True:
+            new_name = value
+            if is_copy:
+                new_name = old_name + '.' + str(count)
+                count += 1
+            if Structure.nameIsValid(new_name):
+                break
+
+        return new_name
 
     @staticmethod
     def nameIsValid(name):
-        return True
+        return name not in Structure.name_value

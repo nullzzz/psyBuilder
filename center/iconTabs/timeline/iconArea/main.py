@@ -57,16 +57,19 @@ class IconArea(QFrame):
             e.ignore()
 
     def dragMoveEvent(self, e):
-        if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
-                e.mimeData().hasFormat("application/IconTable-col") or \
-                e.mimeData().hasFormat("application/IconTable-copy-col"):
-            # 给iconTable发送x坐标
-            self.signShow.emit(e.pos().x())
+        try:
+            if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
+                    e.mimeData().hasFormat("application/IconTable-col") or \
+                    e.mimeData().hasFormat("application/IconTable-copy-col"):
+                # 给iconTable发送x坐标
+                self.signShow.emit(e.pos().x())
 
-            e.setDropAction(Qt.CopyAction)
-            e.accept()
-        else:
-            e.ignore()
+                e.setDropAction(Qt.CopyAction)
+                e.accept()
+            else:
+                e.ignore()
+        except Exception as e:
+            print("error {} happens in drop move icon. [icoaArea/main.py]".format(e))
 
     def dropEvent(self, e):
         # drag from icon bar
@@ -86,12 +89,13 @@ class IconArea(QFrame):
                 # 插入一列
                 self.icon_table.insertColumn(self.icon_table.fill_count + 1)
                 self.icon_table.setIcon(1, self.icon_table.fill_count, pixmap, text)
-                self.icon_table.setText(3, self.icon_table.fill_count, text)
 
                 # 给timeLine发射信号
-                text = Structure.getName(text)
                 value = self.icon_table.cellWidget(1, self.icon_table.fill_count).value
+                text = Structure.getName(value, text)
                 self.iconAdd.emit(text, pixmap, value)
+                # 新列名称
+                self.icon_table.setText(3, self.icon_table.fill_count, text)
 
                 # 根据鼠标位置进行移动
                 drag_col = self.icon_table.fill_count
@@ -150,15 +154,13 @@ class IconArea(QFrame):
                 # 插入一列
                 self.icon_table.insertColumn(self.icon_table.fill_count + 1)
                 self.icon_table.setIcon(1, self.icon_table.fill_count, pixmap, text)
-                self.icon_table.setText(3, self.icon_table.fill_count, text)
 
                 # newValue 由于复制, icon构造函数中, value默认采用text后缀count, 故可能存在错误
-                new_value = self.icon_table.cellWidget(1, self.icon_table.fill_count).value
                 widget_type = old_value.split('.')[0]
-                value_count = new_value.split('.')[1]
-                self.icon_table.cellWidget(1, self.icon_table.fill_count).value = widget_type + '.' + value_count
+                self.icon_table.cellWidget(1, self.icon_table.fill_count).changeType(widget_type)
                 new_value = self.icon_table.cellWidget(1, self.icon_table.fill_count).value
-
+                text = Structure.getName(new_value, text, True, text)
+                self.icon_table.setText(3, self.icon_table.fill_count, text)
                 # 给timeLine发射信号
                 self.iconAdd.emit(text, pixmap, new_value)
                 # 根据鼠标位置进行移动
@@ -250,21 +252,21 @@ class IconArea(QFrame):
             # 插入一列
             self.icon_table.insertColumn(col + 1)
             self.icon_table.setIcon(1, col + 1, pixmap, text)
-            self.icon_table.setText(3, col + 1, text)
 
             # newValue 由于复制, icon构造函数中, value默认采用text后缀count, 故可能存在错误
-            new_value = self.icon_table.cellWidget(1, col + 1).value
             widget_type = old_value.split('.')[0]
-            value_count = new_value.split('.')[1]
-            self.icon_table.cellWidget(1, col + 1).value = widget_type + '.' + value_count
+            self.icon_table.cellWidget(1, col + 1).changeType(widget_type)
             new_value = self.icon_table.cellWidget(1, col + 1).value
 
             # name根据一定规则去命名, 避免重复
-            text = Structure.getName(text)
+            text = Structure.getName(new_value, text, True, text)
+            self.icon_table.setText(3, col + 1, text)
 
             # 给timeLine发射信号
             self.iconAdd.emit(text, pixmap, new_value)
             # 给icon tabs发信号, 让new value去复制old value的属性
             self.iconCopy.emit(old_value, new_value, text)
+            # 移动信号
+            self.iconMove.emit(self.icon_table.fill_count, col + 1, new_value)
         except Exception as e:
             print("error {} happens in just copy icon. [iconArea/main.py]".format(e))
