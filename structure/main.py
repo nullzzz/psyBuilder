@@ -145,3 +145,13 @@ class Structure(QDockWidget):
             return data
         except Exception:
             print("error happens in do get node_value. [structure/main.py]")
+
+    @staticmethod
+    def getName(old_name):
+        name = old_name
+        print("I am producing a valid name.")
+        return name
+
+    @staticmethod
+    def nameIsValid(name):
+        return True

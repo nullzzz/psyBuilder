@@ -23,6 +23,8 @@ from .quest.update import QuestUpdate
 
 from .image import getImage
 
+import copy
+
 
 class IconTabs(QTabWidget):
     # widget发送给properties窗口 (properties)
@@ -449,14 +451,13 @@ class IconTabs(QTabWidget):
         try:
             old_widget = self.value_widget[old_value]
             widget_type = old_value.split('.')[0]
-            if widget_type == 'Cycle':
-                # properties
-                # new_widget.properties = old_widget.properties
+            try:
+                # ToDo 各个widget的复制, 在各个weidget的内部实现
+                self.value_widget[new_value] = old_widget.copy()
+            except Exception:
                 pass
-            else:
-                self.value_widget[new_value] = old_widget
-        except Exception:
-            print("error happens in copy widget. [iconTabs/main.py]")
+        except Exception as e:
+            print("error {} happens in copy widget. [iconTabs/main.py]".format(e))
 
     def contextMenuEvent(self, e):
         try:

@@ -17,6 +17,8 @@ class IconTable(QTableWidget):
     iconRemove = pyqtSignal(str)
     # 双击icon打开tab (value, name)
     iconDoubleClicked = pyqtSignal(str, str)
+    # 点击菜单里面的copy是在所点击的后面复制一个 (col)
+    copyIconToNextCol = pyqtSignal(int)
     # copy模式启动 ()
     copyDragBegin = pyqtSignal()
     # 单击得properties, 给icon tabs发送信号 (value)
@@ -38,8 +40,6 @@ class IconTable(QTableWidget):
         self.is_edit = False
         # 是否是copy模式
         self.is_copy_module = False
-        # 可以被复制的列
-        self.can_copy_col = -1
 
         # 隐藏表头
         self.horizontalHeader().setVisible(False)
@@ -196,14 +196,18 @@ class IconTable(QTableWidget):
             self.is_fill = True
 
     def mouseMoveEvent(self, e):
-        if self.columnAt(e.pos().x()) in range(1, self.fill_count + 1) and self.rowAt(e.pos().y()) in (1, 3):
-            # move模式
-            if not self.is_copy_module:
-                self.moveDrag(Qt.MoveAction)
-            # copy模式
-            else:
-                if self.can_copy_col != -1 and self.columnAt(e.pos().x()) == self.can_copy_col:
+        try:
+            if self.columnAt(e.pos().x()) in range(1, self.fill_count + 1) and self.rowAt(e.pos().y()) in (1, 3):
+                # copy模式
+                if e.modifiers() == Qt.ControlModifier:
+                    self.copyDragStart()
                     self.copyDrag()
+                # move模式
+                else:
+                    self.moveDrag(Qt.MoveAction)
+        except Exception as e:
+            print("error {} happens in mouse move event. [iconArea/iconTable.py]".format(e))
+
 
     def moveDrag(self, dropActions):
         drag_col = self.currentColumn()
@@ -221,7 +225,7 @@ class IconTable(QTableWidget):
 
     def copyDrag(self):
         col = self.currentColumn()
-        if col >= 1 and col < self.fill_count + 1 and col == self.can_copy_col:
+        if col >= 1 and col < self.fill_count + 1:
             # 将col传过去
             data = QByteArray()
             stream = QDataStream(data, QIODevice.WriteOnly)
@@ -276,33 +280,36 @@ class IconTable(QTableWidget):
 
     # 接收x坐标, 给signTable发送应当显示的col
     def showSign(self, x):
-        col = self.columnAt(x)
-        icon_col = col
+        try:
+            col = self.columnAt(x)
+            icon_col = col
 
-        if not self.is_fill:
-            if col == 0:
-                icon_col = 0
-            elif col > self.fill_count or col == -1:
-                icon_col = self.fill_count
-            else:
-                col_temp = self.columnAt(x + self.WIDTH)
-                if col_temp == col:
-                    icon_col = col - 1
-        else:
-            if col == self.columnCount() - 1 or col == -1:
-                icon_col = self.up_sign.columnCount() - 1
-            elif col == 0:
-                icon_col = 0
-            else:
-                col_temp = self.columnAt(x + self.WIDTH)
-                if col_temp == -1:
+            if not self.is_fill:
+                if col == 0:
+                    icon_col = 0
+                elif col > self.fill_count or col == -1:
                     icon_col = self.fill_count
-                if col_temp > col:
-                    pass
-                elif col == col_temp:
-                    icon_col = col - 1
+                else:
+                    col_temp = self.columnAt(x + self.WIDTH)
+                    if col_temp == col:
+                        icon_col = col - 1
+            else:
+                if col == self.columnCount() - 1 or col == -1:
+                    icon_col = self.up_sign.columnCount() - 1
+                elif col == 0:
+                    icon_col = 0
+                else:
+                    col_temp = self.columnAt(x + self.WIDTH)
+                    if col_temp == -1:
+                        icon_col = self.fill_count
+                    if col_temp > col:
+                        pass
+                    elif col == col_temp:
+                        icon_col = col - 1
 
-        self.signShow.emit(icon_col)
+            self.signShow.emit(icon_col)
+        except Exception as e:
+            print("error {} happens in show sign. [iconArea/iconTable.py]".format(e))
 
     # 给sign发送消除信号
     def sendFinish(self):
@@ -321,7 +328,7 @@ class IconTable(QTableWidget):
                     self.delete_action.triggered.connect(lambda : self.removeColumn(column, True))
                     # copy action
                     self.copy_action.disconnect()
-                    self.copy_action.triggered.connect(lambda :self.copyDragStart(column))
+                    self.copy_action.triggered.connect(lambda :self.copyIconToNext(column))
                     item_value = self.cellWidget(row, column).value
                     if item_value.startswith("Cycle"):
                         self.copy_action.setDisabled(True)
@@ -376,11 +383,11 @@ class IconTable(QTableWidget):
         if index != -1:
             self.removeColumn(index)
 
-    def copyDragStart(self, col):
+    def copyIconToNext(self, col):
+        self.copyIconToNextCol.emit(col)
+
+    def copyDragStart(self):
         self.copyDragBegin.emit()
-        self.can_copy_col = col
 
     def copyDragFinish(self):
-        self.can_copy_col = -1
         self.is_copy_module = False
-
