@@ -1,19 +1,19 @@
-from PyQt5.QtWidgets import QComboBox, QWidget, QLineEdit, QVBoxLayout
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QComboBox, QWidget, QLineEdit, QVBoxLayout
 
 from center.iconTabs.events.image.imageProperty import ImageProperty
 from center.iconTabs.events.soundOut.soundProperty import SoundProperty
 from center.iconTabs.events.text.textProperty import TextProperty
 from center.iconTabs.events.video.videoProperty import VideoProperty
-
-from ..timeline.icon import Icon
 from ..image import getImage
+from ..timeline.icon import Icon
 
 
 class IconChoose(QWidget):
     # 发送到上一层, 由上一层再转至properties (properties)
     propertiesShow = pyqtSignal(dict)
+
     def __init__(self, parent=None):
         super(IconChoose, self).__init__(parent)
 
@@ -90,8 +90,8 @@ class IconChoose(QWidget):
     def checkPosInIcon(self, e):
         x = e.pos().x()
         y = e.pos().y()
-        if x <= self.icon.rect().right() and x >= self.icon.rect().left() \
-                and y >= self.icon_name.rect().top() and y <= self.icon.rect().bottom():
+        if self.icon.rect().right() >= x >= self.icon.rect().left() and self.icon_name.rect().top() <= y <= \
+                self.icon.rect().bottom():
             return True
         return False
 

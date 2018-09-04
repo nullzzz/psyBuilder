@@ -2,9 +2,9 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
+from center.iconTabs.condition.switchBranch import SwitchBranch
 from center.iconTabs.timeline.main import Timeline
 from .condition.ifBranch import IfBranch
-from .condition.switch import Switch
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
 from .events.soundOut.soundDisplay import SoundDisplay
@@ -17,13 +17,10 @@ from .eyeTracker.close import Close
 from .eyeTracker.endR import EndR
 from .eyeTracker.open import Open
 from .eyeTracker.startR import StartR
+from .image import getImage
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
-
-from .image import getImage
-
-import copy
 
 
 class IconTabs(QTabWidget):
@@ -255,7 +252,7 @@ class IconTabs(QTabWidget):
                     widget = IfBranch(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Switch":
-                    widget = Switch()
+                    widget = SwitchBranch()
                     widget.tabClose.connect(self.closeTab)
                 else:
                     pass

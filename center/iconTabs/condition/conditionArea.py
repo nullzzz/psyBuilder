@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import (QTableWidget, QComboBox, QLineEdit, QPushButton, QFrame)
+
 from noDash import NoDash
 
 
 class ConditionArea(QTableWidget):
     MAX_CONDITION_COUNT = 6
+
     def __init__(self, parent=None):
         super(ConditionArea, self).__init__(parent)
 
