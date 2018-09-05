@@ -25,11 +25,35 @@ class Structure(QDockWidget):
     propertiesShow = pyqtSignal(str)
 
     name_value = {}
+    name_parent = {'Timeline' : None}
+    name_count = {}
+    value_node = {}
+    # name count
+    TIMELINE_COUNT = 0
+    # event
+    CYCLE_COUNT = 0
+    SOUNTOUT_COUNT = 0
+    TEXT_COUNT = 0
+    IMAGE_COUNT = 0
+    VIDEO_COUNT = 0
+    # eye tracker
+    OPEN_COUNT = 0
+    DC_COUNT = 0
+    CALIBRATION_COUNT = 0
+    ACTION_COUNT = 0
+    STARTR_COUNT = 0
+    ENDR_COUNT = 0
+    CLOSE_COUNT = 0
+    # quest
+    QUESTINIT_COUNT = 0
+    QUESTUPDATA_COUNT = 0
+    QUESTGETVALUE_COUNT = 0
+    # condition
+    IF_ELSE_COUNT = 0
+    SWITCH_COUNT = 0
+
     def __init__(self, parent=None):
         super(Structure, self).__init__(parent)
-
-        # 键为value, 值为StructureItem
-        self.value_node = {}
 
         self.structure_tree = StructureTree()
         # 设置列数、头标签
@@ -41,7 +65,7 @@ class Structure(QDockWidget):
         self.root.setText(0, "Timeline")
         self.root.setIcon(0, QIcon(".\\image\\timeLine.png"))
 
-        self.value_node['Timeline.10001'] = self.root
+        Structure.value_node['Timeline.10001'] = self.root
         # 添加根节点
         self.structure_tree.addTopLevelItem(self.root)
         self.structure_tree.collapseItem(self.root)
@@ -70,28 +94,33 @@ class Structure(QDockWidget):
         self.structure_tree.collapseItem(root)
         if value != '':
             # 往字典中加入
-            self.value_node[value] = root
+            Structure.value_node[value] = root
 
     def addNode(self, parentValue='Timeline.10001', text="node", pixmap=None, value="", properties_window=None):
-        if parentValue in self.value_node:
-            parent = self.value_node[parentValue]
+        if parentValue in Structure.value_node:
+            parent = Structure.value_node[parentValue]
             node = StructureItem(parent, value)
             node.setText(0, text)
             node.setIcon(0, QIcon(pixmap))
             parent.setExpanded(True)
             # 往字典中加入
-            self.value_node[value] = node
+            Structure.value_node[value] = node
+            if parent.value.startswith('If_else.'):
+                text = text[4:]
             Structure.name_value[text] = value
+            Structure.name_parent[text] = parent.text(0)
+            # count
+            self.addCount(value.split('.')[0])
 
     def removeNode(self, parentValue, value):
-        if parentValue in self.value_node and value in self.value_node:
-            parent = self.value_node[parentValue]
-            node = self.value_node[value]
+        if parentValue in Structure.value_node and value in Structure.value_node:
+            parent = Structure.value_node[parentValue]
+            node = Structure.value_node[value]
             parent.removeChild(node)
 
     def moveNode(self, dragCol, targetCol, parentValue, value):
-        parent = self.value_node[parentValue]
-        node = self.value_node[value]
+        parent = Structure.value_node[parentValue]
+        node = Structure.value_node[value]
         if targetCol != -1:
             if targetCol > parent.childCount():
                 targetCol = parent.childCount()
@@ -100,11 +129,11 @@ class Structure(QDockWidget):
 
     def changeNodeName(self, parent_value, value, name):
         try:
-            if value in self.value_node:
-                old_name = self.value_node[value].text(0)
+            if value in Structure.value_node:
+                old_name = Structure.value_node[value].text(0)
                 del Structure.name_value[old_name]
                 Structure.name_value[name] = value
-                self.value_node[value].setText(0, name)
+                Structure.value_node[value].setText(0, name)
 
                 # timeline中icon
                 if parent_value.startswith('Timeline.'):
@@ -157,19 +186,122 @@ class Structure(QDockWidget):
         except Exception:
             print("error happens in do get node_value. [structure/main.py]")
 
+    def addCount(self, widget_type):
+        if widget_type == "Cycle":
+            Structure.CYCLE_COUNT += 1
+        elif widget_type == "Timeline":
+            Structure.TIMELINE_COUNT += 1
+        elif widget_type == "SoundOut":
+            Structure.SOUNTOUT_COUNT += 1
+        elif widget_type == "Text":
+            Structure.TEXT_COUNT += 1
+        elif widget_type == "Image":
+            Structure.IMAGE_COUNT += 1
+        elif widget_type == "Video":
+            Structure.VIDEO_COUNT += 1
+        elif widget_type == "Close":
+            Structure.CLOSE_COUNT += 1
+        elif widget_type == "DC":
+            Structure.DC_COUNT += 1
+        elif widget_type == "Calibration":
+            Structure.CALIBRATION_COUNT += 1
+        elif widget_type == "EndR":
+            Structure.ENDR_COUNT += 1
+        elif widget_type == "Open":
+            Structure.OPEN_COUNT += 1
+        elif widget_type == "Action":
+            Structure.ACTION_COUNT += 1
+        elif widget_type == "StartR":
+            Structure.STARTR_COUNT += 1
+        elif widget_type == "QuestGetValue":
+            Structure.QUESTGETVALUE_COUNT += 1
+        elif widget_type == "QuestUpdate":
+            Structure.QUESTUPDATA_COUNT += 1
+        elif widget_type == "QuestInit":
+            Structure.QUESTINIT_COUNT += 1
+        elif widget_type == "If_else":
+            Structure.IF_ELSE_COUNT += 1
+        elif widget_type == "Switch":
+            Structure.SWITCH_COUNT += 1
+        else:
+            Structure.OTHER_COUNT += 1
+
     @staticmethod
-    def getName(value, name, is_copy = False, old_name = ''):
+    def getCount(widget_type):
+        if widget_type == "Cycle":
+            return Structure.CYCLE_COUNT
+        elif widget_type == "Timeline":
+            return Structure.TIMELINE_COUNT
+        elif widget_type == "SoundOut":
+            return Structure.SOUNTOUT_COUNT
+        elif widget_type == "Text":
+            return Structure.TEXT_COUNT
+        elif widget_type == "Image":
+            return Structure.IMAGE_COUNT
+        elif widget_type == "Video":
+            return Structure.VIDEO_COUNT
+        elif widget_type == "Close":
+            return Structure.CLOSE_COUNT
+        elif widget_type == "DC":
+            return Structure.DC_COUNT
+        elif widget_type == "Calibration":
+            return Structure.CALIBRATION_COUNT
+        elif widget_type == "EndR":
+            return Structure.ENDR_COUNT
+        elif widget_type == "Open":
+            return Structure.OPEN_COUNT
+        elif widget_type == "Action":
+            return Structure.ACTION_COUNT
+        elif widget_type == "StartR":
+            return Structure.STARTR_COUNT
+        elif widget_type == "QuestGetValue":
+            return Structure.QUESTGETVALUE_COUNT
+        elif widget_type == "QuestUpdate":
+            return Structure.QUESTUPDATA_COUNT
+        elif widget_type == "QuestInit":
+            return Structure.QUESTINIT_COUNT
+        elif widget_type == "If_else":
+            return Structure.IF_ELSE_COUNT
+        elif widget_type == "Switch":
+            return Structure.SWITCH_COUNT
+        else:
+            return Structure.OTHER_COUNT
+
+    # get name主要用在drop, copy, branch的自动命名
+    @staticmethod
+    def getName(value, name, is_copy=False, old_name=''):
+        new_name = value.split('.')[0] + '.' + str(Structure.getCount(value.split('.')[0]))
         count = 0
         while True:
-            new_name = value
             if is_copy:
                 new_name = old_name + '.' + str(count)
                 count += 1
-            if Structure.checkNameIsValid(new_name):
+            if new_name not in Structure.name_value:
                 break
 
         return new_name
 
     @staticmethod
-    def checkNameIsValid(name):
-        return name not in Structure.name_value
+    def checkNameIsValid(name, parent_value='', value=''):
+        # 0: 完全不能取(即名字出现在他的父节点中或在同一层次), 1: 可以, 2: 可以取但是有重复的, 需要确定
+        # 如果没出现过或者没有改变
+        if name not in Structure.name_value or Structure.name_value[name] == value:
+            return 1
+        else:
+            parent = Structure.value_node[parent_value]
+            parent_name = parent.text(0)
+            # 如果在同一层次
+            if Structure.name_parent[name] == parent_name:
+                return 0
+            else:
+                in_parent = False
+                while parent_name:
+                    if name == parent_name:
+                        in_parent = True
+                        break
+                    parent_name = Structure.name_parent[parent_name]
+
+                if in_parent:
+                    return 0
+                else:
+                    return 2

@@ -135,10 +135,14 @@ class IfBranch(QWidget):
         add_flag = False
         # name非空
         if current_name or current_value.startswith('Other.'):
-            # name合法
-            if Structure.checkNameIsValid(current_name):
+            res = Structure.checkNameIsValid(current_name, parent_value=self.value, value=current_value)
+            # 不可取
+            if res == 0:
+                add_flag = False
+            #
+            elif res == 1:
                 add_flag = True
-            else:
+            elif res == 2:
                 # 如果用户想重复
                 if QMessageBox.question(self, "Tips", '{}  group\'s name is repeat.'.format(
                         'True' if condition_type == 'T' else 'False'), QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
@@ -173,6 +177,9 @@ class IfBranch(QWidget):
                         if current_name != self.type_value[condition_type][1]:
                             self.nodeNameChange.emit(self.value, current_value,
                                                      '[{}] '.format(condition_type) + current_name)
+            else:
+                QMessageBox.information(self, 'Warning', '{}  group\'s name can\'t be same in same ifBranch.'.format(
+                    'True' if condition_type == 'T' else 'False'), QMessageBox.Ok)
         else:
             QMessageBox.information(self, 'Warning', '{}  group\'s name can\'t be none.'.format(
                 'True' if condition_type == 'T' else 'False'), QMessageBox.Ok)
