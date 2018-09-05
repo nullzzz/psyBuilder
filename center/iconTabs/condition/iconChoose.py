@@ -6,9 +6,9 @@ from center.iconTabs.events.image.imageProperty import ImageProperty
 from center.iconTabs.events.soundOut.soundProperty import SoundProperty
 from center.iconTabs.events.text.textProperty import TextProperty
 from center.iconTabs.events.video.videoProperty import VideoProperty
+from structure.main import Structure
 from ..image import getImage
 from ..timeline.icon import Icon
-from structure.main import Structure
 
 
 class IconChoose(QWidget):
@@ -100,6 +100,7 @@ class IconChoose(QWidget):
         try:
             if self.checkPosInIcon(e):
                 if self.properties_window:
+                    self.properties_window.setWindowModality(Qt.ApplicationModal)
                     self.properties_window.show()
         except Exception as e:
             print('error {} happen in show properties window. [condition/iconChoose.py]'.format(e))
