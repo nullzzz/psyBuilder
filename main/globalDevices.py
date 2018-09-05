@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
-from PyQt5.QtGui import QIcon, QMouseEvent, QDragMoveEvent
+from PyQt5.QtGui import QIcon, QMouseEvent, QDragMoveEvent, QCursor
 from PyQt5.QtWidgets import QWidget, QListWidget, QListWidgetItem, QTextEdit, QVBoxLayout, QHBoxLayout, QApplication, \
-    QListView, QFrame, QPushButton
+    QListView, QFrame, QPushButton, QMenu
 
 in_device = {
     "mouse": 0,
@@ -105,12 +105,15 @@ class DropDemo(QListWidget):
     def __init__(self, device_type=0, parent=None):
         super(DropDemo, self).__init__(parent)
         self.device_type = device_type
+
         # 拖动的图标
         self.dragItem = None
         # self.setViewMode(QListView.IconMode)
         self.setAcceptDrops(True)
         self.setSortingEnabled(True)
         self.setWrapping(False)
+        self.createContextMenu()
+
 
     def dropEvent(self, e):
         source = e.source()
@@ -164,6 +167,27 @@ class DropDemo(QListWidget):
         if item:
             item.setSelected(True)
         e.accept()
+
+    def createContextMenu(self):
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.showContextMenu)
+        self.contextMenu = QMenu(self)
+        self.delete_action = self.contextMenu.addAction("delete")
+        self.delete_action.triggered.connect(self.deleteItem)
+        self.clear_action = self.contextMenu.addAction("clear")
+        self.clear_action.triggered.connect(self.clear)
+
+    def deleteItem(self):
+        self.takeItem(self.currentRow())
+
+    def showContextMenu(self, pos):
+        if self.count():
+            item = self.itemAt(pos)
+            if item:
+                self.contextMenu.exec_(QCursor.pos())  # 在鼠标位置显示
+
+
+
 
     # 返回选择设备
     # type: dict
