@@ -8,6 +8,7 @@ from center.iconTabs.events.text.textProperty import TextProperty
 from center.iconTabs.events.video.videoProperty import VideoProperty
 from ..image import getImage
 from ..timeline.icon import Icon
+from structure.main import Structure
 
 
 class IconChoose(QWidget):
@@ -82,7 +83,7 @@ class IconChoose(QWidget):
                     self.properties_window.cancel_bt.clicked.connect(self.properties_window.close)
                     self.properties_window.apply_bt.clicked.connect(self.apply)
 
-                self.icon_name.setText(name)
+                self.icon_name.setText(Structure.getName(self.icon.value, name))
                 self.icon_name.setEnabled(True)
         except Exception as e:
             print("error {} happens in change icon. [condition/iconChoose.py]".format(e))
@@ -96,14 +97,20 @@ class IconChoose(QWidget):
         return False
 
     def mouseDoubleClickEvent(self, e):
-        if self.checkPosInIcon(e):
-            if self.properties_window:
-                self.properties_window.show()
+        try:
+            if self.checkPosInIcon(e):
+                if self.properties_window:
+                    self.properties_window.show()
+        except Exception as e:
+            print('error {} happen in show properties window. [condition/iconChoose.py]'.format(e))
 
     def mousePressEvent(self, e):
-        if self.checkPosInIcon(e):
-            if self.properties_window:
-                self.propertiesShow.emit(self.properties_window.getInfo())
+        try:
+            if self.checkPosInIcon(e):
+                if self.properties_window:
+                    self.propertiesShow.emit(self.properties_window.getInfo())
+        except Exception as e:
+            print('error {} happen in show properties window\'properties. [condition/iconChoose.py]'.format(e))
 
     def ok(self):
         self.apply()

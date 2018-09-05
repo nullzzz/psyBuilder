@@ -123,3 +123,6 @@ class Icon(QLabel):
             Icon.OTHER_COUNT += 1
 
         return count
+
+    def changeValue(self, value):
+        self.value = value

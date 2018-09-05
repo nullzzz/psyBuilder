@@ -52,7 +52,9 @@ class SoundProperty(QWidget):
                   (screen.height() - size.height()) / 2)
 
     def getInfo(self):
-        return {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        # 无frame
+        # return {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        return {**self.general.getInfo(), **self.duration.getInfo()}
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)

@@ -165,11 +165,11 @@ class Structure(QDockWidget):
             if is_copy:
                 new_name = old_name + '.' + str(count)
                 count += 1
-            if Structure.nameIsValid(new_name):
+            if Structure.checkNameIsValid(new_name):
                 break
 
         return new_name
 
     @staticmethod
-    def nameIsValid(name):
+    def checkNameIsValid(name):
         return name not in Structure.name_value

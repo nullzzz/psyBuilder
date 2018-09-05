@@ -6,6 +6,8 @@ from .iconChoose import IconChoose
 from .conditionArea import ConditionArea
 from ..image import getImage
 
+from structure.main import Structure
+
 
 class IfBranch(QWidget):
     tabClose = pyqtSignal(QWidget)
@@ -32,7 +34,8 @@ class IfBranch(QWidget):
 
         self.value = value
         # [value, name, properties]
-        self.type_value = {'T': ['Other.10001', '', {}], 'F': ['Other.10002', '', {}]}
+        self.type_value = {'T': ['Other.10001', '', None], 'F': ['Other.10002', '', None]}
+        self.widget_type_index = {'None': 0, 'Image': 1, 'Text': 2, 'Video': 3, 'SoundOut': 4}
 
         condition_group = QGroupBox("Condition")
         layout1 = QVBoxLayout()
@@ -77,24 +80,46 @@ class IfBranch(QWidget):
             "properties": "none"
         }
 
+    def restoreIcons(self):
+        true_widget_type = self.type_value['T'][0].split('.')[0]
+        false_widget_type = self.type_value['F'][0].split('.')[0]
+
+        if true_widget_type != 'Other':
+            self.true_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
+            self.true_icon_choose.icon.changeValue(self.type_value['T'][0])
+            self.true_icon_choose.icon_name.setText(self.type_value['T'][1])
+            self.true_icon_choose.properties_window = self.type_value['T'][2]
+        else:
+            self.true_icon_choose.icon_comboBox.setCurrentIndex(0)
+
+        if false_widget_type != 'Other':
+            self.false_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
+            self.false_icon_choose.icon.changeValue(self.type_value['F'][0])
+            self.false_icon_choose.icon_name.setText(self.type_value['F'][1])
+            self.false_icon_choose.properties_window = self.type_value['F'][2]
+        else:
+            self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
+
     def clickOk(self):
-        self.clickApply()
-        self.close()
-        self.tabClose.emit(self)
+        if self.clickApply():
+            self.close()
+            self.tabClose.emit(self)
 
     def clickCancel(self):
         self.close()
+        # 还原到初始设定
+        self.restoreIcons()
         self.tabClose.emit(self)
 
     def clickApply(self):
         try:
-            self.disposeNode('T')
-            self.disposeNode('F')
-
             # properties
             self.propertiesChange.emit(self.getInfo())
+            if self.disposeNode('T') and self.disposeNode('F'):
+                return True
+            return False
         except Exception as e:
-            print("error {} happens in apple if-else. [condition/ifBranch.py]".format(e))
+            print("error {} happens in apply if-else. [condition/ifBranch.py]".format(e))
 
     def disposeNode(self, condition_type='T'):
         # 获取当前的icon的value
@@ -107,31 +132,51 @@ class IfBranch(QWidget):
             current_name = self.false_icon_choose.icon_name.text()
             current_properties_window = self.false_icon_choose.properties_window
 
-        # node delete
-        if not self.type_value[condition_type][0].startswith("Other.") and current_value.startswith("Other"):
-            self.nodeDelete.emit(self.value, self.type_value[condition_type][0])
-            self.type_value[condition_type] = ['Other.10001' if condition_type == 'T' else "Other.10002", '', {}]
-        elif not current_value.startswith("Other."):
-            # new node
-            if current_value != self.type_value[condition_type][0]:
-                # delete old
-                if not self.type_value[condition_type][0].startswith("Other"):
+        add_flag = False
+        # name非空
+        if current_name or current_value.startswith('Other.'):
+            # name合法
+            if Structure.checkNameIsValid(current_name):
+                add_flag = True
+            else:
+                # 如果用户想重复
+                if QMessageBox.question(self, "Tips", '{}  group\'s name is repeat.'.format(
+                        'True' if condition_type == 'T' else 'False'), QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+                    add_flag = True
+            #
+            if add_flag:
+                # node delete
+                if not self.type_value[condition_type][0].startswith("Other.") and current_value.startswith("Other"):
                     self.nodeDelete.emit(self.value, self.type_value[condition_type][0])
                     self.type_value[condition_type] = ['Other.10001' if condition_type == 'T' else "Other.10002", '',
-                                                       {}]
-                # add new
-                self.nodeChange.emit(self.value, "[" + condition_type + "] " + current_name,
-                                     getImage(current_value.split('.')[0], 'pixmap'),
-                                     current_value, current_properties_window)
-                self.type_value[condition_type][0] = current_value
-                self.type_value[condition_type][1] = self.true_icon_choose.icon_name.text()
-            # change node
-            else:
-                # name change
-                if current_name != self.type_value[condition_type][1]:
-                    self.nodeNameChange.emit(self.value, current_value, '[{}] '.format(condition_type) + current_name)
-                # properties change
-                pass
+                                                       None]
+                elif not current_value.startswith("Other."):
+                    # new node
+                    if current_value != self.type_value[condition_type][0]:
+                        # delete old
+                        if not self.type_value[condition_type][0].startswith("Other"):
+                            self.nodeDelete.emit(self.value, self.type_value[condition_type][0])
+                            self.type_value[condition_type] = [
+                                'Other.10001' if condition_type == 'T' else "Other.10002",
+                                '',
+                                None]
+                        # add new
+                        self.nodeChange.emit(self.value, "[" + condition_type + "] " + current_name,
+                                             getImage(current_value.split('.')[0], 'pixmap'),
+                                             current_value, current_properties_window)
+                        self.type_value[condition_type][0] = current_value
+                        self.type_value[condition_type][1] = self.true_icon_choose.icon_name.text()
+                        self.type_value[condition_type][2] = current_properties_window
+                    # change node
+                    else:
+                        # name change
+                        if current_name != self.type_value[condition_type][1]:
+                            self.nodeNameChange.emit(self.value, current_value,
+                                                     '[{}] '.format(condition_type) + current_name)
+        else:
+            QMessageBox.information(self, 'Warning', '{}  group\'s name can\'t be none.'.format(
+                'True' if condition_type == 'T' else 'False'), QMessageBox.Ok)
+        return add_flag
 
     def deleteItem(self, value):
         try:
@@ -142,7 +187,7 @@ class IfBranch(QWidget):
             # false
             elif value == self.type_value['F'][0]:
                 self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
-                self.type_value['F'] = ['Other.10001', '', {}]
+                self.type_value['F'] = ['Other.10002', '', {}]
 
         except Exception as e:
             print("error {} happens in delete item. [condition/ifBranch.py]".format(e))
