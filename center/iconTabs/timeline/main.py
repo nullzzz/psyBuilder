@@ -20,7 +20,7 @@ class Timeline(QWidget):
         self.attributes = {}
         # widget
         self.icon_bar = IconBar(self)
-        self.icon_area = IconArea(self)
+        self.icon_area = IconArea(self, self.value)
         # layout
         grid = QGridLayout(self)
         grid.addWidget(self.icon_bar, 0, 0, 1, 1)

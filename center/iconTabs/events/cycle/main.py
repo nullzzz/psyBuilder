@@ -9,6 +9,8 @@ from .colsAdd import ColsAdd
 from .properties.property import Property
 from .timelineTable import TimelineTable
 
+from structure.main import Structure
+
 
 class Cycle(QMainWindow):
     # 属性修改 (properties)
@@ -224,26 +226,61 @@ class Cycle(QMainWindow):
         return res
 
     def addOrChangeTimeline(self, row, col):
-        if col == 1:
-            if row not in self.row_value:
-                name = self.timeline_table.item(row, col).text()
-                if name:
-                    timeline_icon = Icon(parent=None, name="Timeline", pixmap=".\\.\\image\\timeLine.png")
-                    # 相关数据存储
-                    self.row_value[row] = timeline_icon.value
-                    self.row_name[row] = name
-                    self.value_row[timeline_icon.value] = row
-                    # 给
-                    self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
-                    self.timeline_count += 1
-            else:
-                name = self.timeline_table.item(row, col).text()
-                if name:
-                    value = self.row_value[row]
-                    self.timelineNameChange.emit(self.value, value, name)
+        try:
+            if col == 1:
+                # new timeline
+                item = self.timeline_table.item(row, col)
+                if row not in self.row_value:
+                    name = item.text()
+                    if name:
+                        res = Structure.checkNameIsValid(name, self.value, 'Timeline.')
+                        flag = False
+                        if res == 0:
+                            QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
+                            self.timeline_table.setItem(row, col, QTableWidgetItem(''))
+                        elif res == 1:
+                            flag = True
+                        elif res == 2:
+                            if QMessageBox.question(self, 'Tips',
+                                                    'name has existed in other place, are you sure to change?',
+                                                    QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+                                flag = True
+                        if flag:
+                            if name:
+                                timeline_icon = Icon(parent=None, name="Timeline",
+                                                     pixmap=".\\.\\image\\timeLine.png")
+                                # 相关数据存储
+                                self.row_value[row] = timeline_icon.value
+                                self.row_name[row] = name
+                                self.value_row[timeline_icon.value] = row
+                                # 给
+                                self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
+                                self.timeline_count += 1
+                # change timeline name
                 else:
-                    QMessageBox.information(self, "Tips", "Timeline value can't be changed to none.")
-                    self.timeline_table.setItem(row, col, QTableWidgetItem(self.row_name[row]))
+                    name = item.text()
+                    value = self.row_value[row]
+                    if name:
+                        res = Structure.checkNameIsValid(name, self.value, value)
+                        flag = False
+                        if res == 0:
+                            QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
+                            self.timeline_table.setItem(row, col, QTableWidgetItem(self.row_name[row]))
+                        elif res == 1:
+                            flag = True
+                        elif res == 2:
+                            if QMessageBox.question(self, 'Tips',
+                                                    'name has existed in other place, are you sure to change?',
+                                                    QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+                                flag = True
+                        if flag:
+                            self.timelineNameChange.emit(self.value, value, name)
+                    else:
+                        QMessageBox.information(self, "Tips", "Timeline value can't be none.")
+                        self.timeline_table.setItem(row, col, QTableWidgetItem(self.row_name[row]))
+        except Exception as e:
+            print(f"error {e} happens in add or rename timeline. [cycle/main.py]")
+
 
     def deleteTimeline(self, value):
         try:

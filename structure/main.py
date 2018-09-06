@@ -1,11 +1,9 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDockWidget
+from PyQt5.QtWidgets import QDockWidget, QInputDialog, QMessageBox, QLineEdit
 
 from .structureItem import StructureItem
 from .structureTree import StructureTree
-
-from center.iconTabs.timeline.icon import Icon
 
 from collections import OrderedDict
 
@@ -82,7 +80,7 @@ class Structure(QDockWidget):
     def linkSignal(self):
         self.structure_tree.doubleClicked.connect(self.openTab)
         self.structure_tree.clicked.connect(lambda: self.propertiesShow.emit(self.structure_tree.currentItem().value))
-        self.structure_tree.itemNameChange.connect(self.changeNodeName)
+        self.structure_tree.itemNameChange.connect(self.renameNode)
 
     def addRoot(self, text="root", pixmap=None, value=""):
         root = StructureItem(self.structure_tree, value)
@@ -126,6 +124,36 @@ class Structure(QDockWidget):
                 targetCol = parent.childCount()
             parent.removeChild(node)
             parent.insertChild(targetCol - 1, node)
+
+    def renameNode(self, item):
+        try:
+            dialog = QInputDialog()
+            dialog.setModal(True)
+            dialog.setWindowFlag(Qt.WindowCloseButtonHint)
+            name = item.text(0)
+            extend = ''
+            if item.value != 'Timeline.10001':
+                if item.parent().value.startswith('If_else'):
+                    extend = name[0:4]
+                    name = name[4:]
+                text, flag = dialog.getText(None, "Rename", "Rename {} to :".format(name), QLineEdit.Normal, name)
+                # 检测rename
+                res = Structure.checkNameIsValid(text, item.parent().value, item.value)
+                whether_change = False
+                if res == 0:
+                    QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
+                elif res == 1:
+                    whether_change = True
+                elif res == 2:
+                    if QMessageBox.question(self, 'Tips', 'name has existed in other place, are you sure to change?',
+                                            QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+                        whether_change = True
+                if whether_change:
+                    if flag and text:
+                        text = extend + text
+                        self.changeNodeName(item.parent().value, item.value, text)
+        except Exception as e:
+            print("error {} happens in rename node in structure. [structure/structureTree.py]".format(e))
 
     def changeNodeName(self, parent_value, value, name):
         try:
@@ -283,25 +311,33 @@ class Structure(QDockWidget):
 
     @staticmethod
     def checkNameIsValid(name, parent_value='', value=''):
-        # 0: 完全不能取(即名字出现在他的父节点中或在同一层次), 1: 可以, 2: 可以取但是有重复的, 需要确定
+        # 不检查name为空, 在前面部分应该检查掉
+        # 0: 完全不能取
+        # 1: 可以
+        # 2: 可以取但是有重复的, 需要确定
         # 如果没出现过或者没有改变
         if name not in Structure.name_value or Structure.name_value[name] == value:
             return 1
         else:
-            parent = Structure.value_node[parent_value]
-            parent_name = parent.text(0)
-            # 如果在同一层次
-            if Structure.name_parent[name] == parent_name:
+            # 如果已存在, 但是不是同类型, 不可以
+            if not Structure.name_value[name].startswith(value.split('.')[0]):
                 return 0
             else:
-                in_parent = False
-                while parent_name:
-                    if name == parent_name:
-                        in_parent = True
-                        break
-                    parent_name = Structure.name_parent[parent_name]
-
-                if in_parent:
+                parent = Structure.value_node[parent_value]
+                parent_name = parent.text(0)
+                # 如果在同一层次
+                if Structure.name_parent[name] == parent_name:
                     return 0
+                # 如果是在父节点中
                 else:
-                    return 2
+                    in_parent = False
+                    while parent_name:
+                        if name == parent_name:
+                            in_parent = True
+                            break
+                        parent_name = Structure.name_parent[parent_name]
+
+                    if in_parent:
+                        return 0
+                    else:
+                        return 2

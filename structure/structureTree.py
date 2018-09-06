@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction, QInputDialog, QLineEdit, QShortcut
+from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction, QInputDialog, QLineEdit, QShortcut, QMessageBox
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QKeySequence
 from .structureItem import StructureItem
@@ -10,8 +10,8 @@ class StructureTree(QTreeWidget):
     # 发送到main(parent.value, value)
     timelineDelete = pyqtSignal(str, str)
     itemInIfBranchDelete = pyqtSignal(str, str)
-    # (parent_value, value, name)
-    itemNameChange = pyqtSignal(str, str, str)
+    # (item)
+    itemNameChange = pyqtSignal(StructureItem)
 
     def __init__(self, parent=None):
         super(StructureTree, self).__init__(parent)
@@ -49,20 +49,4 @@ class StructureTree(QTreeWidget):
             print("some errors happen in delete structure item. (structureTree.py)")
 
     def renameItem(self, item: StructureItem):
-        try:
-            dialog = QInputDialog()
-            dialog.setModal(True)
-            dialog.setWindowFlag(Qt.WindowCloseButtonHint)
-            name = item.text(0)
-            extend = ''
-            if item.value != 'Timeline.10001':
-                if item.parent().value.startswith('If_else'):
-                    extend = name[0:4]
-                    name = name[4:]
-                text, flag = dialog.getText(None, "Rename", "Rename {} to :".format(name), QLineEdit.Normal, name)
-
-                if flag and text:
-                    text = extend + text
-                    self.itemNameChange.emit(item.parent().value, item.value, text)
-        except Exception as e:
-            print("error {} happens in rename node in structure. [structure/structureTree.py]".format(e))
+        self.itemNameChange.emit(item)

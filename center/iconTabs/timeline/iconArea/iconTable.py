@@ -1,10 +1,11 @@
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMenu, QFrame, QAction, QLabel
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMenu, QFrame, QAction, QLabel, QMessageBox
 from PyQt5.QtCore import Qt, QDataStream, QIODevice, QByteArray, QPoint, QMimeData
 from PyQt5.QtGui import QDrag, QPixmap
 from PyQt5.QtCore import pyqtSignal
 from ..icon import Icon
 from .signTable import SignTable
 from noDash import NoDash
+from structure.main import Structure
 
 
 class IconTable(QTableWidget):
@@ -27,7 +28,7 @@ class IconTable(QTableWidget):
     # icon固定宽度
     WIDTH = 50
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, timeline_value='Timeline.10001'):
         super(IconTable, self).__init__(parent)
         # sign table
         self.up_sign = SignTable(sign="arrow_up.png")
@@ -40,6 +41,10 @@ class IconTable(QTableWidget):
         self.is_edit = False
         # 是否是copy模式
         self.is_copy_module = False
+        # 父亲
+        self.parent_timeline_value = timeline_value
+        # 暂存被修改的名字
+        self.old_name = ''
 
         # 隐藏表头
         self.horizontalHeader().setVisible(False)
@@ -208,7 +213,6 @@ class IconTable(QTableWidget):
         except Exception as e:
             print("error {} happens in mouse move event. [iconArea/iconTable.py]".format(e))
 
-
     def moveDrag(self, dropActions):
         drag_col = self.currentColumn()
         if drag_col >= 1 and drag_col < self.fill_count + 1:
@@ -325,10 +329,10 @@ class IconTable(QTableWidget):
                 if not self.is_copy_module:
                     # delete action
                     self.delete_action.disconnect()
-                    self.delete_action.triggered.connect(lambda : self.removeColumn(column, True))
+                    self.delete_action.triggered.connect(lambda: self.removeColumn(column, True))
                     # copy action
                     self.copy_action.disconnect()
-                    self.copy_action.triggered.connect(lambda :self.copyIconToNext(column))
+                    self.copy_action.triggered.connect(lambda: self.copyIconToNext(column))
                     item_value = self.cellWidget(row, column).value
                     if item_value.startswith("Cycle"):
                         self.copy_action.setDisabled(True)
@@ -351,6 +355,7 @@ class IconTable(QTableWidget):
             # text
             elif row == 3 and col in range(1, self.fill_count + 1):
                 self.setFocus()
+                self.old_name = self.item(row, col).text()
                 self.editItem(self.item(row, col))
                 self.is_edit = True
 
@@ -361,12 +366,38 @@ class IconTable(QTableWidget):
         self.iconDoubleClicked.emit(value, name)
 
     # 更改event name
-    def changIconName(self, item):
-        if self.is_edit:
-            self.cellWidget(1, item.column()).setName(item.text())
-            # 发送value和更改后的name
-            self.iconNameChange.emit(self.cellWidget(1, item.column()).value, item.text())
-            self.is_edit = False
+    def changIconName(self, item: QTableWidgetItem):
+        try:
+            if self.is_edit:
+                if item.text():
+                    res = Structure.checkNameIsValid(item.text(), self.parent_timeline_value,
+                                                     self.cellWidget(1, item.column()).value)
+                    whether_change = True
+                    if res == 0:
+                        whether_change = False
+                        QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
+                    elif res == 1:
+                        pass
+                    elif res == 2:
+                        if QMessageBox.question(self, 'Tips', 'name has existed in other place, are you sure to change?',
+                                                QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+                            pass
+                        else:
+                            whether_change = False
+
+                    if whether_change:
+                        self.cellWidget(1, item.column()).setName(item.text())
+                        # 发送value和更改后的name
+                        self.iconNameChange.emit(self.cellWidget(1, item.column()).value, item.text())
+                    else:
+                        # 还原为原来的name
+                        item.setText(self.old_name)
+                else:
+                    QMessageBox.information(self, "Tips", "name can't be none")
+                    item.setText(self.old_name)
+                self.is_edit = False
+        except Exception as e:
+            print(f"error {e} happens in change icon name. [iconArea/iconTable.py]")
 
     def getProperties(self, row, col):
         if row in (1, 3) and col in range(0, self.fill_count + 1):

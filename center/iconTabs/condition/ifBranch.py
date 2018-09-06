@@ -144,9 +144,13 @@ class IfBranch(QWidget):
                 add_flag = True
             elif res == 2:
                 # 如果用户想重复
-                if QMessageBox.question(self, "Tips", '{}  group\'s name is repeat.'.format(
-                        'True' if condition_type == 'T' else 'False'), QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+                if QMessageBox.question(self, "Tips",
+                                        'the {}  group\'s name has existed in other place, are you sure to change?.'.format(
+                                                'True' if condition_type == 'T' else 'False'),
+                                        QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                     add_flag = True
+                else:
+                    return add_flag
             #
             if add_flag:
                 # node delete
@@ -178,10 +182,10 @@ class IfBranch(QWidget):
                             self.nodeNameChange.emit(self.value, current_value,
                                                      '[{}] '.format(condition_type) + current_name)
             else:
-                QMessageBox.information(self, 'Warning', '{}  group\'s name can\'t be same in same ifBranch.'.format(
+                QMessageBox.information(self, 'Tips', 'the {}  group\'s name can\'t use.'.format(
                     'True' if condition_type == 'T' else 'False'), QMessageBox.Ok)
         else:
-            QMessageBox.information(self, 'Warning', '{}  group\'s name can\'t be none.'.format(
+            QMessageBox.information(self, 'Tips', 'the {}  group\'s name can\'t be none.'.format(
                 'True' if condition_type == 'T' else 'False'), QMessageBox.Ok)
         return add_flag
 
