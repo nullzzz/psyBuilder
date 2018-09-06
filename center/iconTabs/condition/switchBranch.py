@@ -1,9 +1,9 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QGridLayout, QVBoxLayout, QMessageBox, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QVBoxLayout, QMessageBox, QHBoxLayout
 
-from .conditionArea import ConditionArea
 from .iconChoose import IconChoose
+from .switchCondition import SwitchCondition
 from ..image import getImage
 
 
@@ -24,11 +24,14 @@ class SwitchBranch(QWidget):
     def __init__(self, parent=None, value=''):
         super(SwitchBranch, self).__init__(parent)
 
-        self.condition_area = ConditionArea(self)
-        self.true_icon_choose = IconChoose(self)
-        self.true_icon_choose.propertiesShow.connect(self.showIconProperties)
-        self.false_icon_choose = IconChoose(self)
-        self.false_icon_choose.propertiesShow.connect(self.showIconProperties)
+        self.condition_area = SwitchCondition(self)
+        self.condition_area.add_case.connect(self.addCase)
+
+        self.icons = []
+
+        self.default_icon_choose = IconChoose(self)
+        self.default_icon_choose.propertiesShow.connect(self.showIconProperties)
+        self.icons.append(self.default_icon_choose)
 
         self.value = value
         # [value, name, properties]
@@ -39,16 +42,14 @@ class SwitchBranch(QWidget):
         layout1.addWidget(self.condition_area)
         condition_group.setLayout(layout1)
 
-        true_group = QGroupBox("True")
-        true_group.setMinimumHeight(250)
+        self.default_group = QGroupBox("Default")
+        self.default_group.setMinimumHeight(250)
         layout2 = QVBoxLayout()
-        layout2.addWidget(self.true_icon_choose)
-        true_group.setLayout(layout2)
+        layout2.addWidget(self.default_icon_choose)
+        self.default_group.setLayout(layout2)
 
-        false_group = QGroupBox("False")
-        layout3 = QVBoxLayout()
-        layout3.addWidget(self.false_icon_choose)
-        false_group.setLayout(layout3)
+        self.icon_layout = QHBoxLayout()
+        self.icon_layout.addWidget(self.default_group)
 
         buttons_layout = QHBoxLayout()
         self.ok_button = QPushButton("OK")
@@ -62,12 +63,23 @@ class SwitchBranch(QWidget):
         buttons_layout.addWidget(self.cancel_button)
         buttons_layout.addWidget(self.apply_button)
 
-        layout = QGridLayout()
-        layout.addWidget(condition_group, 0, 0, 1, 2)
-        layout.addWidget(true_group, 1, 0, 2, 1)
-        layout.addWidget(false_group, 1, 1, 2, 1)
-        layout.addLayout(buttons_layout, 3, 0, 1, 2)
-        self.setLayout(layout)
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(condition_group)
+        self.layout.addLayout(self.icon_layout)
+        self.layout.addLayout(buttons_layout)
+        self.setLayout(self.layout)
+
+    def addCase(self, index):
+        group = QGroupBox(f"case{index}")
+        icon_choose = IconChoose(self)
+        self.icons.insert(index, icon_choose)
+
+        layout = QVBoxLayout()
+        layout.addWidget(icon_choose)
+        group.setLayout(layout)
+        self.icon_layout.removeWidget(self.default_group)
+        self.icon_layout.addWidget(group)
+        self.icon_layout.addWidget(self.default_group)
 
     def showProperty(self):
         QMessageBox.warning(self, "todo", "set the properties of the event", QMessageBox.Ok)
@@ -96,6 +108,7 @@ class SwitchBranch(QWidget):
         except Exception as e:
             print("error {} happens in apple if-else. [condition/ifBranch.py]".format(e))
 
+    # todo:这是啥呀
     def disposeNode(self, condition_type='T'):
         # 获取当前的icon的value
         if condition_type == 'T':
@@ -133,6 +146,7 @@ class SwitchBranch(QWidget):
                 # properties change
                 pass
 
+    # 删除
     def deleteItem(self, value):
         try:
             # true
@@ -147,6 +161,7 @@ class SwitchBranch(QWidget):
         except Exception as e:
             print("error {} happens in delete item. [condition/ifBranch.py]".format(e))
 
+    # 重命名
     def changeItemName(self, value, name):
         try:
             # true
@@ -158,5 +173,6 @@ class SwitchBranch(QWidget):
         except Exception as e:
             print("error {} happens in change item name. [condition/ifBranch.py]".format(e))
 
+    # 事件参数
     def showIconProperties(self, properties):
         self.iconPropertiesShow.emit(properties)
