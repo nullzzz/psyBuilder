@@ -15,10 +15,6 @@ out_device = {
     "network_port": 0,
 }
 
-# 暂时只考虑输出设备的选择
-# 写完了输出在写输出
-# 重点是我特么一个输出设备都不知道
-
 
 class GlobalDevice(QWidget):
     InputDevice = 0
@@ -185,9 +181,6 @@ class DropDemo(QListWidget):
             item = self.itemAt(pos)
             if item:
                 self.contextMenu.exec_(QCursor.pos())  # 在鼠标位置显示
-
-
-
 
     # 返回选择设备
     # type: dict

@@ -1,9 +1,9 @@
 import json
-import sys
 import os
+import sys
 
-from PyQt5.QtCore import Qt, QTimer, QSettings
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QMessageBox
 
 from attributes.main import Attributes
 from center.iconTabs.events.durationPage import DurationPage
@@ -44,24 +44,46 @@ class MainWindow(QMainWindow):
         file_menu.addAction(save_file_action)
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
+
         # view menu
         view_menu = menu_bar.addMenu("&View")
+        self.attribute_action = QAction("&Attribute", self)
+        self.structure_action = QAction("&Structure", self)
+        self.main_action = QAction("&Main", self)
+        self.property_action = QAction("&Property", self)
+        self.output_action = QAction("&Output", self)
+        self.default_action = QAction("&Default", self)
+        self.attribute_action.setCheckable(True)
+        self.attribute_action.setChecked(True)
+        self.attribute_action.setData("attribute")
+        self.structure_action.setCheckable(True)
+        self.structure_action.setChecked(True)
+        self.structure_action.setData("structure")
+        self.main_action.setCheckable(True)
+        self.main_action.setChecked(True)
+        self.main_action.setData("main")
+        self.output_action.setCheckable(True)
+        self.output_action.setChecked(True)
+        self.output_action.setData("output")
+        self.property_action.setCheckable(True)
+        self.property_action.setChecked(True)
+        self.property_action.setData("property")
 
-        attribute_action = QAction("&Attribute", self)
-        structure_action = QAction("&Structure", self)
-        main_action = QAction("&Main", self)
-        property_action = QAction("&Property", self)
-        output_action = QAction("&Output", self)
-        default_action = QAction("&Default", self)
-        default_action.triggered.connect(self.resetView)
+        self.attribute_action.toggled.connect(self.setDockView)
+        self.structure_action.toggled.connect(self.setDockView)
+        self.main_action.toggled.connect(self.setDockView)
+        self.output_action.toggled.connect(self.setDockView)
+        self.property_action.toggled.connect(self.setDockView)
 
-        view_menu.addAction(attribute_action)
-        view_menu.addAction(structure_action)
-        view_menu.addAction(main_action)
-        view_menu.addAction(property_action)
-        view_menu.addAction(output_action)
+        self.default_action.triggered.connect(self.resetView)
+
+        view_menu.addAction(self.attribute_action)
+        view_menu.addAction(self.structure_action)
+        view_menu.addAction(self.main_action)
+        view_menu.addAction(self.property_action)
+        view_menu.addAction(self.output_action)
         view_menu.addSeparator()
-        view_menu.addAction(default_action)
+        view_menu.addAction(self.default_action)
 
         # devices menu
         self.input_devices = GlobalDevice(device_type=0)
@@ -81,8 +103,12 @@ class MainWindow(QMainWindow):
         # help menu
         help_menu = menu_bar.addMenu("&Help")
         about_action = QAction("&About", self)
+        about_Qt_action = QAction("&About Qt", self)
+        about_action.triggered.connect(self.about)
+        about_Qt_action.triggered.connect(QApplication.instance().aboutQt)
 
         help_menu.addAction(about_action)
+        help_menu.addAction(about_Qt_action)
 
         # 设置dock widgets
         # attributes
@@ -189,9 +215,43 @@ class MainWindow(QMainWindow):
 
     def resetView(self):
         try:
-            print("I can't finish it, AHHh.")
+            self.structure_action.setChecked(True)
+            self.property_action.setChecked(True)
+            self.main_action.setChecked(True)
+            self.output_action.setChecked(True)
+            self.attribute_action.setChecked(True)
         except Exception:
             print("error happens in reset view. [main/main.py]")
+
+    def setDockView(self, checked):
+        dock = self.sender().data()
+        # 显示dock
+        if checked:
+            if dock == "attribute":
+                self.attributes.setVisible(True)
+            elif dock == "structure":
+                self.structure.setVisible(True)
+            elif dock == "main":
+                self.center.setVisible(True)
+            elif dock == "property":
+                self.properties.setVisible(True)
+            elif dock == "output":
+                self.output.setVisible(True)
+            else:
+                print("wtf")
+        else:
+            if dock == "attribute":
+                self.attributes.setVisible(False)
+            elif dock == "structure":
+                self.structure.setVisible(False)
+            elif dock == "main":
+                self.center.setVisible(False)
+            elif dock == "property":
+                self.properties.setVisible(False)
+            elif dock == "output":
+                self.output.setVisible(False)
+            else:
+                print("wtf")
 
     def showDevices(self, device_type):
         if device_type:
@@ -209,3 +269,6 @@ class MainWindow(QMainWindow):
 
     def contextMenuEvent(self, QContextMenuEvent):
         super().contextMenuEvent(QContextMenuEvent)
+
+    def about(self):
+        QMessageBox.about(self, "About PsyDemo", "This is a bad project")
