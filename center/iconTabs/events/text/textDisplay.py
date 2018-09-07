@@ -56,7 +56,7 @@ class TextDisplay(QMainWindow):
         self.pro.setWindowModality(Qt.ApplicationModal)
         self.pro.show()
 
-    # 预览图片
+    # 预览
     def preView(self):
         try:
             self.preview = Preview(self.text_label, self.x_pos, self.y_pos, self.w_size, self.h_size)
@@ -86,22 +86,33 @@ class TextDisplay(QMainWindow):
     def apply(self):
         self.getPro()
         self.text_label.setTextColor(QColor(self.fore_color))
+        self.text_label.setFont(self.font)
         self.text_label.setText(self.text)
         self.text_label.setStyleSheet("background-color: {};".format(self.back_color))
+        self.pro.general.text.setTextColor(QColor(self.fore_color))
+        self.pro.general.text.setFont(self.font)
+        self.pro.general.text.setText(self.text)
+        self.pro.general.text.setStyleSheet("background-color: {};".format(self.back_color))
 
         if self.align == "Center":
             self.text_label.setAlignment(Qt.AlignCenter)
+            self.pro.general.text.setAlignment(Qt.AlignCenter)
         elif self.align == "Left":
             self.text_label.setAlignment(Qt.AlignLeft)
+            self.pro.general.text.setAlignment(Qt.AlignLeft)
         elif self.align == "Right":
             self.text_label.setAlignment(Qt.AlignRight)
+            self.pro.general.text.setAlignment(Qt.AlignRight)
         elif self.align == "Justify":
             self.text_label.setAlignment(Qt.AlignJustify)
+            self.pro.general.text.setAlignment(Qt.AlignJustify)
 
         if self.is_wrap:
             self.text_label.setWordWrapMode(QTextOption.WordWrap)
+            self.pro.general.text.setWordWrapMode(QTextOption.WordWrap)
         else:
             self.text_label.setWordWrapMode(QTextOption.NoWrap)
+            self.pro.general.text.setWordWrapMode(QTextOption.NoWrap)
 
         # 发送信号
         self.propertiesChange.emit(self.getInfo())
@@ -109,6 +120,7 @@ class TextDisplay(QMainWindow):
     # 获取参数
     def getPro(self):
         self.text = self.pro.general.text.toPlainText()
+        self.font = self.pro.general.font
         self.align = self.pro.general.align.currentText()
         self.fore_color = self.pro.general.fore_color.currentText()
         self.back_color = self.pro.general.back_color.currentText()

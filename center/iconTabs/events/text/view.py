@@ -16,6 +16,7 @@ class Preview(QDialog):
         self.label.setPixmap(pix)
         self.text.setTextColor(text.textColor())
         self.text.setText(text.toPlainText())
+        self.text.setFont(text.font())
         self.text.setReadOnly(True)
         screen = QDesktopWidget().screenGeometry()
         if "%" in start_x:

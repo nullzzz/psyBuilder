@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QComboBox, QSpinBox, QApplication, \
-    QMessageBox, QTextEdit, QCheckBox
+    QMessageBox, QTextEdit, QCheckBox, QFontDialog, QPushButton
 
 from center.iconTabs.colorBobox import ColorListEditor
 
@@ -22,6 +22,10 @@ class TextTab1(QWidget):
         self.clear_after = QComboBox()
         # self.word_wrap = QComboBox()
         self.word_wrap = QCheckBox("Word wrap")
+        self.font = QFont("宋体", 9)
+        self.font_bt = QPushButton("Font")
+        self.font_bt.clicked.connect(self.getFont)
+        self.font_label = QLabel()
         self.setGeneral()
 
     def setGeneral(self):
@@ -36,6 +40,7 @@ class TextTab1(QWidget):
 
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -73,7 +78,11 @@ class TextTab1(QWidget):
         layout2.addWidget(self.clear_after, 2, 1)
         layout2.addWidget(l7, 2, 2)
         layout2.addWidget(self.transparent, 2, 3)
-        layout2.addWidget(self.word_wrap, 3, 1)
+
+        layout2.addWidget(self.font_bt, 3, 0)
+        layout2.addWidget(self.font_label, 3, 1)
+        layout2.addWidget(self.word_wrap, 3, 3)
+        # layout2.addWidget(self.font_label, 4, 0, 1, 4)
 
         group2.setLayout(layout2)
 
@@ -98,6 +107,16 @@ class TextTab1(QWidget):
             if text and text[0] == "[":
                 QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
                 temp.clear()
+
+    def getFont(self):
+        font, ok = QFontDialog.getFont(QFont(self.font_label.text()), self)
+        if ok:
+            self.font = font
+            self.font_label.setText(font.family())
+            normal_font = font
+            normal_font.setPointSize(12)
+            # self.font_label.setFont(normal_font)
+            self.font_label.setFont(normal_font)
 
     def setAttributes(self, attributes):
         self.attributes = attributes
