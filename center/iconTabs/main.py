@@ -60,6 +60,7 @@ class IconTabs(QTabWidget):
         # self
         self.tabCloseRequested.connect(self.removeTab)
         self.currentChanged.connect(self.showTimelineAttributes)
+        self.currentChanged.connect(self.showProperties)
         # timeline
         self.linkTimelineSignals('Timeline.10001')
         # cycle
@@ -187,6 +188,18 @@ class IconTabs(QTabWidget):
         widget = self.widget(tab_index)
         if isinstance(widget, Timeline):
             self.attributesShow.emit(self.getTimelineAttributes(widget.value))
+
+    def showProperties(self, current_index):
+        try:
+            widget = self.widget(current_index)
+            if hasattr(widget, 'getInfo'):
+                self.propertiesShow.emit(widget.getInfo())
+            elif hasattr(widget, 'getProperties'):
+                self.propertiesShow.emit(widget.getProperties())
+            else:
+                self.propertiesShow.emit({"error" : "can't get properties"})
+        except Exception as e:
+            print(f"error {e} happens in show properties. [iconTabs/main.py]")
 
     def openTab(self, value, name, can_open=True):
         try:
