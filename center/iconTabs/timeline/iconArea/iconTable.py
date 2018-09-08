@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMenu, QFrame, QAction, QLabel, QMessageBox
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMenu, QFrame, QAction, QLabel, QMessageBox, QShortcut
 from PyQt5.QtCore import Qt, QDataStream, QIODevice, QByteArray, QPoint, QMimeData
-from PyQt5.QtGui import QDrag, QPixmap
+from PyQt5.QtGui import QDrag, QPixmap, QKeySequence
 from PyQt5.QtCore import pyqtSignal
 from ..icon import Icon
 from .signTable import SignTable
@@ -124,6 +124,9 @@ class IconTable(QTableWidget):
 
         self.right_button_menu.addAction(self.delete_action)
         self.right_button_menu.addAction(self.copy_action)
+        # short cut
+        self.delete_shortcut = QShortcut(QKeySequence("Backspace"), self)
+        self.delete_shortcut.activated.connect(self.deleteIcon)
 
     def setText(self, row, col, text):
         item = QTableWidgetItem(text)
@@ -413,6 +416,14 @@ class IconTable(QTableWidget):
 
         if index != -1:
             self.removeColumn(index)
+
+    def deleteIcon(self):
+        try:
+            if self.currentColumn() in range(1, self.fill_count + 1):
+
+                self.removeColumn(self.currentColumn(), True)
+        except Exception as e:
+            print(f"error {e} happens in delete icon. [iconArea/iconTable.py]")
 
     def copyIconToNext(self, col):
         self.copyIconToNextCol.emit(col)

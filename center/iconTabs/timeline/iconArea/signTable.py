@@ -29,7 +29,7 @@ class SignTable(QTableWidget):
     def showSign(self, col):
         try:
             sign = QLabel()
-            sign.setPixmap(QPixmap(".\\.\\.\\Image\\" + self.sign).scaledToHeight(60))
+            sign.setPixmap(QPixmap(".\\.\\.\\Image\\" + self.sign).scaledToHeight(40))
             sign.setAlignment(Qt.AlignCenter)
             if col == -1:
                 col = self.columnCount() - 1
