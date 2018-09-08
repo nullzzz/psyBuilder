@@ -72,10 +72,12 @@ class VideoDisplay(QMainWindow):
                 self.sender().setIcon(QIcon(".\\.\\image\\start_video"))
                 self.sender().setText("start")
                 self.mediaPlayer.pause()
-            else:
+            elif self.mediaPlayer.state() == QMediaPlayer.PausedState:
                 self.sender().setIcon(QIcon(".\\.\\image\\pause_video"))
                 self.sender().setText("pause")
                 self.mediaPlayer.play()
+            else:
+                print("error: the media file is wrong [videoDisplay]")
         else:
             QMessageBox.warning(self, "No Video Error", "Please load video first!", QMessageBox.Ok)
 

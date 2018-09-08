@@ -44,7 +44,7 @@ class SoundTab1(QWidget):
         self.buffer_size.setText("5000")
         self.start_offset.setText("0")
         self.stop_offset.setText("0")
-        self.volume.setRange(-1000, 0)
+        self.volume.setRange(0, 100)
         self.volume.setEnabled(False)
         self.pan.setRange(-1000, 1000)
         self.pan.setEnabled(False)

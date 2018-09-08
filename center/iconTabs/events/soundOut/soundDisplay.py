@@ -14,6 +14,7 @@ class SoundDisplay(QMainWindow):
         super(SoundDisplay, self).__init__(parent)
 
         self.attributes = []
+        self.volume = 1
         self.pro = SoundProperty()
         self.pro.ok_bt.clicked.connect(self.ok)
         self.pro.cancel_bt.clicked.connect(self.pro.close)
@@ -87,9 +88,13 @@ class SoundDisplay(QMainWindow):
 
     def apply(self):
         self.file = self.pro.general.file_name.text()
+        volume_control = self.pro.general.volume_control.checkState()
+        if volume_control:
+            self.volume = self.pro.general.volume.value()
         if self.file:
             self.play_bt.setIcon(QIcon(".\\.\\image\\start_video"))
             if QFileInfo(self.file).isFile():
+                # 文件名
                 try:
                     file_name = ".".join(self.file.split("/")[-1].split(".")[0:-1])
                 except Exception:
@@ -120,6 +125,7 @@ class SoundDisplay(QMainWindow):
             self.play_bt.setIcon(QIcon(".\\.\\image\\start_video"))
         else:
             self.player.play()
+            # self.player.setVolume(self.volume)
             self.progress_bar.setRange(0, self.player.duration())
             self.setLabel()
             self.play_bt.setIcon(QIcon(".\\.\\image\\pause_video"))
