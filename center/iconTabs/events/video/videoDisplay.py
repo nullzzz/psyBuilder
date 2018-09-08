@@ -14,6 +14,7 @@ class VideoDisplay(QMainWindow):
         super(VideoDisplay, self).__init__(parent)
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+        self.mediaPlayer.mediaStatusChanged.connect(self.loadStatue)
         self.videoWidget = QVideoWidget()
 
         self.mediaPlayer.setVideoOutput(self.videoWidget)
@@ -52,22 +53,23 @@ class VideoDisplay(QMainWindow):
 
         tool = QToolBar()
         open_pro = QAction(QIcon(".\\.\\image\\setting"), "setting", self)
-        open_pro.triggered.connect(self.open_pro)
+        open_pro.triggered.connect(self.openPro)
         tool.addAction(open_pro)
 
-        play_video = QAction(QIcon(".\\.\\image\\start_video"), "start", self)
-        play_video.triggered.connect(self.playVideo)
-        tool.addAction(play_video)
+        self.play_video = QAction(QIcon(".\\.\\image\\start_video"), "start", self)
+        self.play_video.triggered.connect(self.playVideo)
+        tool.addAction(self.play_video)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
-    def open_pro(self):
+    def openPro(self):
         # 阻塞原窗口
         self.pro.setWindowModality(Qt.ApplicationModal)
         self.pro.show()
 
     def playVideo(self):
         if self.file:
+            # 播放状态
             if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
                 self.sender().setIcon(QIcon(".\\.\\image\\start_video"))
                 self.sender().setText("start")
@@ -77,7 +79,10 @@ class VideoDisplay(QMainWindow):
                 self.sender().setText("pause")
                 self.mediaPlayer.play()
             else:
-                print("error: the media file is wrong [videoDisplay]")
+                self.sender().setIcon(QIcon(".\\.\\image\\pause_video"))
+                self.sender().setText("pause")
+                self.mediaPlayer.play()
+                print("error: state {} the media file is wrong [videoDisplay]".format(self.mediaPlayer.state()))
         else:
             QMessageBox.warning(self, "No Video Error", "Please load video first!", QMessageBox.Ok)
 
@@ -113,16 +118,16 @@ class VideoDisplay(QMainWindow):
         # else:
         #     self.stop_after = False
         # self.stop_after_mode = self.pro.tab1.stop_after_mode.currentText()
-        isStretchText = self.pro.general.stretch.currentText()
-        if isStretchText == "Yes":
+        is_stretch = self.pro.general.stretch.currentText()
+        if is_stretch == "Yes":
             self.stretch = True
         else:
             self.stretch = False
         self.stretch_mode = self.pro.general.stretch_mode.currentText()
         # self.end_video_action = self.pro.tab1.end_video_action.currentText()
         self.screen_name = self.pro.general.screen_name.currentText()
-        isClearText = self.pro.general.clear_after.currentText()
-        if isClearText == "Yes":
+        is_clear_after = self.pro.general.clear_after.currentText()
+        if is_clear_after == "Yes":
             self.clear_after = True
         else:
             self.clear_after = False
@@ -130,6 +135,14 @@ class VideoDisplay(QMainWindow):
         self.y_pos = self.pro.frame.y_pos.currentText()
         self.w_size = self.pro.frame.width.currentText()
         self.h_size = self.pro.frame.height.currentText()
+
+    # 加载状态
+    def loadStatue(self, media_statue):
+        # 加载中、不识别状态
+        if media_statue == QMediaPlayer.LoadingMedia or media_statue == QMediaPlayer.UnknownMediaStatus:
+            self.play_video.setEnabled(False)
+        else:
+            self.play_video.setEnabled(True)
 
     @staticmethod
     def getStartTime(str_time):

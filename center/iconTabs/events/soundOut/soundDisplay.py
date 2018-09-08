@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal, QUrl, Qt, QFileInfo
 from PyQt5.QtGui import QIcon
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaPlaylist
 from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QToolBar, QPushButton, QMessageBox, QSlider, QWidget, \
     QGridLayout, QLabel, QVBoxLayout
 
@@ -14,16 +14,17 @@ class SoundDisplay(QMainWindow):
         super(SoundDisplay, self).__init__(parent)
 
         self.attributes = []
-        self.volume = 1
+        self.volume = 100
         self.pro = SoundProperty()
         self.pro.ok_bt.clicked.connect(self.ok)
         self.pro.cancel_bt.clicked.connect(self.pro.close)
         self.pro.apply_bt.clicked.connect(self.apply)
 
-        self.file = ""
         self.play_bt = QPushButton("")
         self.play_bt.setIcon(QIcon(".\\.\\image\\start_video"))
         self.player = QMediaPlayer()
+        self.player_list = QMediaPlaylist()
+
         self.play_bt.setEnabled(False)
         self.player.positionChanged.connect(self.positionChanged)
         self.play_bt.clicked.connect(self.play)
@@ -87,10 +88,7 @@ class SoundDisplay(QMainWindow):
         self.pro.close()
 
     def apply(self):
-        self.file = self.pro.general.file_name.text()
-        volume_control = self.pro.general.volume_control.checkState()
-        if volume_control:
-            self.volume = self.pro.general.volume.value()
+        self.getPro()
         if self.file:
             self.play_bt.setIcon(QIcon(".\\.\\image\\start_video"))
             if QFileInfo(self.file).isFile():
@@ -99,7 +97,14 @@ class SoundDisplay(QMainWindow):
                     file_name = ".".join(self.file.split("/")[-1].split(".")[0:-1])
                 except Exception:
                     file_name = "audio"
-                self.player.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
+                self.player_list.addMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
+                if self.is_loop:
+                    self.player_list.setPlaybackMode(QMediaPlaylist.CurrentItemInLoop)
+                else:
+                    self.player_list.setPlaybackMode(QMediaPlaylist.CurrentItemOnce)
+                self.player.setPlaylist(self.player_list)
+
+                # self.player.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
                 self.play_bt.setEnabled(True)
                 self.tip.setText(file_name)
             else:
@@ -114,18 +119,28 @@ class SoundDisplay(QMainWindow):
 
         self.propertiesChange.emit(self.getInfo())
 
+    def getPro(self):
+        self.file = self.pro.general.file_name.text()
+        if self.pro.general.loop.currentText() == "Yes":
+            self.is_loop = True
+        else:
+            self.is_loop = False
+        volume_control = self.pro.general.volume_control.checkState()
+        if volume_control:
+            self.volume = self.pro.general.volume.value()
+
     def setLabel(self):
         m = int(self.player.duration() / (1000 * 60))
         s = int(self.player.duration() / 1000 - m * 60)
         self.tip2.setText('{:0>2d}:{:0>2d}'.format(m, s))
 
     def play(self):
-        if self.player.state() == 1:
+        if self.player.state() == QMediaPlayer.PlayingState:
             self.player.pause()
             self.play_bt.setIcon(QIcon(".\\.\\image\\start_video"))
         else:
             self.player.play()
-            # self.player.setVolume(self.volume)
+            self.player.setVolume(self.volume)
             self.progress_bar.setRange(0, self.player.duration())
             self.setLabel()
             self.play_bt.setIcon(QIcon(".\\.\\image\\pause_video"))
