@@ -22,8 +22,8 @@ class Structure(QDockWidget):
     # 单击node, 显示properties
     propertiesShow = pyqtSignal(str)
 
-    name_value = {}
-    name_parent = {'Timeline' : None}
+    name_value = {'Timeline': 'Timeline.10001'}
+    name_parent = {'Timeline': None}
     name_count = {}
     value_node = {}
     # name count
