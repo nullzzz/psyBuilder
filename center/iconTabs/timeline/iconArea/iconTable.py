@@ -375,7 +375,7 @@ class IconTable(QTableWidget):
         try:
             if self.is_edit:
                 if item.text():
-                    res, exist_value = Structure.checkNameIsValid(item.text(), self.parent_timeline_id,
+                    res, exist_value = Structure.checkNameIsValid(item.text(), self.parent_timeline_value,
                                                                   self.cellWidget(1, item.column()).value)
                     whether_change = True
                     if res == 0:
