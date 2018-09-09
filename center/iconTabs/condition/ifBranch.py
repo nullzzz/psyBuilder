@@ -137,18 +137,19 @@ class IfBranch(QWidget):
         if current_name or current_value.startswith('Other.'):
             res = Structure.checkNameIsValid(current_name, parent_value=self.value, value=current_value)
             # 不可取
-            if res == 0:
+            if res[0] == 0:
                 add_flag = False
             #
-            elif res == 1:
+            elif res[0] == 1:
                 add_flag = True
-            elif res == 2:
+            elif res[0] == 2:
                 # 如果用户想重复
                 if QMessageBox.question(self, "Tips",
                                         'the {}  group\'s name has existed in other place, are you sure to change?.'.format(
                                                 'True' if condition_type == 'T' else 'False'),
                                         QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                     add_flag = True
+                    # todo merge widget
                 else:
                     return add_flag
             #

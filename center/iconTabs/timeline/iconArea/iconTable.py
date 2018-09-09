@@ -24,11 +24,13 @@ class IconTable(QTableWidget):
     copyDragBegin = pyqtSignal()
     # 单击得properties, 给icon tabs发送信号 (value)
     propertiesShow = pyqtSignal(str)
+    #
+    widgetMerge = pyqtSignal(str, str)
 
     # icon固定宽度
     WIDTH = 50
 
-    def __init__(self, parent=None, timeline_value='Timeline.10001'):
+    def __init__(self, parent=None, timeline_id='Timeline.10001'):
         super(IconTable, self).__init__(parent)
         # sign table
         self.up_sign = SignTable(sign="arrow_up.png")
@@ -42,7 +44,7 @@ class IconTable(QTableWidget):
         # 是否是copy模式
         self.is_copy_module = False
         # 父亲
-        self.parent_timeline_value = timeline_value
+        self.parent_timeline_id = timeline_id
         # 暂存被修改的名字
         self.old_name = ''
 
@@ -373,8 +375,8 @@ class IconTable(QTableWidget):
         try:
             if self.is_edit:
                 if item.text():
-                    res = Structure.checkNameIsValid(item.text(), self.parent_timeline_value,
-                                                     self.cellWidget(1, item.column()).value)
+                    res, exist_value = Structure.checkNameIsValid(item.text(), self.parent_timeline_id,
+                                                                  self.cellWidget(1, item.column()).value)
                     whether_change = True
                     if res == 0:
                         whether_change = False
@@ -382,9 +384,10 @@ class IconTable(QTableWidget):
                     elif res == 1:
                         pass
                     elif res == 2:
-                        if QMessageBox.question(self, 'Tips', 'name has existed in other place, are you sure to change?',
+                        if QMessageBox.question(self, 'Tips',
+                                                'name has existed in other place, are you sure to change?',
                                                 QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-                            pass
+                            self.cellWidget(1, item.column()).changeValue(exist_value)
                         else:
                             whether_change = False
 
@@ -420,7 +423,6 @@ class IconTable(QTableWidget):
     def deleteIcon(self):
         try:
             if self.currentColumn() in range(1, self.fill_count + 1):
-
                 self.removeColumn(self.currentColumn(), True)
         except Exception as e:
             print(f"error {e} happens in delete icon. [iconArea/iconTable.py]")
