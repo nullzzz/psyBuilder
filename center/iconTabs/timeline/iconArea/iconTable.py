@@ -89,10 +89,10 @@ class IconTable(QTableWidget):
             item_1.setFlags(Qt.ItemIsSelectable)
             self.setItem(3, col, item_1)
 
-        self.setPixmap(2, 0, QPixmap(".\\.\\image\\line_half.png"))
+        self.setPixmap(2, 0, QPixmap("image/line_half.png"))
         for col in range(1, 9):
-            self.setPixmap(2, col, QPixmap(".\\.\\image\\line.png"))
-        self.setPixmap(2, 9, QPixmap(".\\.\\image\\arrow.png"))
+            self.setPixmap(2, col, QPixmap("image/line.png"))
+        self.setPixmap(2, 9, QPixmap("image/arrow.png"))
 
         self.setMinimumHeight(400)
 
@@ -172,7 +172,7 @@ class IconTable(QTableWidget):
                 self.down_sign.removeColumn(self.columnCount() - 1)
             else:
                 super().insertColumn(9)
-                self.setPixmap(2, 9, QPixmap(".\\.\\image\\line.png"))
+                self.setPixmap(2, 9, QPixmap("image/line.png"))
                 self.setColumnWidth(9, self.WIDTH * 2)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsSelectable)
@@ -190,7 +190,7 @@ class IconTable(QTableWidget):
     def insertColumn(self, col):
         if self.fill_count >= 8:
             super().insertColumn(col)
-            self.setPixmap(2, col, QPixmap(".\\.\\image\\line.png"))
+            self.setPixmap(2, col, QPixmap("image/line.png"))
             self.up_sign.insertColumn(self.up_sign.columnCount())
             self.up_sign.setColumnWidth(self.up_sign.columnCount() - 1, self.WIDTH * 2)
             self.down_sign.insertColumn(self.down_sign.columnCount())
@@ -198,7 +198,7 @@ class IconTable(QTableWidget):
         else:
             super().removeColumn(8)
             super().insertColumn(col)
-            self.setPixmap(2, col, QPixmap(".\\.\\image\\line.png"))
+            self.setPixmap(2, col, QPixmap("image/line.png"))
 
         self.fill_count += 1
 
