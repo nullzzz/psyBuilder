@@ -35,7 +35,6 @@ class StructureTree(QTreeWidget):
 
     def deleteItem(self):
         try:
-            print("da")
             item = self.currentItem()
             if item.value != 'Timeline.10001':
                 parent = item.parent()

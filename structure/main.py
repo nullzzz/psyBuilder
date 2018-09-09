@@ -138,7 +138,7 @@ class Structure(QDockWidget):
                     name = name[4:]
                 text, flag = dialog.getText(None, "Rename", "Rename {} to :".format(name), QLineEdit.Normal, name)
                 # 检测rename
-                res = Structure.checkNameIsValid(text, item.parent().value, item.value)
+                res, exist_value = Structure.checkNameIsValid(text, item.parent().value, item.value)
                 whether_change = False
                 if res == 0:
                     QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
@@ -148,6 +148,7 @@ class Structure(QDockWidget):
                     if QMessageBox.question(self, 'Tips', 'name has existed in other place, are you sure to change?',
                                             QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                         whether_change = True
+                        # todo merge widget
                 if whether_change:
                     if flag and text:
                         text = extend + text
@@ -310,24 +311,24 @@ class Structure(QDockWidget):
         return new_name
 
     @staticmethod
-    def checkNameIsValid(name, parent_value='', value=''):
+    def checkNameIsValid(name: str, parent_value='', value=''):
         # 不检查name为空, 在前面部分应该检查掉
         # 0: 完全不能取
         # 1: 可以
         # 2: 可以取但是有重复的, 需要确定
         # 如果没出现过或者没有改变
         if name not in Structure.name_value or Structure.name_value[name] == value:
-            return 1
+            return (1, '')
         else:
             # 如果已存在, 但是不是同类型, 不可以
             if not Structure.name_value[name].startswith(value.split('.')[0]):
-                return 0
+                return (0, '')
             else:
                 parent = Structure.value_node[parent_value]
                 parent_name = parent.text(0)
                 # 如果在同一层次
                 if Structure.name_parent[name] == parent_name:
-                    return 0
+                    return (0, '')
                 # 如果是在父节点中
                 else:
                     in_parent = False
@@ -338,6 +339,7 @@ class Structure(QDockWidget):
                         parent_name = Structure.name_parent[parent_name]
 
                     if in_parent:
-                        return 0
+                        return (0, '')
                     else:
-                        return 2
+                        exist_value = Structure.name_value[name]
+                        return (2, exist_value)

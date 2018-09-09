@@ -233,7 +233,7 @@ class Cycle(QMainWindow):
                 if row not in self.row_value:
                     name = item.text()
                     if name:
-                        res = Structure.checkNameIsValid(name, self.value, 'Timeline.')
+                        res, exist_value = Structure.checkNameIsValid(name, self.value, 'Timeline.')
                         flag = False
                         if res == 0:
                             QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
@@ -245,6 +245,7 @@ class Cycle(QMainWindow):
                                                     'name has existed in other place, are you sure to change?',
                                                     QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                                 flag = True
+                                # todo merge widget
                         if flag:
                             if name:
                                 timeline_icon = Icon(parent=None, name="Timeline",
@@ -261,7 +262,7 @@ class Cycle(QMainWindow):
                     name = item.text()
                     value = self.row_value[row]
                     if name:
-                        res = Structure.checkNameIsValid(name, self.value, value)
+                        res, exist_value = Structure.checkNameIsValid(name, self.value, value)
                         flag = False
                         if res == 0:
                             QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
@@ -273,6 +274,7 @@ class Cycle(QMainWindow):
                                                     'name has existed in other place, are you sure to change?',
                                                     QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                                 flag = True
+                                # todo merge widget
                         if flag:
                             self.timelineNameChange.emit(self.value, value, name)
                     else:
