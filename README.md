@@ -10,3 +10,8 @@
     <li>参数返回接口：getInfo/getProperties</li>
     <li>颜色框直接用：from center.iconTabs.colorBobox import ColorListEditor</li>
 </ul>
+
+<p><big>图片文件路径</big></p>
+<ul>
+    <li>为了适配mac：image/xxx</li>
+</ul>
