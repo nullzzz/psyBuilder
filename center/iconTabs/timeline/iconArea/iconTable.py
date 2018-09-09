@@ -30,7 +30,7 @@ class IconTable(QTableWidget):
     # icon固定宽度
     WIDTH = 50
 
-    def __init__(self, parent=None, timeline_id='Timeline.10001'):
+    def __init__(self, parent=None, timeline_value='Timeline.10001'):
         super(IconTable, self).__init__(parent)
         # sign table
         self.up_sign = SignTable(sign="arrow_up.png")
@@ -44,7 +44,7 @@ class IconTable(QTableWidget):
         # 是否是copy模式
         self.is_copy_module = False
         # 父亲
-        self.parent_timeline_id = timeline_id
+        self.parent_timeline_value = timeline_value
         # 暂存被修改的名字
         self.old_name = ''
 
