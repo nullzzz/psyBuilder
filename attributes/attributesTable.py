@@ -31,9 +31,9 @@ class AttributesTable(QTableWidget):
     def sortChangeIcon(self, col):
         if self.asc:
             for i in range(0, self.rowCount()):
-                self.item(i, col).setIcon(QIcon(".\\Image\\arrows_down.png"))
+                self.item(i, col).setIcon(QIcon("image/arrows_down.png"))
             self.asc = False
         else:
             for i in range(0, self.rowCount()):
-                self.item(i, col).setIcon(QIcon(".\\Image\\arrows_up.png"))
+                self.item(i, col).setIcon(QIcon("image/arrows_up.png"))
             self.asc = True

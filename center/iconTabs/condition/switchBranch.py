@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QVBoxLayout, QMessa
 
 from .iconChoose import IconChoose
 from .switchCondition import SwitchCondition
-from ..image import getImage
+from getImage import getImage
 
 
 class SwitchBranch(QWidget):

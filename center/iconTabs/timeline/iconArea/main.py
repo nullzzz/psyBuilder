@@ -215,28 +215,28 @@ class IconArea(QFrame):
         # pass
         self.setStyleSheet("background-color:rgba(255,255,255)")
 
-        self.icon_table.setPixmap(2, 0, QPixmap(".\\.\\image\\line_half.png"))
+        self.icon_table.setPixmap(2, 0, QPixmap("image/line_half.png"))
         for col in range(1, self.icon_table.columnCount() - 1):
-            self.icon_table.setPixmap(2, col, QPixmap(".\\.\\image\\line.png"))
-        self.icon_table.setPixmap(2, self.icon_table.columnCount() - 1, QPixmap(".\\.\\image\\arrow.png"))
+            self.icon_table.setPixmap(2, col, QPixmap("image/line.png"))
+        self.icon_table.setPixmap(2, self.icon_table.columnCount() - 1, QPixmap("image/arrow.png"))
 
     def becomeLightGray(self):
         # pass
         self.setStyleSheet("background-color:rgba(211,211,211, 0.3)")
 
-        self.icon_table.setPixmap(2, 0, QPixmap(".\\.\\image\\line_half_lightGray.png"))
+        self.icon_table.setPixmap(2, 0, QPixmap("image/line_half_lightGray.png"))
         for col in range(1, self.icon_table.columnCount() - 1):
-            self.icon_table.setPixmap(2, col, QPixmap(".\\.\\image\\line_lightGray.png"))
-        self.icon_table.setPixmap(2, self.icon_table.columnCount() - 1, QPixmap(".\\.\\image\\arrow_lightGray.png"))
+            self.icon_table.setPixmap(2, col, QPixmap("image/line_lightGray.png"))
+        self.icon_table.setPixmap(2, self.icon_table.columnCount() - 1, QPixmap("image/arrow_lightGray.png"))
 
     def becomeGray(self):
         # pass
         self.setStyleSheet("background-color:rgba(211,211,211)")
 
-        self.icon_table.setPixmap(2, 0, QPixmap(".\\.\\image\\line_half_gray.png"))
+        self.icon_table.setPixmap(2, 0, QPixmap("image/line_half_gray.png"))
         for col in range(1, self.icon_table.columnCount() - 1):
-            self.icon_table.setPixmap(2, col, QPixmap(".\\.\\image\\line_gray.png"))
-        self.icon_table.setPixmap(2, self.icon_table.columnCount() - 1, QPixmap(".\\.\\image\\arrow_gray.png"))
+            self.icon_table.setPixmap(2, col, QPixmap("image/line_gray.png"))
+        self.icon_table.setPixmap(2, self.icon_table.columnCount() - 1, QPixmap("image/arrow_gray.png"))
 
     def copyDrag(self):
         # 改变模式

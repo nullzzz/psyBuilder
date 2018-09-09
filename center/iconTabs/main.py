@@ -17,7 +17,7 @@ from .eyeTracker.close import Close
 from .eyeTracker.endR import EndR
 from .eyeTracker.open import Open
 from .eyeTracker.startR import StartR
-from .image import getImage
+from getImage import getImage
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
@@ -48,7 +48,7 @@ class IconTabs(QTabWidget):
 
         self.timeline = Timeline(self)
         self.value_widget['Timeline.10001'] = self.timeline
-        tab_icon = QIcon(".\\.\\image\\timeLine.png")
+        tab_icon = QIcon("image/timeLine.png")
         self.addTab(self.timeline, tab_icon, "Timeline")
         self.tabBar().setShape(QTabBar.TriangularNorth)
         # 右键菜单及快捷键

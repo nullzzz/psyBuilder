@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPixmap
 
 from .iconChoose import IconChoose
 from .conditionArea import ConditionArea
-from ..image import getImage
+from getImage import getImage
 
 from structure.main import Structure
 

@@ -21,7 +21,7 @@ class SoundDisplay(QMainWindow):
         self.pro.apply_bt.clicked.connect(self.apply)
 
         self.play_bt = QPushButton("")
-        self.play_bt.setIcon(QIcon(".\\.\\image\\start_video"))
+        self.play_bt.setIcon(QIcon("image/start_video"))
         self.player = QMediaPlayer()
         self.player_list = QMediaPlaylist()
 
@@ -71,7 +71,7 @@ class SoundDisplay(QMainWindow):
         self.setCentralWidget(center)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(".\\.\\image\\setting"), "setting", self)
+        open_pro = QAction(QIcon("image/setting"), "setting", self)
         open_pro.triggered.connect(self.openPro)
 
         tool.addAction(open_pro)
@@ -90,7 +90,7 @@ class SoundDisplay(QMainWindow):
     def apply(self):
         self.getPro()
         if self.file:
-            self.play_bt.setIcon(QIcon(".\\.\\image\\start_video"))
+            self.play_bt.setIcon(QIcon("image/start_video"))
             if QFileInfo(self.file).isFile():
                 # 文件名
                 try:
@@ -137,13 +137,13 @@ class SoundDisplay(QMainWindow):
     def play(self):
         if self.player.state() == QMediaPlayer.PlayingState:
             self.player.pause()
-            self.play_bt.setIcon(QIcon(".\\.\\image\\start_video"))
+            self.play_bt.setIcon(QIcon("image/start_video"))
         else:
             self.player.play()
             self.player.setVolume(self.volume)
             self.progress_bar.setRange(0, self.player.duration())
             self.setLabel()
-            self.play_bt.setIcon(QIcon(".\\.\\image\\pause_video"))
+            self.play_bt.setIcon(QIcon("image/pause_video"))
 
     # 拖动进度
     def setPosition(self, position):

@@ -51,11 +51,11 @@ class Cycle(QMainWindow):
         self.linkSignals()
 
     def setToolbar(self):
-        setting = QAction(QIcon(".\\.\\image\\setting.png"), "Setting", self)
-        add_row = QAction(QIcon(".\\.\\image\\addRow.png"), "Add Row", self)
-        add_rows = QAction(QIcon(".\\.\\image\\addRows.png"), "Add Rows", self)
-        add_column = QAction(QIcon(".\\.\\image\\addColumn.png"), "Add Column", self)
-        add_columns = QAction(QIcon(".\\.\\image\\addColumns.png"), "Add Columns", self)
+        setting = QAction(QIcon("image/setting.png"), "Setting", self)
+        add_row = QAction(QIcon("image/addRow.png"), "Add Row", self)
+        add_rows = QAction(QIcon("image/addRows.png"), "Add Rows", self)
+        add_column = QAction(QIcon("image/addColumn.png"), "Add Column", self)
+        add_columns = QAction(QIcon("image/addColumns.png"), "Add Columns", self)
 
         setting.triggered.connect(self.setting)
         add_row.triggered.connect(self.timeline_table.addRow)
@@ -248,7 +248,7 @@ class Cycle(QMainWindow):
                         if flag:
                             if name:
                                 timeline_icon = Icon(parent=None, name="Timeline",
-                                                     pixmap=".\\.\\image\\timeLine.png")
+                                                     pixmap="image/timeLine.png")
                                 # 相关数据存储
                                 self.row_value[row] = timeline_icon.value
                                 self.row_name[row] = name

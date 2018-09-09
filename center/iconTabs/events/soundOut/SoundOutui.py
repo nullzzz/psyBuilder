@@ -110,7 +110,7 @@ class Ui_Dialog(object):
         self.pushButton_4 = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.pushButton_4.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(".\\.\\image\\folder.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("image/folder.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_4.setIcon(icon)
         self.pushButton_4.setIconSize(QtCore.QSize(40, 24))
         self.pushButton_4.setObjectName("pushButton_4")

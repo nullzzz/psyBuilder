@@ -52,11 +52,11 @@ class VideoDisplay(QMainWindow):
         self.setCentralWidget(self.label)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(".\\.\\image\\setting"), "setting", self)
+        open_pro = QAction(QIcon("image/setting"), "setting", self)
         open_pro.triggered.connect(self.openPro)
         tool.addAction(open_pro)
 
-        self.play_video = QAction(QIcon(".\\.\\image\\start_video"), "start", self)
+        self.play_video = QAction(QIcon("image/start_video"), "start", self)
         self.play_video.triggered.connect(self.playVideo)
         tool.addAction(self.play_video)
 
@@ -71,15 +71,15 @@ class VideoDisplay(QMainWindow):
         if self.file:
             # 播放状态
             if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
-                self.sender().setIcon(QIcon(".\\.\\image\\start_video"))
+                self.sender().setIcon(QIcon("image/start_video"))
                 self.sender().setText("start")
                 self.mediaPlayer.pause()
             elif self.mediaPlayer.state() == QMediaPlayer.PausedState:
-                self.sender().setIcon(QIcon(".\\.\\image\\pause_video"))
+                self.sender().setIcon(QIcon("image/pause_video"))
                 self.sender().setText("pause")
                 self.mediaPlayer.play()
             else:
-                self.sender().setIcon(QIcon(".\\.\\image\\pause_video"))
+                self.sender().setIcon(QIcon("image/pause_video"))
                 self.sender().setText("pause")
                 self.mediaPlayer.play()
                 print("error: state {} the media file is wrong [videoDisplay]".format(self.mediaPlayer.state()))

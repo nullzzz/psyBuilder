@@ -20,7 +20,7 @@ class General(QWidget):
         self.file_name.setEnabled(False)
         self.open_button.setEnabled(False)
         icon = QIcon()
-        icon.addPixmap(QPixmap(".\\.\\image\\folder.png"), QIcon.Normal, QIcon.Off)
+        icon.addPixmap(QPixmap("image/folder.png"), QIcon.Normal, QIcon.Off)
         self.open_button.setIcon(icon)
 
         grid = QGridLayout(self)

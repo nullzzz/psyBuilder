@@ -12,7 +12,7 @@ class Preview(QDialog):
         self.label.resize(400, 150)
 
         pix = QPixmap()
-        pix.load(".\\.\\image\\preview_tip")
+        pix.load("image/preview_tip")
         self.label.setPixmap(pix)
         self.text.setTextColor(text.textColor())
         self.text.setText(text.toPlainText())

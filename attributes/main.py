@@ -1,6 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QTableWidgetItem, QDockWidget
+from PyQt5.QtWidgets import QDockWidget
 
 from .attributesTable import AttributesTable
 from .attributeItem import AttributeItem
@@ -24,8 +23,8 @@ class Attributes(QDockWidget):
             if row == self.attributes_table.rowCount():
                 self.attributes_table.setRowCount(self.attributes_table.rowCount() + 1)
             self.attributes_table.setItem(row, col, attribute)
-        except Exception:
-            print("error happens in set attribute")
+        except Exception as e:
+            print(f"error {e} happens in set attribute")
 
     def showAttributes(self, attributes):
         try:

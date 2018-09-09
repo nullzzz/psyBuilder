@@ -7,7 +7,7 @@ from center.iconTabs.events.soundOut.soundProperty import SoundProperty
 from center.iconTabs.events.text.textProperty import TextProperty
 from center.iconTabs.events.video.videoProperty import VideoProperty
 from structure.main import Structure
-from ..image import getImage
+from getImage import getImage
 from ..timeline.icon import Icon
 
 

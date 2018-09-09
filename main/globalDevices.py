@@ -89,7 +89,7 @@ class DeviceItem(QListWidgetItem):
         self.item_type = device_type
         self.describe = QTextEdit()
         # self.setIcon(QIcon(r"..\image\{}_device.png".format(self.item_type)))
-        self.setIcon(QIcon(".\\.\\image\\{}_device.png".format(self.item_type)))
+        self.setIcon(QIcon("image/{}_device.png".format(self.item_type)))
 
     # 重写clone，返回的是DeviceItem类型，而不是QListWidgetItem类型
     def clone(self):

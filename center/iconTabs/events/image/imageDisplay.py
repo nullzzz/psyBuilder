@@ -43,9 +43,9 @@ class ImageDisplay(QMainWindow):
         self.setCentralWidget(self.label)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(".\\.\\image\\setting"), "setting", self)
+        open_pro = QAction(QIcon("image/setting"), "setting", self)
         open_pro.triggered.connect(self.openPro)
-        pre_view = QAction(QIcon(".\\.\\image\\preview"), "preview", self)
+        pre_view = QAction(QIcon("image/preview"), "preview", self)
         pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
         tool.addAction(pre_view)
