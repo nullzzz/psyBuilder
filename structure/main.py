@@ -21,10 +21,12 @@ class Structure(QDockWidget):
     itemInIfBranchNameChange = pyqtSignal(str, str, str)
     # 单击node, 显示properties
     propertiesShow = pyqtSignal(str)
+    # 发送到icon tabs (value, exist_value)
+    nodeWidgetMerge = pyqtSignal(str, str)
 
     name_value = {'Timeline': 'Timeline.10001'}
     name_parent = {'Timeline': None}
-    name_count = {}
+    name_count = {'Timeline': 1}
     value_node = {}
     # name count
     TIMELINE_COUNT = 0
@@ -148,7 +150,7 @@ class Structure(QDockWidget):
                     if QMessageBox.question(self, 'Tips', 'name has existed in other place, are you sure to change?',
                                             QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                         whether_change = True
-                        # todo merge widget
+                        self.nodeWidgetMerge.emit(item.value, exist_value)
                 if whether_change:
                     if flag and text:
                         text = extend + text

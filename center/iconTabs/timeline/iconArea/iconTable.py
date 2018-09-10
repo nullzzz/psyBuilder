@@ -24,10 +24,8 @@ class IconTable(QTableWidget):
     copyDragBegin = pyqtSignal()
     # 单击得properties, 给icon tabs发送信号 (value)
     propertiesShow = pyqtSignal(str)
-    # 发送给structure （old_value, exist_value)
-    widgetMerge = pyqtSignal(str, str)
-    # 发送给icon tabs， 为了关闭掉被同步的icon (old_value)
-    tabDelete = pyqtSignal(str)
+    # 发送给icon tabs （old_value, exist_value)
+    iconWidgetChange = pyqtSignal(str, str)
 
     # icon固定宽度
     WIDTH = 50
@@ -389,9 +387,8 @@ class IconTable(QTableWidget):
                         if QMessageBox.question(self, 'Tips',
                                                 'name has existed in other place, are you sure to change?',
                                                 QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-                            old_value = self.cellWidget(1, item.column()).value
-                            self.cellWidget(1, item.column()).changeValue(exist_value)
-                            self.widgetMerge.emit(old_value, exist_value)
+                            value = self.cellWidget(1, item.column()).value
+                            self.iconWidgetChange.emit(value, exist_value)
                         else:
                             whether_change = False
 

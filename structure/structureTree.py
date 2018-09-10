@@ -27,7 +27,6 @@ class StructureTree(QTreeWidget):
         self.rename_shortcut = QShortcut(QKeySequence('F2'), self)
         self.rename_shortcut.activated.connect(self.renameItem)
 
-
     def contextMenuEvent(self, e):
         item = self.itemAt(e.pos())
         if item and item.value != "Timeline.10001":

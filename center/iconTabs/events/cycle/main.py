@@ -23,6 +23,8 @@ class Cycle(QMainWindow):
     attributeAdd = pyqtSignal(str, str, str)
     # attribute修改 (value, name, attribute_value)
     attributeChange = pyqtSignal(str, str, str)
+    # (value, exist_value)
+    timelineWidgetMerge = pyqtSignal(str, str)
 
     def __init__(self, parent=None, value=''):
         super(Cycle, self).__init__(parent)
@@ -235,6 +237,7 @@ class Cycle(QMainWindow):
                     if name:
                         res, exist_value = Structure.checkNameIsValid(name, self.value, 'Timeline.')
                         flag = False
+                        mergeFlag = False
                         if res == 0:
                             QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
                             self.timeline_table.setItem(row, col, QTableWidgetItem(''))
@@ -245,18 +248,19 @@ class Cycle(QMainWindow):
                                                     'name has existed in other place, are you sure to change?',
                                                     QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                                 flag = True
-                                # todo merge widget
+                                mergeFlag = True
                         if flag:
-                            if name:
-                                timeline_icon = Icon(parent=None, name="Timeline",
-                                                     pixmap="image/timeLine.png")
-                                # 相关数据存储
-                                self.row_value[row] = timeline_icon.value
-                                self.row_name[row] = name
-                                self.value_row[timeline_icon.value] = row
-                                # 给
-                                self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
-                                self.timeline_count += 1
+                            timeline_icon = Icon(parent=None, name="Timeline",
+                                                 pixmap="image/timeLine.png")
+                            # 相关数据存储
+                            self.row_value[row] = timeline_icon.value
+                            self.row_name[row] = name
+                            self.value_row[timeline_icon.value] = row
+                            # 给
+                            self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
+                            self.timeline_count += 1
+                            if mergeFlag:
+                                self.timelineWidgetMerge.emit(timeline_icon.value, exist_value)
                 # change timeline name
                 else:
                     name = item.text()
@@ -274,7 +278,7 @@ class Cycle(QMainWindow):
                                                     'name has existed in other place, are you sure to change?',
                                                     QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                                 flag = True
-                                # todo merge widget
+                                self.timelineWidgetMerge.emit(value, exist_value)
                         if flag:
                             self.timelineNameChange.emit(self.value, value, name)
                     else:

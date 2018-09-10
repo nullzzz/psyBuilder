@@ -22,6 +22,8 @@ class IfBranch(QWidget):
     iconPropertiesChange = pyqtSignal(QWidget)
     # 将icon的value, 发送iconTabs (properties)
     iconPropertiesShow = pyqtSignal(dict)
+    #
+    iconWidgetMerge = pyqtSignal(str, str)
 
     def __init__(self, parent=None, value=''):
         super(IfBranch, self).__init__(parent)
@@ -135,21 +137,21 @@ class IfBranch(QWidget):
         add_flag = False
         # name非空
         if current_name or current_value.startswith('Other.'):
-            res = Structure.checkNameIsValid(current_name, parent_value=self.value, value=current_value)
+            res, exist_value = Structure.checkNameIsValid(current_name, parent_value=self.value, value=current_value)
             # 不可取
-            if res[0] == 0:
+            if res == 0:
                 add_flag = False
             #
-            elif res[0] == 1:
+            elif res == 1:
                 add_flag = True
-            elif res[0] == 2:
+            elif res == 2:
                 # 如果用户想重复
                 if QMessageBox.question(self, "Tips",
                                         'the {}  group\'s name has existed in other place, are you sure to change?.'.format(
                                                 'True' if condition_type == 'T' else 'False'),
                                         QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                     add_flag = True
-                    # todo merge widget
+                    self.iconWidgetMerge.emit(current_value, exist_value)
                 else:
                     return add_flag
             #
