@@ -61,7 +61,7 @@ class Structure(QDockWidget):
 
         self.root = StructureItem(self.structure_tree, 'Timeline.10001')
         self.root.setText(0, "Timeline")
-        self.root.setIcon(0, QIcon(".\\image\\timeLine.png"))
+        self.root.setIcon(0, QIcon("image/timeLine.png"))
 
         Structure.value_node['Timeline.10001'] = self.root
         # 添加根节点
@@ -186,6 +186,9 @@ class Structure(QDockWidget):
                 self.timelineAdd.emit(value)
         except Exception:
             print("error happens in open tab. [structure/main.py]")
+
+    def changeNodeValue(self, old_value, new_value):
+        self.value_node[old_value].value = new_value
 
     def getNodeValue(self):
         try:

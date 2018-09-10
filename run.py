@@ -416,7 +416,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     demo = MainWindow()
-    demo.resize(1600, 900)
+    demo.resize(app.desktop().width() * 0.9, app.desktop().height() * 0.8)
 
     demo.show()
     demo.move((app.desktop().width() - demo.width()) / 2,

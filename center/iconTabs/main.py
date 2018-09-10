@@ -80,6 +80,7 @@ class IconTabs(QTabWidget):
             self.value_widget[value].icon_area.icon_table.iconDoubleClicked.connect(self.openTab)
             self.value_widget[value].icon_area.icon_table.iconRemove.connect(self.deleteTab)
             self.value_widget[value].icon_area.icon_table.propertiesShow.connect(self.getWidgetProperties)
+            self.value_widget[value].icon_area.icon_table.tabDelete.connect(self.deleteTab)
 
     def linkCycleSignals(self, value):
         try:

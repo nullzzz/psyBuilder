@@ -22,7 +22,7 @@ class IconArea(QFrame):
     def __init__(self, parent=None, timeline_value='Timeline.10001'):
         super(IconArea, self).__init__(parent)
         self.row_height = 0
-        self.icon_table = IconTable(timeline_id=timeline_value)
+        self.icon_table = IconTable(timeline_value=timeline_value)
         # ui
         self.setFrameStyle(QFrame.StyledPanel)
         # 设置布局
