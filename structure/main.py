@@ -24,9 +24,7 @@ class Structure(QDockWidget):
     # 发送到icon tabs (value, exist_value)
     nodeWidgetMerge = pyqtSignal(str, str)
 
-    name_value = {'Timeline': 'Timeline.10001'}
-    name_parent = {'Timeline': None}
-    name_count = {'Timeline': 1}
+    name_values = {'Timeline': ['Timeline.10001']}
     value_node = {}
     # name count
     TIMELINE_COUNT = 0
@@ -107,8 +105,10 @@ class Structure(QDockWidget):
             Structure.value_node[value] = node
             if parent.value.startswith('If_else.'):
                 text = text[4:]
-            Structure.name_value[text] = value
-            Structure.name_parent[text] = parent.text(0)
+            if text in Structure.name_values:
+                Structure.name_values[text].append(value)
+            else:
+                Structure.name_values[text] = [value]
             # count
             self.addCount(value.split('.')[0])
 
@@ -162,8 +162,18 @@ class Structure(QDockWidget):
         try:
             if value in Structure.value_node:
                 old_name = Structure.value_node[value].text(0)
-                del Structure.name_value[old_name]
-                Structure.name_value[name] = value
+                # delete old name
+                # if name has many values
+                if len(Structure.name_values[old_name]) > 1:
+                    Structure.name_values[old_name].remove(value)
+                elif len(Structure.name_values[old_name]) == 1:
+                    del Structure.name_values[old_name]
+                # new name
+                if name in Structure.name_values:
+                    Structure.name_values[name].append(value)
+                else:
+                    Structure.name_values[name] = [value]
+
                 Structure.value_node[value].setText(0, name)
 
                 # timeline中icon
@@ -310,7 +320,7 @@ class Structure(QDockWidget):
             if is_copy:
                 new_name = old_name + '.' + str(count)
                 count += 1
-            if new_name not in Structure.name_value:
+            if new_name not in Structure.name_values:
                 break
 
         return new_name
@@ -321,30 +331,38 @@ class Structure(QDockWidget):
         # 0: 完全不能取
         # 1: 可以
         # 2: 可以取但是有重复的, 需要确定
-        # 如果没出现过或者没有改变
-        if name not in Structure.name_value or Structure.name_value[name] == value:
-            return (1, '')
-        else:
-            # 如果已存在, 但是不是同类型, 不可以
-            if not Structure.name_value[name].startswith(value.split('.')[0]):
-                return (0, '')
+        try:
+            # 如果没出现过或者没有改变
+            if name not in Structure.name_values or value in Structure.name_values[name]:
+                return (1, '')
             else:
-                parent = Structure.value_node[parent_value]
-                parent_name = parent.text(0)
-                # 如果在同一层次
-                if Structure.name_parent[name] == parent_name:
+                # 如果已存在, 但是不是同类型, 不可以
+                if not Structure.name_values[name][0].startswith(value.split('.')[0]):
                     return (0, '')
-                # 如果是在父节点中
                 else:
-                    in_parent = False
-                    while parent_name:
-                        if name == parent_name:
-                            in_parent = True
-                            break
-                        parent_name = Structure.name_parent[parent_name]
-
-                    if in_parent:
+                    parent_node = Structure.value_node[parent_value]
+                    parent_name = parent_node.text(0)
+                    exist_value = Structure.name_values[name][0]
+                    # 判断在同一层次是否有同名
+                    in_same_level = False
+                    for node_value in Structure.name_values[name]:
+                        if Structure.value_node[node_value].parent().text(0) == parent_name:
+                            in_same_level = True
+                    # 如果在同一层次
+                    if in_same_level:
                         return (0, '')
+                    # 如果是在父节点中
                     else:
-                        exist_value = Structure.name_value[name]
-                        return (2, exist_value)
+                        in_parent = False
+                        while parent_node:
+                            if name == parent_node.text(0):
+                                in_parent = True
+                                break
+                            parent_node = parent_node.parent()
+
+                        if in_parent:
+                            return (0, '')
+                        else:
+                            return (2, exist_value)
+        except Exception as e:
+            print(f"error {e} happens in check name is valid. [structure/main.py]")
