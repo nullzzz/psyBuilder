@@ -15,9 +15,9 @@ class VideoDisplay(QMainWindow):
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.mediaStatusChanged.connect(self.loadStatue)
-        self.videoWidget = QVideoWidget()
+        self.video_widget = QVideoWidget()
 
-        self.mediaPlayer.setVideoOutput(self.videoWidget)
+        self.mediaPlayer.setVideoOutput(self.video_widget)
 
         self.label = QLabel()
         self.pro = VideoProperty()
@@ -30,10 +30,11 @@ class VideoDisplay(QMainWindow):
         self.endPos = 0
         self.back_color = "white"
         self.transparent_value = 0
-        self.stop_after = False
-        self.stop_after_mode = "OffsetTime"
-        self.stretch = False
-        self.stretch_mode = "Both"
+        # self.stop_after = False
+        # self.stop_after_mode = "OffsetTime"
+        # self.is_stretch = False
+        # self.stretch_mode = "Both"
+        self.aspect_ration_mode = -1
         # self.end_video_action = "none"
         self.screen_name = "Display"
         self.clear_after = "Yes"
@@ -74,15 +75,11 @@ class VideoDisplay(QMainWindow):
                 self.sender().setIcon(QIcon("image/start_video"))
                 self.sender().setText("start")
                 self.mediaPlayer.pause()
-            elif self.mediaPlayer.state() == QMediaPlayer.PausedState:
-                self.sender().setIcon(QIcon("image/pause_video"))
-                self.sender().setText("pause")
-                self.mediaPlayer.play()
+            # 暂停、停止状态
             else:
                 self.sender().setIcon(QIcon("image/pause_video"))
                 self.sender().setText("pause")
                 self.mediaPlayer.play()
-                print("error: state {} the media file is wrong [videoDisplay]".format(self.mediaPlayer.state()))
         else:
             QMessageBox.warning(self, "No Video Error", "Please load video first!", QMessageBox.Ok)
 
@@ -92,14 +89,16 @@ class VideoDisplay(QMainWindow):
 
     def apply(self):
         self.getPro()
-        if self.file:
-            self.setCentralWidget(self.videoWidget)
-            if QFileInfo(self.file).isFile():
-                try:
+        file_name = self.pro.general.file_name.text()
+        if file_name:
+            self.setCentralWidget(self.video_widget)
+            if QFileInfo(file_name).isFile():
+                # 判断文件是否改变，避免重复加载
+                if file_name != self.file:
+                    self.file = file_name
                     self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
-                    self.mediaPlayer.setPosition(self.getStartTime(self.startPos))
-                except Exception as e:
-                    print(e)
+                self.mediaPlayer.setPosition(self.getStartTime(self.startPos))
+                self.video_widget.setAspectRatioMode(self.aspect_ration_mode)
             else:
                 QMessageBox.warning(
                     self, "Warning", "The file path is invalid!")
@@ -107,7 +106,6 @@ class VideoDisplay(QMainWindow):
         self.propertiesChange.emit(self.getInfo())
 
     def getPro(self):
-        self.file = self.pro.general.file_name.text()
         self.startPos = self.pro.general.startPos.text()
         self.endPos = self.pro.general.endPos.text()
         self.back_color = self.pro.general.back_color.currentText()
@@ -118,12 +116,13 @@ class VideoDisplay(QMainWindow):
         # else:
         #     self.stop_after = False
         # self.stop_after_mode = self.pro.tab1.stop_after_mode.currentText()
-        is_stretch = self.pro.general.stretch.currentText()
-        if is_stretch == "Yes":
-            self.stretch = True
-        else:
-            self.stretch = False
-        self.stretch_mode = self.pro.general.stretch_mode.currentText()
+        # is_stretch = self.pro.general.stretch.currentText()
+        # if is_stretch == "Yes":
+        #     self.is_stretch = True
+        # else:
+        #     self.is_stretch = False
+        # self.stretch_mode = self.pro.general.stretch_mode.currentText()
+        self.aspect_ration_mode = self.pro.general.aspect_ratio.currentIndex() - 1
         # self.end_video_action = self.pro.tab1.end_video_action.currentText()
         self.screen_name = self.pro.general.screen_name.currentText()
         is_clear_after = self.pro.general.clear_after.currentText()
@@ -143,6 +142,7 @@ class VideoDisplay(QMainWindow):
             self.play_video.setEnabled(False)
         else:
             self.play_video.setEnabled(True)
+            buffer = self.mediaPlayer.mediaStream()
 
     @staticmethod
     def getStartTime(str_time):

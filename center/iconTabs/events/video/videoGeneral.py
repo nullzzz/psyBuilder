@@ -30,6 +30,8 @@ class VideoTab1(QWidget):
         self.stretch = QComboBox()
         self.stretch_mode = QComboBox()
 
+        self.aspect_ratio = QComboBox()
+
         # self.end_video_action = QComboBox()
         self.screen_name = QComboBox()
         self.clear_after = QComboBox()
@@ -55,6 +57,7 @@ class VideoTab1(QWidget):
         self.stretch.currentTextChanged.connect(self.stretchChange)
         self.stretch_mode.addItems(["Both", "LeftRight", "UpDown"])
         self.stretch_mode.setEnabled(False)
+        self.aspect_ratio.addItems(["default", "ignore", "keep", "keepByExpanding"])
         self.transparent.setMaximum(100)
         self.transparent.setSuffix("%")
         self.transparent.setValue(100)
@@ -83,10 +86,12 @@ class VideoTab1(QWidget):
         # layout.addWidget(self.stop_after, 5, 1, 1, 1)
         # layout.addWidget(QLabel("Stop After Mode:"), 5, 2, 1, 1)
         # layout.addWidget(self.stop_after_mode, 5, 3, 1, 1)
-        layout.addWidget(QLabel("Stretch:"), 6, 0, 1, 1)
-        layout.addWidget(self.stretch, 6, 1, 1, 1)
-        layout.addWidget(QLabel("Stretch Mode:"), 6, 2, 1, 1)
-        layout.addWidget(self.stretch_mode, 6, 3, 1, 1)
+        # layout.addWidget(QLabel("Stretch:"), 6, 0, 1, 1)
+        # layout.addWidget(self.stretch, 6, 1, 1, 1)
+        # layout.addWidget(QLabel("Stretch Mode:"), 6, 2, 1, 1)
+        # layout.addWidget(self.stretch_mode, 6, 3, 1, 1)
+        layout.addWidget(QLabel("Aspect Ratio:"), 6, 0, 1, 1)
+        layout.addWidget(self.aspect_ratio, 6, 1, 1, 1)
         # layout.addWidget(QLabel("End Video Action:"), 7, 0, 1, 1)
         # layout.addWidget(self.end_video_action, 7, 1, 1, 1)
         layout.addWidget(QLabel("Screen Name:"), 8, 0, 1, 1)
@@ -144,8 +149,9 @@ class VideoTab1(QWidget):
             "File name": self.file_name.text(),
             "Start position": self.startPos.text(),
             "End position": self.endPos.text(),
-            "Stretch": self.stretch.currentText(),
-            "Stretch mode": self.stretch_mode.currentText(),
+            # "Stretch": self.stretch.currentText(),
+            # "Stretch mode": self.stretch_mode.currentText(),
+            "Aspect ratio": self.aspect_ratio.currentText(),
             "Back color": self.back_color.currentText(),
             "Transparent": "{}%".format(self.transparent.value()),
             "Clear after": self.clear_after.currentText(),
