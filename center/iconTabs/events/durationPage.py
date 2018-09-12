@@ -18,8 +18,11 @@ class DurationPage(QWidget):
         # top
         self.duration = QComboBox()
         # output device
+        # 参数
         self.out_stack = QStackedWidget()
         self.out_stack.setStyleSheet("{border: 2px; background-color: white}")
+        # 输出设备
+        self.selected_out_devices = []
         self.out_devices = QListWidget()
         self.out_devices.currentItemChanged.connect(self.deviceOutChanged)
         self.out_add_bt = QPushButton("+")
@@ -37,6 +40,7 @@ class DurationPage(QWidget):
         self.in_tip2 = QLabel("Resp Trigger:")
         self.in_tip1.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.in_tip2.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.selected_in_devices = []
         self.in_devices = QListWidget()
         self.in_devices.currentItemChanged.connect(self.deviceInChanged)
         self.in_add_bt = QPushButton("&Add...")
@@ -129,20 +133,27 @@ class DurationPage(QWidget):
             if self.in_devices.count() == 0:
                 self.in_tip1.hide()
                 self.in_tip2.hide()
-            item = DeviceInItem(device_name)
-            self.in_devices.addItem(item)
-            # 设置可选变量
-            item.setAttributes(self.attributes)
-            # 添加可选trigger输出设备
-            for i in range(self.out_devices.count()):
-                name = self.out_devices.item(i).name
-                self.in_devices.item(self.in_devices.count() - 1).resp_trigger_out.addItem(name)
-            self.in_stack1.addWidget(item.pro1)
-            self.in_stack2.addWidget(item.pro2)
-            # 设置remove按钮可用性
-            if self.in_devices.count():
-                self.in_del_bt.setEnabled(True)
-        self.in_devices_dialog.close()
+            if device_name not in self.selected_in_devices:
+                self.selected_in_devices.append(device_name)
+                item = DeviceInItem(device_name)
+                self.in_devices.addItem(item)
+                # 设置可选变量
+                item.setAttributes(self.attributes)
+                # 添加可选trigger输出设备
+                for i in range(self.out_devices.count()):
+                    name = self.out_devices.item(i).name
+                    self.in_devices.item(self.in_devices.count() - 1).resp_trigger_out.addItem(name)
+                self.in_stack1.addWidget(item.pro1)
+                self.in_stack2.addWidget(item.pro2)
+                # 设置remove按钮可用性
+                if self.in_devices.count():
+                    self.in_del_bt.setEnabled(True)
+                self.in_devices_dialog.close()
+            else:
+                self.in_devices_dialog.close()
+                QMessageBox.warning(self, "Warning", f"Device {device_name} has been selected", QMessageBox.Ok)
+        else:
+            self.in_devices_dialog.close()
 
     # 弹出输出设备选择框
     def showOutDevices(self):
@@ -160,17 +171,24 @@ class DurationPage(QWidget):
             device_name = temp.text()
             if self.out_devices.count() == 0:
                 self.out_tip.hide()
-            item = DeviceOutItem(device_name)
-            self.out_devices.addItem(item)
-            # 设置可选变量
-            item.setAttributes(self.attributes)
-            # 设置trigger输出设备
-            for i in range(self.in_devices.count()):
-                self.in_devices.item(i).resp_trigger_out.addItem(device_name)
-            self.out_stack.addWidget(item.pro)
-            if self.out_devices.count():
-                self.out_del_bt.setEnabled(True)
-        self.out_devices_dialog.close()
+            if device_name not in self.selected_out_devices:
+                self.selected_out_devices.append(device_name)
+                item = DeviceOutItem(device_name)
+                self.out_devices.addItem(item)
+                # 设置可选变量
+                item.setAttributes(self.attributes)
+                # 设置trigger输出设备
+                for i in range(self.in_devices.count()):
+                    self.in_devices.item(i).resp_trigger_out.addItem(device_name)
+                self.out_stack.addWidget(item.pro)
+                if self.out_devices.count():
+                    self.out_del_bt.setEnabled(True)
+                self.out_devices_dialog.close()
+            else:
+                self.out_devices_dialog.close()
+                QMessageBox.warning(self, "Warning", f"Device {device_name} has been selected", QMessageBox.Ok)
+        else:
+            self.out_devices_dialog.close()
 
     # 移除输入设备
     def removeInDevices(self):
@@ -178,6 +196,7 @@ class DurationPage(QWidget):
         # 选中有效
         if index != -1:
             item = self.in_devices.takeItem(index)
+            self.selected_in_devices.remove(item.text())
             self.in_stack1.removeWidget(item.pro1)
             self.in_stack2.removeWidget(item.pro2)
             if not self.in_devices.count():
@@ -190,6 +209,7 @@ class DurationPage(QWidget):
         index = self.out_devices.currentRow()
         if index != -1:
             item = self.out_devices.takeItem(index)
+            self.selected_out_devices.remove(item.text())
             self.out_stack.removeWidget(item.pro)
             # 移除trigger可选输出设备
             for i in range(self.in_devices.count()):

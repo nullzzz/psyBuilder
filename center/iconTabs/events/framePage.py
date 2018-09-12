@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtWidgets import QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QComboBox, QWidget, QSpinBox, QLabel, \
     QMessageBox, QCompleter
@@ -51,22 +51,34 @@ class Tab2(QWidget):
         self.height.lineEdit().textChanged.connect(self.findVar)
         self.height.lineEdit().returnPressed.connect(self.finalCheck)
 
+        l1 = QLabel("X position:")
+        l2 = QLabel("Y position:")
+        l3 = QLabel("Width:")
+        l4 = QLabel("Height:")
+        l5 = QLabel("Border Color:")
+        l6 = QLabel("Border Width:")
+        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         group1 = QGroupBox("Geometry")
         layout1 = QGridLayout()
-        layout1.addWidget(QLabel("X position"), 0, 0)
+        layout1.addWidget(l1, 0, 0)
         layout1.addWidget(self.x_pos, 0, 1)
-        layout1.addWidget(QLabel("Y position"), 1, 0)
+        layout1.addWidget(l2, 1, 0)
         layout1.addWidget(self.y_pos, 1, 1)
-        layout1.addWidget(QLabel("Width"), 0, 2)
+        layout1.addWidget(l3, 0, 2)
         layout1.addWidget(self.width, 0, 3)
-        layout1.addWidget(QLabel("Height"), 1, 2)
+        layout1.addWidget(l4, 1, 2)
         layout1.addWidget(self.height, 1, 3)
         group1.setLayout(layout1)
 
         group2 = QGroupBox("Border")
         layout2 = QFormLayout()
-        layout2.addRow(QLabel("Border Color"), self.border_color)
-        layout2.addRow(QLabel("Border Width"), self.border_width)
+        layout2.addRow(l5, self.border_color)
+        layout2.addRow(l6, self.border_width)
         layout2.setVerticalSpacing(20)
         group2.setLayout(layout2)
 

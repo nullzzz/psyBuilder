@@ -70,7 +70,7 @@ class DeviceOutDialog(QDialog):
         self.devices_list.setSortingEnabled(True)
         self.devices_list.setAcceptDrops(False)
         self.devices_list.setAutoFillBackground(True)
-        self.devices_list.setWrapping(False)
+        # self.devices_list.setWrapping(False)
         self.devices_list.setSpacing(20)
 
         layout = QGridLayout()

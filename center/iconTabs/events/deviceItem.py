@@ -38,23 +38,9 @@ class DeviceOutItem(QListWidgetItem):
         self.pulse_dur.lineEdit().textChanged.connect(self.findVar)
         self.pulse_dur.lineEdit().returnPressed.connect(self.finalCheck)
 
-        # self.pulse_dur = QLineEdit()
-        # self.pulse_dur.setText("End of Duration")
-        # self.pulse_dur.textChanged.connect(self.findVar)
-        # self.pulse_dur.returnPressed.connect(self.finalCheck)
         self.setPro()
 
     def setPro(self):
-        # layout = QGridLayout()
-        # l1 = QLabel("Value or Message:")
-        # l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # layout.addWidget(l1, 0, 0)
-        # layout.addWidget(self.value, 0, 1)
-        # l2 = QLabel("Pulse Dur:")
-        # l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # layout.addWidget(l2, 1, 0)
-        # layout.addWidget(self.pulse_dur, 1, 1)
-        # layout.setVerticalSpacing(40)
         layout = QFormLayout()
         layout.addRow("Value or Msg:", self.value)
         layout.addRow("Pulse Dur:", self.pulse_dur)

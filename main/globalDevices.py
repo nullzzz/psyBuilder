@@ -3,17 +3,6 @@ from PyQt5.QtGui import QIcon, QMouseEvent, QDragMoveEvent, QCursor
 from PyQt5.QtWidgets import QWidget, QListWidget, QListWidgetItem, QTextEdit, QVBoxLayout, QHBoxLayout, QApplication, \
     QListView, QFrame, QPushButton, QMenu
 
-in_device = {
-    "mouse": 0,
-    "keyboard": 0,
-    "response box": 0,
-    "game pad": 0
-}
-out_device = {
-    "serial_port": 0,
-    "parallel_port": 0,
-    "network_port": 0,
-}
 
 
 class GlobalDevice(QWidget):
@@ -26,10 +15,10 @@ class GlobalDevice(QWidget):
         super(GlobalDevice, self).__init__(parent)
         self.device_type = device_type
         if device_type:
-            self.devices = out_device
+            self.devices = ["serial_port", "parallel_port", "network_port"]
             self.setWindowTitle("Output Devices")
         else:
-            self.devices = in_device
+            self.devices = ["mouse", "keyboard", "response box", "game pad"]
             self.setWindowTitle("Input Devices")
         self.devices_list = QListWidget()
         self.devices_list.setViewMode(QListView.IconMode)
@@ -41,7 +30,9 @@ class GlobalDevice(QWidget):
         self.devices_list.setFrameStyle(QFrame.NoFrame)
         self.devices_list.setIconSize(QSize(40, 40))
 
+        # 已选择设备
         self.selected_devices = DropDemo(self.device_type)
+        # 还母鸡要做啥子
         self.describe = QTextEdit()
         self.describe.setText("此处留白\n\t设备描述\n\t参数设置")
 
@@ -85,10 +76,9 @@ class GlobalDevice(QWidget):
 class DeviceItem(QListWidgetItem):
     def __init__(self, device_type: str, name: str, parent=None):
         super(DeviceItem, self).__init__(name, parent)
-        self.types = ("mouse", "keyboard")
         self.item_type = device_type
+        # 母鸡啥子
         self.describe = QTextEdit()
-        # self.setIcon(QIcon(r"..\image\{}_device.png".format(self.item_type)))
         self.setIcon(QIcon("image/{}_device.png".format(self.item_type)))
 
     # 重写clone，返回的是DeviceItem类型，而不是QListWidgetItem类型
@@ -97,10 +87,19 @@ class DeviceItem(QListWidgetItem):
 
 
 class DropDemo(QListWidget):
-
     def __init__(self, device_type=0, parent=None):
         super(DropDemo, self).__init__(parent)
         self.device_type = device_type
+        # 对已选择设备计数
+        self.device_count = {
+            "mouse": 0,
+            "keyboard": 0,
+            "response box": 0,
+            "game pad": 0,
+            "serial_port": 0,
+            "parallel_port": 0,
+            "network_port": 0
+        }
 
         # 拖动的图标
         self.dragItem = None
@@ -110,19 +109,20 @@ class DropDemo(QListWidget):
         self.setWrapping(False)
         self.createContextMenu()
 
-
     def dropEvent(self, e):
         source = e.source()
         item_type = source.currentItem().item_type
         drop_item = source.currentItem().clone()
-        if self.device_type:
-            out_device[item_type] += 1
-            if out_device[item_type] > 1:
-                drop_item.setText("{}{}".format(drop_item.text(), out_device[item_type]))
-        else:
-            in_device[item_type] += 1
-            if in_device[item_type] > 1:
-                drop_item.setText("{}{}".format(drop_item.text(), in_device[item_type]))
+        # if self.device_type:
+        #     out_device[item_type] += 1
+        #     if out_device[item_type] > 1:
+        #         drop_item.setText("{}{}".format(drop_item.text(), out_device[item_type]))
+        # else:
+        #     in_device[item_type] += 1
+        #     if in_device[item_type] > 1:
+        #         drop_item.setText("{}{}".format(drop_item.text(), in_device[item_type]))
+        drop_item.setText("{}.{}".format(drop_item.text(), self.device_count[item_type]))
+        self.device_count[item_type] += 1
 
         # 当前位置item
         item = self.itemAt(e.pos())

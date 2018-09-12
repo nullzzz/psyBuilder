@@ -101,7 +101,7 @@ class SoundTab1(QWidget):
         layout2.addRow(self.volume_control)
         layout2.addRow("\tvolume:", self.volume)
         layout2.addRow(self.pan_control)
-        layout2.addRow("\tpan", self.pan)
+        layout2.addRow("\tpan:", self.pan)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()

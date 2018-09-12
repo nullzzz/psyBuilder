@@ -1,6 +1,6 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QIcon, QTextOption, QColor
+from PyQt5.QtGui import QIcon, QTextOption
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QTextEdit
 
 from center.iconTabs.events.text.textProperty import TextProperty
@@ -60,13 +60,13 @@ class TextDisplay(QMainWindow):
     def preView(self):
         try:
             self.preview = Preview(self.text_label, self.x_pos, self.y_pos, self.w_size, self.h_size)
-            self.preview.setStyleSheet("background-color:{}".format(self.back_color))
-            self.preview.text.setStyleSheet("background-color:{}".format(self.back_color))
-            # self.preview.setTransparent(self.transparent_value)
-            # self.preview.setWindowModality(Qt.ApplicationModal)
-            self.preview.showFullScreen()
-            self.preview.setAlign(self.align)
+            # self.preview.setStyleSheet("background-color:{}".format(self.back_color))
+            # self.preview.text.setStyleSheet("background-color:{}".format(self.back_color))
+            self.preview.setWindowModality(Qt.ApplicationModal)
+
+            self.preview.setFont(self.font)
             self.preview.setWrap(self.is_wrap)
+            self.preview.showFullScreen()
             self.preview.moveText()
             self.preview.setTransparent(self.transparent_value)
             self.t = QtCore.QTimer()
@@ -85,41 +85,32 @@ class TextDisplay(QMainWindow):
 
     def apply(self):
         self.getPro()
-        self.text_label.setTextColor(QColor(self.fore_color))
+        self.text_label.setHtml(self.text_html)
         self.text_label.setFont(self.font)
-        self.text_label.setText(self.text)
-        self.text_label.setStyleSheet("background-color: {};".format(self.back_color))
-        self.pro.general.text.setTextColor(QColor(self.fore_color))
-        self.pro.general.text.setFont(self.font)
-        self.pro.general.text.setText(self.text)
-        self.pro.general.text.setStyleSheet("background-color: {};".format(self.back_color))
-
-        if self.align == "Center":
-            self.text_label.setAlignment(Qt.AlignCenter)
-            self.pro.general.text.setAlignment(Qt.AlignCenter)
-        elif self.align == "Left":
-            self.text_label.setAlignment(Qt.AlignLeft)
-            self.pro.general.text.setAlignment(Qt.AlignLeft)
-        elif self.align == "Right":
-            self.text_label.setAlignment(Qt.AlignRight)
-            self.pro.general.text.setAlignment(Qt.AlignRight)
-        elif self.align == "Justify":
-            self.text_label.setAlignment(Qt.AlignJustify)
-            self.pro.general.text.setAlignment(Qt.AlignJustify)
-
         if self.is_wrap:
             self.text_label.setWordWrapMode(QTextOption.WordWrap)
-            self.pro.general.text.setWordWrapMode(QTextOption.WordWrap)
         else:
             self.text_label.setWordWrapMode(QTextOption.NoWrap)
-            self.pro.general.text.setWordWrapMode(QTextOption.NoWrap)
+        # self.text_label.setFont(self.font)
+        # self.text_label.setHtml(self.text)
+        # self.text_label.setStyleSheet("background-color: {};".format(self.back_color))
+        #
+        # if self.align == "Center":
+        #     self.text_label.setAlignment(Qt.AlignCenter)
+        # elif self.align == "Left":
+        #     self.text_label.setAlignment(Qt.AlignLeft)
+        # elif self.align == "Right":
+        #     self.text_label.setAlignment(Qt.AlignRight)
+        # elif self.align == "Justify":
+        #     self.pro.general.text.setAlignment(Qt.AlignJustify)
+
 
         # 发送信号
         self.propertiesChange.emit(self.getInfo())
 
     # 获取参数
     def getPro(self):
-        self.text = self.pro.general.text.toPlainText()
+        self.text_html = self.pro.general.text_edit.toHtml()
         self.font = self.pro.general.font
         self.align = self.pro.general.align.currentText()
         self.fore_color = self.pro.general.fore_color.currentText()

@@ -217,6 +217,11 @@ class MainWindow(QMainWindow):
 
     def resetView(self):
         try:
+            self.structure_action.setChecked(False)
+            self.property_action.setChecked(False)
+            self.main_action.setChecked(False)
+            self.output_action.setChecked(False)
+            self.attribute_action.setChecked(False)
             self.structure_action.setChecked(True)
             self.property_action.setChecked(True)
             self.main_action.setChecked(True)

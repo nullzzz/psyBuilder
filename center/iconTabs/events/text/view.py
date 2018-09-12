@@ -14,9 +14,10 @@ class Preview(QDialog):
         pix = QPixmap()
         pix.load("image/preview_tip")
         self.label.setPixmap(pix)
-        self.text.setTextColor(text.textColor())
-        self.text.setText(text.toPlainText())
-        self.text.setFont(text.font())
+        # self.text.setTextColor(text.textColor())
+        # self.text.setText(text.toPlainText())
+        # self.text.setFont(text.font())
+        self.text.setHtml(text.toHtml())
         self.text.setReadOnly(True)
         screen = QDesktopWidget().screenGeometry()
         if "%" in start_x:
@@ -36,7 +37,6 @@ class Preview(QDialog):
             self.height_factor = int(height[0:-1]) * screen.height() / 100
         else:
             self.height_factor = int(height)
-
 
     # 换行
     def setWrap(self, is_wrap):
