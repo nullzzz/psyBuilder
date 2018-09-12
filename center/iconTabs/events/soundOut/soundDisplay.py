@@ -28,7 +28,7 @@ class SoundDisplay(QMainWindow):
 
         self.play_bt.setEnabled(False)
         self.player.positionChanged.connect(self.positionChanged)
-        self.play_bt.clicked.connect(self.play)
+        self.play_bt.clicked.connect(self.playSound)
         self.progress_bar = QSlider()
         self.progress_bar.setOrientation(Qt.Horizontal)
         self.progress_bar.sliderMoved.connect(self.setPosition)
@@ -57,7 +57,6 @@ class SoundDisplay(QMainWindow):
         layout.addWidget(QLabel(""), 2)
         layout.addWidget(self.play_bt, 2, Qt.AlignHCenter)
         layout.addWidget(self.tip, 1, Qt.AlignCenter)
-        # layout.setVerticalSpacing(0)
         layout2 = QGridLayout()
         layout2.addWidget(self.progress_bar, 0, 1, 1, 4)
         layout2.addWidget(self.tip1, 0, 0, 1, 1)
@@ -94,7 +93,7 @@ class SoundDisplay(QMainWindow):
         if file_name:
             self.play_bt.setIcon(QIcon("image/start_video"))
             if QFileInfo(file_name).isFile():
-                # 文件名
+                # 音频文件名
                 try:
                     audio_name = ".".join(file_name.split("/")[-1].split(".")[0:-1])
                 except Exception:
@@ -112,7 +111,6 @@ class SoundDisplay(QMainWindow):
                     self.player_list.setPlaybackMode(QMediaPlaylist.CurrentItemInLoop)
                 else:
                     self.player_list.setPlaybackMode(QMediaPlaylist.CurrentItemOnce)
-
                 self.play_bt.setEnabled(True)
                 self.tip.setText(audio_name)
             else:
@@ -121,12 +119,9 @@ class SoundDisplay(QMainWindow):
             self.play_bt.setEnabled(False)
             self.tip.setText("Load your audio first!")
 
-
-
         self.propertiesChange.emit(self.getInfo())
 
     def getPro(self):
-
         if self.pro.general.loop.currentText() == "Yes":
             self.is_loop = True
         else:
@@ -141,7 +136,7 @@ class SoundDisplay(QMainWindow):
         x = int(self.player.duration() % 1000)
         self.tip2.setText('{:0>2d}:{:0>2d}.{:0>3d}'.format(m, s, x))
 
-    def play(self):
+    def playSound(self):
         if self.player.state() == QMediaPlayer.PlayingState:
             self.player.pause()
             self.play_bt.setIcon(QIcon("image/start_video"))

@@ -97,6 +97,8 @@ class VideoDisplay(QMainWindow):
                 if file_name != self.file:
                     self.file = file_name
                     self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
+                    self.play_video.setIcon(QIcon("image/start_video"))
+                    self.play_video.setText("start")
                 self.mediaPlayer.setPosition(self.getStartTime(self.startPos))
                 self.video_widget.setAspectRatioMode(self.aspect_ration_mode)
             else:
@@ -116,12 +118,7 @@ class VideoDisplay(QMainWindow):
         # else:
         #     self.stop_after = False
         # self.stop_after_mode = self.pro.tab1.stop_after_mode.currentText()
-        # is_stretch = self.pro.general.stretch.currentText()
-        # if is_stretch == "Yes":
-        #     self.is_stretch = True
-        # else:
-        #     self.is_stretch = False
-        # self.stretch_mode = self.pro.general.stretch_mode.currentText()
+
         self.aspect_ration_mode = self.pro.general.aspect_ratio.currentIndex() - 1
         # self.end_video_action = self.pro.tab1.end_video_action.currentText()
         self.screen_name = self.pro.general.screen_name.currentText()

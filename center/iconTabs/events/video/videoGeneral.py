@@ -26,9 +26,8 @@ class VideoTab1(QWidget):
 
         # self.stop_after = QComboBox()
         # self.stop_after_mode = QComboBox()
-
-        self.stretch = QComboBox()
-        self.stretch_mode = QComboBox()
+        # self.stretch = QComboBox()
+        # self.stretch_mode = QComboBox()
 
         self.aspect_ratio = QComboBox()
 
@@ -38,7 +37,6 @@ class VideoTab1(QWidget):
         self.setUI()
 
     def setUI(self):
-        # self.open_bt.setIcon(QIcon("image/folder.png"))
         valid_pos = QRegExp("(\d{1,2}:\d{1,2}:\d{2}\.\d{3})|(\[\w+\])")
         self.startPos.setText("00:00:00.000")
         self.startPos.setMinimumWidth(120)
@@ -49,21 +47,22 @@ class VideoTab1(QWidget):
         self.startPos.returnPressed.connect(self.finalCheck)
         self.endPos.textChanged.connect(self.findVar)
         self.endPos.returnPressed.connect(self.finalCheck)
+
         # self.stop_after.addItems(["No", "Yes"])
         # self.stop_after.currentTextChanged.connect(self.changed1)
         # self.stop_after_mode.addItems(["NextOnsetTime", "OffsetTime"])
         # self.stop_after_mode.setEnabled(False)
-        self.stretch.addItems(["No", "Yes"])
-        self.stretch.currentTextChanged.connect(self.stretchChange)
-        self.stretch_mode.addItems(["Both", "LeftRight", "UpDown"])
-        self.stretch_mode.setEnabled(False)
+
+        # self.stretch.addItems(["No", "Yes"])
+        # self.stretch.currentTextChanged.connect(self.stretchChange)
+        # self.stretch_mode.addItems(["Both", "LeftRight", "UpDown"])
+        # self.stretch_mode.setEnabled(False)
+
         self.aspect_ratio.addItems(["default", "ignore", "keep", "keepByExpanding"])
         self.transparent.setMaximum(100)
         self.transparent.setSuffix("%")
         self.transparent.setValue(100)
-        # self.end_video_action.addItems(["None", "Terminate"])
         self.screen_name.addItems(["Display"])
-        # self.screen_name.setEditable(True)
         self.clear_after.addItems(["Yes", "No"])
 
         l1 = QLabel("Start Position:")
@@ -169,4 +168,5 @@ class VideoTab1(QWidget):
             "Back color": self.back_color.currentText(),
             "Transparent": "{}%".format(self.transparent.value()),
             "Clear after": self.clear_after.currentText(),
-            "Screen name": self.screen_name.currentText()}
+            "Screen name": self.screen_name.currentText()
+        }

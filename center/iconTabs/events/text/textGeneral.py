@@ -7,6 +7,8 @@ from center.iconTabs.colorBobox import ColorListEditor
 
 
 # text event专属页面
+# 文本颜色设置为全体文本
+# 对齐方式也是
 class TextTab1(QWidget):
     def __init__(self, parent=None):
         super(TextTab1, self).__init__(parent)
@@ -16,7 +18,9 @@ class TextTab1(QWidget):
             "p, li { white-space: pre-wrap; }\n")
         self.html_font = "</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; " \
                          "font-style:normal;\">"
+
         self.attributes = []
+
         self.text_edit = QTextEdit()
 
         self.align = QComboBox()
@@ -33,7 +37,6 @@ class TextTab1(QWidget):
         self.transparent = QSpinBox()
         self.screen_name = QComboBox()
         self.clear_after = QComboBox()
-        # self.word_wrap = QComboBox()
         self.word_wrap = QCheckBox("Word wrap")
         self.word_wrap.stateChanged.connect(self.checkWrap)
         self.is_wrap = False
@@ -41,7 +44,6 @@ class TextTab1(QWidget):
         self.font_bt = QPushButton("Font")
         self.font_bt.clicked.connect(self.getFont)
         self.font_label = QLabel()
-        # self.font_label.setAlignment(Qt.AlignCenter)
         self.font_label.setText("SimSun")
         self.font_label.setFont(self.font)
         self.setGeneral()
@@ -54,7 +56,6 @@ class TextTab1(QWidget):
         l5 = QLabel("Back Color:")
         l6 = QLabel("Clear After:")
         l7 = QLabel("Transparent:")
-        # l8 = QLabel("Word wrap:")
 
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -63,11 +64,9 @@ class TextTab1(QWidget):
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l8.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         self.align.addItems(["Center", "Left", "Right", "Justify"])
         self.clear_after.addItems(["Yes", "No"])
-        # self.word_wrap.addItems(["Yes", "No"])
 
         self.transparent.setMaximum(100)
         self.transparent.setSuffix("%")
@@ -76,7 +75,6 @@ class TextTab1(QWidget):
 
         group1 = QGroupBox("Text")
         layout1 = QGridLayout()
-        # layout1.addWidget(QLabel("Text"), 0, 0)
         layout1.addWidget(self.text_edit, 0, 0)
         group1.setLayout(layout1)
 
@@ -86,22 +84,17 @@ class TextTab1(QWidget):
         layout2.addWidget(self.align, 0, 1)
         layout2.addWidget(l3, 1, 0)
         layout2.addWidget(self.screen_name, 1, 1)
-
         layout2.addWidget(l4, 0, 2)
         layout2.addWidget(self.fore_color, 0, 3)
-
         layout2.addWidget(l5, 1, 2)
         layout2.addWidget(self.back_color, 1, 3)
         layout2.addWidget(l6, 2, 0)
         layout2.addWidget(self.clear_after, 2, 1)
         layout2.addWidget(l7, 2, 2)
         layout2.addWidget(self.transparent, 2, 3)
-
         layout2.addWidget(self.font_bt, 3, 0)
         layout2.addWidget(self.font_label, 3, 1, 1, 2)
         layout2.addWidget(self.word_wrap, 3, 3)
-        # layout2.addWidget(self.font_label, 4, 0, 1, 4)
-
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
@@ -133,10 +126,12 @@ class TextTab1(QWidget):
             self.back_color_name = color
         self.setAll()
 
-    def alignChange(self, align_mode):
-        self.align_mode = align_mode
+    def alignChange(self, align_mode: str):
+        # html中要小写
+        self.align_mode = align_mode.lower()
         self.setAll()
 
+    # 获取字体
     def getFont(self):
         font, ok = QFontDialog.getFont(self.font, self)
         if ok:
@@ -144,13 +139,11 @@ class TextTab1(QWidget):
             self.font_label.setText(font.family())
             self.font_label.setFont(QFont(font.family(), 12))
             self.setAll()
-            #
-            # self.text_edit.setFont(font)
-            # print(self.text_edit.toHtml())
 
     def setAttributes(self, attributes):
         self.attributes = attributes
 
+    # 处理html获得格式
     def setAll(self):
         texts = self.text_edit.toPlainText().split("\n")
         self.html_font = f"</style></head><body style=\" font-family:'{self.font.family()}'; font-size:" \
@@ -158,16 +151,16 @@ class TextTab1(QWidget):
                          f"{self.font.styleName()};\">"
         html = self.html_header + self.html_font
         for text in texts:
-            html += f"\n<p align=\"{self.align_mode.lower()}\"style=\" margin-top:0px; margin-bottom:0px; " \
+            html += f"\n<p align=\"{self.align_mode}\"style=\" margin-top:0px; margin-bottom:0px; " \
                     f"margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent: 0px;\"><span style=\" " \
                     f"color:{self.fore_color_name}; background-color:{self.back_color_name};\">{text}</span>"
         self.text_edit.setHtml(html)
+        # 字体的style和划线在html中不体现
         self.text_edit.setFont(self.font)
-        # print(html)
 
+    # 是否换行
     def checkWrap(self):
         self.is_wrap = self.word_wrap.checkState()
-        # print(self.is_wrap)
         if self.is_wrap:
             self.text_edit.setWordWrapMode(QTextOption.WordWrap)
         else:
@@ -181,6 +174,7 @@ class TextTab1(QWidget):
             "Back color": self.back_color.currentText(),
             "Screen name": self.screen_name.currentText(),
             "Transparent": "{}%".format(self.transparent.value()),
+            "Font": self.font.family(),
             "Word wrap": bool(self.word_wrap.checkState()),
             "Clear after": self.clear_after.currentText()
         }
