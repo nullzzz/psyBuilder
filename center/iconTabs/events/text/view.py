@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QDialog, QDesktopWidget, QTextEdit, QLabel
 
 
 class Preview(QDialog):
-    def __init__(self, text: QTextEdit, start_x=0, start_y=0, width=100, height=100):
+    def __init__(self, start_x=0, start_y=0, width=100, height=100):
         super(Preview, self).__init__()
         self.text = QTextEdit(self)
         self.label = QLabel(self)
@@ -14,9 +14,10 @@ class Preview(QDialog):
         pix = QPixmap()
         pix.load("image/preview_tip")
         self.label.setPixmap(pix)
-        self.text.setTextColor(text.textColor())
-        self.text.setText(text.toPlainText())
-        self.text.setFont(text.font())
+        # self.text.setTextColor(text.textColor())
+        # self.text.setText(text.toPlainText())
+        # self.text.setFont(text.font())
+        # self.text.setHtml(text.toHtml())
         self.text.setReadOnly(True)
         screen = QDesktopWidget().screenGeometry()
         if "%" in start_x:
@@ -36,7 +37,6 @@ class Preview(QDialog):
             self.height_factor = int(height[0:-1]) * screen.height() / 100
         else:
             self.height_factor = int(height)
-
 
     # 换行
     def setWrap(self, is_wrap):
@@ -70,3 +70,5 @@ class Preview(QDialog):
         self.start_x = x
         self.start_y = y
 
+    def setHtml(self, html):
+        self.text.setHtml(html)

@@ -1,7 +1,7 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, \
-    QGridLayout, QComboBox
+    QGridLayout, QComboBox, QMessageBox, QCompleter
 
 
 class EyeCalibrate(QWidget):
@@ -10,11 +10,16 @@ class EyeCalibrate(QWidget):
 
     def __init__(self, parent=None):
         super(EyeCalibrate, self).__init__(parent)
+
+        self.attributes = []
+
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.calibration_type = QComboBox()
         self.calibration_beep = QComboBox()
         self.target_color = QLineEdit()
+        self.target_color.textChanged.connect(self.findVar)
+        self.target_color.returnPressed.connect(self.finalCheck)
         self.target_style = QComboBox()
 
         self.bt_ok = QPushButton("Ok")
@@ -24,6 +29,8 @@ class EyeCalibrate(QWidget):
         self.bt_apply = QPushButton("Apply")
         self.bt_apply.clicked.connect(self.apply)
         self.setUI()
+
+        self.setAttributes(["test"])
         self.calibration_type.setFocus()
 
     def setUI(self):
@@ -42,16 +49,26 @@ class EyeCalibrate(QWidget):
         self.target_style.addItems(
             ["default", "large filled", "small filled", "large open", "small open", "large cross", "small cross"])
 
+        l1 = QLabel("Calibration Type:")
+        l2 = QLabel("Calibration Beep:")
+        l3 = QLabel("Target Color:")
+        l4 = QLabel("Target Style:")
+
+        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
-        layout1.addWidget(QLabel("Calibration type:"), 2, 0, 1, 1)
+        layout1.addWidget(l1, 2, 0, 1, 1)
         layout1.addWidget(self.calibration_type, 2, 1, 1, 1)
-        layout1.addWidget(QLabel("Calibration beep:"), 3, 0, 1, 1)
+        layout1.addWidget(l2, 3, 0, 1, 1)
         layout1.addWidget(self.calibration_beep, 3, 1, 1, 1)
-        layout1.addWidget(QLabel("Target color:"), 4, 0, 1, 1)
+        layout1.addWidget(l3, 4, 0, 1, 1)
         layout1.addWidget(self.target_color, 4, 1, 1, 1)
-        layout1.addWidget(QLabel("Target style:"), 5, 0, 1, 1)
+        layout1.addWidget(l4, 5, 0, 1, 1)
         layout1.addWidget(self.target_style, 5, 1, 1, 1)
 
         layout2 = QHBoxLayout()
@@ -77,6 +94,28 @@ class EyeCalibrate(QWidget):
 
     def apply(self):
         self.propertiesChange.emit(self.getProperties())
+
+        # 检查变量
+
+    def findVar(self, text):
+        if text in self.attributes:
+            self.sender().setStyleSheet("color: blue")
+            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
+        else:
+            self.sender().setStyleSheet("color:black")
+            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
+
+    def finalCheck(self):
+        temp = self.sender()
+        text = temp.text()
+        if text not in self.attributes:
+            if text and text[0] == "[":
+                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                temp.clear()
+
+    def setAttributes(self, attributes):
+        self.attributes = [f"[{attribute}]" for attribute in attributes]
+        self.target_color.setCompleter(QCompleter(self.attributes))
 
     def getProperties(self):
         return {

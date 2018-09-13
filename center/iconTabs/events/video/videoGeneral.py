@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtWidgets import (QLineEdit, QPushButton, QComboBox, QSpinBox, QGridLayout, QLabel, QFileDialog, QMessageBox,
                              QCompleter)
@@ -26,9 +26,8 @@ class VideoTab1(QWidget):
 
         # self.stop_after = QComboBox()
         # self.stop_after_mode = QComboBox()
-
-        self.stretch = QComboBox()
-        self.stretch_mode = QComboBox()
+        # self.stretch = QComboBox()
+        # self.stretch_mode = QComboBox()
 
         self.aspect_ratio = QComboBox()
 
@@ -38,7 +37,6 @@ class VideoTab1(QWidget):
         self.setUI()
 
     def setUI(self):
-        # self.open_bt.setIcon(QIcon("image/folder.png"))
         valid_pos = QRegExp("(\d{1,2}:\d{1,2}:\d{2}\.\d{3})|(\[\w+\])")
         self.startPos.setText("00:00:00.000")
         self.startPos.setMinimumWidth(120)
@@ -49,38 +47,53 @@ class VideoTab1(QWidget):
         self.startPos.returnPressed.connect(self.finalCheck)
         self.endPos.textChanged.connect(self.findVar)
         self.endPos.returnPressed.connect(self.finalCheck)
+
         # self.stop_after.addItems(["No", "Yes"])
         # self.stop_after.currentTextChanged.connect(self.changed1)
         # self.stop_after_mode.addItems(["NextOnsetTime", "OffsetTime"])
         # self.stop_after_mode.setEnabled(False)
-        self.stretch.addItems(["No", "Yes"])
-        self.stretch.currentTextChanged.connect(self.stretchChange)
-        self.stretch_mode.addItems(["Both", "LeftRight", "UpDown"])
-        self.stretch_mode.setEnabled(False)
-        self.aspect_ratio.addItems(["default", "ignore", "keep", "keepByExpanding"])
+
+        # self.stretch.addItems(["No", "Yes"])
+        # self.stretch.currentTextChanged.connect(self.stretchChange)
+        # self.stretch_mode.addItems(["Both", "LeftRight", "UpDown"])
+        # self.stretch_mode.setEnabled(False)
+
+        self.aspect_ratio.addItems(["Default", "Ignore", "Keep", "KeepByExpanding"])
         self.transparent.setMaximum(100)
         self.transparent.setSuffix("%")
         self.transparent.setValue(100)
-
-        # self.end_video_action.addItems(["None", "Terminate"])
         self.screen_name.addItems(["Display"])
-        # self.screen_name.setEditable(True)
         self.clear_after.addItems(["Yes", "No"])
+
+        l1 = QLabel("Start Position:")
+        l2 = QLabel("End Position:")
+        l3 = QLabel("Back Color:")
+        l4 = QLabel("Transparent:")
+        l5 = QLabel("Aspect Ratio:")
+        l6 = QLabel("Screen Name:")
+        l7 = QLabel("Clear After:")
+        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout = QGridLayout()
         layout.addWidget(QLabel("File Name:"), 0, 0, 1, 1)
         layout.addWidget(self.file_name, 0, 1, 1, 2)
         layout.addWidget(self.open_bt, 0, 3, 1, 1)
 
-        layout.addWidget(QLabel("Start Position:"), 1, 0, 1, 1)
+        layout.addWidget(l1, 1, 0, 1, 1)
         layout.addWidget(self.startPos, 1, 1, 1, 1)
-        layout.addWidget(QLabel("hh:mm:ss.xx"), 1, 2, 1, 1)
-        layout.addWidget(QLabel("End Position:"), 2, 0, 1, 1)
+        layout.addWidget(QLabel("hh:mm:ss.xxx"), 1, 2, 1, 1)
+        layout.addWidget(l2, 2, 0, 1, 1)
         layout.addWidget(self.endPos, 2, 1, 1, 1)
-        layout.addWidget(QLabel("hh:mm:ss.xx"), 2, 2, 1, 1)
-        layout.addWidget(QLabel("Back Color:"), 3, 0, 1, 1)
+        layout.addWidget(QLabel("hh:mm:ss.xxx"), 2, 2, 1, 1)
+        layout.addWidget(l3, 3, 0, 1, 1)
         layout.addWidget(self.back_color, 3, 1, 1, 1)
-        layout.addWidget(QLabel("Transparent:"), 4, 0, 1, 1)
+        layout.addWidget(l4, 4, 0, 1, 1)
         layout.addWidget(self.transparent, 4, 1, 1, 1)
         # layout.addWidget(QLabel("Stop After:"), 5, 0, 1, 1)
         # layout.addWidget(self.stop_after, 5, 1, 1, 1)
@@ -90,13 +103,13 @@ class VideoTab1(QWidget):
         # layout.addWidget(self.stretch, 6, 1, 1, 1)
         # layout.addWidget(QLabel("Stretch Mode:"), 6, 2, 1, 1)
         # layout.addWidget(self.stretch_mode, 6, 3, 1, 1)
-        layout.addWidget(QLabel("Aspect Ratio:"), 6, 0, 1, 1)
+        layout.addWidget(l5, 6, 0, 1, 1)
         layout.addWidget(self.aspect_ratio, 6, 1, 1, 1)
         # layout.addWidget(QLabel("End Video Action:"), 7, 0, 1, 1)
         # layout.addWidget(self.end_video_action, 7, 1, 1, 1)
-        layout.addWidget(QLabel("Screen Name:"), 8, 0, 1, 1)
+        layout.addWidget(l6, 8, 0, 1, 1)
         layout.addWidget(self.screen_name, 8, 1, 1, 1)
-        layout.addWidget(QLabel("Clear After:"), 9, 0, 1, 1)
+        layout.addWidget(l7, 9, 0, 1, 1)
         layout.addWidget(self.clear_after, 9, 1, 1, 1)
         layout.setContentsMargins(40, 0, 40, 0)
         self.setLayout(layout)
@@ -155,4 +168,5 @@ class VideoTab1(QWidget):
             "Back color": self.back_color.currentText(),
             "Transparent": "{}%".format(self.transparent.value()),
             "Clear after": self.clear_after.currentText(),
-            "Screen name": self.screen_name.currentText()}
+            "Screen name": self.screen_name.currentText()
+        }

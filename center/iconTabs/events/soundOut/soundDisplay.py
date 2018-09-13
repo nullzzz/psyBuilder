@@ -13,6 +13,7 @@ class SoundDisplay(QMainWindow):
     def __init__(self, parent=None):
         super(SoundDisplay, self).__init__(parent)
 
+        self.file = ""
         self.attributes = []
         self.volume = 100
         self.pro = SoundProperty()
@@ -27,7 +28,7 @@ class SoundDisplay(QMainWindow):
 
         self.play_bt.setEnabled(False)
         self.player.positionChanged.connect(self.positionChanged)
-        self.play_bt.clicked.connect(self.play)
+        self.play_bt.clicked.connect(self.playSound)
         self.progress_bar = QSlider()
         self.progress_bar.setOrientation(Qt.Horizontal)
         self.progress_bar.sliderMoved.connect(self.setPosition)
@@ -47,16 +48,15 @@ class SoundDisplay(QMainWindow):
         self.tip.setMaximumHeight(20)
         self.tip.setAlignment(Qt.AlignCenter)
         self.tip.setText("Load your audio first!")
-        self.tip1.setText("00:00")
+        self.tip1.setText("00:00.000")
         self.tip1.setAlignment(Qt.AlignRight)
-        self.tip2.setText("00:00")
+        self.tip2.setText("00:00.000")
         center = QWidget()
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel(""), 2)
         layout.addWidget(self.play_bt, 2, Qt.AlignHCenter)
         layout.addWidget(self.tip, 1, Qt.AlignCenter)
-        # layout.setVerticalSpacing(0)
         layout2 = QGridLayout()
         layout2.addWidget(self.progress_bar, 0, 1, 1, 4)
         layout2.addWidget(self.tip1, 0, 0, 1, 1)
@@ -89,38 +89,39 @@ class SoundDisplay(QMainWindow):
 
     def apply(self):
         self.getPro()
-        if self.file:
+        file_name = self.pro.general.file_name.text()
+        if file_name:
             self.play_bt.setIcon(QIcon("image/start_video"))
-            if QFileInfo(self.file).isFile():
-                # 文件名
+            if QFileInfo(file_name).isFile():
+                # 音频文件名
                 try:
-                    file_name = ".".join(self.file.split("/")[-1].split(".")[0:-1])
+                    audio_name = ".".join(file_name.split("/")[-1].split(".")[0:-1])
                 except Exception:
-                    file_name = "audio"
-                self.player_list.addMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
+                    audio_name = "audio"
+                # 避免重复加载文件
+                if file_name != self.file:
+                    self.file = file_name
+                    self.player_list.addMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
+                    self.player.setPlaylist(self.player_list)
+                    self.tip1.setText("00:00.000")
+                    self.tip2.setText("00:00.000")
+                    self.progress_bar.setRange(0, 0)
+                # 循环播放否
                 if self.is_loop:
                     self.player_list.setPlaybackMode(QMediaPlaylist.CurrentItemInLoop)
                 else:
                     self.player_list.setPlaybackMode(QMediaPlaylist.CurrentItemOnce)
-                self.player.setPlaylist(self.player_list)
-
-                # self.player.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
                 self.play_bt.setEnabled(True)
-                self.tip.setText(file_name)
+                self.tip.setText(audio_name)
             else:
                 QMessageBox.warning(self, "Warning", "The file path is invalid!", QMessageBox.Ok)
-            self.propertiesChange.emit(self.getInfo())
         else:
             self.play_bt.setEnabled(False)
             self.tip.setText("Load your audio first!")
-        self.tip1.setText("00:00")
-        self.tip2.setText("00:00")
-        self.progress_bar.setRange(0, 0)
 
         self.propertiesChange.emit(self.getInfo())
 
     def getPro(self):
-        self.file = self.pro.general.file_name.text()
         if self.pro.general.loop.currentText() == "Yes":
             self.is_loop = True
         else:
@@ -132,9 +133,10 @@ class SoundDisplay(QMainWindow):
     def setLabel(self):
         m = int(self.player.duration() / (1000 * 60))
         s = int(self.player.duration() / 1000 - m * 60)
-        self.tip2.setText('{:0>2d}:{:0>2d}'.format(m, s))
+        x = int(self.player.duration() % 1000)
+        self.tip2.setText('{:0>2d}:{:0>2d}.{:0>3d}'.format(m, s, x))
 
-    def play(self):
+    def playSound(self):
         if self.player.state() == QMediaPlayer.PlayingState:
             self.player.pause()
             self.play_bt.setIcon(QIcon("image/start_video"))
@@ -157,7 +159,8 @@ class SoundDisplay(QMainWindow):
         self.progress_bar.setValue(position)
         m = int(position/(1000*60))
         s = int(position/1000-m*60)
-        self.tip1.setText('{:0>2d}:{:0>2d}'.format(m, s))
+        x = position % 1000
+        self.tip1.setText('{:0>2d}:{:0>2d}.{:0>3d}'.format(m, s, x))
 
     def getInfo(self):
         return {**self.pro.general.getInfo(), **self.pro.duration.getInfo()}

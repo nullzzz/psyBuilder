@@ -23,10 +23,7 @@ class SoundTab1(QWidget):
         self.pan = QSpinBox()
 
         self.buffer_size = QLineEdit()
-
         self.buffer_mode = QComboBox()
-
-        self.position_time_format = QComboBox()
 
         self.start_offset = QLineEdit()
         self.stop_offset = QLineEdit()
@@ -39,7 +36,6 @@ class SoundTab1(QWidget):
         self.start_offset.setValidator(QRegExpValidator(valid_input, self))
         self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
         self.buffer_mode.addItems(["Buffered", "Streaming"])
-        self.position_time_format.addItems(["MilliSeconds", "MicroSeconds", "Bytes"])
         self.loop.addItems(["Yes", "No"])
         self.buffer_size.setText("5000")
         self.start_offset.setText("0")
@@ -61,17 +57,15 @@ class SoundTab1(QWidget):
         l0 = QLabel("File Name:")
         l1 = QLabel("Buffer Size (ms):")
         l2 = QLabel("Buffer Mode:")
-        l3 = QLabel("Position Time Format:")
-        l4 = QLabel("Start Offset (ms):")
-        l5 = QLabel("Stop Offset (ms):")
-        l6 = QLabel("Loop:")
+        l3 = QLabel("Start Offset (ms):")
+        l4 = QLabel("Stop Offset (ms):")
+        l5 = QLabel("Loop:")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         group1 = QGroupBox()
         layout1 = QGridLayout()
@@ -86,14 +80,12 @@ class SoundTab1(QWidget):
         layout1.addWidget(self.buffer_mode, 2, 1)
 
         layout1.addWidget(l3, 3, 0)
-        layout1.addWidget(self.position_time_format, 3, 1)
+        layout1.addWidget(self.start_offset, 3, 1)
         layout1.addWidget(l4, 4, 0)
-        layout1.addWidget(self.start_offset, 4, 1)
-        layout1.addWidget(l5, 5, 0)
-        layout1.addWidget(self.stop_offset, 5, 1)
+        layout1.addWidget(self.stop_offset, 4, 1)
 
-        layout1.addWidget(l6, 6, 0)
-        layout1.addWidget(self.loop, 6, 1)
+        layout1.addWidget(l5, 5, 0)
+        layout1.addWidget(self.loop, 5, 1)
         group1.setLayout(layout1)
 
         group2 = QGroupBox()
@@ -101,7 +93,7 @@ class SoundTab1(QWidget):
         layout2.addRow(self.volume_control)
         layout2.addRow("\tvolume:", self.volume)
         layout2.addRow(self.pan_control)
-        layout2.addRow("\tpan", self.pan)
+        layout2.addRow("\tpan:", self.pan)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()

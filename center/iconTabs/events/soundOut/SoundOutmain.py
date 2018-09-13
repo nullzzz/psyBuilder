@@ -63,7 +63,7 @@ class Ui_MainWindow(object):
         self.pushButton.setGeometry(QtCore.QRect(320, 60, 141, 111))
         self.pushButton.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("image/play.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("image/playSound.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton.setIcon(icon)
         self.pushButton.setIconSize(QtCore.QSize(50, 100))
         self.pushButton.setObjectName("pushButton")

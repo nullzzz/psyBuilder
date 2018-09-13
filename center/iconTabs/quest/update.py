@@ -1,6 +1,8 @@
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, \
+    QMessageBox, \
+    QCompleter
 
 
 class QuestUpdate(QWidget):
@@ -11,15 +13,24 @@ class QuestUpdate(QWidget):
         super(QuestUpdate, self).__init__(parent)
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
+
+        self.attributes = []
+
         self.response_variable = QLineEdit()
+        self.response_variable.textChanged.connect(self.findVar)
+        self.response_variable.returnPressed.connect(self.finalCheck)
+
         self.resp = ""
-        self.bt_ok = QPushButton("Ok")
+        self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
         self.bt_cancel.clicked.connect(self.cancel)
         self.bt_apply = QPushButton("Apply")
         self.bt_apply.clicked.connect(self.apply)
         self.setUI()
+
+        self.setAttributes(["test"])
+
         self.response_variable.setFocus()
 
     def setUI(self):
@@ -35,7 +46,7 @@ class QuestUpdate(QWidget):
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
-        layout1.addWidget(QLabel("Response variable (0 or 1):"), 2, 0, 1, 1)
+        layout1.addWidget(QLabel("Response Variable (0 or 1):"), 2, 0, 1, 1)
         layout1.addWidget(self.response_variable, 2, 1, 1, 1)
 
         layout2 = QHBoxLayout()
@@ -62,6 +73,27 @@ class QuestUpdate(QWidget):
     def apply(self):
         self.resp = self.response_variable.text()
         self.propertiesChange.emit(self.getInfo())
+
+    # 检查变量
+    def findVar(self, text):
+        if text in self.attributes:
+            self.sender().setStyleSheet("color: blue")
+            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
+        else:
+            self.sender().setStyleSheet("color:black")
+            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
+
+    def finalCheck(self):
+        temp = self.sender()
+        text = temp.text()
+        if text not in self.attributes:
+            if text and text[0] == "[":
+                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                temp.clear()
+
+    def setAttributes(self, attributes):
+        self.attributes = [f"[{attribute}]" for attribute in attributes]
+        self.response_variable.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         return {"Response variable": self.resp}

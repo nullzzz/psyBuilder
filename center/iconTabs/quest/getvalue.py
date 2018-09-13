@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QFormLayout)
+from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QFormLayout, QMessageBox,
+                             QCompleter)
 
 
 class QuestGetValue(QWidget):
@@ -12,17 +13,28 @@ class QuestGetValue(QWidget):
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
 
+        self.attributes = []
+
         self.line1 = QLineEdit()
         self.line2 = QLineEdit()
         self.experimental = QLineEdit()
+        self.line1.returnPressed.connect(self.finalCheck)
+        self.line2.returnPressed.connect(self.finalCheck)
+        self.experimental.returnPressed.connect(self.finalCheck)
+        self.line1.textChanged.connect(self.findVar)
+        self.line2.textChanged.connect(self.findVar)
+        self.experimental.textChanged.connect(self.findVar)
 
-        self.bt_ok = QPushButton("Ok")
+        self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
         self.bt_cancel.clicked.connect(self.cancel)
         self.bt_apply = QPushButton("Apply")
         self.bt_apply.clicked.connect(self.apply)
         self.setUI()
+
+        self.setAttributes(["test"])
+
         self.line1.setFocus()
 
     def setUI(self):
@@ -39,10 +51,10 @@ class QuestGetValue(QWidget):
         layout1 = QFormLayout()
         layout1.addRow(self.tip1)
         layout1.addRow(self.tip2)
-        layout1.addRow("Line1", self.line1)
-        layout1.addRow("Line2", self.line2)
+        layout1.addRow("Line1:", self.line1)
+        layout1.addRow("Line2:", self.line2)
 
-        layout1.addRow("Experimental variable for test value", self.experimental)
+        layout1.addRow("Experimental Variable For Test Value:", self.experimental)
         layout1.setLabelAlignment(Qt.AlignRight)
 
         layout2 = QHBoxLayout()
@@ -70,6 +82,29 @@ class QuestGetValue(QWidget):
 
     def apply(self):
         self.propertiesChange.emit(self.getInfo())
+
+    # 检查变量
+    def findVar(self, text):
+        if text in self.attributes:
+            self.sender().setStyleSheet("color: blue")
+            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
+        else:
+            self.sender().setStyleSheet("color:black")
+            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
+
+    def finalCheck(self):
+        temp = self.sender()
+        text = temp.text()
+        if text not in self.attributes:
+            if text and text[0] == "[":
+                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                temp.clear()
+
+    def setAttributes(self, attributes):
+        self.attributes = [f"[{attribute}]" for attribute in attributes]
+        self.line1.setCompleter(QCompleter(self.attributes))
+        self.line2.setCompleter(QCompleter(self.attributes))
+        self.experimental.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         return {

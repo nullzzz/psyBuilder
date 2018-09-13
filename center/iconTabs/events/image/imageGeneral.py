@@ -1,3 +1,4 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QLineEdit, QPushButton, QCheckBox, \
     QComboBox, QSpinBox, QApplication, QFileDialog, QCompleter, QMessageBox
@@ -71,15 +72,21 @@ class ImageTab1(QWidget):
         # layout2.addWidget(self.align_h, 0, 1)
         # layout2.addWidget(QLabel("AlignVertical:"), 1, 0)
         # layout2.addWidget(self.align_v, 1, 1)
-
-        layout2.addWidget(QLabel("Back Color:"), 0, 0)
+        l1 = QLabel("Back Color:")
+        l2 = QLabel("Transparent:")
+        l3 = QLabel("Clear After:")
+        l4 = QLabel("Screen Name:")
+        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        layout2.addWidget(l1, 0, 0)
         layout2.addWidget(self.back_color, 0, 1)
-
-        layout2.addWidget(QLabel("Transparent:"), 0, 2)
+        layout2.addWidget(l2, 0, 2)
         layout2.addWidget(self.transparent, 0, 3)
-        layout2.addWidget(QLabel("Clear After:"), 1, 0)
+        layout2.addWidget(l3, 1, 0)
         layout2.addWidget(self.clear_after, 1, 1)
-        layout2.addWidget(QLabel("Screen Name:"), 1, 2)
+        layout2.addWidget(l4, 1, 2)
         layout2.addWidget(self.screen_name, 1, 3)
 
         group2.setLayout(layout2)

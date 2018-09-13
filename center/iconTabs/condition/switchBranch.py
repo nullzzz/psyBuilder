@@ -2,9 +2,9 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QVBoxLayout, QMessageBox, QHBoxLayout
 
+from getImage import getImage
 from .iconChoose import IconChoose
 from .switchCondition import SwitchCondition
-from getImage import getImage
 
 
 class SwitchBranch(QWidget):
@@ -24,9 +24,10 @@ class SwitchBranch(QWidget):
     def __init__(self, parent=None, value=''):
         super(SwitchBranch, self).__init__(parent)
 
-        self.condition_area = SwitchCondition(self)
+        self.condition_area = SwitchCondition()
         self.condition_area.add_case.connect(self.addCase)
 
+        # 存放case的event对象
         self.icons = []
 
         self.default_icon_choose = IconChoose(self)
@@ -35,11 +36,12 @@ class SwitchBranch(QWidget):
 
         self.value = value
         # [value, name, properties]
-        self.type_value = {'T': ['Other.10001', '', {}], 'F': ['Other.10002', '', {}]}
+        self.type_value = {'D': ['Other.10001', '', {}]}
 
         condition_group = QGroupBox("Condition")
         layout1 = QVBoxLayout()
-        layout1.addWidget(self.condition_area)
+        layout1.addWidget(self.condition_area, 1)
+        layout1.addStretch()
         condition_group.setLayout(layout1)
 
         self.default_group = QGroupBox("Default")
@@ -64,7 +66,8 @@ class SwitchBranch(QWidget):
         buttons_layout.addWidget(self.apply_button)
 
         self.layout = QVBoxLayout()
-        self.layout.addWidget(condition_group)
+        self.layout.addWidget(condition_group, 1)
+        self.layout.addStretch()
         self.layout.addLayout(self.icon_layout)
         self.layout.addLayout(buttons_layout)
         self.setLayout(self.layout)
@@ -100,8 +103,7 @@ class SwitchBranch(QWidget):
 
     def clickApply(self):
         try:
-            self.disposeNode('T')
-            self.disposeNode('F')
+            self.disposeNode('D')
 
             # properties
             self.propertiesChange.emit(self.getInfo())
@@ -109,35 +111,35 @@ class SwitchBranch(QWidget):
             print("error {} happens in apple if-else. [condition/ifBranch.py]".format(e))
 
     # todo:这是啥呀
-    def disposeNode(self, condition_type='T'):
+    def disposeNode(self, condition_type='D'):
         # 获取当前的icon的value
-        if condition_type == 'T':
-            current_value = self.true_icon_choose.icon.value
-            current_name = self.true_icon_choose.icon_name.text()
-            current_properties_window = self.true_icon_choose.properties_window
+        if condition_type == 'D':
+            current_value = self.default_icon_choose.icon.value
+            current_name = self.default_icon_choose.icon_name.text()
+            current_properties_window = self.default_icon_choose.properties_window
         else:
-            current_value = self.false_icon_choose.icon.value
-            current_name = self.false_icon_choose.icon_name.text()
-            current_properties_window = self.false_icon_choose.properties_window
+            current_value = self.default_icon_choose.icon.value
+            current_name = self.default_icon_choose.icon_name.text()
+            current_properties_window = self.default_icon_choose.properties_window
 
         # node delete
         if not self.type_value[condition_type][0].startswith("Other.") and current_value.startswith("Other"):
             self.nodeDelete.emit(self.value, self.type_value[condition_type][0])
-            self.type_value[condition_type] = ['Other.10001' if condition_type == 'T' else "Other.10002", '', {}]
+            self.type_value[condition_type] = ['Other.10001' if condition_type == 'D' else "Other.10002", '', {}]
         elif not current_value.startswith("Other."):
             # new node
             if current_value != self.type_value[condition_type][0]:
                 # delete old
                 if not self.type_value[condition_type][0].startswith("Other"):
                     self.nodeDelete.emit(self.value, self.type_value[condition_type][0])
-                    self.type_value[condition_type] = ['Other.10001' if condition_type == 'T' else "Other.10002", '',
+                    self.type_value[condition_type] = ['Other.10001' if condition_type == 'D' else "Other.10002", '',
                                                        {}]
                 # add new
                 self.nodeChange.emit(self.value, "[" + condition_type + "] " + current_name,
                                      getImage(current_value.split('.')[0], 'pixmap'),
                                      current_value, current_properties_window)
                 self.type_value[condition_type][0] = current_value
-                self.type_value[condition_type][1] = self.true_icon_choose.icon_name.text()
+                self.type_value[condition_type][1] = self.default_icon_choose.icon_name.text()
             # change node
             else:
                 # name change
