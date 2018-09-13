@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDockWidget, QInputDialog, QMessageBox, QLineEdit
@@ -7,8 +9,6 @@ from .structureTree import StructureTree
 
 from center.iconTabs.timeline.icon import Icon
 from getImage import getImage
-
-from collections import OrderedDict
 
 
 class Structure(QDockWidget):
@@ -448,11 +448,11 @@ class Structure(QDockWidget):
         try:
             # 如果没出现过或者没有改变
             if name not in Structure.name_values or value in Structure.name_values[name]:
-                return (1, '')
+                return 1, ''
             else:
                 # 如果已存在, 但是不是同类型, 不可以
                 if not Structure.name_values[name][0].startswith(value.split('.')[0]):
-                    return (0, '')
+                    return 0, ''
                 else:
                     parent_node = Structure.value_node[parent_value]
                     parent_name = parent_node.text(0)
@@ -464,7 +464,7 @@ class Structure(QDockWidget):
                             in_same_level = True
                     # 如果在同一层次
                     if in_same_level:
-                        return (0, '')
+                        return 0, ''
                     # 如果是在父节点中
                     else:
                         in_parent = False
@@ -475,9 +475,9 @@ class Structure(QDockWidget):
                             parent_node = parent_node.parent()
 
                         if in_parent:
-                            return (0, '')
+                            return 0, ''
                         else:
-                            return (2, exist_value)
+                            return 2, exist_value
         except Exception as e:
             print(f"error {e} happens in check name is valid. [structure/main.py]")
 
