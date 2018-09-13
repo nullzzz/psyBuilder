@@ -51,10 +51,6 @@ class SwitchCondition(QTableWidget):
         self.setCellWidget(0, 4, switch)
         self.setCellWidget(0, 6, add_button)
 
-        # self.insertRow(1)
-        # self.setCellWidget(1, 0, QLabel("default"))
-        # self.setCellWidget(1, 2, default_var)
-
         self.setColumnWidth(0, 60)
         self.setColumnWidth(1, 60)
         self.setColumnWidth(2, 60)

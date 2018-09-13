@@ -1,6 +1,7 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QCompleter, \
+    QMessageBox
 
 
 class StartR(QWidget):
@@ -11,7 +12,13 @@ class StartR(QWidget):
         super(StartR, self).__init__(parent)
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
+
+        self.attributes = []
+
         self.statue_msg = QLineEdit()
+        self.statue_msg.textChanged.connect(self.findVar)
+        self.statue_msg.returnPressed.connect(self.finalCheck)
+
         self.msg = ""
         self.bt_ok = QPushButton("Ok")
         self.bt_ok.clicked.connect(self.ok)
@@ -20,6 +27,9 @@ class StartR(QWidget):
         self.bt_apply = QPushButton("Apply")
         self.bt_apply.clicked.connect(self.apply)
         self.setUI()
+
+        self.setAttributes(["test"])
+
         self.statue_msg.setFocus()
 
     def setUI(self):
@@ -62,6 +72,25 @@ class StartR(QWidget):
         self.msg = self.statue_msg.text()
         self.propertiesChange.emit(self.getProperties())
 
+    def findVar(self, text):
+        if text in self.attributes:
+            self.sender().setStyleSheet("color: blue")
+            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
+        else:
+            self.sender().setStyleSheet("color:black")
+            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
+
+    def finalCheck(self):
+        temp = self.sender()
+        text = temp.text()
+        if text not in self.attributes:
+            if text and text[0] == "[":
+                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                temp.clear()
+
+    def setAttributes(self, attributes):
+        self.attributes = [f"[{attribute}]" for attribute in attributes]
+        self.statue_msg.setCompleter(QCompleter(self.attributes))
 
     def getProperties(self):
         return {"Statue Message": self.msg}

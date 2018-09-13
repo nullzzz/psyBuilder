@@ -1,7 +1,7 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QComboBox, QWidget, QLabel, QLineEdit, QCheckBox, QPushButton, \
-    QHBoxLayout
+    QHBoxLayout, QMessageBox, QCompleter
 
 
 class EyeDC(QWidget):
@@ -10,15 +10,26 @@ class EyeDC(QWidget):
 
     def __init__(self, parent=None):
         super(EyeDC, self).__init__(parent)
+
+        self.attributes = []
+
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
-        self.xpos = QLineEdit()
-        self.ypos = QLineEdit()
+        self.x_pos = QLineEdit()
+        self.y_pos = QLineEdit()
         self.target_color = QLineEdit()
         self.target_style = QComboBox()
-        self.show_display_with_drift_correction_target = QCheckBox("Show display with drift-correction target")
+
+        self.x_pos.textChanged.connect(self.findVar)
+        self.y_pos.textChanged.connect(self.findVar)
+        self.target_color.textChanged.connect(self.findVar)
+        self.x_pos.returnPressed.connect(self.finalCheck)
+        self.y_pos.returnPressed.connect(self.finalCheck)
+        self.target_color.returnPressed.connect(self.finalCheck)
+
+        self.show_display_with_drift_correction_target = QCheckBox("Show Display With Drift-Correction Target")
         self.show_display_with_drift_correction_target.stateChanged.connect(self.statueChanged)
-        self.fixation_triggered = QCheckBox("Fixation triggered (no spacebar press required)")
+        self.fixation_triggered = QCheckBox("Fixation Triggered (No Spacebar Press Required)")
         self.fixation_triggered.stateChanged.connect(self.statueChanged)
         self.bt_ok = QPushButton("Ok")
         self.bt_ok.clicked.connect(self.ok)
@@ -27,7 +38,10 @@ class EyeDC(QWidget):
         self.bt_apply = QPushButton("Apply")
         self.bt_apply.clicked.connect(self.apply)
         self.setUI()
-        self.xpos.setFocus()
+
+        self.setAttributes(["test"])
+
+        self.x_pos.setFocus()
 
     def setUI(self):
         self.setWindowTitle("DC")
@@ -45,18 +59,27 @@ class EyeDC(QWidget):
         self.target_color.setEnabled(False)
         self.target_style.setEnabled(False)
 
+        l1 = QLabel("X Position:")
+        l2 = QLabel("Y Position:")
+        l3 = QLabel("Target Color:")
+        l4 = QLabel("Target Style:")
+        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
-        layout1.addWidget(QLabel("X position"), 2, 0, 1, 1)
-        layout1.addWidget(self.xpos, 2, 1, 1, 1)
+        layout1.addWidget(l1, 2, 0, 1, 1)
+        layout1.addWidget(self.x_pos, 2, 1, 1, 1)
 
-        layout1.addWidget(QLabel("Y position"), 3, 0, 1, 1)
-        layout1.addWidget(self.ypos, 3, 1, 1, 1)
-        layout1.addWidget(QLabel("Target color"), 4, 0, 1, 1)
+        layout1.addWidget(l2, 3, 0, 1, 1)
+        layout1.addWidget(self.y_pos, 3, 1, 1, 1)
+        layout1.addWidget(l3, 4, 0, 1, 1)
         layout1.addWidget(self.target_color, 4, 1, 1, 1)
 
-        layout1.addWidget(QLabel("Target style"), 5, 0, 1, 1)
+        layout1.addWidget(l4, 5, 0, 1, 1)
         layout1.addWidget(self.target_style, 5, 1, 1, 1)
 
         layout1.addWidget(self.show_display_with_drift_correction_target, 6, 1, 1, 1)
@@ -80,10 +103,10 @@ class EyeDC(QWidget):
         b = self.fixation_triggered.checkState()
         if a:
             self.target_color.setEnabled(True)
-            self.target_stytle.setEnabled(True)
+            self.target_style.setEnabled(True)
         else:
             self.target_color.setEnabled(False)
-            self.target_stytle.setEnabled(False)
+            self.target_style.setEnabled(False)
 
     def ok(self):
         self.apply()
@@ -97,11 +120,35 @@ class EyeDC(QWidget):
     def apply(self):
         self.propertiesChange.emit(self.getProperties())
 
+        # 检查变量
+
+    def findVar(self, text):
+        if text in self.attributes:
+            self.sender().setStyleSheet("color: blue")
+            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
+        else:
+            self.sender().setStyleSheet("color:black")
+            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
+
+    def finalCheck(self):
+        temp = self.sender()
+        text = temp.text()
+        if text not in self.attributes:
+            if text and text[0] == "[":
+                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                temp.clear()
+
+    def setAttributes(self, attributes):
+        self.attributes = [f"[{attribute}]" for attribute in attributes]
+        self.x_pos.setCompleter(QCompleter(self.attributes))
+        self.y_pos.setCompleter(QCompleter(self.attributes))
+        self.target_color.setCompleter(QCompleter(self.attributes))
+
     def getProperties(self):
-        x_p = self.xpos.text()
-        y_p = self.ypos.text()
+        x_p = self.x_pos.text()
+        y_p = self.y_pos.text()
         color = self.target_color.text()
-        style = self.target_stytle.currentText()
+        style = self.target_style.currentText()
         a = self.show_display_with_drift_correction_target.checkState()
         b = self.fixation_triggered.checkState()
         return {
@@ -109,6 +156,6 @@ class EyeDC(QWidget):
             "Y position": y_p,
             "Target color": color,
             "Target style": style,
-            "show display with drift correction target": a,
-            "fixation triggered": b
+            "Show display with drift correction target": a,
+            "Fixation triggered": b
         }

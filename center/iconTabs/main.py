@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
 from center.iconTabs.condition.switchBranch import SwitchBranch
 from center.iconTabs.timeline.main import Timeline
+from getImage import getImage
 from .condition.ifBranch import IfBranch
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
@@ -17,7 +18,6 @@ from .eyeTracker.close import Close
 from .eyeTracker.endR import EndR
 from .eyeTracker.open import Open
 from .eyeTracker.startR import StartR
-from getImage import getImage
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
@@ -426,8 +426,8 @@ class IconTabs(QTabWidget):
                     self.removeTab(tab_index)
             elif index != -1 and not widget:
                 self.removeTab(index)
-        except Exception:
-            print("error happens in close tab.")
+        except Exception as e:
+            print(f"error {e} happens in close tab.")
 
     # 删除某个icon, 感觉和之前的removeIcon有点重复造成浪费
     def deleteIcon(self, value):
@@ -440,7 +440,7 @@ class IconTabs(QTabWidget):
                 if not value.startswith("Timeline."):
                     del self.value_parent[value]
         except Exception as e:
-            print("some errors happen in delete icon in timeLine. [iconTabs/main.py]")
+            print(f"error {e} happen in delete icon in timeLine. [iconTabs/main.py]")
 
     def changeIconName(self, parent_value, value, name):
         try:
@@ -470,7 +470,6 @@ class IconTabs(QTabWidget):
                 self.value_widget[value] = self.value_widget[exist_value]
         except Exception as e:
             print(f"error {e} happens in change value widget. [iconTabs/main.py]")
-
 
     def copyWidget(self, old_value, new_value):
         try:

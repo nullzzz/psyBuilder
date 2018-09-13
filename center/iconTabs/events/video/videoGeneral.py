@@ -58,7 +58,7 @@ class VideoTab1(QWidget):
         # self.stretch_mode.addItems(["Both", "LeftRight", "UpDown"])
         # self.stretch_mode.setEnabled(False)
 
-        self.aspect_ratio.addItems(["default", "ignore", "keep", "keepByExpanding"])
+        self.aspect_ratio.addItems(["Default", "Ignore", "Keep", "KeepByExpanding"])
         self.transparent.setMaximum(100)
         self.transparent.setSuffix("%")
         self.transparent.setValue(100)
