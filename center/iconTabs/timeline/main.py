@@ -55,3 +55,6 @@ class Timeline(QWidget):
 
     def getProperties(self):
         return {"properties": "None"}
+
+    def copy(self, value):
+        pass

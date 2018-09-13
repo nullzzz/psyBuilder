@@ -7,6 +7,7 @@ from .structureItem import StructureItem
 class StructureTree(QTreeWidget):
     # (value)
     itemDelete = pyqtSignal(str)
+    nodeDelete = pyqtSignal(str, str)
     # 发送到main(parent.value, value)
     timelineDelete = pyqtSignal(str, str)
     itemInIfBranchDelete = pyqtSignal(str, str)
@@ -33,13 +34,14 @@ class StructureTree(QTreeWidget):
             self.right_button_menu.exec(self.mapToGlobal(e.pos()))
 
     def deleteItem(self):
+        # 并非真正删除，只是发送一系列信号
         try:
             item = self.currentItem()
             if item.value != 'Timeline.10001':
                 parent = item.parent()
                 if isinstance(parent, StructureItem):
-                    parent.removeChild(item)
                     self.itemDelete.emit(item.value)
+                    self.nodeDelete.emit(parent.value, item.value)
                     if item.value.startswith("Timeline"):
                         self.timelineDelete.emit(parent.value, item.value)
                     if parent.value.startswith('If_else'):

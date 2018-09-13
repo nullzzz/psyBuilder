@@ -83,7 +83,8 @@ class IconChoose(QWidget):
                     self.properties_window.cancel_bt.clicked.connect(self.properties_window.close)
                     self.properties_window.apply_bt.clicked.connect(self.apply)
 
-                self.icon_name.setText(Structure.getName(self.icon.value, name))
+                # self.icon_name.setText(Structure.getName(self.icon.value, name))
+                self.icon_name.setPlaceholderText('untitled-' + name)
                 self.icon_name.setEnabled(True)
         except Exception as e:
             print("error {} happens in change icon. [condition/iconChoose.py]".format(e))

@@ -186,6 +186,7 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].timelineAdd.connect(self.structure.addNode)
                 self.center.icon_tabs.value_widget[value].timelineNameChange.connect(self.structure.changeNodeName)
                 self.center.icon_tabs.value_widget[value].timelineWidgetMerge.connect(self.center.icon_tabs.changeValueWidget)
+                self.center.icon_tabs.value_widget[value].timelineWidgetMerge.connect(self.structure.copyNode)
         except Exception:
             print("error happens in link cycle signals to structure. [main/main.py]")
 

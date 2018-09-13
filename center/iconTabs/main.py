@@ -471,7 +471,6 @@ class IconTabs(QTabWidget):
         except Exception as e:
             print(f"error {e} happens in change value widget. [iconTabs/main.py]")
 
-
     def copyWidget(self, old_value, new_value):
         try:
             old_widget = self.value_widget[old_value]
@@ -479,7 +478,7 @@ class IconTabs(QTabWidget):
             try:
                 # ToDo 各个widget的复制, 在各个widget的内部实现
                 print(f"I am copying {widget_type} widget.")
-                self.value_widget[new_value] = old_widget.copy()
+                self.value_widget[new_value] = old_widget.copy(new_value)
             except Exception:
                 pass
         except Exception as e:

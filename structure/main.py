@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QDockWidget, QInputDialog, QMessageBox, QLineEdit
 from .structureItem import StructureItem
 from .structureTree import StructureTree
 
+from center.iconTabs.timeline.icon import Icon
+
 from collections import OrderedDict
 
 
@@ -81,6 +83,7 @@ class Structure(QDockWidget):
         self.structure_tree.doubleClicked.connect(self.openTab)
         self.structure_tree.clicked.connect(lambda: self.propertiesShow.emit(self.structure_tree.currentItem().value))
         self.structure_tree.itemNameChange.connect(self.renameNode)
+        self.structure_tree.nodeDelete.connect(self.removeNode)
 
     def addRoot(self, text="root", pixmap=None, value=""):
         root = StructureItem(self.structure_tree, value)
@@ -94,38 +97,109 @@ class Structure(QDockWidget):
             # 往字典中加入
             Structure.value_node[value] = root
 
-    def addNode(self, parentValue='Timeline.10001', text="node", pixmap=None, value="", properties_window=None):
-        if parentValue in Structure.value_node:
-            parent = Structure.value_node[parentValue]
-            node = StructureItem(parent, value)
-            node.setText(0, text)
-            node.setIcon(0, QIcon(pixmap))
-            parent.setExpanded(True)
-            # 往字典中加入
-            Structure.value_node[value] = node
-            if parent.value.startswith('If_else.'):
-                text = text[4:]
-            if text in Structure.name_values:
-                Structure.name_values[text].append(value)
-            else:
-                Structure.name_values[text] = [value]
-            # count
-            self.addCount(value.split('.')[0])
+    def addNode(self, parent_value='Timeline.10001', text="node", pixmap=None, value="", properties_window=None):
+        try:
+            if parent_value in Structure.value_node:
+                orgin_text = text
+                parent = Structure.value_node[parent_value]
+                # 判断parent_value是否有同名者, 对于同名者也要加入node
+                for same_name_value in Structure.name_values[parent.text(0)]:
+                    if same_name_value != parent_value:
+                        # 对于新增的node，采用不同value，但是指向同一个widget
+                        temp_parent = Structure.value_node[same_name_value]
+                        icon_type = value.split('.')[0]
+                        temp_icon = Icon(None, icon_type, pixmap)
+                        temp_node = StructureItem(temp_parent, temp_icon.value)
+                        temp_node.setText(0, text)
+                        temp_node.setIcon(0, QIcon(pixmap))
+                        temp_parent.setExpanded(True)
+                        # 往字典中加入
+                        Structure.value_node[temp_icon.value] = temp_node
+                        if temp_parent.value.startswith('If_else.'):
+                            text = text[4:]
+                        if text in Structure.name_values:
+                            Structure.name_values[text].append(temp_icon.value)
+                        else:
+                            Structure.name_values[text] = [temp_icon.value]
+                        # count
+                        self.addCount(temp_icon.value.split('.')[0])
+                        # merge
+                        self.nodeWidgetMerge.emit(temp_icon.value, value)
 
-    def removeNode(self, parentValue, value):
-        if parentValue in Structure.value_node and value in Structure.value_node:
-            parent = Structure.value_node[parentValue]
+                text = orgin_text
+                node = StructureItem(parent, value)
+                node.setText(0, text)
+                node.setIcon(0, QIcon(pixmap))
+                parent.setExpanded(True)
+                # 往字典中加入
+                Structure.value_node[value] = node
+                if parent.value.startswith('If_else.'):
+                    text = text[4:]
+                if text in Structure.name_values:
+                    Structure.name_values[text].append(value)
+                else:
+                    Structure.name_values[text] = [value]
+                # count
+                self.addCount(value.split('.')[0])
+        except Exception as e:
+            print(f"error {e} happens in add node in structure. [structure/main.py]")
+
+    def removeNode(self, parent_value, value):
+        try:
+            # 删除node：
+            # 1，要删除其子节点
+            # 2，如果其父亲节点存在同名，其父节点同名者里的此node也要删除，因为其父节点的同名节点应当与其父节点同步
+            if value in Structure.value_node and parent_value in Structure.value_node:
+                parent_name = Structure.value_node[parent_value].text(0)
+                node_name = Structure.value_node[value].text(0)
+                if parent_value.startswith('If_else'):
+                    node_name = node_name[4:]
+                for same_parent_value in Structure.name_values[parent_name]:
+                    same_node_value = self.getNodeValueByName(same_parent_value, node_name)
+                    if same_node_value:
+                         self.removeNodeSimply(same_parent_value, same_node_value)
+        except Exception as e:
+            print(f"error {e} happens in remove node in structure. [structure/main.py]")
+
+    def removeNodeSimply(self, parent_value, value):
+        try:
+            # 只删除自身及其子节点
+            parent = Structure.value_node[parent_value]
             node = Structure.value_node[value]
+            node_name = Structure.value_node[value].text(0)
+            if parent_value.startswith('If_else'):
+                node_name = node_name[4:]
+            # 删除其子节点
+            while node.childCount():
+                self.removeNodeSimply(node.value, node.child(0).value)
+            # 删除自身及相关数据
+            # 数据包含name_value, value_node
+            Structure.name_values[node_name].remove(value)
+            if not Structure.name_values[node_name]:
+                del Structure.name_values[node_name]
+            del Structure.value_node[value]
             parent.removeChild(node)
+        except Exception as e:
+            print(f"error {e} happens in remove node simply. [structure/main.py]")
 
-    def moveNode(self, dragCol, targetCol, parentValue, value):
-        parent = Structure.value_node[parentValue]
-        node = Structure.value_node[value]
-        if targetCol != -1:
-            if targetCol > parent.childCount():
-                targetCol = parent.childCount()
-            parent.removeChild(node)
-            parent.insertChild(targetCol - 1, node)
+    def getNodeValueByName(self, parent_value, name):
+        parent = Structure.value_node[parent_value]
+        for node_value in Structure.name_values[name]:
+            if parent.indexOfChild(Structure.value_node[node_value]) != -1:
+                return node_value
+        return ''
+
+    def moveNode(self, drag_col, target_col, parent_value, value):
+        try:
+            parent = Structure.value_node[parent_value]
+            node = Structure.value_node[value]
+            if target_col != -1:
+                if target_col > parent.childCount():
+                    target_col = parent.childCount()
+                parent.removeChild(node)
+                parent.insertChild(target_col - 1, node)
+        except Exception as e:
+            print(f"error {e} happens in move node in structure. [structure.main.py]")
 
     def renameNode(self, item):
         try:
@@ -187,6 +261,20 @@ class Structure(QDockWidget):
                     self.itemInIfBranchNameChange.emit(parent_value, value, name)
         except Exception as e:
             print("error {} happens in change node name. [structure/main.py]".format(e))
+
+    def copyNode(self, value, exist_value):
+        try:
+            # if value in Structure.value_node and exist_value in Structure.value_node:
+            #     node = Structure.value_node[value]
+            #     exist_value
+            #     # 删除node下所有的子节点
+            #     for child in node.takeChildren():
+            #         self.removeNode(node.value, child.value)
+            #     # 将exist所有的子节点拷贝过来
+            #     # for child in
+            pass
+        except Exception as e:
+            print(f"error {e} happens in copy node. [structure/main.py]")
 
     def openTab(self):
         try:
