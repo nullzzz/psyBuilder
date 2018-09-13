@@ -145,7 +145,7 @@ class MainWindow(QMainWindow):
         self.center.icon_tabs.cycleAdd.connect(self.linkCycleSignals)
         self.center.icon_tabs.ifBranchAdd.connect(self.linkIFBranchSignals)
         self.center.icon_tabs.propertiesShow.connect(self.properties.showProperties)
-        self.center.icon_tabs.attributesShow.connect(self.attributes.showAttributes)
+        self.center.icon_tabs.attributesShow.connect(self.structure.showTimelineAttributes)
         # 将timeline中icon的变更与structure相连
         self.linkTimelineSignals('Timeline.10001')
         # structure中信号
@@ -163,6 +163,7 @@ class MainWindow(QMainWindow):
         self.structure.itemInIfBranchNameChange.connect(self.center.icon_tabs.changeTabName)
         self.structure.itemInIfBranchNameChange.connect(self.center.icon_tabs.changeItemInIfBranchName)
         self.structure.nodeWidgetMerge.connect(self.center.icon_tabs.changeValueWidget)
+        self.structure.timelineAttributesShow.connect(self.attributes.showAttributes)
 
     def linkTimelineSignals(self, value):
         try:
@@ -174,6 +175,7 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].iconRemove.connect(self.structure.removeNode)
                 self.center.icon_tabs.value_widget[value].iconMove.connect(self.structure.moveNode)
                 self.center.icon_tabs.value_widget[value].iconNameChange.connect(self.structure.changeNodeName)
+                self.center.icon_tabs.value_widget[value].icon_area.icon_table.iconWidgetMerge.connect(self.structure.copyNode)
         except Exception:
             print("error happens in link timeline signals to structure. [main/main.py]")
 

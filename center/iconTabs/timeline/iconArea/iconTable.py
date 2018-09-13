@@ -25,7 +25,7 @@ class IconTable(QTableWidget):
     # 单击得properties, 给icon tabs发送信号 (value)
     propertiesShow = pyqtSignal(str)
     # 发送给icon tabs （old_value, exist_value)
-    iconWidgetChange = pyqtSignal(str, str)
+    iconWidgetMerge = pyqtSignal(str, str)
 
     # icon固定宽度
     WIDTH = 50
@@ -388,7 +388,7 @@ class IconTable(QTableWidget):
                                                 'name has existed in other place, are you sure to change?',
                                                 QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                             value = self.cellWidget(1, item.column()).value
-                            self.iconWidgetChange.emit(value, exist_value)
+                            self.iconWidgetMerge.emit(value, exist_value)
                         else:
                             whether_change = False
 

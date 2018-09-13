@@ -30,8 +30,8 @@ class IconTabs(QTabWidget):
     cycleAdd = pyqtSignal(str)
     # 同上
     ifBranchAdd = pyqtSignal(str)
-    # 发送到attributes窗口 (attributes)
-    attributesShow = pyqtSignal(dict)
+    # 发送到structure (value)
+    attributesShow = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(IconTabs, self).__init__(parent)
@@ -80,7 +80,7 @@ class IconTabs(QTabWidget):
             self.value_widget[value].icon_area.icon_table.iconDoubleClicked.connect(self.openTab)
             self.value_widget[value].icon_area.icon_table.iconRemove.connect(self.deleteTab)
             self.value_widget[value].icon_area.icon_table.propertiesShow.connect(self.getWidgetProperties)
-            self.value_widget[value].icon_area.icon_table.iconWidgetChange.connect(self.changeValueWidget)
+            self.value_widget[value].icon_area.icon_table.iconWidgetMerge.connect(self.changeValueWidget)
 
     def linkCycleSignals(self, value):
         try:
@@ -183,13 +183,13 @@ class IconTabs(QTabWidget):
                 else:
                     break
             return attributes
-        except Exception:
-            print("error happens in get timeline attribute. [iconTabs/main.py]")
+        except Exception as e:
+            print(f"error {e} happens in get timeline attribute. [iconTabs/main.py]")
 
     def showTimelineAttributes(self, tab_index):
         widget = self.widget(tab_index)
         if isinstance(widget, Timeline):
-            self.attributesShow.emit(self.getTimelineAttributes(widget.value))
+            self.attributesShow.emit(widget.value)
 
     def showProperties(self, current_index):
         try:
@@ -216,7 +216,8 @@ class IconTabs(QTabWidget):
                     self.setCurrentIndex(self.addTab(widget, tab_icon, name))
                 # 我在cycle中生成timeline时, 就已经生成了timeline实体
                 if value.startswith("Timeline."):
-                    self.attributesShow.emit(self.getTimelineAttributes(value))
+                    self.attributesShow.emit(value)
+
             else:
                 widget = None
                 tab_icon = getImage(widget_type, "icon")

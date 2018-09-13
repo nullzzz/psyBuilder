@@ -6,6 +6,7 @@ from .structureItem import StructureItem
 from .structureTree import StructureTree
 
 from center.iconTabs.timeline.icon import Icon
+from getImage import getImage
 
 from collections import OrderedDict
 
@@ -25,6 +26,8 @@ class Structure(QDockWidget):
     propertiesShow = pyqtSignal(str)
     # 发送到icon tabs (value, exist_value)
     nodeWidgetMerge = pyqtSignal(str, str)
+    # 发送到attributes window (attributes)
+    timelineAttributesShow = pyqtSignal(dict)
 
     name_values = {'Timeline': ['Timeline.10001']}
     value_node = {}
@@ -264,15 +267,38 @@ class Structure(QDockWidget):
 
     def copyNode(self, value, exist_value):
         try:
-            # if value in Structure.value_node and exist_value in Structure.value_node:
-            #     node = Structure.value_node[value]
-            #     exist_value
-            #     # 删除node下所有的子节点
-            #     for child in node.takeChildren():
-            #         self.removeNode(node.value, child.value)
-            #     # 将exist所有的子节点拷贝过来
-            #     # for child in
-            pass
+            # 在value所代表的node下增加已有的节点的子节点
+            if value in Structure.value_node and exist_value in Structure.value_node:
+                node = Structure.value_node[value]
+                exist_node = Structure.value_node[exist_value]
+                # 只能简单删除node下所有的子节点
+                for child_index in range(0, node.childCount()):
+                    child = node.child(child_index)
+                    self.removeNodeSimply(node.value, child.value)
+                # 将exist所有的子节点拷贝过来
+                for exist_child_index in range(0, exist_node.childCount()):
+                    exist_child = exist_node.child(exist_child_index)
+                    # 对于新增的node，采用不同value，但是指向同一个widget
+                    icon_type = exist_child.value.split('.')[0]
+                    pixmap = getImage(icon_type, 'pixmap')
+                    child_icon = Icon(None, icon_type, pixmap)
+                    child_node = StructureItem(node, child_icon.value)
+                    child_node.setText(0, exist_child.text(0))
+                    child_node.setIcon(0, QIcon(pixmap))
+                    node.setExpanded(True)
+                    # 往字典中加入
+                    Structure.value_node[child_node.value] = child_node
+                    text = exist_child.text(0)
+                    if exist_value.startswith('If_else.'):
+                        text = text[4:]
+                    if text in Structure.name_values:
+                        Structure.name_values[text].append(child_node.value)
+                    else:
+                        Structure.name_values[text] = [child_node.value]
+                    # count
+                    self.addCount(child_node.value.split('.')[0])
+                    # merge
+                    self.nodeWidgetMerge.emit(child_node.value, exist_child.value)
         except Exception as e:
             print(f"error {e} happens in copy node. [structure/main.py]")
 
@@ -454,3 +480,10 @@ class Structure(QDockWidget):
                             return (2, exist_value)
         except Exception as e:
             print(f"error {e} happens in check name is valid. [structure/main.py]")
+
+    def showTimelineAttributes(self, value):
+        self.timelineAttributesShow.emit(self.getTimelineAttributes(value))
+
+    def getTimelineAttributes(self, value):
+        # todo 得到timeline的attributes
+        return {}
