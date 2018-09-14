@@ -10,6 +10,14 @@ class Tab2(QWidget):
     def __init__(self, parent=None):
         super(Tab2, self).__init__(parent)
         self.attributes = []
+        self.default_properties = {
+            "X position": "0",
+            "Y position": "0",
+            "Width": "100%",
+            "Height": "100%",
+            "Border color": "white",
+            "Border width": 0
+        }
         # up
         self.x_pos = QComboBox()
         self.y_pos = QComboBox()
@@ -113,11 +121,19 @@ class Tab2(QWidget):
         self.height.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
-        return {
-            "X position": self.x_pos.currentText(),
-            "Y position": self.y_pos.currentText(),
-            "Width": self.width.currentText(),
-            "Height": self.height.currentText(),
-            "Border color": self.border_color.currentText(),
-            "Border width": self.border_width.value()
-        }
+        self.default_properties["X position"] = self.x_pos.currentText()
+        self.default_properties["Y position"] = self.y_pos.currentText()
+        self.default_properties["Width"] = self.width.currentText()
+        self.default_properties["Height"] = self.height.currentText()
+        self.default_properties["Border color"] = self.border_color.currentText()
+        self.default_properties["Border width"] = self.border_width.value()
+        return self.default_properties
+
+    # 加载参数设置
+    def loadSetting(self):
+        self.x_pos.setCurrentText(self.default_properties["X position"])
+        self.y_pos.setCurrentText(self.default_properties["Y position"])
+        self.width.setCurrentText(self.default_properties["Width"])
+        self.height.setCurrentText(self.default_properties["Height"])
+        self.border_color.setCurrentText(self.default_properties["Border color"])
+        self.border_width.setValue(self.default_properties["Border width"])

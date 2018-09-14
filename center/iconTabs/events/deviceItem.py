@@ -24,6 +24,12 @@ class DeviceOutItem(QListWidgetItem):
     def __init__(self, name=None, parent=None):
         super(DeviceOutItem, self).__init__(name, parent)
         self.attributes = []
+
+        self.default_properties = {
+            "Value or Msg": "",
+            "Pulse Duration": ""
+        }
+
         self.name = name
         self.devices = []
         self.pro = QWidget()
@@ -80,11 +86,13 @@ class DeviceOutItem(QListWidgetItem):
         DeviceOutItem.varColor = color
 
     def getInfo(self):
-        return {
-            "Device name": self.name,
-            "Value or msg": self.value.text(),
-            "Pulse Duration": self.pulse_dur.currentText()
-        }
+        self.default_properties["Value or Msg"] = self.value.text()
+        self.default_properties["Pulse Duration"] = self.pulse_dur.text()
+        return self.default_properties
+
+    def loadSetting(self):
+        self.value.setText(self.default_properties["Value or Msg"])
+        self.pulse_dur.setText(self.default_properties["Pulse Duration"])
 
 
 # 重写下方输入设备
@@ -94,6 +102,11 @@ class DeviceInItem(QListWidgetItem):
     def __init__(self, name=None, parent=None):
         super(DeviceInItem, self).__init__(name, parent)
         self.attributes = []
+
+        self.default_properties = {
+
+        }
+
         self.name = name
         self.pro1 = QWidget()
         self.device_label = QLabel(name)
@@ -216,6 +229,7 @@ class DeviceInItem(QListWidgetItem):
         DeviceInItem.varColor = color
 
     def getInfo(self):
+        # todo：当初说的啥眼动设备，属性不一样，现在还不知道是啥子
         if "eye" not in self.name:
             return {
                 "Device name": self.name,
