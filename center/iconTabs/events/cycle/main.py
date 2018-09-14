@@ -426,3 +426,6 @@ class Cycle(QMainWindow):
         self.paste_col = 0
         self.is_paste_disabled = False
         self.paste_data = []
+
+    def copy(self, value):
+        pass

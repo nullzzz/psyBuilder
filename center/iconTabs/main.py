@@ -477,7 +477,7 @@ class IconTabs(QTabWidget):
             old_widget = self.value_widget[old_value]
             widget_type = old_value.split('.')[0]
             try:
-                # ToDo 各个widget的复制, 在各个widget的内部实现
+                # todo 各个widget的复制, 在各个widget的内部实现
                 print(f"I am copying {widget_type} widget.")
                 self.value_widget[new_value] = old_widget.copy(new_value)
             except Exception:
