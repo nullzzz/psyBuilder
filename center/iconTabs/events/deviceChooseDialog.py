@@ -9,7 +9,7 @@ class DeviceInDialog(QDialog):
         super(DeviceInDialog, self).__init__(parent)
         self.devices_list = QListWidget()
         self.tip = QLabel("Please choose input device(s) from menu bar first!")
-        self.ok_bt = QPushButton("Ok")
+        self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
         self.setUI()
 
@@ -23,16 +23,6 @@ class DeviceInDialog(QDialog):
         self.devices_list.setAutoFillBackground(True)
         # self.devices_list.setWrapping(False)
         self.devices_list.setSpacing(20)
-
-        # item1 = QListWidgetItem("eye")
-        # item1.setIcon(QIcon("image/ff"))
-        # self.devices_list.addItem(item1)
-        # item2 = QListWidgetItem("device2")
-        # item2.setIcon(QIcon("image/ff"))
-        # self.devices_list.addItem(item2)
-        # item3 = QListWidgetItem("device1")
-        # item3.setIcon(QIcon("image/ff"))
-        # self.devices_list.addItem(item3)
 
         layout = QGridLayout()
         layout.addWidget(self.devices_list, 0, 0, 1, 4)
@@ -59,7 +49,7 @@ class DeviceOutDialog(QDialog):
         super(DeviceOutDialog, self).__init__(parent)
         self.tip = QLabel("Please choose output device(s) from menu bar first!")
         self.devices_list = QListWidget()
-        self.ok_bt = QPushButton("Ok")
+        self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
         self.setUI()
 

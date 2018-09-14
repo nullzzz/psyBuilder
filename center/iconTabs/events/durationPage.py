@@ -249,13 +249,9 @@ class DurationPage(QWidget):
         out_info = {}
         for i in range(self.in_devices.count()):
             key = self.in_devices.item(i).text()
-            if key in in_info.keys():
-                key += "_another"
             in_info[key] = self.in_devices.item(i).getInfo()
         for i in range(self.out_devices.count()):
             key = self.out_devices.item(i).text()
-            if key in out_info.keys():
-                key += "_another"
             out_info[key] = self.out_devices.item(i).getInfo()
 
         return {

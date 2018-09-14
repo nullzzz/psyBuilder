@@ -1,5 +1,4 @@
 from PyQt5.QtGui import QIcon, QPixmap
-import os
 
 
 def getImage(widget_type, image_type='icon'):

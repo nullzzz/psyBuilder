@@ -1,3 +1,8 @@
+try:
+    import cPickle as pickle
+except:
+    import pickle
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
@@ -17,7 +22,7 @@ class ImageDisplay(QMainWindow):
         self.label = QLabel()
         self.pro = ImageProperty()
         self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.pro.close)
+        self.pro.cancel_bt.clicked.connect(self.cancel)
         self.pro.apply_bt.clicked.connect(self.apply)
 
         self.file = ""
@@ -81,6 +86,9 @@ class ImageDisplay(QMainWindow):
     def ok(self):
         self.apply()
         self.pro.close()
+
+    def cancel(self):
+        self.pro.frame.loadSetting()
 
     def apply(self):
         self.getPro()
@@ -150,3 +158,7 @@ class ImageDisplay(QMainWindow):
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro.setAttributes(format_attributes)
+
+    # copy当前image对象
+    def clone(self):
+        pass
