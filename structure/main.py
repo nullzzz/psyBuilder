@@ -26,6 +26,8 @@ class Structure(QDockWidget):
     propertiesShow = pyqtSignal(str)
     # 发送到icon tabs (value, exist_value)
     nodeWidgetMerge = pyqtSignal(str, str)
+    # 发送到icon tabs (value, old_exist_value)
+    nodeWidgetSplit = pyqtSignal(str, str)
     # 发送到attributes window (attributes)
     timelineAttributesShow = pyqtSignal(dict)
 
@@ -222,7 +224,7 @@ class Structure(QDockWidget):
                     name = name[4:]
                 text, flag = dialog.getText(None, "Rename", "Rename {} to :".format(name), QLineEdit.Normal, name)
                 # 检测rename
-                res, exist_value = Structure.checkNameIsValid(text, item.parent().value, item.value)
+                res, exist_value, old_exist_value = Structure.checkNameIsValid(text, item.parent().value, item.value)
                 whether_change = False
                 if res == 0:
                     QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
@@ -232,6 +234,16 @@ class Structure(QDockWidget):
                     if QMessageBox.question(self, 'Tips', 'name has existed in other place, are you sure to change?',
                                             QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
                         whether_change = True
+                        self.nodeWidgetMerge.emit(item.value, exist_value)
+                # todo split widget
+                elif res == 3:
+                    whether_change = True
+                    self.nodeWidgetSplit.emit(item.value, old_exist_value)
+                elif res == 4:
+                    if QMessageBox.question(self, 'Tips', 'name has existed in other place, are you sure to change?',
+                                            QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+                        whether_change = True
+                        # 好像不需要去断开之前的连接
                         self.nodeWidgetMerge.emit(item.value, exist_value)
                 if whether_change:
                     if flag and text:
@@ -460,14 +472,30 @@ class Structure(QDockWidget):
         # 0: 完全不能取
         # 1: 可以
         # 2: 可以取但是有重复的, 需要确定
+        # 3：改名断开连接
+        # 4：改名断开连接后，新名字为重复值
+        # 返回值type，exist_value，old_value
         try:
-            # 如果没出现过或者没有改变
+            # 如果new name没出现过或者没有改变
             if name not in Structure.name_values or value in Structure.name_values[name]:
-                return 1, ''
+                # 如果有old name且是有同名的，改成没有出现过的new name则是断开原有连接
+                if value in Structure.value_node:
+                    old_name = Structure.value_node[value].text(0)
+                    if len(Structure.name_values[old_name]) > 1:
+                        old_exist_value = ''
+                        for temp_value in Structure.name_values[old_name]:
+                            if temp_value != value:
+                                old_exist_value = old_exist_value = temp_value
+                                break
+                        return 3, '', old_exist_value
+                    else:
+                        return 1, '', ''
+                else:
+                    return 1, '', ''
             else:
                 # 如果已存在, 但是不是同类型, 不可以
                 if not Structure.name_values[name][0].startswith(value.split('.')[0]):
-                    return 0, ''
+                    return 0, '', ''
                 else:
                     parent_node = Structure.value_node[parent_value]
                     parent_name = parent_node.text(0)
@@ -479,7 +507,7 @@ class Structure(QDockWidget):
                             in_same_level = True
                     # 如果在同一层次
                     if in_same_level:
-                        return 0, ''
+                        return 0, '', ''
                     # 如果是在父节点中
                     else:
                         in_parent = False
@@ -490,9 +518,21 @@ class Structure(QDockWidget):
                             parent_node = parent_node.parent()
 
                         if in_parent:
-                            return 0, ''
+                            return 0, '', ''
                         else:
-                            return 2, exist_value
+                            if value in Structure.value_node:
+                                old_name = Structure.value_node[value].text(0)
+                                if len(Structure.name_values[old_name]) > 1:
+                                    old_exist_value = ''
+                                    for temp_value in Structure.name_values[old_name]:
+                                        if temp_value != value:
+                                            old_exist_value = temp_value
+                                            break
+                                    return 4, exist_value, old_exist_value
+                                else:
+                                    return 2, exist_value, ''
+                            else:
+                                return 2, exist_value, ''
         except Exception as e:
             print(f"error {e} happens in check name is valid. [structure/main.py]")
 
@@ -501,4 +541,4 @@ class Structure(QDockWidget):
 
     def getTimelineAttributes(self, value):
         # todo 得到timeline的attributes
-        return {}
+        return {"error" : "can't get attributes"}

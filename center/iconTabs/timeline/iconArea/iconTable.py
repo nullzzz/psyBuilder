@@ -26,6 +26,7 @@ class IconTable(QTableWidget):
     propertiesShow = pyqtSignal(str)
     # 发送给icon tabs （old_value, exist_value)
     iconWidgetMerge = pyqtSignal(str, str)
+    iconWidgetSplit = pyqtSignal(str, str)
 
     # icon固定宽度
     WIDTH = 50
@@ -375,7 +376,7 @@ class IconTable(QTableWidget):
         try:
             if self.is_edit:
                 if item.text():
-                    res, exist_value = Structure.checkNameIsValid(item.text(), self.parent_timeline_value,
+                    res, exist_value, old_exist_value = Structure.checkNameIsValid(item.text(), self.parent_timeline_value,
                                                                   self.cellWidget(1, item.column()).value)
                     whether_change = True
                     if res == 0:
@@ -391,7 +392,17 @@ class IconTable(QTableWidget):
                             self.iconWidgetMerge.emit(value, exist_value)
                         else:
                             whether_change = False
-
+                    # todo split widget
+                    elif res == 3:
+                        self.iconWidgetSplit.emit(self.cellWidget(1, item.column()).value, old_exist_value)
+                    elif res == 4:
+                        if QMessageBox.question(self, 'Tips',
+                                                'name has existed in other place, are you sure to change?',
+                                                QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+                            value = self.cellWidget(1, item.column()).value
+                            self.iconWidgetMerge.emit(value, exist_value)
+                        else:
+                            whether_change = False
                     if whether_change:
                         self.cellWidget(1, item.column()).setName(item.text())
                         # 发送value和更改后的name

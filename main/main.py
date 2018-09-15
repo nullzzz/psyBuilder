@@ -162,7 +162,8 @@ class MainWindow(QMainWindow):
         self.structure.timelineNameChange.connect(self.center.icon_tabs.changeTimelineName)
         self.structure.itemInIfBranchNameChange.connect(self.center.icon_tabs.changeTabName)
         self.structure.itemInIfBranchNameChange.connect(self.center.icon_tabs.changeItemInIfBranchName)
-        self.structure.nodeWidgetMerge.connect(self.center.icon_tabs.changeValueWidget)
+        self.structure.nodeWidgetMerge.connect(self.center.icon_tabs.mergeValueWidget)
+        self.structure.nodeWidgetSplit.connect(self.center.icon_tabs.splitValueWidget)
         self.structure.timelineAttributesShow.connect(self.attributes.showAttributes)
 
     def linkTimelineSignals(self, value):
@@ -187,7 +188,6 @@ class MainWindow(QMainWindow):
             except Exception:
                 self.center.icon_tabs.value_widget[value].timelineAdd.connect(self.structure.addNode)
                 self.center.icon_tabs.value_widget[value].timelineNameChange.connect(self.structure.changeNodeName)
-                self.center.icon_tabs.value_widget[value].timelineWidgetMerge.connect(self.center.icon_tabs.changeValueWidget)
                 self.center.icon_tabs.value_widget[value].timelineWidgetMerge.connect(self.structure.copyNode)
         except Exception:
             print("error happens in link cycle signals to structure. [main/main.py]")

@@ -25,6 +25,7 @@ class Cycle(QMainWindow):
     attributeChange = pyqtSignal(str, str, str)
     # (value, exist_value)
     timelineWidgetMerge = pyqtSignal(str, str)
+    timelineWidgetSplit = pyqtSignal(str, str)
 
     def __init__(self, parent=None, value=''):
         super(Cycle, self).__init__(parent)
@@ -235,9 +236,10 @@ class Cycle(QMainWindow):
                 if row not in self.row_value:
                     name = item.text()
                     if name:
-                        res, exist_value = Structure.checkNameIsValid(name, self.value, 'Timeline.')
+                        res, exist_value, old_exist_value = Structure.checkNameIsValid(name, self.value, 'Timeline.')
                         flag = False
                         mergeFlag = False
+                        # 因为是新增的timeline，不存在断开
                         if res == 0:
                             QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
                             self.timeline_table.setItem(row, col, QTableWidgetItem(''))
@@ -266,7 +268,7 @@ class Cycle(QMainWindow):
                     name = item.text()
                     value = self.row_value[row]
                     if name:
-                        res, exist_value = Structure.checkNameIsValid(name, self.value, value)
+                        res, exist_value, old_exist_value = Structure.checkNameIsValid(name, self.value, value)
                         flag = False
                         if res == 0:
                             QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
@@ -274,6 +276,16 @@ class Cycle(QMainWindow):
                         elif res == 1:
                             flag = True
                         elif res == 2:
+                            if QMessageBox.question(self, 'Tips',
+                                                    'name has existed in other place, are you sure to change?',
+                                                    QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+                                flag = True
+                                self.timelineWidgetMerge.emit(value, exist_value)
+                        # todo split widget
+                        elif res == 3:
+                            flag = True
+                            self.timelineWidgetSplit.emit(value, old_exist_value)
+                        elif res == 4:
                             if QMessageBox.question(self, 'Tips',
                                                     'name has existed in other place, are you sure to change?',
                                                     QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:

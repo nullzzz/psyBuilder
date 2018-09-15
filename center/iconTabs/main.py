@@ -80,7 +80,8 @@ class IconTabs(QTabWidget):
             self.value_widget[value].icon_area.icon_table.iconDoubleClicked.connect(self.openTab)
             self.value_widget[value].icon_area.icon_table.iconRemove.connect(self.deleteTab)
             self.value_widget[value].icon_area.icon_table.propertiesShow.connect(self.getWidgetProperties)
-            self.value_widget[value].icon_area.icon_table.iconWidgetMerge.connect(self.changeValueWidget)
+            self.value_widget[value].icon_area.icon_table.iconWidgetMerge.connect(self.mergeValueWidget)
+            self.value_widget[value].icon_area.icon_table.iconWidgetSplit.connect(self.splitValueWidget)
 
     def linkCycleSignals(self, value):
         try:
@@ -92,6 +93,8 @@ class IconTabs(QTabWidget):
                 cycle.timelineAdd.connect(self.addTimeline)
                 cycle.attributeAdd.connect(self.addTimelineAttribute)
                 cycle.attributeChange.connect(self.changeTimelineAttribute)
+                cycle.timelineWidgetMerge.connect(self.mergeValueWidget)
+                cycle.timelineWidgetSplit.connect(self.splitValueWidget)
         except Exception:
             print("error happens in link cycle signals. [iconTabs\main.py]")
 
@@ -102,7 +105,8 @@ class IconTabs(QTabWidget):
                 self.value_widget[value].iconPropertiesShow.connect(self.showItemInIfBranchProperties)
             except Exception:
                 self.value_widget[value].iconPropertiesShow.connect(self.showItemInIfBranchProperties)
-                self.value_widget[value].iconWidgetMerge.connect(self.changeValueWidget)
+                self.value_widget[value].iconWidgetMerge.connect(self.mergeValueWidget)
+                self.value_widget[value].iconWidgetSplit.connect(self.splitValueWidget)
         except Exception:
             print("error happens in link if branch signals to structure. [main/main.py]")
 
@@ -460,7 +464,7 @@ class IconTabs(QTabWidget):
         except Exception:
             print("some errors happen in copy icon. [iconTabs/main.py]")
 
-    def changeValueWidget(self, value, exist_value):
+    def mergeValueWidget(self, value, exist_value):
         try:
             # 先删除旧的widget
             self.deleteTab(value)
@@ -471,6 +475,12 @@ class IconTabs(QTabWidget):
                 self.value_widget[value] = self.value_widget[exist_value]
         except Exception as e:
             print(f"error {e} happens in change value widget. [iconTabs/main.py]")
+
+    def splitValueWidget(self, value, old_exist_value):
+        try:
+            self.copyWidget(value, old_exist_value)
+        except Exception as e:
+            print(f"error {e} happens in split widget. [iconTabs/main.py]")
 
     def copyWidget(self, old_value, new_value):
         try:

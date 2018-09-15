@@ -37,3 +37,6 @@ class AttributesTable(QTableWidget):
             for i in range(0, self.rowCount()):
                 self.item(i, col).setIcon(QIcon("image/arrows_up.png"))
             self.asc = True
+
+    def mouseDoubleClickEvent(self, QMouseEvent):
+        pass
