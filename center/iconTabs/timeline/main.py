@@ -57,4 +57,8 @@ class Timeline(QWidget):
         return {"properties": "None"}
 
     def copy(self, value):
+        # 返回自身的复制
+        # new_timeline = Timeline(value)
+        #
+        # return new_timeline
         pass

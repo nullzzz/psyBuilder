@@ -416,9 +416,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     demo = MainWindow()
-    demo.resize(app.desktop().width() * 0.9, app.desktop().height() * 0.8)
 
-    demo.show()
+    demo.showMaximized()
     demo.move((app.desktop().width() - demo.width()) / 2,
               (app.desktop().height() - demo.height()) / 2)
     demo.properties.my_widget.setMaximumWidth(600)

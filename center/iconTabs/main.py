@@ -490,8 +490,9 @@ class IconTabs(QTabWidget):
                 # todo 各个widget的复制, 在各个widget的内部实现
                 print(f"I am copying {widget_type} widget.")
                 self.value_widget[new_value] = old_widget.copy(new_value)
+                print(f"I have finished copying {widget_type} widget.")
             except Exception:
-                pass
+                print(f"Fail to copy {widget_type} widget.")
         except Exception as e:
             print("error {} happens in copy widget. [iconTabs/main.py]".format(e))
 

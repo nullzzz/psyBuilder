@@ -476,63 +476,66 @@ class Structure(QDockWidget):
         # 4：改名断开连接后，新名字为重复值
         # 返回值type，exist_value，old_value
         try:
-            # 如果new name没出现过或者没有改变
-            if name not in Structure.name_values or value in Structure.name_values[name]:
-                # 如果有old name且是有同名的，改成没有出现过的new name则是断开原有连接
-                if value in Structure.value_node:
-                    old_name = Structure.value_node[value].text(0)
-                    if len(Structure.name_values[old_name]) > 1:
-                        old_exist_value = ''
-                        for temp_value in Structure.name_values[old_name]:
-                            if temp_value != value:
-                                old_exist_value = old_exist_value = temp_value
-                                break
-                        return 3, '', old_exist_value
+            if name[0].isalpha():
+                # 如果new name没出现过或者没有改变
+                if name not in Structure.name_values or value in Structure.name_values[name]:
+                    # 如果有old name且是有同名的，改成没有出现过的new name则是断开原有连接
+                    if value in Structure.value_node:
+                        old_name = Structure.value_node[value].text(0)
+                        if len(Structure.name_values[old_name]) > 1:
+                            old_exist_value = ''
+                            for temp_value in Structure.name_values[old_name]:
+                                if temp_value != value:
+                                    old_exist_value = old_exist_value = temp_value
+                                    break
+                            return 3, '', old_exist_value
+                        else:
+                            return 1, '', ''
                     else:
                         return 1, '', ''
                 else:
-                    return 1, '', ''
-            else:
-                # 如果已存在, 但是不是同类型, 不可以
-                if not Structure.name_values[name][0].startswith(value.split('.')[0]):
-                    return 0, '', ''
-                else:
-                    parent_node = Structure.value_node[parent_value]
-                    parent_name = parent_node.text(0)
-                    exist_value = Structure.name_values[name][0]
-                    # 判断在同一层次是否有同名
-                    in_same_level = False
-                    for node_value in Structure.name_values[name]:
-                        if Structure.value_node[node_value].parent().text(0) == parent_name:
-                            in_same_level = True
-                    # 如果在同一层次
-                    if in_same_level:
+                    # 如果已存在, 但是不是同类型, 不可以
+                    if not Structure.name_values[name][0].startswith(value.split('.')[0]):
                         return 0, '', ''
-                    # 如果是在父节点中
                     else:
-                        in_parent = False
-                        while parent_node:
-                            if name == parent_node.text(0):
-                                in_parent = True
-                                break
-                            parent_node = parent_node.parent()
-
-                        if in_parent:
+                        parent_node = Structure.value_node[parent_value]
+                        parent_name = parent_node.text(0)
+                        exist_value = Structure.name_values[name][0]
+                        # 判断在同一层次是否有同名
+                        in_same_level = False
+                        for node_value in Structure.name_values[name]:
+                            if Structure.value_node[node_value].parent().text(0) == parent_name:
+                                in_same_level = True
+                        # 如果在同一层次
+                        if in_same_level:
                             return 0, '', ''
+                        # 如果是在父节点中
                         else:
-                            if value in Structure.value_node:
-                                old_name = Structure.value_node[value].text(0)
-                                if len(Structure.name_values[old_name]) > 1:
-                                    old_exist_value = ''
-                                    for temp_value in Structure.name_values[old_name]:
-                                        if temp_value != value:
-                                            old_exist_value = temp_value
-                                            break
-                                    return 4, exist_value, old_exist_value
+                            in_parent = False
+                            while parent_node:
+                                if name == parent_node.text(0):
+                                    in_parent = True
+                                    break
+                                parent_node = parent_node.parent()
+
+                            if in_parent:
+                                return 0, '', ''
+                            else:
+                                if value in Structure.value_node:
+                                    old_name = Structure.value_node[value].text(0)
+                                    if len(Structure.name_values[old_name]) > 1:
+                                        old_exist_value = ''
+                                        for temp_value in Structure.name_values[old_name]:
+                                            if temp_value != value:
+                                                old_exist_value = temp_value
+                                                break
+                                        return 4, exist_value, old_exist_value
+                                    else:
+                                        return 2, exist_value, ''
                                 else:
                                     return 2, exist_value, ''
-                            else:
-                                return 2, exist_value, ''
+            else:
+                return 0, '', ''
         except Exception as e:
             print(f"error {e} happens in check name is valid. [structure/main.py]")
 
