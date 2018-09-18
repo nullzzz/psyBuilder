@@ -39,6 +39,12 @@ class ImageDisplay(QMainWindow):
         self.setUI()
         self.setAttributes(["test", "var"])
 
+    def linkSignal(self):
+        self.pro.ok_bt.clicked.connect(self.ok)
+        # self.pro.cancel_bt.clicked.connect(self.cancel)/
+        self.pro.cancel_bt.clicked.connect(self.testBt)
+        self.pro.apply_bt.clicked.connect(self.apply)
+
     def setUI(self):
         self.setWindowTitle("Image")
 
@@ -87,9 +93,7 @@ class ImageDisplay(QMainWindow):
         self.pro.close()
 
     def cancel(self):
-        self.pro.general.loadSetting()
-        self.pro.frame.loadSetting()
-        self.pro.duration.loadSetting()
+        self.pro.loadSetting()
 
     def apply(self):
         self.getPro()
@@ -143,8 +147,8 @@ class ImageDisplay(QMainWindow):
 
     # 返回设置参数
     def getInfo(self):
-        self.properties = self.pro.getInfo()
-        return self.properties
+        self.default_properties = self.pro.getInfo()
+        return self.default_properties
 
     def setPro(self, pro: ImageProperty):
         del self.pro
@@ -172,6 +176,7 @@ class ImageDisplay(QMainWindow):
     def clone(self):
         clone_widget = ImageDisplay()
         clone_widget.setPro(self.pro.clone())
+        clone_widget.linkSignal()
         clone_widget.getPro()
         clone_widget.setImage()
         return clone_widget
@@ -182,5 +187,4 @@ class ImageDisplay(QMainWindow):
         # self.pro.tab.addTab(clone, "clone")
         clone = self.clone()
         clone.setWindowTitle("aaaaaa")
-        clone.show()
         self.pro.tab.addTab(clone, "c")

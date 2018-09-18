@@ -11,6 +11,16 @@ class VideoTab1(QWidget):
     def __init__(self, parent=None):
         super(VideoTab1, self).__init__(parent)
         self.attributes = []
+        self.default_properties = {
+            "File name": "",
+            "Start position": "00:00:00.000",
+            "End position": "00:00:00.000",
+            "Aspect ratio": "Default",
+            "Back color": "white",
+            "Transparent": 100,
+            "Clear after": "Yes",
+            "Screen name": "Display"
+        }
         # general
         self.file_name = QLineEdit()
         self.file_name.textChanged.connect(self.findVar)
@@ -18,8 +28,8 @@ class VideoTab1(QWidget):
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
-        self.startPos = QLineEdit()
-        self.endPos = QLineEdit()
+        self.start_pos = QLineEdit()
+        self.end_pos = QLineEdit()
 
         self.back_color = ColorListEditor()
         self.transparent = QSpinBox()
@@ -38,15 +48,15 @@ class VideoTab1(QWidget):
 
     def setUI(self):
         valid_pos = QRegExp("(\d{1,2}:\d{1,2}:\d{2}\.\d{3})|(\[\w+\])")
-        self.startPos.setText("00:00:00.000")
-        self.startPos.setMinimumWidth(120)
-        self.endPos.setText("00:00:00.000")
-        self.startPos.setValidator(QRegExpValidator(valid_pos, self))
-        self.endPos.setValidator(QRegExpValidator(valid_pos, self))
-        self.startPos.textChanged.connect(self.findVar)
-        self.startPos.returnPressed.connect(self.finalCheck)
-        self.endPos.textChanged.connect(self.findVar)
-        self.endPos.returnPressed.connect(self.finalCheck)
+        self.start_pos.setText("00:00:00.000")
+        self.start_pos.setMinimumWidth(120)
+        self.end_pos.setText("00:00:00.000")
+        self.start_pos.setValidator(QRegExpValidator(valid_pos, self))
+        self.end_pos.setValidator(QRegExpValidator(valid_pos, self))
+        self.start_pos.textChanged.connect(self.findVar)
+        self.start_pos.returnPressed.connect(self.finalCheck)
+        self.end_pos.textChanged.connect(self.findVar)
+        self.end_pos.returnPressed.connect(self.finalCheck)
 
         # self.stop_after.addItems(["No", "Yes"])
         # self.stop_after.currentTextChanged.connect(self.changed1)
@@ -86,10 +96,10 @@ class VideoTab1(QWidget):
         layout.addWidget(self.open_bt, 0, 3, 1, 1)
 
         layout.addWidget(l1, 1, 0, 1, 1)
-        layout.addWidget(self.startPos, 1, 1, 1, 1)
+        layout.addWidget(self.start_pos, 1, 1, 1, 1)
         layout.addWidget(QLabel("hh:mm:ss.xxx"), 1, 2, 1, 1)
         layout.addWidget(l2, 2, 0, 1, 1)
-        layout.addWidget(self.endPos, 2, 1, 1, 1)
+        layout.addWidget(self.end_pos, 2, 1, 1, 1)
         layout.addWidget(QLabel("hh:mm:ss.xxx"), 2, 2, 1, 1)
         layout.addWidget(l3, 3, 0, 1, 1)
         layout.addWidget(self.back_color, 3, 1, 1, 1)
@@ -154,19 +164,30 @@ class VideoTab1(QWidget):
     def setAttributes(self, attributes):
         self.attributes = attributes
         self.file_name.setCompleter(QCompleter(self.attributes))
-        self.startPos.setCompleter(QCompleter(self.attributes))
-        self.endPos.setCompleter(QCompleter(self.attributes))
+        self.start_pos.setCompleter(QCompleter(self.attributes))
+        self.end_pos.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
-        return {
-            "File name": self.file_name.text(),
-            "Start position": self.startPos.text(),
-            "End position": self.endPos.text(),
-            # "Stretch": self.stretch.currentText(),
-            # "Stretch mode": self.stretch_mode.currentText(),
-            "Aspect ratio": self.aspect_ratio.currentText(),
-            "Back color": self.back_color.currentText(),
-            "Transparent": "{}%".format(self.transparent.value()),
-            "Clear after": self.clear_after.currentText(),
-            "Screen name": self.screen_name.currentText()
-        }
+        self.default_properties["File name"] = self.file_name.text()
+        self.default_properties["Start position"] = self.start_pos.text()
+        self.default_properties["End position"] = self.end_pos.text()
+        self.default_properties["Aspect ratio"] = self.aspect_ratio.currentText()
+        self.default_properties["Back color"] = self.back_color.currentText()
+        self.default_properties["Transparent"] = self.transparent.value()
+        self.default_properties["Clear after"] = self.clear_after.currentText()
+        self.default_properties["Screen name"] = self.screen_name.currentText()
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.file_name.setText(self.default_properties["File name"])
+        self.start_pos.setText(self.default_properties["Start position"])
+        self.end_pos.setText(self.default_properties["End position"])
+        self.aspect_ratio.setCurrentText(self.default_properties["Aspect ratio"])
+        self.back_color.setCurrentText(self.default_properties["Back color"])
+        self.transparent.setValue(self.default_properties["Transparent"])
+        self.clear_after.setCurrentText(self.default_properties["Clear after"])
+        self.screen_name.setCurrentText(self.default_properties["Screen name"])
