@@ -107,6 +107,7 @@ class IconTabs(QTabWidget):
                 self.value_widget[value].iconPropertiesShow.connect(self.showItemInIfBranchProperties)
                 self.value_widget[value].iconWidgetMerge.connect(self.mergeValueWidget)
                 self.value_widget[value].iconWidgetSplit.connect(self.splitValueWidget)
+                self.value_widget[value].iconTabDelete.connect(self.deleteTab)
         except Exception:
             print("error happens in link if branch signals to structure. [main/main.py]")
 
@@ -489,7 +490,10 @@ class IconTabs(QTabWidget):
             try:
                 # todo 各个widget的复制, 在各个widget的内部实现
                 print(f"I am copying {widget_type} widget.")
-                self.value_widget[new_value] = old_widget.copy(new_value)
+                if hasattr(old_widget, 'copy'):
+                    self.value_widget[new_value] = old_widget.copy(new_value)
+                elif hasattr(old_widget, 'clone'):
+                    self.value_widget[new_value] = old_widget.clone()
                 print(f"I have finished copying {widget_type} widget.")
             except Exception:
                 print(f"Fail to copy {widget_type} widget.")

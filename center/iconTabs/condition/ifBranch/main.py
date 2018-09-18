@@ -25,6 +25,8 @@ class IfBranch(QWidget):
     #
     iconWidgetMerge = pyqtSignal(str, str)
     iconWidgetSplit = pyqtSignal(str, str)
+    # 当icon变更事，它的tab应当被关闭
+    iconTabDelete = pyqtSignal(str)
 
     def __init__(self, parent=None, value=''):
         super(IfBranch, self).__init__(parent)
@@ -145,6 +147,7 @@ class IfBranch(QWidget):
             # 有变成空
             else:
                 self.nodeDelete.emit(self.value, self.type_value[condition_type][0])
+                self.iconTabDelete.emit(self.type_value[condition_type][0])
                 self.type_value[condition_type] = [other_value, '', None]
         else:
             # 空变成有
@@ -176,6 +179,7 @@ class IfBranch(QWidget):
                     # delete old
                     if not self.type_value[condition_type][0].startswith("Other"):
                         self.nodeDelete.emit(self.value, self.type_value[condition_type][0])
+                        self.iconTabDelete.emit(self.type_value[condition_type][0])
                         self.type_value[condition_type] = [other_value, '', None]
                     # add new
                     if self.checkIconName(current_name, self.value, current_value, condition_type):
