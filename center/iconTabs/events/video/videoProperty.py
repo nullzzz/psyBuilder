@@ -10,12 +10,14 @@ class VideoProperty(QWidget):
         super(VideoProperty, self).__init__(parent)
         self.tab = QTabWidget()
         self.below = QWidget()
-        self.ok_bt = QPushButton("Ok")
+        self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
         self.general = VideoTab1()
         self.frame = FramePage()
         self.duration = DurationPage()
+
+        self.default_properties = {**self.general.default_properties, **self.frame.default_properties, **self.duration.default_properties}
 
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.frame, "frame")
@@ -48,4 +50,20 @@ class VideoProperty(QWidget):
         self.duration.setAttributes(attributes)
 
     def getInfo(self):
-        return {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.general.setProperties(self.default_properties)
+        self.frame.setProperties(self.default_properties)
+        self.duration.setProperties(self.default_properties)
+
+    def clone(self):
+        properties = self.getInfo()
+        clone_page = VideoProperty()
+        clone_page.setProperties(properties)
+        return clone_page

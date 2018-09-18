@@ -17,6 +17,7 @@ class ImageProperty(QWidget):
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.frame, "frame")
         self.tab.addTab(self.duration, "duration")
+        self.default_properties = {**self.general.default_properties, **self.frame.default_properties, **self.duration.default_properties}
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
@@ -55,8 +56,8 @@ class ImageProperty(QWidget):
                   (screen.height() - size.height()) / 2)
 
     def getInfo(self):
-        self.properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
-        return self.properties
+        self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        return self.default_properties
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
@@ -64,13 +65,13 @@ class ImageProperty(QWidget):
         self.duration.setAttributes(attributes)
 
     def setProperties(self, properties: dict):
-        self.properties = properties
+        self.default_properties = properties
         self.loadSetting()
 
     def loadSetting(self):
-        self.general.setProperties(self.properties)
-        self.frame.setProperties(self.properties)
-        self.duration.setProperties(self.properties)
+        self.general.setProperties(self.default_properties)
+        self.frame.setProperties(self.default_properties)
+        self.duration.setProperties(self.default_properties)
 
     def clone(self):
         properties = self.getInfo()

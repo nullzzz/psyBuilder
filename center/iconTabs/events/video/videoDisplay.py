@@ -21,13 +21,16 @@ class VideoDisplay(QMainWindow):
 
         self.label = QLabel()
         self.pro = VideoProperty()
+
+        self.default_properties = self.pro.getInfo()
+
         self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.pro.close)
+        self.pro.cancel_bt.clicked.connect(self.clone)
         self.pro.apply_bt.clicked.connect(self.apply)
 
         self.file = ""
-        self.startPos = 0
-        self.endPos = 0
+        self.start_pos = 0
+        self.end_pos = 0
         self.back_color = "white"
         self.transparent_value = 0
         # self.stop_after = False
@@ -45,6 +48,11 @@ class VideoDisplay(QMainWindow):
         self.h_size = 100
         self.setUI()
         self.setAttributes(["test"])
+
+    def linkSignal(self):
+        self.pro.ok_bt.clicked.connect(self.ok)
+        self.pro.cancel_bt.clicked.connect(self.clone)
+        self.pro.apply_bt.clicked.connect(self.apply)
 
     def setUI(self):
         self.setWindowTitle("Video")
@@ -87,6 +95,9 @@ class VideoDisplay(QMainWindow):
         self.apply()
         self.pro.close()
 
+    def cancel(self):
+        self.pro.loadSetting()
+
     def apply(self):
         self.getPro()
         file_name = self.pro.general.file_name.text()
@@ -99,7 +110,7 @@ class VideoDisplay(QMainWindow):
                     self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
                     self.play_video.setIcon(QIcon("image/start_video"))
                     self.play_video.setText("start")
-                self.mediaPlayer.setPosition(self.getStartTime(self.startPos))
+                self.mediaPlayer.setPosition(self.getStartTime(self.start_pos))
                 self.video_widget.setAspectRatioMode(self.aspect_ration_mode)
             else:
                 QMessageBox.warning(
@@ -108,8 +119,8 @@ class VideoDisplay(QMainWindow):
         self.propertiesChange.emit(self.getInfo())
 
     def getPro(self):
-        self.startPos = self.pro.general.startPos.text()
-        self.endPos = self.pro.general.endPos.text()
+        self.start_pos = self.pro.general.start_pos.text()
+        self.end_pos = self.pro.general.end_pos.text()
         self.back_color = self.pro.general.back_color.currentText()
         self.transparent_value = self.pro.general.transparent.value()
         # isStopText = self.pro.tab1.stop_after.currentText()
@@ -152,9 +163,30 @@ class VideoDisplay(QMainWindow):
         except ValueError:
             return 0
 
+    def setPro(self, pro: VideoProperty):
+        self.pro = pro
+
+    def setVideo(self):
+        self.setCentralWidget(self.video_widget)
+        self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
+        self.play_video.setIcon(QIcon("image/start_video"))
+        self.play_video.setText("start")
+        self.mediaPlayer.setPosition(self.getStartTime(self.start_pos))
+        self.video_widget.setAspectRatioMode(self.aspect_ration_mode)
+
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro.setAttributes(format_attributes)
 
     def getInfo(self):
-        return {**self.pro.general.getInfo(), **self.pro.frame.getInfo(), **self.pro.duration.getInfo()}
+        self.default_properties = self.pro.getInfo()
+        return self.default_properties
+
+    def clone(self):
+        clone_widget = VideoDisplay()
+        clone_widget.setPro(self.pro.clone())
+        clone_widget.linkSignal()
+        clone_widget.getPro()
+        # clone_widget.setVideo()
+        self.pro.tab.addTab(clone_widget, "c")
+        return clone_widget
