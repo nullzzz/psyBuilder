@@ -108,7 +108,7 @@ class SwitchBranch(QWidget):
             # properties
             self.propertiesChange.emit(self.getInfo())
         except Exception as e:
-            print("error {} happens in apple if-else. [condition/ifBranch.py]".format(e))
+            print("error {} happens in apple if-else. [condition/main.py]".format(e))
 
     # todo:这是啥呀
     def disposeNode(self, condition_type='D'):
@@ -161,7 +161,7 @@ class SwitchBranch(QWidget):
                 self.type_value['F'] = ['Other.10001', '', {}]
 
         except Exception as e:
-            print("error {} happens in delete item. [condition/ifBranch.py]".format(e))
+            print("error {} happens in delete item. [condition/main.py]".format(e))
 
     # 重命名
     def changeItemName(self, value, name):
@@ -173,7 +173,7 @@ class SwitchBranch(QWidget):
             elif value == self.type_value['F'][0]:
                 self.false_icon_choose.icon_name.setText(name[4:])
         except Exception as e:
-            print("error {} happens in change item name. [condition/ifBranch.py]".format(e))
+            print("error {} happens in change item name. [condition/main.py]".format(e))
 
     # 事件参数
     def showIconProperties(self, properties):

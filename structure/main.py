@@ -250,7 +250,7 @@ class Structure(QDockWidget):
                         text = extend + text
                         self.changeNodeName(item.parent().value, item.value, text)
         except Exception as e:
-            print("error {} happens in rename node in structure. [structure/structureTree.py]".format(e))
+            print("error {} happens in rename node in structure. [structure/main.py]".format(e))
 
     def changeNodeName(self, parent_value, value, name):
         try:
@@ -258,6 +258,8 @@ class Structure(QDockWidget):
                 old_name = Structure.value_node[value].text(0)
                 # delete old name
                 # if name has many values
+                if parent_value.startswith('If_else'):
+                    old_name = old_name[4:]
                 if len(Structure.name_values[old_name]) > 1:
                     Structure.name_values[old_name].remove(value)
                 elif len(Structure.name_values[old_name]) == 1:
@@ -482,11 +484,13 @@ class Structure(QDockWidget):
                     # 如果有old name且是有同名的，改成没有出现过的new name则是断开原有连接
                     if value in Structure.value_node:
                         old_name = Structure.value_node[value].text(0)
+                        if parent_value.startswith('If_else.'):
+                            old_name = old_name[4:]
                         if len(Structure.name_values[old_name]) > 1:
                             old_exist_value = ''
                             for temp_value in Structure.name_values[old_name]:
                                 if temp_value != value:
-                                    old_exist_value = old_exist_value = temp_value
+                                    old_exist_value = temp_value
                                     break
                             return 3, '', old_exist_value
                         else:
@@ -537,7 +541,7 @@ class Structure(QDockWidget):
             else:
                 return 0, '', ''
         except Exception as e:
-            print(f"error {e} happens in check name is valid. [structure/main.py]")
+            print(f"error {e} happens in check name is valid or not. [structure/main.py]")
 
     def showTimelineAttributes(self, value):
         self.timelineAttributesShow.emit(self.getTimelineAttributes(value))

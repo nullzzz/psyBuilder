@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 from center.iconTabs.condition.switchBranch import SwitchBranch
 from center.iconTabs.timeline.main import Timeline
 from getImage import getImage
-from .condition.ifBranch import IfBranch
+from .condition.ifBranch.main import IfBranch
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
 from .events.soundOut.soundDisplay import SoundDisplay
