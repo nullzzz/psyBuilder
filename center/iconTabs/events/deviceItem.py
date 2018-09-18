@@ -21,16 +21,18 @@ lineEdit = """
 class DeviceOutItem(QListWidgetItem):
     varColor = "blue"
 
-    def __init__(self, name=None, parent=None):
+    def __init__(self, name: str, device_type: str, parent=None):
         super(DeviceOutItem, self).__init__(name, parent)
         self.attributes = []
-
+        self.name = name
+        self.device_type = device_type
         self.default_properties = {
+            "Device name": self.name,
+            "Device type": self.device_type,
             "Value or Msg": "",
             "Pulse Duration": ""
         }
 
-        self.name = name
         self.devices = []
         self.pro = QWidget()
         self.value = QLineEdit()
@@ -87,27 +89,57 @@ class DeviceOutItem(QListWidgetItem):
 
     def getInfo(self):
         self.default_properties["Value or Msg"] = self.value.text()
-        self.default_properties["Pulse Duration"] = self.pulse_dur.text()
+        self.default_properties["Pulse Duration"] = self.pulse_dur.currentText()
         return self.default_properties
+
+    def setProperties(self, device_info: dict):
+        self.default_properties = device_info
+        self.loadSetting()
 
     def loadSetting(self):
         self.value.setText(self.default_properties["Value or Msg"])
-        self.pulse_dur.setText(self.default_properties["Pulse Duration"])
+        self.pulse_dur.setCurrentText(self.default_properties["Pulse Duration"])
 
 
 # 重写下方输入设备
 class DeviceInItem(QListWidgetItem):
     varColor = "blue"
 
-    def __init__(self, name=None, parent=None):
+    def __init__(self, name: str, device_type: str, parent=None):
         super(DeviceInItem, self).__init__(name, parent)
         self.attributes = []
-
-        self.default_properties = {
-
-        }
-
         self.name = name
+        self.device_type = device_type
+        """
+        :device_type: 0一般类型，1那个啥eye的类型
+        """
+        if device_type != "eye":
+            self.default_properties = {
+                "Device name": "",
+                "Device type": self.device_type,
+                "Allowable": "",
+                "Correct": "",
+                "RT window": "",
+                "End action": "",
+                "Right": "",
+                "Wrong": "",
+                "No resp": "",
+                "Output device": ""
+            }
+        else:
+            self.default_properties = {
+                "Device name": "",
+                "Device type": self.device_type,
+                "Action": "",
+                "ROA": "",
+                "ROA action": "",
+                "duration": "",
+                "Right": "",
+                "Wrong": "",
+                "No resp": "",
+                "Output device": ""
+            }
+
         self.pro1 = QWidget()
         self.device_label = QLabel(name)
         self.allowable = QLineEdit()
@@ -148,7 +180,7 @@ class DeviceInItem(QListWidgetItem):
     def setPro(self):
         self.end_action.addItems(["Terminate", "(None)"])
         self.action.addItems(["Fixation", "Saccade"])
-        if "eye" not in self.name:
+        if self.device_type != "eye":
             layout1 = QFormLayout()
             layout1.addRow("Response:", self.device_label)
             layout1.addRow("Allowable:", self.allowable)
@@ -230,28 +262,39 @@ class DeviceInItem(QListWidgetItem):
 
     def getInfo(self):
         # todo：当初说的啥眼动设备，属性不一样，现在还不知道是啥子
-        if "eye" not in self.name:
-            return {
-                "Device name": self.name,
-                "Allowable": self.allowable.text(),
-                "Correct": self.correct.text(),
-                "RT window": self.RT_window.currentText(),
-                "End action": self.end_action.currentText(),
-                "Right": self.right.text(),
-                "Wrong": self.wrong.text(),
-                "No resp": self.ignore.text(),
-                "Output device": self.resp_trigger_out
-            }
+        if self.device_type != "eye":
+            self.default_properties["Allowable"] = self.allowable.text()
+            self.default_properties["Correct"] = self.correct.text()
+            self.default_properties["RT window"] = self.RT_window.currentText()
+            self.default_properties["End action"] = self.end_action.currentText()
         else:
-            return {
-                "Device name": self.name,
-                "Action": self.action.currentText(),
-                "ROA": self.ROA.text(),
-                "ROA action": self.action.currentText(),
-                "duration": self.RT_window.currentText(),
-                "End action": self.end_action.currentText(),
-                "Right": self.right.text(),
-                "Wrong": self.wrong.text(),
-                "No resp": self.ignore.text(),
-                "Output device": self.resp_trigger_out
-            }
+            self.default_properties["Action"] = self.action.currentText()
+            self.default_properties["ROA"] = self.ROA.text()
+            self.default_properties["ROA action"] = self.ROA2.currentText()
+            self.default_properties["duration"] = self.RT_window.currentText()
+        self.default_properties["Device name"] = self.name
+        self.default_properties["Right"] = self.right.text()
+        self.default_properties["Wrong"] = self.wrong.text()
+        self.default_properties["No resp"] = self.ignore.text()
+        self.default_properties["Output device"] = self.resp_trigger_out.currentText()
+        return self.default_properties
+
+    def setProperties(self, device_info: dict):
+        self.default_properties = device_info
+        self.loadSetting()
+
+    def loadSetting(self):
+        if self.device_type != "eye":
+            self.allowable.setText(self.default_properties["Allowable"])
+            self.correct.setText(self.default_properties["Correct"])
+            self.RT_window.setCurrentText(self.default_properties["RT window"])
+            self.end_action.setCurrentText(self.default_properties["End action"])
+        else:
+            self.action.setCurrentText(self.default_properties["Action"])
+            self.ROA.setText(self.default_properties["ROA"])
+            self.ROA2.setCurrentText(self.default_properties["ROA action"])
+            self.RT_window.setCurrentText(self.default_properties["duration"])
+        self.right.setText(self.default_properties["Right"])
+        self.wrong.setText(self.default_properties["Wrong"])
+        self.ignore.setText(self.default_properties["No resp"])
+        self.resp_trigger_out.setCurrentText(self.default_properties["Output device"])

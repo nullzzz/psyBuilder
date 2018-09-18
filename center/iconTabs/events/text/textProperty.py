@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
 
 from center.iconTabs.events.durationPage import DurationPage
-from center.iconTabs.events.framePage import Tab2
+from center.iconTabs.events.framePage import FramePage
 from center.iconTabs.events.text.textGeneral import TextTab1
 
 
@@ -12,7 +12,7 @@ class TextProperty(QWidget):
         self.below = QWidget()
 
         self.general = TextTab1()
-        self.frame = Tab2()
+        self.frame = FramePage()
         self.duration = DurationPage()
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.frame, "frame")

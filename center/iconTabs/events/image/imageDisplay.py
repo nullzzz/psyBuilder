@@ -1,8 +1,3 @@
-try:
-    import cPickle as pickle
-except:
-    import pickle
-
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
@@ -21,8 +16,12 @@ class ImageDisplay(QMainWindow):
         self.attributes = []
         self.label = QLabel()
         self.pro = ImageProperty()
+
+        self.default_properties = self.pro.getInfo()
+
         self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.cancel)
+        # self.pro.cancel_bt.clicked.connect(self.cancel)
+        self.pro.cancel_bt.clicked.connect(self.testBt)
         self.pro.apply_bt.clicked.connect(self.apply)
 
         self.file = ""
@@ -88,7 +87,9 @@ class ImageDisplay(QMainWindow):
         self.pro.close()
 
     def cancel(self):
+        self.pro.general.loadSetting()
         self.pro.frame.loadSetting()
+        self.pro.duration.loadSetting()
 
     def apply(self):
         self.getPro()
@@ -96,25 +97,7 @@ class ImageDisplay(QMainWindow):
         # 加载图片文件
         if self.file:
             if QFileInfo(self.file).isFile():
-                img = QImage(self.file)
-                image = img.mirrored(self.isLR, self.isUD)
-                pix = QPixmap.fromImage(image)
-                self.pix = pix
-                # 图片反转
-                if self.isStretch:
-                    mode = self.pro.general.stretch_mode.currentText()
-                    w = self.label.size().width()
-                    h = self.label.size().height()
-                    if mode == "Both":
-                        new_pix = pix.scaled(
-                            w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-                    elif mode == "LeftRight":
-                        new_pix = pix.scaledToWidth(w, Qt.FastTransformation)
-                    else:
-                        new_pix = pix.scaledToHeight(h, Qt.FastTransformation)
-                    self.label.setPixmap(new_pix)
-                else:
-                    self.label.setPixmap(pix)
+                self.setImage()
             else:
                 QMessageBox.warning(
                     self, "Warning", "The file path is invalid!")
@@ -123,7 +106,7 @@ class ImageDisplay(QMainWindow):
         # 发送信号
         self.propertiesChange.emit(self.getInfo())
 
-    # 获取参数
+    # 从pro获取参数
     def getPro(self):
         self.file = self.pro.general.file_name.text()
         self.isUD = self.pro.general.mirrorUD.checkState()
@@ -137,9 +120,35 @@ class ImageDisplay(QMainWindow):
         self.w_size = self.pro.frame.width.currentText()
         self.h_size = self.pro.frame.height.currentText()
 
+    # 设置主面板的图片
+    def setImage(self):
+        img = QImage(self.file)
+        image = img.mirrored(self.isLR, self.isUD)
+        pix = QPixmap.fromImage(image)
+        self.pix = pix
+        # 图片反转
+        if self.isStretch:
+            mode = self.pro.general.stretch_mode.currentText()
+            w = self.label.size().width()
+            h = self.label.size().height()
+            if mode == "Both":
+                new_pix = pix.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            elif mode == "LeftRight":
+                new_pix = pix.scaledToWidth(w, Qt.FastTransformation)
+            else:
+                new_pix = pix.scaledToHeight(h, Qt.FastTransformation)
+            self.label.setPixmap(new_pix)
+        else:
+            self.label.setPixmap(pix)
+
     # 返回设置参数
     def getInfo(self):
-        return {**self.pro.general.getInfo(), **self.pro.frame.getInfo(), **self.pro.duration.getInfo()}
+        self.properties = self.pro.getInfo()
+        return self.properties
+
+    def setPro(self, pro: ImageProperty):
+        del self.pro
+        self.pro = pro
 
     # 设置输入输出设备
     def setDevices(self, in_devices, out_devices):
@@ -161,4 +170,17 @@ class ImageDisplay(QMainWindow):
 
     # copy当前image对象
     def clone(self):
-        pass
+        clone_widget = ImageDisplay()
+        clone_widget.setPro(self.pro.clone())
+        clone_widget.getPro()
+        clone_widget.setImage()
+        return clone_widget
+
+    # 测试按钮
+    def testBt(self):
+        # clone = self.pro.duration.clone()
+        # self.pro.tab.addTab(clone, "clone")
+        clone = self.clone()
+        clone.setWindowTitle("aaaaaa")
+        clone.show()
+        self.pro.tab.addTab(clone, "c")

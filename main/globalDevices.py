@@ -36,7 +36,7 @@ class GlobalDevice(QWidget):
         self.describe = QTextEdit()
         self.describe.setText("此处留白\n\t设备描述\n\t参数设置")
 
-        self.ok_bt = QPushButton("Ok")
+        self.ok_bt = QPushButton("OK")
         self.ok_bt.clicked.connect(self.ok)
         self.cancel_bt = QPushButton("Cancel")
         self.cancel_bt.clicked.connect(self.close)

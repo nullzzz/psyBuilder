@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
 
 from center.iconTabs.events.durationPage import DurationPage
-from center.iconTabs.events.framePage import Tab2
+from center.iconTabs.events.framePage import FramePage
 from .imageGeneral import ImageTab1
 
 
@@ -12,13 +12,13 @@ class ImageProperty(QWidget):
         self.below = QWidget()
 
         self.general = ImageTab1()
-        self.frame = Tab2()
+        self.frame = FramePage()
         self.duration = DurationPage()
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.frame, "frame")
         self.tab.addTab(self.duration, "duration")
         # bottom
-        self.ok_bt = QPushButton("Ok")
+        self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
         self.setButtons()
@@ -55,9 +55,25 @@ class ImageProperty(QWidget):
                   (screen.height() - size.height()) / 2)
 
     def getInfo(self):
-        return {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        self.properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        return self.properties
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
         self.frame.setAttributes(attributes)
         self.duration.setAttributes(attributes)
+
+    def setProperties(self, properties: dict):
+        self.properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.general.setProperties(self.properties)
+        self.frame.setProperties(self.properties)
+        self.duration.setProperties(self.properties)
+
+    def clone(self):
+        properties = self.getInfo()
+        clone_page = ImageProperty()
+        clone_page.setProperties(properties)
+        return clone_page

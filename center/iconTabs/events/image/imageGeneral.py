@@ -11,6 +11,17 @@ class ImageTab1(QWidget):
     def __init__(self, parent=None):
         super(ImageTab1, self).__init__(parent)
         self.attributes = []
+        self.default_properties = {
+            "File name": "",
+            "Mirror up/down": False,
+            "Mirror left/right": False,
+            "Stretch": False,
+            "Stretch mode": "Both",
+            "Back color": "white",
+            "Transparent": 100,
+            "Clear after": "Yes",
+            "Screen name": "Display"
+        }
         self.file_name = QLineEdit()
         self.file_name.textChanged.connect(self.findVar)
         self.file_name.returnPressed.connect(self.finalCheck)
@@ -132,17 +143,39 @@ class ImageTab1(QWidget):
         self.file_name.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
-        return {
-            "File name": self.file_name.text(),
-            "Mirror up/down": bool(self.mirrorUD.checkState()),
-            "Mirror left/right": bool(self.mirrorLR.checkState()),
-            "Stretch": bool(self.stretch.checkState()),
-            "Stretch mode": self.stretch_mode.currentText(),
-            "Back color": self.back_color.currentText(),
-            "Transparent": "{}%".format(self.transparent.value()),
-            "Clear after": self.clear_after.currentText(),
-            "Screen name": self.screen_name.currentText()
-        }
+        self.default_properties["File name"] = self.file_name.text()
+        self.default_properties["Mirror up/down"] = bool(self.mirrorUD.checkState())
+        self.default_properties["Mirror left/right"] = bool(self.mirrorLR.checkState())
+        self.default_properties["Stretch"] = bool(self.stretch.checkState())
+        self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
+        self.default_properties["Back color"] = self.back_color.currentText()
+        self.default_properties["Transparent"] = self.transparent.value()
+        self.default_properties["Clear after"] = self.clear_after.currentText()
+        self.default_properties["Screen name"] = self.screen_name.currentText()
+
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.file_name.setText(self.default_properties["File name"])
+        self.mirrorUD.setChecked(self.default_properties["Mirror up/down"])
+        self.mirrorLR.setChecked(self.default_properties["Mirror left/right"])
+        self.stretch.setChecked(self.default_properties["Stretch"])
+        self.stretch_mode.setCurrentText(self.default_properties["Stretch mode"])
+        self.back_color.setCurrentText(self.default_properties["Back color"])
+        self.transparent.setValue(self.default_properties["Transparent"])
+        self.clear_after.setCurrentText(self.default_properties["Clear after"])
+        self.screen_name.setCurrentText(self.default_properties["Screen name"])
+
+    def clone(self):
+        clone_page = ImageTab1()
+        clone_page.setProperties(self.default_properties)
+        return clone_page
+
+
 
 
 if __name__ == "__main__":

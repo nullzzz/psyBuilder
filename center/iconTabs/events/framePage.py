@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QC
 from center.iconTabs.colorBobox import ColorListEditor
 
 
-class Tab2(QWidget):
+class FramePage(QWidget):
     def __init__(self, parent=None):
-        super(Tab2, self).__init__(parent)
+        super(FramePage, self).__init__(parent)
         self.attributes = []
         self.default_properties = {
             "X position": "0",
@@ -129,6 +129,10 @@ class Tab2(QWidget):
         self.default_properties["Border width"] = self.border_width.value()
         return self.default_properties
 
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
     # 加载参数设置
     def loadSetting(self):
         self.x_pos.setCurrentText(self.default_properties["X position"])
@@ -137,3 +141,8 @@ class Tab2(QWidget):
         self.height.setCurrentText(self.default_properties["Height"])
         self.border_color.setCurrentText(self.default_properties["Border color"])
         self.border_width.setValue(self.default_properties["Border width"])
+
+    def clone(self):
+        clone_page = FramePage()
+        clone_page.setProperties(self.default_properties)
+        return clone_page

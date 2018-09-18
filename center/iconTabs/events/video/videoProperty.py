@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
 from center.iconTabs.events.durationPage import DurationPage
-from center.iconTabs.events.framePage import Tab2
+from center.iconTabs.events.framePage import FramePage
 from .videoGeneral import VideoTab1
 
 
@@ -14,7 +14,7 @@ class VideoProperty(QWidget):
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
         self.general = VideoTab1()
-        self.frame = Tab2()
+        self.frame = FramePage()
         self.duration = DurationPage()
 
         self.tab.addTab(self.general, "general")
