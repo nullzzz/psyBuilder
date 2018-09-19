@@ -15,6 +15,15 @@ class EyeDC(QWidget):
 
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
+
+        self.default_properties = {
+            "X position": "",
+            "Y position": "",
+            "Target color": "(foreground)",
+            "Target style": "default",
+            "Show display with drift correction": 0,                                                                                                 "target": a,
+             "Fixation triggered": 0
+        }
         self.x_pos = QLineEdit()
         self.y_pos = QLineEdit()
         self.target_color = QLineEdit()
@@ -114,7 +123,8 @@ class EyeDC(QWidget):
         self.tabClose.emit(self)
 
     def cancel(self):
-        self.close()
+        self.loadSetting()
+        # self.close()
         self.tabClose.emit(self)
 
     def apply(self):
@@ -145,17 +155,27 @@ class EyeDC(QWidget):
         self.target_color.setCompleter(QCompleter(self.attributes))
 
     def getProperties(self):
-        x_p = self.x_pos.text()
-        y_p = self.y_pos.text()
-        color = self.target_color.text()
-        style = self.target_style.currentText()
-        a = self.show_display_with_drift_correction_target.checkState()
-        b = self.fixation_triggered.checkState()
-        return {
-            "X position": x_p,
-            "Y position": y_p,
-            "Target color": color,
-            "Target style": style,
-            "Show display with drift correction target": a,
-            "Fixation triggered": b
-        }
+        self.default_properties["X position"] = self.x_pos.text()
+        self.default_properties["Y position"] = self.y_pos.text()
+        self.default_properties["Target color"] = self.target_color.text()
+        self.default_properties["Target style"] = self.target_style.currentText()
+        self.default_properties["Show display with drift correction"] = self.show_display_with_drift_correction_target.checkState()
+        self.default_properties["Fixation triggered"] = self.fixation_triggered.checkState()
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.x_pos.setText(self.default_properties["X position"])
+        self.y_pos.setText(self.default_properties["Y position"])
+        self.target_color.setText(self.default_properties["Target color"])
+        self.target_style.setCurrentText(self.default_properties["Target style"])
+        self.show_display_with_drift_correction_target.setCheckState(self.default_properties["Show display with drift correction"])
+        self.fixation_triggered.setCheckState(self.default_properties["Fixation triggered"])
+
+    def clone(self):
+        clone_widget = EyeDC()
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

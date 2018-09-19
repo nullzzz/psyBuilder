@@ -15,7 +15,9 @@ class QuestUpdate(QWidget):
         self.tip2 = QLineEdit()
 
         self.attributes = []
-
+        self.default_properties = {
+            "Response variable": "correct"
+        }
         self.response_variable = QLineEdit()
         self.response_variable.textChanged.connect(self.findVar)
         self.response_variable.returnPressed.connect(self.finalCheck)
@@ -67,7 +69,8 @@ class QuestUpdate(QWidget):
         self.tabClose.emit(self)
 
     def cancel(self):
-        self.close()
+        self.loadSetting()
+        # self.close()
         self.tabClose.emit(self)
 
     def apply(self):
@@ -96,4 +99,17 @@ class QuestUpdate(QWidget):
         self.response_variable.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
-        return {"Response variable": self.resp}
+        self.default_properties["Response variable"] = self.response_variable.text()
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.response_variable.setText(self.default_properties["Response variable"])
+
+    def clone(self):
+        clone_widget = QuestUpdate()
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

@@ -14,6 +14,18 @@ class QuestInit(QWidget):
         self.tip2 = QLineEdit()
 
         self.attributes = []
+        self.default_properties = {
+            "Estimated threshold": "0.5",
+            "Std. dev. of estimated threshold": "0.25",
+            "Desired proportion of correct responses": "0.75",
+            "Steepness of the Weibull psychometric function(β)": "3.5",
+            "Proportion of random responses at maximum stimulus intensity(σ)": "0.01",
+            "Chance level (γ)": "0.05",
+            "Method to determine optimal test value": "quantile",
+            "Minimum test value": "0",
+            "Maximum test value": "1",
+            "Is log10 transform": "quest test value",
+        }
 
         self.estimated_threshold = QLineEdit()
         self.std_dev = QLineEdit()
@@ -112,7 +124,8 @@ class QuestInit(QWidget):
         self.tabClose.emit(self)
 
     def cancel(self):
-        self.close()
+        self.loadSetting()
+        # self.close()
         # 关闭信号
         self.tabClose.emit(self)
 
@@ -148,17 +161,37 @@ class QuestInit(QWidget):
         self.maximum.setCompleter(QCompleter(self.attributes))
         self.is_log10_transform.setCompleter(QCompleter(self.attributes))
 
-
     def getInfo(self):
-        return {
-            "Estimated threshold": self.estimated_threshold.text(),
-            "Std. dev. of estimated threshold": self.std_dev.text(),
-            "Desired proportion of correct responses": self.desired_proportion.text(),
-            "Steepness of the Weibull psychometric function(β)": self.steepness.text(),
-            "Proportion of random responses at maximum stimulus intensity(σ)": self.proportion.text(),
-            "Chance level (γ)": self.chance_level.text(),
-            "Method to determine optimal test value": self.method.currentText(),
-            "Minimum test value": self.minimum.text(),
-            "Maximum test value": self.maximum.text(),
-            "Is log10 transform": self.is_log10_transform.text(),
-        }
+        self.default_properties["Estimated threshold"] = self.estimated_threshold.text()
+        self.default_properties["Std. dev. of estimated threshold"] = self.std_dev.text()
+        self.default_properties["Desired proportion of correct responses"] = self.desired_proportion.text()
+        self.default_properties["Steepness of the Weibull psychometric function(β)"] = self.steepness.text()
+        self.default_properties["Proportion of random responses at maximum stimulus intensity(σ)"] = self.proportion.text()
+        self.default_properties["Chance level (γ)"] = self.chance_level.text()
+        self.default_properties["Method to determine optimal test value"] = self.method.currentText()
+        self.default_properties["Minimum test value"] = self.minimum.text()
+        self.default_properties["Maximum test value"] = self.maximum.text()
+        self.default_properties["Is log10 transform"] = self.is_log10_transform.text()
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.estimated_threshold.setText(self.default_properties["Estimated threshold"])
+        self.std_dev.setText(self.default_properties["Std. dev. of estimated threshold"])
+        self.desired_proportion.setText(self.default_properties["Desired proportion of correct responses"])
+        self.steepness.setText(self.default_properties["Steepness of the Weibull psychometric function(β)"])
+        self.proportion.setText(self.default_properties["Proportion of random responses at maximum stimulus intensity(σ)"])
+        self.chance_level.setText(self.default_properties["Chance level (γ)"])
+        self.method.setCurrentText(self.default_properties["Method to determine optimal test value"])
+        self.minimum.setText(self.default_properties["Minimum test value"])
+        self.maximum.setText(self.default_properties["Maximum test value"])
+        self.is_log10_transform.setText(self.default_properties["Is log10 transform"])
+
+    def clone(self):
+        clone_widget = QuestInit()
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget
+

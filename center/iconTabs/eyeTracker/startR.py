@@ -15,6 +15,9 @@ class StartR(QWidget):
 
         self.attributes = []
 
+        self.default_properties = {
+            "Statue message": ""
+        }
         self.statue_msg = QLineEdit()
         self.statue_msg.textChanged.connect(self.findVar)
         self.statue_msg.returnPressed.connect(self.finalCheck)
@@ -65,7 +68,8 @@ class StartR(QWidget):
         self.tabClose.emit(self)
 
     def cancel(self):
-        self.close()
+        self.loadSetting()
+        # self.close()
         self.tabClose.emit(self)
 
     def apply(self):
@@ -93,4 +97,17 @@ class StartR(QWidget):
         self.statue_msg.setCompleter(QCompleter(self.attributes))
 
     def getProperties(self):
-        return {"Statue Message": self.msg}
+        self.default_properties["Statue message"] = self.statue_msg.text()
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.statue_msg.setText(self.default_properties["Statue message"])
+
+    def clone(self):
+        clone_widget = StartR()
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

@@ -17,6 +17,21 @@ class Open(QWidget):
 
         self.attributes = []
 
+        self.default_properties = {
+            "Select tracker type": "",
+            "Eye tracker datafile": "automatic",
+            "Calibrate tracker": 0,
+            "Calibrate beep": 0,
+            "Saccade velocity threshold": 0,
+            "Saccade acceleration threshold": 0,
+            "Force drift correction": 0,
+            "Pupil size mode": "area",
+            "SMI IP address": "127.0.0.1",
+            "SMI send port number": 0,
+            "SMI receive port number": 0,
+            "Tobii glasses Ipv4/Ipv6 address": "",
+            "Tobii glasses UDP port number": 0
+        }
         self.select_tracker_type_tip = QLabel("Select Tracker Type:")
         self.select_tracker_type = QComboBox()
 
@@ -153,7 +168,8 @@ class Open(QWidget):
         self.tabClose.emit(self)
 
     def cancel(self):
-        self.close()
+        self.loadSetting()
+        # self.close()
         self.tabClose.emit(self)
 
     def apply(self):
@@ -235,34 +251,74 @@ class Open(QWidget):
         self.tobii_glasses_ipv46_address.setCompleter(QCompleter(self.attributes))
 
     def getProperties(self):
-        tracker_type = self.select_tracker_type.currentText()
-        is_tracker = self.calibrate_tracker.checkState()
-        is_beep = self.calibration_beep.checkState()
-        datafile = self.eye_tracker_datafile.text()
-        velocity = self.saccade_velocity_threshold.value()
-        acceleration = self.saccade_acceleration_threshold.value()
-        is_force = self.force_drift_correction.checkState()
-        pupil = self.pupil_size_mode.currentText()
-        ip = self.SMI_IP_address.text()
-        send_port = self.SMI_send_port_number.value()
-        receive_port = self.SMI_receive_port_number.value()
-        tobii_address = self.tobii_glasses_ipv46_address.text()
-        tobii_port = self.tobii_glasses_UDP_port_number.value()
-        return {
-            "Select tracker type": tracker_type,
-            "Eye tracker datafile": datafile,
-            "Calibrate tracker": bool(is_tracker),
-            "Calibrate beep": bool(is_beep),
-            "Saccade velocity threshold": "{}°/s".format(velocity),
-            "Saccade acceleration threshold": "{}°/s/s".format(acceleration),
-            "Force drift correction": bool(is_force),
-            "Pupil size mode": pupil,
-            "SMI IP address": ip,
-            "SMI send port number": send_port,
-            "SMI receive port number": receive_port,
-            "Tobii glasses Ipv4/Ipv6 address": tobii_address,
-            "Tobii glasses UDP port number": tobii_port
-        }
+        # tracker_type = self.select_tracker_type.currentText()
+        # is_tracker = self.calibrate_tracker.checkState()
+        # is_beep = self.calibration_beep.checkState()
+        # datafile = self.eye_tracker_datafile.text()
+        # velocity = self.saccade_velocity_threshold.value()
+        # acceleration = self.saccade_acceleration_threshold.value()
+        # is_force = self.force_drift_correction.checkState()
+        # pupil = self.pupil_size_mode.currentText()
+        # ip = self.SMI_IP_address.text()
+        # send_port = self.SMI_send_port_number.value()
+        # receive_port = self.SMI_receive_port_number.value()
+        # tobii_address = self.tobii_glasses_ipv46_address.text()
+        # tobii_port = self.tobii_glasses_UDP_port_number.value()
+
+        self.default_properties["Select tracker type"] = self.select_tracker_type.currentText()
+        self.default_properties["Eye tracker datafile"] = self.eye_tracker_datafile.text()
+        self.default_properties["Calibrate tracker"] = self.calibrate_tracker.checkState()
+        self.default_properties["Calibrate beep"] = self.calibration_beep.checkState()
+        self.default_properties["Saccade velocity threshold"] = self.saccade_velocity_threshold.value()
+        self.default_properties["Saccade acceleration threshold"] = self.saccade_acceleration_threshold.value()
+        self.default_properties["Force drift correction"] = self.force_drift_correction.checkState()
+        self.default_properties["Pupil size mode"] = self.pupil_size_mode.currentText()
+        self.default_properties["SMI IP address"] = self.SMI_IP_address.text()
+        self.default_properties["SMI send port number"] = self.SMI_send_port_number.value()
+        self.default_properties["SMI receive port number"] = self.SMI_receive_port_number.value()
+        self.default_properties["Tobii glasses Ipv4/Ipv6 address"] = self.tobii_glasses_ipv46_address.text()
+        self.default_properties["Tobii glasses UDP port number"] = self.tobii_glasses_UDP_port_number.value()
+
+        return self.default_properties
+        # return {
+        #     "Select tracker type": tracker_type,
+        #     "Eye tracker datafile": datafile,
+        #     "Calibrate tracker": bool(is_tracker),
+        #     "Calibrate beep": bool(is_beep),
+        #     "Saccade velocity threshold": "{}°/s".format(velocity),
+        #     "Saccade acceleration threshold": "{}°/s/s".format(acceleration),
+        #     "Force drift correction": bool(is_force),
+        #     "Pupil size mode": pupil,
+        #     "SMI IP address": ip,
+        #     "SMI send port number": send_port,
+        #     "SMI receive port number": receive_port,
+        #     "Tobii glasses Ipv4/Ipv6 address": tobii_address,
+        #     "Tobii glasses UDP port number": tobii_port
+        # }
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.select_tracker_type.setCurrentText(self.default_properties["Select tracker type"])
+        self.eye_tracker_datafile.setCurrentText(self.default_properties["Eye tracker datafile"])
+        self.calibrate_tracker.setCheckState(self.default_properties["Calibrate tracker"])
+        self.calibration_beep.setCheckState(self.default_properties["Calibrate beep"])
+        self.saccade_velocity_threshold.setValue(self.default_properties["Saccade velocity threshold"])
+        self.saccade_acceleration_threshold.setValue(self.default_properties["Saccade acceleration threshold"])
+        self.force_drift_correction.setCheckState(self.default_properties["Force drift correction"])
+        self.pupil_size_mode.setCurrentText(self.default_properties["Pupil size mode"])
+        self.SMI_IP_address.setText(self.default_properties["SMI IP address"])
+        self.SMI_send_port_number.setValue(self.default_properties["SMI send port number"])
+        self.SMI_receive_port_number.setValue(self.default_properties["SMI receive port number"])
+        self.tobii_glasses_ipv46_address.setText(self.default_properties["Tobii glasses Ipv4/Ipv6 address"])
+        self.tobii_glasses_UDP_port_number.setValue(self.default_properties["Tobii glasses UDP port number"])
+
+    def clone(self):
+        clone_widget = Open()
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget
 
 
 if __name__ == '__main__':

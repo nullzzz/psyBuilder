@@ -13,8 +13,12 @@ class EyeAction(QWidget):
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.event = QComboBox()
+
+        self.default_properties = {
+            "Statue Message": "Saccade start"
+        }
         self.msg = ""
-        self.bt_ok = QPushButton("Ok")
+        self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
         self.bt_cancel.clicked.connect(self.cancel)
@@ -59,7 +63,8 @@ class EyeAction(QWidget):
         self.tabClose.emit(self)
 
     def cancel(self):
-        self.close()
+        self.loadSetting()
+        # self.close()
         self.tabClose.emit(self)
 
     def apply(self):
@@ -67,7 +72,20 @@ class EyeAction(QWidget):
         self.propertiesChange.emit(self.getProperties())
 
     def getProperties(self):
-        return {"Statue Message": self.msg}
+        self.default_properties["Statue Message"] = self.event.currentText()
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.event.setCurrentText(self.default_properties["Statue Message"])
+
+    def clone(self):
+        clone_widget = EyeAction()
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget
 
 
 if __name__ == '__main__':

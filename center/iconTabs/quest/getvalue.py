@@ -15,6 +15,11 @@ class QuestGetValue(QWidget):
 
         self.attributes = []
 
+        self.default_properties = {
+            "Line1": "",
+            "Line2": "",
+            "Experimental variable for test value": "quest test value",
+        }
         self.line1 = QLineEdit()
         self.line2 = QLineEdit()
         self.experimental = QLineEdit()
@@ -46,7 +51,7 @@ class QuestGetValue(QWidget):
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip2.setText("Get value for test")
 
-        self.experimental.setText("quest_test_value")
+        self.experimental.setText("quest test value")
 
         layout1 = QFormLayout()
         layout1.addRow(self.tip1)
@@ -76,7 +81,8 @@ class QuestGetValue(QWidget):
         self.tabClose.emit(self)
 
     def cancel(self):
-        self.close()
+        self.loadSetting()
+        # self.close()
         # 关闭信号
         self.tabClose.emit(self)
 
@@ -107,8 +113,21 @@ class QuestGetValue(QWidget):
         self.experimental.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
-        return {
-            "Line1": self.line1.text(),
-            "Line2": self.line2.text(),
-            "Experimental variable for test value": self.experimental.text(),
-        }
+        self.default_properties["Line1"] = self.line1.text()
+        self.default_properties["Line2"] = self.line2.text()
+        self.default_properties["Experimental variable for test value"] = self.experimental.text()
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.line1.setText(self.default_properties["Line1"])
+        self.line2.setText(self.default_properties["Line2"])
+        self.experimental.setText(self.default_properties["Experimental variable for test value"])
+
+    def clone(self):
+        clone_widget = QuestGetValue()
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

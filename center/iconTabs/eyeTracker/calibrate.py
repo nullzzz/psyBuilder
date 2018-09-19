@@ -15,6 +15,14 @@ class EyeCalibrate(QWidget):
 
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
+
+        self.default_properties = {
+            "Calibration type": "HV13",
+            "Calibration beep": "Yes",
+            "Target color": "(foreground)",
+            "Target style": "default"
+        }
+
         self.calibration_type = QComboBox()
         self.calibration_beep = QComboBox()
         self.target_color = QLineEdit()
@@ -22,7 +30,7 @@ class EyeCalibrate(QWidget):
         self.target_color.returnPressed.connect(self.finalCheck)
         self.target_style = QComboBox()
 
-        self.bt_ok = QPushButton("Ok")
+        self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
         self.bt_cancel.clicked.connect(self.cancel)
@@ -89,7 +97,8 @@ class EyeCalibrate(QWidget):
         self.tabClose.emit(self)
 
     def cancel(self):
-        self.close()
+        self.loadSetting()
+        # self.close()
         self.tabClose.emit(self)
 
     def apply(self):
@@ -118,12 +127,26 @@ class EyeCalibrate(QWidget):
         self.target_color.setCompleter(QCompleter(self.attributes))
 
     def getProperties(self):
-        return {
-            "Calibration type": self.calibration_type.currentText(),
-            "Calibration beep": self.calibration_beep.currentText(),
-            "Target color": self.target_color.text(),
-            "Target style": self.target_style.currentText()
-        }
+        self.default_properties["Calibration type"] = self.calibration_type.currentText()
+        self.default_properties["Calibration beep"] = self.calibration_beep.currentText()
+        self.default_properties["Target color"] = self.target_color.text()
+        self.default_properties["Target style"] = self.target_style.currentText()
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.calibration_type.setCurrentText(self.default_properties["Calibration type"])
+        self.calibration_beep.setCurrentText(self.default_properties["Calibration beep"])
+        self.target_color.setText(self.default_properties["Target color"])
+        self.target_style.setCurrentText(self.default_properties["Target style"])
+
+    def clone(self):
+        clone_widget = EyeCalibrate()
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget
 
 
 if __name__ == '__main__':
