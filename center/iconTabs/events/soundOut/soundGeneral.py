@@ -9,6 +9,19 @@ class SoundTab1(QWidget):
     def __init__(self, parent=None):
         super(SoundTab1, self).__init__(parent)
         self.attributes = []
+
+        self.default_properties = {
+            "File name": "",
+            "Buffer size": "5000",
+            "Buffer mode": "Buffered",
+            "Start offset": "0",
+            "Stop offset": "0",
+            "Loop": "Yes",
+            "Volume control": 0,
+            "Volume": 100,
+            "Pan control": 0,
+            "Pan": 0
+        }
         self.file_name = QLineEdit()
         self.file_name.textChanged.connect(self.findVar)
         self.file_name.returnPressed.connect(self.finalCheck)
@@ -148,18 +161,38 @@ class SoundTab1(QWidget):
         self.pan.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
-        return {
-            "File name": self.file_name.text(),
-            "Buffer size": "{}ms".format(self.buffer_size.text()),
-            "Buffer mode": self.buffer_mode.currentText(),
-            "Start offset": "{}ms".format(self.start_offset.text()),
-            "Stop offset": "{}ms".format(self.stop_offset.text()),
-            "Loop": self.loop.currentText(),
-            "Volume control": bool(self.volume_control.checkState()),
-            "Volume": self.volume.value(),
-            "Pan control": bool(self.pan_control.checkState()),
-            "Pan": self.pan.value()
-        }
+        self.default_properties["File name"] = self.file_name.text()
+        self.default_properties["Buffer size"] = self.buffer_size.text()
+        self.default_properties["Buffer mode"] = self.buffer_mode.currentText()
+        self.default_properties["Start offset"] = self.start_offset.text()
+        self.default_properties["Stop offset"] = self.stop_offset.text()
+        self.default_properties["Loop"] = self.loop.currentText()
+        self.default_properties["Volume control"] = self.volume_control.checkState()
+        self.default_properties["Volume"] = self.volume.value()
+        self.default_properties["Pan control"] = self.pan_control.checkState()
+        self.default_properties["Pan"] = self.pan.value()
+        return self.default_properties
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.file_name.setText(self.default_properties["File name"])
+        self.buffer_size.setText(self.default_properties["Buffer size"])
+        self.buffer_mode.setCurrentText(self.default_properties["Buffer mode"])
+        self.start_offset.setText(self.default_properties["Start offset"])
+        self.stop_offset.setText(self.default_properties["Stop offset"])
+        self.loop.setCurrentText(self.default_properties["Loop"])
+        self.volume_control.setCheckState(self.default_properties["Volume control"])
+        self.volume.setValue(self.default_properties["Volume"])
+        self.pan_control.setCheckState(self.default_properties["Pan control"])
+        self.pan.setValue(self.default_properties["Pan"])
+
+    def clone(self):
+        clone_page = SoundTab1()
+        clone_page.setProperties(self.default_properties)
+        return clone_page
 
 
 if __name__ == "__main__":

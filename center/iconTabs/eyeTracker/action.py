@@ -64,7 +64,7 @@ class EyeAction(QWidget):
 
     def cancel(self):
         self.loadSetting()
-        # self.close()
+        self.close()
         self.tabClose.emit(self)
 
     def apply(self):

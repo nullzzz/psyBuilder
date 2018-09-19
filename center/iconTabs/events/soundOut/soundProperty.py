@@ -14,8 +14,10 @@ class SoundProperty(QWidget):
         self.duration = DurationPage()
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.duration, "duration")
+
+        self.default_properties = {**self.general.default_properties, **self.duration.default_properties}
         # bottom
-        self.ok_bt = QPushButton("Ok")
+        self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
         self.setButtons()
@@ -54,11 +56,26 @@ class SoundProperty(QWidget):
     def getInfo(self):
         # 无frame
         # return {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
-        return {**self.general.getInfo(), **self.duration.getInfo()}
+        self.default_properties = {**self.general.getInfo(), **self.duration.getInfo()}
+        return self.default_properties
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
         self.duration.setAttributes(attributes)
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.general.setProperties(self.default_properties)
+        self.duration.setProperties(self.default_properties)
+
+    def clone(self):
+        properties = self.getInfo()
+        clone_page = SoundProperty()
+        clone_page.setProperties(properties)
+        return clone_page
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ class Close(QWidget):
         self.msg = ""
         self.automatically_log_all_variables = QCheckBox("Automatically log all variables")
         self.log_msg = QTextEdit()
-        self.bt_ok = QPushButton("Ok")
+        self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
         self.bt_cancel.clicked.connect(self.cancel)

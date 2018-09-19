@@ -49,11 +49,6 @@ class VideoDisplay(QMainWindow):
         self.setUI()
         self.setAttributes(["test"])
 
-    def linkSignal(self):
-        self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.clone)
-        self.pro.apply_bt.clicked.connect(self.apply)
-
     def setUI(self):
         self.setWindowTitle("Video")
         self.label.setText("Your video will show here")
@@ -164,7 +159,11 @@ class VideoDisplay(QMainWindow):
             return 0
 
     def setPro(self, pro: VideoProperty):
+        del self.pro
         self.pro = pro
+        self.pro.ok_bt.clicked.connect(self.ok)
+        self.pro.cancel_bt.clicked.connect(self.cancel)
+        self.pro.apply_bt.clicked.connect(self.apply)
 
     def setVideo(self):
         self.setCentralWidget(self.video_widget)
@@ -185,8 +184,7 @@ class VideoDisplay(QMainWindow):
     def clone(self):
         clone_widget = VideoDisplay()
         clone_widget.setPro(self.pro.clone())
-        clone_widget.linkSignal()
-        clone_widget.getPro()
+        clone_widget.apply()
         # clone_widget.setVideo()
         self.pro.tab.addTab(clone_widget, "c")
         return clone_widget

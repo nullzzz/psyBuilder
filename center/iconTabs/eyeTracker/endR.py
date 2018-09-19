@@ -23,7 +23,7 @@ class EndR(QWidget):
         self.statue_msg.returnPressed.connect(self.finalCheck)
 
         self.msg = ""
-        self.bt_ok = QPushButton("Ok")
+        self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
         self.bt_cancel.clicked.connect(self.cancel)

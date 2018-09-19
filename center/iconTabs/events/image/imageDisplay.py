@@ -20,8 +20,8 @@ class ImageDisplay(QMainWindow):
         self.default_properties = self.pro.getInfo()
 
         self.pro.ok_bt.clicked.connect(self.ok)
-        # self.pro.cancel_bt.clicked.connect(self.cancel)
-        self.pro.cancel_bt.clicked.connect(self.testBt)
+        self.pro.cancel_bt.clicked.connect(self.cancel)
+        # self.pro.cancel_bt.clicked.connect(self.testBt)
         self.pro.apply_bt.clicked.connect(self.apply)
 
         self.file = ""
@@ -38,12 +38,6 @@ class ImageDisplay(QMainWindow):
         self.h_size = 100
         self.setUI()
         self.setAttributes(["test", "var"])
-
-    def linkSignal(self):
-        self.pro.ok_bt.clicked.connect(self.ok)
-        # self.pro.cancel_bt.clicked.connect(self.cancel)/
-        self.pro.cancel_bt.clicked.connect(self.testBt)
-        self.pro.apply_bt.clicked.connect(self.apply)
 
     def setUI(self):
         self.setWindowTitle("Image")
@@ -153,6 +147,10 @@ class ImageDisplay(QMainWindow):
     def setPro(self, pro: ImageProperty):
         del self.pro
         self.pro = pro
+        self.pro.ok_bt.clicked.connect(self.ok)
+        self.pro.cancel_bt.clicked.connect(self.cancel)
+        # self.pro.cancel_bt.clicked.connect(self.testBt)
+        self.pro.apply_bt.clicked.connect(self.apply)
 
     # 设置输入输出设备
     def setDevices(self, in_devices, out_devices):
@@ -176,9 +174,8 @@ class ImageDisplay(QMainWindow):
     def clone(self):
         clone_widget = ImageDisplay()
         clone_widget.setPro(self.pro.clone())
-        clone_widget.linkSignal()
-        clone_widget.getPro()
-        clone_widget.setImage()
+        clone_widget.apply()
+        # self.pro.tab.addTab(clone_widget, "c")
         return clone_widget
 
     # 测试按钮

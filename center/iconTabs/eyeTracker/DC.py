@@ -21,8 +21,8 @@ class EyeDC(QWidget):
             "Y position": "",
             "Target color": "(foreground)",
             "Target style": "default",
-            "Show display with drift correction": 0,                                                                                                 "target": a,
-             "Fixation triggered": 0
+            "Show display with drift correction target": 0,
+            "Fixation triggered": 0
         }
         self.x_pos = QLineEdit()
         self.y_pos = QLineEdit()
@@ -40,7 +40,7 @@ class EyeDC(QWidget):
         self.show_display_with_drift_correction_target.stateChanged.connect(self.statueChanged)
         self.fixation_triggered = QCheckBox("Fixation Triggered (No Spacebar Press Required)")
         self.fixation_triggered.stateChanged.connect(self.statueChanged)
-        self.bt_ok = QPushButton("Ok")
+        self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
         self.bt_cancel.clicked.connect(self.cancel)
@@ -124,7 +124,7 @@ class EyeDC(QWidget):
 
     def cancel(self):
         self.loadSetting()
-        # self.close()
+        self.close()
         self.tabClose.emit(self)
 
     def apply(self):

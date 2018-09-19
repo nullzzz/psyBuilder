@@ -17,8 +17,11 @@ class SoundDisplay(QMainWindow):
         self.attributes = []
         self.volume = 100
         self.pro = SoundProperty()
+
+        self.default_properties = self.pro.getInfo()
+
         self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.pro.close)
+        self.pro.cancel_bt.clicked.connect(self.cancel)
         self.pro.apply_bt.clicked.connect(self.apply)
 
         self.play_bt = QPushButton("")
@@ -86,6 +89,9 @@ class SoundDisplay(QMainWindow):
     def ok(self):
         self.apply()
         self.pro.close()
+
+    def cancel(self):
+        self.pro.loadSetting()
 
     def apply(self):
         self.getPro()
@@ -163,7 +169,8 @@ class SoundDisplay(QMainWindow):
         self.tip1.setText('{:0>2d}:{:0>2d}.{:0>3d}'.format(m, s, x))
 
     def getInfo(self):
-        return {**self.pro.general.getInfo(), **self.pro.duration.getInfo()}
+        self.default_properties = self.pro.getInfo()
+        return self.default_properties
 
     # 设置输入输出设备
     def setDevices(self, in_devices, out_devices):
@@ -182,6 +189,20 @@ class SoundDisplay(QMainWindow):
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro.setAttributes(format_attributes)
+
+    def setPro(self, pro: SoundProperty):
+        del self.pro
+        self.pro = pro
+        self.pro.ok_bt.clicked.connect(self.ok)
+        self.pro.cancel_bt.clicked.connect(self.cancel)
+        self.pro.apply_bt.clicked.connect(self.apply)
+
+    # to
+    def clone(self):
+        clone_widget = SoundDisplay()
+        clone_widget.setPro(self.pro.clone())
+        clone_widget.apply()
+        return clone_widget
 
 
 if __name__ == "__main__":
