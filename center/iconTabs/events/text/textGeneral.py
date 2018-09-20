@@ -21,8 +21,20 @@ class TextTab1(QWidget):
 
         self.attributes = []
 
-        self.text_edit = QTextEdit()
+        self.default_properties = {
+            "Text": "",
+            "Alignment": "Center",
+            "Fore color": "black",
+            "Back color": "white",
+            "Screen name": "Display",
+            "Transparent": 100,
+            "Font": "SimSun",
+            "Word wrap": 0,
+            "Clear after": "Yes"
+        }
 
+        self.text_edit = QTextEdit()
+        self.html = ""
         self.align = QComboBox()
         self.align.currentTextChanged.connect(self.alignChange)
         self.align_mode = "center"
@@ -41,6 +53,8 @@ class TextTab1(QWidget):
         self.word_wrap.stateChanged.connect(self.checkWrap)
         self.is_wrap = False
         self.font = QFont("SimSun", 9)
+        self.new_font = QFont("SimSun", 9)
+
         self.font_bt = QPushButton("Font")
         self.font_bt.clicked.connect(self.getFont)
         self.font_label = QLabel()
@@ -133,30 +147,32 @@ class TextTab1(QWidget):
 
     # 获取字体
     def getFont(self):
-        font, ok = QFontDialog.getFont(self.font, self)
+        font, ok = QFontDialog.getFont(self.new_font, self)
         if ok:
-            self.font = font
+            self.new_font = font
             self.font_label.setText(font.family())
-            self.font_label.setFont(QFont(font.family(), 12))
+            self.font_label.setFont(QFont(font.family(), 9))
             self.setAll()
 
     def setAttributes(self, attributes):
         self.attributes = attributes
 
     # 处理html获得格式
+    # 对齐方式、颜色、内容
     def setAll(self):
         texts = self.text_edit.toPlainText().split("\n")
-        self.html_font = f"</style></head><body style=\" font-family:'{self.font.family()}'; font-size:" \
-                         f"{self.font.pointSize()}pt; font-weight:{self.font.weight()}; font-style:" \
-                         f"{self.font.styleName()};\">"
+        self.html_font = f"</style></head><body style=\" font-family:'{self.new_font.family()}'; font-size:" \
+                         f"{self.new_font.pointSize()}pt; font-weight:{self.new_font.weight()}; font-style:" \
+                         f"{self.new_font.styleName()};\">"
         html = self.html_header + self.html_font
         for text in texts:
             html += f"\n<p align=\"{self.align_mode}\"style=\" margin-top:0px; margin-bottom:0px; " \
                     f"margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent: 0px;\"><span style=\" " \
                     f"color:{self.fore_color_name}; background-color:{self.back_color_name};\">{text}</span>"
+
         self.text_edit.setHtml(html)
         # 字体的style和划线在html中不体现
-        self.text_edit.setFont(self.font)
+        self.text_edit.setFont(self.new_font)
 
     # 是否换行
     def checkWrap(self):
@@ -166,18 +182,46 @@ class TextTab1(QWidget):
         else:
             self.text_edit.setWordWrapMode(QTextOption.NoWrap)
 
+    def apply(self):
+        self.font = self.new_font
+        self.html = self.text_edit.toHtml()
+
     def getInfo(self):
-        return {
-            "Text": self.text_edit.toPlainText(),
-            "Alignment": self.align.currentText(),
-            "Fore color": self.fore_color.currentText(),
-            "Back color": self.back_color.currentText(),
-            "Screen name": self.screen_name.currentText(),
-            "Transparent": "{}%".format(self.transparent.value()),
-            "Font": self.font.family(),
-            "Word wrap": bool(self.word_wrap.checkState()),
-            "Clear after": self.clear_after.currentText()
-        }
+        self.default_properties["Text"] = self.text_edit.toPlainText()
+        self.default_properties["Alignment"] = self.align.currentText()
+        self.default_properties["Fore color"] = self.fore_color.currentText()
+        self.default_properties["Back color"] = self.back_color.currentText()
+        self.default_properties["Screen name"] = self.screen_name.currentText()
+        self.default_properties["Transparent"] = self.transparent.value()
+        self.default_properties["Font"] = self.font.family()
+        self.default_properties["Word wrap"] = self.word_wrap.checkState()
+        self.default_properties["Clear after"] = self.clear_after.currentText()
+        return self.default_properties
+
+    def setProperties(self, properties: dict, html: str, font: QFont):
+        self.default_properties = properties
+        self.html = html
+        self.font = font
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.text_edit.setHtml(self.html)
+        self.text_edit.setFont(self.font)
+        self.font_label.setText(self.font.family())
+        self.font_label.setFont(QFont(self.font.family(), 12))
+
+        self.align.setCurrentText(self.default_properties["Alignment"])
+        self.fore_color.setCurrentText(self.default_properties["Fore color"])
+        self.back_color.setCurrentText(self.default_properties["Back color"])
+        self.screen_name.setCurrentText(self.default_properties["Screen name"])
+        self.transparent.setValue(self.default_properties["Transparent"])
+        self.word_wrap.setCheckState(self.default_properties["Word wrap"])
+        self.clear_after.setCurrentText(self.default_properties["Clear after"])
+
+    def clone(self):
+        clone_page = TextTab1()
+        clone_page.setProperties(self.default_properties, self.html, self.font)
+        return clone_page
 
 
 if __name__ == "__main__":

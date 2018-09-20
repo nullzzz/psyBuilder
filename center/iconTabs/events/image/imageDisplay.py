@@ -54,6 +54,10 @@ class ImageDisplay(QMainWindow):
         tool.addAction(open_pro)
         tool.addAction(pre_view)
 
+        t = QAction(QIcon("image/test"), "test", self)
+        t.triggered.connect(self.test)
+        tool.addAction(t)
+
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
@@ -90,6 +94,7 @@ class ImageDisplay(QMainWindow):
         self.pro.loadSetting()
 
     def apply(self):
+        self.getInfo()
         self.getPro()
         self.label.setStyleSheet("background-color:{}".format(self.back_color))
         # 加载图片文件
@@ -102,7 +107,7 @@ class ImageDisplay(QMainWindow):
         else:
             self.label.clear()
         # 发送信号
-        self.propertiesChange.emit(self.getInfo())
+        self.propertiesChange.emit(self.default_properties)
 
     # 从pro获取参数
     def getPro(self):
@@ -185,3 +190,8 @@ class ImageDisplay(QMainWindow):
         clone = self.clone()
         clone.setWindowTitle("aaaaaa")
         self.pro.tab.addTab(clone, "c")
+
+    def test(self):
+        self.pro_clone = self.pro.clone()
+        self.pro_clone.setWindowModality(Qt.ApplicationModal)
+        self.pro_clone.show()

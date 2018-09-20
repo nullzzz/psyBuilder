@@ -307,7 +307,8 @@ class DurationPage(QWidget):
         for i in range(self.out_devices.count()):
             current_devices.append(self.out_devices.item(i).text())
 
-        deleted_out_devices = [device for device in self.default_properties["Output devices"].keys() if device not in current_devices]
+        deleted_out_devices = [device for device in self.default_properties["Output devices"].keys()
+                               if device not in current_devices]
         for device in deleted_out_devices:
             device_info: dict
             device_info = self.default_properties["Output devices"][device]

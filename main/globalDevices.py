@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QWidget, QListWidget, QListWidgetItem, QTextEdit, QV
     QListView, QFrame, QPushButton, QMenu
 
 
-
 class GlobalDevice(QWidget):
     InputDevice = 0
     outputDevice = 1
@@ -31,7 +30,7 @@ class GlobalDevice(QWidget):
         self.devices_list.setIconSize(QSize(40, 40))
 
         # 已选择设备
-        self.selected_devices = DropDemo(self.device_type)
+        self.selected_devices = SelectArea(self.device_type)
         # 还母鸡要做啥子
         self.describe = QTextEdit()
         self.describe.setText("此处留白\n\t设备描述\n\t参数设置")
@@ -39,13 +38,12 @@ class GlobalDevice(QWidget):
         self.ok_bt = QPushButton("OK")
         self.ok_bt.clicked.connect(self.ok)
         self.cancel_bt = QPushButton("Cancel")
-        self.cancel_bt.clicked.connect(self.close)
+        self.cancel_bt.clicked.connect(self.cancel)
         self.apply_bt = QPushButton("Apply")
         self.apply_bt.clicked.connect(self.apply)
         self.setUI()
 
     def setUI(self):
-
         for device in self.devices:
             self.devices_list.addItem(DeviceItem(device, device))
 
@@ -69,6 +67,10 @@ class GlobalDevice(QWidget):
         self.apply()
         self.close()
 
+    def cancel(self):
+
+        self.close()
+
     def apply(self):
         self.deviceSelect.emit(self.device_type, self.selected_devices.getInfo())
 
@@ -86,9 +88,9 @@ class DeviceItem(QListWidgetItem):
         return DeviceItem(self.item_type, self.text())
 
 
-class DropDemo(QListWidget):
-    def __init__(self, device_type=0, parent=None):
-        super(DropDemo, self).__init__(parent)
+class SelectArea(QListWidget):
+    def __init__(self, device_type: int=0, parent=None):
+        super(SelectArea, self).__init__(parent)
         self.device_type = device_type
         # 对已选择设备计数
         self.device_count = {
@@ -171,10 +173,16 @@ class DropDemo(QListWidget):
         self.delete_action = self.contextMenu.addAction("delete")
         self.delete_action.triggered.connect(self.deleteItem)
         self.clear_action = self.contextMenu.addAction("clear")
-        self.clear_action.triggered.connect(self.clear)
+        self.clear_action.triggered.connect(self.clearAll)
 
     def deleteItem(self):
         self.takeItem(self.currentRow())
+
+    def clearAll(self):
+        self.clear()
+        for k in self.device_count.keys():
+            self.device_count[k] = 0
+        print(self.device_count)
 
     def showContextMenu(self, pos):
         if self.count():
