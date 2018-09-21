@@ -11,6 +11,8 @@ from .timelineTable import TimelineTable
 
 from structure.main import Structure
 
+import copy
+
 
 class Cycle(QMainWindow):
     # 属性修改 (properties)
@@ -299,7 +301,6 @@ class Cycle(QMainWindow):
         except Exception as e:
             print(f"error {e} happens in add or rename timeline. [cycle/main.py]")
 
-
     def deleteTimeline(self, value):
         try:
             row = self.value_row[value]
@@ -441,4 +442,23 @@ class Cycle(QMainWindow):
 
     # todo copy cycle
     def copy(self, value):
-        pass
+        try:
+            cycle_copy = Cycle(value=value)
+            # data, 一定要注意要是深拷贝
+            # row_name
+            cycle_copy.row_name = copy.deepcopy(self.row_name)
+            # row_value, value_row
+            for row in self.row_value:
+                timeline_value = Structure.getValueBySameAndParent(self.row_value[row], value)
+                cycle_copy.row_value[row] = timeline_value
+                cycle_copy.value_row[timeline_value] = row
+            # timeline_table
+            cycle_copy.timeline_count = self.timeline_count
+            cycle_copy.timeline_table = copy.deepcopy(self.timeline_table)
+            # properties
+            cycle_copy.properties = self.properties
+            cycle_copy.setProperties()
+            cycle_copy.setCentralWidget(cycle_copy.timeline_table)
+            return cycle_copy
+        except Exception as e:
+            print(f"error {e} happens in copy cycle. [cycle/main.py]")

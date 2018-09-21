@@ -16,7 +16,7 @@ from structure.main import Structure
 
 class MainWindow(QMainWindow):
     # 每隔五分钟自动保存
-    AUTO_SAVE_TIME = 300
+    AUTO_SAVE_TIME = 300000
 
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)

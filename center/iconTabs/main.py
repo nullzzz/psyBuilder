@@ -489,26 +489,26 @@ class IconTabs(QTabWidget):
             try:
                 # todo 各个widget的复制, 在各个widget的内部实现
                 print(f"I am copying {widget_type} widget.")
-                # if hasattr(old_widget, 'copy'):
-                #     self.value_widget[new_value] = old_widget.copy(new_value)
-                # elif hasattr(old_widget, 'clone'):
-                #     self.value_widget[new_value] = old_widget.clone()
+                if hasattr(old_widget, 'copy'):
+                    self.value_widget[new_value] = old_widget.copy(new_value)
+                elif hasattr(old_widget, 'clone'):
+                    self.value_widget[new_value] = old_widget.clone()
                 # todo switch
-                # # 通用属性连接(propertiesChange, tabClose)
-                # if not new_value.startswith('Timeline.'):
-                #     self.value_widget[new_value].propertiesChange.connect(self.getChangedProperties)
-                # try:
-                #     self.value_widget[new_value].tabClose.connect(self.closeTab)
-                # except Exception:
-                #     pass
-                # # 特殊属性
-                # if new_value.startswith('Cycle'):
-                #     self.cycleAdd.emit(new_value)
-                # elif new_value.startswith('Timeline.'):
-                #     self.linkTimelineSignals(new_value)
-                #     self.timelineAdd.emit(new_value)
-                # elif new_value.startswith('If_else'):
-                #     self.ifBranchAdd.emit(new_value)
+                # 通用属性连接(propertiesChange, tabClose)
+                if not new_value.startswith('Timeline.'):
+                    self.value_widget[new_value].propertiesChange.connect(self.getChangedProperties)
+                try:
+                    self.value_widget[new_value].tabClose.connect(self.closeTab)
+                except Exception:
+                    pass
+                # 特殊属性
+                if new_value.startswith('Cycle'):
+                    self.cycleAdd.emit(new_value)
+                elif new_value.startswith('Timeline.'):
+                    self.linkTimelineSignals(new_value)
+                    self.timelineAdd.emit(new_value)
+                elif new_value.startswith('If_else'):
+                    self.ifBranchAdd.emit(new_value)
                 print(f"I have finished copying {widget_type} widget.")
             except Exception:
                 print(f"Fail to copy {widget_type} widget.")

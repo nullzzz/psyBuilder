@@ -359,6 +359,7 @@ class Structure(QDockWidget):
 
     def do_getNodeValue(self, node: StructureItem, data: list):
         try:
+            print(Structure.name_values)
             for i in range(0, node.childCount()):
                 child = node.child(i)
                 if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith(
@@ -549,3 +550,14 @@ class Structure(QDockWidget):
     def getTimelineAttributes(self, value):
         # todo 得到timeline的attributes
         return {"error" : "can't get attributes"}
+
+    @staticmethod
+    def getValueBySameAndParent(same_value, parent_value):
+        try:
+            name = Structure.value_node[same_value].text(0)
+            for value in Structure.name_values[name]:
+                if Structure.value_node[value].parent().value == parent_value:
+                    return value
+            return ''
+        except Exception as e:
+            print(f"error {e} happens in get value. [structure/main.py]")

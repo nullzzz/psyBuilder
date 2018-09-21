@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 from .colAdd import ColAdd
 from noDash import NoDash
 
+import copy
+
 
 class TimelineTable(QTableWidget):
     def __init__(self, parent=None):
@@ -27,3 +29,31 @@ class TimelineTable(QTableWidget):
     def addColumn(self, name):
         self.insertColumn(self.columnCount())
         self.setHorizontalHeaderItem(self.columnCount() - 1, QTableWidgetItem(name))
+
+    def __deepcopy__(self, memodict={}):
+        try:
+            timeline_table_copy = TimelineTable()
+            timeline_table_copy.col_header = copy.deepcopy(self.col_header)
+            timeline_table_copy.col_value = copy.deepcopy(self.col_value)
+            timeline_table_copy.setColumnCount(self.columnCount())
+            timeline_table_copy.setHorizontalHeaderLabels(self.col_header)
+            for row in range(self.rowCount()):
+                if row < timeline_table_copy.rowCount():
+                    for col in range(self.columnCount()):
+                        text = self.item(row, col).text()
+                        if col == 1 and not text:
+                            pass
+                        else:
+                            timeline_table_copy.setItem(row, col, QTableWidgetItem(text))
+                else:
+                    timeline_table_copy.insertRow(timeline_table_copy.rowCount())
+                    for col in range(self.columnCount()):
+                        text = self.item(row, col).text()
+                        if col == 1 and not text:
+                            pass
+                        else:
+                            timeline_table_copy.setItem(row, col, QTableWidgetItem(text))
+
+            return timeline_table_copy
+        except Exception as e:
+            print(f"error {e} happens in copy timeline table. [cycle/timelineTable.py]")

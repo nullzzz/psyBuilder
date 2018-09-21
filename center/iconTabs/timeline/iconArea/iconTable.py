@@ -340,10 +340,6 @@ class IconTable(QTableWidget):
                     self.copy_action.disconnect()
                     self.copy_action.triggered.connect(lambda: self.copyIconToNext(column))
                     item_value = self.cellWidget(row, column).value
-                    if item_value.startswith("Cycle"):
-                        self.copy_action.setDisabled(True)
-                    else:
-                        self.copy_action.setEnabled(True)
                     self.right_button_menu.popup(self.mapToGlobal(e.pos()))
                 else:
                     pass
