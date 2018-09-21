@@ -25,7 +25,7 @@ class VideoDisplay(QMainWindow):
         self.default_properties = self.pro.getInfo()
 
         self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.clone)
+        self.pro.cancel_bt.clicked.connect(self.cancel)
         self.pro.apply_bt.clicked.connect(self.apply)
 
         self.file = ""
@@ -63,6 +63,10 @@ class VideoDisplay(QMainWindow):
         self.play_video = QAction(QIcon("image/start_video"), "start", self)
         self.play_video.triggered.connect(self.playVideo)
         tool.addAction(self.play_video)
+
+        t = QAction(QIcon("image/test"), "test", self)
+        t.triggered.connect(self.test)
+        tool.addAction(t)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
@@ -186,5 +190,10 @@ class VideoDisplay(QMainWindow):
         clone_widget.setPro(self.pro.clone())
         clone_widget.apply()
         # clone_widget.setVideo()
-        self.pro.tab.addTab(clone_widget, "c")
+        # self.pro.tab.addTab(clone_widget, "c")
         return clone_widget
+
+    def test(self):
+        self.pro_clone = self.pro.clone()
+        self.pro_clone.setWindowModality(Qt.ApplicationModal)
+        self.pro_clone.show()

@@ -16,8 +16,13 @@ class TextDisplay(QMainWindow):
         self.attributes = []
         self.text_label = QTextEdit()
         self.pro = TextProperty()
+
+        self.html = self.pro.html
+        self.font = self.pro.font
+        self.default_properties = self.pro.getInfo()
+
         self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.pro.close)
+        self.pro.cancel_bt.clicked.connect(self.cancel)
         self.pro.apply_bt.clicked.connect(self.apply)
 
         self.align = "Center"
@@ -49,6 +54,10 @@ class TextDisplay(QMainWindow):
         tool.addAction(open_pro)
         tool.addAction(pre_view)
 
+        t = QAction(QIcon("image/test"), "test", self)
+        t.triggered.connect(self.test)
+        tool.addAction(t)
+
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
@@ -78,13 +87,25 @@ class TextDisplay(QMainWindow):
             print(e)
             print(type(e))
 
+    def setPro(self, pro: TextProperty):
+        del self.pro
+        self.pro = pro
+        self.pro.ok_bt.clicked.connect(self.ok)
+        self.pro.cancel_bt.clicked.connect(self.cancel)
+        self.pro.apply_bt.clicked.connect(self.apply)
+
     def ok(self):
         self.apply()
         self.pro.close()
 
+    def cancel(self):
+        self.pro.loadSetting()
+        # self.clone()
+
     def apply(self):
+        self.getInfo()
         self.getPro()
-        self.text_label.setHtml(self.text_html)
+        self.text_label.setHtml(self.html)
         self.text_label.setFont(self.font)
         if self.is_wrap:
             self.text_label.setWordWrapMode(QTextOption.WordWrap)
@@ -92,12 +113,12 @@ class TextDisplay(QMainWindow):
             self.text_label.setWordWrapMode(QTextOption.NoWrap)
         # self.text_label.setStyleSheet("background-color: {};".format(self.back_color))
         # 发送信号
-        self.propertiesChange.emit(self.getInfo())
+        self.propertiesChange.emit(self.default_properties)
 
     # 获取参数
     def getPro(self):
-        self.text_html = self.pro.general.text_edit.toHtml()
-        self.font = self.pro.general.font
+        self.html = self.pro.html
+        self.font = self.pro.font
         self.align = self.pro.general.align.currentText()
         self.fore_color = self.pro.general.fore_color.currentText()
         self.back_color = self.pro.general.back_color.currentText()
@@ -110,7 +131,10 @@ class TextDisplay(QMainWindow):
 
     # 返回设置参数
     def getInfo(self):
-        return {**self.pro.general.getInfo(), **self.pro.frame.getInfo(), **self.pro.duration.getInfo()}
+        self.html = self.pro.html
+        self.font = self.pro.font
+        self.default_properties = self.pro.getInfo()
+        return self.default_properties
 
     # 设置输入输出设备
     def setDevices(self, in_devices, out_devices):
@@ -129,6 +153,19 @@ class TextDisplay(QMainWindow):
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro.setAttributes(format_attributes)
+
+    def clone(self):
+        clone_widget = TextDisplay()
+        clone_widget.setPro(self.pro.clone())
+        clone_widget.apply()
+
+        # self.pro.tab.addTab(clone_widget, "c")
+        return clone_widget
+
+    def test(self):
+        self.pro_clone = self.pro.clone()
+        self.pro_clone.setWindowModality(Qt.ApplicationModal)
+        self.pro_clone.show()
 
 
 if __name__ == "__main__":

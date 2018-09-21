@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
 
 from center.iconTabs.events.durationPage import DurationPage
@@ -14,11 +15,17 @@ class TextProperty(QWidget):
         self.general = TextTab1()
         self.frame = FramePage()
         self.duration = DurationPage()
+
+        self.html = self.general.html
+        self.font = self.general.font
+
+        self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.frame, "frame")
         self.tab.addTab(self.duration, "duration")
         # bottom
-        self.ok_bt = QPushButton("Ok")
+        self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
         self.setButtons()
@@ -55,9 +62,32 @@ class TextProperty(QWidget):
                   (screen.height() - size.height()) / 2)
 
     def getInfo(self):
-        return {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        self.general.apply()
+        self.html = self.general.html
+        self.font = self.general.font
+        self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        return self.default_properties
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
         self.frame.setAttributes(attributes)
         self.duration.setAttributes(attributes)
+
+    def setOther(self, html: str="", font: QFont=QFont("SimSun", 12)):
+        self.html = html
+        self.font = font
+
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.general.setProperties(self.default_properties, self.html, self.font)
+        self.frame.setProperties(self.default_properties)
+        self.duration.setProperties(self.default_properties)
+
+    def clone(self):
+        clone_page = TextProperty()
+        clone_page.setOther(self.html, self.font)
+        clone_page.setProperties(self.default_properties)
+        return clone_page
