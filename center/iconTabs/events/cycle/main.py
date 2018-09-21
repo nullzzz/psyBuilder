@@ -454,11 +454,12 @@ class Cycle(QMainWindow):
                 cycle_copy.value_row[timeline_value] = row
             # timeline_table
             cycle_copy.timeline_count = self.timeline_count
-            cycle_copy.timeline_table = copy.deepcopy(self.timeline_table)
+            # cycle_copy.timeline_table = copy.deepcopy(self.timeline_table)
+            self.timeline_table.copy(cycle_copy.timeline_table)
             # properties
             cycle_copy.properties = self.properties
             cycle_copy.setProperties()
-            cycle_copy.setCentralWidget(cycle_copy.timeline_table)
+            # cycle_copy.setCentralWidget(cycle_copy.timeline_table)
             return cycle_copy
         except Exception as e:
             print(f"error {e} happens in copy cycle. [cycle/main.py]")

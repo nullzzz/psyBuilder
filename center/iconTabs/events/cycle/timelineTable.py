@@ -30,30 +30,27 @@ class TimelineTable(QTableWidget):
         self.insertColumn(self.columnCount())
         self.setHorizontalHeaderItem(self.columnCount() - 1, QTableWidgetItem(name))
 
-    def __deepcopy__(self, memodict={}):
+    def copy(self, timeline_table):
         try:
-            timeline_table_copy = TimelineTable()
-            timeline_table_copy.col_header = copy.deepcopy(self.col_header)
-            timeline_table_copy.col_value = copy.deepcopy(self.col_value)
-            timeline_table_copy.setColumnCount(self.columnCount())
-            timeline_table_copy.setHorizontalHeaderLabels(self.col_header)
+            timeline_table.col_header = copy.deepcopy(self.col_header)
+            timeline_table.col_value = copy.deepcopy(self.col_value)
+            timeline_table.setColumnCount(self.columnCount())
+            timeline_table.setHorizontalHeaderLabels(self.col_header)
             for row in range(self.rowCount()):
-                if row < timeline_table_copy.rowCount():
+                if row < timeline_table.rowCount():
                     for col in range(self.columnCount()):
                         text = self.item(row, col).text()
                         if col == 1 and not text:
                             pass
                         else:
-                            timeline_table_copy.setItem(row, col, QTableWidgetItem(text))
+                            timeline_table.setItem(row, col, QTableWidgetItem(text))
                 else:
-                    timeline_table_copy.insertRow(timeline_table_copy.rowCount())
+                    timeline_table.insertRow(timeline_table.rowCount())
                     for col in range(self.columnCount()):
                         text = self.item(row, col).text()
                         if col == 1 and not text:
                             pass
                         else:
-                            timeline_table_copy.setItem(row, col, QTableWidgetItem(text))
-
-            return timeline_table_copy
+                            timeline_table.setItem(row, col, QTableWidgetItem(text))
         except Exception as e:
-            print(f"error {e} happens in copy timeline table. [cycle/timelineTable.py]")
+            print(f'error {e} happens in copy timeline table. [cycle/timelineTable.py]')
