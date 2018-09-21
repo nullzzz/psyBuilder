@@ -30,8 +30,11 @@ class IconTabs(QTabWidget):
     cycleAdd = pyqtSignal(str)
     # 同上
     ifBranchAdd = pyqtSignal(str)
+    timelineAdd = pyqtSignal(str)
     # 发送到structure (value)
     attributesShow = pyqtSignal(str)
+    # 先发送到structure去copyNode (value, exist_value)
+    iconNodeCopy = pyqtSignal(str, str)
 
     def __init__(self, parent=None):
         super(IconTabs, self).__init__(parent)
@@ -139,15 +142,8 @@ class IconTabs(QTabWidget):
             # timeline 相关属性
             timeline_parent = self.value_parent[cycle_value]
             self.timeline_parent[timeline_value] = timeline_parent
-            # 在此函数就去生成timeline实体, 以便去处理timeline的attribute
+            # 在此函数就去生成timeline实体
             self.openTab(timeline_value, timeline_name, False)
-            # 取出该timeline所在行已有attribute
-            cycle = self.value_widget[cycle_value]
-            row = cycle.value_row[timeline_value]
-            for col in range(2, cycle.timeline_table.columnCount()):
-                attribute_name = cycle.timeline_table.col_header[col]
-                attribute_value = cycle.timeline_table.item(row, col).text()
-                self.value_widget[timeline_value].attributes[attribute_name] = attribute_value
         except Exception:
             print("error happens in add timeline. [iconTabs/main.py]")
 
@@ -458,9 +454,10 @@ class IconTabs(QTabWidget):
     def copyIcon(self, old_value, new_value, text):
         try:
             self.value_parent[new_value] = self.value_parent[old_value]
-            # cycle 不能使用 deepcopy
             if old_value in self.value_widget:
-                self.openTab(new_value, text, False)
+                print("I am copying icon in timeline.")
+                # 调用structure中的copyNode
+                self.iconNodeCopy.emit(new_value, old_value)
                 self.copyWidget(old_value, new_value)
         except Exception:
             print("some errors happen in copy icon. [iconTabs/main.py]")
@@ -468,6 +465,7 @@ class IconTabs(QTabWidget):
     def mergeValueWidget(self, value, exist_value):
         try:
             # 先删除旧的widget
+            print("I am merging widget.")
             self.deleteTab(value)
             if exist_value in self.value_widget:
                 self.value_widget[value] = self.value_widget[exist_value]
@@ -479,21 +477,38 @@ class IconTabs(QTabWidget):
 
     def splitValueWidget(self, value, old_exist_value):
         try:
-            self.copyWidget(value, old_exist_value)
+            print("I am splitting widget.")
+            self.copyWidget(old_exist_value, value)
         except Exception as e:
             print(f"error {e} happens in split widget. [iconTabs/main.py]")
 
-    def copyWidget(self, old_value, new_value):
+    def copyWidget(self, old_value, new_value: str):
         try:
             old_widget = self.value_widget[old_value]
             widget_type = old_value.split('.')[0]
             try:
                 # todo 各个widget的复制, 在各个widget的内部实现
                 print(f"I am copying {widget_type} widget.")
-                if hasattr(old_widget, 'copy'):
-                    self.value_widget[new_value] = old_widget.copy(new_value)
-                elif hasattr(old_widget, 'clone'):
-                    self.value_widget[new_value] = old_widget.clone()
+                # if hasattr(old_widget, 'copy'):
+                #     self.value_widget[new_value] = old_widget.copy(new_value)
+                # elif hasattr(old_widget, 'clone'):
+                #     self.value_widget[new_value] = old_widget.clone()
+                # todo switch
+                # # 通用属性连接(propertiesChange, tabClose)
+                # if not new_value.startswith('Timeline.'):
+                #     self.value_widget[new_value].propertiesChange.connect(self.getChangedProperties)
+                # try:
+                #     self.value_widget[new_value].tabClose.connect(self.closeTab)
+                # except Exception:
+                #     pass
+                # # 特殊属性
+                # if new_value.startswith('Cycle'):
+                #     self.cycleAdd.emit(new_value)
+                # elif new_value.startswith('Timeline.'):
+                #     self.linkTimelineSignals(new_value)
+                #     self.timelineAdd.emit(new_value)
+                # elif new_value.startswith('If_else'):
+                #     self.ifBranchAdd.emit(new_value)
                 print(f"I have finished copying {widget_type} widget.")
             except Exception:
                 print(f"Fail to copy {widget_type} widget.")

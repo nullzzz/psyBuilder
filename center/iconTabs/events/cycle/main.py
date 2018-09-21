@@ -439,5 +439,6 @@ class Cycle(QMainWindow):
         self.is_paste_disabled = False
         self.paste_data = []
 
+    # todo copy cycle
     def copy(self, value):
         pass

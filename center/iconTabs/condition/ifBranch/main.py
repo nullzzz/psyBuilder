@@ -271,3 +271,7 @@ class IfBranch(QWidget):
 
     def showIconProperties(self, properties):
         self.iconPropertiesShow.emit(properties)
+
+    # todo copy ifBranch
+    def copy(self, value):
+        pass

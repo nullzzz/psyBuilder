@@ -17,7 +17,6 @@ class Timeline(QWidget):
         super(Timeline, self).__init__(parent)
         # data
         self.value = value
-        self.attributes = {}
         # widget
         self.icon_bar = IconBar(self)
         self.icon_area = IconArea(self, self.value)
@@ -56,9 +55,7 @@ class Timeline(QWidget):
     def getProperties(self):
         return {"properties": "None"}
 
+    # todo copy timeline
     def copy(self, value):
         # 返回自身的复制
-        # new_timeline = Timeline(value)
-        #
-        # return new_timeline
-        pass
+        print(value)
