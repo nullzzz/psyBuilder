@@ -57,5 +57,13 @@ class Timeline(QWidget):
 
     # todo copy timeline
     def copy(self, value):
-        # 返回自身的复制
-        print(value)
+        try:
+            # 返回自身的复制
+            timeline_copy = Timeline(value=value)
+            # icon_bar不需要复制
+            # icon_area需要复制
+            self.icon_area.copy(timeline_copy.icon_area)
+            return timeline_copy
+        except Exception as e:
+            print(f"error {e} happens in copy timeline. [timeline/main.py]")
+

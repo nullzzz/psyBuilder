@@ -61,6 +61,7 @@ class IconTabs(QTabWidget):
 
     def linkSignals(self):
         # self
+        self.tabCloseRequested.connect(self.restoreTab)
         self.tabCloseRequested.connect(self.removeTab)
         self.currentChanged.connect(self.showTimelineAttributes)
         self.currentChanged.connect(self.showProperties)
@@ -73,18 +74,21 @@ class IconTabs(QTabWidget):
 
     def linkTimelineSignals(self, value):
         try:
-            self.value_widget[value].iconAdd.disconnect(self.addIcon)
-            self.value_widget[value].iconAdd.connect(self.addIcon)
-        except Exception:
-            self.value_widget[value].iconAdd.connect(self.addIcon)
-            self.value_widget[value].iconRemove.connect(self.removeIcon)
-            self.value_widget[value].iconNameChange.connect(self.changeTabName)
-            self.value_widget[value].icon_area.iconCopy.connect(self.copyIcon)
-            self.value_widget[value].icon_area.icon_table.iconDoubleClicked.connect(self.openTab)
-            self.value_widget[value].icon_area.icon_table.iconRemove.connect(self.deleteTab)
-            self.value_widget[value].icon_area.icon_table.propertiesShow.connect(self.getWidgetProperties)
-            self.value_widget[value].icon_area.icon_table.iconWidgetMerge.connect(self.mergeValueWidget)
-            self.value_widget[value].icon_area.icon_table.iconWidgetSplit.connect(self.splitValueWidget)
+            try:
+                self.value_widget[value].iconAdd.disconnect(self.addIcon)
+                self.value_widget[value].iconAdd.connect(self.addIcon)
+            except Exception:
+                self.value_widget[value].iconAdd.connect(self.addIcon)
+                self.value_widget[value].iconRemove.connect(self.removeIcon)
+                self.value_widget[value].iconNameChange.connect(self.changeTabName)
+                self.value_widget[value].icon_area.iconCopy.connect(self.copyIcon)
+                self.value_widget[value].icon_area.icon_table.iconDoubleClicked.connect(self.openTab)
+                self.value_widget[value].icon_area.icon_table.iconRemove.connect(self.deleteTab)
+                self.value_widget[value].icon_area.icon_table.propertiesShow.connect(self.getWidgetProperties)
+                self.value_widget[value].icon_area.icon_table.iconWidgetMerge.connect(self.mergeValueWidget)
+                self.value_widget[value].icon_area.icon_table.iconWidgetSplit.connect(self.splitValueWidget)
+        except Exception as e:
+            print(f"error {e} happens in link timeline signals. [iconTabs/main.py]")
 
     def linkCycleSignals(self, value):
         try:
@@ -478,7 +482,8 @@ class IconTabs(QTabWidget):
     def splitValueWidget(self, value, old_exist_value):
         try:
             print("I am splitting widget.")
-            self.copyWidget(old_exist_value, value)
+            if old_exist_value in self.value_widget:
+                self.copyWidget(old_exist_value, value)
         except Exception as e:
             print(f"error {e} happens in split widget. [iconTabs/main.py]")
 
@@ -530,6 +535,11 @@ class IconTabs(QTabWidget):
     def closeAllTab(self):
         for i in range(0, self.count()):
             self.removeTab(0)
+
+    def restoreTab(self, index):
+        widget = self.widget(index)
+        if isinstance(widget, IfBranch):
+            widget.restoreIcons()
 
     def closeOtherTab(self, index):
         for i in range(index + 1, self.count()):

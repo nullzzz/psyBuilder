@@ -270,3 +270,13 @@ class IconArea(QFrame):
             self.iconMove.emit(self.icon_table.fill_count, col + 1, new_value)
         except Exception as e:
             print("error {} happens in just copy icon. [iconArea/main.py]".format(e))
+
+    def copy(self, icon_area_copy):
+        try:
+            # row_height
+            icon_area_copy.row_height = self.row_height
+            icon_area_copy.icon_table.setRowHeight(1, self.row_height)
+            # icon table
+            self.icon_table.copy(icon_area_copy.icon_table)
+        except Exception as e:
+            print(f"error {e} happens in copy icon area. [iconArea/main.py]")

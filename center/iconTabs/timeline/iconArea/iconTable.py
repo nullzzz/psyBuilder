@@ -443,3 +443,31 @@ class IconTable(QTableWidget):
 
     def copyDragFinish(self):
         self.is_copy_module = False
+
+    def copy(self, icon_table_copy):
+        try:
+            # 当前icon count
+            icon_table_copy.fill_count = self.fill_count
+            # 当前icon count 是否 >= 8
+            icon_table_copy.is_fill = self.is_fill
+            # text是否可以被编辑
+            icon_table_copy.is_edit = self.is_edit
+            # 是否是copy模式
+            icon_table_copy.is_copy_module = self.is_copy_module
+            # 暂存被修改的名字
+            icon_table_copy.old_name = self.old_name
+            # table
+            for col in range(1, self.fill_count + 1):
+                name = self.item(3, col).text()
+                icon_value = Structure.getValueBySameAndParent(name, icon_table_copy.parent_timeline_value)
+                pixmap = self.cellWidget(1, col).pixmap()
+                icon_copy = Icon(name=name, pixmap=pixmap, value=icon_value)
+                # icon
+                icon_copy.setAlignment(Qt.AlignCenter)
+                icon_table_copy.setCellWidget(1, col, icon_copy)
+                # name
+                item_copy = QTableWidgetItem(name)
+                item_copy.setTextAlignment(Qt.AlignCenter)
+                icon_table_copy.setItem(3, col, item_copy)
+        except Exception as e:
+            print(f"error {e} happens in copy icon table. [iconArea/iconTable.py]")
