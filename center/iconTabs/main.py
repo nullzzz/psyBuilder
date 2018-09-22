@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
-from center.iconTabs.condition.switchBranch import SwitchBranch
+from center.iconTabs.condition.switchBranch.main import SwitchBranch
 from center.iconTabs.timeline.main import Timeline
 from getImage import getImage
 from .condition.ifBranch.main import IfBranch
@@ -536,6 +536,7 @@ class IconTabs(QTabWidget):
         for i in range(0, self.count()):
             self.removeTab(0)
 
+    # todo switch
     def restoreTab(self, index):
         widget = self.widget(index)
         if isinstance(widget, IfBranch):
@@ -546,3 +547,6 @@ class IconTabs(QTabWidget):
             self.removeTab(index + 1)
         for i in range(0, index):
             self.removeTab(0)
+
+    def getAttribute(self, index):
+        pass
