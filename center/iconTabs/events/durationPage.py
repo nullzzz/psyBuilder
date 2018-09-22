@@ -109,7 +109,7 @@ class DurationPage(QWidget):
             self.sender().setFont(QFont("Timers", 9, QFont.Bold))
         else:
             self.sender().setStyleSheet("color:black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
+            self.sender().setFont(QFont("SimSun", 9, QFont.Normal))
 
     def finalCheck(self):
         temp = self.sender()
@@ -258,7 +258,7 @@ class DurationPage(QWidget):
             self.in_tip2.show()
 
     # 设置可选参数
-    def setAttributes(self, attributes):
+    def setAttributes(self, attributes: list):
         self.attributes = attributes
         self.duration.setCompleter(QCompleter(self.attributes))
         for i in range(self.in_devices.count()):
@@ -306,12 +306,10 @@ class DurationPage(QWidget):
         current_devices = []
         for i in range(self.out_devices.count()):
             current_devices.append(self.out_devices.item(i).text())
-
         deleted_out_devices = [device for device in self.default_properties["Output devices"].keys()
                                if device not in current_devices]
         for device in deleted_out_devices:
-            device_info: dict
-            device_info = self.default_properties["Output devices"][device]
+            device_info: dict = self.default_properties["Output devices"][device]
             device_name = device_info["Device name"]
             device_type = device_info["Device type"]
             item = DeviceOutItem(device_name, device_type)
@@ -333,8 +331,7 @@ class DurationPage(QWidget):
         # 删掉的要加上
         deleted_in_devices = [device for device in self.default_properties["Input devices"].keys() if device not in current_devices]
         for device in deleted_in_devices:
-            device_info: dict
-            device_info = self.default_properties["Input devices"][device]
+            device_info: dict = self.default_properties["Input devices"][device]
             print(device_info)
             device_name = device_info["Device name"]
             device_type = device_info["Device type"]

@@ -13,6 +13,13 @@ class Close(QWidget):
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.pause_between_msg = QSpinBox()
+
+        self.default_properties = {
+            "Pause between message": 0,
+            "Automatically log all variables": 0,
+            "log message": ""
+        }
+
         self.msg = ""
         self.automatically_log_all_variables = QCheckBox("Automatically log all variables")
         self.log_msg = QTextEdit()
@@ -62,17 +69,30 @@ class Close(QWidget):
         self.tabClose.emit(self)
 
     def cancel(self):
+        self.loadSetting()
         self.close()
         self.tabClosesed.emit(self)
 
     def apply(self):
         self.propertiesChange.emit(self.getProperties())
 
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
     def getProperties(self):
-        pause = self.pause_between_msg.value()
-        is_auto = self.automatically_log_all_variables.checkState()
-        text = self.log_msg.toPlainText()
-        return {
-            "Pause between message": "{}ms".format(pause), "Automatically log all variables": bool(is_auto),
-            "log message": text
-        }
+        self.default_properties["Pause between message"] = self.pause_between_msg.value()
+        self.default_properties["Automatically log all variables"] = self.automatically_log_all_variables.checkState()
+        self.default_properties["log message"] = self.log_msg.toPlainText()
+
+        return self.default_properties
+
+    def loadSetting(self):
+        self.pause_between_msg.setValue(self.default_properties["Pause between message"])
+        self.automatically_log_all_variables.setCheckState(self.default_properties["Automatically log all variables"])
+        self.log_msg.setText(self.default_properties["log message"])
+
+    def clone(self):
+        clone_widget = Close()
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

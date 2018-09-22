@@ -115,14 +115,6 @@ class SelectArea(QListWidget):
         source = e.source()
         item_type = source.currentItem().item_type
         drop_item = source.currentItem().clone()
-        # if self.device_type:
-        #     out_device[item_type] += 1
-        #     if out_device[item_type] > 1:
-        #         drop_item.setText("{}{}".format(drop_item.text(), out_device[item_type]))
-        # else:
-        #     in_device[item_type] += 1
-        #     if in_device[item_type] > 1:
-        #         drop_item.setText("{}{}".format(drop_item.text(), in_device[item_type]))
         drop_item.setText("{}.{}".format(drop_item.text(), self.device_count[item_type]))
         self.device_count[item_type] += 1
 
