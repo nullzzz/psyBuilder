@@ -31,6 +31,8 @@ class GlobalDevice(QWidget):
 
         # 已选择设备
         self.selected_devices = SelectArea(self.device_type)
+        self.selected_devices_clone = SelectArea(self.device_type)
+
         # 还母鸡要做啥子
         self.describe = QTextEdit()
         self.describe.setText("此处留白\n\t设备描述\n\t参数设置")
@@ -68,10 +70,13 @@ class GlobalDevice(QWidget):
         self.close()
 
     def cancel(self):
-
-        self.close()
+        # self.selected_devices.clear()
+        self.selected_devices.loadSetting()
+        # print("cancel")
+        # self.close()
 
     def apply(self):
+        self.selected_devices_clone = self.selected_devices.clone()
         self.deviceSelect.emit(self.device_type, self.selected_devices.getInfo())
 
 
@@ -101,6 +106,12 @@ class SelectArea(QListWidget):
             "serial_port": 0,
             "parallel_port": 0,
             "network_port": 0
+        }
+        for i in self.device_count.keys():
+            self.setProperty(i, 0)
+
+        self.default_properties = {
+
         }
 
         # 拖动的图标
@@ -174,7 +185,7 @@ class SelectArea(QListWidget):
         self.clear()
         for k in self.device_count.keys():
             self.device_count[k] = 0
-        print(self.device_count)
+        # print(self.device_count)
 
     def showContextMenu(self, pos):
         if self.count():
@@ -186,10 +197,54 @@ class SelectArea(QListWidget):
     # type: dict
     # name: type
     def getInfo(self):
-        dic = {}
+        for k, v in self.device_count.items():
+            self.setProperty(k, v)
+            # print(k, self.property(k))
         for i in range(self.count()):
-            dic[self.item(i).text()] = self.item(i).item_type
-        return dic
+            self.default_properties[self.item(i).text()] = self.item(i).item_type
+            # 设备名： 设备类型
+        return self.default_properties
+
+    def setDeviceCount(self, device_count: dict):
+        self.device_count = device_count
+
+    def loadSetting(self):
+        del_index = []
+        for i in range(self.count()):
+            item: QListWidgetItem = self.item(i)
+            if item.text() in self.default_properties.keys():
+                pass
+            else:
+                del_index.insert(0, i)
+
+        for i in del_index:
+            self.takeItem(i)
+
+        # 删掉的加上
+        current_devices = []
+        for i in range(self.count()):
+            current_devices.append(self.item(i).text())
+        deleted_out_devices = [device for device in self.default_properties.keys() if
+                                   device not in current_devices]
+        for device in deleted_out_devices:
+            device_type = self.default_properties[device]
+            item = DeviceItem(device_type, device)
+            self.addItem(item)
+        del_index.clear()
+
+        for device_type in self.device_count.keys():
+            self.device_count[device_type] = self.property(device_type)
+            # print(device_type, self.property(device_type))
+            # print(type(self.property(device_type)))
+
+    def clone(self):
+        area_clone = SelectArea()
+        area_clone.setDeviceCount(self.device_count)
+        for i in range(self.count()):
+            item = self.item(i)
+            # print(item)
+            area_clone.addItem(item.clone())
+        return area_clone
 
 
 if __name__ == "__main__":
