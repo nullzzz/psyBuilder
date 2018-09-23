@@ -38,7 +38,7 @@ class DeviceInDialog(QDialog):
         for device_name, device_type in devices.items():
             self.tip.hide()
             item = QListWidgetItem(device_name)
-            item.setData(1, device_type)
+            item.setData(3, device_type)
             item.setIcon(QIcon("image/{}_device".format(device_type)))
             self.devices_list.addItem(item)
 
@@ -77,6 +77,6 @@ class DeviceOutDialog(QDialog):
         for device_name, device_type in devices.items():
             self.tip.hide()
             item = QListWidgetItem(device_name)
-            item.setData(1, device_type)
+            item.setData(3, device_type)
             item.setIcon(QIcon("image/{}_device".format(device_type)))
             self.devices_list.addItem(item)

@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QMessageBox, QLineEdit, QListWidgetItem, QWidget, QComboBox, QGridLayout, QLabel, \
     QFormLayout, QCompleter
 
@@ -26,6 +26,8 @@ class DeviceOutItem(QListWidgetItem):
         self.attributes = []
         self.name = name
         self.device_type = device_type
+        self.setIcon(QIcon("image/{}_device.png".format(self.device_type)))
+
         self.default_properties = {
             "Device name": self.name,
             "Device type": self.device_type,
@@ -65,6 +67,10 @@ class DeviceOutItem(QListWidgetItem):
         else:
             self.pro.sender().setStyleSheet("color:black")
             self.pro.sender().setFont(QFont("宋体", 9, QFont.Normal))
+            # if valid:
+            #    pass
+            # else:
+            # QMessageBox.warning(self.pro, "Warning", "Invalid Attribute!". QMessageBox.Ok)
 
     def finalCheck(self):
         temp = self.pro.sender()
@@ -110,6 +116,7 @@ class DeviceInItem(QListWidgetItem):
         self.attributes = []
         self.name = name
         self.device_type = device_type
+        self.setIcon(QIcon("image/{}_device.png".format(self.device_type)))
         """
         :device_type: 0一般类型，1那个啥eye的类型
         """

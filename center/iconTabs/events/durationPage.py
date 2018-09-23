@@ -134,7 +134,7 @@ class DurationPage(QWidget):
         temp = self.in_devices_dialog.devices_list.currentItem()
         if temp:
             device_name = temp.text()
-            device_type = temp.data(1)
+            device_type = temp.data(3)
             item = DeviceInItem(device_name, device_type)
             self.addInDevice(item)
             self.in_devices_dialog.close()
@@ -155,7 +155,7 @@ class DurationPage(QWidget):
         temp = self.out_devices_dialog.devices_list.currentItem()
         if temp:
             device_name = temp.text()
-            device_type = temp.data(1)
+            device_type = temp.data(3)
             item = DeviceOutItem(device_name, device_type)
             self.addOutDevice(item)
             self.out_devices_dialog.close()

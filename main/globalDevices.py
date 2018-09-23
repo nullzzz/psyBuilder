@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from PyQt5.QtGui import QIcon, QMouseEvent, QDragMoveEvent, QCursor
 from PyQt5.QtWidgets import QWidget, QListWidget, QListWidgetItem, QTextEdit, QVBoxLayout, QHBoxLayout, QApplication, \
-    QListView, QFrame, QPushButton, QMenu
+    QListView, QFrame, QPushButton, QMenu, QInputDialog, QLineEdit, QMessageBox
 
 
 class GlobalDevice(QWidget):
@@ -31,7 +31,7 @@ class GlobalDevice(QWidget):
 
         # 已选择设备
         self.selected_devices = SelectArea(self.device_type)
-        self.selected_devices_clone = SelectArea(self.device_type)
+        self.selected_devices.itemDoubleClicked.connect(self.reName)
 
         # 还母鸡要做啥子
         self.describe = QTextEdit()
@@ -76,8 +76,19 @@ class GlobalDevice(QWidget):
         # self.close()
 
     def apply(self):
-        self.selected_devices_clone = self.selected_devices.clone()
         self.deviceSelect.emit(self.device_type, self.selected_devices.getInfo())
+
+    def reName(self, item):
+        text, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
+        if ok and text != '':
+            text: str
+            if " " in text or text.lower() in self.selected_devices.device_name:
+                QMessageBox.warning(self, "Warning", f"{text} is invalid!", QMessageBox.Ok)
+            else:
+                # print()
+                self.selected_devices.device_name.remove(item.text().lower())
+                self.selected_devices.device_name.append(text)
+                item.setText(text)
 
 
 class DeviceItem(QListWidgetItem):
@@ -107,6 +118,9 @@ class SelectArea(QListWidget):
             "parallel_port": 0,
             "network_port": 0
         }
+
+        self.device_name = []
+
         for i in self.device_count.keys():
             self.setProperty(i, 0)
 
@@ -124,10 +138,13 @@ class SelectArea(QListWidget):
 
     def dropEvent(self, e):
         source = e.source()
-        item_type = source.currentItem().item_type
         drop_item = source.currentItem().clone()
-        drop_item.setText("{}.{}".format(drop_item.text(), self.device_count[item_type]))
+        item_type = drop_item.item_type
+        item_name = "{}.{}".format(item_type, self.device_count[item_type])
+
+        drop_item.setText(item_name)
         self.device_count[item_type] += 1
+        self.device_name.append(item_name.lower())
 
         # 当前位置item
         item = self.itemAt(e.pos())
@@ -185,6 +202,7 @@ class SelectArea(QListWidget):
         self.clear()
         for k in self.device_count.keys():
             self.device_count[k] = 0
+            self.setProperty(k, 0)
         # print(self.device_count)
 
     def showContextMenu(self, pos):
@@ -224,8 +242,8 @@ class SelectArea(QListWidget):
         current_devices = []
         for i in range(self.count()):
             current_devices.append(self.item(i).text())
-        deleted_out_devices = [device for device in self.default_properties.keys() if
-                                   device not in current_devices]
+        deleted_out_devices = [device for device in self.default_properties.keys()
+                               if device not in current_devices]
         for device in deleted_out_devices:
             device_type = self.default_properties[device]
             item = DeviceItem(device_type, device)
