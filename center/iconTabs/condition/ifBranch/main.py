@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QGridLayout, QVBoxL
 from PyQt5.QtGui import QPixmap
 
 from center.iconTabs.condition.iconChoose import IconChoose
-from center.iconTabs.condition.conditionArea import ConditionArea
+from center.iconTabs.condition.ifBranch.conditionArea import ConditionArea
 from getImage import getImage
 
 from structure.main import Structure
@@ -118,8 +118,6 @@ class IfBranch(QWidget):
 
     def clickApply(self):
         try:
-            # properties
-            self.propertiesChange.emit(self.getInfo())
             if self.disposeIconChoose('T') or self.disposeIconChoose('F'):
                 return False
             return True

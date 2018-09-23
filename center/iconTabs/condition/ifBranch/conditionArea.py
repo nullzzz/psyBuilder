@@ -1,13 +1,13 @@
-from PyQt5.QtWidgets import (QTableWidget, QComboBox, QLineEdit, QPushButton, QFrame)
+from PyQt5.QtWidgets import (QTableWidget, QComboBox, QLineEdit, QPushButton, QFrame, QFormLayout, QHBoxLayout)
 
 from noDash import NoDash
 
 
-class ConditionArea(QTableWidget):
+class TempConditionArea(QTableWidget):
     MAX_CONDITION_COUNT = 6
 
     def __init__(self, parent=None):
-        super(ConditionArea, self).__init__(parent)
+        super(TempConditionArea, self).__init__(parent)
 
         # 美化
         self.horizontalHeader().setVisible(False)
@@ -85,6 +85,68 @@ class ConditionArea(QTableWidget):
                     self.setCellWidget(index + 1, 8, add_button)
         except Exception as e:
             print("error {} happens in add condition. [condition/conditionArea.py]".format(e))
+
+    def getIndex(self, add_button):
+        for i in range(0, len(self.add_buttons)):
+            if add_button == self.add_buttons[i]:
+                return i
+        return -1
+
+class ConditionArea(QFrame):
+    #
+    MAX_CONDITION_COUNT = 6
+
+    def __init__(self, parent=None):
+        super(ConditionArea, self).__init__(parent)
+        #
+        self.add_buttons = []
+        #
+        self.form_layout = QFormLayout(self)
+
+        h_box = QHBoxLayout()
+
+        var = QComboBox()
+        compare_operator = QComboBox()
+        compare_operator.addItems((">", "<", "=="))
+        compare_var = QComboBox()
+        add_button = QPushButton("Add")
+        add_button.clicked.connect(self.addCondition)
+        self.add_buttons.append(add_button)
+
+        h_box.addWidget(var)
+        h_box.addWidget(compare_operator)
+        h_box.addWidget(compare_var)
+        h_box.addWidget(add_button)
+        self.form_layout.addRow(h_box)
+
+        self.setLayout(self.form_layout)
+
+    def addCondition(self):
+        try:
+            if len(self.add_buttons) < ConditionArea.MAX_CONDITION_COUNT:
+                index = self.getIndex(self.sender())
+                if index != -1:
+                    h_box = QHBoxLayout()
+
+                    logical_operator = QComboBox()
+                    logical_operator.addItems(('and', 'or', 'xor', 'nor', 'nand', 'xnor'))
+                    var = QComboBox()
+                    compare_operator = QComboBox()
+                    compare_operator.addItems((">", "<", "=="))
+                    compare_var = QComboBox()
+                    add_button = QPushButton("Add")
+                    add_button.clicked.connect(self.addCondition)
+                    self.add_buttons.insert(index + 1, add_button)
+
+                    h_box.addWidget(logical_operator)
+                    h_box.addWidget(var)
+                    h_box.addWidget(compare_operator)
+                    h_box.addWidget(compare_var)
+                    h_box.addWidget(add_button)
+
+                    self.form_layout.insertRow(index + 1, h_box)
+        except Exception as e:
+            print(f"error {e} happens in add condition. [ifBranch/conditionArea.py]")
 
     def getIndex(self, add_button):
         for i in range(0, len(self.add_buttons)):
