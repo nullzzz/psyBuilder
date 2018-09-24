@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QTableWidget, QFrame, QTableWidgetItem, QComboBox, QPushButton
+from PyQt5.QtWidgets import QTableWidget, QFrame, QTableWidgetItem, QComboBox, QPushButton, QLabel
 from PyQt5.QtCore import Qt
 
 from .case import Case
@@ -6,7 +6,7 @@ from noDash import NoDash
 
 
 class CaseTable(QTableWidget):
-    MAX_CASE_COUNT = 10
+    MAX_CASE_COUNT = 9
     def __init__(self, parent=None):
         super(CaseTable, self).__init__(parent)
         # data
@@ -18,6 +18,7 @@ class CaseTable(QTableWidget):
         self.horizontalHeader().setVisible(False)
         self.verticalHeader().setVisible(False)
         self.setFrameStyle(QFrame.NoFrame)
+        self.setShowGrid(False)
         self.setItemDelegate(NoDash())
         self.setStyleSheet("""
             QTableView{
@@ -30,57 +31,22 @@ class CaseTable(QTableWidget):
 
         self.setRowCount(2)
         self.setColumnCount(3)
+        self.setColumnWidth(0, 300)
         self.setColumnWidth(1, 300)
+        self.setColumnWidth(2, 300)
         # first row
-        item = QTableWidgetItem('Switch')
-        item.setFlags(Qt.ItemIsSelectable)
-        self.setItem(0, 0, item)
+        label = QLabel("Switch:")
+        label.setAlignment(Qt.AlignRight)
+        self.setCellWidget(0, 0, label)
         self.setCellWidget(0, 1, self.var)
         # second row
-        item = QTableWidgetItem(f"Case {0}")
-        item.setTextAlignment(Qt.AlignTop)
-        item.setFlags(Qt.ItemIsSelectable)
-        self.setItem(1, 0, item)
-        case = Case()
-        self.cases.append(case)
-        self.setCellWidget(1, 1, case)
-        add_button = QPushButton("Add")
-        add_button.setFixedHeight(30)
-        add_button.clicked.connect(self.insertCase)
-        self.add_buttons.append(add_button)
-        self.setCellWidget(1, 2, add_button)
         self.setRowHeight(1, 300)
+        case_1 = Case("Case 1")
+        self.setCellWidget(1, 0, case_1)
+        case_2 = Case("Case 2")
+        self.setCellWidget(1, 1, case_2)
+        case_default = Case("Case default")
+        self.setCellWidget(1, 2, case_default)
 
-    def insertCase(self):
-        if len(self.add_buttons) < CaseTable.MAX_CASE_COUNT:
-            index = self.getIndex(self.sender())
-            if index != -1:
-                self.insertRow(index + 2)
-                row = index + 2
-
-                item = QTableWidgetItem(f"Case {index + 1}")
-                item.setTextAlignment(Qt.AlignTop)
-                item.setFlags(Qt.ItemIsSelectable)
-                self.setItem(row, 0, item)
-
-                case = Case()
-                self.cases.append(case)
-                self.setCellWidget(row, 1, case)
-
-                add_button = QPushButton("Add")
-                add_button.clicked.connect(self.insertCase)
-                add_button.setFixedHeight(30)
-                self.add_buttons.insert(index + 1, add_button)
-                self.setCellWidget(row, 2, add_button)
-
-                self.setRowHeight(row, 300)
-
-                # change case name
-                for i in range(row + 1, self.rowCount()):
-                    self.item(i, 0).setText(f'Case {i - 1}')
-
-    def getIndex(self, add_button):
-        for i in range(0, len(self.add_buttons)):
-            if add_button == self.add_buttons[i]:
-                return i
-        return -1
+    def insertCase(self, index):
+        pass

@@ -96,8 +96,8 @@ class IconChoose(QWidget):
     def checkPosInIcon(self, e):
         x = e.pos().x()
         y = e.pos().y()
-        if self.icon.rect().right() >= x >= self.icon.rect().left() and self.icon_name.rect().top() <= y <= \
-                self.icon.rect().bottom():
+        if self.icon.mapToParent(self.icon.rect().topLeft()).x() <= x <= self.icon.mapToParent(self.icon.rect().bottomRight()).x() \
+                and self.icon.mapToParent(self.icon.rect().topLeft()).y() <= y <= self.icon.mapToParent(self.icon.rect().bottomRight()).y():
             return True
         return False
 
