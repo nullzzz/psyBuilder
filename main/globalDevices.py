@@ -32,6 +32,7 @@ class GlobalDevice(QWidget):
         # 已选择设备
         self.selected_devices = SelectArea(self.device_type)
         self.selected_devices.itemDoubleClicked.connect(self.reName)
+        self.selected_devices.itemDoubleClick.connect(self.reName)
 
         # 还母鸡要做啥子
         self.describe = QTextEdit()
@@ -79,11 +80,13 @@ class GlobalDevice(QWidget):
         self.deviceSelect.emit(self.device_type, self.selected_devices.getInfo())
 
     def reName(self, item):
+        item_name:str = item.text().lower()
         text, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
         if ok and text != '':
             text: str
-            if " " in text or text.lower() in self.selected_devices.device_name:
-                QMessageBox.warning(self, "Warning", f"{text} is invalid!", QMessageBox.Ok)
+            if " " in text or (text.lower() in self.selected_devices.device_name and item_name != text.lower()):
+                QMessageBox.warning(self, f"{text} is invalid!",
+                                    "Device name must be unique and without spaces", QMessageBox.Ok)
             else:
                 # print()
                 self.selected_devices.device_name.remove(item.text().lower())
@@ -105,7 +108,9 @@ class DeviceItem(QListWidgetItem):
 
 
 class SelectArea(QListWidget):
-    def __init__(self, device_type: int=0, parent=None):
+    itemDoubleClick = pyqtSignal(DeviceItem)
+
+    def __init__(self, device_type: int = 0, parent=None):
         super(SelectArea, self).__init__(parent)
         self.device_type = device_type
         # 对已选择设备计数
@@ -140,10 +145,15 @@ class SelectArea(QListWidget):
         source = e.source()
         drop_item = source.currentItem().clone()
         item_type = drop_item.item_type
+
         item_name = "{}.{}".format(item_type, self.device_count[item_type])
+        self.device_count[item_type] += 1
+        while item_name in self.device_name:
+            item_name = "{}.{}".format(item_type, self.device_count[item_type])
+            self.device_count[item_type] += 1
 
         drop_item.setText(item_name)
-        self.device_count[item_type] += 1
+
         self.device_name.append(item_name.lower())
 
         # 当前位置item
@@ -164,7 +174,7 @@ class SelectArea(QListWidget):
                 if item is None:
                     self.addItem(self.dragItem.clone())
                 else:
-                    self.insertItem(insert_pos-1, self.dragItem.clone())
+                    self.insertItem(insert_pos - 1, self.dragItem.clone())
 
     def dragEnterEvent(self, e):
         source = e.source()
@@ -190,6 +200,9 @@ class SelectArea(QListWidget):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.showContextMenu)
         self.contextMenu = QMenu(self)
+        self.delete_action = self.contextMenu.addAction("rename")
+        self.delete_action.triggered.connect(lambda: self.itemDoubleClick.emit(self.currentItem()))
+
         self.delete_action = self.contextMenu.addAction("delete")
         self.delete_action.triggered.connect(self.deleteItem)
         self.clear_action = self.contextMenu.addAction("clear")
