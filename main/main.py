@@ -206,19 +206,22 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].nodeNameChange.connect(self.structure.changeNodeName)
                 self.center.icon_tabs.value_widget[value].nodeDelete.connect(self.structure.removeNode)
         except Exception:
-            print("error happens in link cycle signals to structure. [main/main.py]")
+            print("error happens in link if branch signals to structure. [main/main.py]")
 
     def newFile(self):
         python = sys.executable
         os.execl(python, python, *sys.argv)
 
     def getData(self):
-        node_value = self.structure.getNodeValue()
-        self.output.text_area.setText(
-            "Only show structure data, attributes or properties will be show in next version.\n" + json.dumps(
-                node_value))
-        # reset timer
-        self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
+        try:
+            node_value = self.structure.getNodeValue()
+            self.output.text_area.setText(
+                "Only show structure data, attributes or properties will be show in next version.\n" + json.dumps(
+                    node_value))
+            # reset timer
+            self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
+        except Exception as e:
+            print(f"error {e} happens in get data and reset timer. [main/main.py]")
 
     def resetView(self):
         try:

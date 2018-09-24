@@ -1,96 +1,6 @@
-from PyQt5.QtWidgets import (QTableWidget, QComboBox, QLineEdit, QPushButton, QFrame, QFormLayout, QHBoxLayout)
-
-from noDash import NoDash
-
-
-class TempConditionArea(QTableWidget):
-    MAX_CONDITION_COUNT = 6
-
-    def __init__(self, parent=None):
-        super(TempConditionArea, self).__init__(parent)
-
-        # 美化
-        self.horizontalHeader().setVisible(False)
-        self.verticalHeader().setVisible(False)
-        self.setFrameStyle(QFrame.NoFrame)
-        self.setShowGrid(False)
-        self.setItemDelegate(NoDash())
-
-        self.setColumnCount(9)
-        self.setRowCount(1)
-
-        self.setStyleSheet("""
-            QComboBox {
-                max-height : 30px;
-            }
-            QLineEdit {
-                max-height : 30px;
-            }
-            QPushButton {
-                max-height: 30px;
-            }
-            QTableWidget{
-                selection-background-color : transparent;
-            }
-        """)
-
-        self.add_buttons = []
-
-        var = QComboBox()
-        compare_operator = QComboBox()
-        compare_operator.addItems((">", "<", "=="))
-        compare_value = QLineEdit()
-        add_button = QPushButton("Add")
-        add_button.clicked.connect(self.addCondition)
-
-        self.add_buttons.append(add_button)
-
-        self.setCellWidget(0, 2, var)
-        self.setCellWidget(0, 4, compare_operator)
-        self.setCellWidget(0, 6, compare_value)
-        self.setCellWidget(0, 8, add_button)
-
-        self.setColumnWidth(0, 60)
-        self.setColumnWidth(1, 10)
-        self.setColumnWidth(2, 100)
-        self.setColumnWidth(3, 10)
-        self.setColumnWidth(4, 100)
-        self.setColumnWidth(5, 10)
-        self.setColumnWidth(6, 500)
-        self.setColumnWidth(7, 10)
-        self.setColumnWidth(8, 60)
-
-    def addCondition(self):
-        try:
-            if self.rowCount() < ConditionArea.MAX_CONDITION_COUNT:
-                index = self.getIndex(self.sender())
-                if index != -1:
-                    self.insertRow(index + 1)
-
-                    and_or = QComboBox()
-                    and_or.addItems(("and", "or"))
-                    var = QComboBox()
-                    compare_operator = QComboBox()
-                    compare_operator.addItems((">", "<", "=="))
-                    compare_value = QLineEdit()
-                    add_button = QPushButton("Add")
-                    add_button.clicked.connect(self.addCondition)
-
-                    self.add_buttons.insert(index + 1, add_button)
-
-                    self.setCellWidget(index + 1, 0, and_or)
-                    self.setCellWidget(index + 1, 2, var)
-                    self.setCellWidget(index + 1, 4, compare_operator)
-                    self.setCellWidget(index + 1, 6, compare_value)
-                    self.setCellWidget(index + 1, 8, add_button)
-        except Exception as e:
-            print("error {} happens in add condition. [condition/conditionArea.py]".format(e))
-
-    def getIndex(self, add_button):
-        for i in range(0, len(self.add_buttons)):
-            if add_button == self.add_buttons[i]:
-                return i
-        return -1
+from PyQt5.QtWidgets import (QComboBox, QPushButton, QFrame, QFormLayout, QHBoxLayout, QMessageBox, QLabel, QGridLayout)
+from PyQt5.QtGui import QIcon
+from ..addDeleteButton import AddDeleteButton
 
 class ConditionArea(QFrame):
     #
@@ -100,23 +10,36 @@ class ConditionArea(QFrame):
         super(ConditionArea, self).__init__(parent)
         #
         self.add_buttons = []
+        self.delete_buttons = [None]
         #
         self.form_layout = QFormLayout(self)
 
         h_box = QHBoxLayout()
-
+        # place holder
+        self.placeholder_width = 100
+        placeholder = QLabel()
+        placeholder.setFixedWidth(self.placeholder_width)
+        # var
         var = QComboBox()
+        # compare operator
         compare_operator = QComboBox()
         compare_operator.addItems((">", "<", "=="))
+        compare_operator.setFixedWidth(self.placeholder_width)
+        # compare var
         compare_var = QComboBox()
-        add_button = QPushButton("Add")
+        # add button
+        add_button = AddDeleteButton(button_type='add')
         add_button.clicked.connect(self.addCondition)
         self.add_buttons.append(add_button)
 
+        h_box.addWidget(placeholder)
         h_box.addWidget(var)
         h_box.addWidget(compare_operator)
         h_box.addWidget(compare_var)
         h_box.addWidget(add_button)
+        placeholder_ = QLabel()
+        placeholder_.setFixedWidth(add_button.width())
+        h_box.addWidget(placeholder_)
         self.form_layout.addRow(h_box)
 
         self.setLayout(self.form_layout)
@@ -124,32 +47,64 @@ class ConditionArea(QFrame):
     def addCondition(self):
         try:
             if len(self.add_buttons) < ConditionArea.MAX_CONDITION_COUNT:
-                index = self.getIndex(self.sender())
+                index = self.getAddButtonIndex(self.sender())
                 if index != -1:
                     h_box = QHBoxLayout()
-
+                    # logical operator
                     logical_operator = QComboBox()
                     logical_operator.addItems(('and', 'or', 'xor', 'nor', 'nand', 'xnor'))
+                    logical_operator.setFixedWidth(self.placeholder_width)
+                    # var
                     var = QComboBox()
+                    # compare_operator
                     compare_operator = QComboBox()
                     compare_operator.addItems((">", "<", "=="))
+                    compare_operator.setFixedWidth(self.placeholder_width)
+                    # compare var
                     compare_var = QComboBox()
-                    add_button = QPushButton("Add")
-                    add_button.clicked.connect(self.addCondition)
+                    # add button
+                    add_button = AddDeleteButton(button_type='add')
                     self.add_buttons.insert(index + 1, add_button)
+                    add_button.clicked.connect(self.addCondition)
+                    # delete button
+                    delete_button = AddDeleteButton(button_type='delete')
+                    delete_button.clicked.connect(self.deleteCondition)
+                    self.delete_buttons.insert(index + 1, delete_button)
 
                     h_box.addWidget(logical_operator)
                     h_box.addWidget(var)
                     h_box.addWidget(compare_operator)
                     h_box.addWidget(compare_var)
                     h_box.addWidget(add_button)
+                    h_box.addWidget(delete_button)
 
                     self.form_layout.insertRow(index + 1, h_box)
+            else:
+                QMessageBox.information(self, 'Tips', f'you can add no more than {ConditionArea.MAX_CONDITION_COUNT}')
         except Exception as e:
             print(f"error {e} happens in add condition. [ifBranch/conditionArea.py]")
 
-    def getIndex(self, add_button):
+    def deleteCondition(self):
+        try:
+            index = self.getDeleteButtonIndex(self.sender())
+            if index != -1:
+                self.form_layout.removeRow(index)
+                # delete buttons
+                self.add_buttons.pop(index)
+                self.delete_buttons.pop(index)
+
+        except Exception as e:
+            print(f"error {e} happens in delete condition. [ifBranch/conditionArea.py]")
+
+    def getAddButtonIndex(self, add_button):
         for i in range(0, len(self.add_buttons)):
             if add_button == self.add_buttons[i]:
                 return i
         return -1
+
+    def getDeleteButtonIndex(self, delete_button):
+        for i in range(1, len(self.delete_buttons)):
+            if delete_button == self.delete_buttons[i]:
+                return i
+        return -1
+

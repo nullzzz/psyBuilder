@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QComboBox, QWidget, QLineEdit, QVBoxLayout
+from PyQt5.QtWidgets import QComboBox, QWidget, QLineEdit, QGridLayout, QLabel
 
 from center.iconTabs.events.image.imageProperty import ImageProperty
 from center.iconTabs.events.soundOut.soundProperty import SoundProperty
@@ -34,15 +34,19 @@ class IconChoose(QWidget):
         self.icon_name = QLineEdit()
         self.icon_name.setEnabled(False)
 
-        vBox_layout = QVBoxLayout()
+        grid_layout = QGridLayout()
 
-        vBox_layout.addWidget(self.icon_comboBox)
-        vBox_layout.addStretch(1)
-        vBox_layout.addWidget(self.icon)
-        vBox_layout.addStretch(1)
-        vBox_layout.addWidget(self.icon_name)
+        label_1 = QLabel("Type:")
+        label_1.setAlignment(Qt.AlignRight)
+        label_2 = QLabel("Object Name:")
+        label_2.setAlignment(Qt.AlignRight)
+        grid_layout.addWidget(label_1, 0, 0, 1, 1)
+        grid_layout.addWidget(self.icon_comboBox, 0, 1, 1, 3)
+        grid_layout.addWidget(self.icon, 1, 1, 3, 3)
+        grid_layout.addWidget(label_2, 4, 0, 1, 1)
+        grid_layout.addWidget(self.icon_name, 4, 1, 1, 3)
 
-        self.setLayout(vBox_layout)
+        self.setLayout(grid_layout)
 
     def changeIcon(self, current_index):
         try:
@@ -57,8 +61,9 @@ class IconChoose(QWidget):
             else:
                 name = self.icon_comboBox.currentText()
 
-                pixmap = getImage(name, "pixmap")
+                pixmap = getImage(name, "pixmap").scaledToHeight(64)
                 self.icon.setPixmap(pixmap)
+                self.icon.setFixedHeight(64)
                 self.icon.changeType(name)
 
                 if name == "Image":
