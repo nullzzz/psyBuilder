@@ -41,7 +41,7 @@ class CaseTable(QTableWidget):
         self.setCellWidget(0, 1, self.var)
         # second row
         self.setRowHeight(1, 300)
-        case_1 = Case("Case 1")
+        case_1 = Case("Case 1", can_add=True, can_delete=True)
         self.setCellWidget(1, 0, case_1)
         case_2 = Case("Case 2")
         self.setCellWidget(1, 1, case_2)
