@@ -1,11 +1,10 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QGridLayout, QVBoxLayout, QMessageBox, QHBoxLayout
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QVBoxLayout, QMessageBox, QHBoxLayout
 
 from center.iconTabs.condition.iconChoose import IconChoose
 from center.iconTabs.condition.ifBranch.conditionArea import ConditionArea
 from getImage import getImage
-
 from structure.main import Structure
 
 
@@ -43,19 +42,19 @@ class IfBranch(QWidget):
         self.widget_type_index = {'None': 0, 'Image': 1, 'Text': 2, 'Video': 3, 'SoundOut': 4}
 
         condition_group = QGroupBox("Condition")
-        condition_group.setFixedHeight(350)
+        # condition_group.setFixedHeight(350)
         layout1 = QVBoxLayout()
         layout1.addWidget(self.condition_area)
         condition_group.setLayout(layout1)
 
         true_group = QGroupBox("True")
-        true_group.setFixedHeight(200)
+        # true_group.setFixedHeight(200)
         layout2 = QVBoxLayout()
         layout2.addWidget(self.true_icon_choose)
         true_group.setLayout(layout2)
 
         false_group = QGroupBox("False")
-        false_group.setFixedHeight(200)
+        # false_group.setFixedHeight(200)
         layout3 = QVBoxLayout()
         layout3.addWidget(self.false_icon_choose)
         false_group.setLayout(layout3)
@@ -71,12 +70,21 @@ class IfBranch(QWidget):
         buttons_layout.addWidget(self.ok_button)
         buttons_layout.addWidget(self.cancel_button)
         buttons_layout.addWidget(self.apply_button)
+        buttons_layout.setContentsMargins(0, 0, 0, 0)
+        #
+        # layout = QGridLayout()
+        # layout.addWidget(condition_group, 0, 0, 1, 2)
+        # layout.addWidget(true_group, 1, 0, 2, 1)
+        # layout.addWidget(false_group, 1, 1, 2, 1)
+        # layout.addLayout(buttons_layout, 3, 0, 1, 2)
 
-        layout = QGridLayout()
-        layout.addWidget(condition_group, 0, 0, 1, 2)
-        layout.addWidget(true_group, 1, 0, 2, 1)
-        layout.addWidget(false_group, 1, 1, 2, 1)
-        layout.addLayout(buttons_layout, 3, 0, 1, 2)
+        layout = QVBoxLayout()
+        layout.addWidget(condition_group, 1)
+        tf_layout = QHBoxLayout()
+        tf_layout.addWidget(true_group)
+        tf_layout.addWidget(false_group)
+        layout.addLayout(tf_layout, 20)
+        layout.addLayout(buttons_layout, 1)
         self.setLayout(layout)
 
     def showProperty(self):

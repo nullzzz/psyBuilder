@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import (QComboBox, QPushButton, QFrame, QFormLayout, QHBoxLayout, QMessageBox, QLabel, QGridLayout)
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import (QComboBox, QFrame, QFormLayout, QHBoxLayout, QMessageBox, QLabel)
+
 from ..addDeleteButton import AddDeleteButton
+
 
 class ConditionArea(QFrame):
     #
@@ -80,7 +81,7 @@ class ConditionArea(QFrame):
 
                     self.form_layout.insertRow(index + 1, h_box)
             else:
-                QMessageBox.information(self, 'Tips', f'you can add no more than {ConditionArea.MAX_CONDITION_COUNT}')
+                QMessageBox.information(self, 'Tips', f'you can add no more than {ConditionArea.MAX_CONDITION_COUNT}', QMessageBox.Ok)
         except Exception as e:
             print(f"error {e} happens in add condition. [ifBranch/conditionArea.py]")
 
@@ -92,7 +93,6 @@ class ConditionArea(QFrame):
                 # delete buttons
                 self.add_buttons.pop(index)
                 self.delete_buttons.pop(index)
-
         except Exception as e:
             print(f"error {e} happens in delete condition. [ifBranch/conditionArea.py]")
 

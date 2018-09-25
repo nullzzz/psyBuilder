@@ -1,10 +1,11 @@
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QLabel
 
 
 class AddDeleteButton(QLabel):
     clicked = pyqtSignal()
+
     def __init__(self, parent=None, button_type='add'):
         super(AddDeleteButton, self).__init__(parent)
 
