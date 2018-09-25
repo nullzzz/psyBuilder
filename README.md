@@ -15,3 +15,8 @@
 <ul>
     <li>为了适配mac：image/xxx</li>
 </ul>
+
+<p><big>做好烂尾准备</big></p>
+<ul>
+    <li>因为大家明显不想干了</li>
+</ul>
