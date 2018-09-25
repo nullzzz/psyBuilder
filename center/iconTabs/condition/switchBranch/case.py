@@ -15,27 +15,33 @@ class Case(QGroupBox):
         self.case_comBox = QComboBox(self)
         # icon choose
         self.icon_choose = IconChoose(self)
+        self.add_button = AddDeleteButton(self, 'add')
+        self.delete_button = AddDeleteButton(self, 'delete')
 
         self.grid_layout = QGridLayout(self)
 
         label = QLabel("Case Value:")
         label.setAlignment(Qt.AlignRight)
         self.grid_layout.addWidget(label, 0, 0, 1, 1)
-        self.grid_layout.addWidget(self.case_comBox, 0, 1, 1, 3)
-        self.grid_layout.addWidget(self.icon_choose, 1, 0, 3, 4)
+        self.grid_layout.addWidget(self.case_comBox, 0, 1, 1, 5)
+        self.grid_layout.addWidget(self.icon_choose, 1, 0, 3, 5)
+        self.grid_layout.addWidget(self.add_button, 4, 1, 1, 1)
+        self.grid_layout.addWidget(self.delete_button, 4, 3, 1, 1)
         self.setLayout(self.grid_layout)
 
-        x = self.rect().topRight().x()
-        y = self.rect().topRight().y()
+        if not can_add:
+            self.add_button.setDisabled(True)
+        if not can_delete:
+            self.delete_button.setDisabled(True)
 
-        self.add_button = AddDeleteButton('add')
-        self.delete_button = AddDeleteButton('delete')
+    def setAddDisabled(self, disabled=False):
+        if disabled:
+            self.add_button.setDisabled(True)
+        else:
+            self.add_button.setDisabled(False)
 
-        print(x, y)
-        if can_add:
-            self.add_button.move(x - 150, y - 150)
-            self.add_button.show()
-        if can_delete:
-            self.delete_button.move(x - 50, y - 50)
-            self.delete_button.show()
-        self.repaint()
+    def setDeleteDisabled(self, disabled=False):
+        if disabled:
+            self.delete_button.setDisabled(True)
+        else:
+            self.delete_button.setDisabled(False)

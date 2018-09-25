@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QMainWindow, QHBoxLayout, QGridLayout, QPushButton, QMessageBox
 from PyQt5.QtCore import pyqtSignal
-from .caseTable import CaseTable
+from .caseArea import CaseArea
 from structure.main import Structure
 
 
@@ -18,7 +18,7 @@ class SwitchBranch(QWidget):
         #
         self.value = value
         #
-        self.case_table = CaseTable(self)
+        self.case_area = CaseArea(self)
 
         buttons_layout = QHBoxLayout()
         self.ok_button = QPushButton("OK")
@@ -33,7 +33,7 @@ class SwitchBranch(QWidget):
         buttons_layout.addWidget(self.apply_button)
 
         layout = QGridLayout()
-        layout.addWidget(self.case_table, 0, 0, 3, 2)
+        layout.addWidget(self.case_area, 0, 0, 3, 2)
         layout.addLayout(buttons_layout, 3, 0, 1, 2)
 
         self.setLayout(layout)
@@ -51,7 +51,7 @@ class SwitchBranch(QWidget):
 
     def clickApply(self):
         try:
-            for i in range(len(self.case_table.add_buttons)):
+            for i in range(len(self.case_area.add_buttons)):
                 # 如果发生错误
                 if self.disposeCase(i):
                     return False
@@ -63,14 +63,12 @@ class SwitchBranch(QWidget):
         return {"properties" : "none"}
 
     def disposeCase(self, case_index):
-        current_icon_choose = self.case_table.cellWidget(case_index + 1, 1).icon_choose
+        current_icon_choose = self.case_area.cellWidget(case_index + 1, 1).icon_choose
         current_value = current_icon_choose.icon.value
         current_name = current_icon_choose.icon_name.text()
         current_properties_window = current_icon_choose.properties_window
 
         has_error = False
-
-
 
         return has_error
 
