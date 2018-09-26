@@ -14,7 +14,7 @@ class CaseArea(QScrollArea):
         self.cases = []
         case_1 = Case(title='Case 1', can_add=True, can_delete=False)
         case_2 = Case(title='Case 2', can_add=True, can_delete=False)
-        case_3 = Case(title='Case Default', can_add=False, can_delete=False)
+        case_3 = Case(title='Otherwise', can_add=False, can_delete=False)
         self.linkCaseSignals(case_1)
         self.linkCaseSignals(case_2)
         self.linkCaseSignals(case_3)
@@ -66,7 +66,7 @@ class CaseArea(QScrollArea):
                         case.add_button.setDisabled(True)
                 self.grid_layout.addWidget(new_case, row, col, 1, 1)
                 # default case
-                self.cases[-1].setTitle('Case Default')
+                self.cases[-1].setTitle('Otherwise')
                 self.cases[-1].add_button.setDisabled(True)
                 self.cases[-1].delete_button.setDisabled(True)
                 self.update()
@@ -79,7 +79,6 @@ class CaseArea(QScrollArea):
         try:
             index = self.getIndex(self.sender())
             if index != -1:
-                print(self.cases[index].title())
                 self.grid_layout.removeWidget(self.cases[index])
                 self.cases[index].hide()
                 self.update()
@@ -96,8 +95,11 @@ class CaseArea(QScrollArea):
                 if len(self.cases) == 3:
                     for case in self.cases:
                         case.setDeleteDisabled(True)
+                if len(self.cases) == 8:
+                    for case in self.cases:
+                        case.setAddDisabled(False)
                 # default case
-                self.cases[-1].setTitle('Case Default')
+                self.cases[-1].setTitle('Otherwise')
                 self.cases[-1].add_button.setDisabled(True)
                 self.cases[-1].delete_button.setDisabled(True)
                 self.update()

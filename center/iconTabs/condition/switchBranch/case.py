@@ -20,7 +20,7 @@ class Case(QGroupBox):
 
         self.grid_layout = QGridLayout(self)
 
-        label = QLabel("Case Value:")
+        label = QLabel("Value:")
         label.setAlignment(Qt.AlignRight)
         self.grid_layout.addWidget(label, 0, 0, 1, 1)
         self.grid_layout.addWidget(self.case_comBox, 0, 1, 1, 5)
