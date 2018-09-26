@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt, QUrl, QFileInfo, pyqtSignal
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPalette
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel, QSizePolicy
 
 from .videoProperty import VideoProperty
 
@@ -15,9 +15,13 @@ class VideoDisplay(QMainWindow):
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.mediaStatusChanged.connect(self.loadStatue)
-        self.video_widget = QVideoWidget()
+        self.mediaPlayer.bufferStatusChanged.connect(self.bufferLoad)
+        self.video_widget = VideoWidget()
 
         self.mediaPlayer.setVideoOutput(self.video_widget)
+
+        self.mediaPlayer.positionChanged.connect(self.stopPlaying)
+        self.mediaPlayer.stateChanged.connect(self.changeIcon)
 
         self.label = QLabel()
         self.pro = VideoProperty()
@@ -30,9 +34,10 @@ class VideoDisplay(QMainWindow):
 
         self.file = ""
         self.start_pos = 0
-        self.end_pos = 0
-        self.back_color = "white"
-        self.transparent_value = 0
+        self.end_pos = 9999999
+        # self.back_color = "white"
+        self.playback_rate = 1.0
+        # self.transparent_value = 100
         # self.stop_after = False
         # self.stop_after_mode = "OffsetTime"
         # self.is_stretch = False
@@ -79,13 +84,13 @@ class VideoDisplay(QMainWindow):
         if self.file:
             # 播放状态
             if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
-                self.sender().setIcon(QIcon("image/start_video"))
-                self.sender().setText("start")
+                # self.sender().setIcon(QIcon("image/start_video"))
+                # self.sender().setText("start")
                 self.mediaPlayer.pause()
             # 暂停、停止状态
             else:
-                self.sender().setIcon(QIcon("image/pause_video"))
-                self.sender().setText("pause")
+                # self.sender().setIcon(QIcon("image/pause_video"))
+                # self.sender().setText("pause")
                 self.mediaPlayer.play()
         else:
             QMessageBox.warning(self, "No Video Error", "Please load video first!", QMessageBox.Ok)
@@ -107,10 +112,12 @@ class VideoDisplay(QMainWindow):
                 if file_name != self.file:
                     self.file = file_name
                     self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
-                    self.play_video.setIcon(QIcon("image/start_video"))
-                    self.play_video.setText("start")
+                    # self.play_video.setIcon(QIcon("image/start_video"))
+                    # self.play_video.setText("start")
                 self.mediaPlayer.setPosition(self.getStartTime(self.start_pos))
                 self.video_widget.setAspectRatioMode(self.aspect_ration_mode)
+                self.mediaPlayer.setPlaybackRate(self.playback_rate)
+                # self.setWindowOpacity(self.transparent_value/100)
             else:
                 QMessageBox.warning(
                     self, "Warning", "The file path is invalid!")
@@ -119,9 +126,10 @@ class VideoDisplay(QMainWindow):
 
     def getPro(self):
         self.start_pos = self.pro.general.start_pos.text()
-        self.end_pos = self.pro.general.end_pos.text()
-        self.back_color = self.pro.general.back_color.currentText()
-        self.transparent_value = self.pro.general.transparent.value()
+        self.end_pos = self.getStartTime(self.pro.general.end_pos.text())
+        # self.back_color = self.pro.general.back_color.currentText()
+        self.playback_rate = float(self.pro.general.playback_rate.currentText())
+        # self.transparent_value = self.pro.general.transparent.value()
         # isStopText = self.pro.tab1.stop_after.currentText()
         # if isStopText == "Yes":
         #     self.stop_after = True
@@ -144,12 +152,58 @@ class VideoDisplay(QMainWindow):
 
     # 加载状态
     def loadStatue(self, media_statue):
-        # 加载中、不识别状态
-        if media_statue == QMediaPlayer.LoadingMedia or media_statue == QMediaPlayer.UnknownMediaStatus:
+        a = ["UnknownMediaStatus", "NoMedia", "LoadingMedia", "LoadedMedia",
+             "StalledMedia", "BufferingMedia", "BufferedMedia", "EndOfMedia",
+             "InvalidMedia"]
+        # print(a[media_statue])
+        # label = QLabel()
+        # label.setAlignment(Qt.AlignCenter)
+        # 不识别状态
+        if media_statue == QMediaPlayer.UnknownMediaStatus:
             self.play_video.setEnabled(False)
-        else:
+            # self.setCentralWidget(label)
+            self.play_video.setText("Unknown Media")
+            # self.statusBar().showMessage("Unknown Media", 5000)
+
+        # 没媒体
+        elif media_statue == QMediaPlayer.NoMedia:
+            self.play_video.setEnabled(False)
+            # self.setCentralWidget(label)
+            self.play_video.setText("No Media")
+            # self.statusBar().showMessage("No Media", 5000)
+        # 加载中
+        elif media_statue == QMediaPlayer.LoadingMedia:
+            self.play_video.setEnabled(False)
+            # self.statusBar().showMessage("Loading", 5000)
+            self.play_video.setText("Loading Media")
+
+        # 加载完成
+        elif media_statue == QMediaPlayer.LoadedMedia:
             self.play_video.setEnabled(True)
-            buffer = self.mediaPlayer.mediaStream()
+            # self.setCentralWidget(self.video_widget)
+            self.play_video.setText("Start")
+            # self.statusBar().showMessage("Loaded Media", 5000)
+        # 缓冲失败
+        elif media_statue == QMediaPlayer.StalledMedia:
+            pass
+        # 缓冲中
+        elif media_statue == QMediaPlayer.BufferingMedia:
+            pass
+        # 缓冲完成
+        elif media_statue == QMediaPlayer.BufferedMedia:
+            pass
+        # 播放完成
+        elif media_statue == QMediaPlayer.EndOfMedia:
+            pass
+        # 无法播放
+        elif media_statue == QMediaPlayer.InvalidMedia:
+            self.play_video.setEnabled(False)
+            # self.setCentralWidget(label)
+            self.play_video.setText("Invalid Media")
+            # self.statusBar().showMessage("Invalid Media", 5000)
+
+    def bufferLoad(self, percentage: int):
+        print(percentage)
 
     @staticmethod
     def getStartTime(str_time):
@@ -160,6 +214,9 @@ class VideoDisplay(QMainWindow):
             x = int(str_time[9:12])
             return h * 60 * 60 * 1000 + m * 60 * 1000 + s * 1000 + x
         except ValueError:
+            return 0
+        except Exception as e:
+            print(e)
             return 0
 
     def setPro(self, pro: VideoProperty):
@@ -172,10 +229,21 @@ class VideoDisplay(QMainWindow):
     def setVideo(self):
         self.setCentralWidget(self.video_widget)
         self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(self.file)))
-        self.play_video.setIcon(QIcon("image/start_video"))
-        self.play_video.setText("start")
+
         self.mediaPlayer.setPosition(self.getStartTime(self.start_pos))
         self.video_widget.setAspectRatioMode(self.aspect_ration_mode)
+
+    def stopPlaying(self, duration):
+        if abs(self.end_pos - duration) < 1000:
+            self.mediaPlayer.pause()
+
+    def changeIcon(self, statue):
+        if statue == QMediaPlayer.PlayingState:
+            self.play_video.setIcon(QIcon("image/pause_video"))
+            self.play_video.setText("pause")
+        else:
+            self.play_video.setIcon(QIcon("image/start_video"))
+            self.play_video.setText("start")
 
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
@@ -197,3 +265,35 @@ class VideoDisplay(QMainWindow):
         self.pro_clone = self.pro.clone()
         self.pro_clone.setWindowModality(Qt.ApplicationModal)
         self.pro_clone.show()
+
+
+# 支持全屏显示
+class VideoWidget(QVideoWidget):
+
+    def __init__(self, parent=None):
+        super(VideoWidget, self).__init__(parent)
+
+        self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+
+        p = self.palette()
+        p.setColor(QPalette.Window, Qt.black)
+        self.setPalette(p)
+
+        self.setAttribute(Qt.WA_OpaquePaintEvent)
+
+    def keyPressEvent(self, event):
+        # esc退出全屏
+        if event.key() == Qt.Key_Escape and self.isFullScreen():
+            self.setFullScreen(False)
+            event.accept()
+        # 这是啥？？？Alt+Enter？？？不管用呀
+        elif event.key() == Qt.Key_Enter and event.modifiers() & Qt.Key_Alt:
+            self.setFullScreen(not self.isFullScreen())
+            event.accept()
+        else:
+            super(VideoWidget, self).keyPressEvent(event)
+
+    # 双击打开退出全屏
+    def mouseDoubleClickEvent(self, event):
+        self.setFullScreen(not self.isFullScreen())
+        event.accept()

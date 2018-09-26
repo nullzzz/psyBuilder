@@ -16,8 +16,9 @@ class VideoTab1(QWidget):
             "Start position": "00:00:00.000",
             "End position": "00:00:00.000",
             "Aspect ratio": "Default",
-            "Back color": "white",
-            "Transparent": 100,
+            "Playback rate": "1",
+            # "Back color": "white",
+            # "Transparent": 100,
             "Clear after": "Yes",
             "Screen name": "Display"
         }
@@ -32,6 +33,8 @@ class VideoTab1(QWidget):
         self.end_pos = QLineEdit()
 
         self.back_color = ColorListEditor()
+        # 倍速
+        self.playback_rate = QComboBox()
         self.transparent = QSpinBox()
 
         # self.stop_after = QComboBox()
@@ -50,13 +53,15 @@ class VideoTab1(QWidget):
         valid_pos = QRegExp("(\d{1,2}:\d{1,2}:\d{2}\.\d{3})|(\[\w+\])")
         self.start_pos.setText("00:00:00.000")
         self.start_pos.setMinimumWidth(120)
-        self.end_pos.setText("00:00:00.000")
+        self.end_pos.setText("99:99:99.999")
         self.start_pos.setValidator(QRegExpValidator(valid_pos, self))
         self.end_pos.setValidator(QRegExpValidator(valid_pos, self))
         self.start_pos.textChanged.connect(self.findVar)
         self.start_pos.returnPressed.connect(self.finalCheck)
         self.end_pos.textChanged.connect(self.findVar)
         self.end_pos.returnPressed.connect(self.finalCheck)
+
+        self.playback_rate.addItems(["1.0", "1.25", "1.5", "1.75", "2.0", "-1.0"])
 
         # self.stop_after.addItems(["No", "Yes"])
         # self.stop_after.currentTextChanged.connect(self.changed1)
@@ -77,18 +82,18 @@ class VideoTab1(QWidget):
 
         l1 = QLabel("Start Position:")
         l2 = QLabel("End Position:")
-        l3 = QLabel("Back Color:")
-        l4 = QLabel("Transparent:")
-        l5 = QLabel("Aspect Ratio:")
-        l6 = QLabel("Screen Name:")
-        l7 = QLabel("Clear After:")
+        l3 = QLabel("Playback Rate:")
+        # l4 = QLabel("Transparent:")
+        l4 = QLabel("Aspect Ratio:")
+        l5 = QLabel("Screen Name:")
+        l6 = QLabel("Clear After:")
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout = QGridLayout()
         layout.addWidget(QLabel("File Name:"), 0, 0, 1, 1)
@@ -101,10 +106,15 @@ class VideoTab1(QWidget):
         layout.addWidget(l2, 2, 0, 1, 1)
         layout.addWidget(self.end_pos, 2, 1, 1, 1)
         layout.addWidget(QLabel("hh:mm:ss.xxx"), 2, 2, 1, 1)
+
+        # layout.addWidget(l3, 3, 0, 1, 1)
+        # layout.addWidget(self.back_color, 3, 1, 1, 1)
+
         layout.addWidget(l3, 3, 0, 1, 1)
-        layout.addWidget(self.back_color, 3, 1, 1, 1)
-        layout.addWidget(l4, 4, 0, 1, 1)
-        layout.addWidget(self.transparent, 4, 1, 1, 1)
+        layout.addWidget(self.playback_rate, 3, 1, 1, 1)
+
+        # layout.addWidget(l4, 4, 0, 1, 1)
+        # layout.addWidget(self.transparent, 4, 1, 1, 1)
         # layout.addWidget(QLabel("Stop After:"), 5, 0, 1, 1)
         # layout.addWidget(self.stop_after, 5, 1, 1, 1)
         # layout.addWidget(QLabel("Stop After Mode:"), 5, 2, 1, 1)
@@ -113,14 +123,14 @@ class VideoTab1(QWidget):
         # layout.addWidget(self.stretch, 6, 1, 1, 1)
         # layout.addWidget(QLabel("Stretch Mode:"), 6, 2, 1, 1)
         # layout.addWidget(self.stretch_mode, 6, 3, 1, 1)
-        layout.addWidget(l5, 6, 0, 1, 1)
-        layout.addWidget(self.aspect_ratio, 6, 1, 1, 1)
+        layout.addWidget(l4, 4, 0, 1, 1)
+        layout.addWidget(self.aspect_ratio, 4, 1, 1, 1)
         # layout.addWidget(QLabel("End Video Action:"), 7, 0, 1, 1)
         # layout.addWidget(self.end_video_action, 7, 1, 1, 1)
-        layout.addWidget(l6, 8, 0, 1, 1)
-        layout.addWidget(self.screen_name, 8, 1, 1, 1)
-        layout.addWidget(l7, 9, 0, 1, 1)
-        layout.addWidget(self.clear_after, 9, 1, 1, 1)
+        layout.addWidget(l5, 5, 0, 1, 1)
+        layout.addWidget(self.screen_name, 5, 1, 1, 1)
+        layout.addWidget(l6, 6, 0, 1, 1)
+        layout.addWidget(self.clear_after, 6, 1, 1, 1)
         layout.setContentsMargins(40, 0, 40, 0)
         self.setLayout(layout)
 
@@ -172,8 +182,9 @@ class VideoTab1(QWidget):
         self.default_properties["Start position"] = self.start_pos.text()
         self.default_properties["End position"] = self.end_pos.text()
         self.default_properties["Aspect ratio"] = self.aspect_ratio.currentText()
-        self.default_properties["Back color"] = self.back_color.currentText()
-        self.default_properties["Transparent"] = self.transparent.value()
+        self.default_properties["Playback rate"] = self.playback_rate.currentText()
+        # self.default_properties["Back color"] = self.back_color.currentText()
+        # self.default_properties["Transparent"] = self.transparent.value()
         self.default_properties["Clear after"] = self.clear_after.currentText()
         self.default_properties["Screen name"] = self.screen_name.currentText()
         return self.default_properties
@@ -187,7 +198,8 @@ class VideoTab1(QWidget):
         self.start_pos.setText(self.default_properties["Start position"])
         self.end_pos.setText(self.default_properties["End position"])
         self.aspect_ratio.setCurrentText(self.default_properties["Aspect ratio"])
-        self.back_color.setCurrentText(self.default_properties["Back color"])
-        self.transparent.setValue(self.default_properties["Transparent"])
+        # self.back_color.setCurrentText(self.default_properties["Back color"])
+        self.playback_rate.setCurrentText(self.default_properties["Playback rate"])
+        # self.transparent.setValue(self.default_properties["Transparent"])
         self.clear_after.setCurrentText(self.default_properties["Clear after"])
         self.screen_name.setCurrentText(self.default_properties["Screen name"])
