@@ -477,6 +477,7 @@ class Structure(QDockWidget):
         # 2: 可以取但是有重复的, 需要确定
         # 3：改名断开连接
         # 4：改名断开连接后，新名字为重复值
+        # 5: 重复进行复制
         # 返回值type，exist_value，old_value
         try:
             if name[0].isalpha():
