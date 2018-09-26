@@ -36,7 +36,7 @@ class IconChoose(QWidget):
 
         grid_layout = QGridLayout()
 
-        label_1 = QLabel("Type:")
+        label_1 = QLabel("Stim Type:")
         label_1.setAlignment(Qt.AlignRight)
         label_2 = QLabel("Object Name:")
         label_2.setAlignment(Qt.AlignRight)

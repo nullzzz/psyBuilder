@@ -368,46 +368,66 @@ class IconTable(QTableWidget):
         self.iconDoubleClicked.emit(value, name)
 
     # 更改event name
+    # def changIconName(self, item: QTableWidgetItem):
+    #     try:
+    #         if self.is_edit:
+    #             if item.text():
+    #                 res, exist_value, old_exist_value = Structure.checkNameIsValid(item.text(), self.parent_timeline_value,
+    #                                                               self.cellWidget(1, item.column()).value)
+    #                 whether_change = True
+    #                 if res == 0:
+    #                     whether_change = False
+    #                     QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
+    #                 elif res == 1:
+    #                     pass
+    #                 elif res == 2:
+    #                     if QMessageBox.question(self, 'Tips',
+    #                                             'name has existed in other place, are you sure to change?',
+    #                                             QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    #                         value = self.cellWidget(1, item.column()).value
+    #                         self.iconWidgetMerge.emit(value, exist_value)
+    #                     else:
+    #                         whether_change = False
+    #                 # todo split widget
+    #                 elif res == 3:
+    #                     self.iconWidgetSplit.emit(self.cellWidget(1, item.column()).value, old_exist_value)
+    #                 elif res == 4:
+    #                     if QMessageBox.question(self, 'Tips',
+    #                                             'name has existed in other place, are you sure to change?',
+    #                                             QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    #                         value = self.cellWidget(1, item.column()).value
+    #                         self.iconWidgetMerge.emit(value, exist_value)
+    #                     else:
+    #                         whether_change = False
+    #                 if whether_change:
+    #                     self.cellWidget(1, item.column()).setName(item.text())
+    #                     # 发送value和更改后的name
+    #                     self.iconNameChange.emit(self.cellWidget(1, item.column()).value, item.text())
+    #                 else:
+    #                     # 还原为原来的name
+    #                     item.setText(self.old_name)
+    #             else:
+    #                 QMessageBox.information(self, "Tips", "name can't be none")
+    #                 item.setText(self.old_name)
+    #             self.is_edit = False
+    #     except Exception as e:
+    #         print(f"error {e} happens in change icon name. [iconArea/iconTable.py]")
+
     def changIconName(self, item: QTableWidgetItem):
         try:
             if self.is_edit:
+                # 非空
                 if item.text():
-                    res, exist_value, old_exist_value = Structure.checkNameIsValid(item.text(), self.parent_timeline_value,
-                                                                  self.cellWidget(1, item.column()).value)
-                    whether_change = True
-                    if res == 0:
-                        whether_change = False
-                        QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
-                    elif res == 1:
-                        pass
-                    elif res == 2:
-                        if QMessageBox.question(self, 'Tips',
-                                                'name has existed in other place, are you sure to change?',
-                                                QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-                            value = self.cellWidget(1, item.column()).value
-                            self.iconWidgetMerge.emit(value, exist_value)
-                        else:
-                            whether_change = False
-                    # todo split widget
-                    elif res == 3:
-                        self.iconWidgetSplit.emit(self.cellWidget(1, item.column()).value, old_exist_value)
-                    elif res == 4:
-                        if QMessageBox.question(self, 'Tips',
-                                                'name has existed in other place, are you sure to change?',
-                                                QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-                            value = self.cellWidget(1, item.column()).value
-                            self.iconWidgetMerge.emit(value, exist_value)
-                        else:
-                            whether_change = False
+                    whether_change, tips = Structure.checkNameValidity(item.text(), self.cellWidget(1, item.column()).value)
                     if whether_change:
                         self.cellWidget(1, item.column()).setName(item.text())
                         # 发送value和更改后的name
                         self.iconNameChange.emit(self.cellWidget(1, item.column()).value, item.text())
                     else:
-                        # 还原为原来的name
+                        QMessageBox.information(self, 'Tips', tips)
                         item.setText(self.old_name)
                 else:
-                    QMessageBox.information(self, "Tips", "name can't be none")
+                    QMessageBox.information(self, "Tips", "Name can't be none")
                     item.setText(self.old_name)
                 self.is_edit = False
         except Exception as e:
