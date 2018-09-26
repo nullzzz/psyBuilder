@@ -29,6 +29,8 @@ class Case(QGroupBox):
         self.grid_layout.addWidget(self.delete_button, 4, 3, 1, 1)
         self.setLayout(self.grid_layout)
 
+        self.setMaximumHeight(300)
+
         if not can_add:
             self.add_button.setDisabled(True)
         if not can_delete:
