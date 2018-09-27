@@ -3,6 +3,7 @@ import os
 import sys
 
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QMessageBox
 
 from attributes.main import Attributes
@@ -53,27 +54,27 @@ class MainWindow(QMainWindow):
         self.property_action = QAction("&Property", self)
         self.output_action = QAction("&Output", self)
         self.default_action = QAction("&Default", self)
-        self.attribute_action.setCheckable(True)
-        self.attribute_action.setChecked(True)
+        # self.attribute_action.setCheckable(True)
+        # self.attribute_action.setChecked(True)
         self.attribute_action.setData("attribute")
-        self.structure_action.setCheckable(True)
-        self.structure_action.setChecked(True)
+        # self.structure_action.setCheckable(True)
+        # self.structure_action.setChecked(True)
         self.structure_action.setData("structure")
-        self.main_action.setCheckable(True)
-        self.main_action.setChecked(True)
-        self.main_action.setData("main")
-        self.output_action.setCheckable(True)
-        self.output_action.setChecked(True)
+        # self.main_action.setCheckable(True)
+        # self.main_action.setChecked(True)
+        # self.main_action.setData("main")
+        # self.output_action.setCheckable(True)
+        # self.output_action.setChecked(True)
         self.output_action.setData("output")
-        self.property_action.setCheckable(True)
-        self.property_action.setChecked(True)
+        # self.property_action.setCheckable(True)
+        # self.property_action.setChecked(True)
         self.property_action.setData("property")
 
-        self.attribute_action.toggled.connect(self.setDockView)
-        self.structure_action.toggled.connect(self.setDockView)
-        self.main_action.toggled.connect(self.setDockView)
-        self.output_action.toggled.connect(self.setDockView)
-        self.property_action.toggled.connect(self.setDockView)
+        self.attribute_action.triggered.connect(self.setDockView)
+        self.structure_action.triggered.connect(self.setDockView)
+        self.main_action.triggered.connect(self.setDockView)
+        self.output_action.triggered.connect(self.setDockView)
+        self.property_action.triggered.connect(self.setDockView)
 
         self.default_action.triggered.connect(self.resetView)
 
@@ -114,18 +115,23 @@ class MainWindow(QMainWindow):
         # attributes
         self.attributes = Attributes(self)
         self.attributes.setWindowTitle("Attributes")
+        self.attributes.setObjectName("Attributes")
         # structure
         self.structure = Structure()
         self.structure.setWindowTitle("Structure")
+        self.structure.setObjectName("Structure")
         # properties
         self.properties = Properties()
         self.properties.setWindowTitle("Properties")
+        self.properties.setObjectName("Properties")
         # center
         self.center = Center()
         self.center.setWindowTitle("Main")
+        self.center.setObjectName("Main")
         # output
         self.output = Output()
         self.output.setWindowTitle("Output")
+        self.output.setObjectName("Output")
 
         # 添加dock widget
         self.addDockWidget(Qt.LeftDockWidgetArea, self.structure)
@@ -133,6 +139,14 @@ class MainWindow(QMainWindow):
         self.splitDockWidget(self.center, self.attributes, Qt.Horizontal)
         self.splitDockWidget(self.structure, self.properties, Qt.Vertical)
         self.splitDockWidget(self.center, self.output, Qt.Vertical)
+
+        self.attributes.visibilityChanged.connect(self.checkVisible)
+        self.structure.visibilityChanged.connect(self.checkVisible)
+        self.properties.visibilityChanged.connect(self.checkVisible)
+        self.center.visibilityChanged.connect(self.checkVisible)
+        self.output.visibilityChanged.connect(self.checkVisible)
+
+        self.default_dock_widget_layout = self.saveState()
 
         # 连接信号
         self.linkSignals()
@@ -223,50 +237,44 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"error {e} happens in get data and reset timer. [main/main.py]")
 
+    # 恢复默认布局
     def resetView(self):
-        try:
-            self.structure_action.setChecked(False)
-            self.property_action.setChecked(False)
-            self.main_action.setChecked(False)
-            self.output_action.setChecked(False)
-            self.attribute_action.setChecked(False)
-            self.structure_action.setChecked(True)
-            self.property_action.setChecked(True)
-            self.main_action.setChecked(True)
-            self.output_action.setChecked(True)
-            self.attribute_action.setChecked(True)
-        except Exception:
-            print("error happens in reset view. [main/main.py]")
+        self.restoreState(self.default_dock_widget_layout)
 
+    # 单个dock的显示与隐藏
     def setDockView(self, checked):
         dock = self.sender().data()
-        # 显示dock
-        if checked:
-            if dock == "attribute":
-                self.attributes.setVisible(True)
-            elif dock == "structure":
-                self.structure.setVisible(True)
-            elif dock == "main":
-                self.center.setVisible(True)
-            elif dock == "property":
-                self.properties.setVisible(True)
-            elif dock == "output":
-                self.output.setVisible(True)
-            else:
-                print("wtf")
+        if dock == "attribute":
+            self.attributes.setVisible(self.attributes.isHidden())
+        elif dock == "structure":
+            self.structure.setVisible(self.structure.isHidden())
+        elif dock == "main":
+            self.center.setVisible(self.center.isHidden())
+        elif dock == "property":
+            self.properties.setVisible(self.properties.isHidden())
+        elif dock == "output":
+            self.output.setVisible(self.output.isHidden())
         else:
-            if dock == "attribute":
-                self.attributes.setVisible(False)
-            elif dock == "structure":
-                self.structure.setVisible(False)
-            elif dock == "main":
-                self.center.setVisible(False)
-            elif dock == "property":
-                self.properties.setVisible(False)
-            elif dock == "output":
-                self.output.setVisible(False)
-            else:
-                print("wtf")
+            print(f"wtf{dock}")
+
+    def checkVisible(self, is_visible):
+        dock = self.sender().windowTitle()
+        if is_visible:
+            icon = QIcon("image/dock_visible.png")
+        else:
+            icon = QIcon("")
+        if dock == "Attributes":
+            self.attribute_action.setIcon(icon)
+        elif dock == "Structure":
+            self.structure_action.setIcon(icon)
+        elif dock == "Main":
+            self.main_action.setIcon(icon)
+        elif dock == "Properties":
+            self.property_action.setIcon(icon)
+        elif dock == "Output":
+            self.output_action.setIcon(icon)
+        else:
+            print(f"wtf{dock}")
 
     def showDevices(self, device_type):
         if device_type:
