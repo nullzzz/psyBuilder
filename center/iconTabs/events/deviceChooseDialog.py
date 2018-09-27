@@ -48,6 +48,7 @@ class DeviceOutDialog(QDialog):
     def __init__(self, parent=None):
         super(DeviceOutDialog, self).__init__(parent)
         self.tip = QLabel("Please choose output device(s) from menu bar first!")
+        self.tip.setAlignment(Qt.AlignCenter)
         self.devices_list = QListWidget()
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")

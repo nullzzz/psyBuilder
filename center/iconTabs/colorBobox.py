@@ -1,8 +1,6 @@
 from PyQt5.QtCore import QRegExp, Qt
-from PyQt5.QtGui import QColor, QIcon
-from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QColorDialog, QMessageBox
-from PyQt5.QtWidgets import QComboBox
+from PyQt5.QtGui import QColor, QIcon, QRegExpValidator
+from PyQt5.QtWidgets import QColorDialog, QComboBox, QMessageBox
 
 
 class ColorListEditor(QComboBox):
@@ -12,13 +10,15 @@ class ColorListEditor(QComboBox):
         self.isValid = True
         self.isShow = False
         self.isChoose = False
-        self.default_color = ("white", "gray", "black", "red", "orange", "yellow", "green", "blue", "purple")
+        self.default_color = ("white", "gray", "black", "red",
+                              "orange", "yellow", "green", "blue", "purple")
         self.populateList()
         self.currentTextChanged.connect(self.changeColor)
         self.setStyleSheet("background: {}".format(self.currentText()))
         # 支持输入255,255,255及#ffffff格式rgb
         valid_rgb = QRegExp(
-            "((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{6}|white|gray|black|red|orange|yellow|green|blue|purple")
+            "((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{"
+            "6}|white|gray|black|red|orange|yellow|green|blue|purple")
         self.setValidator(QRegExpValidator(valid_rgb, self))
         self.setInsertPolicy(QComboBox.NoInsert)
 
@@ -57,7 +57,8 @@ class ColorListEditor(QComboBox):
                     self.setStyleSheet("background-color: rgb({});".format(e))
                     # 添加到下拉菜单
                     if self.findText(e) == -1:
-                        color = QColor(int(color_rgb[0]), int(color_rgb[1]), int(color_rgb[2]))
+                        color = QColor(int(color_rgb[0]), int(
+                            color_rgb[1]), int(color_rgb[2]))
                         self.insertItem(1, e)
                         self.setItemData(1, color, Qt.DecorationRole)
                         self.setCurrentIndex(1)
@@ -109,7 +110,8 @@ class ColorListEditor(QComboBox):
                 if not self.isValid:
                     self.setStyleSheet("background: white;")
                     self.setCurrentText("white")
-                    QMessageBox.warning(self, "Warning", "Invalid Color!", QMessageBox.Ok)
+                    QMessageBox.warning(
+                        self, "Warning", "Invalid Color!", QMessageBox.Ok)
                     # self.lineEdit().clear()
                     # self.setFocus()
                 else:

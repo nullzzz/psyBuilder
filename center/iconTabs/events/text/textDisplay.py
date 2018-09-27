@@ -72,7 +72,7 @@ class TextDisplay(QMainWindow):
             # self.preview.text.setStyleSheet("background-color:{}".format(self.back_color))
             self.preview.setWindowModality(Qt.ApplicationModal)
             self.preview.setFont(self.font)
-            self.preview.setHtml(self.text_html)
+            self.preview.setHtml(self.html)
             self.preview.setWrap(self.is_wrap)
             self.preview.showFullScreen()
             self.preview.moveText()
@@ -81,8 +81,8 @@ class TextDisplay(QMainWindow):
             self.t.timeout.connect(self.preview.close)
             self.t.start(10000)
             self.t.setSingleShot(True)
-        except AttributeError:
-            QMessageBox.warning(self, "Unknown Error", "Please contact the developer!", QMessageBox.Ok)
+        except AttributeError as ae:
+            QMessageBox.warning(self, "Unknown Error", f"Please contact the developers!", QMessageBox.Ok)
         except Exception as e:
             print(e)
             print(type(e))
