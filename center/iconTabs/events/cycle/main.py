@@ -10,6 +10,7 @@ from .properties.property import Property
 from .timelineTable import TimelineTable
 
 from structure.main import Structure
+from getImage import getImage
 
 import copy
 
@@ -230,32 +231,89 @@ class Cycle(QMainWindow):
 
         return res
 
+    # def addOrChangeTimeline(self, row, col):
+    #     try:
+    #         if col == 1:
+    #             # new timeline
+    #             item = self.timeline_table.item(row, col)
+    #             if row not in self.row_value:
+    #                 name = item.text()
+    #                 if name:
+    #                     res, exist_value, old_exist_value = Structure.checkNameIsValid(name, self.value, 'Timeline.')
+    #                     flag = False
+    #                     mergeFlag = False
+    #                     # 因为是新增的timeline，不存在断开
+    #                     if res == 0:
+    #                         QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
+    #                         self.timeline_table.setItem(row, col, QTableWidgetItem(''))
+    #                     elif res == 1:
+    #                         flag = True
+    #                     elif res == 2:
+    #                         if QMessageBox.question(self, 'Tips',
+    #                                                 'name has existed in other place, are you sure to change?',
+    #                                                 QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    #                             flag = True
+    #                             mergeFlag = True
+    #                     if flag:
+    #                         timeline_icon = Icon(parent=None, name="Timeline",
+    #                                              pixmap="image/timeLine.png")
+    #                         # 相关数据存储
+    #                         self.row_value[row] = timeline_icon.value
+    #                         self.row_name[row] = name
+    #                         self.value_row[timeline_icon.value] = row
+    #                         # 给
+    #                         self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
+    #                         self.timeline_count += 1
+    #                         if mergeFlag:
+    #                             self.timelineWidgetMerge.emit(timeline_icon.value, exist_value)
+    #             # change timeline name
+    #             else:
+    #                 name = item.text()
+    #                 value = self.row_value[row]
+    #                 if name:
+    #                     res, exist_value, old_exist_value = Structure.checkNameIsValid(name, self.value, value)
+    #                     flag = False
+    #                     if res == 0:
+    #                         QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
+    #                         self.timeline_table.setItem(row, col, QTableWidgetItem(self.row_name[row]))
+    #                     elif res == 1:
+    #                         flag = True
+    #                     elif res == 2:
+    #                         if QMessageBox.question(self, 'Tips',
+    #                                                 'name has existed in other place, are you sure to change?',
+    #                                                 QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    #                             flag = True
+    #                             self.timelineWidgetMerge.emit(value, exist_value)
+    #                     # todo split widget
+    #                     elif res == 3:
+    #                         flag = True
+    #                         self.timelineWidgetSplit.emit(value, old_exist_value)
+    #                     elif res == 4:
+    #                         if QMessageBox.question(self, 'Tips',
+    #                                                 'name has existed in other place, are you sure to change?',
+    #                                                 QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    #                             flag = True
+    #                             self.timelineWidgetMerge.emit(value, exist_value)
+    #                     if flag:
+    #                         self.timelineNameChange.emit(self.value, value, name)
+    #                 else:
+    #                     QMessageBox.information(self, "Tips", "Timeline value can't be none.")
+    #                     self.timeline_table.setItem(row, col, QTableWidgetItem(self.row_name[row]))
+    #     except Exception as e:
+    #         print(f"error {e} happens in add or rename timeline. [cycle/main.py]")
+
     def addOrChangeTimeline(self, row, col):
         try:
             if col == 1:
-                # new timeline
                 item = self.timeline_table.item(row, col)
+                # new timeline
                 if row not in self.row_value:
                     name = item.text()
                     if name:
-                        res, exist_value, old_exist_value = Structure.checkNameIsValid(name, self.value, 'Timeline.')
-                        flag = False
-                        mergeFlag = False
-                        # 因为是新增的timeline，不存在断开
-                        if res == 0:
-                            QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
-                            self.timeline_table.setItem(row, col, QTableWidgetItem(''))
-                        elif res == 1:
-                            flag = True
-                        elif res == 2:
-                            if QMessageBox.question(self, 'Tips',
-                                                    'name has existed in other place, are you sure to change?',
-                                                    QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-                                flag = True
-                                mergeFlag = True
-                        if flag:
-                            timeline_icon = Icon(parent=None, name="Timeline",
-                                                 pixmap="image/timeLine.png")
+                        name_validity, tips = Structure.checkNameValidity(name, 'Timeline.')
+                        if name_validity:
+                            # 生成timeline的icon实例
+                            timeline_icon = Icon(name='Timeline', pixmap=getImage('Timeline', 'pixmap'))
                             # 相关数据存储
                             self.row_value[row] = timeline_icon.value
                             self.row_name[row] = name
@@ -263,38 +321,18 @@ class Cycle(QMainWindow):
                             # 给
                             self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
                             self.timeline_count += 1
-                            if mergeFlag:
-                                self.timelineWidgetMerge.emit(timeline_icon.value, exist_value)
+                        else:
+                            QMessageBox.information(self, 'Tips', tips)
                 # change timeline name
                 else:
                     name = item.text()
                     value = self.row_value[row]
                     if name:
-                        res, exist_value, old_exist_value = Structure.checkNameIsValid(name, self.value, value)
-                        flag = False
-                        if res == 0:
-                            QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
-                            self.timeline_table.setItem(row, col, QTableWidgetItem(self.row_name[row]))
-                        elif res == 1:
-                            flag = True
-                        elif res == 2:
-                            if QMessageBox.question(self, 'Tips',
-                                                    'name has existed in other place, are you sure to change?',
-                                                    QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-                                flag = True
-                                self.timelineWidgetMerge.emit(value, exist_value)
-                        # todo split widget
-                        elif res == 3:
-                            flag = True
-                            self.timelineWidgetSplit.emit(value, old_exist_value)
-                        elif res == 4:
-                            if QMessageBox.question(self, 'Tips',
-                                                    'name has existed in other place, are you sure to change?',
-                                                    QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-                                flag = True
-                                self.timelineWidgetMerge.emit(value, exist_value)
-                        if flag:
+                        name_validity, tips = Structure.checkNameValidity(name, value)
+                        if name_validity:
                             self.timelineNameChange.emit(self.value, value, name)
+                        else:
+                            QMessageBox.information(self, "Tips", tips)
                     else:
                         QMessageBox.information(self, "Tips", "Timeline value can't be none.")
                         self.timeline_table.setItem(row, col, QTableWidgetItem(self.row_name[row]))

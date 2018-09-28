@@ -31,6 +31,7 @@ class IconTabs(QTabWidget):
     # 同上
     ifBranchAdd = pyqtSignal(str)
     timelineAdd = pyqtSignal(str)
+    switchBranchAdd = pyqtSignal(str)
     # 发送到structure (value)
     attributesShow = pyqtSignal(str)
     # 先发送到structure去copyNode (value, exist_value)
@@ -71,6 +72,8 @@ class IconTabs(QTabWidget):
         self.cycleAdd.connect(self.linkCycleSignals)
         # if branch
         self.ifBranchAdd.connect(self.linkIFBranchSignals)
+        # switch
+        self.switchBranchAdd.connect(self.linkSwitchBranchSignals)
 
     def linkTimelineSignals(self, value):
         try:
@@ -108,15 +111,29 @@ class IconTabs(QTabWidget):
     def linkIFBranchSignals(self, value):
         try:
             try:
-                self.value_widget[value].iconPropertiesShow.disconnect(self.showItemInIfBranchProperties)
-                self.value_widget[value].iconPropertiesShow.connect(self.showItemInIfBranchProperties)
+                self.value_widget[value].iconPropertiesShow.disconnect(self.showIconPropertiesInBranch)
+                self.value_widget[value].iconPropertiesShow.connect(self.showIconPropertiesInBranch)
             except Exception:
-                self.value_widget[value].iconPropertiesShow.connect(self.showItemInIfBranchProperties)
+                self.value_widget[value].nodeAdd.connect(self.createTabForItemInBranch)
+                self.value_widget[value].iconPropertiesShow.connect(self.showIconPropertiesInBranch)
                 self.value_widget[value].iconWidgetMerge.connect(self.mergeValueWidget)
                 self.value_widget[value].iconWidgetSplit.connect(self.splitValueWidget)
                 self.value_widget[value].iconTabDelete.connect(self.deleteTab)
         except Exception:
-            print("error happens in link if branch signals to structure. [main/main.py]")
+            print("error happens in link if branch signals. [iconTabs/main.py]")
+
+    def linkSwitchBranchSignals(self, value):
+        try:
+            switch:SwitchBranch = self.value_widget[value]
+            try:
+                switch.iconPropertiesShow.disconnect(self.showIconPropertiesInBranch)
+                switch.iconPropertiesShow.connect(self.showIconPropertiesInBranch)
+            except Exception:
+                switch.caseAdd.connect(self.createTabForItemInBranch)
+                switch.iconPropertiesShow.connect(self.showIconPropertiesInBranch)
+                switch.caseTabDelete.connect(self.deleteTab)
+        except Exception as e:
+            print(f"error {e} happens in link switch branch signals. [iconTabs/main.py]")
 
     def setMenuAndShortcut(self):
         # right button menu
@@ -222,7 +239,6 @@ class IconTabs(QTabWidget):
                 # 我在cycle中生成timeline时, 就已经生成了timeline实体
                 if value.startswith("Timeline."):
                     self.attributesShow.emit(value)
-
             else:
                 widget = None
                 tab_icon = getImage(widget_type, "icon")
@@ -273,7 +289,7 @@ class IconTabs(QTabWidget):
                     widget = IfBranch(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Switch":
-                    widget = SwitchBranch()
+                    widget = SwitchBranch(value=value)
                     widget.tabClose.connect(self.closeTab)
                 else:
                     pass
@@ -285,6 +301,8 @@ class IconTabs(QTabWidget):
                         self.cycleAdd.emit(value)
                     elif widget_type == "If_else":
                         self.ifBranchAdd.emit(value)
+                    elif widget_type == 'Switch':
+                        self.switchBranchAdd.emit(value)
                     # 各种widget的propertiesChange信号
                     try:
                         widget.propertiesChange.connect(self.getChangedProperties)
@@ -394,10 +412,10 @@ class IconTabs(QTabWidget):
         except Exception as e:
             print("error {} happens in change condition item name. [iconTabs/main.py]".format(e))
 
-    def showItemInIfBranchProperties(self, properties):
+    def showIconPropertiesInBranch(self, properties):
         self.propertiesShow.emit(properties)
 
-    def createTabForItemInIfBranch(self, parent_value, name,  pixmap, value, properties_window):
+    def createTabForItemInBranch(self, parent_value, name, pixmap, value, properties_window):
         try:
             self.openTab(value, name, False)
             widget = self.value_widget[value]
@@ -514,6 +532,8 @@ class IconTabs(QTabWidget):
                     self.timelineAdd.emit(new_value)
                 elif new_value.startswith('If_else'):
                     self.ifBranchAdd.emit(new_value)
+                elif new_value.startswith('Switch'):
+                    self.switchBranchAdd.emit(new_value)
                 print(f"I have finished copying {widget_type} widget.")
             except Exception:
                 print(f"Fail to copy {widget_type} widget.")

@@ -13,7 +13,7 @@ class IfBranch(QWidget):
     tabClose = pyqtSignal(QWidget)
     propertiesChange = pyqtSignal(dict)
     # 发送给structure, iconTabs (self.value, name, pixmap, value, properties window)
-    nodeChange = pyqtSignal(str, str, QPixmap, str, QWidget)
+    nodeAdd = pyqtSignal(str, str, QPixmap, str, QWidget)
     # (self.value, value)
     nodeDelete = pyqtSignal(str, str)
     # (parent_value, value, name)
@@ -158,9 +158,9 @@ class IfBranch(QWidget):
             # 空变成有
             if self.type_value[condition_type][0].startswith('Other.'):
                 if self.checkIconName(current_name, self.value, current_value, condition_type):
-                    self.nodeChange.emit(self.value, "[" + condition_type + "] " + current_name,
-                                         getImage(current_value.split('.')[0], 'pixmap'),
-                                         current_value, current_properties_window)
+                    self.nodeAdd.emit(self.value, current_name,
+                                      getImage(current_value.split('.')[0], 'pixmap'),
+                                      current_value, current_properties_window)
                     self.type_value[condition_type][0] = current_value
                     self.type_value[condition_type][1] = current_name
                     self.type_value[condition_type][2] = current_properties_window
@@ -188,9 +188,9 @@ class IfBranch(QWidget):
                         self.type_value[condition_type] = [other_value, '', None]
                     # add new
                     if self.checkIconName(current_name, self.value, current_value, condition_type):
-                        self.nodeChange.emit(self.value, "[" + condition_type + "] " + current_name,
-                                             getImage(current_value.split('.')[0], 'pixmap'),
-                                             current_value, current_properties_window)
+                        self.nodeAdd.emit(self.value, "[" + condition_type + "] " + current_name,
+                                          getImage(current_value.split('.')[0], 'pixmap'),
+                                          current_value, current_properties_window)
                         self.type_value[condition_type][0] = current_value
                         self.type_value[condition_type][1] = current_name
                         self.type_value[condition_type][2] = current_properties_window
@@ -199,47 +199,68 @@ class IfBranch(QWidget):
 
             return has_error
 
+    # def checkIconName(self, name, parent_value, value, condition_type):
+    #     try:
+    #         # name非空
+    #         is_valid = True
+    #         if name:
+    #             res, exist_value, old_exist_value = Structure.checkNameIsValid(name, parent_value, value)
+    #             #
+    #             if res == 0:
+    #                 is_valid= False
+    #             elif res == 1:
+    #                 pass
+    #             elif res == 2:
+    #                 # 如果用户想重复
+    #                 if QMessageBox.question(self, "Tips",
+    #                                         'the {}  group\'s name has existed in other place, are you sure to change?.'.format(
+    #                                                 'True' if condition_type == 'T' else 'False'),
+    #                                         QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    #                     self.iconWidgetMerge.emit(value, exist_value)
+    #                 else:
+    #                     is_valid = False
+    #             elif res == 3:
+    #                 self.iconWidgetSplit.emit(value, old_exist_value)
+    #             elif res == 4:
+    #                 # 如果用户想重复
+    #                 if QMessageBox.question(self, "Tips",
+    #                                         'the {}  group\'s name has existed in other place, are you sure to change?.'.format(
+    #                                             'True' if condition_type == 'T' else 'False'),
+    #                                         QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    #                     self.iconWidgetMerge.emit(value, exist_value)
+    #                 else:
+    #                     is_valid = False
+    #         else:
+    #             is_valid = False
+    #
+    #         # is valid
+    #         if is_valid:
+    #             return True
+    #         else:
+    #             if name:
+    #                 QMessageBox.information(self, 'Tips', 'the {}  group\'s name can\'t use.'.format(
+    #                     'True' if condition_type == 'T' else 'False'), QMessageBox.Ok)
+    #             else:
+    #                 QMessageBox.information(self, 'Tips', 'the {}  group\'s name can\'t be none.'.format(
+    #                     'True' if condition_type == 'T' else 'False'), QMessageBox.Ok)
+    #             return False
+    #     except Exception as e:
+    #         print(f"error {e} happens in check icon name. [ifBranch/main.py]")
+
     def checkIconName(self, name, parent_value, value, condition_type):
         try:
             # name非空
-            is_valid = True
+            is_valid = False
+            tips = ''
             if name:
-                res, exist_value, old_exist_value = Structure.checkNameIsValid(name, parent_value, value)
-                #
-                if res == 0:
-                    is_valid= False
-                elif res == 1:
-                    pass
-                elif res == 2:
-                    # 如果用户想重复
-                    if QMessageBox.question(self, "Tips",
-                                            'the {}  group\'s name has existed in other place, are you sure to change?.'.format(
-                                                    'True' if condition_type == 'T' else 'False'),
-                                            QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-                        self.iconWidgetMerge.emit(value, exist_value)
-                    else:
-                        is_valid = False
-                elif res == 3:
-                    self.iconWidgetSplit.emit(value, old_exist_value)
-                elif res == 4:
-                    # 如果用户想重复
-                    if QMessageBox.question(self, "Tips",
-                                            'the {}  group\'s name has existed in other place, are you sure to change?.'.format(
-                                                'True' if condition_type == 'T' else 'False'),
-                                            QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-                        self.iconWidgetMerge.emit(value, exist_value)
-                    else:
-                        is_valid = False
-            else:
-                is_valid = False
-
+                is_valid, tips = Structure.checkNameValidity(name, value)
             # is valid
             if is_valid:
                 return True
             else:
                 if name:
-                    QMessageBox.information(self, 'Tips', 'the {}  group\'s name can\'t use.'.format(
-                        'True' if condition_type == 'T' else 'False'), QMessageBox.Ok)
+                    QMessageBox.information(self, 'Tips', 'the {}  group\'s name can\'t use, because {}'.format(
+                        'True' if condition_type == 'T' else 'False', tips), QMessageBox.Ok)
                 else:
                     QMessageBox.information(self, 'Tips', 'the {}  group\'s name can\'t be none.'.format(
                         'True' if condition_type == 'T' else 'False'), QMessageBox.Ok)

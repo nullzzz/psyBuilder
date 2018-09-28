@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import QComboBox, QLabel, QGridLayout, QWidget, QScrollArea
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 
 from .case import Case
 
 
 class CaseArea(QScrollArea):
     MAX_CASE_COUNT = 9
-
+    caseAdd = pyqtSignal(Case)
     def __init__(self, parent=None):
         super(CaseArea, self).__init__(parent)
 
@@ -57,6 +57,7 @@ class CaseArea(QScrollArea):
                 # 放入新case
                 new_case = Case(title=f"Case {add_index + 1}", can_add=True, can_delete=True)
                 self.linkCaseSignals(new_case)
+                self.caseAdd.emit(new_case)
                 self.cases.insert(add_index, new_case)
                 if len(self.cases) > 3:
                     for case in self.cases:
@@ -92,6 +93,8 @@ class CaseArea(QScrollArea):
                     self.grid_layout.addWidget(old_case, row, col, 1, 1)
                 # 按钮状态变化
                 self.cases.pop(index)
+                for i in range(len(self.cases)):
+                    self.cases[i].setTitle(f"Case {i + 1}")
                 if len(self.cases) == 3:
                     for case in self.cases:
                         case.setDeleteDisabled(True)

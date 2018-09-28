@@ -164,6 +164,7 @@ class MainWindow(QMainWindow):
         self.center.icon_tabs.cycleAdd.connect(self.linkCycleSignals)
         self.center.icon_tabs.ifBranchAdd.connect(self.linkIFBranchSignals)
         self.center.icon_tabs.timelineAdd.connect(self.linkTimelineSignals)
+        self.center.icon_tabs.switchBranchAdd.connect(self.linkSwitchBranchSignals)
         self.center.icon_tabs.propertiesShow.connect(self.properties.showProperties)
         self.center.icon_tabs.attributesShow.connect(self.structure.showTimelineAttributes)
         self.center.icon_tabs.iconNodeCopy.connect(self.structure.copyNode)
@@ -199,7 +200,7 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].iconNameChange.connect(self.structure.changeNodeName)
                 self.center.icon_tabs.value_widget[value].icon_area.icon_table.iconWidgetMerge.connect(self.structure.copyNode)
         except Exception:
-            print("error happens in link timeline signals to structure. [main/main.py]")
+            print("error happens in link timeline signals. [main/main.py]")
 
     def linkCycleSignals(self, value):
         try:
@@ -211,21 +212,33 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].timelineNameChange.connect(self.structure.changeNodeName)
                 self.center.icon_tabs.value_widget[value].timelineWidgetMerge.connect(self.structure.copyNode)
         except Exception:
-            print("error happens in link cycle signals to structure. [main/main.py]")
+            print("error happens in link cycle signals. [main/main.py]")
 
     def linkIFBranchSignals(self, value):
         try:
             try:
-                self.center.icon_tabs.value_widget[value].nodeChange.disconnect(self.structure.addNode)
-                self.center.icon_tabs.value_widget[value].nodeChange.connect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].nodeAdd.disconnect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].nodeAdd.connect(self.structure.addNode)
             except Exception:
-                self.center.icon_tabs.value_widget[value].nodeChange.connect(self.structure.addNode)
-                self.center.icon_tabs.value_widget[value].nodeChange.connect(
-                    self.center.icon_tabs.createTabForItemInIfBranch)
+                self.center.icon_tabs.value_widget[value].nodeAdd.connect(self.structure.addNode)
                 self.center.icon_tabs.value_widget[value].nodeNameChange.connect(self.structure.changeNodeName)
                 self.center.icon_tabs.value_widget[value].nodeDelete.connect(self.structure.removeNode)
         except Exception:
-            print("error happens in link if branch signals to structure. [main/main.py]")
+            print("error happens in link if branch signals. [main/main.py]")
+
+    def linkSwitchBranchSignals(self, value):
+        try:
+            try:
+                self.center.icon_tabs.value_widget[value].caseAdd.disconnect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].caseAdd.connect(self.structure.addNode)
+            except Exception:
+                self.center.icon_tabs.value_widget[value].caseAdd.connect(self.structure.addNode)
+                self.center.icon_tabs.value_widget[value].caseNameChange.connect(self.structure.changeNodeName)
+                self.center.icon_tabs.value_widget[value].caseDelete.connect(self.structure.removeNode)
+        except Exception:
+            print("error happens in link if branch signals. [main/main.py]")
+
+
 
     def newFile(self):
         python = sys.executable

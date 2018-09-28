@@ -418,8 +418,8 @@ class IconTable(QTableWidget):
             if self.is_edit:
                 # 非空
                 if item.text():
-                    whether_change, tips = Structure.checkNameValidity(item.text(), self.cellWidget(1, item.column()).value)
-                    if whether_change:
+                    name_validity, tips = Structure.checkNameValidity(item.text(), self.cellWidget(1, item.column()).value)
+                    if name_validity:
                         self.cellWidget(1, item.column()).setName(item.text())
                         # 发送value和更改后的name
                         self.iconNameChange.emit(self.cellWidget(1, item.column()).value, item.text())
@@ -464,6 +464,7 @@ class IconTable(QTableWidget):
     def copyDragFinish(self):
         self.is_copy_module = False
 
+    # todo change copy
     def copy(self, icon_table_copy):
         try:
             # 当前icon count

@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QComboBox, QWidget, QLineEdit, QGridLayout, QLabel
+from PyQt5.QtCore import Qt, pyqtSignal, QRegExp
+from PyQt5.QtGui import QPixmap, QRegExpValidator
+from PyQt5.QtWidgets import QComboBox, QWidget, QLineEdit, QGridLayout, QLabel, QMessageBox
 
 from center.iconTabs.events.image.imageProperty import ImageProperty
 from center.iconTabs.events.soundOut.soundProperty import SoundProperty
@@ -88,7 +88,7 @@ class IconChoose(QWidget):
                     self.properties_window.apply_bt.clicked.connect(self.apply)
 
                 # self.icon_name.setText(Structure.getName(self.icon.value, name))
-                self.icon_name.setPlaceholderText('untitled-' + name)
+                self.icon_name.setPlaceholderText(f'Untitled-{name}')
                 self.icon_name.setEnabled(True)
         except Exception as e:
             print("error {} happens in change icon. [condition/iconChoose.py]".format(e))
