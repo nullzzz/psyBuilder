@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QWidget, QMainWindow, QHBoxLayout, QGridLayout, QPushButton, QMessageBox
 from PyQt5.QtCore import pyqtSignal
-from .caseArea import CaseArea
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGridLayout, QPushButton, QMessageBox
+
 from structure.main import Structure
+from .caseArea import CaseArea
 
 
 class SwitchBranch(QWidget):
@@ -57,7 +58,7 @@ class SwitchBranch(QWidget):
                     return False
             return True
         except Exception as e:
-            print("error {} happens in apply if-else. [ifBranch/main.py]".format(e))
+            print("error {} happens in apply if-else. [switchBranch/main.py]".format(e))
 
     def getInfo(self):
         return {"properties" : "none"}

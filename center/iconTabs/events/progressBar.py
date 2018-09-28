@@ -6,8 +6,9 @@ from PyQt5.QtWidgets import QDialog, QApplication, QFrame, QVBoxLayout
 
 
 class LoadingTip(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, title="Checking for update...", parent=None):
         super(LoadingTip, self).__init__(parent)
+        self.setWindowTitle(title)
         self.bar = ProgressBar()
         layout = QVBoxLayout()
         layout.addWidget(self.bar, 1, Qt.AlignCenter)
@@ -15,6 +16,9 @@ class LoadingTip(QDialog):
 
     def setValue(self, value: int):
         self.bar.setValue(value)
+
+    def changeValue(self):
+        self.bar.changeValue()
 
 
 class ProgressBar(QFrame):

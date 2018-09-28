@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QMessageBox
 
 from attributes.main import Attributes
 from center.iconTabs.events.durationPage import DurationPage
+from center.iconTabs.events.progressBar import LoadingTip
 from center.main import Center
 from main.globalDevices import GlobalDevice
 from output.main import Output
@@ -105,11 +106,15 @@ class MainWindow(QMainWindow):
         help_menu = menu_bar.addMenu("&Help")
         about_action = QAction("&About", self)
         about_Qt_action = QAction("&About Qt", self)
+        check_for_update = QAction("&Check for updates", self)
+
         about_action.triggered.connect(self.about)
         about_Qt_action.triggered.connect(QApplication.instance().aboutQt)
+        check_for_update.triggered.connect(self.checkUpdate)
 
         help_menu.addAction(about_action)
         help_menu.addAction(about_Qt_action)
+        help_menu.addAction(check_for_update)
 
         # 设置dock widgets
         # attributes
@@ -257,6 +262,7 @@ class MainWindow(QMainWindow):
         else:
             print(f"wtf{dock}")
 
+    # 通过判断dock的显示与隐藏来改变菜单栏view的图标
     def checkVisible(self, is_visible):
         dock = self.sender().windowTitle()
         if is_visible:
@@ -276,6 +282,7 @@ class MainWindow(QMainWindow):
         else:
             print(f"wtf{dock}")
 
+    # 显示设备选择框
     def showDevices(self, device_type):
         if device_type:
             self.output_devices.show()
@@ -295,3 +302,18 @@ class MainWindow(QMainWindow):
 
     def about(self):
         QMessageBox.about(self, "About PsyDemo", "This is a bad project")
+
+    def checkUpdate(self):
+        self.bar = LoadingTip()
+        self.bar.setWindowModality(Qt.ApplicationModal)
+        self.bar.show()
+        self.t = QTimer()
+        self.t.timeout.connect(self.re)
+        self.t.start(100)
+
+    def re(self):
+        self.bar.changeValue()
+        self.bar.update()
+        if self.bar.bar.value == 100:
+            self.t.stop()
+            self.bar.close()

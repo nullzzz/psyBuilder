@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from PyQt5.QtGui import QIcon, QMouseEvent, QDragMoveEvent, QCursor
-from PyQt5.QtWidgets import QWidget, QListWidget, QListWidgetItem, QTextEdit, QVBoxLayout, QHBoxLayout, QApplication, \
-    QListView, QFrame, QPushButton, QMenu, QInputDialog, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QWidget, QListWidget, QListWidgetItem, QVBoxLayout, QHBoxLayout, QApplication, \
+    QListView, QFrame, QPushButton, QMenu, QInputDialog, QLineEdit, QMessageBox, QStackedWidget, QFormLayout, QLabel
 
 
 class GlobalDevice(QWidget):
@@ -34,9 +34,11 @@ class GlobalDevice(QWidget):
         self.selected_devices.itemDoubleClicked.connect(self.reName)
         self.selected_devices.itemDoubleClick.connect(self.reName)
 
+        # self.selected_devices.currentItemChanged.connect(self.itemChanged)
+
         # 还母鸡要做啥子
-        self.describe = QTextEdit()
-        self.describe.setText("此处留白\n\t设备描述\n\t参数设置")
+        self.describe = QStackedWidget()
+        # self.describe.setText("此处留白\n\t设备描述\n\t参数设置")
 
         self.ok_bt = QPushButton("OK")
         self.ok_bt.clicked.connect(self.ok)
@@ -54,7 +56,7 @@ class GlobalDevice(QWidget):
 
         layout1 = QHBoxLayout()
         layout1.addWidget(self.selected_devices, 1)
-        layout1.addWidget(self.describe, 1)
+        layout1.addWidget(self.selected_devices.pro, 1)
         layout2 = QHBoxLayout()
         layout2.addStretch(5)
         layout2.addWidget(self.ok_bt)
@@ -79,8 +81,13 @@ class GlobalDevice(QWidget):
     def apply(self):
         self.deviceSelect.emit(self.device_type, self.selected_devices.getInfo())
 
+    def itemChanged(self, e):
+        if e:
+            index = self.selected_devices.row(e)
+            self.describe.setCurrentIndex(index)
+
     def reName(self, item):
-        item_name:str = item.text().lower()
+        item_name: str = item.text().lower()
         text, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
         if ok and text != '':
             text: str
@@ -99,8 +106,17 @@ class DeviceItem(QListWidgetItem):
         super(DeviceItem, self).__init__(name, parent)
         self.item_type = device_type
         # 母鸡啥子
-        self.describe = QTextEdit()
+        # self.describe = QTextEdit()
         self.setIcon(QIcon("image/{}_device.png".format(self.item_type)))
+        self.pro = QWidget()
+        self.port = "127.0.0.1"
+        self.port_line = QLineEdit()
+        self.port_line.setText(self.port)
+        lay = QFormLayout()
+        lay.addRow("Type:", QLabel(self.item_type))
+        lay.addRow("Name:", QLabel(self.text()))
+        lay.addRow("Port:", self.port_line)
+        self.pro.setLayout(lay)
 
     # 重写clone，返回的是DeviceItem类型，而不是QListWidgetItem类型
     def clone(self):
@@ -109,6 +125,7 @@ class DeviceItem(QListWidgetItem):
 
 class SelectArea(QListWidget):
     itemDoubleClick = pyqtSignal(DeviceItem)
+    itemAdd = pyqtSignal(QWidget)
 
     def __init__(self, device_type: int = 0, parent=None):
         super(SelectArea, self).__init__(parent)
@@ -132,6 +149,9 @@ class SelectArea(QListWidget):
         self.default_properties = {
 
         }
+
+        self.pro = QStackedWidget()
+        self.currentItemChanged.connect(self.changeItem)
 
         # 拖动的图标
         self.dragItem = None
@@ -165,6 +185,10 @@ class SelectArea(QListWidget):
                 self.insertItem(insert_pos, drop_item)
             else:
                 self.addItem(drop_item)
+            try:
+                self.pro.addWidget(drop_item.pro)
+            except Exception as e:
+                print(e)
         # 内部调序
         # 暂不支持
         elif source == self:
@@ -223,6 +247,9 @@ class SelectArea(QListWidget):
             item = self.itemAt(pos)
             if item:
                 self.contextMenu.exec_(QCursor.pos())  # 在鼠标位置显示
+
+    def changeItem(self, e):
+        self.pro.setCurrentWidget(self.currentItem().pro)
 
     # 返回选择设备
     # type: dict
