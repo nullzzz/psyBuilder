@@ -740,3 +740,26 @@ class Structure(QDockWidget):
             return ''
         except Exception as e:
             print(f"error {e} happens in get value. [structure/main.py]")
+
+    @staticmethod
+    def getNameAndValueByParent(parent_value, index):
+        try:
+            parent = Structure.value_node[parent_value]
+            child = parent.child(index)
+            return child.text(0), child.value
+        except Exception as e:
+            print(f"error {e} happens in get name and value. [structure/main.py]")
+
+    @staticmethod
+    def getNameAndValueByOldAndParent(old_name, old_parent_value, parent_value):
+        try:
+            old_parent = Structure.value_node[old_parent_value]
+            index = -1
+            for i in range(old_parent.childCount()):
+                if old_parent.child(i).text(0) == old_name:
+                    index = i
+            parent = Structure.value_node[parent_value]
+            child = parent.child(index)
+            return child.text(0), child.value
+        except Exception as e:
+            print(f'error {e} happens in get name and value. [structure/main.py]')

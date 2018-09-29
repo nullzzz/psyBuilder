@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 from .colAdd import ColAdd
 from noDash import NoDash
+from structure.main import Structure
 
 import copy
 
@@ -30,26 +31,29 @@ class TimelineTable(QTableWidget):
         self.insertColumn(self.columnCount())
         self.setHorizontalHeaderItem(self.columnCount() - 1, QTableWidgetItem(name))
 
-    def copy(self, timeline_table):
+    def copy(self, timeline_table, row_name):
         try:
             timeline_table.col_header = copy.deepcopy(self.col_header)
             timeline_table.col_value = copy.deepcopy(self.col_value)
             timeline_table.setColumnCount(self.columnCount())
             timeline_table.setHorizontalHeaderLabels(self.col_header)
+            # 得到name
             for row in range(self.rowCount()):
                 if row < timeline_table.rowCount():
                     for col in range(self.columnCount()):
                         text = self.item(row, col).text()
-                        if col == 1 and not text:
-                            pass
+                        if col == 1:
+                            if text:
+                                timeline_table.setItem(row, col, QTableWidgetItem(row_name[row]))
                         else:
                             timeline_table.setItem(row, col, QTableWidgetItem(text))
                 else:
                     timeline_table.insertRow(timeline_table.rowCount())
                     for col in range(self.columnCount()):
                         text = self.item(row, col).text()
-                        if col == 1 and not text:
-                            pass
+                        if col == 1:
+                            if text:
+                                timeline_table.setItem(row, col, QTableWidgetItem(row_name[row]))
                         else:
                             timeline_table.setItem(row, col, QTableWidgetItem(text))
         except Exception as e:

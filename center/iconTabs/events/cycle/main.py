@@ -478,26 +478,45 @@ class Cycle(QMainWindow):
         self.is_paste_disabled = False
         self.paste_data = []
 
-    # todo copy cycle
+    # def copy(self, value):
+    #     try:
+    #         cycle_copy = Cycle(value=value)
+    #         # data, 一定要注意要是深拷贝
+    #         # row_name
+    #         cycle_copy.row_name = copy.deepcopy(self.row_name)
+    #         # row_value, value_row
+    #         for row in self.row_value:
+    #             timeline_value = Structure.getValueBySameAndParent(self.row_value[row], value)
+    #             cycle_copy.row_value[row] = timeline_value
+    #             cycle_copy.value_row[timeline_value] = row
+    #         # timeline_table
+    #         cycle_copy.timeline_count = self.timeline_count
+    #         # cycle_copy.timeline_table = copy.deepcopy(self.timeline_table)
+    #         self.timeline_table.copy(cycle_copy.timeline_table)
+    #         # properties
+    #         cycle_copy.properties = self.properties
+    #         cycle_copy.setProperties()
+    #         # cycle_copy.setCentralWidget(cycle_copy.timeline_table)
+    #         return cycle_copy
+    #     except Exception as e:
+    #         print(f"error {e} happens in copy cycle. [cycle/main.py]")
+
     def copy(self, value):
         try:
             cycle_copy = Cycle(value=value)
             # data, 一定要注意要是深拷贝
-            # row_name
-            cycle_copy.row_name = copy.deepcopy(self.row_name)
-            # row_value, value_row
-            for row in self.row_value:
-                timeline_value = Structure.getValueBySameAndParent(self.row_value[row], value)
-                cycle_copy.row_value[row] = timeline_value
-                cycle_copy.value_row[timeline_value] = row
+            # row_name row_value, value_row
+            for row in self.row_name:
+                name, value = Structure.getNameAndValueByOldAndParent(self.row_name[row], self.value, value)
+                cycle_copy.row_name[row] = name
+                cycle_copy.row_value[row] = value
+                cycle_copy.value_row[value] = row
             # timeline_table
             cycle_copy.timeline_count = self.timeline_count
-            # cycle_copy.timeline_table = copy.deepcopy(self.timeline_table)
-            self.timeline_table.copy(cycle_copy.timeline_table)
+            self.timeline_table.copy(cycle_copy.timeline_table, cycle_copy.row_name)
             # properties
-            cycle_copy.properties = self.properties
+            cycle_copy.properties = copy.deepcopy(self.properties)
             cycle_copy.setProperties()
-            # cycle_copy.setCentralWidget(cycle_copy.timeline_table)
             return cycle_copy
         except Exception as e:
             print(f"error {e} happens in copy cycle. [cycle/main.py]")
