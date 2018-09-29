@@ -1,10 +1,10 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QComboBox, QStackedWidget, QListWidget, QPushButton, QLabel, QGroupBox, \
-    QHBoxLayout, QGridLayout, QVBoxLayout, QCompleter, QMessageBox
+    QHBoxLayout, QGridLayout, QVBoxLayout, QCompleter, QMessageBox, QListWidgetItem
 
+from center.iconTabs.events.deviceItem import DeviceInItem, DeviceOutItem
 from .deviceChooseDialog import DeviceOutDialog, DeviceInDialog
-from .deviceItem import DeviceOutItem, DeviceInItem
 
 
 class DurationPage(QWidget):
@@ -131,10 +131,10 @@ class DurationPage(QWidget):
     # 添加输入设备
     def selectIn(self, e):
         # 选中设备，默认为0号位置
-        temp = self.in_devices_dialog.devices_list.currentItem()
+        temp: QListWidgetItem = self.in_devices_dialog.devices_list.currentItem()
         if temp:
             device_name = temp.text()
-            device_type = temp.data(3)
+            device_type = temp.data(3)["Device type"]
             item = DeviceInItem(device_name, device_type)
             self.addInDevice(item)
             self.in_devices_dialog.close()
@@ -152,10 +152,11 @@ class DurationPage(QWidget):
 
     # 添加输出设备
     def selectOut(self, e):
-        temp = self.out_devices_dialog.devices_list.currentItem()
+        temp: QListWidgetItem = self.out_devices_dialog.devices_list.currentItem()
         if temp:
             device_name = temp.text()
-            device_type = temp.data(3)
+            device_type = temp.data(3)["Device type"]
+            device_port = temp.data(3)["Port"]
             item = DeviceOutItem(device_name, device_type)
             self.addOutDevice(item)
             self.out_devices_dialog.close()
