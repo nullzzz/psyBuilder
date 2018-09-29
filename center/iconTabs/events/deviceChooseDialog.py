@@ -32,14 +32,14 @@ class DeviceInDialog(QDialog):
         self.setLayout(layout)
 
     # 从菜单栏添加待选设备
-    # devices: list or tuple
+    # devices: dict
     # 图片名与设备名相同
-    def addDevices(self, devices):
-        for device_name, device_type in devices.items():
+    def addDevices(self, devices: dict):
+        for device_name, properties in devices.items():
             self.tip.hide()
             item = QListWidgetItem(device_name)
-            item.setData(3, device_type)
-            item.setIcon(QIcon("image/{}_device".format(device_type)))
+            item.setData(3, properties)
+            item.setIcon(QIcon("image/{}_device".format(properties["Device type"])))
             self.devices_list.addItem(item)
 
 
@@ -72,12 +72,12 @@ class DeviceOutDialog(QDialog):
         self.setLayout(layout)
 
     # 从菜单栏添加待选设备
-    # devices: list or tuple
+    # devices: dict
     # 图片名与设备名相同
-    def addDevices(self, devices):
-        for device_name, device_type in devices.items():
+    def addDevices(self, devices: dict):
+        for device_name, properties in devices.items():
             self.tip.hide()
             item = QListWidgetItem(device_name)
-            item.setData(3, device_type)
-            item.setIcon(QIcon("image/{}_device".format(device_type)))
+            item.setData(3, properties)
+            item.setIcon(QIcon("image/{}_device".format(properties["Device type"])))
             self.devices_list.addItem(item)

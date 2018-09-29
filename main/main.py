@@ -10,7 +10,7 @@ from attributes.main import Attributes
 from center.iconTabs.events.durationPage import DurationPage
 from center.iconTabs.events.progressBar import LoadingTip
 from center.main import Center
-from main.globalDevices import GlobalDevice
+from main.deviceSelection.globalDevices import GlobalDevice
 from output.main import Output
 from properties.main import Properties
 from structure.main import Structure
@@ -88,9 +88,9 @@ class MainWindow(QMainWindow):
         view_menu.addAction(self.default_action)
 
         # devices menu
-        self.input_devices = GlobalDevice(device_type=0)
+        self.input_devices = GlobalDevice(io_type=0)
         self.input_devices.setWindowModality(Qt.ApplicationModal)
-        self.output_devices = GlobalDevice(device_type=1)
+        self.output_devices = GlobalDevice(io_type=1)
         self.output_devices.setWindowModality(Qt.ApplicationModal)
         devices_menu = menu_bar.addMenu("&Devices")
 
