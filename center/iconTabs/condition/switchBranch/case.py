@@ -47,3 +47,9 @@ class Case(QGroupBox):
             self.delete_button.setDisabled(True)
         else:
             self.delete_button.setDisabled(False)
+
+    def canAdd(self):
+        return self.add_button.can_emit
+
+    def canDelete(self):
+        return self.delete_button.can_emit

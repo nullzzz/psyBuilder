@@ -51,15 +51,15 @@ class SwitchBranch(QWidget):
         self.setLayout(layout)
 
     def clickOk(self):
-        if self.clickApply():
-            self.close()
-            self.tabClose.emit(self)
+        self.clickApply()
+        self.close()
+        self.tabClose.emit(self)
 
     def clickCancel(self):
-        self.close()
+        # self.close()
         # 还原到初始设定
-        self.restoreIcons()
-        self.tabClose.emit(self)
+        self.restoreCases()
+        # self.tabClose.emit(self)
 
     def clickApply(self):
         try:
@@ -68,11 +68,21 @@ class SwitchBranch(QWidget):
             change_case_values = []
             keep_case_values = []
             names_validity = True
-            # 先检测当前所有
+            # 得到所有被删除的case的value，name
+            delete_case_values = []
+            delete_case_names = []
+            current_case_values = []
+            for case in self.case_area.cases:
+                current_case_values.append(case.icon_choose.icon.value)
+            for value in self.value_case_data:
+                if value not in current_case_values:
+                    delete_case_values.append(value)
+                    delete_case_names.append(self.value_case_data[value][1])
+            # 先检测当前所有name
             for case in self.case_area.cases:
                 name = case.icon_choose.icon_name.text()
                 if name:
-                    name_validity, tips = Structure.checkNameValidity(name, case.icon_choose.icon.value)
+                    name_validity, tips = Structure.checkNameValidity(name, case.icon_choose.icon.value, delete_names=delete_case_names)
                     if not name_validity:
                         names_validity = False
                         QMessageBox.information(self, 'Tips', f"{case.title()}' name has error---{tips}")
@@ -108,6 +118,8 @@ class SwitchBranch(QWidget):
                 # 处理修改的case
                 for change_case_value in change_case_values:
                     self.changeCase(change_case_value)
+                # backup
+                self.case_area.backup()
         except Exception as e:
             print("error {} happens in apply. [switchBranch/main.py]".format(e))
 
@@ -157,3 +169,9 @@ class SwitchBranch(QWidget):
 
     def showIconProperties(self, properties):
         self.iconPropertiesShow.emit(properties)
+
+    def restoreCases(self):
+        try:
+            self.case_area.restore()
+        except Exception as e:
+            print(f"error {e} happens in restore cases. [switchBranch/main.py]")

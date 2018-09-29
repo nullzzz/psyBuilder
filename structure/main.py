@@ -705,7 +705,7 @@ class Structure(QDockWidget):
             print(f"error {e} happens in check name is valid or not. [structure/main.py]")
 
     @staticmethod
-    def checkNameValidity(name: str, value=''):
+    def checkNameValidity(name: str, value='', delete_names=[]):
         try:
             # name不为空，空的情况应该在之前就排除
             # return: bool, tips
@@ -717,6 +717,8 @@ class Structure(QDockWidget):
                 else:
                     return False, "Name must start with letter."
             else:
+                if name in delete_names:
+                    return True, ''
                 return False, "You can't use existed name."
         except Exception as e:
             print(f"error {e} happens in check name's validity. [structure/main.py]")

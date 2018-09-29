@@ -2,16 +2,21 @@ from PyQt5.QtWidgets import QComboBox, QLabel, QGridLayout, QWidget, QScrollArea
 from PyQt5.QtCore import Qt, pyqtSignal
 
 from .case import Case
+import copy
 
 
 class CaseArea(QScrollArea):
     MAX_CASE_COUNT = 9
     caseAdd = pyqtSignal(Case)
+
     def __init__(self, parent=None):
         super(CaseArea, self).__init__(parent)
 
         # data
+        self.switch_value = ''
         self.cases = []
+        # case_num, [case{case title, case value, case icon value, case name}]
+        self.case_data_backup = {}
         case_1 = Case(title='Case 1', can_add=True, can_delete=False)
         case_2 = Case(title='Case 2', can_add=True, can_delete=False)
         case_3 = Case(title='Otherwise', can_add=False, can_delete=False)
@@ -21,22 +26,22 @@ class CaseArea(QScrollArea):
         self.cases.append(case_1)
         self.cases.append(case_2)
         self.cases.append(case_3)
-        self.switch = QComboBox(self)
+        self.switch = QComboBox()
 
         self.grid_layout = QGridLayout()
 
-        label = QLabel("Switch:")
-        label.setAlignment(Qt.AlignRight)
-        self.grid_layout.addWidget(label, 0, 0, 1, 1)
+        self.label = QLabel("Switch:")
+        self.label.setAlignment(Qt.AlignRight)
+        self.grid_layout.addWidget(self.label, 0, 0, 1, 1)
         self.grid_layout.addWidget(self.switch, 0, 1, 1, 1)
         self.grid_layout.addWidget(self.cases[0], 1, 0, 1, 1)
         self.grid_layout.addWidget(self.cases[1], 1, 1, 1, 1)
         self.grid_layout.addWidget(self.cases[2], 1, 2, 1, 1)
 
-        widget = QWidget()
-        widget.setLayout(self.grid_layout)
+        self.widget = QWidget()
+        self.widget.setLayout(self.grid_layout)
 
-        self.setWidget(widget)
+        self.setWidget(self.widget)
         self.setWidgetResizable(True)
 
     def linkCaseSignals(self, case: Case):
@@ -126,3 +131,37 @@ class CaseArea(QScrollArea):
             if btn in (self.cases[i].add_button, self.cases[i].delete_button):
                 return i
         return -1
+
+    def backup(self):
+        self.case_data_backup['case'] = []
+        for case in self.cases:
+            case_data = {}
+            case_data['case_title'] = case.title()
+            # case_data['case_value'] = case.case_comBox.currentText()
+            case_data['case_icon_value'] = case.icon_choose.icon.value
+            case_data['case_icon_name'] = case.icon_choose.icon_name.text()
+            case_data['can_add'] = case.canAdd()
+            case_data['can_delete'] = case.canDelete()
+            self.case_data_backup['case'].append(case_data)
+
+    def restore(self):
+        # 先删除所有case
+        for case in self.cases:
+            self.grid_layout.removeWidget(case)
+            case.hide()
+            self.widget.update()
+        self.cases.clear()
+        # 增加新case
+        cases = self.case_data_backup['case']
+        for index in range(len(cases)):
+            case = Case(title=cases[index]['case_title'], parent=None, can_add=cases[index]['can_add'],
+                        can_delete=cases[index]['can_delete'])
+
+            case.icon_choose.icon_comboBox.setCurrentText(cases[index]['case_icon_value'].split('.')[0])
+            case.icon_choose.icon.changeValue(cases[index]['case_icon_value'])
+            case.icon_choose.icon_name.setText(cases[index]['case_icon_name'])
+            self.cases.append(case)
+            row = index // 3 + 1
+            col = index % 3
+            self.grid_layout.addWidget(case, row, col, 1, 1)
+
