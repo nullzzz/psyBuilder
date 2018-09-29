@@ -261,7 +261,7 @@ class DiagramScene(QGraphicsScene):
         item.setTextCursor(cursor)
 
         # BUG
-        # if item.toPlainText():
+        # if Item.toPlainText():
         if not item.toPlainText():
             self.removeItem(item)
             item.deleteLater()
@@ -569,17 +569,17 @@ class Slider(QMainWindow):
     def createActions(self):
         self.toFrontAction = QAction(
             QIcon(':/images/bringtofront.png'), "Bring to &Front",
-            self, shortcut="Ctrl+F", statusTip="Bring item to front",
+            self, shortcut="Ctrl+F", statusTip="Bring Item to front",
             triggered=self.bringToFront)
 
         self.sendBackAction = QAction(
             QIcon(':/images/sendtoback.png'), "Send to &Back", self,
-            shortcut="Ctrl+B", statusTip="Send item to back",
+            shortcut="Ctrl+B", statusTip="Send Item to back",
             triggered=self.sendToBack)
 
         self.deleteAction = QAction(QIcon(':/images/delete.png'),
                                     "&Delete", self, shortcut="Delete",
-                                    statusTip="Delete item from diagram",
+                                    statusTip="Delete Item from diagram",
                                     triggered=self.deleteItem)
 
         self.exitAction = QAction("E&xit", self, shortcut="Ctrl+X",

@@ -4,11 +4,10 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDockWidget, QInputDialog, QMessageBox, QLineEdit
 
-from .structureItem import StructureItem
-from .structureTree import StructureTree
-
 from center.iconTabs.timeline.icon import Icon
 from getImage import getImage
+from .structureItem import StructureItem
+from .structureTree import StructureTree
 
 
 class Structure(QDockWidget):
@@ -263,20 +262,20 @@ class Structure(QDockWidget):
         except Exception as e:
             print(f"error {e} happens in move node in structure. [structure.main.py]")
 
-    # def renameNode(self, item):
+    # def renameNode(self, Item):
     #     try:
     #         dialog = QInputDialog()
     #         dialog.setModal(True)
     #         dialog.setWindowFlag(Qt.WindowCloseButtonHint)
-    #         name = item.text(0)
+    #         name = Item.text(0)
     #         extend = ''
-    #         if item.value != 'Timeline.10001':
-    #             if item.parent().value.startswith('If_else'):
+    #         if Item.value != 'Timeline.10001':
+    #             if Item.parent().value.startswith('If_else'):
     #                 extend = name[0:4]
     #                 name = name[4:]
     #             text, flag = dialog.getText(None, "Rename", "Rename {} to :".format(name), QLineEdit.Normal, name)
     #             # 检测rename
-    #             res, exist_value, old_exist_value = Structure.checkNameIsValid(text, item.parent().value, item.value)
+    #             res, exist_value, old_exist_value = Structure.checkNameIsValid(text, Item.parent().value, Item.value)
     #             whether_change = False
     #             if res == 0:
     #                 QMessageBox.information(self, "Warning", "sorry, you can't use this name.")
@@ -286,21 +285,21 @@ class Structure(QDockWidget):
     #                 if QMessageBox.question(self, 'Tips', 'name has existed in other place, are you sure to change?',
     #                                         QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
     #                     whether_change = True
-    #                     self.nodeWidgetMerge.emit(item.value, exist_value)
+    #                     self.nodeWidgetMerge.emit(Item.value, exist_value)
     #             # todo split widget
     #             elif res == 3:
     #                 whether_change = True
-    #                 self.nodeWidgetSplit.emit(item.value, old_exist_value)
+    #                 self.nodeWidgetSplit.emit(Item.value, old_exist_value)
     #             elif res == 4:
     #                 if QMessageBox.question(self, 'Tips', 'name has existed in other place, are you sure to change?',
     #                                         QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
     #                     whether_change = True
     #                     # 好像不需要去断开之前的连接
-    #                     self.nodeWidgetMerge.emit(item.value, exist_value)
+    #                     self.nodeWidgetMerge.emit(Item.value, exist_value)
     #             if whether_change:
     #                 if flag and text:
     #                     text = extend + text
-    #                     self.changeNodeName(item.parent().value, item.value, text)
+    #                     self.changeNodeName(Item.parent().value, Item.value, text)
     #     except Exception as e:
     #         print("error {} happens in rename node in structure. [structure/main.py]".format(e))
 

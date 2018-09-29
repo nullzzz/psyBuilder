@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction, QInputDialog, QLineEdit, QShortcut, QMessageBox
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction, QShortcut
+
 from .structureItem import StructureItem
 
 
@@ -11,7 +12,7 @@ class StructureTree(QTreeWidget):
     # 发送到main(parent.value, value)
     timelineDelete = pyqtSignal(str, str)
     itemInIfBranchDelete = pyqtSignal(str, str)
-    # (item)
+    # (Item)
     itemNameChange = pyqtSignal(StructureItem)
 
     def __init__(self, parent=None):
@@ -47,7 +48,7 @@ class StructureTree(QTreeWidget):
                     if parent.value.startswith('If_else'):
                         self.itemInIfBranchDelete.emit(parent.value, item.value)
         except Exception:
-            print("some errors happen in delete structure item. (structureTree.py)")
+            print("some errors happen in delete structure Item. (structureTree.py)")
 
     def renameItem(self):
         try:

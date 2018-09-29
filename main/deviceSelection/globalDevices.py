@@ -100,7 +100,7 @@ class GlobalDevice(QWidget):
             self.describe.setCurrentIndex(index)
 
     def reName(self, item):
-        name: str = item.text
+        name: str = item.text()
         item_name: str = name.lower()
         text, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
         if ok and text != '':

@@ -326,11 +326,11 @@ listView = """
     show-decoration-selected: 1; /* make the selection span the entire width of the view */
     }
     
-    QListView::item {
+    QListView::Item {
         min-width:80px;
     }
     
-    QListView::item:hover {
+    QListView::Item:hover {
         background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                     stop: 0 #FAFBFE, stop: 1 #aad4fe);
     }
@@ -344,15 +344,15 @@ headerView = """
 """
 
 tree = """
-    QTreeView::branch:has-siblings:!adjoins-item {
+    QTreeView::branch:has-siblings:!adjoins-Item {
         border-image: url(image/vline.png) 0;
     }
     
-    QTreeView::branch:has-siblings:adjoins-item {
+    QTreeView::branch:has-siblings:adjoins-Item {
         border-image: url(image/branch-more.png) 0;
     }
     
-    QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    QTreeView::branch:!has-children:!has-siblings:adjoins-Item {
         border-image: url(image/branch-end.png) 0;
     }
     
@@ -376,12 +376,12 @@ menu = """
     margin: 2px; /* some spacing around the menu */
 }
 
-QMenu::item {
+QMenu::Item {
     padding: 2px 25px 2px 20px;
     border: 0.5px solid gray; /* reserve space for selection border */
 }
 
-QMenu::item:selected {
+QMenu::Item:selected {
     border-color: black;
     background: rgba(135,206,250);
 }
