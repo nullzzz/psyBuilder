@@ -129,8 +129,8 @@ class IconTabs(QTabWidget):
                 switch.iconPropertiesShow.disconnect(self.showIconPropertiesInBranch)
                 switch.iconPropertiesShow.connect(self.showIconPropertiesInBranch)
             except Exception:
-                switch.caseAdd.connect(self.createTabForItemInBranch)
                 switch.iconPropertiesShow.connect(self.showIconPropertiesInBranch)
+                switch.caseAdd.connect(self.createTabForItemInBranch)
                 switch.caseTabDelete.connect(self.deleteTab)
         except Exception as e:
             print(f"error {e} happens in link switch branch signals. [iconTabs/main.py]")
@@ -527,13 +527,11 @@ class IconTabs(QTabWidget):
             old_widget = self.value_widget[old_value]
             widget_type = old_value.split('.')[0]
             try:
-                # todo 各个widget的复制, 在各个widget的内部实现
                 print(f"I am copying {widget_type} widget.")
                 if hasattr(old_widget, 'copy'):
                     self.value_widget[new_value] = old_widget.copy(new_value)
                 elif hasattr(old_widget, 'clone'):
                     self.value_widget[new_value] = old_widget.clone()
-                # todo switch
                 # 通用属性连接(propertiesChange, tabClose)
                 if not new_value.startswith('Timeline.'):
                     self.value_widget[new_value].propertiesChange.connect(self.getChangedProperties)

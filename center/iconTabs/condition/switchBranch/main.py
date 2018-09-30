@@ -29,6 +29,7 @@ class SwitchBranch(QWidget):
         #
         self.case_area = CaseArea(self)
         self.case_area.caseAdd.connect(self.linkCaseSignals)
+        self.case_area.linkOrinalCase()
         # icon_value : [case, name, properties_window, (case var)]
         self.value_case_data = {}
 
@@ -51,9 +52,9 @@ class SwitchBranch(QWidget):
         self.setLayout(layout)
 
     def clickOk(self):
-        self.clickApply()
-        self.close()
-        self.tabClose.emit(self)
+        if self.clickApply():
+            self.close()
+            self.tabClose.emit(self)
 
     def clickCancel(self):
         self.close()
@@ -120,6 +121,9 @@ class SwitchBranch(QWidget):
                     self.changeCase(change_case_value)
                 # backup
                 self.case_area.backup()
+                return True
+            else:
+                return False
         except Exception as e:
             print("error {} happens in apply. [switchBranch/main.py]".format(e))
 

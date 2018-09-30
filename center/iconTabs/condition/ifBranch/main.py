@@ -299,4 +299,14 @@ class IfBranch(QWidget):
 
     # todo copy ifBranch
     def copy(self, value):
-        pass
+        try:
+            if_branch_copy = IfBranch(value=value)
+            # widget
+            self.condition_area.copy(if_branch_copy.condition_area)
+            self.true_icon_choose.copy(if_branch_copy.true_icon_choose)
+            self.false_icon_choose.copy(if_branch_copy.false_icon_choose)
+            # data (type_value[value, name, properties_window])
+
+            return if_branch_copy
+        except Exception as e:
+            print(f"error {e} happens in copy if branch. [ifBranch/main.py]")

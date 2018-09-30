@@ -117,3 +117,5 @@ class ConditionArea(QWidget):
                 return i
         return -1
 
+    def copy(self, condition_area_copy):
+        pass

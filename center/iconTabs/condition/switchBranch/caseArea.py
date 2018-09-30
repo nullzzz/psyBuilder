@@ -18,15 +18,15 @@ class CaseArea(QScrollArea):
         # case_num, [case{case title, case value, case icon value, case name}]
         self.case_data_backup = {}
 
-        case_1 = Case(title='Case 1', can_add=True, can_delete=False)
-        case_2 = Case(title='Case 2', can_add=True, can_delete=False)
-        case_3 = Case(title='Otherwise', can_add=False, can_delete=False)
-        self.linkCaseSignals(case_1)
-        self.linkCaseSignals(case_2)
-        self.linkCaseSignals(case_3)
-        self.cases.append(case_1)
-        self.cases.append(case_2)
-        self.cases.append(case_3)
+        self.case_1 = Case(title='Case 1', can_add=True, can_delete=False)
+        self.case_2 = Case(title='Case 2', can_add=True, can_delete=False)
+        self.case_3 = Case(title='Otherwise', can_add=False, can_delete=False)
+        self.linkCaseSignals(self.case_1)
+        self.linkCaseSignals(self.case_2)
+        self.linkCaseSignals(self.case_3)
+        self.cases.append(self.case_1)
+        self.cases.append(self.case_2)
+        self.cases.append(self.case_3)
         self.switch = QComboBox()
 
         self.grid_layout = QGridLayout()
@@ -44,6 +44,11 @@ class CaseArea(QScrollArea):
 
         self.setWidget(self.widget)
         self.setWidgetResizable(True)
+
+    def linkOrinalCase(self):
+        self.caseAdd.emit(self.case_1)
+        self.caseAdd.emit(self.case_2)
+        self.caseAdd.emit(self.case_3)
 
     def linkCaseSignals(self, case: Case):
         case.add_button.clicked.connect(self.insertCase)

@@ -287,7 +287,6 @@ class Structure(QDockWidget):
     #                                         QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
     #                     whether_change = True
     #                     self.nodeWidgetMerge.emit(Item.value, exist_value)
-    #             # todo split widget
     #             elif res == 3:
     #                 whether_change = True
     #                 self.nodeWidgetSplit.emit(Item.value, old_exist_value)
@@ -384,7 +383,6 @@ class Structure(QDockWidget):
                 # cycle中timeline
                 elif parent_value.startswith('Cycle.'):
                     self.timelineNameChange.emit(parent_value, value, name)
-                # todo switch
                 # if branch中的icon
                 elif parent_value.startswith('If_else.'):
                     self.itemInIfBranchNameChange.emit(parent_value, value, name)
