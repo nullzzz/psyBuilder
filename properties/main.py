@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QDockWidget, QComboBox, QTextEdit, QGridLayout
+from PyQt5.QtWidgets import QWidget, QDockWidget, QTextEdit, QGridLayout
+
 from .propertiesTable import PropertiesTable
 
 
@@ -14,16 +15,16 @@ class Properties(QDockWidget):
         super(Properties, self).__init__(parent)
         # widget
         self.my_widget = MyWidget(self)
-        self.combo = QComboBox(self.my_widget)
+        # self.combo = QComboBox(self.my_widget)
         self.properties_table = PropertiesTable(self.my_widget)
         self.text_edit = QTextEdit()
         self.text_edit.setMaximumHeight(100)
 
         grid = QGridLayout(self.my_widget)
 
-        grid.addWidget(self.combo, 0, 0, 1, 1)
-        grid.addWidget(self.properties_table, 1, 0, 1, 1)
-        grid.addWidget(self.text_edit, 2, 0, 1, 1)
+        # grid.addWidget(self.combo, 0, 0, 1, 1)
+        grid.addWidget(self.properties_table, 0, 0, 1, 1)
+        # grid.addWidget(self.text_edit, 1, 0, 1, 1)
 
         self.my_widget.setLayout(grid)
         self.setWidget(self.my_widget)

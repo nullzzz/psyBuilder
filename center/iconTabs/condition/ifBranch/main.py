@@ -1,11 +1,10 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QGridLayout, QVBoxLayout, QMessageBox, QHBoxLayout
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QVBoxLayout, QMessageBox, QHBoxLayout
 
 from center.iconTabs.condition.iconChoose import IconChoose
 from center.iconTabs.condition.ifBranch.conditionArea import ConditionArea
 from getImage import getImage
-
 from structure.main import Structure
 
 
@@ -280,7 +279,7 @@ class IfBranch(QWidget):
                 self.type_value['F'] = ['Other.10002', '', {}]
 
         except Exception as e:
-            print("error {} happens in delete item. [ifBranch/main.py]".format(e))
+            print("error {} happens in delete Item. [ifBranch/main.py]".format(e))
 
     def changeItemName(self, value, name):
         try:
@@ -293,7 +292,7 @@ class IfBranch(QWidget):
                 self.false_icon_choose.icon_name.setText(name[4:])
                 self.type_value['F'][1] = name[4:]
         except Exception as e:
-            print("error {} happens in change item name. [ifBranch/main.py]".format(e))
+            print("error {} happens in change Item name. [ifBranch/main.py]".format(e))
 
     def showIconProperties(self, properties):
         self.iconPropertiesShow.emit(properties)

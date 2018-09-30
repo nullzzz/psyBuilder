@@ -1,11 +1,12 @@
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMenu, QFrame, QAction, QLabel, QMessageBox, QShortcut
 from PyQt5.QtCore import Qt, QDataStream, QIODevice, QByteArray, QPoint, QMimeData
-from PyQt5.QtGui import QDrag, QPixmap, QKeySequence
 from PyQt5.QtCore import pyqtSignal
-from ..icon import Icon
-from .signTable import SignTable
+from PyQt5.QtGui import QDrag, QPixmap, QKeySequence
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMenu, QFrame, QAction, QLabel, QMessageBox, QShortcut
+
 from noDash import NoDash
 from structure.main import Structure
+from .signTable import SignTable
+from ..icon import Icon
 
 
 class IconTable(QTableWidget):
@@ -368,12 +369,12 @@ class IconTable(QTableWidget):
         self.iconDoubleClicked.emit(value, name)
 
     # 更改event name
-    # def changIconName(self, item: QTableWidgetItem):
+    # def changIconName(self, Item: QTableWidgetItem):
     #     try:
     #         if self.is_edit:
-    #             if item.text():
-    #                 res, exist_value, old_exist_value = Structure.checkNameIsValid(item.text(), self.parent_timeline_value,
-    #                                                               self.cellWidget(1, item.column()).value)
+    #             if Item.text():
+    #                 res, exist_value, old_exist_value = Structure.checkNameIsValid(Item.text(), self.parent_timeline_value,
+    #                                                               self.cellWidget(1, Item.column()).value)
     #                 whether_change = True
     #                 if res == 0:
     #                     whether_change = False
@@ -384,31 +385,31 @@ class IconTable(QTableWidget):
     #                     if QMessageBox.question(self, 'Tips',
     #                                             'name has existed in other place, are you sure to change?',
     #                                             QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-    #                         value = self.cellWidget(1, item.column()).value
+    #                         value = self.cellWidget(1, Item.column()).value
     #                         self.iconWidgetMerge.emit(value, exist_value)
     #                     else:
     #                         whether_change = False
     #                 # todo split widget
     #                 elif res == 3:
-    #                     self.iconWidgetSplit.emit(self.cellWidget(1, item.column()).value, old_exist_value)
+    #                     self.iconWidgetSplit.emit(self.cellWidget(1, Item.column()).value, old_exist_value)
     #                 elif res == 4:
     #                     if QMessageBox.question(self, 'Tips',
     #                                             'name has existed in other place, are you sure to change?',
     #                                             QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-    #                         value = self.cellWidget(1, item.column()).value
+    #                         value = self.cellWidget(1, Item.column()).value
     #                         self.iconWidgetMerge.emit(value, exist_value)
     #                     else:
     #                         whether_change = False
     #                 if whether_change:
-    #                     self.cellWidget(1, item.column()).setName(item.text())
+    #                     self.cellWidget(1, Item.column()).setName(Item.text())
     #                     # 发送value和更改后的name
-    #                     self.iconNameChange.emit(self.cellWidget(1, item.column()).value, item.text())
+    #                     self.iconNameChange.emit(self.cellWidget(1, Item.column()).value, Item.text())
     #                 else:
     #                     # 还原为原来的name
-    #                     item.setText(self.old_name)
+    #                     Item.setText(self.old_name)
     #             else:
     #                 QMessageBox.information(self, "Tips", "name can't be none")
-    #                 item.setText(self.old_name)
+    #                 Item.setText(self.old_name)
     #             self.is_edit = False
     #     except Exception as e:
     #         print(f"error {e} happens in change icon name. [iconArea/iconTable.py]")

@@ -95,9 +95,10 @@ class SelectArea(QListWidget):
     def delItem(self, index):
         del_item = self.takeItem(index)
         self.parameters.removeWidget(del_item.parameter)
-        item_name = del_item.text()
+        item_name: str = del_item.text()
         if item_name in self.default_properties.keys():
             self.default_properties.pop(item_name)
+        self.device_name.remove(item_name.lower())
 
     def clearAll(self):
         for i in range(self.count()-1, -1, -1):
@@ -124,10 +125,11 @@ class SelectArea(QListWidget):
         for k, v in self.device_count.items():
             self.setProperty(k, v)
         for i in range(self.count()):
-            self.default_properties[self.item(i).text()] = self.item(i).getInfo()
-            print(self.item(i).getInfo())
+            # 我也不知道为什么要加copy，不加的话
+            key = self.item(i).text()
+            info = self.item(i).getInfo()
+            self.default_properties[key] = info.copy()
             # {设备名： {设备名：“”， 设备类型： “”}}
-        print(self.default_properties)
         return self.default_properties
 
     def setDeviceCount(self, device_count: dict):
@@ -175,6 +177,5 @@ class SelectArea(QListWidget):
         area_clone.setDeviceCount(self.device_count)
         for i in range(self.count()):
             item = self.item(i)
-            # print(item)
             area_clone.addItem(item.clone())
         return area_clone

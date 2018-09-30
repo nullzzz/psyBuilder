@@ -10,11 +10,12 @@ class OutputDevice(QListWidgetItem):
     def __init__(self, device_type: str, name: str, parent=None):
         super(OutputDevice, self).__init__(name, parent)
         self.item_type = device_type
+        self.item_name = name
         self.setIcon(QIcon("image/{}_device.png".format(self.item_type)))
 
         self.default_properties = {
             "Device type": self.item_type,
-            "Device name": name,
+            "Device name": self.item_name,
             "Port": "127.0.0.1"
         }
 
@@ -23,6 +24,7 @@ class OutputDevice(QListWidgetItem):
         self.port = "127.0.0.1"
         self.port_line = QLineEdit()
         self.port_line.setText(self.port)
+        self.port_line.textChanged.connect(self.setPort)
         lay = QFormLayout()
         lay.addRow("Type:", QLabel(self.item_type))
         lay.addRow("Name:", self.name_label)
@@ -34,6 +36,7 @@ class OutputDevice(QListWidgetItem):
 
     def setName(self, name: str):
         self.setText(name)
+        self.item_name = name
         self.name_label.setText(name)
 
     def getPort(self):

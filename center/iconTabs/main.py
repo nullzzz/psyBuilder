@@ -442,7 +442,7 @@ class IconTabs(QTabWidget):
                 widget.pro.cancel_bt.clicked.connect(widget.pro.close)
                 widget.pro.apply_bt.clicked.connect(widget.apply)
         except Exception as e:
-            print("error {} happens in create tab for item in if branch.[iconTabs/main.py]".format(e))
+            print("error {} happens in create tab for Item in if branch.[iconTabs/main.py]".format(e))
 
     def closeTab(self, widget=None, index=-1):
         try:

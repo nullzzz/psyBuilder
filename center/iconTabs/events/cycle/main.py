@@ -1,18 +1,17 @@
+import copy
+
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
 from PyQt5.QtWidgets import QAction, QMainWindow, QInputDialog, QTableWidgetItem, QMessageBox, QMenu, QApplication, \
     QShortcut
 
 from center.iconTabs.timeline.icon import Icon
+from getImage import getImage
+from structure.main import Structure
 from .colAdd import ColAdd
 from .colsAdd import ColsAdd
 from .properties.property import Property
 from .timelineTable import TimelineTable
-
-from structure.main import Structure
-from getImage import getImage
-
-import copy
 
 
 class Cycle(QMainWindow):
@@ -235,9 +234,9 @@ class Cycle(QMainWindow):
     #     try:
     #         if col == 1:
     #             # new timeline
-    #             item = self.timeline_table.item(row, col)
+    #             Item = self.timeline_table.Item(row, col)
     #             if row not in self.row_value:
-    #                 name = item.text()
+    #                 name = Item.text()
     #                 if name:
     #                     res, exist_value, old_exist_value = Structure.checkNameIsValid(name, self.value, 'Timeline.')
     #                     flag = False
@@ -268,7 +267,7 @@ class Cycle(QMainWindow):
     #                             self.timelineWidgetMerge.emit(timeline_icon.value, exist_value)
     #             # change timeline name
     #             else:
-    #                 name = item.text()
+    #                 name = Item.text()
     #                 value = self.row_value[row]
     #                 if name:
     #                     res, exist_value, old_exist_value = Structure.checkNameIsValid(name, self.value, value)
