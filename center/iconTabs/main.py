@@ -371,6 +371,8 @@ class IconTabs(QTabWidget):
                         except Exception:
                             print("row may be out. [iconTabs/main.py]")
 
+                widget = self.value_widget[value]
+                del widget
                 del self.value_widget[value]
         except Exception:
             print("error happens delete {} tab. [iconTabs/main.py]".format(value.split('.')[0]))
