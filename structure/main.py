@@ -21,6 +21,7 @@ class Structure(QDockWidget):
     iconNameChange = pyqtSignal(str, str, str)
     #
     itemInIfBranchNameChange = pyqtSignal(str, str, str)
+    itemInSwitchBranchNameChange = pyqtSignal(str, str, str)
     # 单击node, 显示properties
     propertiesShow = pyqtSignal(str)
     # 发送到icon tabs (value, exist_value)
@@ -387,6 +388,8 @@ class Structure(QDockWidget):
                 # if branch中的icon
                 elif parent_value.startswith('If_else.'):
                     self.itemInIfBranchNameChange.emit(parent_value, value, name)
+                elif parent_value.startswith('Switch.'):
+                    self.itemInSwitchBranchNameChange.emit(parent_value, value, name)
         except Exception as e:
             print("error {} happens in change node name. [structure/main.py]".format(e))
 

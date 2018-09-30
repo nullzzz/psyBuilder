@@ -17,6 +17,7 @@ class CaseArea(QScrollArea):
         self.cases = []
         # case_num, [case{case title, case value, case icon value, case name}]
         self.case_data_backup = {}
+
         case_1 = Case(title='Case 1', can_add=True, can_delete=False)
         case_2 = Case(title='Case 2', can_add=True, can_delete=False)
         case_3 = Case(title='Otherwise', can_add=False, can_delete=False)

@@ -414,6 +414,21 @@ class IconTabs(QTabWidget):
         except Exception as e:
             print("error {} happens in change condition item name. [iconTabs/main.py]".format(e))
 
+    def deleteItemInSwitchBranch(self, parent_value, value):
+        try:
+            switch:SwitchBranch = self.value_widget[parent_value]
+            switch.deleteAndClearCase(value)
+        except Exception as e:
+            print(f"error {e} happens in delete case. [iconTabs/main.py]")
+
+    def changeItemInSwitchBranchName(self, parent_value, value, name):
+        try:
+            switch:SwitchBranch = self.value_widget[parent_value]
+            switch.changeCaseName(value, name)
+        except Exception as e:
+            print(f"error {e} happens in change case name. [iconTabs/main.py]")
+
+
     def showIconPropertiesInBranch(self, properties):
         self.propertiesShow.emit(properties)
 

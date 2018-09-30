@@ -12,6 +12,7 @@ class StructureTree(QTreeWidget):
     # 发送到main(parent.value, value)
     timelineDelete = pyqtSignal(str, str)
     itemInIfBranchDelete = pyqtSignal(str, str)
+    itemInSwitchBranchDelete = pyqtSignal(str, str)
     # (Item)
     itemNameChange = pyqtSignal(StructureItem)
 
@@ -47,6 +48,8 @@ class StructureTree(QTreeWidget):
                         self.timelineDelete.emit(parent.value, item.value)
                     if parent.value.startswith('If_else'):
                         self.itemInIfBranchDelete.emit(parent.value, item.value)
+                    if parent.value.startswith('Switch'):
+                        self.itemInSwitchBranchDelete.emit(parent.value, item.value)
         except Exception:
             print("some errors happen in delete structure Item. (structureTree.py)")
 

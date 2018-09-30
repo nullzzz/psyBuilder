@@ -56,10 +56,10 @@ class SwitchBranch(QWidget):
         self.tabClose.emit(self)
 
     def clickCancel(self):
-        # self.close()
+        self.close()
         # 还原到初始设定
         self.restoreCases()
-        # self.tabClose.emit(self)
+        self.tabClose.emit(self)
 
     def clickApply(self):
         try:
@@ -175,3 +175,51 @@ class SwitchBranch(QWidget):
             self.case_area.restore()
         except Exception as e:
             print(f"error {e} happens in restore cases. [switchBranch/main.py]")
+
+    def deleteAndClearCase(self, value):
+        try:
+            # 把case变成空，不去删除了，删除太麻烦
+            case_to_delete = None
+            for case in self.case_area.cases:
+                if case.icon_choose.icon.value == value:
+                    case_to_delete = case
+            if case_to_delete:
+                case_to_delete.icon_choose.icon_comboBox.setCurrentText('None')
+                # 删除数据
+                case_title = case_to_delete.title()
+                case_icon_value = case_to_delete.icon_choose.icon.value
+                case_icon_name = case_to_delete.icon_choose.icon_name.text()
+                index = -1
+                try:
+                    index = int(case_title.split(' ')[1]) - 1
+                except Exception:
+                    pass
+                self.case_area.case_data_backup['case'][index]['case_title'] = case_title
+                self.case_area.case_data_backup['case'][index]['case_icon_value'] = case_icon_value
+                self.case_area.case_data_backup['case'][index]['case_icon_name'] = case_icon_name
+                del self.value_case_data[value]
+        except Exception as e:
+            print(f"error {e} happens in delete and clear case. [switchBranch/main.py]")
+
+    def changeCaseName(self, value, name):
+        try:
+            case_to_change = None
+            for case in self.case_area.cases:
+                if case.icon_choose.icon.value == value:
+                    case_to_change = case
+            if case_to_change:
+                case_to_change.icon_choose.icon_name.setText(name)
+                # 相关数据
+                self.value_case_data[value][1] = name
+                index = -1
+                try:
+                    index = int(case_to_change.title().split(' ')[1]) - 1
+                except Exception:
+                    pass
+                self.case_area.case_data_backup['case'][index]['case_icon_name'] = name
+        except Exception as e:
+            print(f"error {e} happens in change case name. [switchBranch/main.py]")
+
+    # todo copy
+    def copy(self, value):
+        pass
