@@ -11,8 +11,8 @@ from structure.main import Structure
 class IfBranch(QWidget):
     tabClose = pyqtSignal(QWidget)
     propertiesChange = pyqtSignal(dict)
-    # 发送给structure, iconTabs (self.value, name, pixmap, value, properties window)
-    nodeAdd = pyqtSignal(str, str, QPixmap, str, QWidget)
+    # 发送给structure, iconTabs (self.value, name, pixmap, value, properties window, condition_type)
+    nodeAdd = pyqtSignal(str, str, QPixmap, str, QWidget, str)
     # (self.value, value)
     nodeDelete = pyqtSignal(str, str)
     # (parent_value, value, name)
@@ -159,7 +159,7 @@ class IfBranch(QWidget):
                 if self.checkIconName(current_name, self.value, current_value, condition_type):
                     self.nodeAdd.emit(self.value, current_name,
                                       getImage(current_value.split('.')[0], 'pixmap'),
-                                      current_value, current_properties_window)
+                                      current_value, current_properties_window, condition_type)
                     self.type_value[condition_type][0] = current_value
                     self.type_value[condition_type][1] = current_name
                     self.type_value[condition_type][2] = current_properties_window
@@ -172,7 +172,7 @@ class IfBranch(QWidget):
                     # 名字改变了
                     if self.type_value[condition_type][1] != current_name:
                         if self.checkIconName(current_name, self.value, current_value, condition_type):
-                            self.nodeNameChange.emit(self.value, current_value, f'[{condition_type}] '+ current_name)
+                            self.nodeNameChange.emit(self.value, current_value, current_name)
                         else:
                             has_error = True
                     # 名字没变
@@ -187,9 +187,8 @@ class IfBranch(QWidget):
                         self.type_value[condition_type] = [other_value, '', None]
                     # add new
                     if self.checkIconName(current_name, self.value, current_value, condition_type):
-                        self.nodeAdd.emit(self.value, "[" + condition_type + "] " + current_name,
-                                          getImage(current_value.split('.')[0], 'pixmap'),
-                                          current_value, current_properties_window)
+                        self.nodeAdd.emit(self.value, current_name, getImage(current_value.split('.')[0], 'pixmap'),
+                                          current_value, current_properties_window, condition_type)
                         self.type_value[condition_type][0] = current_value
                         self.type_value[condition_type][1] = current_name
                         self.type_value[condition_type][2] = current_properties_window
@@ -285,28 +284,41 @@ class IfBranch(QWidget):
         try:
             # true
             if value == self.type_value['T'][0]:
-                self.true_icon_choose.icon_name.setText(name[4:])
-                self.type_value['T'][1] = name[4:]
+                self.true_icon_choose.icon_name.setText(name)
+                self.type_value['T'][1] = name
             # false
             elif value == self.type_value['F'][0]:
-                self.false_icon_choose.icon_name.setText(name[4:])
-                self.type_value['F'][1] = name[4:]
+                self.false_icon_choose.icon_name.setText(name)
+                self.type_value['F'][1] = name
         except Exception as e:
             print("error {} happens in change Item name. [ifBranch/main.py]".format(e))
 
     def showIconProperties(self, properties):
         self.iconPropertiesShow.emit(properties)
 
-    # todo copy ifBranch
+    # todo copy ifBranch (copy condition area)
     def copy(self, value):
         try:
             if_branch_copy = IfBranch(value=value)
-            # widget
-            self.condition_area.copy(if_branch_copy.condition_area)
-            self.true_icon_choose.copy(if_branch_copy.true_icon_choose)
-            self.false_icon_choose.copy(if_branch_copy.false_icon_choose)
             # data (type_value[value, name, properties_window])
-
+            if not self.type_value['T'][0].startswith('Other.'):
+                # icon_name, icon_value
+                icon_name, icon_value = Structure.getNameAndValueInIfBranchByParent(value, 'T')
+                if_branch_copy.type_value['T'][0] = icon_value
+                if_branch_copy.type_value['T'][1] = icon_name
+                if_branch_copy.true_icon_choose.icon_comboBox.setCurrentText(icon_value.split('.')[0])
+                if_branch_copy.true_icon_choose.icon.changeValue(icon_value)
+                if_branch_copy.true_icon_choose.icon_name.setText(icon_name)
+                if_branch_copy.true_icon_choose.properties_window.setProperties(self.type_value['T'][2].getInfo())
+                if_branch_copy.type_value['T'][2] = if_branch_copy.true_icon_choose.properties_window
+            if not self.type_value['F'][0].startswith('Other.'):
+                icon_name, icon_value = Structure.getNameAndValueInIfBranchByParent(value, 'F')
+                if_branch_copy.type_value['F'][0], if_branch_copy.type_value['F'][1] = icon_value, icon_name
+                if_branch_copy.true_icon_choose.icon_comboBox.setCurrentText(icon_value.split('.')[0])
+                if_branch_copy.true_icon_choose.icon.changeValue(icon_value)
+                if_branch_copy.true_icon_choose.icon_name.setText(icon_name)
+                if_branch_copy.true_icon_choose.properties_window.setProperties(self.type_value['F'][2].getInfo())
+                if_branch_copy.type_value['F'][2] = if_branch_copy.true_icon_choose.properties_window
             return if_branch_copy
         except Exception as e:
             print(f"error {e} happens in copy if branch. [ifBranch/main.py]")

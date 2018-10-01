@@ -159,7 +159,7 @@ class IconArea(QFrame):
                 widget_type = old_value.split('.')[0]
                 self.icon_table.cellWidget(1, self.icon_table.fill_count).changeType(widget_type)
                 new_value = self.icon_table.cellWidget(1, self.icon_table.fill_count).value
-                text = Structure.getName(new_value, text, True, text)
+                text = Structure.getValidName(new_value, old_name=text, is_copy=True)
                 self.icon_table.setText(3, self.icon_table.fill_count, text)
                 # 给timeLine发射信号
                 self.iconAdd.emit(text, pixmap, new_value)

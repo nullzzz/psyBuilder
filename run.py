@@ -17,13 +17,9 @@ tabBar = """
         border: 0px transparent black;
     }
 
-    QTabWidget::tab {
-        text-align: left;
-    }
-
     QTabBar::tab{
         min-height: 30px; 
-        min-width: 100px;
+        min-width: 150px;
     }
 
     QTabBar::close-button  {

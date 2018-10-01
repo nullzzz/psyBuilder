@@ -130,6 +130,3 @@ class IconChoose(QWidget):
 
     def cancel(self):
         self.properties_window.close()
-
-    def copy(self, icon_choose_copy):
-        pass

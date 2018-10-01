@@ -55,6 +55,7 @@ class IconTabs(QTabWidget):
         tab_icon = QIcon("image/timeLine.png")
         self.addTab(self.timeline, tab_icon, "Timeline")
         self.tabBar().setShape(QTabBar.TriangularNorth)
+        self.tabBar().setUsesScrollButtons(True)
         # 右键菜单及快捷键
         self.setMenuAndShortcut()
         # 连接信号
@@ -434,6 +435,7 @@ class IconTabs(QTabWidget):
 
     def createTabForItemInBranch(self, parent_value, name, pixmap, value, properties_window):
         try:
+            print(name)
             self.openTab(value, name, False)
             widget = self.value_widget[value]
             if value.startswith('Video'):

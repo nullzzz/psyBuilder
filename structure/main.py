@@ -153,18 +153,20 @@ class Structure(QDockWidget):
     #     except Exception as e:
     #         print(f"error {e} happens in add node in structure. [structure/main.py]")
 
-    def addNode(self, parent_value='Timeline.10001', text="node", pixmap=None, value:str="", properties_window=None):
+    def addNode(self, parent_value='Timeline.10001', text="node", pixmap=None, value:str="", properties_window=None, condition_type=''):
         try:
             if parent_value in Structure.value_node:
                 parent = Structure.value_node[parent_value]
                 node = StructureItem(parent, value)
-                node.setText(0, text)
+                name = text
+                # TODO 涉及If_else
+                if parent_value.startswith('If_else'):
+                    name = f'[{condition_type}] ' + text
+                node.setText(0, name)
                 node.setIcon(0, QIcon(pixmap))
                 parent.setExpanded(True)
                 # 相关字典数据
                 Structure.value_node[value] = node
-                if parent_value.startswith('If_else'):
-                    text = text[4:]
                 Structure.name_value[text] = value
                 # 名称计数
                 self.addCount(value.split('.')[0])
@@ -305,14 +307,14 @@ class Structure(QDockWidget):
 
     def renameNode(self, item):
         try:
+            # 传出去的name也是不带前缀的
             dialog = QInputDialog()
             dialog.setModal(True)
             dialog.setWindowFlag(Qt.WindowCloseButtonHint)
             name = item.text(0)
-            extend = ''
             if item.value != 'Timeline.10001':
+                # TODO 涉及If_else
                 if item.parent().value.startswith('If_else'):
-                    extend = name[0:4]
                     name = name[4:]
                 text, flag = dialog.getText(None, "Rename", "Rename {} to :".format(name), QLineEdit.Normal, name)
                 if flag:
@@ -321,7 +323,6 @@ class Structure(QDockWidget):
                         # 检测name合法性
                         weather_change, tips = Structure.checkNameValidity(text, item.value)
                         if weather_change:
-                            text = extend + text
                             self.changeNodeName(item.parent().value, item.value, text)
                         else:
                             QMessageBox.information(self, 'Tips', tips)
@@ -364,18 +365,22 @@ class Structure(QDockWidget):
 
     def changeNodeName(self, parent_value, value, name):
         try:
+            # 要注意if else，造孽啊，当初搞那玩意加上T，F
+            # 此时传进来的name都是不带前缀的
             if value in Structure.value_node:
                 old_name = Structure.value_node[value].text(0)
                 # delete old name
-                # if name has many values
-                # todo If_else name
+                # todo 涉及If_else
+                prefix = ''
                 if parent_value.startswith('If_else'):
+                    prefix = old_name[:4]
                     old_name = old_name[4:]
+                new_name = prefix + name
                 # 删除旧name相关数据
                 del Structure.name_value[old_name]
                 # new name
                 Structure.name_value[name]  = value
-                Structure.value_node[value].setText(0, name)
+                Structure.value_node[value].setText(0, new_name)
 
                 # timeline中icon
                 if parent_value.startswith('Timeline.'):
@@ -385,6 +390,7 @@ class Structure(QDockWidget):
                     self.timelineNameChange.emit(parent_value, value, name)
                 # if branch中的icon
                 elif parent_value.startswith('If_else.'):
+                    # 发出去的是不带前缀的
                     self.itemInIfBranchNameChange.emit(parent_value, value, name)
                 elif parent_value.startswith('Switch.'):
                     self.itemInSwitchBranchNameChange.emit(parent_value, value, name)
@@ -465,6 +471,7 @@ class Structure(QDockWidget):
             # 往字典中加入
             Structure.value_node[child_node.value] = child_node
             text = child_node.text(0)
+            # TODO 涉及If_else
             if exist_value.startswith('If_else.'):
                 text = text[4:]
             Structure.name_value[text] = child_node.value
@@ -477,8 +484,15 @@ class Structure(QDockWidget):
 
     def openTab(self):
         try:
-            value = self.structure_tree.currentItem().value
-            name = self.structure_tree.currentItem().text(0)
+            child = self.structure_tree.currentItem()
+            value = child.value
+            name = child.text(0)
+            # TODO 涉及If_else
+            try:
+                if child.parent().value.startswith('If_else'):
+                    name = name[4:]
+            except Exception:
+                pass
             self.nodeDoubleClick.emit(value, name)
             # cycle新增timeline, 只能通过structure打开, 故此时去连接timeline相应信号
             if value != "Timeline.10001" and value.startswith('Timeline'):
@@ -503,11 +517,10 @@ class Structure(QDockWidget):
 
     def do_getNodeValue(self, node: StructureItem, data: list):
         try:
-            print(Structure.name_values)
             for i in range(0, node.childCount()):
                 child = node.child(i)
                 if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith(
-                        'If_else.'):
+                        'If_else.') or child.value.startswith("Switch."):
                     grand_child_data = OrderedDict()
                     grand_child_data[child.value] = self.do_getNodeValue(child, [])
                     data.append(grand_child_data)
@@ -763,3 +776,14 @@ class Structure(QDockWidget):
             return child.text(0), child.value
         except Exception as e:
             print(f'error {e} happens in get name and value. [structure/main.py]')
+
+    @staticmethod
+    def getNameAndValueInIfBranchByParent(parent_value, condition_type):
+        try:
+            parent = Structure.value_node[parent_value]
+            for i in range(parent.childCount()):
+                child:StructureItem = parent.child(i)
+                if child.text(0).startswith(f"[{condition_type}]"):
+                    return ' '.join(child.text(0).split(' ')[1:]), child.value
+        except Exception as e:
+            print(f"error {e} happens in get name and value of item in if. [structure/main.py]")
