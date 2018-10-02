@@ -3,8 +3,9 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QComboBox, QStackedWidget, QListWidget, QPushButton, QLabel, QGroupBox, \
     QHBoxLayout, QGridLayout, QVBoxLayout, QCompleter, QMessageBox, QListWidgetItem
 
-from center.iconTabs.events.deviceItem import DeviceInItem, DeviceOutItem
-from .deviceChooseDialog import DeviceOutDialog, DeviceInDialog
+from main.deviceSelection.InputDeviceItem import DeviceInItem
+from main.deviceSelection.OutputDeviceItem import DeviceOutItem
+from main.deviceSelection.deviceChooseDialog import DeviceOutDialog, DeviceInDialog
 
 
 class DurationPage(QWidget):

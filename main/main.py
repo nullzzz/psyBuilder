@@ -8,9 +8,9 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QMessageBox
 
 from attributes.main import Attributes
 from center.iconTabs.events.durationPage import DurationPage
-from center.iconTabs.events.progressBar import LoadingTip
 from center.main import Center
 from main.deviceSelection.globalDevices import GlobalDevice
+from main.deviceSelection.progressBar import LoadingTip
 from output.main import Output
 from properties.main import Properties
 from structure.main import Structure
