@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import QCompleter, QMessageBox, QComboBox, QFormLayout, QListWidgetItem, QWidget, QLineEdit
+
 
 # 重写上方输出设备list widget的item
 class DeviceOutItem(QListWidgetItem):

@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QUrl, QFileInfo, pyqtSignal
-from PyQt5.QtGui import QIcon, QPalette
+from PyQt5.QtGui import QIcon, QPalette, QKeyEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel, QSizePolicy
@@ -68,6 +68,7 @@ class VideoDisplay(QMainWindow):
         self.play_video = QAction(QIcon("image/start_video"), "start", self)
         self.play_video.triggered.connect(self.playVideo)
         tool.addAction(self.play_video)
+        self.video_widget.play_and_pause.connect(lambda: self.play_video.trigger())
 
         t = QAction(QIcon("image/test"), "test", self)
         t.triggered.connect(self.test)
@@ -245,6 +246,13 @@ class VideoDisplay(QMainWindow):
             self.play_video.setIcon(QIcon("image/start_video"))
             self.play_video.setText("start")
 
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key_Space:
+            self.play_video.trigger()
+            event.accept()
+        else:
+            super(VideoDisplay, self).keyPressEvent(event)
+
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro.setAttributes(format_attributes)
@@ -269,6 +277,7 @@ class VideoDisplay(QMainWindow):
 
 # 支持全屏显示
 class VideoWidget(QVideoWidget):
+    play_and_pause = pyqtSignal()
 
     def __init__(self, parent=None):
         super(VideoWidget, self).__init__(parent)
@@ -281,13 +290,15 @@ class VideoWidget(QVideoWidget):
 
         self.setAttribute(Qt.WA_OpaquePaintEvent)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key_Space:
+            self.play_and_pause.emit()
         # esc退出全屏
-        if event.key() == Qt.Key_Escape and self.isFullScreen():
+        elif event.key() == Qt.Key_Escape and self.isFullScreen():
             self.setFullScreen(False)
             event.accept()
         # 这是啥？？？Alt+Enter？？？不管用呀
-        elif event.key() == Qt.Key_Enter and event.modifiers() & Qt.Key_Alt:
+        elif event.key() == Qt.Key_Enter and event.modifiers() == Qt.Key_Alt:
             self.setFullScreen(not self.isFullScreen())
             event.accept()
         else:

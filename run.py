@@ -414,9 +414,9 @@ if __name__ == '__main__':
     demo = MainWindow()
 
     demo.showMaximized()
-    demo.move((app.desktop().width() - demo.width()) / 2,
-              (app.desktop().height() - demo.height()) / 2)
-    demo.properties.my_widget.setMaximumWidth(600)
+    # demo.move((app.desktop().width() - demo.width()) / 2,
+    #           (app.desktop().height() - demo.height()) / 2)
+    # demo.properties.my_widget.setMaximumWidth(600)
     demo.center.setMaximumHeight(app.desktop().height() * 0.8)
 
     app.setStyleSheet(styleSheet)
