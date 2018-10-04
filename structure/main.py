@@ -787,3 +787,17 @@ class Structure(QDockWidget):
                     return ' '.join(child.text(0).split(' ')[1:]), child.value
         except Exception as e:
             print(f"error {e} happens in get name and value of item in if. [structure/main.py]")
+
+    @staticmethod
+    def getNameAndValueInSwitchBranchByParent(old_parent_value, old_case_value, new_parent_value):
+        try:
+            old_parent = Structure.value_node[old_parent_value]
+            index = 0
+            for i in range(old_parent.childCount()):
+                if old_parent.child(i).value == old_case_value:
+                    index = i
+            new_parent = Structure.value_node[new_parent_value]
+            child = new_parent.child(index)
+            return child.text(0), child.value
+        except Exception as e:
+            print(f"error {e} happens in get name and value of item in switch. [structure/main.py]")

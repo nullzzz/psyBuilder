@@ -435,7 +435,6 @@ class IconTabs(QTabWidget):
 
     def createTabForItemInBranch(self, parent_value, name, pixmap, value, properties_window):
         try:
-            print(name)
             self.openTab(value, name, False)
             widget = self.value_widget[value]
             if value.startswith('Video'):

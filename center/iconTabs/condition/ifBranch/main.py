@@ -314,11 +314,11 @@ class IfBranch(QWidget):
             if not self.type_value['F'][0].startswith('Other.'):
                 icon_name, icon_value = Structure.getNameAndValueInIfBranchByParent(value, 'F')
                 if_branch_copy.type_value['F'][0], if_branch_copy.type_value['F'][1] = icon_value, icon_name
-                if_branch_copy.true_icon_choose.icon_comboBox.setCurrentText(icon_value.split('.')[0])
-                if_branch_copy.true_icon_choose.icon.changeValue(icon_value)
-                if_branch_copy.true_icon_choose.icon_name.setText(icon_name)
-                if_branch_copy.true_icon_choose.properties_window.setProperties(self.type_value['F'][2].getInfo())
-                if_branch_copy.type_value['F'][2] = if_branch_copy.true_icon_choose.properties_window
+                if_branch_copy.false_icon_choose.icon_comboBox.setCurrentText(icon_value.split('.')[0])
+                if_branch_copy.false_icon_choose.icon.changeValue(icon_value)
+                if_branch_copy.false_icon_choose.icon_name.setText(icon_name)
+                if_branch_copy.false_icon_choose.properties_window.setProperties(self.type_value['F'][2].getInfo())
+                if_branch_copy.type_value['F'][2] = if_branch_copy.false_icon_choose.properties_window
             return if_branch_copy
         except Exception as e:
             print(f"error {e} happens in copy if branch. [ifBranch/main.py]")

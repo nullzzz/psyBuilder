@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QWidget, QMainWindow, QHBoxLayout, QGridLayout, QPus
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import pyqtSignal
 from .caseArea import CaseArea
-from .case import Case
 from structure.main import Structure
 from getImage import getImage
 
@@ -30,8 +29,8 @@ class SwitchBranch(QWidget):
         self.case_area = CaseArea(self)
         self.case_area.caseAdd.connect(self.linkCaseSignals)
         self.case_area.linkOrinalCase()
-        # icon_value : [case, name, properties_window, (case var)]
-        self.value_case_data = {}
+        # icon_value : [case, name]
+        self.value_case_name = {}
 
         buttons_layout = QHBoxLayout()
         self.ok_button = QPushButton("OK")
@@ -75,15 +74,16 @@ class SwitchBranch(QWidget):
             current_case_values = []
             for case in self.case_area.cases:
                 current_case_values.append(case.icon_choose.icon.value)
-            for value in self.value_case_data:
+            for value in self.value_case_name:
                 if value not in current_case_values:
                     delete_case_values.append(value)
-                    delete_case_names.append(self.value_case_data[value][1])
+                    delete_case_names.append(self.value_case_name[value][0].icon_choose.icon_name.text())
             # 先检测当前所有name
             for case in self.case_area.cases:
                 name = case.icon_choose.icon_name.text()
                 if name:
-                    name_validity, tips = Structure.checkNameValidity(name, case.icon_choose.icon.value, delete_names=delete_case_names)
+                    name_validity, tips = Structure.checkNameValidity(name, case.icon_choose.icon.value,
+                                                                      delete_names=delete_case_names)
                     if not name_validity:
                         names_validity = False
                         QMessageBox.information(self, 'Tips', f"{case.title()}' name has error---{tips}")
@@ -97,10 +97,10 @@ class SwitchBranch(QWidget):
                     case_icon_value = case.icon_choose.icon.value
                     # 排除空的
                     if not case_icon_value.startswith('Other.'):
-                        if case_icon_value in self.value_case_data:
+                        if case_icon_value in self.value_case_name:
                             # 是否命名修改
                             name = case.icon_choose.icon_name.text()
-                            if name == self.value_case_data[case_icon_value][1]:
+                            if name == self.value_case_name[case_icon_value][1]:
                                 keep_case_values.append(case_icon_value)
                             else:
                                 change_case_values.append(case_icon_value)
@@ -108,7 +108,7 @@ class SwitchBranch(QWidget):
                             new_case_values.append(case_icon_value)
                 # 处理被删除的case
                 delete_case_values = []
-                for value in self.value_case_data:
+                for value in self.value_case_name:
                     if value not in change_case_values and value not in keep_case_values:
                         delete_case_values.append(value)
                 for delete_case_value in delete_case_values:
@@ -133,7 +133,7 @@ class SwitchBranch(QWidget):
     def deleteCase(self, value):
         try:
             # 删除相关数据
-            del self.value_case_data[value]
+            del self.value_case_name[value]
             # 信号
             self.caseDelete.emit(self.value, value)
             self.caseTabDelete.emit(value)
@@ -143,8 +143,8 @@ class SwitchBranch(QWidget):
     def changeCase(self, value):
         try:
             # 修改相关数据
-            name = self.value_case_data[value][0].icon_choose.icon_name.text()
-            self.value_case_data[value][1] = name
+            name = self.value_case_name[value][0].icon_choose.icon_name.text()
+            self.value_case_name[value][1] = name
             # 信号
             self.caseNameChange.emit(self.value, value, name)
         except Exception as e:
@@ -156,7 +156,7 @@ class SwitchBranch(QWidget):
             case = self.getCaseByValue(value)
             name = case.icon_choose.icon_name.text()
             properties_window = case.icon_choose.properties_window
-            self.value_case_data[value] = [case, name, properties_window]
+            self.value_case_name[value] = [case, name]
             # 信号
             self.caseAdd.emit(self.value, name, getImage(value.split('.')[0], 'pixmap'), value, properties_window)
         except Exception as e:
@@ -201,20 +201,17 @@ class SwitchBranch(QWidget):
                 self.case_area.case_data_backup['case'][index]['case_title'] = case_title
                 self.case_area.case_data_backup['case'][index]['case_icon_value'] = case_icon_value
                 self.case_area.case_data_backup['case'][index]['case_icon_name'] = case_icon_name
-                del self.value_case_data[value]
+                del self.value_case_name[value]
         except Exception as e:
             print(f"error {e} happens in delete and clear case. [switchBranch/main.py]")
 
     def changeCaseName(self, value, name):
         try:
-            case_to_change = None
-            for case in self.case_area.cases:
-                if case.icon_choose.icon.value == value:
-                    case_to_change = case
-            if case_to_change:
+            if value in self.value_case_name:
+                case_to_change = self.value_case_name[value][0]
                 case_to_change.icon_choose.icon_name.setText(name)
                 # 相关数据
-                self.value_case_data[value][1] = name
+                self.value_case_name[value][1] = name
                 index = -1
                 try:
                     index = int(case_to_change.title().split(' ')[1]) - 1
@@ -226,4 +223,19 @@ class SwitchBranch(QWidget):
 
     # todo copy
     def copy(self, value):
-        pass
+        try:
+            switch_copy = SwitchBranch(value=value)
+            # widget(case area)
+            # 先获取相对应的value，name
+            old_new = {}
+            for case_value in self.value_case_name:
+                case_new_name, case_new_value = Structure.getNameAndValueInSwitchBranchByParent(self.value, case_value,
+                                                                                                value)
+                old_new[case_value] = [case_new_value, case_new_name]
+            self.case_area.copy(switch_copy.case_area, old_new)
+            # data(value case data)
+            for case in switch_copy.case_area.cases:
+                switch_copy.value_case_name[case.icon_choose.icon.value] = [case, case.icon_choose.icon_name.text()]
+            return switch_copy
+        except Exception as e:
+            print(f"error {e} happens in copy switchBranch. [switchBranch/main.py]")
