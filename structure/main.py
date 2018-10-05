@@ -628,18 +628,21 @@ class Structure(QDockWidget):
 
     @staticmethod
     def getValidName(value, is_copy=False, old_name=''):
-        value_type = value.split('.')[0]
-        name = f"{value_type}.{Structure.getCount(value_type)}"
+        try:
+            value_type = value.split('.')[0]
+            name = f"{value_type}.{Structure.getCount(value_type)}"
 
-        count = 0
-        while True:
-            if is_copy:
-                name = f"{old_name}.{count}"
-            if name not in Structure.name_value:
-                break
-            count += 1
+            count = 0
+            while True:
+                if is_copy:
+                    name = f"{old_name}.{count}"
+                if name not in Structure.name_value:
+                    break
+                count += 1
 
-        return name
+            return name
+        except Exception as e:
+            print(f"error {e} happens in get valid name. [structure/main.py]")
 
     @staticmethod
     def checkNameIsValid(name: str, parent_value='', value=''):

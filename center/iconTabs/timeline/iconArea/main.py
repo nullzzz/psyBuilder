@@ -1,9 +1,9 @@
 from PyQt5.QtWidgets import QVBoxLayout, QFrame, QTableWidgetItem
-from PyQt5.QtCore import Qt, QDataStream, QIODevice
+from PyQt5.QtCore import Qt, QDataStream, QIODevice, pyqtSignal, QSize
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import pyqtSignal
 from .iconTable import IconTable
 from structure.main import Structure
+from getImage import getImage
 
 import time
 
@@ -45,8 +45,9 @@ class IconArea(QFrame):
     def dragEnterEvent(self, e):
         if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
                 e.mimeData().hasFormat("application/IconTable-col") or \
-                e.mimeData().hasFormat("application/IconTable-copy-col"):
-            if self.icon_table.is_copy_module:
+                e.mimeData().hasFormat("application/IconTable-copy-col") or \
+                e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+            if self.icon_table.is_copy_module or e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
                 self.becomeGray()
             else:
                 self.becomeLightGray()
@@ -57,17 +58,19 @@ class IconArea(QFrame):
             e.ignore()
 
     def dragMoveEvent(self, e):
-        try:
-            if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
-                    e.mimeData().hasFormat("application/IconTable-col") or \
-                    e.mimeData().hasFormat("application/IconTable-copy-col"):
-                # 给iconTable发送x坐标
-                self.signShow.emit(e.pos().x())
+        if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
+                e.mimeData().hasFormat("application/IconTable-col") or \
+                e.mimeData().hasFormat("application/StructureTree-copy-value-name") or \
+                e.mimeData().hasFormat("application/IconTable-copy-col"):
+            # 给iconTable发送x坐标
+            self.signShow.emit(e.pos().x())
 
-                e.setDropAction(Qt.CopyAction)
-                e.accept()
-            else:
-                e.ignore()
+            e.setDropAction(Qt.CopyAction)
+            e.accept()
+        else:
+            e.ignore()
+        try:
+            pass
         except Exception as e:
             print("error {} happens in drop move icon. [icoaArea/main.py]".format(e))
 
@@ -160,6 +163,47 @@ class IconArea(QFrame):
                 self.icon_table.cellWidget(1, self.icon_table.fill_count).changeType(widget_type)
                 new_value = self.icon_table.cellWidget(1, self.icon_table.fill_count).value
                 text = Structure.getValidName(new_value, old_name=text, is_copy=True)
+                self.icon_table.setText(3, self.icon_table.fill_count, text)
+                # 给timeLine发射信号
+                self.iconAdd.emit(text, pixmap, new_value)
+                # 根据鼠标位置进行移动
+                drag_col = self.icon_table.fill_count
+                target_col = self.icon_table.getColumnForInsert(e.pos().x())
+
+                if target_col != -1:
+                    # 往前移动
+                    if target_col < drag_col:
+                        self.moveToTarget(drag_col, target_col)
+
+                e.setDropAction(Qt.CopyAction)
+                e.accept()
+
+                # 发射结束信号
+                self.dragFinish.emit()
+                # 移动信号
+                self.iconMove.emit(drag_col, target_col, new_value)
+                # 给icon tabs发信号, 让new value去复制old value的属性
+                self.iconCopy.emit(old_value, new_value, text)
+
+                self.becomeWhite()
+                self.copyDragFinish.emit()
+            elif e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+                # 我只需要old_value, old_name，且我需要做的只是将一个新的icon插入其中，其余的东西会被之前的机制自动处理
+                data = e.mimeData().data("application/StructureTree-copy-value-name")
+                stream = QDataStream(data, QIODevice.ReadOnly)
+                # 读出数据
+                old_value = stream.readQString()
+                old_text = stream.readQString()
+                pixmap = getImage(old_value.split('.')[0], 'icon').pixmap(QSize(50, 50))
+                # 插入一列
+                self.icon_table.insertColumn(self.icon_table.fill_count + 1)
+                self.icon_table.setIcon(1, self.icon_table.fill_count, pixmap, old_text)
+
+                # newValue 由于复制, icon构造函数中, value默认采用text后缀count, 故可能存在错误
+                widget_type = old_value.split('.')[0]
+                self.icon_table.cellWidget(1, self.icon_table.fill_count).changeType(widget_type)
+                new_value = self.icon_table.cellWidget(1, self.icon_table.fill_count).value
+                text = Structure.getValidName(new_value, old_name=old_text, is_copy=True)
                 self.icon_table.setText(3, self.icon_table.fill_count, text)
                 # 给timeLine发射信号
                 self.iconAdd.emit(text, pixmap, new_value)

@@ -45,7 +45,7 @@ class IconTabs(QTabWidget):
         # 用一个字典存放所有tab, 每个tab有一个随机的特征值
         # 键为特征值, 值为widget
         self.value_widget = {}
-        # value : parentValue, 仅仅限于timeline和其中icon, 不包含cycle和其中的timeline
+        # value : parentValue, 仅仅限于timeline和其中icon
         self.value_parent = {}
         # timeline属性及父节点timeline
         self.timeline_parent = {'Timeline.10001': None}

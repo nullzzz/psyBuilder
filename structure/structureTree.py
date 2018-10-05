@@ -1,5 +1,5 @@
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QKeySequence
+from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMimeData
+from PyQt5.QtGui import QKeySequence, QDrag
 from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction, QShortcut
 
 from .structureItem import StructureItem
@@ -60,3 +60,39 @@ class StructureTree(QTreeWidget):
                 self.itemNameChange.emit(item)
         except Exception as e:
             print(f"error {e} happens in rename node. [structure/structureTree.py]")
+
+    # 拖拽相关
+    def mouseMoveEvent(self, e):
+        try:
+            item = self.itemAt(e.pos())
+            if item:
+                # copy模式
+                if e.modifiers() == Qt.ControlModifier:
+                    self.copyDrag(item)
+                # move模式
+                else:
+                    self.moveDrag(item)
+        except Exception as e:
+            print(f"error {e} happens in mouse move. [structure/structureTree.py]")
+
+    def moveDrag(self, item):
+        try:
+            data = QByteArray()
+            stream = QDataStream(data, QIODevice.WriteOnly)
+
+        except Exception as e:
+            print(f"error {e} happens in move drag. [structure/structureTree.py]")
+
+    def copyDrag(self, item):
+        try:
+            data = QByteArray()
+            stream = QDataStream(data, QIODevice.WriteOnly)
+            stream.writeQString(item.value)
+            stream.writeQString(item.text(0))
+            mime_data = QMimeData()
+            mime_data.setData("application/StructureTree-copy-value-name", data)
+            drag = QDrag(self)
+            drag.setMimeData(mime_data)
+            drag.exec(Qt.CopyAction)
+        except Exception as e:
+            print(f"error {e} happens in copy drag. [structure/structureTree.py]")
