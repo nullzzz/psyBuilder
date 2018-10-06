@@ -32,6 +32,8 @@ class Structure(QDockWidget):
     nodeWidgetCopy = pyqtSignal(str, str)
     # 发送到attributes window (attributes)
     timelineAttributesShow = pyqtSignal(dict)
+    # 移动节点后将原父节点控件中的子节点进行一个删除
+    iconRemove = pyqtSignal(str, str)
 
     name_values = {'Timeline': ['Timeline.10001']}
     name_value = {'Timeline' : 'Timeline.10001'}
@@ -481,6 +483,16 @@ class Structure(QDockWidget):
             self.addCount(child_node.value.split('.')[0])
             # 拷贝子节点的子节点
             self.copyNodeSimply(child_node.value, exist_child.value)
+
+    def changeNode(self, new_parent_value, value):
+        # 将一个节点及其所有子节点移动到新的parent下
+        child = Structure.value_node[value]
+        old_parent = child.parent()
+        old_parent.removeChild(child)
+        new_parent:StructureItem = Structure.value_node[new_parent_value]
+        new_parent.addChild(child)
+        # 将原父节点控件中的子节点图标删除
+        self.iconRemove.emit(old_parent.value, value)
 
     def openTab(self):
         try:

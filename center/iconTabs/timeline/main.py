@@ -12,6 +12,7 @@ class Timeline(QWidget):
     iconRemove = pyqtSignal(str, str)
     iconMove = pyqtSignal(int, int, str, str)
     iconNameChange = pyqtSignal(str, str, str)
+    iconChange = pyqtSignal(str, str)
 
     def __init__(self, parent=None, value='Timeline.10001'):
         super(Timeline, self).__init__(parent)
@@ -32,6 +33,7 @@ class Timeline(QWidget):
     def linkSignals(self):
         self.icon_area.iconAdd.connect(self.addIcon)
         self.icon_area.iconMove.connect(self.moveIcon)
+        self.icon_area.iconChange.connect(self.changeIcon)
         self.icon_area.icon_table.iconRemove.connect(self.removeIcon)
         self.icon_area.icon_table.iconNameChange.connect(self.sendIconNameChange)
 
@@ -41,8 +43,14 @@ class Timeline(QWidget):
     def removeIcon(self, value):
         self.iconRemove.emit(self.value, value)
 
+    def removeIconSimply(self, value):
+        self.icon_area.icon_table.removeIcon(value)
+
     def moveIcon(self, dragCol, targetCol, value):
         self.iconMove.emit(dragCol, targetCol, self.value, value)
+
+    def changeIcon(self, value):
+        self.iconChange.emit(self.value, value)
 
     def sendIconNameChange(self, value, name):
         self.iconNameChange.emit(self.value, value, name)

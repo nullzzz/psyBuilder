@@ -16,6 +16,8 @@ class IconArea(QFrame):
     iconAdd = pyqtSignal(str, QPixmap, str)
     iconMove = pyqtSignal(int, int, str)
     iconCopy = pyqtSignal(str, str, str)
+    #
+    iconChange = pyqtSignal(str)
     # copy drag finish ()
     copyDragFinish = pyqtSignal()
 
@@ -46,7 +48,8 @@ class IconArea(QFrame):
         if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
                 e.mimeData().hasFormat("application/IconTable-col") or \
                 e.mimeData().hasFormat("application/IconTable-copy-col") or \
-                e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+                e.mimeData().hasFormat("application/StructureTree-copy-value-name") or \
+                e.mimeData().hasFormat("application/StructureTree-move-value-name"):
             if self.icon_table.is_copy_module or e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
                 self.becomeGray()
             else:
@@ -61,6 +64,7 @@ class IconArea(QFrame):
         if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
                 e.mimeData().hasFormat("application/IconTable-col") or \
                 e.mimeData().hasFormat("application/StructureTree-copy-value-name") or \
+                e.mimeData().hasFormat("application/StructureTree-move-value-name") or \
                 e.mimeData().hasFormat("application/IconTable-copy-col"):
             # 给iconTable发送x坐标
             self.signShow.emit(e.pos().x())
@@ -226,6 +230,39 @@ class IconArea(QFrame):
                 # 给icon tabs发信号, 让new value去复制old value的属性
                 self.iconCopy.emit(old_value, new_value, text)
 
+                self.becomeWhite()
+                self.copyDragFinish.emit()
+            elif e.mimeData().hasFormat("application/StructureTree-move-value-name"):
+                # 我只需要value, name，且我需要做的只是将一个新的icon以value，name插入其中，其余的东西会被之前的机制自动处理
+                data = e.mimeData().data("application/StructureTree-move-value-name")
+                stream = QDataStream(data, QIODevice.ReadOnly)
+                # 读出数据
+                old_value = stream.readQString()
+                old_text = stream.readQString()
+                pixmap = getImage(old_value.split('.')[0], 'icon').pixmap(QSize(50, 50))
+                # 插入一列
+                self.icon_table.insertColumn(self.icon_table.fill_count + 1)
+                self.icon_table.setIcon(1, self.icon_table.fill_count, pixmap, old_text, old_value)
+
+                self.icon_table.setText(3, self.icon_table.fill_count, old_text)
+                # 根据鼠标位置进行移动
+                drag_col = self.icon_table.fill_count
+                target_col = self.icon_table.getColumnForInsert(e.pos().x())
+
+                if target_col != -1:
+                    # 往前移动
+                    if target_col < drag_col:
+                        self.moveToTarget(drag_col, target_col)
+
+                e.setDropAction(Qt.CopyAction)
+                e.accept()
+
+                # 发射结束信号
+                self.dragFinish.emit()
+                # 相关数据处理信号iconTabs的value_parent，structure的节点移动，原timeline的icon删除
+                self.iconChange.emit(old_value)
+                # 移动信号
+                self.iconMove.emit(drag_col, target_col, old_value)
                 self.becomeWhite()
                 self.copyDragFinish.emit()
             else:

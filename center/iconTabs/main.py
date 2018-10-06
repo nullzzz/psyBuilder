@@ -84,6 +84,7 @@ class IconTabs(QTabWidget):
             except Exception:
                 self.value_widget[value].iconAdd.connect(self.addIcon)
                 self.value_widget[value].iconRemove.connect(self.removeIcon)
+                self.value_widget[value].iconChange.connect(self.changeIcon)
                 self.value_widget[value].iconNameChange.connect(self.changeTabName)
                 self.value_widget[value].icon_area.iconCopy.connect(self.copyIcon)
                 self.value_widget[value].icon_area.icon_table.iconDoubleClicked.connect(self.openTab)
@@ -155,9 +156,19 @@ class IconTabs(QTabWidget):
     def addIcon(self, parent_value, name, pixmap, value):
         self.value_parent[value] = parent_value
 
+    def changeIcon(self, new_parent, value):
+        self.value_parent[value] = new_parent
+
     # 单纯的保存所有timeline中的icon增减
     def removeIcon(self, parent_value, value):
         del self.value_parent[value]
+
+    def removeInWidget(self, parent_value, value):
+        try:
+            widget = self.value_widget[parent_value]
+            widget.removeIconSimply(value)
+        except Exception as e:
+            print(f"error {e} happens in remove icon in widget. [iconTabs/main.py]")
 
     def addTimeline(self, cycle_value, timeline_name, timeline_pixmap, timeline_value):
         try:
@@ -480,7 +491,8 @@ class IconTabs(QTabWidget):
                 timeline.icon_area.icon_table.removeIcon(value)
                 # 删除该tab相关属性
                 if not value.startswith("Timeline."):
-                    del self.value_parent[value]
+                    if value in self.value_widget:
+                        del self.value_parent[value]
         except Exception as e:
             print(f"error {e} happen in delete icon in timeLine. [iconTabs/main.py]")
 

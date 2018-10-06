@@ -79,9 +79,15 @@ class StructureTree(QTreeWidget):
         try:
             data = QByteArray()
             stream = QDataStream(data, QIODevice.WriteOnly)
-
+            stream.writeQString(item.value)
+            stream.writeQString(item.text(0))
+            mime_data = QMimeData()
+            mime_data.setData("application/StructureTree-move-value-name", data)
+            drag = QDrag(self)
+            drag.setMimeData(mime_data)
+            drag.exec(Qt.MoveAction)
         except Exception as e:
-            print(f"error {e} happens in move drag. [structure/structureTree.py]")
+            print(f"error {e} happens in cut drag. [structure/structureTree.py]")
 
     def copyDrag(self, item):
         try:

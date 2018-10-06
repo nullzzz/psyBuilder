@@ -171,6 +171,7 @@ class MainWindow(QMainWindow):
         # 将timeline中icon的变更与structure相连
         self.linkTimelineSignals('Timeline.10001')
         # structure中信号
+        self.structure.iconRemove.connect(self.center.icon_tabs.removeInWidget)
         self.structure.nodeDoubleClick.connect(self.center.icon_tabs.openTab)
         self.structure.timelineAdd.connect(self.linkTimelineSignals)
         self.structure.propertiesShow.connect(self.center.icon_tabs.getWidgetProperties)
@@ -200,6 +201,7 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].iconAdd.connect(self.structure.addNode)
                 self.center.icon_tabs.value_widget[value].iconRemove.connect(self.structure.removeNode)
                 self.center.icon_tabs.value_widget[value].iconMove.connect(self.structure.moveNode)
+                self.center.icon_tabs.value_widget[value].iconChange.connect(self.structure.changeNode)
                 self.center.icon_tabs.value_widget[value].iconNameChange.connect(self.structure.changeNodeName)
                 self.center.icon_tabs.value_widget[value].icon_area.icon_table.iconWidgetMerge.connect(
                     self.structure.copyNode)
