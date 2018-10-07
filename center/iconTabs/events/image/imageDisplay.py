@@ -183,14 +183,6 @@ class ImageDisplay(QMainWindow):
         # self.pro.tab.addTab(clone_widget, "c")
         return clone_widget
 
-    # 测试按钮
-    def testBt(self):
-        # clone = self.pro.duration.clone()
-        # self.pro.tab.addTab(clone, "clone")
-        clone = self.clone()
-        clone.setWindowTitle("aaaaaa")
-        self.pro.tab.addTab(clone, "c")
-
     def test(self):
         self.pro_clone = self.pro.clone()
         self.pro_clone.setWindowModality(Qt.ApplicationModal)
