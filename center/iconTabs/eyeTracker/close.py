@@ -8,8 +8,9 @@ class Close(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(Close, self).__init__(parent)
+        self.value = value
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.pause_between_msg = QSpinBox()
@@ -92,7 +93,7 @@ class Close(QWidget):
         self.automatically_log_all_variables.setCheckState(self.default_properties["Automatically log all variables"])
         self.log_msg.setText(self.default_properties["log message"])
 
-    def clone(self):
-        clone_widget = Close()
+    def clone(self, value):
+        clone_widget = Close(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget

@@ -18,6 +18,7 @@ class Timeline(QWidget):
         super(Timeline, self).__init__(parent)
         # data
         self.value = value
+        self.attributes = {}
         # widget
         self.icon_bar = IconBar(self)
         self.icon_area = IconArea(self, self.value)

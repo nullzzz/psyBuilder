@@ -816,3 +816,24 @@ class Structure(QDockWidget):
             return child.text(0), child.value
         except Exception as e:
             print(f"error {e} happens in get name and value of item in switch. [structure/main.py]")
+
+    @staticmethod
+    def getParentValue(value):
+        if value != 'Timeline.10001':
+            return Structure.value_node[value].parent().value
+        return ''
+
+    @staticmethod
+    def getTimelineValues(value):
+        try:
+            values = []
+            while True:
+                if value.startswith('Timeline.'):
+                    values.append(value)
+                try:
+                    value = Structure.value_node[value].parent().value
+                except Exception:
+                    break
+            return values
+        except Exception as e:
+            print(f"error {e} happens in get timeline value list. [structure/main.py]")

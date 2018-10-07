@@ -11,8 +11,9 @@ class ImageDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
     # parameter: self.attributes
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(ImageDisplay, self).__init__(parent)
+        self.value = value
         self.attributes = []
         self.label = QLabel()
         self.pro = ImageProperty()
@@ -176,8 +177,8 @@ class ImageDisplay(QMainWindow):
         self.pro.setAttributes(format_attributes)
 
     # copy当前image对象
-    def clone(self):
-        clone_widget = ImageDisplay()
+    def clone(self, value):
+        clone_widget = ImageDisplay(value=value)
         clone_widget.setPro(self.pro.clone())
         clone_widget.apply()
         # self.pro.tab.addTab(clone_widget, "c")

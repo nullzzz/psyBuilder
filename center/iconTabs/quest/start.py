@@ -8,8 +8,9 @@ class QuestInit(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(QuestInit, self).__init__(parent)
+        self.value = value
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
 
@@ -190,8 +191,8 @@ class QuestInit(QWidget):
         self.maximum.setText(self.default_properties["Maximum test value"])
         self.is_log10_transform.setText(self.default_properties["Is log10 transform"])
 
-    def clone(self):
-        clone_widget = QuestInit()
+    def clone(self, value):
+        clone_widget = QuestInit(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget
 

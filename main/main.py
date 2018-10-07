@@ -166,7 +166,8 @@ class MainWindow(QMainWindow):
         self.center.icon_tabs.timelineAdd.connect(self.linkTimelineSignals)
         self.center.icon_tabs.switchBranchAdd.connect(self.linkSwitchBranchSignals)
         self.center.icon_tabs.propertiesShow.connect(self.properties.showProperties)
-        self.center.icon_tabs.attributesShow.connect(self.structure.showTimelineAttributes)
+        # self.center.icon_tabs.attributesShow.connect(self.structure.showTimelineAttributes)
+        self.center.icon_tabs.attributesShow.connect(self.attributes.showAttributes)
         self.center.icon_tabs.iconNodeCopy.connect(self.structure.copyNode)
         # 将timeline中icon的变更与structure相连
         self.linkTimelineSignals('Timeline.10001')

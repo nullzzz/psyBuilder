@@ -21,6 +21,7 @@ from .eyeTracker.startR import StartR
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
+from structure.main import Structure
 
 
 class IconTabs(QTabWidget):
@@ -32,8 +33,8 @@ class IconTabs(QTabWidget):
     ifBranchAdd = pyqtSignal(str)
     timelineAdd = pyqtSignal(str)
     switchBranchAdd = pyqtSignal(str)
-    # 发送到structure (value)
-    attributesShow = pyqtSignal(str)
+    # 发送到attribute (attributes)
+    attributesShow = pyqtSignal(dict)
     # 先发送到structure去copyNode (value, exist_value)
     iconNodeCopy = pyqtSignal(str, str)
 
@@ -51,6 +52,12 @@ class IconTabs(QTabWidget):
         self.timeline_parent = {'Timeline.10001': None}
 
         self.timeline = Timeline(self)
+        self.timeline.attributes['subName'] = ''
+        self.timeline.attributes['subNum'] = ''
+        self.timeline.attributes['subSex'] = ''
+        self.timeline.attributes['subAge'] = ''
+        self.timeline.attributes['subHandness'] = ''
+        self.timeline.attributes['sessionNum'] = ''
         self.value_widget['Timeline.10001'] = self.timeline
         tab_icon = QIcon("image/timeLine.png")
         self.addTab(self.timeline, tab_icon, "Timeline")
@@ -67,6 +74,7 @@ class IconTabs(QTabWidget):
         self.tabCloseRequested.connect(self.removeTab)
         self.currentChanged.connect(self.showTimelineAttributes)
         self.currentChanged.connect(self.showProperties)
+        self.currentChanged.connect(self.showAttributes)
         # timeline
         self.linkTimelineSignals('Timeline.10001')
         # cycle
@@ -223,7 +231,8 @@ class IconTabs(QTabWidget):
     def showTimelineAttributes(self, tab_index):
         widget = self.widget(tab_index)
         if isinstance(widget, Timeline):
-            self.attributesShow.emit(widget.value)
+            # self.attributesShow.emit(widget.value)
+            pass
 
     def showProperties(self, current_index):
         try:
@@ -250,7 +259,8 @@ class IconTabs(QTabWidget):
                     self.setCurrentIndex(self.addTab(widget, tab_icon, name))
                 # 我在cycle中生成timeline时, 就已经生成了timeline实体
                 if value.startswith("Timeline."):
-                    self.attributesShow.emit(value)
+                    # self.attributesShow.emit(value)
+                    pass
             else:
                 widget = None
                 tab_icon = getImage(widget_type, "icon")
@@ -260,42 +270,42 @@ class IconTabs(QTabWidget):
                 elif widget_type == "Timeline":
                     widget = Timeline(value=value)
                 elif widget_type == "SoundOut":
-                    widget = SoundDisplay()
+                    widget = SoundDisplay(value=value)
                 elif widget_type == "Text":
-                    widget = TextDisplay()
+                    widget = TextDisplay(value=value)
                 elif widget_type == "Image":
-                    widget = ImageDisplay()
+                    widget = ImageDisplay(value=value)
                 elif widget_type == "Video":
-                    widget = VideoDisplay()
+                    widget = VideoDisplay(value=value)
                 elif widget_type == "Close":
-                    widget = Close()
+                    widget = Close(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Action":
-                    widget = EyeAction()
+                    widget = EyeAction(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Calibration":
-                    widget = EyeCalibrate()
+                    widget = EyeCalibrate(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "EndR":
-                    widget = EndR()
+                    widget = EndR(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Open":
-                    widget = Open()
+                    widget = Open(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "DC":
-                    widget = EyeDC()
+                    widget = EyeDC(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "StartR":
-                    widget = StartR()
+                    widget = StartR(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestInit":
-                    widget = QuestInit()
+                    widget = QuestInit(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestUpdate":
-                    widget = QuestUpdate()
+                    widget = QuestUpdate(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestGetValue":
-                    widget = QuestGetValue()
+                    widget = QuestGetValue(value=value)
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "If_else":
                     widget = IfBranch(value=value)
@@ -544,7 +554,7 @@ class IconTabs(QTabWidget):
                 if hasattr(old_widget, 'copy'):
                     self.value_widget[new_value] = old_widget.copy(new_value)
                 elif hasattr(old_widget, 'clone'):
-                    self.value_widget[new_value] = old_widget.clone()
+                    self.value_widget[new_value] = old_widget.clone(new_value)
                 # 通用属性连接(propertiesChange, tabClose)
                 if not new_value.startswith('Timeline.'):
                     self.value_widget[new_value].propertiesChange.connect(self.getChangedProperties)
@@ -598,3 +608,20 @@ class IconTabs(QTabWidget):
 
     def getAttribute(self, index):
         pass
+
+    def showAttributes(self, index):
+        try:
+            widget = self.widget(index)
+            widget_value = widget.value
+            # 调用structure中静态函数获取timeline values
+            values = Structure.getTimelineValues(widget_value)
+            # 通过values得到属性
+            attributes = {}
+            for value in values:
+                for attribute in self.value_widget[value].attributes:
+                    if attribute not in attributes:
+                        attributes[attribute] = self.value_widget[value].attributes[attribute]
+            # 发送到attribute
+            self.attributesShow.emit(attributes)
+        except Exception as e:
+            print(f"error {e} happens in show attributes. [iconTabs/main.py]")

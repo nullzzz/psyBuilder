@@ -9,8 +9,9 @@ class QuestUpdate(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(QuestUpdate, self).__init__(parent)
+        self.value = value
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
 
@@ -109,7 +110,7 @@ class QuestUpdate(QWidget):
     def loadSetting(self):
         self.response_variable.setText(self.default_properties["Response variable"])
 
-    def clone(self):
-        clone_widget = QuestUpdate()
+    def clone(self, value):
+        clone_widget = QuestUpdate(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget

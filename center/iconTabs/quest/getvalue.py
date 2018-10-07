@@ -8,8 +8,9 @@ class QuestGetValue(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(QuestGetValue, self).__init__(parent)
+        self.value = value
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
 
@@ -127,7 +128,7 @@ class QuestGetValue(QWidget):
         self.line2.setText(self.default_properties["Line2"])
         self.experimental.setText(self.default_properties["Experimental variable for test value"])
 
-    def clone(self):
-        clone_widget = QuestGetValue()
+    def clone(self, value):
+        clone_widget = QuestGetValue(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget

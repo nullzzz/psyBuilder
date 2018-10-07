@@ -8,8 +8,9 @@ class StartR(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(StartR, self).__init__(parent)
+        self.value = value
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
 
@@ -107,7 +108,7 @@ class StartR(QWidget):
     def loadSetting(self):
         self.statue_msg.setText(self.default_properties["Statue message"])
 
-    def clone(self):
-        clone_widget = StartR()
+    def clone(self, value):
+        clone_widget = StartR(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget

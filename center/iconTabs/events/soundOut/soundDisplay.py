@@ -10,9 +10,9 @@ from center.iconTabs.events.soundOut.soundProperty import SoundProperty
 class SoundDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(SoundDisplay, self).__init__(parent)
-
+        self.value=value
         self.file = ""
         self.attributes = []
         self.volume = 100
@@ -225,8 +225,8 @@ class SoundDisplay(QMainWindow):
         self.pro.apply_bt.clicked.connect(self.apply)
 
     # to
-    def clone(self):
-        clone_widget = SoundDisplay()
+    def clone(self, value):
+        clone_widget = SoundDisplay(value=value)
         clone_widget.setPro(self.pro.clone())
         clone_widget.apply()
         return clone_widget

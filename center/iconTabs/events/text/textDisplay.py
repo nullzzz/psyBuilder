@@ -11,8 +11,9 @@ class TextDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
     # parameter: self.attributes
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(TextDisplay, self).__init__(parent)
+        self.value = value
         self.attributes = []
         self.text_label = QTextEdit()
         self.pro = TextProperty()
@@ -154,8 +155,8 @@ class TextDisplay(QMainWindow):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro.setAttributes(format_attributes)
 
-    def clone(self):
-        clone_widget = TextDisplay()
+    def clone(self, value):
+        clone_widget = TextDisplay(value=value)
         clone_widget.setPro(self.pro.clone())
         clone_widget.apply()
 

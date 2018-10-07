@@ -8,8 +8,9 @@ class EyeAction(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(EyeAction, self).__init__(parent)
+        self.value = value
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.event = QComboBox()
@@ -82,8 +83,8 @@ class EyeAction(QWidget):
     def loadSetting(self):
         self.event.setCurrentText(self.default_properties["Statue Message"])
 
-    def clone(self):
-        clone_widget = EyeAction()
+    def clone(self, value):
+        clone_widget = EyeAction(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget
 

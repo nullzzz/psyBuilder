@@ -8,8 +8,9 @@ class EndR(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(EndR, self).__init__(parent)
+        self.value = value
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
 
@@ -111,7 +112,7 @@ class EndR(QWidget):
     def loadSetting(self):
         self.statue_msg.setText(self.default_properties["Statue message"])
 
-    def clone(self):
-        clone_widget = EndR()
+    def clone(self, value):
+        clone_widget = EndR(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget

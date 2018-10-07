@@ -8,8 +8,9 @@ class EyeDC(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(EyeDC, self).__init__(parent)
+        self.value = value
 
         self.attributes = []
 
@@ -175,7 +176,7 @@ class EyeDC(QWidget):
         self.show_display_with_drift_correction_target.setCheckState(self.default_properties["Show display with drift correction"])
         self.fixation_triggered.setCheckState(self.default_properties["Fixation triggered"])
 
-    def clone(self):
-        clone_widget = EyeDC()
+    def clone(self, value):
+        clone_widget = EyeDC(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget

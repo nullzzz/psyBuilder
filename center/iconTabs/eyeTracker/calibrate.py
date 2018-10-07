@@ -8,8 +8,9 @@ class EyeCalibrate(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(EyeCalibrate, self).__init__(parent)
+        self.value = value
 
         self.attributes = []
 
@@ -143,8 +144,8 @@ class EyeCalibrate(QWidget):
         self.target_color.setText(self.default_properties["Target color"])
         self.target_style.setCurrentText(self.default_properties["Target style"])
 
-    def clone(self):
-        clone_widget = EyeCalibrate()
+    def clone(self, value):
+        clone_widget = EyeCalibrate(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget
 

@@ -15,6 +15,7 @@ class Attributes(QDockWidget):
         self.setFloating(False)
         self.setAllowedAreas(Qt.LeftDockWidgetArea)
         self.setWidget(self.attributes_table)
+        self.showAttributes({'subName': '', 'subNum': '', 'subSex': '', 'subAge': '', 'subHandness': '', 'sessionNum': ''})
 
     def setAttributeItem(self, row, col, attribute_name, attribute_value):
         try:

@@ -10,8 +10,9 @@ class Open(QWidget):
     propertiesChange = pyqtSignal(dict)
     tabClose = pyqtSignal(QWidget)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(Open, self).__init__(parent)
+        self.value = value
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
 
@@ -315,8 +316,8 @@ class Open(QWidget):
         self.tobii_glasses_ipv46_address.setText(self.default_properties["Tobii glasses Ipv4/Ipv6 address"])
         self.tobii_glasses_UDP_port_number.setValue(self.default_properties["Tobii glasses UDP port number"])
 
-    def clone(self):
-        clone_widget = Open()
+    def clone(self, value):
+        clone_widget = Open(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget
 

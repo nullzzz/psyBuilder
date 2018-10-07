@@ -10,8 +10,9 @@ from .videoProperty import VideoProperty
 class VideoDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, value=''):
         super(VideoDisplay, self).__init__(parent)
+        self.value = value
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.mediaStatusChanged.connect(self.loadStatue)
@@ -261,8 +262,8 @@ class VideoDisplay(QMainWindow):
         self.default_properties = self.pro.getInfo()
         return self.default_properties
 
-    def clone(self):
-        clone_widget = VideoDisplay()
+    def clone(self, value):
+        clone_widget = VideoDisplay(value=value)
         clone_widget.setPro(self.pro.clone())
         clone_widget.apply()
         # clone_widget.setVideo()
