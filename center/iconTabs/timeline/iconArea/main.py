@@ -361,3 +361,20 @@ class IconArea(QFrame):
             self.icon_table.copy(icon_area_copy.icon_table)
         except Exception as e:
             print(f"error {e} happens in copy icon area. [iconArea/main.py]")
+
+    def save(self):
+        try:
+            data = {}
+            data["row_height"] = self.row_height
+            data["icon_table"] = self.icon_table.save()
+            return data
+        except Exception as e:
+            print(f"error {e} happens in save icon area. [iconArea/main.py]")
+
+    def restore(self, data):
+        try:
+            self.row_height = data["row_height"]
+            self.icon_table.setRowHeight(1, self.row_height)
+            self.icon_table.restore(data['icon_table'])
+        except Exception as e:
+            print(f"error {e} happens in restore icon area. [iconArea/main.py]")

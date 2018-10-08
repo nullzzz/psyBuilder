@@ -519,3 +519,22 @@ class Cycle(QMainWindow):
             return cycle_copy
         except Exception as e:
             print(f"error {e} happens in copy cycle. [cycle/main.py]")
+
+    def save(self):
+        try:
+            data = {}
+            data['row_name'] = self.row_name
+            data['row_value'] = self.row_value
+            data['value_row'] = self.value_row
+            data['timeline_count'] = self.timeline_count
+            data['properties'] = self.properties
+            data['timeline_table'] = self.timeline_table.save()
+            return data
+        except Exception as e:
+            print(f"error {e} happens in save cycle. [cycle/main.py]")
+
+    def restore(self, data):
+        try:
+            pass
+        except Exception as e:
+            print(f"error {e} happens in restore cycle. [cycle/main.py]")

@@ -191,6 +191,7 @@ class MainWindow(QMainWindow):
         self.structure.itemInSwitchBranchNameChange.connect(self.center.icon_tabs.changeItemInSwitchBranchName)
         self.structure.nodeWidgetMerge.connect(self.center.icon_tabs.mergeValueWidget)
         self.structure.nodeWidgetSplit.connect(self.center.icon_tabs.splitValueWidget)
+        self.structure.nodeWidgetCopy.connect(self.center.icon_tabs.copyWidget)
         self.structure.timelineAttributesShow.connect(self.attributes.showAttributes)
 
     def linkTimelineSignals(self, value):

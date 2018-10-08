@@ -58,3 +58,18 @@ class TimelineTable(QTableWidget):
                             timeline_table.setItem(row, col, QTableWidgetItem(text))
         except Exception as e:
             print(f'error {e} happens in copy timeline table. [cycle/timelineTable.py]')
+
+    def save(self):
+        try:
+            data = {}
+            data['col_header'] = self.col_header
+            data['col_value'] = self.col_value
+            return data
+        except Exception as e:
+            print(f"error {e} happens in copy cycle. [cycle/timelineTable.py]")
+
+    def restore(self, data):
+        try:
+            pass
+        except Exception as e:
+            print(f"error {e} happens in copy cycle. [cycle/timelineTable.py]")

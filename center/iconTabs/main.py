@@ -547,36 +547,38 @@ class IconTabs(QTabWidget):
 
     def copyWidget(self, old_value, new_value: str):
         try:
-            old_widget = self.value_widget[old_value]
             widget_type = old_value.split('.')[0]
-            try:
-                print(f"I am copying {widget_type} widget.")
-                if hasattr(old_widget, 'copy'):
-                    self.value_widget[new_value] = old_widget.copy(new_value)
-                elif hasattr(old_widget, 'clone'):
-                    self.value_widget[new_value] = old_widget.clone(new_value)
-                # 通用属性连接(propertiesChange, tabClose)
-                if not new_value.startswith('Timeline.'):
-                    self.value_widget[new_value].propertiesChange.connect(self.getChangedProperties)
+            print(f"I am copying {widget_type} widget.")
+            if old_value in self.value_widget:
+                old_widget = self.value_widget[old_value]
                 try:
-                    self.value_widget[new_value].tabClose.connect(self.closeTab)
+                    if hasattr(old_widget, 'copy'):
+                        self.value_widget[new_value] = old_widget.copy(new_value)
+                    elif hasattr(old_widget, 'clone'):
+                        self.value_widget[new_value] = old_widget.clone(new_value)
+                    # 通用属性连接(propertiesChange, tabClose)
+                    if not new_value.startswith('Timeline.'):
+                        self.value_widget[new_value].propertiesChange.connect(self.getChangedProperties)
+                    try:
+                        self.value_widget[new_value].tabClose.connect(self.closeTab)
+                    except Exception:
+                        pass
+                    # 特殊属性
+                    if new_value.startswith('Cycle'):
+                        self.cycleAdd.emit(new_value)
+                    elif new_value.startswith('Timeline.'):
+                        self.linkTimelineSignals(new_value)
+                        self.timelineAdd.emit(new_value)
+                    elif new_value.startswith('If_else'):
+                        self.ifBranchAdd.emit(new_value)
+                    elif new_value.startswith('Switch'):
+                        self.switchBranchAdd.emit(new_value)
+                    print(f"I have finished copying {widget_type} widget.")
                 except Exception:
-                    pass
-                # 特殊属性
-                if new_value.startswith('Cycle'):
-                    self.cycleAdd.emit(new_value)
-                elif new_value.startswith('Timeline.'):
-                    self.linkTimelineSignals(new_value)
-                    self.timelineAdd.emit(new_value)
-                elif new_value.startswith('If_else'):
-                    self.ifBranchAdd.emit(new_value)
-                elif new_value.startswith('Switch'):
-                    self.switchBranchAdd.emit(new_value)
-                print(f"I have finished copying {widget_type} widget.")
-            except Exception:
-                print(f"Fail to copy {widget_type} widget.")
+                    print(f"Fail to copy {widget_type} widget.")
         except Exception as e:
             print("error {} happens in copy widget. [iconTabs/main.py]".format(e))
+            print(f"Fail to copy {widget_type} widget.")
 
     def contextMenuEvent(self, e):
         try:

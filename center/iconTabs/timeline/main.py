@@ -76,3 +76,18 @@ class Timeline(QWidget):
         except Exception as e:
             print(f"error {e} happens in copy timeline. [timeline/main.py]")
 
+    def save(self):
+        try:
+            data = {}
+            data['attributes'] = self.attributes
+            data['icon_area'] = self.icon_area.save()
+            return data
+        except Exception as e:
+            print(f"error {e} happens in save timeline. [timeline/main.py]")
+
+    def restore(self, data):
+        try:
+            self.attributes = data['attributes']
+            self.icon_area.restore(data['icon_area'])
+        except Exception as e:
+            print(f"error {e} happens in restore timeline. [timeline/main.py]")

@@ -477,12 +477,12 @@ class Structure(QDockWidget):
             if exist_value.startswith('If_else.'):
                 text = text[4:]
             Structure.name_value[text] = child_node.value
-            # copy widget
-            self.nodeWidgetCopy.emit(child_node.value, exist_child.value)
             # count
             self.addCount(child_node.value.split('.')[0])
             # 拷贝子节点的子节点
             self.copyNodeSimply(child_node.value, exist_child.value)
+            # copy widget
+            self.nodeWidgetCopy.emit(exist_child.value, child_node.value)
 
     def changeNode(self, new_parent_value, value):
         # 将一个节点及其所有子节点移动到新的parent下
@@ -774,6 +774,7 @@ class Structure(QDockWidget):
         try:
             parent = Structure.value_node[parent_value]
             child = parent.child(index)
+            print(parent_value, index)
             return child.text(0), child.value
         except Exception as e:
             print(f"error {e} happens in get name and value. [structure/main.py]")

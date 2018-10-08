@@ -7,6 +7,7 @@ from noDash import NoDash
 from structure.main import Structure
 from .signTable import SignTable
 from ..icon import Icon
+from getImage import getImage
 
 
 class IconTable(QTableWidget):
@@ -504,7 +505,7 @@ class IconTable(QTableWidget):
             icon_table_copy.is_copy_module = self.is_copy_module
             # table
             for col in range(1, self.fill_count + 1):
-                name, icon_value = Structure.getNameAndValueByParent(icon_table_copy.parent_timeline_value)
+                name, icon_value = Structure.getNameAndValueByParent(icon_table_copy.parent_timeline_value, col - 1)
                 pixmap = self.cellWidget(1, col).pixmap()
                 icon_copy = Icon(name=name, pixmap=pixmap, value=icon_value)
                 # icon
@@ -516,3 +517,41 @@ class IconTable(QTableWidget):
                 icon_table_copy.setItem(3, col, item_copy)
         except Exception as e:
             print(f"error {e} happens in copy icon table. [iconArea/iconTable.py]")
+
+    def save(self):
+        try:
+            data = {}
+            data["fill_count"] = self.fill_count
+            data["is_fill"] = self.is_fill
+            data["is_edit"] = self.is_edit
+            data["is_copy_module"] = self.is_copy_module
+            data["icon"] = []
+            for col in range(1, self.fill_count + 1):
+                value = self.cellWidget(1, col).value
+                name = self.item(3, col).text()
+                data["icon"].append([value, name])
+            return data
+        except Exception as e:
+            print(f"error {e} happens in save icon table. [iconArea/iconTable.py]")
+
+    def restore(self, data):
+        try:
+            self.fill_count = data['fill_count']
+            self.is_fill = data['is_fill']
+            self.is_edit = data['is_edit']
+            self.is_copy_module = data['is_copy_module']
+            col = 1
+            for value, name in data['icon']:
+                pixmap = getImage(value.split('.')[0], "icon").pixmap(50, 50)
+                icon = Icon(name=name, pixmap=pixmap, value=value)
+                # icon
+                icon.setAlignment(Qt.AlignCenter)
+                self.setCellWidget(1, col, icon)
+                # name
+                item = QTableWidgetItem(name)
+                item.setTextAlignment(Qt.AlignCenter)
+                self.setItem(3, col, item)
+
+                col += 1
+        except Exception as e:
+            print(f"error {e} happens in restore icon table. [iconArea/iconTable.py]")

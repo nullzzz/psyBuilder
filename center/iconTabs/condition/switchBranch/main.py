@@ -239,3 +239,9 @@ class SwitchBranch(QWidget):
             return switch_copy
         except Exception as e:
             print(f"error {e} happens in copy switchBranch. [switchBranch/main.py]")
+
+    def save(self):
+        return self.case_area.backup()
+
+    def restore(self):
+        self.case_area.restore()
