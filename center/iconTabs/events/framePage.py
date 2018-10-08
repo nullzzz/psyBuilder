@@ -121,10 +121,30 @@ class FramePage(QWidget):
         self.height.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
-        self.default_properties["X position"] = self.x_pos.currentText()
-        self.default_properties["Y position"] = self.y_pos.currentText()
-        self.default_properties["Width"] = self.width.currentText()
-        self.default_properties["Height"] = self.height.currentText()
+        x_pos = self.x_pos.currentText()
+        y_pos = self.y_pos.currentText()
+        width = self.width.currentText()
+        height = self.height.currentText()
+        if x_pos:
+            self.default_properties["X position"] = x_pos
+        else:
+            self.default_properties["X position"] = "0"
+            self.x_pos.setCurrentText("0")
+        if y_pos:
+            self.default_properties["Y position"] = y_pos
+        else:
+            self.default_properties["Y position"] = "0"
+            self.y_pos.setCurrentText("0")
+        if width:
+            self.default_properties["Width"] = self.width.currentText()
+        else:
+            self.default_properties["Width"] = "100%"
+            self.width.setCurrentText("100%")
+        if height:
+            self.default_properties["Height"] = self.height.currentText()
+        else:
+            self.default_properties["Height"] = "100%"
+            self.height.setCurrentText("100%")
         self.default_properties["Border color"] = self.border_color.currentText()
         self.default_properties["Border width"] = self.border_width.value()
         return self.default_properties
@@ -146,3 +166,7 @@ class FramePage(QWidget):
         clone_page = FramePage()
         clone_page.setProperties(self.default_properties)
         return clone_page
+
+    def focusOutEvent(self, e):
+        print(e)
+
