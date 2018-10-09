@@ -2,6 +2,7 @@ from PyQt5.QtCore import QSize, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QApplication, QListView, QFrame, \
     QPushButton, QInputDialog, QLineEdit, QMessageBox, QStackedWidget
 
+from Info import Info
 from main.deviceSelection.inputDevice import InputDevice
 from main.deviceSelection.outputDevice import OutputDevice
 from main.deviceSelection.selectionList import SelectArea
@@ -90,6 +91,7 @@ class GlobalDevice(QWidget):
         # self.close()
 
     def apply(self):
+        self.getInfo()
         default_properties = self.selected_devices.getInfo()
         self.deviceSelect.emit(self.device_type, default_properties)
         # print(default_properties)
@@ -118,6 +120,17 @@ class GlobalDevice(QWidget):
                     self.selected_devices.default_properties[text] = self.selected_devices.default_properties[name].copy()
                     self.selected_devices.default_properties.pop(name)
                 item.setName(text)
+
+    # todo: 参数导出
+    def getInfo(self):
+        if self.device_type:
+            Info.INPUT_DEVICE_INFO = self.selected_devices.getInfo().copy()
+        else:
+            Info.OUTPUT_DEVICE_INFO = self.selected_devices.getInfo().copy()
+
+    # todo:参数导入
+    def setProperties(self, properties: dict):
+        self.selected_devices.setPorperties(properties)
 
 
 if __name__ == "__main__":

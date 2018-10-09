@@ -147,6 +147,10 @@ class SelectArea(QListWidget):
     def setDeviceCount(self, device_count: dict):
         self.device_count = device_count
 
+    def setProperties(self, properties: dict):
+        self.default_properties = properties
+        self.loadSetting()
+
     # 以default_properties导入
     def loadSetting(self):
         # 多余的删掉
