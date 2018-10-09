@@ -506,10 +506,10 @@ class Cycle(QMainWindow):
             # data, 一定要注意要是深拷贝
             # row_name row_value, value_row
             for row in self.row_name:
-                name, value = Structure.getNameAndValueByOldAndParent(self.row_name[row], self.value, value)
+                name, timeline_value = Structure.getNameAndValueByOldAndParent(self.row_name[row], self.value, value)
                 cycle_copy.row_name[row] = name
-                cycle_copy.row_value[row] = value
-                cycle_copy.value_row[value] = row
+                cycle_copy.row_value[row] = timeline_value
+                cycle_copy.value_row[timeline_value] = row
             # timeline_table
             cycle_copy.timeline_count = self.timeline_count
             self.timeline_table.copy(cycle_copy.timeline_table, cycle_copy.row_name)

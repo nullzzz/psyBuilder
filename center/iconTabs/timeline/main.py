@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QWidget, QGridLayout
 from .iconArea.main import IconArea
 from .iconBar import IconBar
 
+import copy
+
 
 class Timeline(QWidget):
     # 发送给structure
@@ -69,6 +71,7 @@ class Timeline(QWidget):
         try:
             # 返回自身的复制
             timeline_copy = Timeline(value=value)
+            timeline_copy.attributes = copy.deepcopy(self.attributes)
             # icon_bar不需要复制
             # icon_area需要复制
             self.icon_area.copy(timeline_copy.icon_area)

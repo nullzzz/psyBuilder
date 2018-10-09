@@ -5,8 +5,6 @@ from .iconTable import IconTable
 from structure.main import Structure
 from getImage import getImage
 
-import time
-
 
 class IconArea(QFrame):
     # sign显示
