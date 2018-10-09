@@ -136,12 +136,15 @@ class SelectArea(QListWidget):
         self.device_count = device_count
 
     def loadSetting(self):
+        # for i in range(self.count()):
+        #     item = self.item(i)
+        #     item.loadSetting()
         # 多余的删掉
         del_index = []
         for i in range(self.count()):
             item = self.item(i)
             if item.text() in self.default_properties.keys():
-                pass
+                item.loadSetting()
             else:
                 del_index.insert(0, i)
         for i in del_index:

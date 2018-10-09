@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtCore import Qt, QRegExp, QObject, QEvent
+from PyQt5.QtGui import QIcon, QFont, QRegExpValidator
 from PyQt5.QtWidgets import QCompleter, QMessageBox, QComboBox, QFormLayout, QListWidgetItem, QWidget, QLineEdit
 
 
@@ -22,7 +22,39 @@ class DeviceOutItem(QListWidgetItem):
         }
 
         self.devices = []
-        self.pro = QWidget()
+        self.pro = ItemWidget()
+
+    # 设置可选属性
+    def setAttributes(self, attributes):
+        self.attributes = attributes
+        self.pro.attributes = attributes
+        self.pro.value.setCompleter(QCompleter(self.attributes))
+        self.pro.pulse_dur.setCompleter(QCompleter(self.attributes))
+
+    @staticmethod
+    def setVarColor(self, color):
+        DeviceOutItem.varColor = color
+
+    def getInfo(self):
+        self.default_properties["Value or Msg"] = self.pro.value.text()
+        self.default_properties["Pulse Duration"] = self.pro.pulse_dur.currentText()
+        return self.default_properties
+
+    def setProperties(self, device_info: dict):
+        self.default_properties = device_info
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.pro.value.setText(self.default_properties["Value or Msg"])
+        self.pro.pulse_dur.setCurrentText(self.default_properties["Pulse Duration"])
+
+
+class ItemWidget(QWidget):
+    def __init__(self, parent=None):
+        super(QWidget, self).__init__(parent)
+
+        self.attributes = []
+
         self.value = QLineEdit()
         self.value.textChanged.connect(self.findVar)
         self.value.returnPressed.connect(self.finalCheck)
@@ -31,8 +63,13 @@ class DeviceOutItem(QListWidgetItem):
         self.pulse_dur.setInsertPolicy(QComboBox.NoInsert)
         self.pulse_dur.addItems(["End of Duration", "0", "100", "200", "300", "400", "500"])
 
+        valid_num = QRegExp("\[\w+\]|\d+|End of Duration")
+        self.pulse_dur.setValidator(QRegExpValidator(valid_num))
         self.pulse_dur.lineEdit().textChanged.connect(self.findVar)
         self.pulse_dur.lineEdit().returnPressed.connect(self.finalCheck)
+
+        self.value.installEventFilter(self)
+        self.pulse_dur.installEventFilter(self)
 
         self.setPro()
 
@@ -44,50 +81,33 @@ class DeviceOutItem(QListWidgetItem):
         layout.setVerticalSpacing(40)
         # 左、上、右、下
         layout.setContentsMargins(10, 20, 10, 0)
-        self.pro.setLayout(layout)
+        self.setLayout(layout)
 
     def findVar(self, text):
         if text in self.attributes:
-            self.pro.sender().setStyleSheet("color:{}".format(DeviceOutItem.varColor))
-            self.pro.sender().setFont(QFont("Timers", 9, QFont.Bold))
+            self.sender().setStyleSheet("color:{}".format(DeviceOutItem.varColor))
+            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
         else:
-            self.pro.sender().setStyleSheet("color:black")
-            self.pro.sender().setFont(QFont("宋体", 9, QFont.Normal))
-            # if valid:
-            #    pass
-            # else:
-            # QMessageBox.warning(self.pro, "Warning", "Invalid Attribute!". QMessageBox.Ok)
+            self.sender().setStyleSheet("color:black")
+            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
 
     def finalCheck(self):
-        temp = self.pro.sender()
+        temp = self.sender()
         if isinstance(temp, QLineEdit):
             text = temp.text()
         else:
             text = temp.currentText()
         if text not in self.attributes:
             if text and text[0] == "[":
-                QMessageBox.warning(self.pro, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
                 temp.clear()
 
-    # 设置可选属性
-    def setAttributes(self, attributes):
-        self.attributes = attributes
-        self.value.setCompleter(QCompleter(self.attributes))
-        self.pulse_dur.setCompleter(QCompleter(self.attributes))
-
-    @staticmethod
-    def setVarColor(self, color):
-        DeviceOutItem.varColor = color
-
-    def getInfo(self):
-        self.default_properties["Value or Msg"] = self.value.text()
-        self.default_properties["Pulse Duration"] = self.pulse_dur.currentText()
-        return self.default_properties
-
-    def setProperties(self, device_info: dict):
-        self.default_properties = device_info
-        self.loadSetting()
-
-    def loadSetting(self):
-        self.value.setText(self.default_properties["Value or Msg"])
-        self.pulse_dur.setCurrentText(self.default_properties["Pulse Duration"])
+    def eventFilter(self, obj: QObject, e: QEvent):
+        if obj == self.pulse_dur:
+            if e.type() == QEvent.FocusOut:
+                text = self.pulse_dur.currentText()
+                if text not in self.attributes:
+                    if text and text[0] == "[":
+                        QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                        self.pulse_dur.setCurrentIndex(0)
+        return QWidget.eventFilter(self, obj, e)

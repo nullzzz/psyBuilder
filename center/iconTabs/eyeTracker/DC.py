@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, Qt, QEvent, QObject
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QComboBox, QWidget, QLabel, QLineEdit, QCheckBox, QPushButton, \
     QHBoxLayout, QMessageBox, QCompleter
@@ -26,7 +26,9 @@ class EyeDC(QWidget):
             "Fixation triggered": 0
         }
         self.x_pos = QLineEdit()
+        self.x_pos.installEventFilter(self)
         self.y_pos = QLineEdit()
+        self.y_pos.installEventFilter(self)
         self.target_color = QLineEdit()
         self.target_style = QComboBox()
 
@@ -131,8 +133,7 @@ class EyeDC(QWidget):
     def apply(self):
         self.propertiesChange.emit(self.getProperties())
 
-        # 检查变量
-
+    # 检查变量
     def findVar(self, text):
         if text in self.attributes:
             self.sender().setStyleSheet("color: blue")
@@ -180,3 +181,25 @@ class EyeDC(QWidget):
         clone_widget = EyeDC(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget
+
+    def eventFilter(self, obj: QObject, e):
+        # print(obj)
+        # print(e)
+        if obj == self.x_pos or obj == self.y_pos:
+            if e.type() == QEvent.FocusOut:
+                text = obj.text()
+                if text not in self.attributes:
+                    if text and text[0] == "[":
+                        QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                        obj.clear()
+                        obj.setFocus()
+        # elif obj == self.y_pos:
+        #     if e.type() == QEvent.FocusOut:
+        #         text = self.y_pos.text()
+        #         if text not in self.attributes:
+        #             if text and text[0] == "[":
+        #                 QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+        #                 self.y_pos.clear()
+
+        return QWidget.eventFilter(self, obj, e)
+

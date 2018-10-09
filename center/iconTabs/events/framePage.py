@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QRegExp, Qt
+from PyQt5.QtCore import QRegExp, Qt, QObject, QEvent
 from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtWidgets import QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QComboBox, QWidget, QSpinBox, QLabel, \
     QMessageBox, QCompleter
@@ -23,6 +23,10 @@ class FramePage(QWidget):
         self.y_pos = QComboBox()
         self.width = QComboBox()
         self.height = QComboBox()
+        self.x_pos.installEventFilter(self)
+        self.y_pos.installEventFilter(self)
+        self.width.installEventFilter(self)
+        self.height.installEventFilter(self)
         # down
         self.border_color = ColorListEditor()
         self.border_width = QSpinBox()
@@ -167,6 +171,18 @@ class FramePage(QWidget):
         clone_page.setProperties(self.default_properties)
         return clone_page
 
-    def focusOutEvent(self, e):
-        print(e)
+    def eventFilter(self, obj: QObject, e: QEvent):
+        if obj == self.x_pos or obj == self.y_pos:
+            obj: QComboBox
+            if e.type() == QEvent.FocusOut:
+                text: str = obj.currentText()
+                if text not in self.attributes:
+                    if text:
+                        if text[0] == "[":
+                            QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                            obj.clear()
+                    else:
+                        QMessageBox.warning(self, "Warning", "Attribute cannot be none!", QMessageBox.Ok)
+                        obj.setFocus()
+        return QWidget.eventFilter(self, obj, e)
 

@@ -1,5 +1,6 @@
+from PyQt5.QtCore import QObject, QEvent
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QWidget, QListWidgetItem
+from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QWidget, QListWidgetItem, QMessageBox
 
 
 class OutputDevice(QListWidgetItem):
@@ -19,28 +20,30 @@ class OutputDevice(QListWidgetItem):
             "Port": "127.0.0.1"
         }
 
-        self.parameter = QWidget()
-        self.name_label = QLabel()
-        self.port = "127.0.0.1"
-        self.port_line = QLineEdit()
-        self.port_line.setText(self.port)
-        self.port_line.textChanged.connect(self.setPort)
-        lay = QFormLayout()
-        lay.addRow("Type:", QLabel(self.item_type))
-        lay.addRow("Name:", self.name_label)
-        lay.addRow("Port:", self.port_line)
-        self.parameter.setLayout(lay)
+        self.parameter = ItemWidget(self.item_type)
+        # self.name_label = QLabel()
+        # self.port = "127.0.0.1"
+        # self.port_line = QLineEdit()
+        # self.port_line.setText(self.port)
+        # self.port_line.textChanged.connect(self.setPort)
+        # self.port_line.installEventFilter(self.parameter)
+        #
+        # lay = QFormLayout()
+        # lay.addRow("Type:", QLabel(self.item_type))
+        # lay.addRow("Name:", self.name_label)
+        # lay.addRow("Port:", self.port_line)
+        # self.parameter.setLayout(lay)
 
-    def setPort(self, port):
-        self.port = port
+    def setPort(self, port: str):
+        self.parameter.setPort(port)
 
     def setName(self, name: str):
         self.setText(name)
         self.item_name = name
-        self.name_label.setText(name)
+        self.parameter.name_label.setText(name)
 
     def getPort(self):
-        return self.port
+        return self.parameter.port
 
     def getType(self):
         return self.item_type
@@ -58,12 +61,54 @@ class OutputDevice(QListWidgetItem):
         self.default_properties["Port"] = self.getPort()
         return self.default_properties
 
-    # todo 检查port合法性
-    def checkPort(self):
-        pass
-
     # 重写clone，返回的是DeviceItem类型，而不是QListWidgetItem类型
     def clone(self):
         item = OutputDevice(self.item_type, self.text())
         item.setProperties(self.default_properties)
         return item
+
+
+class ItemWidget(QWidget):
+    def __init__(self, item_type: str, parent=None):
+        super(ItemWidget, self).__init__(parent)
+        self.name_label = QLabel()
+        self.port = "127.0.0.1"
+        self.port_line = QLineEdit()
+        self.port_line.setText(self.port)
+        self.port_line.textChanged.connect(self.setPort)
+
+        self.port_line.installEventFilter(self)
+
+        layout = QFormLayout()
+        layout.addRow("Type:", QLabel(item_type))
+        layout.addRow("Name:", self.name_label)
+        layout.addRow("Port:", self.port_line)
+        self.setLayout(layout)
+
+    def eventFilter(self, obj: QObject, e: QEvent):
+        if obj == self.port_line:
+            if e.type() == QEvent.FocusOut:
+                port = self.port_line.text()
+                if not self.checkPort(port):
+                    QMessageBox.warning(self, "Warning", "Invalid Port!", QMessageBox.Ok)
+                    self.port_line.setFocus()
+        return QWidget.eventFilter(self, obj, e)
+
+    def setPort(self, port: str):
+        if self.checkPort(port):
+            self.port = port
+            self.port_line.setText(port)
+
+    @staticmethod
+    def checkPort(port: str):
+        port_list = port.split(".")
+        if len(port_list) == 4:
+            for i in port_list:
+                if i.isdigit():
+                    if int(i) < 0 or int(i) > 255:
+                        return False
+                else:
+                    return False
+            return True
+        else:
+            return False
