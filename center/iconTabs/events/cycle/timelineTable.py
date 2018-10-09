@@ -64,12 +64,54 @@ class TimelineTable(QTableWidget):
             data = {}
             data['col_header'] = self.col_header
             data['col_value'] = self.col_value
+            data['timeline'] = []
+            # 列表中的值
+            for row in self.rowCount():
+                timeline_data = []
+                for col in self.columnCount():
+                    timeline_data.append(self.item(row, col).text())
+                data['timeline'].append(timeline_data)
             return data
         except Exception as e:
             print(f"error {e} happens in copy cycle. [cycle/timelineTable.py]")
 
-    def restore(self, data):
+    def restore(self, data: dict):
         try:
-            pass
+            self.col_header = data['col_header']
+            self.col_value = data['col_value']
+            self.setColumnCount(self.col_header)
+            self.setHorizontalHeaderLabels(self.col_header)
+            # 还原timeline table
+            for row in range(len(data['timeline'])):
+                timeline_data = data['timeline'][row]
+                if row < self.rowCount():
+                    for col in range(len(timeline_data)):
+                        if col == 1:
+                            try:
+                                timeline_name = self.item(row, col).text()
+                                if timeline_name:
+                                    self.setItem(row, col, QTableWidgetItem(timeline_name))
+                            except Exception:
+                                pass
+                        else:
+                            try:
+                                self.setItem(row, col, QTableWidgetItem(self.item(row, col).text()))
+                            except Exception:
+                                pass
+                else:
+                    self.insertRow(self.rowCount())
+                    for col in range(len(timeline_data)):
+                        if col == 1:
+                            try:
+                                timeline_name = self.item(row, col).text()
+                                if timeline_name:
+                                    self.setItem(row, col, QTableWidgetItem(timeline_name))
+                            except Exception:
+                                pass
+                        else:
+                            try:
+                                self.setItem(row, col, QTableWidgetItem(self.item(row, col).text()))
+                            except Exception:
+                                pass
         except Exception as e:
             print(f"error {e} happens in copy cycle. [cycle/timelineTable.py]")
