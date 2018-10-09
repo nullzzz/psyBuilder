@@ -61,6 +61,9 @@ class OutputDevice(QListWidgetItem):
         self.default_properties["Port"] = self.getPort()
         return self.default_properties
 
+    def getProperties(self):
+        return self.default_properties
+
     # 重写clone，返回的是DeviceItem类型，而不是QListWidgetItem类型
     def clone(self):
         item = OutputDevice(self.item_type, self.text())

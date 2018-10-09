@@ -8,6 +8,12 @@ from main.deviceSelection.outputDevice import OutputDevice
 
 class SelectArea(QListWidget):
     itemDoubleClick = pyqtSignal(QListWidgetItem)
+    """
+    :param device__name 存放当前显示的设备
+    :param default_properties 存放已保存的设备信息
+    :param device_count 存放当前的设备计数
+    :param property 存放已保存的设备计数
+    """
 
     def __init__(self, device_type: int=0, parent=None):
         super(SelectArea, self).__init__(parent)
@@ -61,6 +67,7 @@ class SelectArea(QListWidget):
             self.device_count[item_type] += 1
 
         drop_item.setName(item_name)
+        drop_item.getInfo()
 
         self.device_name.append(item_name.lower())
 
@@ -80,8 +87,8 @@ class SelectArea(QListWidget):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.showContextMenu)
         self.contextMenu = QMenu(self)
-        self.delete_action = self.contextMenu.addAction("rename")
-        self.delete_action.triggered.connect(lambda: self.itemDoubleClick.emit(self.currentItem()))
+        self.rename_action = self.contextMenu.addAction("rename")
+        self.rename_action.triggered.connect(lambda: self.itemDoubleClick.emit(self.currentItem()))
 
         self.delete_action = self.contextMenu.addAction("delete")
         self.delete_action.triggered.connect(self.deleteItem)
@@ -92,13 +99,17 @@ class SelectArea(QListWidget):
         index = self.currentRow()
         self.delItem(index)
 
+    # 改变当前状态：device_name
     def delItem(self, index):
         del_item = self.takeItem(index)
         self.parameters.removeWidget(del_item.parameter)
         item_name: str = del_item.text()
-        if item_name in self.default_properties.keys():
-            self.default_properties.pop(item_name)
-        self.device_name.remove(item_name.lower())
+        # if item_name in self.default_properties.keys():
+        #     self.default_properties.pop(item_name)
+        try:
+            self.device_name.remove(item_name.lower())
+        except ValueError:
+            pass
 
     def clearAll(self):
         for i in range(self.count()-1, -1, -1):
@@ -117,13 +128,14 @@ class SelectArea(QListWidget):
     def changeItem(self, item):
         if item:
             self.parameters.setCurrentWidget(item.parameter)
+            # print(item.getInfo())
 
     # 返回选择设备
-    #
     def getInfo(self):
         # 更新property记录的设备数量
         for k, v in self.device_count.items():
             self.setProperty(k, v)
+        # 更新default_properties
         for i in range(self.count()):
             # 我也不知道为什么要加copy，不加的话
             key = self.item(i).text()
@@ -135,41 +147,55 @@ class SelectArea(QListWidget):
     def setDeviceCount(self, device_count: dict):
         self.device_count = device_count
 
+    # 以default_properties导入
     def loadSetting(self):
-        # for i in range(self.count()):
-        #     item = self.item(i)
-        #     item.loadSetting()
         # 多余的删掉
         del_index = []
+        # 2018/10/9
+        # 这他么有个大坑，遍历item得到的properties全是最后一个item的
+        # 别的地方就没有这么个坑
         for i in range(self.count()):
             item = self.item(i)
             if item.text() in self.default_properties.keys():
-                item.loadSetting()
+                item.setProperties(self.default_properties[item.text()])
             else:
                 del_index.insert(0, i)
         for i in del_index:
             self.delItem(i)
 
         # 删掉的加上
+        # 我们当前有啥
         current_devices = []
         for i in range(self.count()):
-            current_devices.append(self.item(i).text())
+            device_name = self.item(i).text()
+            current_devices.append(device_name)
+            # print(device_name)
+        # 当前没有的
         deleted_out_devices = [device for device in self.default_properties.keys()
                                if device not in current_devices]
 
+        # 输出设备
         if self.device_type:
             for device in deleted_out_devices:
                 properties: dict = self.default_properties[device]
                 device_type = properties["Device type"]
                 item = OutputDevice(device_type, device)
                 item.setProperties(properties)
+                self.addItem(item)
+                self.parameters.addWidget(item.parameter)
+                self.device_name.append(device.lower())
+        # 输入设备
         else:
             for device in deleted_out_devices:
                 properties: dict = self.default_properties[device]
                 device_type = properties["Device type"]
                 item = InputDevice(device_type, device)
                 item.setProperties(properties)
-        del_index.clear()
+                self.addItem(item)
+                self.parameters.addWidget(item.parameter)
+                self.device_name.append(device.lower())
+        del current_devices
+        del del_index
 
         # 恢复设备计数
         for device_type in self.device_count.keys():

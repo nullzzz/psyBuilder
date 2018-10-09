@@ -109,10 +109,13 @@ class GlobalDevice(QWidget):
                 QMessageBox.warning(self, f"{text} is invalid!",
                                     "Device name must be unique and without spaces", QMessageBox.Ok)
             else:
-                # print()
-                self.selected_devices.device_name.remove(item.text().lower())
-                self.selected_devices.device_name.append(text)
+                try:
+                    self.selected_devices.device_name.remove(item.text().lower())
+                except ValueError:
+                    pass
+                self.selected_devices.device_name.append(text.lower())
                 if name in self.selected_devices.default_properties.keys():
+                    self.selected_devices.default_properties[text] = self.selected_devices.default_properties[name].copy()
                     self.selected_devices.default_properties.pop(name)
                 item.setName(text)
 
