@@ -48,33 +48,44 @@ class IconArea(QFrame):
                 e.mimeData().hasFormat("application/IconTable-copy-col") or \
                 e.mimeData().hasFormat("application/StructureTree-copy-value-name") or \
                 e.mimeData().hasFormat("application/StructureTree-move-value-name"):
-            if self.icon_table.is_copy_module or e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
-                self.becomeGray()
-            else:
-                self.becomeLightGray()
+            can_drop = True
+            if e.mimeData().hasFormat("application/StructureTree-move-value-name"):
+                data = e.mimeData().data("application/StructureTree-move-value-name")
+                stream = QDataStream(data, QIODevice.ReadOnly)
+                value = stream.readQString()
+                # 检测value 不是timeline，不在这个timeline中
+                if value.startswith('Timeline.') or self.checkValueIn(value):
+                    can_drop = False
 
-            e.setDropAction(Qt.CopyAction)
-            e.accept()
+            if can_drop:
+                if self.icon_table.is_copy_module or e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+                    self.becomeGray()
+                else:
+                    self.becomeLightGray()
+
+                e.setDropAction(Qt.CopyAction)
+                e.accept()
+            else:
+                e.ignore()
         else:
             e.ignore()
 
     def dragMoveEvent(self, e):
-        if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
-                e.mimeData().hasFormat("application/IconTable-col") or \
-                e.mimeData().hasFormat("application/StructureTree-copy-value-name") or \
-                e.mimeData().hasFormat("application/StructureTree-move-value-name") or \
-                e.mimeData().hasFormat("application/IconTable-copy-col"):
-            # 给iconTable发送x坐标
-            self.signShow.emit(e.pos().x())
-
-            e.setDropAction(Qt.CopyAction)
-            e.accept()
-        else:
-            e.ignore()
         try:
-            pass
+            if e.mimeData().hasFormat("application/IconBar-text-pixmap") or \
+                    e.mimeData().hasFormat("application/IconTable-col") or \
+                    e.mimeData().hasFormat("application/StructureTree-copy-value-name") or \
+                    e.mimeData().hasFormat("application/StructureTree-move-value-name") or \
+                    e.mimeData().hasFormat("application/IconTable-copy-col"):
+                # 给iconTable发送x坐标
+                self.signShow.emit(e.pos().x())
+
+                e.setDropAction(Qt.CopyAction)
+                e.accept()
+            else:
+                e.ignore()
         except Exception as e:
-            print("error {} happens in drop move icon. [icoaArea/main.py]".format(e))
+            print("error {} happens in drop move icon. [iconArea/main.py]".format(e))
 
     def dropEvent(self, e):
         # drag from icon bar
@@ -263,6 +274,13 @@ class IconArea(QFrame):
                 self.iconMove.emit(drag_col, target_col, old_value)
                 self.becomeWhite()
                 self.copyDragFinish.emit()
+            elif e.mimeData().hasFormat("application/StructureTree-test-value-name"):
+                print("dada")
+                # data = e.mimeData().data("application/StructureTree-test-value-name")
+                # stream = QDataStream(data, QIODevice.ReadOnly)
+                # print(stream.readQString(), stream.readQString())
+                # e.setDropAction(Qt.CopyAction)
+                # e.accept()
             else:
                 # 发射结束信号
                 self.dragFinish.emit()
@@ -321,6 +339,12 @@ class IconArea(QFrame):
         # 改变模式
         self.icon_table.is_copy_module = True
         self.becomeGray()
+
+    def checkValueIn(self, value):
+        for col in range(1, self.icon_table.fill_count + 1):
+            if self.icon_table.cellWidget(1, col).value == value:
+                return True
+        return False
 
     def copyIconToNext(self, col):
         try:

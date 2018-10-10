@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QComboBox, QLabel, QGridLayout, QWidget, QScrollArea
 from PyQt5.QtCore import Qt, pyqtSignal
 
 from .case import Case
+from ..varChoose import  VarChoose
 import copy
 
 
@@ -9,10 +10,11 @@ class CaseArea(QScrollArea):
     MAX_CASE_COUNT = 9
     caseAdd = pyqtSignal(Case)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, parent_value=''):
         super(CaseArea, self).__init__(parent)
 
         # data
+        self.parent_value = parent_value
         self.switch_value = ''
         self.cases = []
         # case_num, [case{case title, case value, case icon value, case name}]
@@ -28,7 +30,7 @@ class CaseArea(QScrollArea):
         self.cases.append(self.case_2)
         self.cases.append(self.case_3)
         self.backup()
-        self.switch = QComboBox()
+        self.switch = VarChoose(parent_value=self.parent_value)
 
         self.grid_layout = QGridLayout()
 

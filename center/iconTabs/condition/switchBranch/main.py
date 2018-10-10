@@ -26,7 +26,7 @@ class SwitchBranch(QWidget):
         #
         self.value = value
         #
-        self.case_area = CaseArea(self)
+        self.case_area = CaseArea(self, self.value)
         self.case_area.caseAdd.connect(self.linkCaseSignals)
         self.case_area.linkOrinalCase()
         # icon_value : [case, name]

@@ -865,3 +865,9 @@ class Structure(QDockWidget):
             return values
         except Exception as e:
             print(f"error {e} happens in get timeline value list. [structure/main.py]")
+
+    @staticmethod
+    def checkDragValidity(value):
+        # 里面的var choose的检测，父节点检测
+        # 父节点检测先做
+        pass

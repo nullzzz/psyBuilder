@@ -2,11 +2,9 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
-from Info import Info
 from center.iconTabs.condition.switchBranch.main import SwitchBranch
 from center.iconTabs.timeline.main import Timeline
 from getImage import getImage
-from structure.main import Structure
 from .condition.ifBranch.main import IfBranch
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
@@ -23,6 +21,7 @@ from .eyeTracker.startR import StartR
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
+from structure.main import Structure
 
 
 class IconTabs(QTabWidget):
@@ -38,6 +37,8 @@ class IconTabs(QTabWidget):
     attributesShow = pyqtSignal(dict)
     # 先发送到structure去copyNode (value, exist_value)
     iconNodeCopy = pyqtSignal(str, str)
+
+    value_widget_global = {}
 
     def __init__(self, parent=None):
         super(IconTabs, self).__init__(parent)
@@ -60,7 +61,7 @@ class IconTabs(QTabWidget):
         self.timeline.attributes['subHandness'] = ''
         self.timeline.attributes['sessionNum'] = ''
         self.value_widget['Timeline.10001'] = self.timeline
-        Info.VALUE_WIDGET["Timeline.10001"] = self.timeline
+        IconTabs.value_widget_global['Timeline.10001'] = self.timeline
         tab_icon = QIcon("image/timeLine.png")
         self.addTab(self.timeline, tab_icon, "Timeline")
         self.tabBar().setShape(QTabBar.TriangularNorth)
@@ -107,14 +108,15 @@ class IconTabs(QTabWidget):
 
     def linkCycleSignals(self, value):
         try:
-            cycle = self.value_widget[value]
+            cycle: Cycle = self.value_widget[value]
             try:
                 cycle.timelineAdd.disconnect(self.addTimeline)
                 cycle.timelineAdd.connect(self.addTimeline)
             except Exception:
                 cycle.timelineAdd.connect(self.addTimeline)
                 cycle.attributeAdd.connect(self.addTimelineAttribute)
-                cycle.attributeChange.connect(self.changeTimelineAttribute)
+                cycle.attributeNameChange.connect(self.changeTimelineAttributeName)
+                cycle.attributeValueChange.connect(self.changeTimelineAttributeValue)
                 cycle.timelineWidgetMerge.connect(self.mergeValueWidget)
                 cycle.timelineWidgetSplit.connect(self.splitValueWidget)
         except Exception:
@@ -204,13 +206,23 @@ class IconTabs(QTabWidget):
         except Exception:
             print("error happens in add new timeline attribute. [iconTabs/main.py]")
 
-    def changeTimelineAttribute(self, timeline_value, attribute_name, attribute_value):
+    def changeTimelineAttributeValue(self, timeline_value, attribute_name, attribute_value):
         try:
             if timeline_value in self.value_widget:
                 timeline = self.value_widget[timeline_value]
                 timeline.attributes[attribute_name] = attribute_value
         except Exception:
             print("error happens in change timeline attribute value. [iconTabs/main.py]")
+
+    def changeTimelineAttributeName(self, cycle_value, old_header, new_header):
+        try:
+            cycle: Cycle = self.value_widget[cycle_value]
+            for row in cycle.row_value:
+                timeline = self.value_widget[cycle.row_value[row]]
+                timeline.attributes[new_header] = timeline.attributes[old_header]
+                del timeline.attributes[old_header]
+        except Exception as e:
+            print(f"error {e} happens in change timeline attribute name. [iconTabs/main.py]")
 
     def getTimelineAttributes(self, value):
         try:
@@ -241,10 +253,10 @@ class IconTabs(QTabWidget):
             widget = self.widget(current_index)
             if hasattr(widget, 'getInfo'):
                 self.propertiesShow.emit(widget.getInfo())
-            elif hasattr(widget, 'getInfo'):
-                self.propertiesShow.emit(widget.getInfo())
+            elif hasattr(widget, 'getProperties'):
+                self.propertiesShow.emit(widget.getProperties())
             else:
-                self.propertiesShow.emit({"error" : "can't get properties"})
+                self.propertiesShow.emit({"error": "can't get properties"})
         except Exception as e:
             print(f"error {e} happens in show properties. [iconTabs/main.py]")
 
@@ -321,7 +333,7 @@ class IconTabs(QTabWidget):
                 if widget:
                     # 新生成widget放入字典
                     self.value_widget[value] = widget
-                    Info.VALUE_WIDGET[value] = widget
+                    IconTabs.value_widget_global[value] = widget
                     if widget_type == 'Cycle':
                         self.cycleAdd.emit(value)
                     elif widget_type == "If_else":
@@ -352,7 +364,7 @@ class IconTabs(QTabWidget):
             if value in self.value_widget:
                 widget = self.value_widget[value]
 
-            if hasattr(widget, "getInfo"):
+            if hasattr(widget, "getProperties"):
                 properties = widget.getProperties()
             elif hasattr(widget, "getInfo"):
                 properties = widget.getInfo()
@@ -399,6 +411,7 @@ class IconTabs(QTabWidget):
                 widget = self.value_widget[value]
                 del widget
                 del self.value_widget[value]
+                del IconTabs.value_widget_global[value]
         except Exception:
             print("error happens delete {} tab. [iconTabs/main.py]".format(value.split('.')[0]))
 
@@ -533,9 +546,11 @@ class IconTabs(QTabWidget):
             self.deleteTab(value)
             if exist_value in self.value_widget:
                 self.value_widget[value] = self.value_widget[exist_value]
+                IconTabs.value_widget_global[value] = IconTabs.value_widget_global[value]
             else:
                 self.openTab(exist_value, '', False)
                 self.value_widget[value] = self.value_widget[exist_value]
+                IconTabs.value_widget_global[value] = IconTabs.value_widget_global[value]
         except Exception as e:
             print(f"error {e} happens in change value widget. [iconTabs/main.py]")
 
@@ -556,8 +571,10 @@ class IconTabs(QTabWidget):
                 try:
                     if hasattr(old_widget, 'copy'):
                         self.value_widget[new_value] = old_widget.copy(new_value)
+                        IconTabs.value_widget_global[new_value] = self.value_widget[new_value]
                     elif hasattr(old_widget, 'clone'):
                         self.value_widget[new_value] = old_widget.clone(new_value)
+                        IconTabs.value_widget_global[new_value] = self.value_widget[new_value]
                     # 通用属性连接(propertiesChange, tabClose)
                     if not new_value.startswith('Timeline.'):
                         self.value_widget[new_value].propertiesChange.connect(self.getChangedProperties)
@@ -610,22 +627,24 @@ class IconTabs(QTabWidget):
         for i in range(0, index):
             self.removeTab(0)
 
-    def getAttribute(self, index):
-        pass
-
     def showAttributes(self, index):
         try:
             widget = self.widget(index)
             widget_value = widget.value
-            # 调用structure中静态函数获取timeline values
-            values = Structure.getTimelineValues(widget_value)
-            # 通过values得到属性
-            attributes = {}
-            for value in values:
-                for attribute in self.value_widget[value].attributes:
-                    if attribute not in attributes:
-                        attributes[attribute] = self.value_widget[value].attributes[attribute]
-            # 发送到attribute
-            self.attributesShow.emit(attributes)
+            # 得到attributes，并发送到attribute
+            self.attributesShow.emit(IconTabs.getAttributes(widget_value))
         except Exception as e:
             print(f"error {e} happens in show attributes. [iconTabs/main.py]")
+
+    @staticmethod
+    def getAttributes(value):
+        # 调用structure中静态函数获取timeline values
+        values = Structure.getTimelineValues(value)
+        # 通过values得到属性
+        attributes = {}
+        for value in values:
+            for attribute in IconTabs.value_widget_global[value].attributes:
+                if attribute not in attributes:
+                    attributes[attribute] = IconTabs.value_widget_global[value].attributes[attribute]
+
+        return attributes
