@@ -35,6 +35,7 @@ class VideoTab1(QWidget):
         self.back_color = ColorListEditor()
         # 倍速
         self.playback_rate = QComboBox()
+        self.playback_rate_tip = QLabel()
         self.transparent = QSpinBox()
 
         # self.stop_after = QComboBox()
@@ -62,6 +63,7 @@ class VideoTab1(QWidget):
         self.end_pos.returnPressed.connect(self.finalCheck)
 
         self.playback_rate.addItems(["1.0", "1.25", "1.5", "1.75", "2.0", "-1.0"])
+        self.playback_rate.currentTextChanged.connect(self.pbTip)
 
         # self.stop_after.addItems(["No", "Yes"])
         # self.stop_after.currentTextChanged.connect(self.changed1)
@@ -112,6 +114,7 @@ class VideoTab1(QWidget):
 
         layout.addWidget(l3, 3, 0, 1, 1)
         layout.addWidget(self.playback_rate, 3, 1, 1, 1)
+        layout.addWidget(self.playback_rate_tip, 3, 2, 1, 1)
 
         # layout.addWidget(l4, 4, 0, 1, 1)
         # layout.addWidget(self.transparent, 4, 1, 1, 1)
@@ -133,6 +136,12 @@ class VideoTab1(QWidget):
         layout.addWidget(self.clear_after, 6, 1, 1, 1)
         layout.setContentsMargins(40, 0, 40, 0)
         self.setLayout(layout)
+
+    def pbTip(self, text):
+        if text == "-1.0":
+            self.playback_rate_tip.setText("may not support")
+        else:
+            self.playback_rate_tip.setText("")
 
     # 打开文件夹
     def openFile(self):

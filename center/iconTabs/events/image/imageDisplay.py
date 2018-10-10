@@ -188,3 +188,10 @@ class ImageDisplay(QMainWindow):
         self.pro_clone = self.pro.clone()
         self.pro_clone.setWindowModality(Qt.ApplicationModal)
         self.pro_clone.show()
+
+    def getDuration(self):
+        try:
+            duration = self.default_properties["Duration"]
+        except KeyError:
+            duration = "(Infinite)"
+        return duration
