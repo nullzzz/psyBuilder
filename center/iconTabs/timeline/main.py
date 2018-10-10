@@ -1,11 +1,12 @@
+import copy
+import sys
+
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout
 
 from .iconArea.main import IconArea
 from .iconBar import IconBar
-
-import copy
 
 
 class Timeline(QWidget):
@@ -77,20 +78,18 @@ class Timeline(QWidget):
             self.icon_area.copy(timeline_copy.icon_area)
             return timeline_copy
         except Exception as e:
-            print(f"error {e} happens in copy timeline. [timeline/main.py]")
+            print(f"error {e} happens in copy timeline {sys._getframe().f_lineno}. [timeline/main.py]")
 
     def save(self):
         try:
-            data = {}
-            data['attributes'] = self.attributes
-            data['icon_area'] = self.icon_area.save()
+            data = {'attributes': self.attributes, 'icon_area': self.icon_area.save()}
             return data
         except Exception as e:
-            print(f"error {e} happens in save timeline. [timeline/main.py]")
+            print(f"error {e} happens in save timeline {sys._getframe().f_lineno}. [timeline/main.py]")
 
     def restore(self, data):
         try:
             self.attributes = data['attributes']
             self.icon_area.restore(data['icon_area'])
         except Exception as e:
-            print(f"error {e} happens in restore timeline. [timeline/main.py]")
+            print(f"error {e} happens in restore timeline {sys._getframe().f_lineno}. [timeline/main.py]")

@@ -174,7 +174,7 @@ class Open(QWidget):
         self.tabClose.emit(self)
 
     def apply(self):
-        self.propertiesChange.emit(self.getProperties())
+        self.propertiesChange.emit(self.getInfo())
 
     def typeChanged(self, index):
         # print(index)
@@ -251,7 +251,7 @@ class Open(QWidget):
         self.SMI_IP_address.setCompleter(QCompleter(self.attributes))
         self.tobii_glasses_ipv46_address.setCompleter(QCompleter(self.attributes))
 
-    def getProperties(self):
+    def getInfo(self):
         # tracker_type = self.select_tracker_type.currentText()
         # is_tracker = self.calibrate_tracker.checkState()
         # is_beep = self.calibration_beep.checkState()

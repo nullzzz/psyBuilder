@@ -70,9 +70,9 @@ class EyeAction(QWidget):
 
     def apply(self):
         self.msg = self.event.currentText()
-        self.propertiesChange.emit(self.getProperties())
+        self.propertiesChange.emit(self.getInfo())
 
-    def getProperties(self):
+    def getInfo(self):
         self.default_properties["Statue Message"] = self.event.currentText()
         return self.default_properties
 

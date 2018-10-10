@@ -494,7 +494,7 @@ class Cycle(QMainWindow):
     #         self.timeline_table.copy(cycle_copy.timeline_table)
     #         # properties
     #         cycle_copy.properties = self.properties
-    #         cycle_copy.setProperties()
+    #         cycle_copy.setInfo()
     #         # cycle_copy.setCentralWidget(cycle_copy.timeline_table)
     #         return cycle_copy
     #     except Exception as e:

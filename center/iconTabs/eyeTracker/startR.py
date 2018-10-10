@@ -75,7 +75,7 @@ class StartR(QWidget):
 
     def apply(self):
         self.msg = self.statue_msg.text()
-        self.propertiesChange.emit(self.getProperties())
+        self.propertiesChange.emit(self.getInfo())
 
     def findVar(self, text):
         if text in self.attributes:
@@ -97,7 +97,7 @@ class StartR(QWidget):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
         self.statue_msg.setCompleter(QCompleter(self.attributes))
 
-    def getProperties(self):
+    def getInfo(self):
         self.default_properties["Statue message"] = self.statue_msg.text()
         return self.default_properties
 

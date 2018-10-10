@@ -103,7 +103,7 @@ class EyeCalibrate(QWidget):
         self.tabClose.emit(self)
 
     def apply(self):
-        self.propertiesChange.emit(self.getProperties())
+        self.propertiesChange.emit(self.getInfo())
 
         # 检查变量
 
@@ -127,7 +127,7 @@ class EyeCalibrate(QWidget):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
         self.target_color.setCompleter(QCompleter(self.attributes))
 
-    def getProperties(self):
+    def getInfo(self):
         self.default_properties["Calibration type"] = self.calibration_type.currentText()
         self.default_properties["Calibration beep"] = self.calibration_beep.currentText()
         self.default_properties["Target color"] = self.target_color.text()

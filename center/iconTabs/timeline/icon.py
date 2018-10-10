@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QLabel
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QLabel
 
 
 class Icon(QLabel):

@@ -3,11 +3,11 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QDrag, QPixmap, QKeySequence
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMenu, QFrame, QAction, QLabel, QMessageBox, QShortcut
 
+from getImage import getImage
 from noDash import NoDash
 from structure.main import Structure
 from .signTable import SignTable
 from ..icon import Icon
-from getImage import getImage
 
 
 class IconTable(QTableWidget):
@@ -237,7 +237,7 @@ class IconTable(QTableWidget):
 
     def copyDrag(self):
         col = self.currentColumn()
-        if col >= 1 and col < self.fill_count + 1:
+        if 1 <= col < self.fill_count + 1:
             # 将col传过去
             data = QByteArray()
             stream = QDataStream(data, QIODevice.WriteOnly)

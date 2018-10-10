@@ -50,8 +50,8 @@ class StructureTree(QTreeWidget):
                         self.itemInIfBranchDelete.emit(parent.value, item.value)
                     if parent.value.startswith('Switch'):
                         self.itemInSwitchBranchDelete.emit(parent.value, item.value)
-        except Exception:
-            print("some errors happen in delete structure Item. (structureTree.py)")
+        except Exception as e:
+            print(f"error {e} happens in delete structure Item. (structureTree.py)")
 
     def renameItem(self):
         try:

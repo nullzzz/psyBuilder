@@ -55,20 +55,10 @@ class MainWindow(QMainWindow):
         self.property_action = QAction("&Property", self)
         self.output_action = QAction("&Output", self)
         self.default_action = QAction("&Default", self)
-        # self.attribute_action.setCheckable(True)
-        # self.attribute_action.setChecked(True)
+
         self.attribute_action.setData("attribute")
-        # self.structure_action.setCheckable(True)
-        # self.structure_action.setChecked(True)
         self.structure_action.setData("structure")
-        # self.main_action.setCheckable(True)
-        # self.main_action.setChecked(True)
-        # self.main_action.setData("main")
-        # self.output_action.setCheckable(True)
-        # self.output_action.setChecked(True)
         self.output_action.setData("output")
-        # self.property_action.setCheckable(True)
-        # self.property_action.setChecked(True)
         self.property_action.setData("property")
 
         self.attribute_action.triggered.connect(self.setDockView)
@@ -207,8 +197,8 @@ class MainWindow(QMainWindow):
                 self.center.icon_tabs.value_widget[value].iconNameChange.connect(self.structure.changeNodeName)
                 self.center.icon_tabs.value_widget[value].icon_area.icon_table.iconWidgetMerge.connect(
                     self.structure.copyNode)
-        except Exception:
-            print("error happens in link timeline signals. [main/main.py]")
+        except Exception as e:
+            print(f"error {e} happens in link timeline signals. [main/main.py]")
 
     def linkCycleSignals(self, value):
         try:
@@ -259,7 +249,7 @@ class MainWindow(QMainWindow):
             # reset timer
             self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
         except Exception as e:
-            print(f"error {e} happens in get data and reset timer. [main/main.py]")
+            print(f"error {e} happens in get data and reset timer {sys._getframe().f_lineno}. [main/main.py]")
 
     # 恢复默认布局
     def resetView(self):

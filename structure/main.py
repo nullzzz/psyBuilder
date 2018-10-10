@@ -1,9 +1,11 @@
+import sys
 from collections import OrderedDict
 
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDockWidget, QInputDialog, QMessageBox, QLineEdit
 
+from Info import Info
 from center.iconTabs.timeline.icon import Icon
 from getImage import getImage
 from .structureItem import StructureItem
@@ -232,7 +234,8 @@ class Structure(QDockWidget):
         except Exception as e:
             print(f"error {e} happens in remove node. [structure/main.py]")
 
-    def getNodeValueByName(self, parent_value, name):
+    @staticmethod
+    def getNodeValueByName(parent_value, name):
         parent = Structure.value_node[parent_value]
         for node_value in Structure.name_values[name]:
             if parent.indexOfChild(Structure.value_node[node_value]) != -1:
@@ -255,7 +258,8 @@ class Structure(QDockWidget):
     #     except Exception as e:
     #         print(f"error {e} happens in move node in structure. [structure.main.py]")
 
-    def moveNode(self, drag_col, target_col, parent_value, value):
+    @staticmethod
+    def moveNode(drag_col, target_col, parent_value, value):
         try:
             if target_col != -1:
                 parent = Structure.value_node[parent_value]
@@ -515,33 +519,56 @@ class Structure(QDockWidget):
     def changeNodeValue(self, old_value, new_value):
         self.value_node[old_value].value = new_value
 
+    # 从structure结构树上遍历得到每个event/的properties
     def getNodeValue(self):
+        """
+        root 就是timeline
+        :return: node_value
+        """
         try:
             # 深度优先遍历
+            # node_value存储信息
             node_value = OrderedDict()
+            # 遍历根节点
             for i in range(0, self.structure_tree.topLevelItemCount()):
                 root = self.structure_tree.topLevelItem(i)
-                node_value[root.value] = self.do_getNodeValue(root, [])
-
+                # 节点的特征值： 节点的properties
+                node_value[root.value] = self.do_getNodeValue(root, {})
             return node_value
-        except Exception:
-            print("error happens in get node_value. [structure/main.py]")
+        except Exception as e:
+            print(f"error {e} happens in get node_value {sys._getframe().f_lineno}. [structure/main.py]")
 
-    def do_getNodeValue(self, node: StructureItem, data: list):
+    # 查找
+    def do_getNodeValue(self, node: StructureItem, data: dict):
+        """
+        :param node: 节点， 如果节点是单个事件，返回参数；否则递归
+        :param data: 用于存放参数的字典
+        :return:
+        """
         try:
+            # 遍历子节点
             for i in range(0, node.childCount()):
                 child = node.child(i)
-                if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith(
-                        'If_else.') or child.value.startswith("Switch."):
-                    grand_child_data = OrderedDict()
-                    grand_child_data[child.value] = self.do_getNodeValue(child, [])
-                    data.append(grand_child_data)
+                # 子节点为Cycle\Timeline\if\switch时
+                # 继续递归遍历
+                if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith("Switch."):
+                    pass
+                    # grand_child_data = OrderedDict()
+                    # grand_child_data[child.value] = self.do_getNodeValue(child, {})
+                    # data[child.value] = grand_child_data
+                elif child.value.startswith("If_else."):
+                    # grand_child_data = OrderedDict()
+                    pass
                 else:
-                    data.append(child.value)
+                    try:
+                        widget = Info.VALUE_WIDGET[child.value]
+                        data[child.value] = widget.getInfo()
+                    except KeyError:
+                        print(f"{child.value} hasn't been initialized")
 
             return data
-        except Exception:
-            print("error happens in do get node_value. [structure/main.py]")
+        except Exception as e:
+            print(f"error {e} happens in do get node_value {sys._getframe().f_lineno}. [structure/main.py]")
 
     @staticmethod
     def addCount(widget_type):
@@ -757,7 +784,7 @@ class Structure(QDockWidget):
 
     def getTimelineAttributes(self, value):
         # todo 得到timeline的attributes
-        return {"error" : "can't get attributes"}
+        return {"error": "can't get attributes"}
 
     @staticmethod
     def getValueBySameAndParent(same_value, parent_value):

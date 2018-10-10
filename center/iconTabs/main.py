@@ -2,9 +2,11 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
+from Info import Info
 from center.iconTabs.condition.switchBranch.main import SwitchBranch
 from center.iconTabs.timeline.main import Timeline
 from getImage import getImage
+from structure.main import Structure
 from .condition.ifBranch.main import IfBranch
 from .events.cycle.main import Cycle
 from .events.image.imageDisplay import ImageDisplay
@@ -21,7 +23,6 @@ from .eyeTracker.startR import StartR
 from .quest.getvalue import QuestGetValue
 from .quest.start import QuestInit
 from .quest.update import QuestUpdate
-from structure.main import Structure
 
 
 class IconTabs(QTabWidget):
@@ -59,6 +60,7 @@ class IconTabs(QTabWidget):
         self.timeline.attributes['subHandness'] = ''
         self.timeline.attributes['sessionNum'] = ''
         self.value_widget['Timeline.10001'] = self.timeline
+        Info.VALUE_WIDGET["Timeline.10001"] = self.timeline
         tab_icon = QIcon("image/timeLine.png")
         self.addTab(self.timeline, tab_icon, "Timeline")
         self.tabBar().setShape(QTabBar.TriangularNorth)
@@ -134,7 +136,7 @@ class IconTabs(QTabWidget):
 
     def linkSwitchBranchSignals(self, value):
         try:
-            switch:SwitchBranch = self.value_widget[value]
+            switch: SwitchBranch = self.value_widget[value]
             try:
                 switch.iconPropertiesShow.disconnect(self.showIconPropertiesInBranch)
                 switch.iconPropertiesShow.connect(self.showIconPropertiesInBranch)
@@ -239,8 +241,8 @@ class IconTabs(QTabWidget):
             widget = self.widget(current_index)
             if hasattr(widget, 'getInfo'):
                 self.propertiesShow.emit(widget.getInfo())
-            elif hasattr(widget, 'getProperties'):
-                self.propertiesShow.emit(widget.getProperties())
+            elif hasattr(widget, 'getInfo'):
+                self.propertiesShow.emit(widget.getInfo())
             else:
                 self.propertiesShow.emit({"error" : "can't get properties"})
         except Exception as e:
@@ -319,6 +321,7 @@ class IconTabs(QTabWidget):
                 if widget:
                     # 新生成widget放入字典
                     self.value_widget[value] = widget
+                    Info.VALUE_WIDGET[value] = widget
                     if widget_type == 'Cycle':
                         self.cycleAdd.emit(value)
                     elif widget_type == "If_else":
@@ -349,7 +352,7 @@ class IconTabs(QTabWidget):
             if value in self.value_widget:
                 widget = self.value_widget[value]
 
-            if hasattr(widget, "getProperties"):
+            if hasattr(widget, "getInfo"):
                 properties = widget.getProperties()
             elif hasattr(widget, "getInfo"):
                 properties = widget.getInfo()
@@ -438,18 +441,17 @@ class IconTabs(QTabWidget):
 
     def deleteItemInSwitchBranch(self, parent_value, value):
         try:
-            switch:SwitchBranch = self.value_widget[parent_value]
+            switch: SwitchBranch = self.value_widget[parent_value]
             switch.deleteAndClearCase(value)
         except Exception as e:
             print(f"error {e} happens in delete case. [iconTabs/main.py]")
 
     def changeItemInSwitchBranchName(self, parent_value, value, name):
         try:
-            switch:SwitchBranch = self.value_widget[parent_value]
+            switch: SwitchBranch = self.value_widget[parent_value]
             switch.changeCaseName(value, name)
         except Exception as e:
             print(f"error {e} happens in change case name. [iconTabs/main.py]")
-
 
     def showIconPropertiesInBranch(self, properties):
         self.propertiesShow.emit(properties)
