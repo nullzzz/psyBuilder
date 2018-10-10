@@ -161,7 +161,7 @@ class SelectArea(QListWidget):
         for i in range(self.count()):
             item = self.item(i)
             if item.text() in self.default_properties.keys():
-                item.setProperties(self.default_properties[item.text()])
+                item.setInfo(self.default_properties[item.text()])
             else:
                 del_index.insert(0, i)
         for i in del_index:

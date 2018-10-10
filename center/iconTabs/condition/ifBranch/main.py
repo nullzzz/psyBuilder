@@ -309,7 +309,7 @@ class IfBranch(QWidget):
                 if_branch_copy.true_icon_choose.icon_comboBox.setCurrentText(icon_value.split('.')[0])
                 if_branch_copy.true_icon_choose.icon.changeValue(icon_value)
                 if_branch_copy.true_icon_choose.icon_name.setText(icon_name)
-                if_branch_copy.true_icon_choose.properties_window.setProperties(self.type_value['T'][2].getInfo())
+                if_branch_copy.true_icon_choose.properties_window.setInfo(self.type_value['T'][2].getInfo())
                 if_branch_copy.type_value['T'][2] = if_branch_copy.true_icon_choose.properties_window
             if not self.type_value['F'][0].startswith('Other.'):
                 icon_name, icon_value = Structure.getNameAndValueInIfBranchByParent(value, 'F')
@@ -317,7 +317,7 @@ class IfBranch(QWidget):
                 if_branch_copy.false_icon_choose.icon_comboBox.setCurrentText(icon_value.split('.')[0])
                 if_branch_copy.false_icon_choose.icon.changeValue(icon_value)
                 if_branch_copy.false_icon_choose.icon_name.setText(icon_name)
-                if_branch_copy.false_icon_choose.properties_window.setProperties(self.type_value['F'][2].getInfo())
+                if_branch_copy.false_icon_choose.properties_window.setInfo(self.type_value['F'][2].getInfo())
                 if_branch_copy.type_value['F'][2] = if_branch_copy.false_icon_choose.properties_window
             return if_branch_copy
         except Exception as e:
@@ -346,3 +346,7 @@ class IfBranch(QWidget):
             self.false_icon_choose.properties_window = self.type_value['F'][2]
         else:
             self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
+
+    # 获取condition\true\false参数
+    def getInfo(self):
+        pass

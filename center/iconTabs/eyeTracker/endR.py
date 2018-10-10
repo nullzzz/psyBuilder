@@ -78,7 +78,7 @@ class EndR(QWidget):
 
     def apply(self):
         self.msg = self.statue_msg.text()
-        self.propertiesChange.emit(self.getProperties())
+        self.propertiesChange.emit(self.getInfo())
 
     # 检查变量
     def findVar(self, text):
@@ -101,7 +101,7 @@ class EndR(QWidget):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
         self.statue_msg.setCompleter(QCompleter(self.attributes))
 
-    def getProperties(self):
+    def getInfo(self):
         self.default_properties["Statue message"] =  self.statue_msg.text()
         return self.default_properties
 
@@ -114,5 +114,5 @@ class EndR(QWidget):
 
     def clone(self, value):
         clone_widget = EndR(value=value)
-        clone_widget.setProperties(self.default_properties)
+        clone_widget.setInfo(self.default_properties)
         return clone_widget

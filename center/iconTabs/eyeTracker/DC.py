@@ -131,7 +131,7 @@ class EyeDC(QWidget):
         self.tabClose.emit(self)
 
     def apply(self):
-        self.propertiesChange.emit(self.getProperties())
+        self.propertiesChange.emit(self.getInfo())
 
     # 检查变量
     def findVar(self, text):
@@ -156,7 +156,7 @@ class EyeDC(QWidget):
         self.y_pos.setCompleter(QCompleter(self.attributes))
         self.target_color.setCompleter(QCompleter(self.attributes))
 
-    def getProperties(self):
+    def getInfo(self):
         self.default_properties["X position"] = self.x_pos.text()
         self.default_properties["Y position"] = self.y_pos.text()
         self.default_properties["Target color"] = self.target_color.text()

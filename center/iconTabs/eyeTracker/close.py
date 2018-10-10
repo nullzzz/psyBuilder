@@ -75,13 +75,13 @@ class Close(QWidget):
         self.tabClosesed.emit(self)
 
     def apply(self):
-        self.propertiesChange.emit(self.getProperties())
+        self.propertiesChange.emit(self.getInfo())
 
     def setProperties(self, properties: dict):
         self.default_properties = properties
         self.loadSetting()
 
-    def getProperties(self):
+    def getInfo(self):
         self.default_properties["Pause between message"] = self.pause_between_msg.value()
         self.default_properties["Automatically log all variables"] = self.automatically_log_all_variables.checkState()
         self.default_properties["log message"] = self.log_msg.toPlainText()
