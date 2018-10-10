@@ -3,6 +3,7 @@ from PyQt5.QtCore import pyqtSignal, Qt
 
 from ..iconChoose import IconChoose
 from ..addDeleteButton import AddDeleteButton
+from ..varChoose import VarChoose
 
 
 class Case(QGroupBox):
@@ -12,7 +13,7 @@ class Case(QGroupBox):
     def __init__(self, title: str='test', parent=None, can_add=False, can_delete=False):
         super(Case, self).__init__(title, parent)
         # case
-        self.case_comBox = QComboBox(self)
+        self.case_comBox = VarChoose(self)
         # icon choose
         self.icon_choose = IconChoose(self)
         self.add_button = AddDeleteButton(self, 'add')

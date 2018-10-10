@@ -1,17 +1,17 @@
 from PyQt5.QtWidgets import (QComboBox, QFrame, QFormLayout, QHBoxLayout, QMessageBox, QLabel, QWidget)
 
 from ..addDeleteButton import AddDeleteButton
-
-import time
+from ..varChoose import VarChoose
 
 
 class ConditionArea(QWidget):
     #
     MAX_CONDITION_COUNT = 6
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, parent_value=''):
         super(ConditionArea, self).__init__(parent)
         #
+        self.parent_value = parent_value
         self.add_buttons = []
         self.delete_buttons = [None]
         #
@@ -23,13 +23,13 @@ class ConditionArea(QWidget):
         placeholder = QLabel()
         placeholder.setFixedWidth(self.placeholder_width)
         # var
-        var = QComboBox()
+        var = VarChoose(parent_value=parent_value)
         # compare operator
         compare_operator = QComboBox()
         compare_operator.addItems((">", "<", "=="))
         compare_operator.setFixedWidth(self.placeholder_width)
         # compare var
-        compare_var = QComboBox()
+        compare_var = VarChoose(parent_value=parent_value)
         # add button
         add_button = AddDeleteButton(button_type='add')
         add_button.clicked.connect(self.addCondition)
@@ -58,13 +58,13 @@ class ConditionArea(QWidget):
                     logical_operator.addItems(('and', 'or', 'xor', 'nor', 'nand', 'xnor'))
                     logical_operator.setFixedWidth(self.placeholder_width)
                     # var
-                    var = QComboBox()
+                    var = VarChoose(parent_value=self.parent_value)
                     # compare_operator
                     compare_operator = QComboBox()
                     compare_operator.addItems((">", "<", "=="))
                     compare_operator.setFixedWidth(self.placeholder_width)
                     # compare var
-                    compare_var = QComboBox()
+                    compare_var = VarChoose(parent_value=self.parent_value)
                     # add button
                     add_button = AddDeleteButton(button_type='add')
                     self.add_buttons.insert(index + 1, add_button)

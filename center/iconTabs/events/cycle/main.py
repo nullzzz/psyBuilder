@@ -24,7 +24,8 @@ class Cycle(QMainWindow):
     # 新增attribute (value, name, default_value)
     attributeAdd = pyqtSignal(str, str, str)
     # attribute修改 (value, name, attribute_value)
-    attributeChange = pyqtSignal(str, str, str)
+    attributeNameChange = pyqtSignal(str, str, str)
+    attributeValueChange = pyqtSignal(str, str, str)
     # (value, exist_value)
     timelineWidgetMerge = pyqtSignal(str, str)
     timelineWidgetSplit = pyqtSignal(str, str)
@@ -110,7 +111,7 @@ class Cycle(QMainWindow):
         self.property.ok_bt.clicked.connect(self.savePropertiesClose)
         self.property.apply_bt.clicked.connect(self.saveProperties)
         self.timeline_table.cellChanged.connect(self.addOrChangeTimeline)
-        self.timeline_table.cellChanged.connect(self.changeAttribute)
+        self.timeline_table.cellChanged.connect(self.changeAttributeValue)
 
     def addRows(self):
         try:
@@ -163,16 +164,22 @@ class Cycle(QMainWindow):
                 self.attributeAdd.emit(self.value, data[i], data[i + 1])
         else:
             col = data[-1]
-            default = self.timeline_table.col_value[col]
-            self.timeline_table.col_header[col] = data[0]
-            self.timeline_table.col_value[col] = data[1]
-            for row in range(0, self.timeline_table.rowCount()):
-                if self.timeline_table.item(row, col) == None or self.timeline_table.item(row, col).text() in ['',
-                                                                                                               default]:
-                    self.timeline_table.setItem(row, col, QTableWidgetItem(data[1]))
+            old_header = self.timeline_table.col_header[col]
+            default_value = self.timeline_table.col_value[col]
+            # header变化
+            if old_header != data[0]:
+                self.timeline_table.col_header[col] = data[0]
+                self.attributeNameChange.emit(self.value, old_header, data[0])
+            # default value变化
+            if default_value != data[1]:
+                self.timeline_table.col_value[col] = data[1]
+                for row in range(0, self.timeline_table.rowCount()):
+                    if self.timeline_table.item(row, col) == None or self.timeline_table.item(row, col).text() in ['',
+                                                                                                                   default_value]:
+                        self.timeline_table.setItem(row, col, QTableWidgetItem(data[1]))
         self.timeline_table.setHorizontalHeaderLabels(self.timeline_table.col_header)
 
-    def changeAttribute(self, row, col):
+    def changeAttributeValue(self, row, col):
         try:
             # col > 1的列才是attribute
             if col > 1:
@@ -181,7 +188,7 @@ class Cycle(QMainWindow):
                     attribute_name = self.timeline_table.col_header[col]
                     attribute_value = self.timeline_table.item(row, col).text()
                     timeline_value = self.row_value[row]
-                    self.attributeChange.emit(timeline_value, attribute_name, attribute_value)
+                    self.attributeValueChange.emit(timeline_value, attribute_name, attribute_value)
         except Exception:
             print("error happens in change timeline attribute. [cycle/main.py]")
 

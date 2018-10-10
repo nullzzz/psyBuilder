@@ -30,7 +30,7 @@ class IfBranch(QWidget):
     def __init__(self, parent=None, value=''):
         super(IfBranch, self).__init__(parent)
 
-        self.condition_area = ConditionArea(self)
+        self.condition_area = ConditionArea(self, value)
         self.true_icon_choose = IconChoose(self)
         self.true_icon_choose.propertiesShow.connect(self.showIconProperties)
         self.false_icon_choose = IconChoose(self)
