@@ -840,7 +840,12 @@ class Structure(QDockWidget):
             print(f"error {e} happens in get timeline value list. [structure/main.py]")
 
     @staticmethod
-    def checkDragValidity(value):
+    def checkDragValidity(drag_value, drop_value):
         # 里面的var choose的检测，父节点检测
         # 父节点检测先做
-        pass
+        parent = Structure.value_node[drop_value].parent()
+        while parent:
+            if parent.value == drag_value:
+                return False
+            parent = parent.parent()
+        return True

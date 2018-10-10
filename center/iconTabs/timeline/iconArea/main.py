@@ -56,6 +56,14 @@ class IconArea(QFrame):
                 # 检测value 不是timeline，不在这个timeline中
                 if value.startswith('Timeline.') or self.checkValueIn(value):
                     can_drop = False
+            if e.mimeData().hasFormat("application/StructureTree-move-value-name") or \
+                    e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+                data = e.mimeData().data("application/StructureTree-move-value-name")
+                if e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+                    data = e.mimeData().data("application/StructureTree-copy-value-name")
+                stream = QDataStream(data, QIODevice.ReadOnly)
+                value = stream.readQString()
+                can_drop = Structure.checkDragValidity(value, self.icon_table.parent_timeline_value)
 
             if can_drop:
                 if self.icon_table.is_copy_module or e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
