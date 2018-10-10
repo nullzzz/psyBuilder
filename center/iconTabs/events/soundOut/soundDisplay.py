@@ -231,6 +231,12 @@ class SoundDisplay(QMainWindow):
         clone_widget.apply()
         return clone_widget
 
+    def getDuration(self):
+        try:
+            duration = self.default_properties["Duration"]
+        except KeyError:
+            duration = "(Infinite)"
+        return duration
 
 if __name__ == "__main__":
     import sys

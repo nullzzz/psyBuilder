@@ -22,6 +22,7 @@
     <li>setAttributs(iterable): 设置变量，就是那个可以变蓝的东西</li>
     <li>getInfo(): 返回参数，字典类型</li>
     <li>setProperties(dict): 设置参数，也就是从文件导入的接口</li>
+    <li>getDuration(): 返回事件的duration参数(ms)</li>
 </ul>
 
 <p><big>TODO</big></p>

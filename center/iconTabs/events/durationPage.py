@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QObject, QEvent
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QComboBox, QStackedWidget, QListWidget, QPushButton, QLabel, QGroupBox, \
     QHBoxLayout, QGridLayout, QVBoxLayout, QCompleter, QMessageBox, QListWidgetItem
@@ -23,6 +23,7 @@ class DurationPage(QWidget):
         }
         # top
         self.duration = QComboBox()
+        self.duration.installEventFilter(self)
         # output device
         # 参数
         self.out_stack = QStackedWidget()
@@ -345,3 +346,29 @@ class DurationPage(QWidget):
         clone_page = DurationPage()
         clone_page.setProperties(self.default_properties)
         return clone_page
+
+    def eventFilter(self, obj: QObject, e: QEvent):
+        if obj == self.duration:
+            if e.type() == QEvent.FocusOut:
+                text = self.duration.currentText()
+                # 是否是变量
+                if text not in self.attributes:
+                    # 是否是提供选项
+                    if self.duration.findText(text, Qt.MatchCaseSensitive) == -1:
+                        # 输入的数字
+                        if text.isdigit():
+                            pass
+                        else:
+                            # 输入的范围
+                            split = text.split("~")
+                            if len(split) == 2:
+                                if split[0].isdigit() and split[1].isdigit():
+                                    pass
+                                else:
+                                    QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                                    self.duration.setCurrentIndex(0)
+                            else:
+                                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                                self.duration.setCurrentIndex(0)
+
+        return QWidget.eventFilter(self, obj, e)

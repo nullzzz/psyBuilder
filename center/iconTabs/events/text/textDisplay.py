@@ -168,6 +168,13 @@ class TextDisplay(QMainWindow):
         self.pro_clone.setWindowModality(Qt.ApplicationModal)
         self.pro_clone.show()
 
+    def getDuration(self):
+        try:
+            duration = self.default_properties["Duration"]
+        except KeyError:
+            duration = "(Infinite)"
+        return duration
+
 
 if __name__ == "__main__":
     import sys

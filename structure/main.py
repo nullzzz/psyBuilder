@@ -36,7 +36,7 @@ class Structure(QDockWidget):
     iconRemove = pyqtSignal(str, str)
 
     name_values = {'Timeline': ['Timeline.10001']}
-    name_value = {'Timeline' : 'Timeline.10001'}
+    name_value = {'Timeline': 'Timeline.10001'}
     value_node = {}
     # name count
     TIMELINE_COUNT = 0
@@ -543,7 +543,8 @@ class Structure(QDockWidget):
         except Exception:
             print("error happens in do get node_value. [structure/main.py]")
 
-    def addCount(self, widget_type):
+    @staticmethod
+    def addCount(widget_type):
         if widget_type == "Cycle":
             Structure.CYCLE_COUNT += 1
         elif widget_type == "Timeline":

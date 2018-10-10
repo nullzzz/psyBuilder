@@ -180,9 +180,9 @@ class FramePage(QWidget):
                     if text:
                         if text[0] == "[":
                             QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                            obj.clear()
+                            obj.setCurrentIndex(0)
                     else:
                         QMessageBox.warning(self, "Warning", "Attribute cannot be none!", QMessageBox.Ok)
-                        obj.setFocus()
+                        obj.setCurrentIndex(0)
         return QWidget.eventFilter(self, obj, e)
 
