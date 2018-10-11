@@ -282,13 +282,6 @@ class IconArea(QFrame):
                 self.iconMove.emit(drag_col, target_col, old_value)
                 self.becomeWhite()
                 self.copyDragFinish.emit()
-            elif e.mimeData().hasFormat("application/StructureTree-test-value-name"):
-                print("dada")
-                # data = e.mimeData().data("application/StructureTree-test-value-name")
-                # stream = QDataStream(data, QIODevice.ReadOnly)
-                # print(stream.readQString(), stream.readQString())
-                # e.setDropAction(Qt.CopyAction)
-                # e.accept()
             else:
                 # 发射结束信号
                 self.dragFinish.emit()
