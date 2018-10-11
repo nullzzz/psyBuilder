@@ -347,7 +347,3 @@ class IfBranch(QWidget):
             self.false_icon_choose.properties_window = self.type_value['F'][2]
         else:
             self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
-
-    # 获取condition\true\false参数
-    def getInfo(self):
-        pass

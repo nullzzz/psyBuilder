@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 
@@ -247,6 +246,7 @@ class MainWindow(QMainWindow):
         file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", "",
                                                    "Psy File (*.psy;*.ini)", options=options)
         if file_name:
+            Info.FILE_NAME = file_name
             file_name: str
             if file_name.endswith("ini"):
                 setting = QSettings(file_name, QSettings.IniFormat)
@@ -256,36 +256,43 @@ class MainWindow(QMainWindow):
                 output_device_info = setting.value("OUTPUT_DEVICE_INFO")
                 if output_device_info is not None:
                     self.output_devices.setProperties(output_device_info)
+                dock_layout = setting.value("DOCK_LAYOUT")
+                if dock_layout is not None:
+                    self.restoreState(dock_layout)
             elif file_name.endswith("psy"):
                 with open(file_name, "r") as f:
-                    for line in f.readlines():
-                        if line.startswith("INPUT_DEVICE_INFO:"):
-                            pass
-                    info = json.loads(f.read())
-                    self.input_devices.setProperties(info)
+                    pass
 
     def getData(self):
         # 导出输入设备信息
         input_device_info: dict = Info.INPUT_DEVICE_INFO.copy()
         output_device_info:dict = Info.OUTPUT_DEVICE_INFO.copy()
-        with open("test_file.psy", "w") as f:
-            f.write("INPUT_DEVICE_INFO:\n")
-            f.write(json.dumps(input_device_info))
-            f.write("OUTPUT_DEVICE_INFO:\n")
-            f.write(json.dumps(output_device_info))
-        setting = QSettings("load.ini", QSettings.IniFormat)
-        setting.setValue("INPUT_DEVICE_INFO", input_device_info)
-        setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
-        print("save input devices information successful")
-        try:
-            node_value = self.structure.getNodeValue()
-            self.output.text_area.setText(
-                "Only show structure data, attributes or properties will be show in next version.\n" + json.dumps(
-                    node_value))
-            # reset timer
-            self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
-        except Exception as e:
-            print(f"error {e} happens in get data and reset timer {sys._getframe().f_lineno}. [main/main.py]")
+
+        # 导出当前dock布局信息
+        current_dock_layout = self.saveState()
+        options = QFileDialog.Options()
+
+        if Info.FILE_NAME:
+            pass
+        else:
+            save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Psy Files (*.ini);",
+                                                            options=options)
+            if save_file_name:
+                Info.FILE_NAME = save_file_name
+                setting = QSettings(save_file_name, QSettings.IniFormat)
+                setting.setValue("INPUT_DEVICE_INFO", input_device_info)
+                setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
+                setting.setValue("DOCK_LAYOUT", current_dock_layout)
+                try:
+                    structure_tree = self.structure.getNodeValue()
+                    setting.setValue("STRUCTURE_TREE", structure_tree)
+                    self.output.text_area.setText(
+                        "Only show structure data, attributes or properties will be show in next version.\n")
+                    print(structure_tree)
+                    # reset timer
+                    self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
+                except Exception as e:
+                    print(f"error {e} happens in get data and reset timer {sys._getframe().f_lineno}. [main/main.py]")
 
     # 恢复默认布局
     def resetView(self):

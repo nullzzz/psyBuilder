@@ -1,7 +1,6 @@
 import sys
-from collections import OrderedDict
 
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, Qt, QSettings
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDockWidget, QInputDialog, QMessageBox, QLineEdit
 
@@ -528,22 +527,24 @@ class Structure(QDockWidget):
         try:
             # 深度优先遍历
             # node_value存储信息
-            node_value = OrderedDict()
+            # node_value = OrderedDict()
+            struture_tree: list = []
             # 遍历根节点
             for i in range(0, self.structure_tree.topLevelItemCount()):
                 root = self.structure_tree.topLevelItem(i)
                 # 节点的特征值： 节点的properties
-                node_value[root.value] = self.do_getNodeValue(root, {})
-            return node_value
+                # node_value[root.value] = self.do_getNodeValue(root, [])
+                struture_tree.append(root.value)
+                self.do_getNodeValue(root, struture_tree)
+            return struture_tree
         except Exception as e:
             print(f"error {e} happens in get node_value {sys._getframe().f_lineno}. [structure/main.py]")
 
     # 查找
-    def do_getNodeValue(self, node: StructureItem, data: dict):
+    def do_getNodeValue(self, node: StructureItem, sub_tree: list):
         """
         :param node: 节点， 如果节点是单个事件，返回参数；否则递归
-        :param data: 用于存放参数的字典
-        :return:
+        :param sub_tree: 用于存放当前子树的列表[根节点， 子树一， 子数二]
         """
         try:
             # 遍历子节点
@@ -551,22 +552,32 @@ class Structure(QDockWidget):
                 child = node.child(i)
                 # 子节点为Cycle\Timeline\if\switch时
                 # 继续递归遍历
-                if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith("Switch."):
-                    pass
-                    # grand_child_data = OrderedDict()
-                    # grand_child_data[child.value] = self.do_getNodeValue(child, {})
-                    # data[child.value] = grand_child_data
+                if child.value.startswith("Cycle."):
+                    child_tree: list = [child.value]
+                    self.do_getNodeValue(child, child_tree)
+                    sub_tree.append(child_tree)
+                elif child.value.startswith("Timeline."):
+                    child_tree: list = [child.value]
+                    self.do_getNodeValue(child, child_tree)
+                    sub_tree.append(child_tree)
+                elif child.value.startswith("Switch."):
+                    child_tree: list = [child.value]
+                    self.do_getNodeValue(child, child_tree)
+                    sub_tree.append(child_tree)
                 elif child.value.startswith("If_else."):
-                    # grand_child_data = OrderedDict()
-                    pass
+                    child_tree: list = [child.value]
+                    self.do_getNodeValue(child, child_tree)
+                    sub_tree.append(child_tree)
                 else:
                     try:
                         widget = Info.VALUE_WIDGET[child.value]
-                        data[child.value] = widget.getInfo()
+                        setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
+                        node_name: dict = {"__name__": child.text(0)}
+                        setting.setValue(child.value, widget.getInfo().update(node_name))
+                        sub_tree.append(child.value)
                     except KeyError:
                         print(f"{child.value} hasn't been initialized")
 
-            return data
         except Exception as e:
             print(f"error {e} happens in do get node_value {sys._getframe().f_lineno}. [structure/main.py]")
 
