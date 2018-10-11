@@ -9,6 +9,13 @@ class VarChoose(QComboBox):
         try:
             from ..main import IconTabs
             # todo attributes
-            self.addItems(IconTabs.getAttributes('Timeline.10001'))
+            self.addItems(IconTabs.getAttributes(self.parent_value))
         except Exception:
             pass
+
+    def addAttribute(self, new_attribute):
+        self.addItem(new_attribute)
+
+    def changeAttribute(self, old_attribute, new_attribute):
+        index = self.findText(old_attribute)
+        self.setItemText(index, new_attribute)

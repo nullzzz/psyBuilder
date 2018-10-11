@@ -38,7 +38,6 @@ class IfBranch(QWidget):
 
         self.value = value
         # [value, name, properties]
-
         self.type_value = {'T': ['Other.10001', '', None], 'F': ['Other.10002', '', None]}
         self.widget_type_index = {'None': 0, 'Image': 1, 'Text': 2, 'Video': 3, 'SoundOut': 4}
 
@@ -87,9 +86,9 @@ class IfBranch(QWidget):
     def showProperty(self):
         QMessageBox.warning(self, "todo", "set the properties of the event", QMessageBox.Ok)
 
-    def getInfo(self):
+    def getProperties(self):
         return {
-            "properties": "none"
+            "properties": "None"
         }
 
     def restoreIcons(self):
@@ -296,6 +295,22 @@ class IfBranch(QWidget):
 
     def showIconProperties(self, properties):
         self.iconPropertiesShow.emit(properties)
+
+    def addVarComboBoxAttribute(self, new_attribute):
+        try:
+            for comboBoxes in self.condition_area.comboBoxes:
+                comboBoxes[1].addAttribute(new_attribute)
+                comboBoxes[3].addAttribute(new_attribute)
+        except Exception as e:
+            print(f"error {e} happens in add attribute. [ifBranch/main.py]")
+
+    def changeVarComboBoxAttribute(self, old_attribute, new_attribute):
+        try:
+            for comboBoxes in self.condition_area.comboBoxes:
+                comboBoxes[1].changeAttribute(old_attribute, new_attribute)
+                comboBoxes[3].changeAttribute(old_attribute, new_attribute)
+        except Exception as e:
+            print(f"error {e} happens in change attribute. [ifBranch/main.py]")
 
     # todo copy ifBranch (copy condition area)
     def copy(self, value):

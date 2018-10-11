@@ -892,3 +892,20 @@ class Structure(QDockWidget):
                 return False
             parent = parent.parent()
         return True
+
+    @staticmethod
+    def getIfAndSwitchInTimeline(timeline_value, values):
+        try:
+            # 怕不是又是深度优先遍历
+            timeline: StructureItem = Structure.value_node[timeline_value]
+            for i in range(timeline.childCount()):
+                child = timeline.child(i)
+                if child.value.startswith('If_else'):
+                    values['If_else'].append(child.value)
+                elif child.value.startswith('Switch'):
+                    values['Switch'].append(child.value)
+                if child.value.startswith('Cycle'):
+                    for j in range(child.childCount()):
+                        Structure.getIfAndSwitchInTimeline(child.child(j).value, values)
+        except Exception as e:
+            print(f"error {e} happens in get if and switch. [structure/main.py]")

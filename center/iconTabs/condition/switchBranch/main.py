@@ -221,6 +221,16 @@ class SwitchBranch(QWidget):
         except Exception as e:
             print(f"error {e} happens in change case name. [switchBranch/main.py]")
 
+    def addVarComboBoxAttribute(self, new_attribute):
+        self.case_area.switch.addAttribute(new_attribute)
+        for case in self.case_area.cases:
+            case.case_comBox.addAttribute(new_attribute)
+
+    def changeVarComboBoxAttribute(self, old_attribute, new_attribute):
+        self.case_area.switch.changeAttribute(old_attribute, new_attribute)
+        for case in self.case_area.cases:
+            case.case_comBox.changeAttribute(old_attribute, new_attribute)
+
     # todo copy
     def copy(self, value):
         try:
