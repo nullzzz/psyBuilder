@@ -38,6 +38,7 @@ class IfBranch(QWidget):
 
         self.value = value
         # [value, name, properties]
+
         self.type_value = {'T': ['Other.10001', '', None], 'F': ['Other.10002', '', None]}
         self.widget_type_index = {'None': 0, 'Image': 1, 'Text': 2, 'Video': 3, 'SoundOut': 4}
 

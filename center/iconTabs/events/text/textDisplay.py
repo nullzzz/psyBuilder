@@ -16,15 +16,15 @@ class TextDisplay(QMainWindow):
         self.value = value
         self.attributes = []
         self.text_label = QTextEdit()
-        self.pro = TextProperty()
+        self.pro_window = TextProperty()
 
-        self.html = self.pro.html
-        self.font = self.pro.font
-        self.default_properties = self.pro.getInfo()
+        self.html = self.pro_window.html
+        self.font = self.pro_window.font
+        self.default_properties = self.pro_window.getInfo()
 
-        self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.cancel)
-        self.pro.apply_bt.clicked.connect(self.apply)
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
         self.align = "Center"
         self.A_v = "Center"
@@ -63,8 +63,8 @@ class TextDisplay(QMainWindow):
 
     def openPro(self):
         # 阻塞原窗口
-        self.pro.setWindowModality(Qt.ApplicationModal)
-        self.pro.show()
+        self.pro_window.setWindowModality(Qt.ApplicationModal)
+        self.pro_window.show()
 
     # 预览
     def preView(self):
@@ -89,18 +89,18 @@ class TextDisplay(QMainWindow):
             print(type(e))
 
     def setPro(self, pro: TextProperty):
-        del self.pro
-        self.pro = pro
-        self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.cancel)
-        self.pro.apply_bt.clicked.connect(self.apply)
+        del self.pro_window
+        self.pro_window = pro
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
     def ok(self):
         self.apply()
-        self.pro.close()
+        self.pro_window.close()
 
     def cancel(self):
-        self.pro.loadSetting()
+        self.pro_window.loadSetting()
         # self.clone()
 
     def apply(self):
@@ -118,23 +118,23 @@ class TextDisplay(QMainWindow):
 
     # 获取参数
     def getPro(self):
-        self.html = self.pro.html
-        self.font = self.pro.font
-        self.align = self.pro.general.align.currentText()
-        self.fore_color = self.pro.general.fore_color.currentText()
-        self.back_color = self.pro.general.back_color.currentText()
-        self.transparent_value = self.pro.general.transparent.value()
-        self.is_wrap = bool(self.pro.general.word_wrap.checkState())
-        self.x_pos = self.pro.frame.x_pos.currentText()
-        self.y_pos = self.pro.frame.y_pos.currentText()
-        self.w_size = self.pro.frame.width.currentText()
-        self.h_size = self.pro.frame.height.currentText()
+        self.html = self.pro_window.html
+        self.font = self.pro_window.font
+        self.align = self.pro_window.general.align.currentText()
+        self.fore_color = self.pro_window.general.fore_color.currentText()
+        self.back_color = self.pro_window.general.back_color.currentText()
+        self.transparent_value = self.pro_window.general.transparent.value()
+        self.is_wrap = bool(self.pro_window.general.word_wrap.checkState())
+        self.x_pos = self.pro_window.frame.x_pos.currentText()
+        self.y_pos = self.pro_window.frame.y_pos.currentText()
+        self.w_size = self.pro_window.frame.width.currentText()
+        self.h_size = self.pro_window.frame.height.currentText()
 
     # 返回设置参数
     def getInfo(self):
-        self.html = self.pro.html
-        self.font = self.pro.font
-        self.default_properties = self.pro.getInfo()
+        self.html = self.pro_window.html
+        self.font = self.pro_window.font
+        self.default_properties = self.pro_window.getInfo()
         return self.default_properties
 
     # 设置输入输出设备
@@ -144,27 +144,34 @@ class TextDisplay(QMainWindow):
 
     # 设置输出设备
     def setOutDevices(self, devices):
-        self.pro.duration.out_devices_dialog.addDevices(devices)
+        self.pro_window.duration.out_devices_dialog.addDevices(devices)
 
     # 设置输入设备
     def setInDevices(self, devices):
-        self.pro.duration.in_devices_dialog.addDevices(devices)
+        self.pro_window.duration.in_devices_dialog.addDevices(devices)
 
     # 设置可选参数
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
-        self.pro.setAttributes(format_attributes)
+        self.pro_window.setAttributes(format_attributes)
+
+    def setProperties(self, properties: dict):
+        self.default_properties.update(properties)
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.pro_window.loadSetting()
 
     def clone(self, value):
         clone_widget = TextDisplay(value=value)
-        clone_widget.setPro(self.pro.clone())
+        clone_widget.setPro(self.pro_window.clone())
         clone_widget.apply()
 
         # self.pro.tab.addTab(clone_widget, "c")
         return clone_widget
 
     def test(self):
-        self.pro_clone = self.pro.clone()
+        self.pro_clone = self.pro_window.clone()
         self.pro_clone.setWindowModality(Qt.ApplicationModal)
         self.pro_clone.show()
 

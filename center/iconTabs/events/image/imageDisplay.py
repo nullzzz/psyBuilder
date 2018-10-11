@@ -16,14 +16,14 @@ class ImageDisplay(QMainWindow):
         self.value = value
         self.attributes = []
         self.label = QLabel()
-        self.pro = ImageProperty()
+        self.pro_window = ImageProperty()
 
-        self.default_properties = self.pro.getInfo()
+        self.default_properties = self.pro_window.getInfo()
 
-        self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
         # self.pro.cancel_bt.clicked.connect(self.testBt)
-        self.pro.apply_bt.clicked.connect(self.apply)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
         self.file = ""
         self.isStretch = False
@@ -63,8 +63,8 @@ class ImageDisplay(QMainWindow):
 
     def openPro(self):
         # 阻塞原窗口
-        self.pro.setWindowModality(Qt.ApplicationModal)
-        self.pro.show()
+        self.pro_window.setWindowModality(Qt.ApplicationModal)
+        self.pro_window.show()
 
     # 预览图片
     def preView(self):
@@ -89,10 +89,10 @@ class ImageDisplay(QMainWindow):
 
     def ok(self):
         self.apply()
-        self.pro.close()
+        self.pro_window.close()
 
     def cancel(self):
-        self.pro.loadSetting()
+        self.pro_window.loadSetting()
 
     def apply(self):
         self.getInfo()
@@ -112,17 +112,17 @@ class ImageDisplay(QMainWindow):
 
     # 从pro获取参数
     def getPro(self):
-        self.file = self.pro.general.file_name.text()
-        self.isUD = self.pro.general.mirrorUD.checkState()
-        self.isLR = self.pro.general.mirrorLR.checkState()
-        self.isStretch = self.pro.general.stretch.checkState()
-        self.stretch_mode = self.pro.general.stretch_mode.currentText()
-        self.back_color = self.pro.general.back_color.currentText()
-        self.transparent_value = self.pro.general.transparent.value()
-        self.x_pos = self.pro.frame.x_pos.currentText()
-        self.y_pos = self.pro.frame.y_pos.currentText()
-        self.w_size = self.pro.frame.width.currentText()
-        self.h_size = self.pro.frame.height.currentText()
+        self.file = self.pro_window.general.file_name.text()
+        self.isUD = self.pro_window.general.mirrorUD.checkState()
+        self.isLR = self.pro_window.general.mirrorLR.checkState()
+        self.isStretch = self.pro_window.general.stretch.checkState()
+        self.stretch_mode = self.pro_window.general.stretch_mode.currentText()
+        self.back_color = self.pro_window.general.back_color.currentText()
+        self.transparent_value = self.pro_window.general.transparent.value()
+        self.x_pos = self.pro_window.frame.x_pos.currentText()
+        self.y_pos = self.pro_window.frame.y_pos.currentText()
+        self.w_size = self.pro_window.frame.width.currentText()
+        self.h_size = self.pro_window.frame.height.currentText()
 
     # 设置主面板的图片
     def setImage(self):
@@ -132,7 +132,7 @@ class ImageDisplay(QMainWindow):
         self.pix = pix
         # 图片反转
         if self.isStretch:
-            mode = self.pro.general.stretch_mode.currentText()
+            mode = self.pro_window.general.stretch_mode.currentText()
             w = self.label.size().width()
             h = self.label.size().height()
             if mode == "Both":
@@ -147,16 +147,16 @@ class ImageDisplay(QMainWindow):
 
     # 返回设置参数
     def getInfo(self):
-        self.default_properties = self.pro.getInfo()
+        self.default_properties = self.pro_window.getInfo()
         return self.default_properties
 
     def setPro(self, pro: ImageProperty):
-        del self.pro
-        self.pro = pro
-        self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.cancel)
+        del self.pro_window
+        self.pro_window = pro
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
         # self.pro.cancel_bt.clicked.connect(self.testBt)
-        self.pro.apply_bt.clicked.connect(self.apply)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
     # 设置输入输出设备
     def setDevices(self, in_devices, out_devices):
@@ -165,27 +165,34 @@ class ImageDisplay(QMainWindow):
 
     # 设置输出设备
     def setOutDevices(self, devices):
-        self.pro.duration.out_devices_dialog.addDevices(devices)
+        self.pro_window.duration.out_devices_dialog.addDevices(devices)
 
     # 设置输入设备
     def setInDevices(self, devices):
-        self.pro.duration.in_devices_dialog.addDevices(devices)
+        self.pro_window.duration.in_devices_dialog.addDevices(devices)
 
     # 设置可选参数
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
-        self.pro.setAttributes(format_attributes)
+        self.pro_window.setAttributes(format_attributes)
+
+    def setProperties(self, properties: dict):
+        self.default_properties.update(properties)
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.pro_window.loadSetting()
 
     # copy当前image对象
     def clone(self, value):
         clone_widget = ImageDisplay(value=value)
-        clone_widget.setPro(self.pro.clone())
+        clone_widget.setPro(self.pro_window.clone())
         clone_widget.apply()
         # self.pro.tab.addTab(clone_widget, "c")
         return clone_widget
 
     def test(self):
-        self.pro_clone = self.pro.clone()
+        self.pro_clone = self.pro_window.clone()
         self.pro_clone.setWindowModality(Qt.ApplicationModal)
         self.pro_clone.show()
 

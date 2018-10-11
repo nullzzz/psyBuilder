@@ -2,10 +2,11 @@ import json
 import os
 import sys
 
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QSettings
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QMessageBox, QFileDialog
 
+from Info import Info
 from attributes.main import Attributes
 from center.iconTabs.events.durationPage import DurationPage
 from center.main import Center
@@ -36,6 +37,7 @@ class MainWindow(QMainWindow):
         new_file_action = QAction("&New", self)
         new_file_action.triggered.connect(self.newFile)
         open_file_action = QAction("&Open", self)
+        open_file_action.triggered.connect(self.openFile)
         save_file_action = QAction("&Save", self)
         save_file_action.triggered.connect(self.getData)
         exit_action = QAction("&Exit", self)
@@ -240,7 +242,41 @@ class MainWindow(QMainWindow):
         python = sys.executable
         os.execl(python, python, *sys.argv)
 
+    def openFile(self):
+        options = QFileDialog.Options()
+        file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", "",
+                                                   "Psy File (*.psy;*.ini)", options=options)
+        if file_name:
+            file_name: str
+            if file_name.endswith("ini"):
+                setting = QSettings(file_name, QSettings.IniFormat)
+                input_device_info = setting.value("INPUT_DEVICE_INFO")
+                if input_device_info is not None:
+                    self.input_devices.setProperties(input_device_info)
+                output_device_info = setting.value("OUTPUT_DEVICE_INFO")
+                if output_device_info is not None:
+                    self.output_devices.setProperties(output_device_info)
+            elif file_name.endswith("psy"):
+                with open(file_name, "r") as f:
+                    for line in f.readlines():
+                        if line.startswith("INPUT_DEVICE_INFO:"):
+                            pass
+                    info = json.loads(f.read())
+                    self.input_devices.setProperties(info)
+
     def getData(self):
+        # 导出输入设备信息
+        input_device_info: dict = Info.INPUT_DEVICE_INFO.copy()
+        output_device_info:dict = Info.OUTPUT_DEVICE_INFO.copy()
+        with open("test_file.psy", "w") as f:
+            f.write("INPUT_DEVICE_INFO:\n")
+            f.write(json.dumps(input_device_info))
+            f.write("OUTPUT_DEVICE_INFO:\n")
+            f.write(json.dumps(output_device_info))
+        setting = QSettings("load.ini", QSettings.IniFormat)
+        setting.setValue("INPUT_DEVICE_INFO", input_device_info)
+        setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
+        print("save input devices information successful")
         try:
             node_value = self.structure.getNodeValue()
             self.output.text_area.setText(

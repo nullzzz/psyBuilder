@@ -262,6 +262,13 @@ class VideoDisplay(QMainWindow):
         self.default_properties = self.pro.getInfo()
         return self.default_properties
 
+    def setProperties(self, properties: dict):
+        self.default_properties.update(properties)
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.pro_window.loadSetting()
+
     def clone(self, value):
         clone_widget = VideoDisplay(value=value)
         clone_widget.setPro(self.pro.clone())

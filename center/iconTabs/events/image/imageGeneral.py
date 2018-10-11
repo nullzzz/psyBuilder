@@ -110,7 +110,7 @@ class ImageTab1(QWidget):
     # 打开文件夹
     def openFile(self):
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Find the image file)", self.file_name.text(),
+        file_name, _ = QFileDialog.getOpenFileName(self, "Find the image file", self.file_name.text(),
                                                    "Image File (*.bmp;*.jpeg;*.jpg;*.png;*.gif)", options=options)
         if file_name:
             self.file_name.setText(file_name)

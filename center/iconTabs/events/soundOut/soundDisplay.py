@@ -224,7 +224,13 @@ class SoundDisplay(QMainWindow):
         self.pro.cancel_bt.clicked.connect(self.cancel)
         self.pro.apply_bt.clicked.connect(self.apply)
 
-    # to
+    def setProperties(self, properties: dict):
+        self.default_properties.update(properties)
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.pro_window.loadSetting()
+
     def clone(self, value):
         clone_widget = SoundDisplay(value=value)
         clone_widget.setPro(self.pro.clone())
