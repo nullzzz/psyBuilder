@@ -31,6 +31,7 @@ class GlobalDevice(QWidget):
         self.devices_list.setIconSize(QSize(40, 40))
 
         self.device_type = io_type
+        # device_list是写死的
         if io_type:
             self.devices = ("serial_port", "parallel_port", "network_port")
             self.setWindowTitle("Output Devices")
@@ -124,13 +125,15 @@ class GlobalDevice(QWidget):
     # todo: 参数导出
     def getInfo(self):
         if self.device_type:
-            Info.INPUT_DEVICE_INFO = self.selected_devices.getInfo().copy()
+            Info.OUTPUT_DEVICE_INFO.update(self.selected_devices.getInfo().copy())
         else:
-            Info.OUTPUT_DEVICE_INFO = self.selected_devices.getInfo().copy()
+            Info.INPUT_DEVICE_INFO.update(self.selected_devices.getInfo().copy())
 
     # todo:参数导入
     def setProperties(self, properties: dict):
-        self.selected_devices.setPorperties(properties)
+        self.selected_devices.clearAll()
+        self.selected_devices.setProperties(properties)
+
 
 
 if __name__ == "__main__":
