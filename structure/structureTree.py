@@ -87,7 +87,7 @@ class StructureTree(QTreeWidget):
             drag.setMimeData(mime_data)
             drag.exec(Qt.MoveAction)
         except Exception as e:
-            print(f"error {e} happens in cut drag. [structure/structureTree.py]")
+            print(f"error {e} happens in move drag. [structure/structureTree.py]")
 
     def copyDrag(self, item):
         try:

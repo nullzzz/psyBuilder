@@ -1,6 +1,6 @@
 import copy
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QDataStream, QIODevice
 from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
 from PyQt5.QtWidgets import QAction, QMainWindow, QInputDialog, QTableWidgetItem, QMessageBox, QMenu, QApplication, \
     QShortcut
@@ -29,6 +29,8 @@ class Cycle(QMainWindow):
     # (value, exist_value)
     timelineWidgetMerge = pyqtSignal(str, str)
     timelineWidgetSplit = pyqtSignal(str, str)
+    timelineParentChange = pyqtSignal(str, str)
+    timelineCopy = pyqtSignal(str, str)
 
     def __init__(self, parent=None, value=''):
         super(Cycle, self).__init__(parent)
@@ -43,6 +45,7 @@ class Cycle(QMainWindow):
         self.row_name = {}
         # value : row
         self.value_row = {}
+        self.emit_change = True
         self.timeline_count = 0
 
         self.setCentralWidget(self.timeline_table)
@@ -55,6 +58,7 @@ class Cycle(QMainWindow):
         self.setMenuAndShortcut()
         # 信号
         self.linkSignals()
+        self.setAcceptDrops(True)
 
     def setToolbar(self):
         setting = QAction(QIcon("image/setting.png"), "Setting", self)
@@ -237,6 +241,66 @@ class Cycle(QMainWindow):
 
         return res
 
+    def dragEnterEvent(self, e):
+        if e.mimeData().hasFormat("application/StructureTree-move-value-name") or \
+                e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+            e.setDropAction(Qt.CopyAction)
+            e.accept()
+        else:
+            e.ignore()
+
+    def dragMoveEvent(self, e):
+        try:
+            if e.mimeData().hasFormat("application/StructureTree-move-value-name") or \
+                    e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+
+                e.setDropAction(Qt.CopyAction)
+                e.accept()
+            else:
+                e.ignore()
+        except Exception as e:
+            print(f"error {e} happens in drag move. [cycle/main.py]")
+
+    def dropEvent(self, e):
+        if e.mimeData().hasFormat("application/StructureTree-move-value-name"):
+            data = e.mimeData().data("application/StructureTree-move-value-name")
+            stream = QDataStream(data, QIODevice.ReadOnly)
+            value = stream.readQString()
+            name = stream.readQString()
+            self.timeline_table.addRow()
+            row = self.timeline_table.rowCount() - 1
+            # 将原有节点删除
+            self.timelineParentChange.emit(self.value, value)
+            self.emit_change = False
+            self.timeline_table.setItem(row, 1, QTableWidgetItem(name))
+            self.row_value[row] = value
+            self.row_name[row] = name
+            self.value_row[value] = row
+
+            e.setDropAction(Qt.MoveAction)
+            e.accept()
+        elif e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+            data = e.mimeData().data("application/StructureTree-copy-value-name")
+            stream = QDataStream(data, QIODevice.ReadOnly)
+            value = stream.readQString()
+            name = stream.readQString()
+            # 先新建一个节点
+            self.timeline_table.addRow()
+            row = self.timeline_table.rowCount() - 1
+            name = Structure.getValidName('Timeline.', True, name)
+            self.timeline_table.setItem(row, 1, QTableWidgetItem(name))
+            # copy
+            self.timelineCopy.emit(self.row_value[row], value)
+
+            e.setDropAction(Qt.CopyAction)
+            e.accept()
+        else:
+            e.ignore()
+        try:
+            pass
+        except Exception as e:
+            print(f"error {e} happens in drop. [cycle/main.py]")
+
     # def addOrChangeTimeline(self, row, col):
     #     try:
     #         if col == 1:
@@ -314,21 +378,24 @@ class Cycle(QMainWindow):
                 item = self.timeline_table.item(row, col)
                 # new timeline
                 if row not in self.row_value:
-                    name = item.text()
-                    if name:
-                        name_validity, tips = Structure.checkNameValidity(name, 'Timeline.')
-                        if name_validity:
-                            # 生成timeline的icon实例
-                            timeline_icon = Icon(name='Timeline', pixmap=getImage('Timeline', 'pixmap'))
-                            # 相关数据存储
-                            self.row_value[row] = timeline_icon.value
-                            self.row_name[row] = name
-                            self.value_row[timeline_icon.value] = row
-                            # 给
-                            self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
-                            self.timeline_count += 1
-                        else:
-                            QMessageBox.information(self, 'Tips', tips)
+                    if self.emit_change:
+                        name = item.text()
+                        if name:
+                            name_validity, tips = Structure.checkNameValidity(name, 'Timeline.', [name])
+                            if name_validity:
+                                # 生成timeline的icon实例
+                                timeline_icon = Icon(name='Timeline', pixmap=getImage('Timeline', 'pixmap'))
+                                # 相关数据存储
+                                self.row_value[row] = timeline_icon.value
+                                self.row_name[row] = name
+                                self.value_row[timeline_icon.value] = row
+                                # 给
+                                self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
+                                self.timeline_count += 1
+                            else:
+                                QMessageBox.information(self, 'Tips', tips)
+                    else:
+                        self.emit_change = True
                 # change timeline name
                 else:
                     name = item.text()
@@ -506,6 +573,9 @@ class Cycle(QMainWindow):
     #         return cycle_copy
     #     except Exception as e:
     #         print(f"error {e} happens in copy cycle. [cycle/main.py]")
+
+    def removeIconSimply(self, value):
+            self.deleteTimeline(value)
 
     def copy(self, value):
         try:

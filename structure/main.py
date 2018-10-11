@@ -157,7 +157,8 @@ class Structure(QDockWidget):
     #     except Exception as e:
     #         print(f"error {e} happens in add node in structure. [structure/main.py]")
 
-    def addNode(self, parent_value='Timeline.10001', text="node", pixmap=None, value:str="", properties_window=None, condition_type=''):
+    def addNode(self, parent_value='Timeline.10001', text="node", pixmap=None, value: str = "", properties_window=None,
+                condition_type=''):
         try:
             if parent_value in Structure.value_node:
                 parent = Structure.value_node[parent_value]
@@ -385,7 +386,7 @@ class Structure(QDockWidget):
                 # 删除旧name相关数据
                 del Structure.name_value[old_name]
                 # new name
-                Structure.name_value[name]  = value
+                Structure.name_value[name] = value
                 Structure.value_node[value].setText(0, new_name)
 
                 # timeline中icon
@@ -451,12 +452,13 @@ class Structure(QDockWidget):
     #         print(f"error {e} happens in copy icon simply. [structure/main.py]")
 
     def copyNode(self, value, exist_value):
+        # 在调用时要保证value节点已经被建立，控件已经被复制
         # 此节点的复制命名，应该已经在前面的步骤完成
-        # 在此函数中要完成其子节点的复制命名
+        # 在此函数中要完成其子节点的复制命名，以及发送控件复制信号到iconTabs
         if value in Structure.value_node and exist_value in Structure.value_node:
             # 删除所有原有子节点
             node = Structure.value_node[value]
-            while(node.childCount()):
+            while (node.childCount()):
                 self.removeNode(value, node.child(0).value)
             # 将被复制的节点的子节点复制过来
             self.copyNodeSimply(value, exist_value)
@@ -489,14 +491,17 @@ class Structure(QDockWidget):
             self.nodeWidgetCopy.emit(exist_child.value, child_node.value)
 
     def changeNode(self, new_parent_value, value):
-        # 将一个节点及其所有子节点移动到新的parent下
-        child = Structure.value_node[value]
-        old_parent = child.parent()
-        old_parent.removeChild(child)
-        new_parent:StructureItem = Structure.value_node[new_parent_value]
-        new_parent.addChild(child)
-        # 将原父节点控件中的子节点图标删除
-        self.iconRemove.emit(old_parent.value, value)
+        try:
+            # 将一个节点及其所有子节点移动到新的parent下
+            child = Structure.value_node[value]
+            old_parent = child.parent()
+            old_parent.removeChild(child)
+            new_parent: StructureItem = Structure.value_node[new_parent_value]
+            new_parent.addChild(child)
+            # 将原父节点控件中的子节点图标删除
+            self.iconRemove.emit(old_parent.value, value)
+        except Exception as e:
+            print(f"error {e} happens in change node parent. [structure/main.py]")
 
     def openTab(self):
         try:
@@ -551,7 +556,8 @@ class Structure(QDockWidget):
                 child = node.child(i)
                 # 子节点为Cycle\Timeline\if\switch时
                 # 继续递归遍历
-                if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith("Switch."):
+                if child.value.startswith("Cycle.") or child.value.startswith("Timeline.") or child.value.startswith(
+                        "Switch."):
                     pass
                     # grand_child_data = OrderedDict()
                     # grand_child_data[child.value] = self.do_getNodeValue(child, {})
@@ -825,7 +831,7 @@ class Structure(QDockWidget):
         try:
             parent = Structure.value_node[parent_value]
             for i in range(parent.childCount()):
-                child:StructureItem = parent.child(i)
+                child: StructureItem = parent.child(i)
                 if child.text(0).startswith(f"[{condition_type}]"):
                     return ' '.join(child.text(0).split(' ')[1:]), child.value
         except Exception as e:
