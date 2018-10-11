@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QVBoxLayout, QFrame, QTableWidgetItem
 from PyQt5.QtCore import Qt, QDataStream, QIODevice, pyqtSignal, QSize
 from PyQt5.QtGui import QPixmap
-from .iconTable import IconTable
-from structure.main import Structure
+from PyQt5.QtWidgets import QVBoxLayout, QFrame
+
 from getImage import getImage
+from structure.main import Structure
+from .iconTable import IconTable
 
 
 class IconArea(QFrame):
