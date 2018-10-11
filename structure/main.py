@@ -62,6 +62,8 @@ class Structure(QDockWidget):
     # condition
     IF_ELSE_COUNT = 0
     SWITCH_COUNT = 0
+    # other
+    OTHER_COUNT = 0
 
     def __init__(self, parent=None):
         super(Structure, self).__init__(parent)
@@ -527,7 +529,7 @@ class Structure(QDockWidget):
     def getNodeValue(self):
         """
         root 就是timeline
-        :return: node_value
+        :return: structure_tree: 嵌套列表存储树状结构，[根节点，子树1， 子数2， ……]
         """
         try:
             # 深度优先遍历
@@ -590,42 +592,61 @@ class Structure(QDockWidget):
     def addCount(widget_type):
         if widget_type == "Cycle":
             Structure.CYCLE_COUNT += 1
+            Info.WIDGET_COUNT["CYCLE_COUNT"] += 1
         elif widget_type == "Timeline":
             Structure.TIMELINE_COUNT += 1
+            Info.WIDGET_COUNT["TIMELINE_COUNT"] += 1
         elif widget_type == "SoundOut":
             Structure.SOUNTOUT_COUNT += 1
+            Info.WIDGET_COUNT["SOUNTOUT_COUNT"] += 1
         elif widget_type == "Text":
             Structure.TEXT_COUNT += 1
+            Info.WIDGET_COUNT["TEXT_COUNT"] += 1
         elif widget_type == "Image":
             Structure.IMAGE_COUNT += 1
+            Info.WIDGET_COUNT["IMAGE_COUNT"] += 1
         elif widget_type == "Video":
             Structure.VIDEO_COUNT += 1
+            Info.WIDGET_COUNT["VIDEO_COUNT"] += 1
         elif widget_type == "Close":
             Structure.CLOSE_COUNT += 1
+            Info.WIDGET_COUNT["CLOSE_COUNT"] += 1
         elif widget_type == "DC":
             Structure.DC_COUNT += 1
+            Info.WIDGET_COUNT["DC_COUNT"] += 1
         elif widget_type == "Calibration":
             Structure.CALIBRATION_COUNT += 1
+            Info.WIDGET_COUNT["CALIBRATION_COUNT"] += 1
         elif widget_type == "EndR":
             Structure.ENDR_COUNT += 1
+            Info.WIDGET_COUNT["ENDR_COUNT"] += 1
         elif widget_type == "Open":
             Structure.OPEN_COUNT += 1
+            Info.WIDGET_COUNT["OPEN_COUNT"] += 1
         elif widget_type == "Action":
             Structure.ACTION_COUNT += 1
+            Info.WIDGET_COUNT["ACTION_COUNT"] += 1
         elif widget_type == "StartR":
             Structure.STARTR_COUNT += 1
+            Info.WIDGET_COUNT["STARTR_COUNT"] += 1
         elif widget_type == "QuestGetValue":
             Structure.QUESTGETVALUE_COUNT += 1
+            Info.WIDGET_COUNT["QUESTGETVALUE_COUNT"] += 1
         elif widget_type == "QuestUpdate":
             Structure.QUESTUPDATA_COUNT += 1
+            Info.WIDGET_COUNT["QUESTUPDATA_COUNT"] += 1
         elif widget_type == "QuestInit":
             Structure.QUESTINIT_COUNT += 1
+            Info.WIDGET_COUNT["QUESTINIT_COUNT"] += 1
         elif widget_type == "If_else":
             Structure.IF_ELSE_COUNT += 1
+            Info.WIDGET_COUNT["IF_ELSE_COUNT"] += 1
         elif widget_type == "Switch":
             Structure.SWITCH_COUNT += 1
+            Info.WIDGET_COUNT["SWITCH_COUNT"] += 1
         else:
             Structure.OTHER_COUNT += 1
+            Info.WIDGET_COUNT["OTHER_COUNT"] += 1
 
     @staticmethod
     def getCount(widget_type):
@@ -892,3 +913,7 @@ class Structure(QDockWidget):
                 return False
             parent = parent.parent()
         return True
+
+    # todo: 导入widget_count
+    def setCount(self, widget_count: dict):
+        pass

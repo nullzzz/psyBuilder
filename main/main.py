@@ -261,6 +261,9 @@ class MainWindow(QMainWindow):
                 dock_layout = setting.value("DOCK_LAYOUT")
                 if dock_layout is not None:
                     self.restoreState(dock_layout)
+
+                structure_tree: list = setting.value("STRUCTURE_TREE")
+                # todo: 遍历节点，以value获取参数字典，添加到structure和center
             elif file_name.endswith("psy"):
                 with open(file_name, "r") as f:
                     pass
@@ -286,8 +289,11 @@ class MainWindow(QMainWindow):
                 setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
                 setting.setValue("DOCK_LAYOUT", current_dock_layout)
                 try:
+                    # 保存树状结构及其节点数量
                     structure_tree = self.structure.getNodeValue()
                     setting.setValue("STRUCTURE_TREE", structure_tree)
+                    widget_count: dict = Info.WIDGET_COUNT.copy()
+                    setting.setValue("WIDGET_COUNT", widget_count)
                     self.output.text_area.setText(
                         "Only show structure data, attributes or properties will be show in next version.\n")
                     print(structure_tree)
