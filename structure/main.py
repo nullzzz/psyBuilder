@@ -161,19 +161,26 @@ class Structure(QDockWidget):
     def addNode(self, parent_value='Timeline.10001', text="node", pixmap=None, value: str = "", properties_window=None,
                 condition_type=''):
         try:
-            if parent_value in Structure.value_node:
+            # 判断父节点是否在
+            if parent_value in Structure.value_node.keys():
                 parent = Structure.value_node[parent_value]
                 node = StructureItem(parent, value)
                 name = text
                 # todo 涉及If_else
                 if parent_value.startswith('If_else'):
-                    name = f'[{condition_type}] ' + text
+                    # 从文件导入
+                    if text.startswith("["):
+                        pass
+                    # 直接添加
+                    else:
+                        name = f'[{condition_type}] ' + text
                 node.setText(0, name)
                 # node.setIcon(0, QIcon(pixmap))
                 parent.setExpanded(True)
                 # 相关字典数据
                 Structure.value_node[value] = node
                 Structure.name_value[text] = value
+                Info.VALUE_NODE[value] = node
                 # 名称计数
                 self.addCount(value.split('.')[0])
         except Exception as e:
@@ -541,7 +548,7 @@ class Structure(QDockWidget):
                 root = self.structure_tree.topLevelItem(i)
                 # 节点的特征值： 节点的properties
                 # node_value[root.value] = self.do_getNodeValue(root, [])
-                struture_tree.append(root.value)
+                struture_tree.append(f"{root.text(0)}-{root.value}")
                 self.do_getNodeValue(root, struture_tree)
             return struture_tree
         except Exception as e:
@@ -937,16 +944,16 @@ class Structure(QDockWidget):
         pass
 
     # 从文件加载structure
+    # todo: 对于if_branch的true和false标签要加上
     def loadStructure(self, data: list):
         """
         :param parent_value:
         :param data: 树结构
         :return:
         """
-        parent_value = data[0]
+        parent_value = data[0].split("-")[1]
         for i in data[1:]:
             if isinstance(i, list):
-                print(i)
                 text, value = i[0].split("-")
                 self.addNode(parent_value, text=text, value=value)
                 self.loadStructure(i)

@@ -4,7 +4,8 @@ from getImage import getImage
 
 
 class StructureItem(QTreeWidgetItem):
-    def __init__(self, parent=None, value=''):
+    def __init__(self, parent=None, value: str=""):
+        # 要确保value的格式是Cycle.0
         super(StructureItem, self).__init__(parent)
 
         self.value = value

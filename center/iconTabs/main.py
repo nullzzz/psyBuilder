@@ -637,8 +637,8 @@ class IconTabs(QTabWidget):
                 self.close_other_action.disconnect()
                 self.close_other_action.triggered.connect(lambda: self.closeOtherTab(index=tab_index))
                 self.right_button_menu.exec(self.mapToGlobal(e.pos()))
-        except Exception:
-            print("error happens in showing tab bar right button menu. [iconTabs/main.py]")
+        except Exception as e:
+            print(f"error {e} happens in showing tab bar right button menu. [iconTabs/main.py]")
 
     def closeAllTab(self):
         for i in range(0, self.count()):
@@ -677,3 +677,20 @@ class IconTabs(QTabWidget):
                     attributes[attribute] = IconTabs.value_widget_global[value].attributes[attribute]
 
         return attributes
+
+
+    # todo icon加入timeline
+    def loadIcon(self, data: list):
+        """
+        :param data:
+        :return:
+        """
+        print("here")
+        parent_value = data[0].split("-")[1]
+        for i in data:
+            if isinstance(i, list):
+                text, value = i[0].split("-")
+
+            else:
+                text, value = i.split("-")
+            self.addIcon(parent_value, text, "", value)

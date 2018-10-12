@@ -8,6 +8,8 @@ class Info:
 
     # 特征值-控件对象
     VALUE_WIDGET: dict = {}
+    # 特征值-node节点
+    VALUE_NODE: dict = {}
 
     WIDGET_INFO: dict = {}
 
