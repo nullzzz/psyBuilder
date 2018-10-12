@@ -1,5 +1,7 @@
 # 全局变量
 class Info:
+    # 自动保存间隔时间
+    AUTO_SAVE_TIME: int = 3000000
     # 输入输出设备
     INPUT_DEVICE_INFO: dict = {}
     OUTPUT_DEVICE_INFO: dict = {}

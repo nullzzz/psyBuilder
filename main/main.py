@@ -17,14 +17,11 @@ from structure.main import Structure
 
 
 class MainWindow(QMainWindow):
-    # 每隔五分钟自动保存
-    AUTO_SAVE_TIME = 3000000
-
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         # auto save
         self.auto_save = QTimer(self)
-        self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
+        self.auto_save.start(Info.AUTO_SAVE_TIME)
         self.auto_save.timeout.connect(self.getData)
         # set UI
         self.setWindowTitle("PsyDemo")
@@ -264,6 +261,7 @@ class MainWindow(QMainWindow):
 
                 structure_tree: list = setting.value("STRUCTURE_TREE")
                 # todo: 遍历节点，以value获取参数字典，添加到structure和center
+                self.structure.loadStructure(structure_tree)
             elif file_name.endswith("psy"):
                 with open(file_name, "r") as f:
                     pass
@@ -276,7 +274,7 @@ class MainWindow(QMainWindow):
         # 导出当前dock布局信息
         current_dock_layout = self.saveState()
         options = QFileDialog.Options()
-
+        # todo: 判断另存为还是直接保存
         if Info.FILE_NAME:
             pass
         else:
@@ -294,13 +292,20 @@ class MainWindow(QMainWindow):
                     setting.setValue("STRUCTURE_TREE", structure_tree)
                     widget_count: dict = Info.WIDGET_COUNT.copy()
                     setting.setValue("WIDGET_COUNT", widget_count)
+
                     self.output.text_area.setText(
                         "Only show structure data, attributes or properties will be show in next version.\n")
                     print(structure_tree)
                     # reset timer
-                    self.auto_save.start(MainWindow.AUTO_SAVE_TIME)
+                    self.auto_save.start(Info.AUTO_SAVE_TIME)
                 except Exception as e:
                     print(f"error {e} happens in get data and reset timer {sys._getframe().f_lineno}. [main/main.py]")
+
+    def saveAs(self):
+        options = QFileDialog.Options()
+        save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Psy Files (*.ini);", options=options)
+        if save_file_name:
+            Info.FILE_NAME = save_file_name
 
     # 恢复默认布局
     def resetView(self):

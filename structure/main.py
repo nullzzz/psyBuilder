@@ -165,11 +165,11 @@ class Structure(QDockWidget):
                 parent = Structure.value_node[parent_value]
                 node = StructureItem(parent, value)
                 name = text
-                # TODO 涉及If_else
+                # todo 涉及If_else
                 if parent_value.startswith('If_else'):
                     name = f'[{condition_type}] ' + text
                 node.setText(0, name)
-                node.setIcon(0, QIcon(pixmap))
+                # node.setIcon(0, QIcon(pixmap))
                 parent.setExpanded(True)
                 # 相关字典数据
                 Structure.value_node[value] = node
@@ -560,19 +560,19 @@ class Structure(QDockWidget):
                 # 子节点为Cycle\Timeline\if\switch时
                 # 继续递归遍历
                 if child.value.startswith("Cycle."):
-                    child_tree: list = [child.value]
+                    child_tree: list = [f"{child.text(0)}-{child.value}"]
                     self.do_getNodeValue(child, child_tree)
                     sub_tree.append(child_tree)
                 elif child.value.startswith("Timeline."):
-                    child_tree: list = [child.value]
+                    child_tree: list = [f"{child.text(0)}-{child.value}"]
                     self.do_getNodeValue(child, child_tree)
                     sub_tree.append(child_tree)
                 elif child.value.startswith("Switch."):
-                    child_tree: list = [child.value]
+                    child_tree: list = [f"{child.text(0)}-{child.value}"]
                     self.do_getNodeValue(child, child_tree)
                     sub_tree.append(child_tree)
                 elif child.value.startswith("If_else."):
-                    child_tree: list = [child.value]
+                    child_tree: list = [f"{child.text(0)}-{child.value}"]
                     self.do_getNodeValue(child, child_tree)
                     sub_tree.append(child_tree)
                 else:
@@ -580,8 +580,9 @@ class Structure(QDockWidget):
                         widget = Info.VALUE_WIDGET[child.value]
                         setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
                         node_name: dict = {"__name__": child.text(0)}
-                        setting.setValue(child.value, widget.getInfo().update(node_name))
-                        sub_tree.append(child.value)
+                        key: str = f"{child.text(0)}-{child.value}"
+                        setting.setValue(key, widget.getInfo().update(node_name))
+                        sub_tree.append(key)
                     except KeyError:
                         print(f"{child.value} hasn't been initialized")
 
@@ -934,3 +935,21 @@ class Structure(QDockWidget):
     # todo: 导入widget_count
     def setCount(self, widget_count: dict):
         pass
+
+    # 从文件加载structure
+    def loadStructure(self, data: list):
+        """
+        :param parent_value:
+        :param data: 树结构
+        :return:
+        """
+        parent_value = data[0]
+        for i in data[1:]:
+            if isinstance(i, list):
+                print(i)
+                text, value = i[0].split("-")
+                self.addNode(parent_value, text=text, value=value)
+                self.loadStructure(i)
+            elif isinstance(i, str):
+                text, value = i.split("-")
+                self.addNode(parent_value, text=text, value=value)
