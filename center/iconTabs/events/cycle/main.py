@@ -31,6 +31,7 @@ class Cycle(QMainWindow):
     timelineWidgetSplit = pyqtSignal(str, str)
     timelineParentChange = pyqtSignal(str, str)
     timelineCopy = pyqtSignal(str, str)
+    timelineCopyWidget = pyqtSignal(str, str)
 
     def __init__(self, parent=None, value=''):
         super(Cycle, self).__init__(parent)
@@ -116,6 +117,7 @@ class Cycle(QMainWindow):
         self.property.apply_bt.clicked.connect(self.saveProperties)
         self.timeline_table.cellChanged.connect(self.addOrChangeTimeline)
         self.timeline_table.cellChanged.connect(self.changeAttributeValue)
+        self.timeline_table.canEmit.connect(self.setEmitable)
 
     def addRows(self):
         try:
@@ -158,14 +160,19 @@ class Cycle(QMainWindow):
         # 新增attributes
         if not len(data) % 2:
             for i in range(0, len(data), 2):
-                self.timeline_table.col_header.append(data[i])
-                self.timeline_table.col_value.append(data[i + 1])
-                self.timeline_table.insertColumn(self.timeline_table.columnCount())
-                for row in range(0, self.timeline_table.rowCount()):
-                    self.timeline_table.setItem(row, self.timeline_table.columnCount() - 1,
-                                                QTableWidgetItem(data[i + 1]))
-                # 每次新增一个属性, 给icon tabs发送一个信号, 给此cycle中的timeline增加属性
-                self.attributeAdd.emit(self.value, data[i], data[i + 1])
+                name = data[i]
+                from center.iconTabs.main import IconTabs
+                if name not in IconTabs.getAttributes(self.value):
+                    self.timeline_table.col_header.append(data[i])
+                    self.timeline_table.col_value.append(data[i + 1])
+                    self.timeline_table.insertColumn(self.timeline_table.columnCount())
+                    for row in range(0, self.timeline_table.rowCount()):
+                        self.timeline_table.setItem(row, self.timeline_table.columnCount() - 1,
+                                                    QTableWidgetItem(data[i + 1]))
+                    # 每次新增一个属性, 给icon tabs发送一个信号, 给此cycle中的timeline增加属性
+                    self.attributeAdd.emit(self.value, data[i], data[i + 1])
+                else:
+                    QMessageBox.information(self, 'Tips', "Name has already existed.")
         else:
             col = data[-1]
             old_header = self.timeline_table.col_header[col]
@@ -178,8 +185,9 @@ class Cycle(QMainWindow):
             if default_value != data[1]:
                 self.timeline_table.col_value[col] = data[1]
                 for row in range(0, self.timeline_table.rowCount()):
-                    if self.timeline_table.item(row, col) == None or self.timeline_table.item(row, col).text() in ['',
-                                                                                                                   default_value]:
+                    if self.timeline_table.item(row, col) == None or self.timeline_table.item(row, col).text() in [
+                        '',
+                        default_value]:
                         self.timeline_table.setItem(row, col, QTableWidgetItem(data[1]))
         self.timeline_table.setHorizontalHeaderLabels(self.timeline_table.col_header)
 
@@ -244,6 +252,10 @@ class Cycle(QMainWindow):
     def dragEnterEvent(self, e):
         if e.mimeData().hasFormat("application/StructureTree-move-value-name") or \
                 e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+            data = e.mimeData().data("application/StructureTree-move-value-name")
+            if e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+                data = e.mimeData().data("application/StructureTree-copy-value-name")
+            # todo 检测
             e.setDropAction(Qt.CopyAction)
             e.accept()
         else:
@@ -291,6 +303,7 @@ class Cycle(QMainWindow):
             self.timeline_table.setItem(row, 1, QTableWidgetItem(name))
             # copy
             self.timelineCopy.emit(self.row_value[row], value)
+            self.timelineCopyWidget.emit(self.row_value[row], value)
 
             e.setDropAction(Qt.CopyAction)
             e.accept()
@@ -541,7 +554,8 @@ class Cycle(QMainWindow):
                 left_column = self.timeline_table.selectedRanges()[0].leftColumn()
                 for row in range(top_row, top_row + self.paste_row):
                     for col in range(left_column, left_column + self.paste_col):
-                        self.timeline_table.item(row, col).setText(self.paste_data[row - top_row][col - left_column])
+                        self.timeline_table.item(row, col).setText(
+                            self.paste_data[row - top_row][col - left_column])
         except Exception:
             print("paste into table error.")
 
@@ -575,7 +589,10 @@ class Cycle(QMainWindow):
     #         print(f"error {e} happens in copy cycle. [cycle/main.py]")
 
     def removeIconSimply(self, value):
-            self.deleteTimeline(value)
+        self.deleteTimeline(value)
+
+    def setEmitable(self, flag):
+        self.emit_change = flag
 
     def copy(self, value):
         try:
@@ -583,7 +600,8 @@ class Cycle(QMainWindow):
             # data, 一定要注意要是深拷贝
             # row_name row_value, value_row
             for row in self.row_name:
-                name, timeline_value = Structure.getNameAndValueByOldAndParent(self.row_name[row], self.value, value)
+                name, timeline_value = Structure.getNameAndValueByOldAndParent(self.row_name[row], self.value,
+                                                                               value)
                 cycle_copy.row_name[row] = name
                 cycle_copy.row_value[row] = timeline_value
                 cycle_copy.value_row[timeline_value] = row
@@ -612,6 +630,12 @@ class Cycle(QMainWindow):
 
     def restore(self, data):
         try:
-            pass
+            self.row_name = data['row_name']
+            self.row_value = data['row_value']
+            self.value_row = data['value_row']
+            self.timeline_count = data['timeline_count']
+            self.properties = data['properties']
+            self.setProperties()
+            self.timeline_table.restore(data['timeline_table'])
         except Exception as e:
             print(f"error {e} happens in restore cycle. [cycle/main.py]")

@@ -316,6 +316,9 @@ class IfBranch(QWidget):
     def copy(self, value):
         try:
             if_branch_copy = IfBranch(value=value)
+            # condition area
+            self.condition_area.copy(if_branch_copy.condition_area)
+            # icon choose
             # data (type_value[value, name, properties_window])
             if not self.type_value['T'][0].startswith('Other.'):
                 # icon_name, icon_value
@@ -340,25 +343,38 @@ class IfBranch(QWidget):
             print(f"error {e} happens in copy if branch. [ifBranch/main.py]")
 
     def save(self):
-        return self.type_value
+        try:
+            data = {}
+            data["condition_area"] = self.condition_area.save()
+            data['type_value'] = self.type_value
+            return data
+        except Exception as e:
+            print(f"error {e} happens in save if branch. [ifBranch/main.py]")
 
-    def restore(self, type_value:dict):
-        self.type_value = type_value
-        true_widget_type = self.type_value['T'][0].split('.')[0]
-        false_widget_type = self.type_value['F'][0].split('.')[0]
+    def restore(self, data:dict):
+        try:
+            # condition area
+            self.condition_area.restore(data['condition_area'])
+            # type value
+            type_value = data['type_value']
+            self.type_value = type_value
+            true_widget_type = self.type_value['T'][0].split('.')[0]
+            false_widget_type = self.type_value['F'][0].split('.')[0]
 
-        if true_widget_type != 'Other':
-            self.true_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
-            self.true_icon_choose.icon.changeValue(self.type_value['T'][0])
-            self.true_icon_choose.icon_name.setText(self.type_value['T'][1])
-            self.true_icon_choose.properties_window = self.type_value['T'][2]
-        else:
-            self.true_icon_choose.icon_comboBox.setCurrentIndex(0)
+            if true_widget_type != 'Other':
+                self.true_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
+                self.true_icon_choose.icon.changeValue(self.type_value['T'][0])
+                self.true_icon_choose.icon_name.setText(self.type_value['T'][1])
+                self.true_icon_choose.properties_window = self.type_value['T'][2]
+            else:
+                self.true_icon_choose.icon_comboBox.setCurrentIndex(0)
 
-        if false_widget_type != 'Other':
-            self.false_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
-            self.false_icon_choose.icon.changeValue(self.type_value['F'][0])
-            self.false_icon_choose.icon_name.setText(self.type_value['F'][1])
-            self.false_icon_choose.properties_window = self.type_value['F'][2]
-        else:
-            self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
+            if false_widget_type != 'Other':
+                self.false_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
+                self.false_icon_choose.icon.changeValue(self.type_value['F'][0])
+                self.false_icon_choose.icon_name.setText(self.type_value['F'][1])
+                self.false_icon_choose.properties_window = self.type_value['F'][2]
+            else:
+                self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
+        except Exception as e:
+            print(f"error {e} happens in restore if branch. [ifBranch/main.py]")

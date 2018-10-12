@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
+from PyQt5.QtCore import pyqtSignal
 from .colAdd import ColAdd
 from noDash import NoDash
 from structure.main import Structure
@@ -7,6 +8,7 @@ import copy
 
 
 class TimelineTable(QTableWidget):
+    canEmit = pyqtSignal(bool)
     def __init__(self, parent=None):
         super(TimelineTable, self).__init__(parent)
         # 保存name及其默认值
@@ -66,9 +68,9 @@ class TimelineTable(QTableWidget):
             data['col_value'] = self.col_value
             data['timeline'] = []
             # 列表中的值
-            for row in self.rowCount():
+            for row in range(self.rowCount()):
                 timeline_data = []
-                for col in self.columnCount():
+                for col in range(self.columnCount()):
                     timeline_data.append(self.item(row, col).text())
                 data['timeline'].append(timeline_data)
             return data
@@ -79,23 +81,26 @@ class TimelineTable(QTableWidget):
         try:
             self.col_header = data['col_header']
             self.col_value = data['col_value']
-            self.setColumnCount(self.col_header)
+            self.setColumnCount(len(self.col_header))
             self.setHorizontalHeaderLabels(self.col_header)
             # 还原timeline table
+            print(data['timeline'])
             for row in range(len(data['timeline'])):
                 timeline_data = data['timeline'][row]
                 if row < self.rowCount():
                     for col in range(len(timeline_data)):
                         if col == 1:
                             try:
-                                timeline_name = self.item(row, col).text()
+                                timeline_name = timeline_data[col]
                                 if timeline_name:
+                                    self.canEmit.emit(False)
                                     self.setItem(row, col, QTableWidgetItem(timeline_name))
+                                    self.canEmit.emit(True)
                             except Exception:
                                 pass
                         else:
                             try:
-                                self.setItem(row, col, QTableWidgetItem(self.item(row, col).text()))
+                                self.setItem(row, col, QTableWidgetItem(timeline_data[col]))
                             except Exception:
                                 pass
                 else:
@@ -103,14 +108,16 @@ class TimelineTable(QTableWidget):
                     for col in range(len(timeline_data)):
                         if col == 1:
                             try:
-                                timeline_name = self.item(row, col).text()
+                                timeline_name = timeline_data[col]
                                 if timeline_name:
+                                    self.canEmit.emit(False)
                                     self.setItem(row, col, QTableWidgetItem(timeline_name))
+                                    self.canEmit.emit(True)
                             except Exception:
                                 pass
                         else:
                             try:
-                                self.setItem(row, col, QTableWidgetItem(self.item(row, col).text()))
+                                self.setItem(row, col, QTableWidgetItem(timeline_data[col]))
                             except Exception:
                                 pass
         except Exception as e:

@@ -89,6 +89,7 @@ class Timeline(QWidget):
 
     def restore(self, data):
         try:
+            print(data)
             self.attributes = data['attributes']
             self.icon_area.restore(data['icon_area'])
         except Exception as e:

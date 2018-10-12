@@ -8,7 +8,6 @@ class VarChoose(QComboBox):
         self.setInsertPolicy(QComboBox.InsertAlphabetically)
         try:
             from ..main import IconTabs
-            # todo attributes
             self.addItems(IconTabs.getAttributes(self.parent_value))
         except Exception:
             pass

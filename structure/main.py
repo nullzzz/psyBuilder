@@ -161,6 +161,7 @@ class Structure(QDockWidget):
     def addNode(self, parent_value='Timeline.10001', text="node", pixmap=None, value: str = "", properties_window=None,
                 condition_type=''):
         try:
+            print(text)
             if parent_value in Structure.value_node:
                 parent = Structure.value_node[parent_value]
                 node = StructureItem(parent, value)
@@ -489,7 +490,7 @@ class Structure(QDockWidget):
             # 拷贝子节点的子节点
             self.copyNodeSimply(child_node.value, exist_child.value)
             # copy widget
-            self.nodeWidgetCopy.emit(exist_child.value, child_node.value)
+            self.nodeWidgetCopy.emit(child_node.value, exist_child.value)
 
     def changeNode(self, new_parent_value, value):
         try:

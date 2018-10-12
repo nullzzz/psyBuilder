@@ -49,10 +49,12 @@ class ConditionArea(QWidget):
 
         self.setLayout(self.form_layout)
 
-    def addCondition(self):
+    def addCondition(self, flag=False):
         try:
             if len(self.add_buttons) < ConditionArea.MAX_CONDITION_COUNT:
-                index = self.getAddButtonIndex(self.sender())
+                index = len(self.comboBoxes) - 1
+                if not flag:
+                    index = self.getAddButtonIndex(self.sender())
                 if index != -1:
                     h_box = QHBoxLayout()
                     # logical operator
@@ -123,4 +125,40 @@ class ConditionArea(QWidget):
         return -1
 
     def copy(self, condition_area_copy):
-        pass
+        # 将condition数量调整为一致
+        for i in range(1, len(self.comboBoxes)):
+            condition_area_copy.addCondition(True)
+        # 依次调整属性
+        for i in range(1, len(self.comboBoxes[0])):
+            current_text = self.comboBoxes[0][i].currentText()
+            index = condition_area_copy.comboBoxes[0][i].findText(current_text)
+            if index != -1:
+                condition_area_copy.comboBoxes[0][i].setCurrentText(current_text)
+        for i in range(1, len(self.comboBoxes)):
+            for j in range(0, len(self.comboBoxes[i])):
+                current_text = self.comboBoxes[i][j].currentText()
+                index = condition_area_copy.comboBoxes[i][j].findText(current_text)
+                if index != -1:
+                    condition_area_copy.comboBoxes[i][j].setCurrentText(current_text)
+
+    def save(self):
+        try:
+            data = [[] for i in range(len(self.comboBoxes))]
+            data[0] = [self.comboBoxes[0][1].currentText(), self.comboBoxes[0][2].currentText(),
+                       self.comboBoxes[0][3].currentText()]
+            for i in range(1, len(self.comboBoxes)):
+                for j in range(0, len(self.comboBoxes[i])):
+                    data[i].append(self.comboBoxes[i][j].currentText())
+            return data
+        except Exception as e:
+            print(f"error {e} happens in save condition area. [ifBranch/conditionArea.py]")
+
+    def restore(self, data):
+        try:
+            # 先add好condition area
+            for i in range(len(data)):
+                self.addCondition(True)
+            # 还原
+            self.comboBoxes
+        except Exception as e:
+            print(f"error {e} happens in restore condition area. [ifBranch/conditionArea.py]")

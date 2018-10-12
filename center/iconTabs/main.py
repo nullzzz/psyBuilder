@@ -121,6 +121,7 @@ class IconTabs(QTabWidget):
                 cycle.attributeValueChange.connect(self.changeTimelineAttributeValue)
                 cycle.timelineWidgetMerge.connect(self.mergeValueWidget)
                 cycle.timelineWidgetSplit.connect(self.splitValueWidget)
+                cycle.timelineCopyWidget.connect(self.copyWidget)
         except Exception:
             print("error happens in link cycle signals. [iconTabs\main.py]")
 
@@ -564,7 +565,7 @@ class IconTabs(QTabWidget):
                 print("I am copying icon in timeline.")
                 # 调用structure中的copyNode
                 self.iconNodeCopy.emit(new_value, old_value)
-                self.copyWidget(old_value, new_value)
+                self.copyWidget(new_value, old_value)
         except Exception:
             print("some errors happen in copy icon. [iconTabs/main.py]")
 
@@ -587,40 +588,40 @@ class IconTabs(QTabWidget):
         try:
             print("I am splitting widget.")
             if old_exist_value in self.value_widget:
-                self.copyWidget(old_exist_value, value)
+                self.copyWidget(value, old_exist_value)
         except Exception as e:
             print(f"error {e} happens in split widget. [iconTabs/main.py]")
 
-    def copyWidget(self, old_value, new_value: str):
+    def copyWidget(self, value: str, exist_value):
         try:
-            widget_type = old_value.split('.')[0]
-            print(f"I am copying {widget_type} widget.")
-            if old_value in self.value_widget:
-                old_widget = self.value_widget[old_value]
+            widget_type = exist_value.split('.')[0]
+            if exist_value in self.value_widget:
+                print(f"I am copying {widget_type} widget.")
+                old_widget = self.value_widget[exist_value]
                 try:
                     if hasattr(old_widget, 'copy'):
-                        self.value_widget[new_value] = old_widget.copy(new_value)
-                        IconTabs.value_widget_global[new_value] = self.value_widget[new_value]
+                        self.value_widget[value] = old_widget.copy(value)
+                        IconTabs.value_widget_global[value] = self.value_widget[value]
                     elif hasattr(old_widget, 'clone'):
-                        self.value_widget[new_value] = old_widget.clone(new_value)
-                        IconTabs.value_widget_global[new_value] = self.value_widget[new_value]
+                        self.value_widget[value] = old_widget.clone(value)
+                        IconTabs.value_widget_global[value] = self.value_widget[value]
                     # 通用属性连接(propertiesChange, tabClose)
-                    if not new_value.startswith('Timeline.'):
-                        self.value_widget[new_value].propertiesChange.connect(self.getChangedProperties)
+                    if not value.startswith('Timeline.'):
+                        self.value_widget[value].propertiesChange.connect(self.getChangedProperties)
                     try:
-                        self.value_widget[new_value].tabClose.connect(self.closeTab)
+                        self.value_widget[value].tabClose.connect(self.closeTab)
                     except Exception:
                         pass
                     # 特殊属性
-                    if new_value.startswith('Cycle'):
-                        self.cycleAdd.emit(new_value)
-                    elif new_value.startswith('Timeline.'):
-                        self.linkTimelineSignals(new_value)
-                        self.timelineAdd.emit(new_value)
-                    elif new_value.startswith('If_else'):
-                        self.ifBranchAdd.emit(new_value)
-                    elif new_value.startswith('Switch'):
-                        self.switchBranchAdd.emit(new_value)
+                    if value.startswith('Cycle'):
+                        self.cycleAdd.emit(value)
+                    elif value.startswith('Timeline.'):
+                        self.linkTimelineSignals(value)
+                        self.timelineAdd.emit(value)
+                    elif value.startswith('If_else'):
+                        self.ifBranchAdd.emit(value)
+                    elif value.startswith('Switch'):
+                        self.switchBranchAdd.emit(value)
                     print(f"I have finished copying {widget_type} widget.")
                 except Exception:
                     print(f"Fail to copy {widget_type} widget.")
@@ -677,3 +678,8 @@ class IconTabs(QTabWidget):
                     attributes[attribute] = IconTabs.value_widget_global[value].attributes[attribute]
 
         return attributes
+
+    @staticmethod
+    def checkConflictAboutVar():
+        # 目前先检测if和switch里面的var comboBox
+        pass
