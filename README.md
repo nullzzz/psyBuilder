@@ -11,11 +11,6 @@
     <li>为了适配mac：image/xxx</li>
 </ul>
 
-<p><big>做好烂尾准备</big></p>
-<ul>
-    <li>因为大家明显不想干了</li>
-</ul>
-
 <p><big>events/eyeTriacker/quest接口说明</big></p>
 <ul>
     <li>clone(): 返回当前事件的深拷贝</li>
@@ -31,4 +26,11 @@
     <li>事件绑定事件名</li>
     <li>以timeline为单位的参数导入导出</li>
     <li>condition的条件判断</li>
+</ul>
+
+<p><big>关于导入导出的问题</big></p>
+<ul>
+    <li>timeline和cycle，调用save就可以得到数据</li>
+    <li>调用restore，参数就是save得到的数据，就可以复原</li>
+    <li>但是这个复原我阻止了发信号到structure，因为是structure的复原不会受到这个到影响</li>
 </ul>
