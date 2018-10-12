@@ -4,6 +4,7 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel, QSizePolicy
 
+# from Info import Info
 from .videoProperty import VideoProperty
 
 
@@ -78,6 +79,7 @@ class VideoDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
+        # self.setAttributes(Info.getAttributes(self.value))
         # 阻塞原窗口
         self.pro.setWindowModality(Qt.ApplicationModal)
         self.pro.show()

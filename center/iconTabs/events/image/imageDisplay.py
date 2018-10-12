@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel
 
+# from Info import Info
 from .imageProperty import ImageProperty
 from .view import Preview
 
@@ -62,6 +63,7 @@ class ImageDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
+        # self.setAttributes(Info.getAttributes(self.value))
         # 阻塞原窗口
         self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.show()

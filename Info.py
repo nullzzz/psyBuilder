@@ -1,4 +1,7 @@
 # 全局变量
+# from center.iconTabs.main import IconTabs
+
+
 class Info:
     # 自动保存间隔时间
     AUTO_SAVE_TIME: int = 3000000
@@ -8,12 +11,16 @@ class Info:
 
     # 特征值-控件对象
     VALUE_WIDGET: dict = {}
+    # 特征值-node节点
+    VALUE_NODE: dict = {}
 
+    # 控件参数
     WIDGET_INFO: dict = {}
 
     # 当前导入导出文件名
     FILE_NAME: str = ""
 
+    ATTRIBUTES: dict = {}
     # 对widget计数
     WIDGET_COUNT: dict = {
         "TIMELINE_COUNT": 0,
@@ -40,3 +47,7 @@ class Info:
         "SWITCH_COUNT": 0,
         "OTHER_COUNT": 0
     }
+
+    @staticmethod
+    def getAttributes(value):
+        return IconTabs.getAttributes(value)

@@ -260,8 +260,9 @@ class MainWindow(QMainWindow):
                     self.restoreState(dock_layout)
 
                 structure_tree: list = setting.value("STRUCTURE_TREE")
-                # todo: 遍历节点，以value获取参数字典，添加到structure和center
+                # todo: 遍历节点，以value获取参数字典，添加到center
                 self.structure.loadStructure(structure_tree)
+                self.center.icon_tabs.loadIcon(structure_tree)
             elif file_name.endswith("psy"):
                 with open(file_name, "r") as f:
                     pass

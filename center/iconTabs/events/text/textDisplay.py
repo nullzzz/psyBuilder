@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon, QTextOption
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QTextEdit
 
+# from Info import Info
 from center.iconTabs.events.text.textProperty import TextProperty
 from center.iconTabs.events.text.view import Preview
 
@@ -62,6 +63,7 @@ class TextDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
+        # self.setAttributes(Info.getAttributes(self.value))
         # 阻塞原窗口
         self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.show()
