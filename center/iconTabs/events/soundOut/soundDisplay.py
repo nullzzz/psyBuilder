@@ -4,15 +4,16 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaPlaylist
 from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QToolBar, QPushButton, QMessageBox, QSlider, QWidget, \
     QGridLayout, QLabel, QVBoxLayout
 
+# from Info import Info
 from center.iconTabs.events.soundOut.soundProperty import SoundProperty
 
 
 class SoundDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
 
-    def __init__(self, parent=None, value=''):
+    def __init__(self, parent=None, value: str=''):
         super(SoundDisplay, self).__init__(parent)
-        self.value=value
+        self.value = value
         self.file = ""
         self.attributes = []
         self.volume = 100
@@ -84,6 +85,7 @@ class SoundDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
+        # self.setAttributes(Info.getAttributes(self.value))
         # 阻塞原窗口
         self.pro.setWindowModality(Qt.ApplicationModal)
         self.pro.show()

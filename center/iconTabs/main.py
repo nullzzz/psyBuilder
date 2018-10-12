@@ -666,18 +666,18 @@ class IconTabs(QTabWidget):
             print(f"error {e} happens in show attributes. [iconTabs/main.py]")
 
     @staticmethod
-    def getAttributes(value):
+    def getAttributes(current_value):
         # 调用structure中静态函数获取timeline values
-        values = Structure.getTimelineValues(value)
+        values = Structure.getTimelineValues(current_value)
         # 通过values得到属性
         attributes = {}
+        # value: current_value可用的timeline的特征值
         for value in values:
             for attribute in IconTabs.value_widget_global[value].attributes:
                 if attribute not in attributes:
                     attributes[attribute] = IconTabs.value_widget_global[value].attributes[attribute]
 
         return attributes
-
 
     # todo icon加入timeline
     def loadIcon(self, data: list):
