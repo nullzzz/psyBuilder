@@ -20,9 +20,9 @@ class CaseArea(QScrollArea):
         # case_num, [case{case title, case value, case icon value, case name}]
         self.case_data_backup = {}
 
-        self.case_1 = Case(title='Case 1', can_add=True, can_delete=False)
-        self.case_2 = Case(title='Case 2', can_add=True, can_delete=False)
-        self.case_3 = Case(title='Otherwise', can_add=False, can_delete=False)
+        self.case_1 = Case(title='Case 1', can_add=True, can_delete=False, parent_value=parent_value)
+        self.case_2 = Case(title='Case 2', can_add=True, can_delete=False, parent_value=parent_value)
+        self.case_3 = Case(title='Otherwise', can_add=False, can_delete=False, parent_value=parent_value)
         self.linkCaseSignals(self.case_1)
         self.linkCaseSignals(self.case_2)
         self.linkCaseSignals(self.case_3)
@@ -69,7 +69,7 @@ class CaseArea(QScrollArea):
                 for i in range(len(self.cases), add_index, -1):
                     self.setCase(i, self.cases[i - 1])
                 # 放入新case
-                new_case = Case(title=f"Case {add_index + 1}", can_add=True, can_delete=True)
+                new_case = Case(title=f"Case {add_index + 1}", can_add=True, can_delete=True, parent_value=parent_value)
                 self.linkCaseSignals(new_case)
                 self.caseAdd.emit(new_case)
                 self.cases.insert(add_index, new_case)

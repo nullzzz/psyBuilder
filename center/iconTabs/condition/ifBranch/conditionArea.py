@@ -14,6 +14,7 @@ class ConditionArea(QWidget):
         self.parent_value = parent_value
         self.add_buttons = []
         self.delete_buttons = [None]
+        self.comboBoxes = []
         #
         self.form_layout = QFormLayout(self)
 
@@ -26,10 +27,11 @@ class ConditionArea(QWidget):
         var = VarChoose(parent_value=parent_value)
         # compare operator
         compare_operator = QComboBox()
-        compare_operator.addItems((">", "<", "=="))
+        compare_operator.addItems((">", '>=', "==", "<", "<="))
         compare_operator.setFixedWidth(self.placeholder_width)
         # compare var
         compare_var = VarChoose(parent_value=parent_value)
+        self.comboBoxes.append([None, var, compare_operator, compare_var])
         # add button
         add_button = AddDeleteButton(button_type='add')
         add_button.clicked.connect(self.addCondition)
@@ -68,6 +70,7 @@ class ConditionArea(QWidget):
                     # add button
                     add_button = AddDeleteButton(button_type='add')
                     self.add_buttons.insert(index + 1, add_button)
+                    self.comboBoxes.insert(index + 1, [logical_operator, var, compare_operator, compare_var])
                     add_button.clicked.connect(self.addCondition)
                     # delete button
                     delete_button = AddDeleteButton(button_type='delete')
@@ -86,7 +89,8 @@ class ConditionArea(QWidget):
                         for btn in self.add_buttons:
                             btn.setDisabled(True)
             else:
-                QMessageBox.information(self, 'Tips', f'you can add no more than {ConditionArea.MAX_CONDITION_COUNT}', QMessageBox.Ok)
+                QMessageBox.information(self, 'Tips', f'you can add no more than {ConditionArea.MAX_CONDITION_COUNT}',
+                                        QMessageBox.Ok)
         except Exception as e:
             print(f"error {e} happens in add condition. [ifBranch/conditionArea.py]")
 
@@ -97,6 +101,7 @@ class ConditionArea(QWidget):
                 # delete buttons
                 self.add_buttons.pop(index)
                 self.delete_buttons.pop(index)
+                self.comboBoxes.pop(index)
                 self.form_layout.removeRow(index)
                 # 修改按钮状态
                 if len(self.add_buttons) == ConditionArea.MAX_CONDITION_COUNT - 1:

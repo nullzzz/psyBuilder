@@ -10,10 +10,10 @@ class Case(QGroupBox):
     add = pyqtSignal()
     delete = pyqtSignal()
 
-    def __init__(self, title: str='test', parent=None, can_add=False, can_delete=False):
+    def __init__(self, title: str='test', parent=None, can_add=False, can_delete=False, parent_value='Timeline.10001'):
         super(Case, self).__init__(title, parent)
         # case
-        self.case_comBox = VarChoose(self)
+        self.case_comBox = VarChoose(self, parent_value=parent_value)
         # icon choose
         self.icon_choose = IconChoose(self)
         self.add_button = AddDeleteButton(self, 'add')

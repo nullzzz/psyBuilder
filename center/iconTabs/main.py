@@ -205,6 +205,19 @@ class IconTabs(QTabWidget):
                 if timeline_value in self.value_widget:
                     timeline = self.value_widget[timeline_value]
                     timeline.attributes[name] = default_value
+                    # 对此timeline下面对varChoose进行新增
+                    values = {"If_else": [], 'Switch': []}
+                    Structure.getIfAndSwitchInTimeline(timeline.value, values)
+                    # if else
+                    for value in values['If_else']:
+                        if value in self.value_widget:
+                            if_else: IfBranch = self.value_widget[value]
+                            if_else.addVarComboBoxAttribute(name)
+                    # switch
+                    for value in values['Switch']:
+                        if value in self.value_widget:
+                            switch: SwitchBranch = self.value_widget[value]
+                            switch.addVarComboBoxAttribute(name)
         except Exception:
             print("error happens in add new timeline attribute. [iconTabs/main.py]")
 
@@ -223,6 +236,18 @@ class IconTabs(QTabWidget):
                 timeline = self.value_widget[cycle.row_value[row]]
                 timeline.attributes[new_header] = timeline.attributes[old_header]
                 del timeline.attributes[old_header]
+                # 再修改该timeline下面的所有属性
+                # 先从structure那边拿到该timeline下面的所有if和switch的value
+                values = {"If_else" : [], 'Switch' : []}
+                Structure.getIfAndSwitchInTimeline(timeline.value, values)
+                # if else
+                for value in values['If_else']:
+                    if_else:IfBranch = self.value_widget[value]
+                    if_else.changeVarComboBoxAttribute(old_header, new_header)
+                # switch
+                for value in values['Switch']:
+                    switch:SwitchBranch = self.value_widget[value]
+                    switch.changeVarComboBoxAttribute(old_header, new_header)
         except Exception as e:
             print(f"error {e} happens in change timeline attribute name. [iconTabs/main.py]")
 
@@ -253,12 +278,14 @@ class IconTabs(QTabWidget):
     def showProperties(self, current_index):
         try:
             widget = self.widget(current_index)
+            properties = {"error": "can't get properties"}
             if hasattr(widget, 'getInfo'):
-                self.propertiesShow.emit(widget.getInfo())
-            elif hasattr(widget, 'getProperties'):
-                self.propertiesShow.emit(widget.getProperties())
-            else:
-                self.propertiesShow.emit({"error": "can't get properties"})
+                properties = widget.getInfo()
+            elif hasattr(widget, 'getProperties') or not properties:
+                properties = widget.getProperties()
+            if not properties:
+                properties = {"error": "can't get properties"}
+            self.propertiesShow.emit(properties)
         except Exception as e:
             print(f"error {e} happens in show properties. [iconTabs/main.py]")
 
@@ -363,18 +390,17 @@ class IconTabs(QTabWidget):
     def getWidgetProperties(self, value):
         properties = {"state": "not initialized"}
         try:
-            widget = None
             if value in self.value_widget:
                 widget = self.value_widget[value]
-
-            if hasattr(widget, "getProperties"):
-                properties = widget.getProperties()
-            elif hasattr(widget, "getInfo"):
-                properties = widget.getInfo()
+                if hasattr(widget, "getProperties"):
+                    properties = widget.getProperties()
+                elif hasattr(widget, "getInfo"):
+                    properties = widget.getInfo()
         except Exception as e:
             properties = {"error": "can't get properties"}
             print("error {} happens in get properties. [iconTabs/main.py]".format(e))
-
+        if not properties:
+            properties = {"error": "can't get properties"}
         self.propertiesShow.emit(properties)
 
     def getChangedProperties(self, properties):
