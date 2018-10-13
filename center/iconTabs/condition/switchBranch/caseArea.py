@@ -29,8 +29,8 @@ class CaseArea(QScrollArea):
         self.cases.append(self.case_1)
         self.cases.append(self.case_2)
         self.cases.append(self.case_3)
-        self.backup()
         self.switch = VarChoose(parent_value=self.parent_value)
+        self.backup()
 
         self.grid_layout = QGridLayout()
 
@@ -69,7 +69,7 @@ class CaseArea(QScrollArea):
                 for i in range(len(self.cases), add_index, -1):
                     self.setCase(i, self.cases[i - 1])
                 # 放入新case
-                new_case = Case(title=f"Case {add_index + 1}", can_add=True, can_delete=True, parent_value=parent_value)
+                new_case = Case(title=f"Case {add_index + 1}", can_add=True, can_delete=True, parent_value=self.parent_value)
                 self.linkCaseSignals(new_case)
                 self.caseAdd.emit(new_case)
                 self.cases.insert(add_index, new_case)
@@ -142,19 +142,22 @@ class CaseArea(QScrollArea):
         return -1
 
     def backup(self):
+        self.case_data_backup['switch'] = self.switch.currentText()
         self.case_data_backup['case'] = []
         for case in self.cases:
             case_data = {}
             case_data['case_title'] = case.title()
-            # case_data['case_value'] = case.case_comBox.currentText()
+            case_data['case_value'] = case.case_comBox.currentText()
             case_data['case_icon_value'] = case.icon_choose.icon.value
             case_data['case_icon_name'] = case.icon_choose.icon_name.text()
+            case_data['case_icon_properties'] = {} if not case.icon_choose.properties_window else case.icon_choose.properties_window.getInfo()
             case_data['can_add'] = case.canAdd()
             case_data['can_delete'] = case.canDelete()
             self.case_data_backup['case'].append(case_data)
 
-    def restore(self):
+    def restore(self, data):
         try:
+            self.case_data_backup = data
             # 先删除所有case
             for case in self.cases:
                 self.grid_layout.removeWidget(case)
@@ -166,14 +169,18 @@ class CaseArea(QScrollArea):
             for index in range(len(cases)):
                 case = Case(title=cases[index]['case_title'], parent=None, can_add=cases[index]['can_add'],
                             can_delete=cases[index]['can_delete'])
-
+                case.case_comBox.setCurrentText(cases[index]['case_value'])
                 case.icon_choose.icon_comboBox.setCurrentText(cases[index]['case_icon_value'].split('.')[0])
                 case.icon_choose.icon.changeValue(cases[index]['case_icon_value'])
                 case.icon_choose.icon_name.setText(cases[index]['case_icon_name'])
+                if cases[index]['case_icon_properties']:
+                    case.icon_choose.properties_window.setProperties(cases[index]['case_icon_properties'])
                 self.cases.append(case)
                 row = index // 3 + 1
                 col = index % 3
                 self.grid_layout.addWidget(case, row, col, 1, 1)
+                self.linkCaseSignals(case)
+                self.caseAdd.emit(case)
         except Exception as e:
             print(f"error {e} happens in restore cases. [switchBranch/caseArea.py]")
 
@@ -198,10 +205,12 @@ class CaseArea(QScrollArea):
                 case_copy.setAddDisabled(not case.canAdd())
                 case_copy.setDeleteDisabled(not case.canDelete())
                 value = case.icon_choose.icon.value
+                case_copy.case_comBox.setCurrentText(case.case_comBox.currentText())
                 if not value.startswith('Other.'):
                     case_copy.icon_choose.icon_comboBox.setCurrentText(value.split('.')[0])
                     case_copy.icon_choose.icon.changeValue(old_value[value][0])
                     case_copy.icon_choose.icon_name.setText(old_value[value][1])
+                    case_copy.icon_choose.properties_window.setProperties(case_copy.icon_choose.properties_window.getInfo())
             # backup
             case_area_copy.backup()
         except Exception as e:

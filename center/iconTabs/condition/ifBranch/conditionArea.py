@@ -156,9 +156,16 @@ class ConditionArea(QWidget):
     def restore(self, data):
         try:
             # 先add好condition area
-            for i in range(len(data)):
+            for i in range(len(self.comboBoxes), len(data)):
                 self.addCondition(True)
             # 还原
-            self.comboBoxes
+            # 第一行
+            self.comboBoxes[0][1].setCurrentText(data[0][0])
+            self.comboBoxes[0][2].setCurrentText(data[0][1])
+            self.comboBoxes[0][3].setCurrentText(data[0][2])
+            # 后面几行
+            for i in range(1, len(data)):
+                for j in range(0, len(data[i])):
+                    self.comboBoxes[i][j].setCurrentText(data[i][j])
         except Exception as e:
             print(f"error {e} happens in restore condition area. [ifBranch/conditionArea.py]")

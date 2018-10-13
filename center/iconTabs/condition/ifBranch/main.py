@@ -4,6 +4,10 @@ from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QVBoxLayout, QMessa
 
 from center.iconTabs.condition.iconChoose import IconChoose
 from center.iconTabs.condition.ifBranch.conditionArea import ConditionArea
+from center.iconTabs.events.text import textProperty
+from center.iconTabs.events.image import imageProperty
+from center.iconTabs.events.video import videoProperty
+from center.iconTabs.events.soundOut import soundProperty
 from getImage import getImage
 from structure.main import Structure
 
@@ -39,7 +43,7 @@ class IfBranch(QWidget):
         self.value = value
         # [value, name, properties]
         self.type_value = {'T': ['Other.10001', '', None], 'F': ['Other.10002', '', None]}
-        self.widget_type_index = {'None': 0, 'Image': 1, 'Text': 2, 'Video': 3, 'SoundOut': 4}
+        self.back_up = {}
 
         condition_group = QGroupBox("Condition")
         layout1 = QVBoxLayout()
@@ -91,26 +95,6 @@ class IfBranch(QWidget):
             "properties": "None"
         }
 
-    def restoreIcons(self):
-        true_widget_type = self.type_value['T'][0].split('.')[0]
-        false_widget_type = self.type_value['F'][0].split('.')[0]
-
-        if true_widget_type != 'Other':
-            self.true_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
-            self.true_icon_choose.icon.changeValue(self.type_value['T'][0])
-            self.true_icon_choose.icon_name.setText(self.type_value['T'][1])
-            self.true_icon_choose.properties_window = self.type_value['T'][2]
-        else:
-            self.true_icon_choose.icon_comboBox.setCurrentIndex(0)
-
-        if false_widget_type != 'Other':
-            self.false_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
-            self.false_icon_choose.icon.changeValue(self.type_value['F'][0])
-            self.false_icon_choose.icon_name.setText(self.type_value['F'][1])
-            self.false_icon_choose.properties_window = self.type_value['F'][2]
-        else:
-            self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
-
     def clickOk(self):
         if self.clickApply():
             self.close()
@@ -119,13 +103,15 @@ class IfBranch(QWidget):
     def clickCancel(self):
         self.close()
         # 还原到初始设定
-        self.restoreIcons()
+        if self.back_up:
+            self.restore(self.back_up)
         self.tabClose.emit(self)
 
     def clickApply(self):
         try:
             if self.disposeIconChoose('T') or self.disposeIconChoose('F'):
                 return False
+            self.back_up = self.save()
             return True
         except Exception as e:
             print("error {} happens in apply if-else. [ifBranch/main.py]".format(e))
@@ -344,14 +330,19 @@ class IfBranch(QWidget):
 
     def save(self):
         try:
+            # 犯了一个大错，对于properties的保存应当采用字符串保存
             data = {}
             data["condition_area"] = self.condition_area.save()
-            data['type_value'] = self.type_value
+            data['type_value'] = {}
+            data['type_value']['T'] = [self.type_value['T'][0], self.type_value['T'][1],
+                                       {} if not self.type_value['T'][2] else self.type_value['T'][2].getInfo()]
+            data['type_value']['F'] = [self.type_value['F'][0], self.type_value['F'][1],
+                                       {} if not self.type_value['F'][2] else self.type_value['F'][2].getInfo()]
             return data
         except Exception as e:
             print(f"error {e} happens in save if branch. [ifBranch/main.py]")
 
-    def restore(self, data:dict):
+    def restore(self, data: dict):
         try:
             # condition area
             self.condition_area.restore(data['condition_area'])
@@ -362,18 +353,18 @@ class IfBranch(QWidget):
             false_widget_type = self.type_value['F'][0].split('.')[0]
 
             if true_widget_type != 'Other':
-                self.true_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
+                self.true_icon_choose.icon_comboBox.setCurrentText(true_widget_type)
                 self.true_icon_choose.icon.changeValue(self.type_value['T'][0])
                 self.true_icon_choose.icon_name.setText(self.type_value['T'][1])
-                self.true_icon_choose.properties_window = self.type_value['T'][2]
+                self.true_icon_choose.properties_window.setProperties(self.type_value['T'][2])
             else:
                 self.true_icon_choose.icon_comboBox.setCurrentIndex(0)
 
             if false_widget_type != 'Other':
-                self.false_icon_choose.icon_comboBox.setCurrentIndex(self.widget_type_index[true_widget_type])
+                self.false_icon_choose.icon_comboBox.setCurrentText(false_widget_type)
                 self.false_icon_choose.icon.changeValue(self.type_value['F'][0])
                 self.false_icon_choose.icon_name.setText(self.type_value['F'][1])
-                self.false_icon_choose.properties_window = self.type_value['F'][2]
+                self.false_icon_choose.properties_window.setProperties(self.type_value['F'][2])
             else:
                 self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
         except Exception as e:

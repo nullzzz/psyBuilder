@@ -176,7 +176,7 @@ class SwitchBranch(QWidget):
 
     def restoreCases(self):
         try:
-            self.case_area.restore()
+            self.case_area.restore(self.case_area.case_data_backup)
         except Exception as e:
             print(f"error {e} happens in restore cases. [switchBranch/main.py]")
 
@@ -253,5 +253,5 @@ class SwitchBranch(QWidget):
     def save(self):
         return self.case_area.backup()
 
-    def restore(self):
-        self.case_area.restore()
+    def restore(self, data):
+        self.case_area.restore(data)
