@@ -33,4 +33,5 @@
     <li>timeline和cycle，调用save就可以得到数据</li>
     <li>调用restore，参数就是save得到的数据，就可以复原</li>
     <li>但是这个复原我阻止了发信号到structure，因为是structure的复原不会受到这个到影响</li>
+    <li>对于if和switch的复制，之前返回的数据包含了一个类，已经被我修改为属性字典，测试正常</li>
 </ul>
