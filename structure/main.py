@@ -542,15 +542,18 @@ class Structure(QDockWidget):
             # 深度优先遍历
             # node_value存储信息
             # node_value = OrderedDict()
-            struture_tree: list = []
+            structure_tree: list = []
             # 遍历根节点
+            setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
             for i in range(0, self.structure_tree.topLevelItemCount()):
                 root = self.structure_tree.topLevelItem(i)
+                properties_of_timeline10001 = Info.VALUE_WIDGET[root.value].save()
+                setting.setValue(root.value, properties_of_timeline10001)
                 # 节点的特征值： 节点的properties
                 # node_value[root.value] = self.do_getNodeValue(root, [])
-                struture_tree.append(f"{root.text(0)}-{root.value}")
-                self.do_getNodeValue(root, struture_tree)
-            return struture_tree
+                structure_tree.append(f"{root.text(0)}-{root.value}")
+                self.do_getNodeValue(root, structure_tree)
+            return structure_tree
         except Exception as e:
             print(f"error {e} happens in get node_value {sys._getframe().f_lineno}. [structure/main.py]")
 
@@ -560,6 +563,7 @@ class Structure(QDockWidget):
         :param node: 节点， 如果节点是单个事件，返回参数；否则递归
         :param sub_tree: 用于存放当前子树的列表[根节点， 子树一， 子数二]
         """
+        setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
         try:
             # 遍历子节点
             for i in range(0, node.childCount()):
@@ -567,28 +571,32 @@ class Structure(QDockWidget):
                 # 子节点为Cycle\Timeline\if\switch时
                 # 继续递归遍历
                 if child.value.startswith("Cycle."):
+                    setting.setValue(child.value, Info.VALUE_WIDGET[child.value].save())
                     child_tree: list = [f"{child.text(0)}-{child.value}"]
                     self.do_getNodeValue(child, child_tree)
                     sub_tree.append(child_tree)
+
                 elif child.value.startswith("Timeline."):
+                    setting.setValue(child.value, Info.VALUE_WIDGET[child.value].save())
                     child_tree: list = [f"{child.text(0)}-{child.value}"]
                     self.do_getNodeValue(child, child_tree)
                     sub_tree.append(child_tree)
                 elif child.value.startswith("Switch."):
+                    setting.setValue(child.value, Info.VALUE_WIDGET[child.value].save())
                     child_tree: list = [f"{child.text(0)}-{child.value}"]
                     self.do_getNodeValue(child, child_tree)
                     sub_tree.append(child_tree)
                 elif child.value.startswith("If_else."):
+                    setting.setValue(child.value, Info.VALUE_WIDGET[child.value].save())
                     child_tree: list = [f"{child.text(0)}-{child.value}"]
                     self.do_getNodeValue(child, child_tree)
                     sub_tree.append(child_tree)
                 else:
                     try:
                         widget = Info.VALUE_WIDGET[child.value]
-                        setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
                         node_name: dict = {"__name__": child.text(0)}
                         key: str = f"{child.text(0)}-{child.value}"
-                        setting.setValue(key, widget.getInfo().update(node_name))
+                        setting.setValue(child.value, widget.getInfo().update(node_name))
                         sub_tree.append(key)
                     except KeyError:
                         print(f"{child.value} hasn't been initialized")
@@ -944,13 +952,13 @@ class Structure(QDockWidget):
         pass
 
     # 从文件加载structure
-    # todo: 对于if_branch的true和false标签要加上
     def loadStructure(self, data: list):
         """
         :param parent_value:
         :param data: 树结构
         :return:
         """
+        setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
         parent_value = data[0].split("-")[1]
         for i in data[1:]:
             if isinstance(i, list):
@@ -960,3 +968,7 @@ class Structure(QDockWidget):
             elif isinstance(i, str):
                 text, value = i.split("-")
                 self.addNode(parent_value, text=text, value=value)
+
+    # todo 写一个专门的加载函数
+    def loadWidgetAndNode(self, parent_value: str, text: str, value):
+        pass

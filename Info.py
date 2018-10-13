@@ -48,6 +48,3 @@ class Info:
         "OTHER_COUNT": 0
     }
 
-    @staticmethod
-    def getAttributes(value):
-        return IconTabs.getAttributes(value)

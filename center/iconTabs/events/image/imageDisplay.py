@@ -3,7 +3,6 @@ from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel
 
-# from Info import Info
 from .imageProperty import ImageProperty
 from .view import Preview
 

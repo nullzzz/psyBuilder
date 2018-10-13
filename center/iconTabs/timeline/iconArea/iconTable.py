@@ -520,12 +520,13 @@ class IconTable(QTableWidget):
 
     def save(self):
         try:
-            data = {}
-            data["fill_count"] = self.fill_count
-            data["is_fill"] = self.is_fill
-            data["is_edit"] = self.is_edit
-            data["is_copy_module"] = self.is_copy_module
-            data["icon"] = []
+            data = {
+                "fill_count": self.fill_count,
+                "is_fill": self.is_fill,
+                "is_edit": self.is_edit,
+                "is_copy_module": self.is_copy_module,
+                "icon": []
+            }
             for col in range(1, self.fill_count + 1):
                 value = self.cellWidget(1, col).value
                 name = self.item(3, col).text()

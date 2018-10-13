@@ -289,6 +289,7 @@ class MainWindow(QMainWindow):
                 setting.setValue("DOCK_LAYOUT", current_dock_layout)
                 try:
                     # 保存树状结构及其节点数量
+                    # 在遍历过程中保存widget参数
                     structure_tree = self.structure.getNodeValue()
                     setting.setValue("STRUCTURE_TREE", structure_tree)
                     widget_count: dict = Info.WIDGET_COUNT.copy()

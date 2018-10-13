@@ -4,10 +4,6 @@ from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QVBoxLayout, QMessa
 
 from center.iconTabs.condition.iconChoose import IconChoose
 from center.iconTabs.condition.ifBranch.conditionArea import ConditionArea
-from center.iconTabs.events.text import textProperty
-from center.iconTabs.events.image import imageProperty
-from center.iconTabs.events.video import videoProperty
-from center.iconTabs.events.soundOut import soundProperty
 from getImage import getImage
 from structure.main import Structure
 
@@ -331,9 +327,10 @@ class IfBranch(QWidget):
     def save(self):
         try:
             # 犯了一个大错，对于properties的保存应当采用字符串保存
-            data = {}
-            data["condition_area"] = self.condition_area.save()
-            data['type_value'] = {}
+            data = {
+                "condition_area": self.condition_area.save(),
+                'type_value': {}
+            }
             data['type_value']['T'] = [self.type_value['T'][0], self.type_value['T'][1],
                                        {} if not self.type_value['T'][2] else self.type_value['T'][2].getInfo()]
             data['type_value']['F'] = [self.type_value['F'][0], self.type_value['F'][1],

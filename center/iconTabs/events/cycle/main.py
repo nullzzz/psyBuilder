@@ -33,7 +33,7 @@ class Cycle(QMainWindow):
     timelineCopy = pyqtSignal(str, str)
     timelineCopyWidget = pyqtSignal(str, str)
 
-    def __init__(self, parent=None, value=''):
+    def __init__(self, parent: object = None, value: object = '') -> object:
         super(Cycle, self).__init__(parent)
 
         self.timeline_table = TimelineTable(self)
