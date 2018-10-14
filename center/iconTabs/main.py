@@ -185,13 +185,14 @@ class IconTabs(QTabWidget):
         except Exception as e:
             print(f"error {e} happens in remove icon in widget. [iconTabs/main.py]")
 
-    def addTimeline(self, cycle_value, timeline_name, timeline_pixmap, timeline_value):
+    def addTimeline(self, cycle_value, timeline_name, timeline_pixmap, timeline_value, attributes):
         try:
             # timeline 相关属性
             timeline_parent = self.value_parent[cycle_value]
             self.timeline_parent[timeline_value] = timeline_parent
             # 在此函数就去生成timeline实体
             self.openTab(timeline_value, timeline_name, False)
+            self.value_widget[timeline_value].attributes = attributes
         except Exception:
             print("error happens in add timeline. [iconTabs/main.py]")
 
@@ -662,7 +663,6 @@ class IconTabs(QTabWidget):
             widget = self.widget(index)
             widget_value = widget.value
             # 得到attributes，并发送到attribute
-            print(1)
             self.attributesShow.emit(IconTabs.getAttributes(widget_value))
         except Exception as e:
             print(f"error {e} happens in show attributes. [iconTabs/main.py]")

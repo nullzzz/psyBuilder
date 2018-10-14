@@ -17,8 +17,8 @@ from .timelineTable import TimelineTable
 class Cycle(QMainWindow):
     # 属性修改 (properties)
     propertiesChange = pyqtSignal(dict)
-    # 新增timeline (Cycle.value, name, pixmap, value)
-    timelineAdd = pyqtSignal(str, str, QPixmap, str)
+    # 新增timeline (Cycle.value, name, pixmap, value, attributes)
+    timelineAdd = pyqtSignal(str, str, QPixmap, str, dict)
     # 某行的timeline名称修改 (parent_value, value, name)
     timelineNameChange = pyqtSignal(str, str, str)
     # 新增attribute (value, name, default_value)
@@ -402,8 +402,13 @@ class Cycle(QMainWindow):
                                 self.row_value[row] = timeline_icon.value
                                 self.row_name[row] = name
                                 self.value_row[timeline_icon.value] = row
-                                # 给
-                                self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value)
+                                # 给iconTabs发信号
+                                attributes = {}
+                                for col in range(2, self.timeline_table.columnCount()):
+                                    attributes[self.timeline_table.col_header[col]] = self.timeline_table.item(row,
+                                                                                                               col).text()
+                                self.timelineAdd.emit(self.value, name, timeline_icon.pixmap(), timeline_icon.value,
+                                                      attributes)
                                 self.timeline_count += 1
                             else:
                                 QMessageBox.information(self, 'Tips', tips)
