@@ -117,7 +117,7 @@ class IconArea(QFrame):
 
                 # 给timeLine发射信号
                 value = self.icon_table.cellWidget(1, self.icon_table.fill_count).value
-                text = Structure.getName(value, text)
+                text = Structure.getValidName(value)
                 self.iconAdd.emit(text, pixmap, value)
                 # 新列名称
                 self.icon_table.setText(3, self.icon_table.fill_count, text)
@@ -364,7 +364,7 @@ class IconArea(QFrame):
             new_value = self.icon_table.cellWidget(1, col + 1).value
 
             # name根据一定规则去命名, 避免重复
-            text = Structure.getName(new_value, text, True, text)
+            text = Structure.getValidName(new_value, True, text)
             self.icon_table.setText(3, col + 1, text)
 
             # 给timeLine发射信号

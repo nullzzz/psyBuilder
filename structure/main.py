@@ -723,12 +723,12 @@ class Structure(QDockWidget):
     def getValidName(value, is_copy=False, old_name=''):
         try:
             value_type = value.split('.')[0]
-            name = f"{value_type}.{Structure.getCount(value_type)}"
+            name = f"{value_type}_{Structure.getCount(value_type)}"
 
             count = 0
             while True:
                 if is_copy:
-                    name = f"{old_name}.{count}"
+                    name = f"{old_name}_{count}"
                 if name not in Structure.name_value:
                     break
                 count += 1
@@ -944,6 +944,26 @@ class Structure(QDockWidget):
                 if child.value.startswith('Cycle'):
                     for j in range(child.childCount()):
                         Structure.getIfAndSwitchInTimeline(child.child(j).value, values)
+        except Exception as e:
+            print(f"error {e} happens in get if and switch. [structure/main.py]")
+
+    @staticmethod
+    def getAttributeUser(value, user_values: list):
+        try:
+            # 怕不是又是深度优先遍历
+            if value.startswith('If_else') or value.startswith('Switch'):
+                user_values.append(value)
+            # 其子节点
+            node: StructureItem = Structure.value_node[value]
+            for i in range(node.childCount()):
+                child = node.child(i)
+                #
+                if child.value.startswith('If_else') or child.value.startswith('Switch'):
+                    user_values.append(child.value)
+                #
+                if child.value.startswith('Cycle'):
+                    for j in range(child.childCount()):
+                        Structure.getAttributeUser(child.child(j).value, user_values)
         except Exception as e:
             print(f"error {e} happens in get if and switch. [structure/main.py]")
 

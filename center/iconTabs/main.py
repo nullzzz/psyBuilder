@@ -662,6 +662,7 @@ class IconTabs(QTabWidget):
             widget = self.widget(index)
             widget_value = widget.value
             # 得到attributes，并发送到attribute
+            print(1)
             self.attributesShow.emit(IconTabs.getAttributes(widget_value))
         except Exception as e:
             print(f"error {e} happens in show attributes. [iconTabs/main.py]")
@@ -697,6 +698,9 @@ class IconTabs(QTabWidget):
             self.addIcon(parent_value, text, "", value)
 
     @staticmethod
-    def checkConflictAboutVar():
+    def checkConflictAboutVar(value, container_value):
         # 目前先检测if和switch里面的var comboBox
+        # 先得到该value下面所有的attributes，再得到container_value中支持的attributes
+        # 先得到该value下所有用到attributes的value
+        # Structure.
         pass
