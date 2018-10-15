@@ -156,6 +156,20 @@ class EyeDC(QWidget):
         self.y_pos.setCompleter(QCompleter(self.attributes))
         self.target_color.setCompleter(QCompleter(self.attributes))
 
+    # 返回当前选择attributes
+    def getUsingAttributes(self):
+        using_attributes: list = []
+        self.findAttributes(self.default_properties, using_attributes)
+        return using_attributes
+
+    def findAttributes(self, properties: dict, using_attributes: list):
+        for v in properties.values():
+            if isinstance(v, dict):
+                self.findAttributes(v, using_attributes)
+            elif isinstance(v, str):
+                if v.startswith("[") and v.endswith("]"):
+                    using_attributes.append(v[1:-1])
+
     def getInfo(self):
         self.default_properties["X position"] = self.x_pos.text()
         self.default_properties["Y position"] = self.y_pos.text()

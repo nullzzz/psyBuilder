@@ -230,6 +230,21 @@ class SoundDisplay(QMainWindow):
         self.pro_window.setProperties(properties)
         self.apply()
 
+    # 返回当前选择attributes
+    def getUsingAttributes(self):
+        using_attributes: list = []
+        self.findAttributes(self.default_properties, using_attributes)
+        print(using_attributes)
+        return using_attributes
+
+    def findAttributes(self, properties: dict, using_attributes: list):
+        for v in properties.values():
+            if isinstance(v, dict):
+                self.findAttributes(v, using_attributes)
+            elif isinstance(v, str):
+                if v.startswith("[") and v.endswith("]"):
+                    using_attributes.append(v[1:-1])
+
     def loadSetting(self):
         self.pro_window.loadSetting()
 

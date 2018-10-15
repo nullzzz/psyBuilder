@@ -975,7 +975,6 @@ class Structure(QDockWidget):
     # todo 如果在已编辑状态加载文件先clear
     def loadStructure(self, data: list):
         """
-        :param parent_value:
         :param data: 树结构
         :return:
         """
@@ -991,6 +990,12 @@ class Structure(QDockWidget):
 
     # todo 写一个专门的加载函数
     def loadWidgetAndNode(self, parent_value: str, text: str, value: str):
+        """
+        :param parent_value:
+        :param text:
+        :param value:
+        :return:
+        """
         try:
             # 判断父节点是否在
             if parent_value in Info.VALUE_NODE:

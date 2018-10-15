@@ -14,7 +14,9 @@ class ImageDisplay(QMainWindow):
     def __init__(self, parent=None, value=''):
         super(ImageDisplay, self).__init__(parent)
         self.value = value
-        self.attributes = []
+        # todo: 考虑后面要键值转换，attributes可能要换成字典
+        self.attributes: list = []
+        self.using_attributes: list = []
         self.label = QLabel()
         self.pro_window = ImageProperty()
 
@@ -176,6 +178,21 @@ class ImageDisplay(QMainWindow):
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
+
+    # 返回当前选择attributes
+    def getUsingAttributes(self):
+        using_attributes:list = []
+        self.findAttributes(self.default_properties, using_attributes)
+        print(using_attributes)
+        return using_attributes
+
+    def findAttributes(self, properties: dict, using_attributes: list):
+        for v in properties.values():
+            if isinstance(v, dict):
+                self.findAttributes(v, using_attributes)
+            elif isinstance(v, str):
+                if v.startswith("[") and v.endswith("]"):
+                    using_attributes.append(v[1:-1])
 
     def setProperties(self, properties: dict):
         # self.default_properties.update(properties)

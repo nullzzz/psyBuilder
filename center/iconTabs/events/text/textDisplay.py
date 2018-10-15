@@ -157,6 +157,21 @@ class TextDisplay(QMainWindow):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
 
+    # 返回当前选择attributes
+    def getUsingAttributes(self):
+        using_attributes: list = []
+        self.findAttributes(self.default_properties, using_attributes)
+        print(using_attributes)
+        return using_attributes
+
+    def findAttributes(self, properties: dict, using_attributes: list):
+        for v in properties.values():
+            if isinstance(v, dict):
+                self.findAttributes(v, using_attributes)
+            elif isinstance(v, str):
+                if v.startswith("[") and v.endswith("]"):
+                    using_attributes.append(v[1:-1])
+
     def setProperties(self, properties: dict):
         self.pro_window.setProperties(properties)
         self.apply()
