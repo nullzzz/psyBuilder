@@ -26,13 +26,13 @@ class VideoDisplay(QMainWindow):
         self.mediaPlayer.stateChanged.connect(self.changeIcon)
 
         self.label = QLabel()
-        self.pro = VideoProperty()
+        self.pro_window = VideoProperty()
 
-        self.default_properties = self.pro.getInfo()
+        self.default_properties = self.pro_window.getInfo()
 
-        self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.cancel)
-        self.pro.apply_bt.clicked.connect(self.apply)
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
         self.file = ""
         self.start_pos = 0
@@ -81,8 +81,8 @@ class VideoDisplay(QMainWindow):
     def openPro(self):
         # self.setAttributes(Info.getAttributes(self.value))
         # 阻塞原窗口
-        self.pro.setWindowModality(Qt.ApplicationModal)
-        self.pro.show()
+        self.pro_window.setWindowModality(Qt.ApplicationModal)
+        self.pro_window.show()
 
     def playVideo(self):
         if self.file:
@@ -101,14 +101,14 @@ class VideoDisplay(QMainWindow):
 
     def ok(self):
         self.apply()
-        self.pro.close()
+        self.pro_window.close()
 
     def cancel(self):
-        self.pro.loadSetting()
+        self.pro_window.loadSetting()
 
     def apply(self):
         self.getPro()
-        file_name = self.pro.general.file_name.text()
+        file_name = self.pro_window.general.file_name.text()
         if file_name:
             self.setCentralWidget(self.video_widget)
             if QFileInfo(file_name).isFile():
@@ -129,10 +129,10 @@ class VideoDisplay(QMainWindow):
         self.propertiesChange.emit(self.getInfo())
 
     def getPro(self):
-        self.start_pos = self.pro.general.start_pos.text()
-        self.end_pos = self.getStartTime(self.pro.general.end_pos.text())
+        self.start_pos = self.pro_window.general.start_pos.text()
+        self.end_pos = self.getStartTime(self.pro_window.general.end_pos.text())
         # self.back_color = self.pro.general.back_color.currentText()
-        self.playback_rate = float(self.pro.general.playback_rate.currentText())
+        self.playback_rate = float(self.pro_window.general.playback_rate.currentText())
         # self.transparent_value = self.pro.general.transparent.value()
         # isStopText = self.pro.tab1.stop_after.currentText()
         # if isStopText == "Yes":
@@ -141,18 +141,18 @@ class VideoDisplay(QMainWindow):
         #     self.stop_after = False
         # self.stop_after_mode = self.pro.tab1.stop_after_mode.currentText()
 
-        self.aspect_ration_mode = self.pro.general.aspect_ratio.currentIndex() - 1
+        self.aspect_ration_mode = self.pro_window.general.aspect_ratio.currentIndex() - 1
         # self.end_video_action = self.pro.tab1.end_video_action.currentText()
-        self.screen_name = self.pro.general.screen_name.currentText()
-        is_clear_after = self.pro.general.clear_after.currentText()
+        self.screen_name = self.pro_window.general.screen_name.currentText()
+        is_clear_after = self.pro_window.general.clear_after.currentText()
         if is_clear_after == "Yes":
             self.clear_after = True
         else:
             self.clear_after = False
-        self.x_pos = self.pro.frame.x_pos.currentText()
-        self.y_pos = self.pro.frame.y_pos.currentText()
-        self.w_size = self.pro.frame.width.currentText()
-        self.h_size = self.pro.frame.height.currentText()
+        self.x_pos = self.pro_window.frame.x_pos.currentText()
+        self.y_pos = self.pro_window.frame.y_pos.currentText()
+        self.w_size = self.pro_window.frame.width.currentText()
+        self.h_size = self.pro_window.frame.height.currentText()
 
     # 加载状态
     def loadStatue(self, media_statue):
@@ -224,11 +224,11 @@ class VideoDisplay(QMainWindow):
             return 0
 
     def setPro(self, pro: VideoProperty):
-        del self.pro
-        self.pro = pro
-        self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.cancel)
-        self.pro.apply_bt.clicked.connect(self.apply)
+        del self.pro_window
+        self.pro_window = pro
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
     def setVideo(self):
         self.setCentralWidget(self.video_widget)
@@ -258,29 +258,29 @@ class VideoDisplay(QMainWindow):
 
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
-        self.pro.setAttributes(format_attributes)
+        self.pro_window.setAttributes(format_attributes)
 
     def getInfo(self):
-        self.default_properties = self.pro.getInfo()
+        self.default_properties = self.pro_window.getInfo()
         return self.default_properties
 
     def setProperties(self, properties: dict):
-        self.default_properties.update(properties)
-        self.loadSetting()
+        self.pro_window.setProperties(properties)
+        self.apply()
 
     def loadSetting(self):
         self.pro_window.loadSetting()
 
     def clone(self, value):
         clone_widget = VideoDisplay(value=value)
-        clone_widget.setPro(self.pro.clone())
+        clone_widget.setPro(self.pro_window.clone())
         clone_widget.apply()
         # clone_widget.setVideo()
         # self.pro.tab.addTab(clone_widget, "c")
         return clone_widget
 
     def test(self):
-        self.pro_clone = self.pro.clone()
+        self.pro_clone = self.pro_window.clone()
         self.pro_clone.setWindowModality(Qt.ApplicationModal)
         self.pro_clone.show()
 

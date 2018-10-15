@@ -79,6 +79,7 @@ class Structure(QDockWidget):
         self.root.setIcon(0, QIcon("image/timeLine.png"))
 
         Structure.value_node['Timeline.10001'] = self.root
+        Info.VALUE_NODE["Timeline.10001"] = self.root
         # 添加根节点
         self.structure_tree.addTopLevelItem(self.root)
         self.structure_tree.collapseItem(self.root)
@@ -594,9 +595,8 @@ class Structure(QDockWidget):
                 else:
                     try:
                         widget = Info.VALUE_WIDGET[child.value]
-                        node_name: dict = {"__name__": child.text(0)}
                         key: str = f"{child.text(0)}-{child.value}"
-                        setting.setValue(child.value, widget.getInfo().update(node_name))
+                        setting.setValue(child.value, widget.getInfo())
                         sub_tree.append(key)
                     except KeyError:
                         print(f"{child.value} hasn't been initialized")
@@ -972,23 +972,37 @@ class Structure(QDockWidget):
         pass
 
     # 从文件加载structure
+    # todo 如果在已编辑状态加载文件先clear
     def loadStructure(self, data: list):
         """
         :param parent_value:
         :param data: 树结构
         :return:
         """
-        setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
         parent_value = data[0].split("-")[1]
         for i in data[1:]:
             if isinstance(i, list):
                 text, value = i[0].split("-")
-                self.addNode(parent_value, text=text, value=value)
+                self.loadWidgetAndNode(parent_value, text=text, value=value)
                 self.loadStructure(i)
             elif isinstance(i, str):
                 text, value = i.split("-")
-                self.addNode(parent_value, text=text, value=value)
+                self.loadWidgetAndNode(parent_value, text=text, value=value)
 
     # todo 写一个专门的加载函数
-    def loadWidgetAndNode(self, parent_value: str, text: str, value):
-        pass
+    def loadWidgetAndNode(self, parent_value: str, text: str, value: str):
+        try:
+            # 判断父节点是否在
+            if parent_value in Info.VALUE_NODE:
+                parent = Info.VALUE_NODE[parent_value]
+                node = StructureItem(parent, value)
+                node.setText(0, text)
+                parent.setExpanded(True)
+                # 相关字典数据
+                Structure.value_node[value] = node
+                Structure.name_value[text] = value
+                Info.VALUE_NODE[value] = node
+                # todo 当前加载方案会打开所有tab窗口，可以考虑保存tab窗口状态并还原
+                self.nodeDoubleClick.emit(value, text)
+        except Exception as e:
+            print(f"error {e} happens in loading node. [structure/main.py]")

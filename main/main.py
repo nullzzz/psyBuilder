@@ -247,6 +247,7 @@ class MainWindow(QMainWindow):
         if file_name:
             Info.FILE_NAME = file_name
             file_name: str
+            # todo 关于文件后缀弄个啥？？？
             if file_name.endswith("ini"):
                 setting = QSettings(file_name, QSettings.IniFormat)
                 input_device_info = setting.value("INPUT_DEVICE_INFO")
@@ -260,9 +261,9 @@ class MainWindow(QMainWindow):
                     self.restoreState(dock_layout)
 
                 structure_tree: list = setting.value("STRUCTURE_TREE")
-                # todo: 遍历节点，以value获取参数字典，添加到center
+                root = Info.VALUE_WIDGET["Timeline.10001"]
+                root.restore(setting.value("Timeline.10001"))
                 self.structure.loadStructure(structure_tree)
-                self.center.icon_tabs.loadIcon(structure_tree)
             elif file_name.endswith("psy"):
                 with open(file_name, "r") as f:
                     pass
@@ -270,44 +271,41 @@ class MainWindow(QMainWindow):
     def getData(self):
         # 导出输入设备信息
         input_device_info: dict = Info.INPUT_DEVICE_INFO.copy()
-        output_device_info:dict = Info.OUTPUT_DEVICE_INFO.copy()
+        output_device_info: dict = Info.OUTPUT_DEVICE_INFO.copy()
 
         # 导出当前dock布局信息
         current_dock_layout = self.saveState()
-        options = QFileDialog.Options()
-        # todo: 判断另存为还是直接保存
+        # 有文件名就保存
         if Info.FILE_NAME:
-            pass
+            setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
+            setting.setValue("INPUT_DEVICE_INFO", input_device_info)
+            setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
+            setting.setValue("DOCK_LAYOUT", current_dock_layout)
+            try:
+                # 保存树状结构及其节点数量
+                # 在遍历过程中保存widget参数
+                structure_tree = self.structure.getNodeValue()
+                setting.setValue("STRUCTURE_TREE", structure_tree)
+                widget_count: dict = Info.WIDGET_COUNT.copy()
+                setting.setValue("WIDGET_COUNT", widget_count)
+
+                self.output.text_area.setText(
+                    f"Only show structure data, attributes or properties will be saved directly.\n{str(structure_tree)}")
+                # reset timer
+                self.auto_save.start(Info.AUTO_SAVE_TIME)
+            except Exception as e:
+                print(f"error {e} happens in get data and reset timer {sys._getframe().f_lineno}. [main/main.py]")
+        # 没文件名就搞个文件名
         else:
-            save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Psy Files (*.ini);",
-                                                            options=options)
-            if save_file_name:
-                Info.FILE_NAME = save_file_name
-                setting = QSettings(save_file_name, QSettings.IniFormat)
-                setting.setValue("INPUT_DEVICE_INFO", input_device_info)
-                setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
-                setting.setValue("DOCK_LAYOUT", current_dock_layout)
-                try:
-                    # 保存树状结构及其节点数量
-                    # 在遍历过程中保存widget参数
-                    structure_tree = self.structure.getNodeValue()
-                    setting.setValue("STRUCTURE_TREE", structure_tree)
-                    widget_count: dict = Info.WIDGET_COUNT.copy()
-                    setting.setValue("WIDGET_COUNT", widget_count)
+            self.saveAs()
 
-                    self.output.text_area.setText(
-                        "Only show structure data, attributes or properties will be show in next version.\n")
-                    print(structure_tree)
-                    # reset timer
-                    self.auto_save.start(Info.AUTO_SAVE_TIME)
-                except Exception as e:
-                    print(f"error {e} happens in get data and reset timer {sys._getframe().f_lineno}. [main/main.py]")
-
+    # 这个就是在保存之前获取一下文件名
     def saveAs(self):
         options = QFileDialog.Options()
         save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Psy Files (*.ini);", options=options)
         if save_file_name:
             Info.FILE_NAME = save_file_name
+            self.getData()
 
     # 恢复默认布局
     def resetView(self):

@@ -158,8 +158,8 @@ class TextDisplay(QMainWindow):
         self.pro_window.setAttributes(format_attributes)
 
     def setProperties(self, properties: dict):
-        self.default_properties.update(properties)
-        self.loadSetting()
+        self.pro_window.setProperties(properties)
+        self.apply()
 
     def loadSetting(self):
         self.pro_window.loadSetting()

@@ -17,13 +17,13 @@ class SoundDisplay(QMainWindow):
         self.file = ""
         self.attributes = []
         self.volume = 100
-        self.pro = SoundProperty()
+        self.pro_window = SoundProperty()
 
-        self.default_properties = self.pro.getInfo()
+        self.default_properties = self.pro_window.getInfo()
 
-        self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.cancel)
-        self.pro.apply_bt.clicked.connect(self.apply)
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
         self.play_bt = QPushButton("")
         self.play_bt.setIcon(QIcon("image/start_video"))
@@ -87,19 +87,19 @@ class SoundDisplay(QMainWindow):
     def openPro(self):
         # self.setAttributes(Info.getAttributes(self.value))
         # 阻塞原窗口
-        self.pro.setWindowModality(Qt.ApplicationModal)
-        self.pro.show()
+        self.pro_window.setWindowModality(Qt.ApplicationModal)
+        self.pro_window.show()
 
     def ok(self):
         self.apply()
-        self.pro.close()
+        self.pro_window.close()
 
     def cancel(self):
-        self.pro.loadSetting()
+        self.pro_window.loadSetting()
 
     def apply(self):
         self.getPro()
-        file_name = self.pro.general.file_name.text()
+        file_name = self.pro_window.general.file_name.text()
         if file_name:
             # self.play_bt.setIcon(QIcon("image/start_video"))
             if QFileInfo(file_name).isFile():
@@ -133,13 +133,13 @@ class SoundDisplay(QMainWindow):
         self.propertiesChange.emit(self.getInfo())
 
     def getPro(self):
-        if self.pro.general.loop.currentText() == "Yes":
+        if self.pro_window.general.loop.currentText() == "Yes":
             self.is_loop = True
         else:
             self.is_loop = False
-        volume_control = self.pro.general.volume_control.checkState()
+        volume_control = self.pro_window.general.volume_control.checkState()
         if volume_control:
-            self.volume = self.pro.general.volume.value()
+            self.volume = self.pro_window.general.volume.value()
 
     def setLabel(self):
         m = int(self.player.duration() / (1000 * 60))
@@ -198,7 +198,7 @@ class SoundDisplay(QMainWindow):
             self.play_bt.setIcon(QIcon("image/start_video"))
 
     def getInfo(self):
-        self.default_properties = self.pro.getInfo()
+        self.default_properties = self.pro_window.getInfo()
         return self.default_properties
 
     # 设置输入输出设备
@@ -208,34 +208,34 @@ class SoundDisplay(QMainWindow):
 
     # 设置输出设备
     def setOutDevices(self, devices):
-        self.pro.duration.out_devices_dialog.addDevices(devices)
+        self.pro_window.duration.out_devices_dialog.addDevices(devices)
 
     # 设置输入设备
     def setInDevices(self, devices):
-        self.pro.duration.in_devices_dialog.addDevices(devices)
+        self.pro_window.duration.in_devices_dialog.addDevices(devices)
 
     # 设置可选参数
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
-        self.pro.setAttributes(format_attributes)
+        self.pro_window.setAttributes(format_attributes)
 
     def setPro(self, pro: SoundProperty):
-        del self.pro
-        self.pro = pro
-        self.pro.ok_bt.clicked.connect(self.ok)
-        self.pro.cancel_bt.clicked.connect(self.cancel)
-        self.pro.apply_bt.clicked.connect(self.apply)
+        del self.pro_window
+        self.pro_window = pro
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
     def setProperties(self, properties: dict):
-        self.default_properties.update(properties)
-        self.loadSetting()
+        self.pro_window.setProperties(properties)
+        self.apply()
 
     def loadSetting(self):
         self.pro_window.loadSetting()
 
     def clone(self, value):
         clone_widget = SoundDisplay(value=value)
-        clone_widget.setPro(self.pro.clone())
+        clone_widget.setPro(self.pro_window.clone())
         clone_widget.apply()
         return clone_widget
 

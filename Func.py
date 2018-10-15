@@ -126,5 +126,7 @@ def getWidget(value: str):
         elif widget_type == "Switch":
             widget = SwitchBranch(value=value)
         else:
+            widget = "Unknown"
             print(f"Error {widget_type} unknown.[Func/getWidget]")
-        Info.VALUE_WIDGET[value] = widget
+        # Info.VALUE_WIDGET[value] = widget
+        return widget

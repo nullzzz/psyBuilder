@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QSettings
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QMenu, QShortcut, QAction
 
@@ -307,6 +307,8 @@ class IconTabs(QTabWidget):
                     # self.attributesShow.emit(value)
                     pass
             else:
+                setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
+                properties = setting.value(value)
                 widget = None
                 tab_icon = getImage(widget_type, "icon")
                 # 生成相应widget
@@ -360,6 +362,11 @@ class IconTabs(QTabWidget):
                     widget.tabClose.connect(self.closeTab)
                 else:
                     pass
+                if properties:
+                    if widget_type in ("Timeline", "Cycle", "If_else", "Switch"):
+                        widget.restore(properties)
+                    else:
+                        widget.setProperties(properties)
 
                 if widget:
                     # 新生成widget放入字典
@@ -680,22 +687,6 @@ class IconTabs(QTabWidget):
                     attributes[attribute] = IconTabs.value_widget_global[value].attributes[attribute]
 
         return attributes
-
-    # todo icon加入timeline
-    def loadIcon(self, data: list):
-        """
-        :param data:
-        :return:
-        """
-        print("here")
-        parent_value = data[0].split("-")[1]
-        for i in data:
-            if isinstance(i, list):
-                text, value = i[0].split("-")
-
-        else:
-            text, value = i.split("-")
-            self.addIcon(parent_value, text, "", value)
 
     @staticmethod
     def checkConflictAboutVar(value, container_value):
