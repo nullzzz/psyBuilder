@@ -18,6 +18,7 @@
     <li>getInfo(): 返回参数，字典类型</li>
     <li>setProperties(dict): 设置参数，也就是从文件导入的接口</li>
     <li>getDuration(): 返回事件的duration参数(ms)</li>
+    <li>getUsingAttributes(): 返回使用中的attributes，列表类型</li>
 </ul>
 
 <p><big>TODO</big></p>
