@@ -905,6 +905,7 @@ class Structure(QDockWidget):
         return ''
 
     @staticmethod
+    # 用来得到某个icon所在的地方的所有value
     def getTimelineValues(value):
         try:
             values = []
@@ -915,6 +916,20 @@ class Structure(QDockWidget):
                     value = Structure.value_node[value].parent().value
                 except Exception:
                     break
+            return values
+        except Exception as e:
+            print(f"error {e} happens in get timeline value list. [structure/main.py]")
+
+    @staticmethod
+    # 得到在timeline里面的某个icon前面的所有icon的value
+    def getBeforeItemValuesInTimeline(value):
+        try:
+            values = []
+            child = Structure.value_node[value]
+            parent: StructureItem = Structure.value_node[child.parent().value]
+            index = parent.indexOfChild(child)
+            for i in range(0, index):
+                values.append(parent.child(i).value)
             return values
         except Exception as e:
             print(f"error {e} happens in get timeline value list. [structure/main.py]")
@@ -946,6 +961,10 @@ class Structure(QDockWidget):
                         Structure.getIfAndSwitchInTimeline(child.child(j).value, values)
         except Exception as e:
             print(f"error {e} happens in get if and switch. [structure/main.py]")
+
+    @staticmethod
+    def getNodeName(value):
+        return Structure.value_node[value].text(0)
 
     @staticmethod
     def getAttributeUser(value, user_values: list):

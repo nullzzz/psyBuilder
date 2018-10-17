@@ -38,7 +38,7 @@ class IconArea(QFrame):
 
     def linkSignals(self):
         self.signShow.connect(self.icon_table.showSign)
-        self.dragFinish.connect(lambda : self.icon_table.signHide.emit())
+        self.dragFinish.connect(lambda: self.icon_table.signHide.emit())
         self.copyDragFinish.connect(self.icon_table.copyDragFinish)
         self.icon_table.copyIconToNextCol.connect(self.copyIconToNext)
         self.icon_table.copyDragBegin.connect(self.copyDrag)
@@ -64,10 +64,13 @@ class IconArea(QFrame):
                     data = e.mimeData().data("application/StructureTree-copy-value-name")
                 stream = QDataStream(data, QIODevice.ReadOnly)
                 value = stream.readQString()
-                can_drop = Structure.checkDragValidity(value, self.icon_table.parent_timeline_value)
+                from center.iconTabs.main import IconTabs
+                can_drop = Structure.checkDragValidity(value, self.icon_table.parent_timeline_value) \
+                           and IconTabs.checkConflictAboutVar(value, self.icon_table.parent_timeline_value)
 
             if can_drop:
-                if self.icon_table.is_copy_module or e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+                if self.icon_table.is_copy_module or e.mimeData().hasFormat(
+                        "application/StructureTree-copy-value-name"):
                     self.becomeGray()
                 else:
                     self.becomeLightGray()

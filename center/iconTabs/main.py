@@ -75,7 +75,6 @@ class IconTabs(QTabWidget):
 
     def linkSignals(self):
         # self
-        self.tabCloseRequested.connect(self.restoreTab)
         self.tabCloseRequested.connect(self.removeTab)
         self.currentChanged.connect(self.showTimelineAttributes)
         self.currentChanged.connect(self.showProperties)
@@ -240,15 +239,15 @@ class IconTabs(QTabWidget):
                 del timeline.attributes[old_header]
                 # 再修改该timeline下面的所有属性
                 # 先从structure那边拿到该timeline下面的所有if和switch的value
-                values = {"If_else" : [], 'Switch' : []}
+                values = {"If_else": [], 'Switch': []}
                 Structure.getIfAndSwitchInTimeline(timeline.value, values)
                 # if else
                 for value in values['If_else']:
-                    if_else:IfBranch = self.value_widget[value]
+                    if_else: IfBranch = self.value_widget[value]
                     if_else.changeVarComboBoxAttribute(old_header, new_header)
                 # switch
                 for value in values['Switch']:
-                    switch:SwitchBranch = self.value_widget[value]
+                    switch: SwitchBranch = self.value_widget[value]
                     switch.changeVarComboBoxAttribute(old_header, new_header)
         except Exception as e:
             print(f"error {e} happens in change timeline attribute name. [iconTabs/main.py]")
@@ -669,12 +668,6 @@ class IconTabs(QTabWidget):
         for i in range(0, self.count()):
             self.removeTab(0)
 
-    # todo switch
-    def restoreTab(self, index):
-        widget = self.widget(index)
-        if isinstance(widget, IfBranch):
-            widget.restoreIcons()
-
     def closeOtherTab(self, index):
         for i in range(index + 1, self.count()):
             self.removeTab(index + 1)
@@ -692,6 +685,7 @@ class IconTabs(QTabWidget):
 
     @staticmethod
     def getAttributes(current_value):
+        # 第一部分，该icon所在位置的所以父timeline
         # 调用structure中静态函数获取timeline values
         values = Structure.getTimelineValues(current_value)
         # 通过values得到属性
@@ -701,13 +695,36 @@ class IconTabs(QTabWidget):
             for attribute in IconTabs.value_widget_global[value].attributes:
                 if attribute not in attributes:
                     attributes[attribute] = IconTabs.value_widget_global[value].attributes[attribute]
+        # 第二部分，如果是在timeline中的icon，需要其前面的icon的attributes
+        try:
+            parent_value = Structure.getParentValue(current_value)
+            if parent_value.startswith('Timeline.'):
+                widget_values = Structure.getBeforeItemValuesInTimeline(current_value)
+                for value in widget_values:
+                    # todo 对于为初始化的widget的attributes获取还有疑问
+                    hidden_attributes = {
+                        "onsettime": 0,
+                        "acc": 0,
+                        "resp": 0,
+                        "rt": 0
+                    }
+                    if value in IconTabs.value_widget_global:
+                        widget = IconTabs.value_widget_global[value]
+                        if hasattr(widget, 'getHiddenAttribute'):
+                            hidden_attributes: dict = IconTabs.value_widget_global[value].getHiddenAttribute()
+                        else:
+                            print(value)
+                            print(f"{value.split('.')[0]} widget has no attribute 'getHiddenAttribute'. [IconTabs/main]")
+                    for attribute in hidden_attributes:
+                        name = Structure.getNodeName(value)
+                        attributes[f'{name}.{attribute}'] = hidden_attributes[attribute]
+        except Exception as e:
+            print(f"error {e} happens in get hidden attributes. [iconTabs/main.py]")
         Info.VALUE_ATTRIBUTES[current_value] = attributes
         return attributes
 
+    # todo check conflict attribute used
     @staticmethod
     def checkConflictAboutVar(value, container_value):
-        # 目前先检测if和switch里面的var comboBox
-        # 先得到该value下面所有的attributes，再得到container_value中支持的attributes
-        # 先得到该value下所有用到attributes的value
-        # Structure.
-        pass
+        # 先得到value及其子节点所涉及的一切有效value（不包括cycle）
+        return True

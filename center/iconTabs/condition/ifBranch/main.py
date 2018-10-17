@@ -310,7 +310,7 @@ class IfBranch(QWidget):
                 if_branch_copy.true_icon_choose.icon_comboBox.setCurrentText(icon_value.split('.')[0])
                 if_branch_copy.true_icon_choose.icon.changeValue(icon_value)
                 if_branch_copy.true_icon_choose.icon_name.setText(icon_name)
-                if_branch_copy.true_icon_choose.properties_window.setInfo(self.type_value['T'][2].getInfo())
+                if_branch_copy.true_icon_choose.properties_window.setProperties(self.type_value['T'][2].getInfo())
                 if_branch_copy.type_value['T'][2] = if_branch_copy.true_icon_choose.properties_window
             if not self.type_value['F'][0].startswith('Other.'):
                 icon_name, icon_value = Structure.getNameAndValueInIfBranchByParent(value, 'F')
@@ -318,7 +318,7 @@ class IfBranch(QWidget):
                 if_branch_copy.false_icon_choose.icon_comboBox.setCurrentText(icon_value.split('.')[0])
                 if_branch_copy.false_icon_choose.icon.changeValue(icon_value)
                 if_branch_copy.false_icon_choose.icon_name.setText(icon_name)
-                if_branch_copy.false_icon_choose.properties_window.setInfo(self.type_value['F'][2].getInfo())
+                if_branch_copy.false_icon_choose.properties_window.setProperties(self.type_value['F'][2].getInfo())
                 if_branch_copy.type_value['F'][2] = if_branch_copy.false_icon_choose.properties_window
             return if_branch_copy
         except Exception as e:
@@ -366,3 +366,22 @@ class IfBranch(QWidget):
                 self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
         except Exception as e:
             print(f"error {e} happens in restore if branch. [ifBranch/main.py]")
+
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr
+
+    def getUsingAttributes(self):
+        using_attributes = []
+        for i in range(0, len(self.condition_area.comboBoxes)):
+            using_attributes.append(self.condition_area.comboBoxes[i][1].currentText())
+            using_attributes.append(self.condition_area.comboBoxes[i][3].currentText())
+        return using_attributes

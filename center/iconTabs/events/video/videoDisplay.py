@@ -308,6 +308,18 @@ class VideoDisplay(QMainWindow):
             duration = "(Infinite)"
         return duration
 
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr
+
 
 # 支持全屏显示
 class VideoWidget(QVideoWidget):
@@ -342,15 +354,3 @@ class VideoWidget(QVideoWidget):
     def mouseDoubleClickEvent(self, event):
         self.setFullScreen(not self.isFullScreen())
         event.accept()
-
-    def getHiddenAttribute(self):
-        """
-        :return:
-        """
-        hidden_attr = {
-            "onsettime": 0,
-            "acc": 0,
-            "resp": 0,
-            "rt":0
-        }
-        return hidden_attr

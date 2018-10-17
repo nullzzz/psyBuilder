@@ -644,3 +644,15 @@ class Cycle(QMainWindow):
             self.timeline_table.restore(data['timeline_table'])
         except Exception as e:
             print(f"error {e} happens in restore cycle. [cycle/main.py]")
+
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr

@@ -255,3 +255,22 @@ class SwitchBranch(QWidget):
 
     def restore(self, data):
         self.case_area.restore(data)
+
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr
+
+    def getUsingAttributes(self):
+        using_attributes = []
+        using_attributes.append(self.case_area.switch.currentText())
+        for case in self.case_area.cases:
+            using_attributes.append(case.case_comBox.currentText())
+        return using_attributes
