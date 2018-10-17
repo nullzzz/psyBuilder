@@ -20,7 +20,7 @@ class Info:
     # 当前导入导出文件名
     FILE_NAME: str = ""
 
-    ATTRIBUTES: dict = {}
+    VALUE_ATTRIBUTES: dict = {}
     # 对widget计数
     WIDGET_COUNT: dict = {
         "TIMELINE_COUNT": 0,

@@ -296,6 +296,8 @@ class IconTabs(QTabWidget):
             widget_type = value.split('.')[0]
             if value in self.value_widget:
                 widget = self.value_widget[value]
+                if hasattr(widget, "setAttributes"):
+                    widget.setAttributes(self.getAttributes(value))
                 tab_index = self.indexOf(widget)
                 if tab_index != -1:
                     self.setCurrentIndex(tab_index)
@@ -318,41 +320,55 @@ class IconTabs(QTabWidget):
                     widget = Timeline(value=value)
                 elif widget_type == "SoundOut":
                     widget = SoundDisplay(value=value)
+                    widget.getAttribute.connect(self.getAttributes)
                 elif widget_type == "Text":
                     widget = TextDisplay(value=value)
+                    widget.getAttribute.connect(self.getAttributes)
                 elif widget_type == "Image":
                     widget = ImageDisplay(value=value)
+                    widget.getAttribute.connect(self.getAttributes)
                 elif widget_type == "Video":
                     widget = VideoDisplay(value=value)
+                    widget.getAttribute.connect(self.getAttributes)
                 elif widget_type == "Close":
                     widget = Close(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Action":
                     widget = EyeAction(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Calibration":
                     widget = EyeCalibrate(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "EndR":
                     widget = EndR(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "Open":
                     widget = Open(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "DC":
                     widget = EyeDC(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "StartR":
                     widget = StartR(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestInit":
                     widget = QuestInit(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestUpdate":
                     widget = QuestUpdate(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "QuestGetValue":
                     widget = QuestGetValue(value=value)
+                    widget.setAttributes(self.getAttributes(value))
                     widget.tabClose.connect(self.closeTab)
                 elif widget_type == "If_else":
                     widget = IfBranch(value=value)
@@ -685,7 +701,7 @@ class IconTabs(QTabWidget):
             for attribute in IconTabs.value_widget_global[value].attributes:
                 if attribute not in attributes:
                     attributes[attribute] = IconTabs.value_widget_global[value].attributes[attribute]
-
+        Info.VALUE_ATTRIBUTES[current_value] = attributes
         return attributes
 
     @staticmethod

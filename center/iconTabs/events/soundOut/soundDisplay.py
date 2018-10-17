@@ -5,11 +5,13 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QToolBar, QPushB
     QGridLayout, QLabel, QVBoxLayout
 
 # from Info import Info
+from Info import Info
 from center.iconTabs.events.soundOut.soundProperty import SoundProperty
 
 
 class SoundDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
+    getAttribute = pyqtSignal(str)
 
     def __init__(self, parent=None, value: str=''):
         super(SoundDisplay, self).__init__(parent)
@@ -85,7 +87,8 @@ class SoundDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
-        # self.setAttributes(Info.getAttributes(self.value))
+        self.getAttribute.emit(self.value)
+        self.setAttributes(Info.VALUE_ATTRIBUTES[self.value])
         # 阻塞原窗口
         self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.show()

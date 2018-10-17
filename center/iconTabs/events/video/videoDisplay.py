@@ -5,11 +5,13 @@ from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel, QSizePolicy
 
 # from Info import Info
+from Info import Info
 from .videoProperty import VideoProperty
 
 
 class VideoDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
+    getAttribute = pyqtSignal(str)
 
     def __init__(self, parent=None, value=''):
         super(VideoDisplay, self).__init__(parent)
@@ -79,7 +81,8 @@ class VideoDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
-        # self.setAttributes(Info.getAttributes(self.value))
+        self.getAttribute.emit(self.value)
+        self.setAttributes(Info.VALUE_ATTRIBUTES[self.value])
         # 阻塞原窗口
         self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.show()

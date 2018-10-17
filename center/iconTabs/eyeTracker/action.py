@@ -93,6 +93,10 @@ class EyeAction(QWidget):
         using_attributes: list = []
         return using_attributes
 
+    def show(self):
+        print("show")
+        QWidget.show()
+
 
 if __name__ == '__main__':
     import sys

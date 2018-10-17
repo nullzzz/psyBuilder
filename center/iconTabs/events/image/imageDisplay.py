@@ -3,12 +3,14 @@ from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel
 
+from Info import Info
 from .imageProperty import ImageProperty
 from .view import Preview
 
 
 class ImageDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
+    getAttribute = pyqtSignal(str)
     # parameter: self.attributes
 
     def __init__(self, parent=None, value=''):
@@ -65,6 +67,8 @@ class ImageDisplay(QMainWindow):
 
     def openPro(self):
         # self.setAttributes(Info.getAttributes(self.value))
+        self.getAttribute.emit(self.value)
+        self.setAttributes(Info.VALUE_ATTRIBUTES[self.value])
         # 阻塞原窗口
         self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.show()
