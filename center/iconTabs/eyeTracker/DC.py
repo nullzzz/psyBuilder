@@ -217,3 +217,14 @@ class EyeDC(QWidget):
 
         return QWidget.eventFilter(self, obj, e)
 
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr

@@ -201,6 +201,18 @@ class TextDisplay(QMainWindow):
             duration = "(Infinite)"
         return duration
 
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr
+
 
 if __name__ == "__main__":
     import sys

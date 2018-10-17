@@ -19,13 +19,14 @@
     <li>setProperties(dict): 设置参数，也就是从文件导入的接口</li>
     <li>getDuration(): 返回事件的duration参数(ms)</li>
     <li>getUsingAttributes(): 返回使用中的attributes，列表类型</li>
+    <li>getHiddenAttributes(): 返回隐藏属性，字典类型</li>
 </ul>
 
 <p><big>TODO</big></p>
 <ul>
-    <li>单个事件获取timeline的attribute</li>
-    <li>事件绑定事件名</li>
-    <li>以timeline为单位的参数导入导出</li>
+    <li>【done】单个事件获取timeline的attribute</li>
+    <li>【done】事件绑定事件名</li>
+    <li>【done】以timeline为单位的参数导入导出</li>
     <li>condition的条件判断</li>
 </ul>
 

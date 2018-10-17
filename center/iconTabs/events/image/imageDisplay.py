@@ -225,3 +225,16 @@ class ImageDisplay(QMainWindow):
         except KeyError:
             duration = "(Infinite)"
         return duration
+
+    # todo 弄啥嘞
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr

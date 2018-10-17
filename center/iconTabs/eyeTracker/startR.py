@@ -126,3 +126,15 @@ class StartR(QWidget):
         clone_widget = StartR(value=value)
         clone_widget.setProperties(self.default_properties)
         return clone_widget
+
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr

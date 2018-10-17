@@ -102,3 +102,15 @@ class Close(QWidget):
     def getUsingAttributes(self):
         using_attributes: list = []
         return using_attributes
+
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr

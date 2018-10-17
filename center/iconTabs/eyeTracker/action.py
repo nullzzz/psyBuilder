@@ -93,9 +93,17 @@ class EyeAction(QWidget):
         using_attributes: list = []
         return using_attributes
 
-    def show(self):
-        print("show")
-        QWidget.show()
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {
+            "onsettime": 0,
+            "acc": 0,
+            "resp": 0,
+            "rt":0
+        }
+        return hidden_attr
 
 
 if __name__ == '__main__':
