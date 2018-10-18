@@ -157,8 +157,8 @@ class SoundTab1(QWidget):
         self.buffer_size.setCompleter(QCompleter(self.attributes))
         self.start_offset.setCompleter(QCompleter(self.attributes))
         self.stop_offset.setCompleter(QCompleter(self.attributes))
-        self.volume.setCompleter(QCompleter(self.attributes))
-        self.pan.setCompleter(QCompleter(self.attributes))
+        # self.volume.setCompleter(QCompleter(self.attributes))
+        # self.pan.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         self.default_properties["File name"] = self.file_name.text()
