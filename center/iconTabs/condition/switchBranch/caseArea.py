@@ -196,7 +196,6 @@ class CaseArea(QScrollArea):
                 self.widget.update()
             self.cases.clear()
             # 增加新case
-            print(self.cases_back_up)
             cases = self.case_data_backup['case']
             for index in range(len(cases)):
                 case = Case(title=cases[index]['case_title'], parent=None, can_add=cases[index]['can_add'],
