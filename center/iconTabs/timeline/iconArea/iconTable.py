@@ -55,7 +55,7 @@ class IconTable(QTableWidget):
         self.horizontalHeader().setVisible(False)
         self.verticalHeader().setVisible(False)
         self.setFrameStyle(QFrame.NoFrame)
-        # 隐藏网格
+        # 隐藏网
         self.setShowGrid(False)
         self.setItemDelegate(NoDash())
         # 设置行数
@@ -518,7 +518,7 @@ class IconTable(QTableWidget):
         except Exception as e:
             print(f"error {e} happens in copy icon table. [iconArea/iconTable.py]")
 
-    def save(self):
+    def sFsave(self):
         try:
             data = {
                 "fill_count": self.fill_count,

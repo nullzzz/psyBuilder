@@ -37,8 +37,9 @@ class IfBranch(QWidget):
         self.false_icon_choose.propertiesShow.connect(self.showIconProperties)
 
         self.value = value
-        # [value, name, properties]
+        # [value, name, properties_window]
         self.type_value = {'T': ['Other.10001', '', None], 'F': ['Other.10002', '', None]}
+        # back_up里面也有type_value但是保存的是properties dict
         self.back_up = {}
 
         condition_group = QGroupBox("Condition")
@@ -99,8 +100,7 @@ class IfBranch(QWidget):
     def clickCancel(self):
         self.close()
         # 还原到初始设定
-        if self.back_up:
-            self.restore(self.back_up)
+        self.restoreForCancel()
         self.tabClose.emit(self)
 
     def clickApply(self):
@@ -253,11 +253,11 @@ class IfBranch(QWidget):
             # true
             if value == self.type_value['T'][0]:
                 self.true_icon_choose.icon_comboBox.setCurrentIndex(0)
-                self.type_value['T'] = ['Other.10001', '', {}]
+                self.type_value['T'] = ['Other.10001', '', None]
             # false
             elif value == self.type_value['F'][0]:
                 self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
-                self.type_value['F'] = ['Other.10002', '', {}]
+                self.type_value['F'] = ['Other.10002', '', None]
 
         except Exception as e:
             print("error {} happens in delete Item. [ifBranch/main.py]".format(e))
@@ -351,21 +351,42 @@ class IfBranch(QWidget):
 
             if true_widget_type != 'Other':
                 self.true_icon_choose.icon_comboBox.setCurrentText(true_widget_type)
-                self.true_icon_choose.icon.changeValue(self.type_value['T'][0])
-                self.true_icon_choose.icon_name.setText(self.type_value['T'][1])
-                self.true_icon_choose.properties_window.setProperties(self.type_value['T'][2])
+                self.true_icon_choose.icon.changeValue(type_value['T'][0])
+                self.true_icon_choose.icon_name.setText(type_value['T'][1])
+                self.true_icon_choose.properties_window.setProperties(type_value['T'][2])
+                self.type_value['T'][2] = self.true_icon_choose.properties_window
             else:
                 self.true_icon_choose.icon_comboBox.setCurrentIndex(0)
 
             if false_widget_type != 'Other':
                 self.false_icon_choose.icon_comboBox.setCurrentText(false_widget_type)
-                self.false_icon_choose.icon.changeValue(self.type_value['F'][0])
-                self.false_icon_choose.icon_name.setText(self.type_value['F'][1])
-                self.false_icon_choose.properties_window.setProperties(self.type_value['F'][2])
+                self.false_icon_choose.icon.changeValue(type_value['F'][0])
+                self.false_icon_choose.icon_name.setText(type_value['F'][1])
+                self.false_icon_choose.properties_window.setProperties(type_value['F'][2])
+                self.type_value['F'][2] = self.true_icon_choose.properties_window
             else:
                 self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
         except Exception as e:
             print(f"error {e} happens in restore if branch. [ifBranch/main.py]")
+
+    def restoreForCancel(self):
+        true_widget_type = self.type_value['T'][0].split('.')[0]
+        false_widget_type = self.type_value['F'][0].split('.')[0]
+        if true_widget_type != 'Other':
+            self.true_icon_choose.icon_comboBox.setCurrentText(true_widget_type)
+            self.true_icon_choose.icon.changeValue(self.type_value['T'][0])
+            self.true_icon_choose.icon_name.setText(self.type_value['T'][1])
+            self.true_icon_choose.properties_window = self.type_value['T'][2]
+        else:
+            self.true_icon_choose.icon_comboBox.setCurrentIndex(0)
+
+        if false_widget_type != 'Other':
+            self.false_icon_choose.icon_comboBox.setCurrentText(false_widget_type)
+            self.false_icon_choose.icon.changeValue(self.type_value['F'][0])
+            self.false_icon_choose.icon_name.setText(self.type_value['F'][1])
+            self.false_icon_choose.properties_window = self.type_value['F'][2]
+        else:
+            self.false_icon_choose.icon_comboBox.setCurrentIndex(0)
 
     def getHiddenAttribute(self):
         """
