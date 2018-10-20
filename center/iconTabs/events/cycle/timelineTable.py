@@ -1,14 +1,16 @@
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
-from PyQt5.QtCore import pyqtSignal
-from .colAdd import ColAdd
-from noDash import NoDash
-from structure.main import Structure
-
 import copy
+
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtGui import QKeyEvent, QMouseEvent
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
+
+from noDash import NoDash
+from .colAdd import ColAdd
 
 
 class TimelineTable(QTableWidget):
     canEmit = pyqtSignal(bool)
+
     def __init__(self, parent=None):
         super(TimelineTable, self).__init__(parent)
         # 保存name及其默认值
@@ -23,6 +25,14 @@ class TimelineTable(QTableWidget):
         self.setColumnCount(2)
         self.setHorizontalHeaderLabels(self.col_header)
         self.addRow()
+
+        # Alt仿excel复制
+        self.is_copying = False
+        self.selected_text = ""
+
+        self.grabKeyboard()
+        self.mouseGrabber()
+        self.cellClicked.connect(self.selectCell)
 
     def addRow(self):
         self.insertRow(self.rowCount())
@@ -122,3 +132,27 @@ class TimelineTable(QTableWidget):
                                 pass
         except Exception as e:
             print(f"error {e} happens in copy cycle. [cycle/timelineTable.py]")
+
+    def selectCell(self, row: int, column: int):
+        item: QTableWidgetItem = self.item(row, column)
+        self.selected_text = item.text()
+
+    def keyPressEvent(self, e: QKeyEvent):
+        if e.key() == Qt.Key_Alt:
+            self.is_copying = True
+            # todo: 复制时候的光标样式等有空找个好看的吧
+            self.setCursor(Qt.SplitVCursor)
+        QTableWidget.keyPressEvent(self, e)
+
+    def keyReleaseEvent(self, e: QKeyEvent):
+        if e.key() == Qt.Key_Alt:
+            self.is_copying = False
+            self.unsetCursor()
+        QTableWidget.keyReleaseEvent(self, e)
+
+    def mouseReleaseEvent(self, e: QMouseEvent):
+        if self.is_copying:
+            items = self.selectedItems()
+            for item in items:
+                item.setText(self.selected_text)
+        QTableWidget.mouseReleaseEvent(self, e)

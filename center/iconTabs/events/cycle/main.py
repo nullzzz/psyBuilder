@@ -185,9 +185,8 @@ class Cycle(QMainWindow):
             if default_value != data[1]:
                 self.timeline_table.col_value[col] = data[1]
                 for row in range(0, self.timeline_table.rowCount()):
-                    if self.timeline_table.item(row, col) == None or self.timeline_table.item(row, col).text() in [
-                        '',
-                        default_value]:
+                    if self.timeline_table.item(row, col) is None or \
+                            self.timeline_table.item(row, col).text() in ['', default_value]:
                         self.timeline_table.setItem(row, col, QTableWidgetItem(data[1]))
         self.timeline_table.setHorizontalHeaderLabels(self.timeline_table.col_header)
 
@@ -411,7 +410,7 @@ class Cycle(QMainWindow):
                                                       attributes)
                                 self.timeline_count += 1
                             else:
-                                QMessageBox.information(self, 'Tips', tips)
+                                QMessageBox.information(self, 'Tips', tips, QMessageBox.Ok)
                     else:
                         self.emit_change = True
                 # change timeline name
@@ -423,7 +422,7 @@ class Cycle(QMainWindow):
                         if name_validity:
                             self.timelineNameChange.emit(self.value, value, name)
                         else:
-                            QMessageBox.information(self, "Tips", tips)
+                            QMessageBox.information(self, "Tips", tips, QMessageBox.Ok)
                     else:
                         QMessageBox.information(self, "Tips", "Timeline value can't be none.")
                         self.timeline_table.setItem(row, col, QTableWidgetItem(self.row_name[row]))
@@ -656,3 +655,5 @@ class Cycle(QMainWindow):
             "rt":0
         }
         return hidden_attr
+
+
