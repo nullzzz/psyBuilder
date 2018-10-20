@@ -527,27 +527,27 @@ class IconTabs(QTabWidget):
             self.openTab(value, name, False)
             widget = self.value_widget[value]
             if value.startswith('Video'):
-                widget.pro = properties_window
-                widget.pro.ok_bt.clicked.connect(widget.ok)
-                widget.pro.cancel_bt.clicked.connect(widget.pro.close)
-                widget.pro.apply_bt.clicked.connect(widget.apply)
+                widget.pro_window = properties_window
+                widget.pro_window.ok_bt.clicked.connect(widget.ok)
+                widget.pro_window.cancel_bt.clicked.connect(widget.pro_window.close)
+                widget.pro_window.apply_bt.clicked.connect(widget.apply)
             elif value.startswith('SoundOut'):
-                widget.pro = properties_window
-                widget.pro.ok_bt.clicked.connect(widget.ok)
-                widget.pro.cancel_bt.clicked.connect(widget.pro.close)
-                widget.pro.apply_bt.clicked.connect(widget.apply)
+                widget.pro_window = properties_window
+                widget.pro_window.ok_bt.clicked.connect(widget.ok)
+                widget.pro_window.cancel_bt.clicked.connect(widget.pro_window.close)
+                widget.pro_window.apply_bt.clicked.connect(widget.apply)
             elif value.startswith('Text'):
-                widget.pro = properties_window
-                widget.pro.ok_bt.clicked.connect(widget.ok)
-                widget.pro.cancel_bt.clicked.connect(widget.pro.close)
-                widget.pro.apply_bt.clicked.connect(widget.apply)
+                widget.pro_window = properties_window
+                widget.pro_window.ok_bt.clicked.connect(widget.ok)
+                widget.pro_window.cancel_bt.clicked.connect(widget.pro_window.close)
+                widget.pro_window.apply_bt.clicked.connect(widget.apply)
             elif value.startswith('Image'):
-                widget.pro = properties_window
-                widget.pro.ok_bt.clicked.connect(widget.ok)
-                widget.pro.cancel_bt.clicked.connect(widget.pro.close)
-                widget.pro.apply_bt.clicked.connect(widget.apply)
+                widget.pro_window = properties_window
+                widget.pro_window.ok_bt.clicked.connect(widget.ok)
+                widget.pro_window.cancel_bt.clicked.connect(widget.pro_window.close)
+                widget.pro_window.apply_bt.clicked.connect(widget.apply)
         except Exception as e:
-            print("error {} happens in create tab for Item in if branch.[iconTabs/main.py]".format(e))
+            print("error {} happens in create tab for Item in if branch. [iconTabs/main.py]".format(e))
 
     def closeTab(self, widget=None, index=-1):
         try:
@@ -714,7 +714,8 @@ class IconTabs(QTabWidget):
                             hidden_attributes: dict = IconTabs.value_widget_global[value].getHiddenAttribute()
                         else:
                             print(value)
-                            print(f"{value.split('.')[0]} widget has no attribute 'getHiddenAttribute'. [IconTabs/main]")
+                            print(
+                                f"{value.split('.')[0]} widget has no attribute 'getHiddenAttribute'. [IconTabs/main]")
                     for attribute in hidden_attributes:
                         name = Structure.getNodeName(value)
                         attributes[f'{name}.{attribute}'] = hidden_attributes[attribute]
@@ -726,5 +727,5 @@ class IconTabs(QTabWidget):
     # todo check conflict attribute used
     @staticmethod
     def checkConflictAboutVar(value, container_value):
-        # 先得到value及其子节点所涉及的一切有效value（不包括cycle）
+        # 到底怎么检查，检查什么
         return True
