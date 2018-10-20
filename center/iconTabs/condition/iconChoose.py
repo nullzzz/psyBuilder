@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt, pyqtSignal, QRegExp
-from PyQt5.QtGui import QPixmap, QRegExpValidator
-from PyQt5.QtWidgets import QComboBox, QWidget, QLineEdit, QGridLayout, QLabel, QMessageBox
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QComboBox, QWidget, QLineEdit, QGridLayout, QLabel
 
 from center.iconTabs.events.image.imageProperty import ImageProperty
 from center.iconTabs.events.soundOut.soundProperty import SoundProperty
@@ -10,6 +10,7 @@ from getImage import getImage
 from ..timeline.icon import Icon
 
 
+# todo 有bug，在if\switch里面打开的pro_window和structure里打开widget的pro_window不是一个
 class IconChoose(QWidget):
     # 发送到上一层, 由上一层再转至properties (properties)
     propertiesShow = pyqtSignal(dict)

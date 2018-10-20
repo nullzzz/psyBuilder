@@ -105,8 +105,7 @@ class EyeCalibrate(QWidget):
     def apply(self):
         self.propertiesChange.emit(self.getInfo())
 
-        # 检查变量
-
+    # 检查变量
     def findVar(self, text):
         if text in self.attributes:
             self.sender().setStyleSheet("color: blue")
