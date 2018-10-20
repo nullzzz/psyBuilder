@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QComboBox, QGroupBox, QHBoxLayout, QVBoxLayout, QFormLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QComboBox, QGroupBox, QHBoxLayout, QFormLayout, QLabel
 
 
 class Selection(QWidget):
@@ -80,5 +80,3 @@ class Selection(QWidget):
             self.order_by_combo.addItem("Session")
             self.order_by_combo.addItem("Run")
             self.order_by_combo.setCurrentIndex(1)
-
-

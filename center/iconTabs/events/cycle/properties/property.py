@@ -1,6 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout, QDialog, QFrame
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QDialog, QFrame
 
-from .general import General
 from .selection import Selection
 
 
@@ -11,7 +10,7 @@ class Property(QDialog):
         self.tab = QFrame(self)
         self.below = QWidget(self)
 
-        self.ok_bt = QPushButton("Ok")
+        self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
 
@@ -26,8 +25,7 @@ class Property(QDialog):
 
         self.cancel_bt.clicked.connect(self.close)
 
-        # 生成主界面
-
+    # 生成主界面
     def setUI(self):
         self.setWindowTitle("properties")
         self.resize(600, 800)
