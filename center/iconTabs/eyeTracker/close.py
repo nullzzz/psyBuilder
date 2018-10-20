@@ -98,6 +98,9 @@ class Close(QWidget):
         clone_widget.setProperties(self.default_properties)
         return clone_widget
 
+    def setAttributes(self, attributes):
+        pass
+
     # 返回当前选择attributes
     def getUsingAttributes(self):
         using_attributes: list = []
