@@ -17,6 +17,7 @@ class CaseArea(QScrollArea):
         self.parent_value = parent_value
         self.switch_value = ''
         self.cases = []
+        self.cases_back_up = []
         # case_num, [case{case title, case value, case icon value, case name}]
         self.case_data_backup = {}
 
@@ -144,7 +145,9 @@ class CaseArea(QScrollArea):
     def backup(self):
         self.case_data_backup['switch'] = self.switch.currentText()
         self.case_data_backup['case'] = []
+        self.cases_back_up.clear()
         for case in self.cases:
+            self.cases_back_up.append(case.icon_choose.properties_window)
             case_data = {}
             case_data['case_title'] = case.title()
             case_data['case_value'] = case.case_comBox.currentText()
@@ -183,6 +186,34 @@ class CaseArea(QScrollArea):
                 self.caseAdd.emit(case)
         except Exception as e:
             print(f"error {e} happens in restore cases. [switchBranch/caseArea.py]")
+
+    def restoreForCancel(self):
+        try:
+            # 先删除所有case
+            for case in self.cases:
+                self.grid_layout.removeWidget(case)
+                case.hide()
+                self.widget.update()
+            self.cases.clear()
+            # 增加新case
+            print(self.cases_back_up)
+            cases = self.case_data_backup['case']
+            for index in range(len(cases)):
+                case = Case(title=cases[index]['case_title'], parent=None, can_add=cases[index]['can_add'],
+                            can_delete=cases[index]['can_delete'])
+                case.case_comBox.setCurrentText(cases[index]['case_value'])
+                case.icon_choose.icon_comboBox.setCurrentText(cases[index]['case_icon_value'].split('.')[0])
+                case.icon_choose.icon.changeValue(cases[index]['case_icon_value'])
+                case.icon_choose.icon_name.setText(cases[index]['case_icon_name'])
+                case.icon_choose.properties_window = self.cases_back_up[index]
+                self.cases.append(case)
+                row = index // 3 + 1
+                col = index % 3
+                self.grid_layout.addWidget(case, row, col, 1, 1)
+                self.linkCaseSignals(case)
+                self.caseAdd.emit(case)
+        except Exception as e:
+            print(f"error {e} happens in restore cases for cancel. [switchBranch/caseArea.py]")
 
     def copy(self, case_area_copy, old_value:dict):
         try:
