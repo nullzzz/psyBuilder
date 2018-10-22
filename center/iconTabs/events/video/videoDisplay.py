@@ -9,6 +9,7 @@ from Info import Info
 from .videoProperty import VideoProperty
 
 
+# todo 加载完视频截一帧贴上去
 class VideoDisplay(QMainWindow):
     propertiesChange = pyqtSignal(dict)
     getAttribute = pyqtSignal(str)
