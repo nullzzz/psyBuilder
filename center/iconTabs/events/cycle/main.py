@@ -37,7 +37,9 @@ class Cycle(QMainWindow):
         super(Cycle, self).__init__(parent)
 
         self.timeline_table = TimelineTable(self)
-        # self.properties = {"loadMethod": 0, "fileName": "", "order_combo": 0, "no_repeat_after": 0, "order_by_combo": 0}
+        self.timeline_table.installEventFilter(self)
+        # self.properties = {"loadMethod": 0, "fileName": "", "order_combo": 0, "no_repeat_after": 0,
+        # "order_by_combo": 0}
         self.properties = {"order_combo": 0, "no_repeat_after": 0, "order_by_combo": 0}
         self.value = value
         # row : value
@@ -185,8 +187,8 @@ class Cycle(QMainWindow):
             if default_value != data[1]:
                 self.timeline_table.col_value[col] = data[1]
                 for row in range(0, self.timeline_table.rowCount()):
-                    if self.timeline_table.item(row, col) is None or \
-                            self.timeline_table.item(row, col).text() in ['', default_value]:
+                    if self.timeline_table.item(row, col) is None or self.timeline_table.item(row, col).text() in ['',
+                                                                                                                   default_value]:
                         self.timeline_table.setItem(row, col, QTableWidgetItem(data[1]))
         self.timeline_table.setHorizontalHeaderLabels(self.timeline_table.col_header)
 
@@ -249,8 +251,8 @@ class Cycle(QMainWindow):
         return res
 
     def dragEnterEvent(self, e):
-        if e.mimeData().hasFormat("application/StructureTree-move-value-name") or \
-                e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+        if e.mimeData().hasFormat("application/StructureTree-move-value-name") or e.mimeData().hasFormat(
+            "application/StructureTree-copy-value-name"):
             data = e.mimeData().data("application/StructureTree-move-value-name")
             if e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
                 data = e.mimeData().data("application/StructureTree-copy-value-name")
@@ -262,8 +264,8 @@ class Cycle(QMainWindow):
 
     def dragMoveEvent(self, e):
         try:
-            if e.mimeData().hasFormat("application/StructureTree-move-value-name") or \
-                    e.mimeData().hasFormat("application/StructureTree-copy-value-name"):
+            if e.mimeData().hasFormat("application/StructureTree-move-value-name") or e.mimeData().hasFormat(
+                "application/StructureTree-copy-value-name"):
 
                 e.setDropAction(Qt.CopyAction)
                 e.accept()
@@ -558,8 +560,7 @@ class Cycle(QMainWindow):
                 left_column = self.timeline_table.selectedRanges()[0].leftColumn()
                 for row in range(top_row, top_row + self.paste_row):
                     for col in range(left_column, left_column + self.paste_col):
-                        self.timeline_table.item(row, col).setText(
-                            self.paste_data[row - top_row][col - left_column])
+                        self.timeline_table.item(row, col).setText(self.paste_data[row - top_row][col - left_column])
         except Exception:
             print("paste into table error.")
 
@@ -604,8 +605,7 @@ class Cycle(QMainWindow):
             # data, 一定要注意要是深拷贝
             # row_name row_value, value_row
             for row in self.row_name:
-                name, timeline_value = Structure.getNameAndValueByOldAndParent(self.row_name[row], self.value,
-                                                                               value)
+                name, timeline_value = Structure.getNameAndValueByOldAndParent(self.row_name[row], self.value, value)
                 cycle_copy.row_name[row] = name
                 cycle_copy.row_value[row] = timeline_value
                 cycle_copy.value_row[timeline_value] = row
@@ -648,12 +648,10 @@ class Cycle(QMainWindow):
         """
         :return:
         """
-        hidden_attr = {
-            "onsettime": 0,
-            "acc": 0,
-            "resp": 0,
-            "rt":0
-        }
+        hidden_attr = {"onsettime": 0, "acc": 0, "resp": 0, "rt": 0}
         return hidden_attr
 
-
+    # def eventFilter(self, obj: QObject, e: QEvent):
+    #     if obj == self.timeline_table:
+    #         print(e.type())
+    #     return QMainWindow.eventFilter(self, obj, e)

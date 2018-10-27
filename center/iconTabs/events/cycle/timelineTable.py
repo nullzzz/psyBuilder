@@ -30,9 +30,11 @@ class TimelineTable(QTableWidget):
         self.is_copying = False
         self.selected_text = ""
 
-        self.grabKeyboard()
-        self.mouseGrabber()
+        # self.mouseGrabber()
         self.cellClicked.connect(self.selectCell)
+        self.itemDoubleClicked.connect(lambda: print("double click"))
+        # todo: bug need fixing, table 监听键盘事件会覆盖item的键盘事件
+        self.grabKeyboard()
 
     def addRow(self):
         self.insertRow(self.rowCount())
