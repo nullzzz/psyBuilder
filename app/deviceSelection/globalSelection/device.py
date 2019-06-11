@@ -1,0 +1,79 @@
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QListWidgetItem
+
+from app.func import Func
+
+
+class Device(QListWidgetItem):
+    """
+    :param device_type: 串、并、网口、
+    :param name: 自定义设备名，即item的text
+    """
+
+    def __init__(self, device_type: str, device_id: str = None, parent=None):
+        super(Device, self).__init__(device_type, parent)
+        # 设备类型
+        self.device_type = device_type
+
+        # 地址
+        if device_type == "network_port":
+            self.port = "127.0.0.1"
+        elif device_type == "parallel_port":
+            self.port = "D010"
+        elif device_type == "serial_port":
+            self.port = "com1"
+        elif device_type == "screen":
+            self.port = "0"
+        else:
+            self.port = "null"
+
+        # 设备标识符
+        self.device_id = device_id
+
+        # 设置图标
+        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
+
+        self.default_properties = {
+            "Device Type": self.device_type,
+            "Device Name": device_id,
+            "Device Port": self.port
+        }
+
+    def getType(self):
+        return self.device_type
+
+    def setName(self, name: str):
+        self.setText(name)
+
+    def getDeviceId(self):
+        return self.device_id
+
+    def getName(self):
+        return self.text()
+
+    def getPort(self):
+        return self.port
+
+    def setPort(self, port):
+        if port.startswith("screen"):
+            self.port = port.split(".")[-1]
+        elif port.startswith("serial_port"):
+            self.port = f"com{port.split('.')[-1]}"
+        elif port.startswith(self.device_type):
+            pass
+        else:
+            self.port = port
+
+    def setProperties(self, properties: dict):
+        if isinstance(properties, dict):
+            self.default_properties = properties
+            self.loadSetting()
+
+    def loadSetting(self):
+        self.setName(self.default_properties["Device Name"])
+        self.setPort(self.default_properties["Device Port"])
+
+    def getInfo(self):
+        self.default_properties["Device Name"] = self.text()
+        self.default_properties["Device Port"] = self.port
+        return self.default_properties

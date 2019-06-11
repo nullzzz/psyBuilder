@@ -1,0 +1,3 @@
+2019.6.11 李扬
+将widget类型统一用Info.xxx表示
+将图片路径统一使用Func.getImage(image_name)表示
