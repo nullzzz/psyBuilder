@@ -17,6 +17,11 @@ class TimelineTable(QTableWidget):
     timeline_delete = pyqtSignal(str)
 
     def __init__(self, parent=None, widget_id=''):
+        """
+        init
+        :param parent:
+        :param widget_id:
+        """
         super(TimelineTable, self).__init__(parent)
         # data
         self.widget_id = widget_id
@@ -46,17 +51,31 @@ class TimelineTable(QTableWidget):
 
         # self.grabKeyboard()
 
-    def linkSignals(self):
+    def linkSignals(self) -> None:
+        """
+        连接信号
+        :return:
+        """
         self.itemChanged.connect(self.addTimeline)
         self.itemChanged.connect(self.deleteTimeline)
         self.cellClicked.connect(self.selectCell)
 
-    def setMenuAndShortcut(self):
+    def setMenuAndShortcut(self) -> None:
+        """
+
+        :return:
+        """
         pass
 
-    def addRow(self):
+    def addRow(self) -> None:
+        """
+        增加一行，需要考虑到attributes
+        :return:
+        """
         try:
+            # 插入一行
             self.insertRow(self.rowCount())
+            # 根据attribute设置内容
             self.setItem(self.rowCount() - 1, 0, QTableWidgetItem(self.attribute_value[self.col_attribute[0]]))
             item = QTableWidgetItem(self.attribute_value[self.col_attribute[1]])
             item.setFlags(Qt.ItemIsEnabled)
@@ -66,7 +85,7 @@ class TimelineTable(QTableWidget):
         except Exception as e:
             print(f"error {e} happen in add row. [timeline_table/main.py]")
 
-    def deleteRow(self, row):
+    def deleteRow(self, row) -> None:
         """
         删除选中的某行
         :param row:
@@ -85,8 +104,15 @@ class TimelineTable(QTableWidget):
         except Exception as e:
             print(f"error {e} happen in delete row. [timeline_table/main.py]")
 
-    def addAttribute(self, attribute='', default_value=''):
+    def addAttribute(self, attribute='', default_value='') -> None:
+        """
+        添加attribute
+        :param attribute: attribute名
+        :param default_value: attribute默认值
+        :return:
+        """
         try:
+            # 添加进字典
             self.col_attribute.append(attribute)
             self.attribute_value[attribute] = default_value
             self.insertColumn(self.columnCount())
@@ -98,17 +124,31 @@ class TimelineTable(QTableWidget):
         except Exception as e:
             print(f"error {e} happen in add attribute. [timeline_table/main.py]")
 
-    def addAttributes(self, attribute_list, value):
+    def addAttributes(self, attribute_list: list, value: list) -> None:
+        """
+        添加attributes
+        :param attribute_list: attributes名列表
+        :param value: 对应值
+        :return:
+        """
         try:
             for i in range(len(attribute_list)):
                 self.addAttribute(attribute_list[i], value[i])
         except Exception as e:
             print(f"error {e} happen in add attributes. [timeline_table/main.py]")
 
-    def changeAttribute(self, col, attribute, value):
+    def changeAttribute(self, col: int, attribute: str, value: str):
+        """
+        修改attribute的名或值
+        :param col: 列索引
+        :param attribute:
+        :param value:
+        :return:
+        """
         try:
             old_attribute = self.col_attribute[col]
             old_value = self.attribute_value[old_attribute]
+            # 于旧的名与值比较
             if old_attribute == attribute:
                 self.attribute_value[attribute] = value
                 for row in range(self.rowCount()):
@@ -127,7 +167,13 @@ class TimelineTable(QTableWidget):
             print(f"error {e} happen in change attribute. [timeline_table/main.py]")
 
     def deleteAttribute(self, col):
+        """
+        删除attribute
+        :param col: 索引
+        :return:
+        """
         try:
+            # 不能删除第0和1列
             if col not in [0, 1]:
                 del self.attribute_value[self.col_attribute[col]]
                 self.col_attribute.pop(col)
@@ -137,6 +183,11 @@ class TimelineTable(QTableWidget):
             print(f"error {e} happen in delete attribute. [timeline_table/main.py]")
 
     def addTimeline(self, item: QTableWidgetItem):
+        """
+        当timeline那列item被修改时，需要作出一系列反应，add和delete
+        :param item:
+        :return:
+        """
         try:
             if self.edit_row == item.row() and item.column() == 1 and item.text():
                 name = item.text()
@@ -152,8 +203,16 @@ class TimelineTable(QTableWidget):
                         self.name_wid[name] = timeline_widget_id
                     else:
                         self.name_count[name] += 1
+                    # 如果old_name有效，其被修改后，count-1
+                    if (self.old_timeline_name):
+                        self.name_count[self.old_timeline_name] -= 1
+                        # 如果此cycle中不存在相同名的timeline需要进行删除
+                        if not self.name_count[self.old_timeline_name]:
+                            del self.name_count[self.old_timeline_name]
+                            self.timeline_delete.emit(self.name_wid[self.old_timeline_name])
+                            del self.name_wid[self.old_timeline_name]
                 elif validity == Info.TimelineNameExist:
-                    # 没有出现过是要进行新增的
+                    # 没有出现过是要进行新增的，且是引用
                     if name not in self.name_count:
                         widget_icon = WidgetIcon(widget_type=Info.TIMELINE)
                         timeline_widget_id = widget_icon.widget_id
@@ -163,6 +222,14 @@ class TimelineTable(QTableWidget):
                         self.name_wid[name] = timeline_widget_id
                     else:
                         self.name_count[name] += 1
+                    # 如果old_name有效，其被修改后，count-1
+                    if (self.old_timeline_name):
+                        self.name_count[self.old_timeline_name] -= 1
+                        # 如果此cycle中不存在相同名的timeline需要进行删除
+                        if not self.name_count[self.old_timeline_name]:
+                            del self.name_count[self.old_timeline_name]
+                            self.timeline_delete.emit(self.name_wid[self.old_timeline_name])
+                            del self.name_wid[self.old_timeline_name]
                 elif validity == Info.TimelineNameError:
                     item.setText(self.old_timeline_name)
                     QMessageBox.information(self, 'Warning', "Name must start with letter.")
@@ -179,8 +246,12 @@ class TimelineTable(QTableWidget):
             print(f"error {e} happens in add timeline. [timeline_table/main.py]")
 
     def deleteTimeline(self, item: QTableWidgetItem):
+        """
+        这个函数是来应对timeline的name被修改为空，或者删除某一行时被调用
+        :param item:
+        :return:
+        """
         try:
-            # 这个函数是来应对timeline的name被修改为空，或者删除某一行时被调用
             if self.edit_row == item.row() and item.column() == 1 and not item.text():
                 self.edit_row = -2
                 self.name_count[self.old_timeline_name] -= 1
