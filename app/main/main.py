@@ -1,6 +1,6 @@
+import os
 import sys
 
-import os
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMessageBox
@@ -159,8 +159,6 @@ class PsyApplication(QMainWindow):
 
         # wait dialog
         self.wait_dialog = WaitDialog(self)
-        self.wait_timer = QTimer(self)
-        self.wait_timer.timeout.connect(self.refresh_wait_dialog)
 
         self.linkSignals()
 
@@ -531,8 +529,10 @@ class PsyApplication(QMainWindow):
         启动等待窗口
         :return:
         """
-        self.wait_dialog.show()
-        self.wait_timer.start(10)
+        self.wait_timer = QTimer(self)
+        self.wait_timer.timeout.connect(self.refresh_wait_dialog)
+        self.wait_dialog.start()
+        self.wait_timer.start(0)
 
     def refresh_wait_dialog(self) -> None:
         """
@@ -540,7 +540,7 @@ class PsyApplication(QMainWindow):
         :return:
         """
         self.wait_dialog.change_image()
-        self.wait_timer.start(10)
+        self.wait_timer.start(0)
 
     def stop_wait_dialog(self) -> None:
         """

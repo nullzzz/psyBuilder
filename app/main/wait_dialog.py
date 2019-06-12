@@ -57,5 +57,4 @@ class WaitDialog(QDialog):
         关闭等待窗口
         :return:
         """
-        self.image_index = 0
         self.close()

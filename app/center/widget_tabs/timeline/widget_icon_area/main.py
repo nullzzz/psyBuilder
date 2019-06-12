@@ -94,6 +94,9 @@ class WidgetIconArea(QFrame):
     def dropEvent(self, e):
         try:
             if e.mimeData().hasFormat("widget_icon_bar/widget_icon_type"):
+                # 隐藏箭头
+                QApplication.processEvents()
+                self.signHide.emit()
                 # 从widget icon bar拖拽到widget icon area中
                 data = e.mimeData().data("widget_icon_bar/widget_icon_type")
                 stream = QDataStream(data, QIODevice.ReadOnly)
@@ -110,8 +113,6 @@ class WidgetIconArea(QFrame):
                 if target_col != -1 and target_col < drag_col:
                     self.widget_icon_table.moveWidgetIcon(drag_col, target_col)
                 # end
-                QApplication.processEvents()
-                self.signHide.emit()
                 QApplication.processEvents()
                 self.widgetIconAdd.emit(self.widget_id, widget_id, name, Info.WidgetAdd, '')
                 QApplication.processEvents()

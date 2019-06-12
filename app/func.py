@@ -1,5 +1,6 @@
 import copy
 import os
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QPainter, QColor
 from PyQt5.QtWidgets import QWidget
