@@ -17,7 +17,8 @@ class VideoProperty(QWidget):
         self.frame = FramePage()
         self.duration = DurationPage()
 
-        self.default_properties = {**self.general.default_properties, **self.frame.default_properties, **self.duration.default_properties}
+        self.default_properties = {**self.general.default_properties, **self.frame.default_properties,
+                                   **self.duration.default_properties}
 
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.frame, "frame")
@@ -26,6 +27,7 @@ class VideoProperty(QWidget):
         self.setUI()
 
         # 生成主界面
+
     def setUI(self):
         self.setWindowTitle("Video property")
         self.resize(600, 800)

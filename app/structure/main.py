@@ -1,5 +1,4 @@
 import copy
-
 from PyQt5.QtCore import pyqtSignal, QSettings
 from PyQt5.QtWidgets import QDockWidget, QApplication
 

@@ -9,7 +9,7 @@ class Timeline(QWidget):
     # 无用信号，只是为了统一串信号用
     propertiesChange = pyqtSignal(str)
 
-    def __init__(self, parent=None, widget_id: str=""):
+    def __init__(self, parent=None, widget_id: str = ""):
         """
         init
         :param parent:

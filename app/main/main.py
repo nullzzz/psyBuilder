@@ -1,6 +1,6 @@
-import os
 import sys
 
+import os
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMessageBox
@@ -159,6 +159,8 @@ class PsyApplication(QMainWindow):
 
         # wait dialog
         self.wait_dialog = WaitDialog(self)
+        self.wait_timer = QTimer(self)
+        self.wait_timer.timeout.connect(self.refresh_wait_dialog)
 
         self.linkSignals()
 
@@ -182,8 +184,8 @@ class PsyApplication(QMainWindow):
         self.linkWidgetSignals(f'{Info.TIMELINE}.0')
         # structure
         self.structure.widgetSignalsLink.connect(self.linkWidgetSignals)
-        self.structure.widgetCreatStart.connect(self.wait_dialog.start)
-        self.structure.widgetCreatEnd.connect(self.wait_dialog.stop)
+        self.structure.widgetCreatStart.connect(self.start_wait_dialog)
+        self.structure.widgetCreatEnd.connect(self.stop_wait_dialog)
         self.structure.structure_tree.widgetOpen.connect(self.center.widget_tabs.openWidget)
         self.structure.structure_tree.nodeNameChange.connect(self.center.widget_tabs.changeTabName)
         self.structure.structure_tree.nodeDelete.connect(self.center.widget_tabs.closeTab)
@@ -523,3 +525,27 @@ class PsyApplication(QMainWindow):
             self.close()
         except:
             self.close()
+
+    def start_wait_dialog(self) -> None:
+        """
+        启动等待窗口
+        :return:
+        """
+        self.wait_dialog.show()
+        self.wait_timer.start(10)
+
+    def refresh_wait_dialog(self) -> None:
+        """
+        刷新等待窗口
+        :return:
+        """
+        self.wait_dialog.change_image()
+        self.wait_timer.start(10)
+
+    def stop_wait_dialog(self) -> None:
+        """
+        关闭等待窗口
+        :return:
+        """
+        self.wait_timer.stop()
+        self.wait_dialog.stop()

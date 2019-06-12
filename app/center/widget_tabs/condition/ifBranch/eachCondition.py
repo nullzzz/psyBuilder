@@ -129,5 +129,5 @@ class EachCondition(QFrame):
         e.g. and ([var] == "var value")
         :return:
         """
-        return f"{self.default_properties.get('op', '')} ({self.default_properties.get('var','')}" \
+        return f"{self.default_properties.get('op', '')} ({self.default_properties.get('var', '')}" \
             f"{self.default_properties.get('compare', '=')}{self.default_properties.get('var value')})"

@@ -71,11 +71,11 @@ class CaseArea(QScrollArea):
         del_case = self.case_list.pop(index - 1)
         self.layout.removeWidget(del_case)
         del_case.hide()
-        for case in self.case_list[index-1:-1]:
+        for case in self.case_list[index - 1:-1]:
             case.updateIndex(-1)
             self.layout.removeWidget(case)
         self.layout.removeWidget(self.case_0)
-        for case in self.case_list[index-1:-1]:
+        for case in self.case_list[index - 1:-1]:
             self.addCase(case)
         cnt = len(self.case_list)
         self.layout.addWidget(self.case_0, (cnt - 1) // 3, (cnt - 1) % 3)
@@ -117,11 +117,11 @@ class CaseArea(QScrollArea):
         old_cnt = len(self.default_properties)
         new_cnt = len(self.case_list)
         if old_cnt > new_cnt:
-            for i in range(old_cnt-new_cnt):
-                self.insertCase(new_cnt+i-1)
+            for i in range(old_cnt - new_cnt):
+                self.insertCase(new_cnt + i - 1)
         else:
-            for i in range(new_cnt-old_cnt):
-                self.delCase(old_cnt-1)
+            for i in range(new_cnt - old_cnt):
+                self.delCase(old_cnt - 1)
         for case in self.case_list:
             case.setProperties(self.default_properties.get(case.title(), {}))
 

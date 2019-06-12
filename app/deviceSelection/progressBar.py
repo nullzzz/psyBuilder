@@ -36,10 +36,10 @@ class ProgressBar(QFrame):
     def paintEvent(self, e):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        m_rotate_angle = int(360*self.value/100)
+        m_rotate_angle = int(360 * self.value / 100)
         side = 400
         out_rect = QRectF(0, 0, side, side)
-        in_rect = QRectF(20, 20, side-40, side-40)
+        in_rect = QRectF(20, 20, side - 40, side - 40)
         value_str = f"{self.value}%"
         # 画外圆
         p.setPen(Qt.NoPen)

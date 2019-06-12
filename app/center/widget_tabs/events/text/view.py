@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QDialog, QDesktopWidget, QTextEdit, QLabel
 
 from app.func import Func
 
+
 class Preview(QDialog):
     def __init__(self, start_x=0, start_y=0, width=100, height=100):
         super(Preview, self).__init__()
