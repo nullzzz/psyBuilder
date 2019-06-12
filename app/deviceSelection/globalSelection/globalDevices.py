@@ -89,19 +89,16 @@ class GlobalDevice(QWidget):
 
     def apply(self):
         self.getInfo()
-        default_properties = self.selected_devices.getInfo()
+        default_properties: dict = self.selected_devices.getInfo()
         self.deviceSelect.emit(self.device_type, default_properties)
 
-    def changeItem(self, device_type, device_name, device_port):
-        # print("change item")
-        # print(device_name)
-        # print(device_type)
+    def changeItem(self, device_type: str, device_name: str, device_port: str):
         self.describer.describe(device_type, device_name, device_port)
 
-    def changePort(self, port):
+    def changePort(self, port: str):
         self.selected_devices.changeCurrentPort(port)
 
-    def rename(self, item):
+    def rename(self, item: Device):
         name: str = item.text()
         item_name: str = name.lower()
 
@@ -115,7 +112,7 @@ class GlobalDevice(QWidget):
                 self.selected_devices.changeCurrentName(text)
                 self.describer.changeName(text)
 
-    # todo: 参数导出
+    # 参数导出, 记录到Info
     def getInfo(self):
         device_info: dict = self.selected_devices.getInfo()
         if self.device_type:
@@ -125,7 +122,7 @@ class GlobalDevice(QWidget):
             Info.INPUT_DEVICE_INFO = device_info.copy()
             DurationPage.INPUT_DEVICES = device_info
 
-    # todo:参数导入
+    # 参数导入
     def setProperties(self, properties: dict):
         self.selected_devices.clearAll()
         self.selected_devices.setProperties(properties)

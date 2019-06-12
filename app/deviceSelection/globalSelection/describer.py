@@ -11,7 +11,7 @@ class Describer(QWidget):
         self.device_name = QLabel("Unselected")
         self.device_port = QLineEdit("")
         self.port_tip = QLabel("")
-        self.device_port.textEdited.connect(self.judgePort)
+        self.device_port.textEdited.connect(self.showPortTip)
         self.port: str = ""
 
         self.setUI()
@@ -25,9 +25,6 @@ class Describer(QWidget):
         self.setLayout(layout)
 
     def describe(self, device_type, device_name, device_port):
-        # print("describe:")
-        # print(device_name)
-        # print(device_type)
         self.device_type.setText(device_type)
         self.device_name.setText(device_name)
 
@@ -38,7 +35,7 @@ class Describer(QWidget):
             self.device_port.setEnabled(True)
             self.device_port.setText(device_port)
             self.port = device_port
-            self.judgePort(self.port)
+            self.showPortTip(self.port)
 
     def changeName(self, name):
         self.device_name.setText(name)
@@ -57,7 +54,12 @@ class Describer(QWidget):
                         self.portChanged.emit(self.port)
         return QWidget.eventFilter(self, obj, e)
 
-    def judgePort(self, port: str):
+    def showPortTip(self, port: str):
+        """
+        端口有效性提示
+        :param port:
+        :return:
+        """
         flag: bool = self.checkPort(port)
 
         if flag is False:

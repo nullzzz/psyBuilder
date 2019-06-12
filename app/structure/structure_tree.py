@@ -30,7 +30,7 @@ class StructureTree(QTreeWidget):
         self.expandAll()
         # data
         Info.WID_NODE[f"{Info.TIMELINE}.0"] = timeline_node
-        Info.name_wid[Info.TIMELINE] = [f'{Info.TIMELINE}.0']
+        Info.NAME_WID[Info.TIMELINE] = [f'{Info.TIMELINE}.0']
         self.edit_wid = ''
         #
         self.setMenuAndShortcut()
@@ -74,6 +74,7 @@ class StructureTree(QTreeWidget):
                 self.editItem(node, 0)
         except Exception as e:
             print(f"error {e} happens in edit node. [structure/structure_tree.py]")
+            Func.log(e, True)
 
     def renameNode(self, node: StructureNode, index):
         try:
@@ -103,6 +104,7 @@ class StructureTree(QTreeWidget):
                     self.old_name = ''
         except Exception as e:
             print(f"error {e} happens in rename node. [structure/structure_tree.py]")
+            Func.log(e, True)
 
     def deleteNode(self):
         node: StructureNode = self.currentItem()
@@ -133,6 +135,7 @@ class StructureTree(QTreeWidget):
                         self.referDrag(widget_id)
         except Exception as e:
             print(f"error {e} happens in mouse move event. [structure/structure_tree.py]")
+            Func.log(e, True)
 
     def moveDrag(self, widget_id):
         data = QByteArray()

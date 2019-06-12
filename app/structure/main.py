@@ -79,34 +79,35 @@ class Structure(QDockWidget):
         :param name:
         :return:
         """
-        # try:
-        # 先在源节点下添加
-        parent_node = Info.WID_NODE[parent_widget_id]
-        node = StructureNode(parent_node, widget_id)
-        node.setText(0, name)
-        parent_node.setExpanded(True)
-        # data
-        Info.WID_NODE[widget_id] = node
-        Info.name_wid[name] = [widget_id]
-        # 创建控件, 连接信号
-        Func.createWidget(widget_id)
-        self.widgetSignalsLink.emit(widget_id)
-        # 父节点引用
-        widget_type = widget_id.split('.')[0]
-        refer_parent_wids = Func.getReferWidgetIds(parent_widget_id)
-        for refer_parent_wid in refer_parent_wids:
-            refer_parent_node = Info.WID_NODE[refer_parent_wid]
-            # 要为新增节点搞一个widget_id啊
-            refer_child_wid = WidgetIcon(widget_type=widget_type).widget_id
-            refer_child_node = StructureNode(refer_parent_node, refer_child_wid)
-            refer_child_node.setText(0, name)
-            refer_parent_node.setExpanded(True)
+        try:
+            # 先在源节点下添加
+            parent_node = Info.WID_NODE[parent_widget_id]
+            node = StructureNode(parent_node, widget_id)
+            node.setText(0, name)
+            parent_node.setExpanded(True)
             # data
-            Info.WID_NODE[refer_child_wid] = refer_child_node
-            Info.name_wid[name].append(refer_child_wid)
-            Info.WID_WIDGET[refer_child_wid] = Info.WID_WIDGET[widget_id]
-        # except Exception as e:
-        #     print(f"error {e} happens in add node for add. [structure/main.py]")
+            Info.WID_NODE[widget_id] = node
+            Info.NAME_WID[name] = [widget_id]
+            # 创建控件, 连接信号
+            Func.createWidget(widget_id)
+            self.widgetSignalsLink.emit(widget_id)
+            # 父节点引用
+            widget_type = widget_id.split('.')[0]
+            refer_parent_wids = Func.getReferWidgetIds(parent_widget_id)
+            for refer_parent_wid in refer_parent_wids:
+                refer_parent_node = Info.WID_NODE[refer_parent_wid]
+                # 要为新增节点搞一个widget_id啊
+                refer_child_wid = WidgetIcon(widget_type=widget_type).widget_id
+                refer_child_node = StructureNode(refer_parent_node, refer_child_wid)
+                refer_child_node.setText(0, name)
+                refer_parent_node.setExpanded(True)
+                # data
+                Info.WID_NODE[refer_child_wid] = refer_child_node
+                Info.NAME_WID[name].append(refer_child_wid)
+                Info.WID_WIDGET[refer_child_wid] = Info.WID_WIDGET[widget_id]
+        except Exception as e:
+            print(f"error {e} happens in add node for add. [structure/main.py]")
+            Func.log(e, True)
 
     def addNodeForCopy(self, parent_widget_id, widget_id, name, old_widget_id):
         try:
@@ -117,7 +118,7 @@ class Structure(QDockWidget):
             parent_node.setExpanded(True)
             # data
             Info.WID_NODE[widget_id] = node
-            Info.name_wid[name] = [widget_id]
+            Info.NAME_WID[name] = [widget_id]
             # 复制如果原节点存在子节点timeline/cycle，复制的节点下面的子节点也是引用
             self.referChildrenNodes(widget_id, old_widget_id)
             # 复制控件
@@ -136,12 +137,13 @@ class Structure(QDockWidget):
                 refer_parent_node.setExpanded(True)
                 # data
                 Info.WID_NODE[refer_child_wid] = refer_child_node
-                Info.name_wid[name].append(refer_child_wid)
+                Info.NAME_WID[name].append(refer_child_wid)
                 Info.WID_WIDGET[refer_child_wid] = Info.WID_WIDGET[widget_id]
                 # 子节点是引用
                 self.referChildrenNodes(refer_child_wid, widget_id)
         except Exception as e:
             print(f"error {e} happens in add node for copy. [structure/main.py]")
+            Func.log(e, True)
 
     def addNodeForRefer(self, parent_widget_id, widget_id, name, old_widget_id):
         try:
@@ -153,7 +155,7 @@ class Structure(QDockWidget):
             # data
             Info.WID_NODE[widget_id] = node
             Func.referWidget(widget_id, old_widget_id)
-            Info.name_wid[name].append(widget_id)
+            Info.NAME_WID[name].append(widget_id)
             # 子节点
             self.referChildrenNodes(widget_id, old_widget_id)
 
@@ -169,12 +171,13 @@ class Structure(QDockWidget):
                 refer_parent_node.setExpanded(True)
                 # data
                 Info.WID_NODE[refer_child_wid] = refer_child_node
-                Info.name_wid[name].append(refer_child_wid)
+                Info.NAME_WID[name].append(refer_child_wid)
                 Info.WID_WIDGET[refer_child_wid] = Info.WID_WIDGET[widget_id]
                 # 子节点是引用
                 self.referChildrenNodes(refer_child_wid, widget_id)
         except Exception as e:
             print(f"error {e} happens in add node for refer. [structure/main.py]")
+            Func.log(e, True)
 
     def addNodeForMove(self, parent_wid, widget_id, name):
         # 用来应付一个widget在非引用的timeline之间移动，在新的timeline中添加icon，并且从旧的timeline中删除
@@ -194,13 +197,13 @@ class Structure(QDockWidget):
             parent_node.setExpanded(True)
             # data
             Info.WID_NODE[widget_id] = node
-            if name in Info.name_wid:
+            if name in Info.NAME_WID:
                 # 删除节点时没有被全部删除
-                Info.name_wid[name].append(widget_id)
-                Info.WID_WIDGET[widget_id] = Info.WID_WIDGET[Info.name_wid[name][0]]
+                Info.NAME_WID[name].append(widget_id)
+                Info.WID_WIDGET[widget_id] = Info.WID_WIDGET[Info.NAME_WID[name][0]]
             else:
                 # 删除节点时被全部删除掉了
-                Info.name_wid[name] = [widget_id]
+                Info.NAME_WID[name] = [widget_id]
                 # 原有的widget改变一下widget_id，才能适用于新情况
                 widget.changeWidgetId(widget_id)
                 Info.WID_WIDGET[widget_id] = widget
@@ -217,10 +220,11 @@ class Structure(QDockWidget):
                 refer_parent_node.setExpanded(True)
                 # data
                 Info.WID_NODE[refer_child_wid] = refer_child_node
-                Info.name_wid[name].append(refer_child_wid)
+                Info.NAME_WID[name].append(refer_child_wid)
                 Info.WID_WIDGET[refer_child_wid] = Info.WID_WIDGET[widget_id]
         except Exception as e:
             print(f"error {e} happens in add node for move. [structure/main.py]")
+            Func.log(e, True)
 
     def referChildrenNodes(self, widget_id, old_widget_id):
         try:
@@ -241,12 +245,13 @@ class Structure(QDockWidget):
                     # data
                     Info.WID_WIDGET[new_child_wid] = Info.WID_WIDGET[old_child_wid]
                     Info.WID_NODE[new_child_wid] = new_child_node
-                    Info.name_wid[old_child_node.text(0)].append(new_child_wid)
+                    Info.NAME_WID[old_child_node.text(0)].append(new_child_wid)
 
                     self.referChildrenNodes(new_child_wid, old_child_wid)
                 node.setExpanded(True)
         except Exception as e:
             print(f"error {e} happen in refer children node. [structure/main.py]")
+            Func.log(e, True)
 
     # 在这里只修改而不发送信号，只是接收外部的信号来进行rename
     def renameNode(self, widget_id, name, sender=''):
@@ -262,8 +267,8 @@ class Structure(QDockWidget):
                 if not Func.isReferName(old_name):
                     # 普通的rename只存在于其父节点不是引用，且其自身也不是引用
                     node.setText(0, name)
-                    Info.name_wid[name] = Info.name_wid[old_name]
-                    del Info.name_wid[old_name]
+                    Info.NAME_WID[name] = Info.NAME_WID[old_name]
+                    del Info.NAME_WID[old_name]
                 # 之前是引用现在要分离的rename
                 else:
                     # 引用存在的可能很多
@@ -272,23 +277,23 @@ class Structure(QDockWidget):
                     if not Func.isReferName(parent_node.text(0)):
                         # 此时要去断开连接，指向的控件变成原有指向的复制
                         # 如果是源控件脱离引用呢？
-                        if widget_id == Info.name_wid[old_name][0]:
+                        if widget_id == Info.NAME_WID[old_name][0]:
                             # 按下一个widget_id生成一个拷贝，给其余所有widget_id
-                            widget_copy = Info.WID_WIDGET[widget_id].clone(Info.name_wid[old_name][1])
-                            for i in range(1, len(Info.name_wid[old_name])):
-                                Info.WID_WIDGET[Info.name_wid[old_name][i]] = widget_copy
+                            widget_copy = Info.WID_WIDGET[widget_id].clone(Info.NAME_WID[old_name][1])
+                            for i in range(1, len(Info.NAME_WID[old_name])):
+                                Info.WID_WIDGET[Info.NAME_WID[old_name][i]] = widget_copy
                         else:
                             Info.WID_WIDGET[widget_id] = Info.WID_WIDGET[widget_id].clone(widget_id)
                         # name_wid：从原来的list中删除，并新建一个list
-                        Info.name_wid[old_name].remove(widget_id)
-                        Info.name_wid[name] = [widget_id]
+                        Info.NAME_WID[old_name].remove(widget_id)
+                        Info.NAME_WID[name] = [widget_id]
                         # 修改节点name
                         node.setText(0, name)
                     else:
                         # 找出非父节点引用导致的引用的其他引用节点
                         same_parent = []
                         different_parent = []
-                        for wid in Info.name_wid[old_name]:
+                        for wid in Info.NAME_WID[old_name]:
                             if Info.WID_NODE[wid].parent().text(0) == parent_node.text(0):
                                 same_parent.append(wid)
                             else:
@@ -297,8 +302,8 @@ class Structure(QDockWidget):
                         if len(different_parent) == 0:
                             for wid in same_parent:
                                 Info.WID_NODE[wid].setText(0, name)
-                            Info.name_wid[name] = Info.name_wid[old_name]
-                            del Info.name_wid[old_name]
+                            Info.NAME_WID[name] = Info.NAME_WID[old_name]
+                            del Info.NAME_WID[old_name]
                         # 3：父节点是引用，且在其他节点下也有引用
                         else:
                             # 先生成一个源widget的拷贝
@@ -306,35 +311,35 @@ class Structure(QDockWidget):
                             if Info.WID_WIDGET[widget_id].widget_id in same_parent:
                                 # 需要找到一个不是父节点引用的节点，来创建新的widget
                                 widget_copy = Info.WID_WIDGET[widget_id].clone(different_parent[0])
-                                name_wid: list = copy.deepcopy(Info.name_wid[old_name])
+                                name_wid: list = copy.deepcopy(Info.NAME_WID[old_name])
                                 # 修改name，name_wid
                                 for wid in same_parent:
                                     # 从原来的name_wid删除掉
-                                    Info.name_wid[old_name].remove(wid)
+                                    Info.NAME_WID[old_name].remove(wid)
                                     Info.WID_NODE[wid].setText(0, name)
                                 # 修改wid_widget
                                 for wid in different_parent:
                                     Info.WID_WIDGET[wid] = widget_copy
                                     name_wid.remove(wid)
-                                Info.name_wid[name] = name_wid
+                                Info.NAME_WID[name] = name_wid
                             else:
                                 widget_copy = Info.WID_WIDGET[widget_id].clone(same_parent[0])
-                                name_wid: list = copy.deepcopy(Info.name_wid[old_name])
+                                name_wid: list = copy.deepcopy(Info.NAME_WID[old_name])
                                 # name，name_wid, wid_widget
                                 for wid in same_parent:
                                     Info.WID_WIDGET[wid] = widget_copy
                                     Info.WID_NODE[wid].setText(0, name)
-                                    Info.name_wid[old_name].remove(wid)
+                                    Info.NAME_WID[old_name].remove(wid)
                                 # 不需要修改
                                 for wid in different_parent:
                                     name_wid.remove(wid)
-                                Info.name_wid[name] = name_wid
+                                Info.NAME_WID[name] = name_wid
             else:
                 # 是把所有的timeline的名字都改掉，而不是脱离引用,
                 # 这边骚的是所有的都要改，所以要跑到每一个有这个timeline的去改
                 old_name = Info.WID_NODE[widget_id].text(0)
                 has_changed = []
-                for timeline_wid in Info.name_wid[old_name]:
+                for timeline_wid in Info.NAME_WID[old_name]:
                     node = Info.WID_NODE[timeline_wid]
                     # renameItemInWidget的机制是输入widget_id，然后根据wid去获取父节点的widget，然后修改
                     # 由于可能存在重复，所以要去重
@@ -344,10 +349,11 @@ class Structure(QDockWidget):
                         has_changed.append(parent_name)
                     node.setText(0, name)
                 # data
-                Info.name_wid[name] = Info.name_wid[old_name]
-                del Info.name_wid[old_name]
+                Info.NAME_WID[name] = Info.NAME_WID[old_name]
+                del Info.NAME_WID[old_name]
         except Exception as e:
             print(f"error {e} happens in rename node. [structure/main.py]")
+            Func.log(e, True)
 
     # 只删除而不发送信号，只是接收外部的信号来进行delete
     def deleteNode(self, widget_id, sender=''):
@@ -368,7 +374,7 @@ class Structure(QDockWidget):
             # data
             del Info.WID_NODE[widget_id]
             del Info.WID_WIDGET[widget_id]
-            Info.name_wid[name].remove(widget_id)
+            Info.NAME_WID[name].remove(widget_id)
             # 引用父节点
             for refer_parent_wid in Func.getReferWidgetIds(parent_node.widget_id):
                 refer_parent_node: StructureNode = Info.WID_NODE[refer_parent_wid]
@@ -377,26 +383,27 @@ class Structure(QDockWidget):
                 for i in range(refer_parent_node.childCount()):
                     refer_node = refer_parent_node.child(i)
                     refer_node_wid = refer_node.widget_id
-                    if refer_node_wid in Info.name_wid[node.text(0)]:
+                    if refer_node_wid in Info.NAME_WID[node.text(0)]:
                         break
                 if refer_node:
                     refer_parent_node.removeChild(refer_node)
                     del Info.WID_NODE[refer_node_wid]
                     del Info.WID_WIDGET[refer_node_wid]
-                    Info.name_wid[name].remove(refer_node_wid)
+                    Info.NAME_WID[name].remove(refer_node_wid)
                     delete_wid.append(refer_node_wid)
                 else:
                     raise Exception("fail to find refer node in refer parent.")
             # 如果这个引用被清空了，删除相应数据
-            if not len(Info.name_wid[name]):
-                del Info.name_wid[name]
+            if not len(Info.NAME_WID[name]):
+                del Info.NAME_WID[name]
             else:
                 # 有一个可能，被删除的节点是源节点，所以要改变源widget的widget_id啊
-                widget = Info.WID_WIDGET[Info.name_wid[name][0]]
+                widget = Info.WID_WIDGET[Info.NAME_WID[name][0]]
                 if widget.widget_id in delete_wid:
-                    widget.changeWidgetId(Info.name_wid[name][0])
+                    widget.changeWidgetId(Info.NAME_WID[name][0])
         except Exception as e:
             print(f"error {e} happens in delete node. [structure/main.py]")
+            Func.log(e, True)
 
     def moveNode(self, widget_id, drag_col, target_col):
         try:
@@ -423,10 +430,12 @@ class Structure(QDockWidget):
                         raise Exception("fail to find refer node in refer parent.")
         except Exception as e:
             print(f"error {e} happens in move node in structure. [structure.main.py]")
+            Func.log(e, True)
 
     def getStructure(self, requester=None):
         """
         广度优先遍历, 得到一整颗树的结构
+        :type requester: 调用者
         :return:
         """
         structure_tree: list = []
@@ -465,39 +474,38 @@ class Structure(QDockWidget):
                 sub_tree.append(key)
 
     # 从文件加载structure
-    # todo 如果在已编辑状态加载文件先clear
-    def loadStructure(self, data: list):
+    def loadStructure(self, tree: list):
         """
-        :param data: 树结构
+        :param tree: 树结构
         :return:
         """
-        parent_value = data[0][1]
-        for i in data[1:]:
-            if isinstance(i, list):
-                text, widget_id = i[0]
-                self.loadWidgetAndNode(parent_value, text=text, widget_id=widget_id)
-                self.loadStructure(i)
-            elif isinstance(i, tuple):
-                text, widget_id = i
-                self.loadWidgetAndNode(parent_value, text=text, widget_id=widget_id)
+        parent_widget_id = tree[0][1]
+        for subtree in tree[1:]:
+            if isinstance(subtree, list):
+                name, widget_id = subtree[0]
+                self.loadWidgetAndNode(parent_widget_id, widget_name=name, widget_id=widget_id)
+                self.loadStructure(subtree)
+            elif isinstance(subtree, tuple):
+                name, widget_id = subtree
+                self.loadWidgetAndNode(parent_widget_id, widget_name=name, widget_id=widget_id)
 
-    def loadWidgetAndNode(self, parent_value: str, text: str, widget_id: str):
+    def loadWidgetAndNode(self, parent_widget_id: str, widget_name: str, widget_id: str):
         """
-        :param parent_value:
-        :param text:
-        :param widget_id:
+        :param parent_widget_id: 父控件的widget_id
+        :param widget_name: 控件名
+        :param widget_id: 待复原控件的widget_id
         :return:
         """
         # 判断父节点是否在
-        if parent_value in Info.WID_NODE:
-            parent = Info.WID_NODE[parent_value]
+        if parent_widget_id in Info.WID_NODE:
+            parent = Info.WID_NODE[parent_widget_id]
             node = StructureNode(parent, widget_id)
-            node.setText(0, text)
+            node.setText(0, widget_name)
             parent.setExpanded(True)
 
             # 相关字典数据
             Info.WID_NODE[widget_id] = node
-            Info.NAME_WID[text] = widget_id
+            Info.NAME_WID[widget_name].append(widget_id)
 
             # 创建控件, 连接信号
             Func.createWidget(widget_id)

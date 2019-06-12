@@ -1,3 +1,6 @@
+from app.func import Func
+
+
 class TreeNode(object):
     def __init__(self, widget_id: str, widget_name: str, parent=None):
         self.widget_id = widget_id
@@ -16,5 +19,6 @@ class TreeNode(object):
 
     def print_tree(self, layer=0):
         print("\t" * layer + f"{self.widget_name} : [{self.widget_id}]")
+        Func.log("\t" * layer + f"{self.widget_name} : [{self.widget_id}]", timer=False)
         for child in self.children:
             child.print_tree(layer + 1)

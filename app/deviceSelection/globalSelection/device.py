@@ -7,7 +7,7 @@ from app.func import Func
 class Device(QListWidgetItem):
     """
     :param device_type: 串、并、网口、
-    :param name: 自定义设备名，即item的text
+    :param device_id: 设备标识符
     """
 
     def __init__(self, device_type: str, device_id: str = None, parent=None):
@@ -39,22 +39,22 @@ class Device(QListWidgetItem):
             "Device Port": self.port
         }
 
-    def getType(self):
+    def getType(self) -> str:
         return self.device_type
 
     def setName(self, name: str):
         self.setText(name)
 
-    def getDeviceId(self):
+    def getDeviceId(self) -> str:
         return self.device_id
 
-    def getName(self):
+    def getName(self) -> str:
         return self.text()
 
     def getPort(self):
         return self.port
 
-    def setPort(self, port):
+    def setPort(self, port: str):
         if port.startswith("screen"):
             self.port = port.split(".")[-1]
         elif port.startswith("serial_port"):
@@ -73,7 +73,7 @@ class Device(QListWidgetItem):
         self.setName(self.default_properties["Device Name"])
         self.setPort(self.default_properties["Device Port"])
 
-    def getInfo(self):
+    def getInfo(self) -> dict:
         self.default_properties["Device Name"] = self.text()
         self.default_properties["Device Port"] = self.port
         return self.default_properties

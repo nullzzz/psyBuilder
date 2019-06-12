@@ -62,27 +62,6 @@ class SelectArea(QListWidget):
         device_type = source.currentItem().device_type
         self.createDevice(device_type)
 
-        # before 2019/5/31
-        # drop_item = source.currentItem().clone()
-        # item_type = drop_item.item_type
-        # 设备命名，不区分大小写
-        # item_name = "{}.{}".format(item_type, self.device_count[item_type])
-        # self.device_count[item_type] += 1
-        # while item_name in self.device_name:
-        #     item_name = "{}.{}".format(item_type, self.device_count[item_type])
-        #     self.device_count[item_type] += 1
-
-        # drop_item.setName(item_name)
-        # drop_item.getInfo()
-
-        # self.device_name.append(item_name.lower())
-
-        # 外部添加
-        # if source != self:
-        #     self.addItem(drop_item)
-        #     self.parameters.addWidget(drop_item.parameter)
-        # self.setCurrentItem(drop_item)
-
     def dragEnterEvent(self, e):
         source = e.source()
         if source != self:
@@ -120,24 +99,15 @@ class SelectArea(QListWidget):
             if item:
                 self.contextMenu.exec_(QCursor.pos())  # 在鼠标位置显示
 
-    def changeItem(self, item):
+    def changeItem(self, item: Device):
         if item:
-            # self.parameters.setCurrentWidget(item.parameter)
-            # print(item.emitInfo())
             self.itemChanged.emit(item.getType(), item.getName(), item.getPort())
-            # print("emit")
-            # print(item.getType())
-            # print(item.getName())
 
     # 返回选择设备
     def getInfo(self):
         # 清空缓冲区
         self.add_buffer.clear()
         self.delete_buffer.clear()
-
-        # 更新property记录的设备数量
-        # for k, v in self.device_count.items():
-        #     self.setProperty(k, v)
 
         # 更新default_properties
         for i in range(self.count()):
@@ -202,61 +172,9 @@ class SelectArea(QListWidget):
         else:
             self.itemChanged.emit("Unselected", "Unselected", "")
 
-    # # 多余的删掉
-    # del_index = []
-    # # 2018/10/9
-    # # 这他么有个大坑，遍历item得到的properties全是最后一个item的
-    # # 别的地方就没有这么个坑
-    # for i in range(self.count()):
-    #     item = self.item(i)
-    #     if item.text() in self.default_properties.keys():
-    #         item.setProperties(self.default_properties[item.text()])
-    #     else:
-    #         del_index.insert(0, i)
-    # for i in del_index:
-    #     self.delItem(i)
-    #
-    # # 删掉的加上
-    # # 我们当前有啥
-    # current_devices = []
-    # for i in range(self.count()):
-    #     device_name = self.item(i).text()
-    #     current_devices.append(device_name)
-    #     # print(device_name)
-    # # 当前没有的
-    # deleted_out_devices = [device for device in self.default_properties.keys()
-    #                        if device not in current_devices]
-    #
-    # # 输出设备
-    # if self.device_type:
-    #     for device in deleted_out_devices:
-    #         properties: dict = self.default_properties[device]
-    #         device_type = properties["Device type"]
-    #         item = OutputDevice(device_type, device)
-    #         item.setProperties(properties)
-    #         self.addItem(item)
-    #         self.parameters.addWidget(item.parameter)
-    #         self.device_name.append(device.lower())
-    # # 输入设备
-    # else:
-    #     for device in deleted_out_devices:
-    #         properties: dict = self.default_properties[device]
-    #         device_type = properties["Device type"]
-    #         item = InputDevice(device_type, device)
-    #         item.setProperties(properties)
-    #         self.addItem(item)
-    #         self.parameters.addWidget(item.parameter)
-    #         self.device_name.append(device.lower())
-    # del current_devices
-    # del del_index
-    #
-    # # 恢复设备计数
-    # for device_type in self.device_count.keys():
-    #     self.device_count[device_type] = self.property(device_type)
-
     def createDeviceId(self, device_type):
         """
-        创建设备标识符
+        生成设备标识符
         :param device_type:
         :return:
         """
@@ -265,6 +183,12 @@ class SelectArea(QListWidget):
         return f"{device_type}.{current_id}"
 
     def deleteDevice(self, index: int = -1, record: bool = True):
+        """
+        删除设备
+        :param index: 设备索引，默认当前选中
+        :param record: 是否记录到缓冲区，以备恢复
+        :return:
+        """
         if index == -1:
             index = self.currentRow()
         # 被删掉的设备
@@ -274,6 +198,7 @@ class SelectArea(QListWidget):
         device_name: str = del_device.getName()
         device_port: str = del_device.getPort()
         self.device_name.remove(device_name.lower())
+        # 记录到缓冲区
         if record:
             self.delete_buffer.append((device_id, device_type, device_name, device_port))
 
@@ -304,13 +229,13 @@ class SelectArea(QListWidget):
             self.add_buffer.append((device_id, device_type, device_name, device_port))
         self.addItem(device)
 
-    def changeCurrentPort(self, port):
-        item = self.currentItem()
+    def changeCurrentPort(self, port: str):
+        item: Device = self.currentItem()
         item.setPort(port)
 
-    def changeCurrentName(self, name):
-        item = self.currentItem()
-        old_name = item.getName()
+    def changeCurrentName(self, name: str):
+        item: Device = self.currentItem()
+        old_name: str = item.getName()
         # print(old_name)
         # print(self.device_name)
         self.device_name.remove(old_name)

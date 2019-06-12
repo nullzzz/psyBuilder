@@ -10,14 +10,11 @@ class Info(object):
     WID_WIDGET = {}
 
     # 保存structure的 (widget_id -> node)
-    WID_NODE = {}
+    WID_NODE: dict = {}
 
     # 只在structure中进行name的处理，避免失误(name -> [wid1, wid2...]),
     # 必须要保证wid1是所有指向的widget的widget_id！
-    NAME_WID = name_wid = {}
-
-    # todo 保存全部的attribute
-    attribute = {}
+    NAME_WID: dict = {}
 
     # 输入输出设备
     INPUT_DEVICE_INFO: dict = {}

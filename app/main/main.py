@@ -137,6 +137,8 @@ class PsyApplication(QMainWindow):
         self.center.setObjectName("Main")
         # output
         self.output = Output()
+        # 控制台输出
+        Func.log = self.output.print
         self.output.setWindowTitle("Output")
         self.output.setObjectName("Output")
 
@@ -230,6 +232,7 @@ class PsyApplication(QMainWindow):
                 timeline.widget_icon_area.widget_icon_table.widgetIconDelete.connect(self.structure.deleteNode)
         except Exception as e:
             print(f"error {e} happens in link timeline signals. [main/main.py]")
+            Func.log(f"error {e} happens in link timeline signals. [main/main.py]")
 
     def linkCycleSignals(self, widget_id):
         """
@@ -276,32 +279,36 @@ class PsyApplication(QMainWindow):
         file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", "", "Psy File (*.psy;*.ini)", options=options)
 
         if file_name:
-
-            # todo clear
-
+            # 更新文件名
             Info.FILE_NAME = file_name
             file_name: str
             setting = QSettings(file_name, QSettings.IniFormat)
 
+            # 复原根节点
+            # 清空原编辑状态就在这儿做
+            root = Info.WID_WIDGET[f"{Info.TIMELINE}.0"]
+            root_info = setting.value(f"{Info.TIMELINE}.0")
+            if root_info:
+                root.restore(root_info)
+
+            # 更新输入输出设备
             input_device_info = setting.value("INPUT_DEVICE_INFO")
             if input_device_info:
                 self.input_devices.setProperties(input_device_info)
             output_device_info = setting.value("OUTPUT_DEVICE_INFO")
             if output_device_info:
                 self.output_devices.setProperties(output_device_info)
+            # 恢复布局
             dock_layout = setting.value("DOCK_LAYOUT")
             if dock_layout:
                 self.restoreState(dock_layout)
-            name_wid = setting.value("NAME_WID")
+            # 恢复name_wid
+            name_wid: dict = setting.value("NAME_WID")
             if name_wid:
                 Info.NAME_WID = name_wid.copy()
-                Info.name_wid = Info.NAME_WID
-
+                Info.NAME_WID = Info.NAME_WID
+            # 加载控件
             structure_tree: list = setting.value("STRUCTURE_TREE")
-            root = Info.WID_WIDGET[f"{Info.TIMELINE}.0"]
-            root_info = setting.value(f"{Info.TIMELINE}.0")
-            if root_info:
-                root.restore(root_info)
             self.structure.loadStructure(structure_tree)
 
     def loadOut(self):
@@ -414,14 +421,13 @@ class PsyApplication(QMainWindow):
         super().contextMenuEvent(QContextMenuEvent)
 
     def compile(self):
-        QMessageBox.information(self, "Compile", "Compile the project", QMessageBox.Ok)
-        # check saved or not, if not saved, user should  save.
+        # QMessageBox.information(self, "Compile", "Compile the project", QMessageBox.Ok)
+        # check saved or not, if not saved, user should  save first.
         if not Info.FILE_NAME:
             self.saveAs()
             if not Info.FILE_NAME:
                 QMessageBox.information(self, "Warning", "You should save before compile.", QMessageBox.Ok)
                 return
-            # compile
 
         # get save path
         compile_file_name = ".".join(Info.FILE_NAME.split('.')[:-1]) + ".m"
@@ -442,7 +448,7 @@ class PsyApplication(QMainWindow):
                 print(f"outputDevs({count}).index = '{output_device_index}';", file=f)
                 # counter
                 count += 1
-        self.output.print("compile success")
+        Func.log("compile success")
         # except Exception as e:
         #     print(f"compile error {e}")
 

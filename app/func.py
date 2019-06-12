@@ -38,9 +38,9 @@ class Func:
     @staticmethod
     def restore(widget_id: str, properties: dict) -> None:
         """
-        复原
-        :param widget_id:
-        :param properties:
+        复原控件属性
+        :param widget_id: 控件id
+        :param properties: 控件属性
         :return:
         """
         widget = Info.WID_WIDGET.get(widget_id, None)
@@ -96,7 +96,7 @@ class Func:
             if count == -1:
                 raise Exception("fail to generate a valid name, because unknown widget type.")
             name = f"{widget_type}_{count}"
-            if name not in Info.name_wid:
+            if name not in Info.NAME_WID:
                 break
         return name
 
@@ -109,7 +109,7 @@ class Func:
         """
         if not name[0].isalpha():
             return False, 'Name must be started with letter'
-        return not (name in Info.name_wid), 'Name has already existed.'
+        return not (name in Info.NAME_WID), 'Name has already existed.'
 
     @staticmethod
     def isReferName(name: str) -> bool:
@@ -118,7 +118,7 @@ class Func:
         :param name: 需要检测的name
         :return: 是否存在引用
         """
-        return len(Info.name_wid[name]) > 1
+        return len(Info.NAME_WID[name]) > 1
 
     @staticmethod
     def generateWidgetId(widget_type) -> str:
@@ -141,26 +141,26 @@ class Func:
         :param cycle_widget_id: timeline所属的cycle
         :return: 检测结果类型，及对应提示
         """
-        if name not in Info.name_wid:
+        if name not in Info.NAME_WID:
             if name[0].isalpha():
                 return Info.TimelineNameRight, ''
             return Info.TimelineNameError, ''
         else:
-            widget_id = Info.name_wid[name][0]
+            widget_id = Info.NAME_WID[name][0]
             # 类型
             if widget_id.split('.')[0] == Info.TIMELINE:
                 # 是否存在于父节点
                 # 对于判断想引用的timeline是不是cycle的父节点,
                 # 要确认所有引用的cycle的父节点timeline是不是在name的引用，比较繁琐啊
                 parent_timeline_list = []
-                for cycle_wid in Info.name_wid[Info.WID_NODE[cycle_widget_id].text(0)]:
+                for cycle_wid in Info.NAME_WID[Info.WID_NODE[cycle_widget_id].text(0)]:
                     node = Info.WID_NODE[cycle_wid].parent()
                     while node:
                         if node.widget_id.startswith(Info.TIMELINE):
                             parent_timeline_list.append(node.widget_id)
                         node = node.parent()
                 for timeline_wid in parent_timeline_list:
-                    if timeline_wid in Info.name_wid[name]:
+                    if timeline_wid in Info.NAME_WID[name]:
                         return Info.TimelineParentError, ''
                 return Info.TimelineNameExist, widget_id
             return Info.TimelineTypeError, ''
@@ -286,7 +286,7 @@ class Func:
         :return:
         """
         try:
-            widget_ids: list = copy.deepcopy(Info.name_wid[Info.WID_NODE[widget_id].text(0)])
+            widget_ids: list = copy.deepcopy(Info.NAME_WID[Info.WID_NODE[widget_id].text(0)])
             widget_ids.remove(widget_id)
             return widget_ids
         except Exception as e:
@@ -432,7 +432,7 @@ class Func:
                 # 检测目标的timeline的自身包括引用节点上面有没有父节点name是cycle的name
                 cycle_name = Info.WID_NODE[widget_id].text(0)
                 timeline_name = Info.WID_NODE[target_timeline_wid].text(0)
-                for timeline_wid in Info.name_wid[timeline_name]:
+                for timeline_wid in Info.NAME_WID[timeline_name]:
                     node = Info.WID_NODE[timeline_wid].parent()
                     while node:
                         if node.text() == cycle_name:
@@ -466,7 +466,7 @@ class Func:
                 screens.append(v["Device Name"])
         return screens
 
+    # 控制台输出信息
     @staticmethod
-    def clear():
-        # todo 清空info里面的信息
+    def log(text, error=False, timer=True):
         pass

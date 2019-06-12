@@ -1,13 +1,14 @@
-## 关于Info类的详细说明
- **数据目前包括**
-* wid_widget: widget_id -> widget
-* wid_node: widget_id -> node
-* name_wid: name -> [widget_id1, .widget_id2..]
+# todo list
+### 2019-6-12
+* 啥也不想做
 ---
-**重要函数目前包括（将在下一次update中移入func）**
-* createWidget: 根据widget_id创建widget
-* copyWidget: 根据new_widget_id, old_widget_id进行拷贝
-* referWidget: 根据new_widget_id, old_widget_id进行引用
+# 关于Info类的详细说明
+ **数据目前包括**
+* wid_widget: [dict] widget_id -> widget
+* wid_node: [dict] widget_id -> node
+* name_wid: [dict] name -> [widget_id1, .widget_id2..]
+* file_name: [str] 文件名
+---
 # widget具有的基本属性
 ## signals
 * propertiesChange: properties -> structure</li>
@@ -63,3 +64,16 @@
 ## Attributes相关
 ***属性的层次***
 + 第一层timeline为0，依次递增，调用方法，Info.getAttributes(widget_id，是否需要层次信息), 格式为{"attribute_name":layer(int),...}
+
+# 关于控制台输出
++ 函数：Func.log(text: str, error: bool, timer: bool)
++ 参数：text输出文字内容，error是否为报错信息，timer是否输出时间戳
++ 功能：输出提示信息，自动定位文件及行号
++ 示例：
+  ```
+  try: 
+      # some code
+  except Exception as e:
+      Func.printInfo(e, True)
+  ```
+

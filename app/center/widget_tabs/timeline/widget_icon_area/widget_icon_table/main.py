@@ -124,6 +124,7 @@ class WidgetIconTable(QTableWidget):
                 self.right_button_menu.popup(self.mapToGlobal(e.pos()))
         except Exception as e:
             print(f"error {e} happens in generate menu. [widget_icon_table/main.py]")
+            Func.log(e, True)
 
     def setWidgetIcon(self, col, widget_type, widget_id=''):
         widget_icon = WidgetIcon(widget_type=widget_type, widget_id=widget_id)
@@ -185,6 +186,7 @@ class WidgetIconTable(QTableWidget):
                 self.is_fill = False
         except Exception as e:
             print(f"error {e} happens in remove column. [widget_icon_table/main.py]")
+            Func.log(e, True)
 
     def insertColumn(self, col):
         try:
@@ -208,6 +210,7 @@ class WidgetIconTable(QTableWidget):
                 self.is_fill = True
         except Exception as e:
             print(f"error {e} happens in insert column. [widget_icon_table/main.py]")
+            Func.log(e, True)
 
     def mouseMoveEvent(self, e):
         try:
@@ -222,6 +225,7 @@ class WidgetIconTable(QTableWidget):
                     self.moveDrag()
         except Exception as e:
             print(f"error {e} happens in mouse move event. [widget_icon_table/main.py]")
+            Func.log(e, True)
 
     def moveDrag(self):
         col = self.currentColumn()
@@ -323,6 +327,7 @@ class WidgetIconTable(QTableWidget):
             self.down_sign.showSign(icon_col)
         except Exception as e:
             print(f"error {e} happens in show sign. [widget_icon_table/main.py]")
+            Func.log(e, True)
 
     def hideSign(self):
         self.up_sign.hideSign()
@@ -342,6 +347,7 @@ class WidgetIconTable(QTableWidget):
                 self.setWidgetName(target_col, widget_name)
         except Exception:
             print("error happens in move icon to target. [widget_icon_table/main.py]")
+            Func.log(e, True)
 
     def mouseDoubleClickEvent(self, e):
         # 只支持鼠标左键双击
@@ -386,6 +392,7 @@ class WidgetIconTable(QTableWidget):
                 self.removeColumn(self.currentColumn(), True)
         except Exception as e:
             print(f"error {e} happens in delete icon. [widget_icon_table/main.py]")
+            Func.log(e, True)
 
     def mousePressEvent(self, e):
         try:
@@ -397,6 +404,7 @@ class WidgetIconTable(QTableWidget):
                 self.attributesShow.emit(self.cellWidget(1, col).widget_id)
         except Exception as e:
             print(f"error {e} happens in show icon properties. [widget_icon_table/main.py]")
+            Func.log(e, True)
 
     def getInfo(self):
         info = {
@@ -409,6 +417,13 @@ class WidgetIconTable(QTableWidget):
         return info
 
     def restore(self, info):
+        # 清除原来的东西
+        # 我也母鸡会不会有新bug
+        try:
+            for col in range(self.widget_icon_count):
+                self.removeColumn(1, True)
+        except Exception as e:
+            Func.log(f"Failed to clear current edit status, {e}", True)
         try:
             widget_icon_count = info['widget_icon_count']
             self.is_fill = info['is_fill']
@@ -421,3 +436,4 @@ class WidgetIconTable(QTableWidget):
                 self.setWidgetName(self.widget_icon_count, name)
         except Exception as e:
             print(f"error {e} happens in restore. [widget_icon_table/main.py]")
+            Func.log(e, True)
