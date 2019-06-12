@@ -927,7 +927,12 @@ class Slider(QMainWindow):
     def __init__(self, widget_id):
         super(Slider, self).__init__()
         self.widget_id = widget_id
-        self.attributes = Func.getAttributes(self.widget_id)
+        self.attributes = []
+        try:
+            self.attributes = Func.getAttributes(self.widget_id)
+        except KeyError:
+            # condition下的slider在此出错
+            pass
 
         self.createActions()
         self.createMenus()
@@ -1148,8 +1153,12 @@ class Slider(QMainWindow):
                           "The <b>Diagram Scene</b> example shows use of the graphics framework.")
 
     def openPro(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
+        try:
+            self.attributes = Func.getAttributes(self.widget_id)
+            self.setAttributes(self.attributes)
+        except KeyError as e:
+            # condition下的slider在这里出错
+            pass
         screen_devices = Func.getScreen()
         self.pro_window.general.setScreen(screen_devices)
 

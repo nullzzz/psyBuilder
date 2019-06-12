@@ -18,6 +18,8 @@ class CaseArea(QScrollArea):
     def __init__(self, parent=None):
         super(CaseArea, self).__init__(parent)
 
+        self.attributes: list = []
+
         self.case_0 = Case(title='Default')
 
         self.case_list: list = [Case(title='Case 1'), Case(title='Case 2'), self.case_0]
@@ -52,6 +54,7 @@ class CaseArea(QScrollArea):
 
         self.layout.removeWidget(self.case_0)
         new_case = Case(f"Case {index + 1}")
+        new_case.setAttributes(self.attributes)
         new_case.addCase.connect(self.insertCase)
         new_case.delCase.connect(self.delCase)
         self.case_list.insert(index, new_case)
@@ -123,8 +126,9 @@ class CaseArea(QScrollArea):
             case.setProperties(self.default_properties.get(case.title(), {}))
 
     def setAttributes(self, attributes: list):
+        self.attributes = attributes
         for case in self.case_list:
-            case.setAttributes(attributes)
+            case.setAttributes(self.attributes)
 
     def clone(self):
         clone_case_area = CaseArea()

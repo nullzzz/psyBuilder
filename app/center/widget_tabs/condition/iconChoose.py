@@ -38,7 +38,7 @@ class IconChoose(QWidget):
         self.name_line.textChanged.connect(self.changeName)
         self.icon_label = IconLabel()
         self.icon_label.setAlignment(Qt.AlignCenter)
-        self.icon_label.doubleClick.connect(self.openPro)
+        self.icon_label.doubleClick.connect(self.openProWindow)
 
         self.widget_id = ""
 
@@ -67,59 +67,34 @@ class IconChoose(QWidget):
         self.setLayout(grid_layout)
 
     def changeIcon(self, current_type):
+        if current_type not in (Info.IMAGE, Info.TEXT, Info.VIDEO, Info.SOUND, "None"):
+            return
         self.event_type = current_type
         pix_map = Func.getWidgetImage(self.event_type, "pixmap")
         self.icon_label.setPixmap(pix_map)
 
+        # 删除原来的widget
         Func.delWidget(self.widget_id)
-
+        # 空
         if current_type == "None":
             self.name_line.clear()
             self.name_line.setEnabled(False)
             self.widget = None
             return
 
+        # 创建widget
         self.widget_id = Func.generateWidgetId(current_type)
         self.widget = Func.createWidget(self.widget_id)
         assert self.widget is not None
 
+        # slider
         if self.event_type == Info.SLIDER:
             self.pro_window = self.widget
         else:
             self.pro_window = self.widget.pro_window
-            # if self.event_type == "Image":
-            #     self.pro_window = ImageProperty()
-            #     self.pro_window.setAttributes(self.attributes)
-            # elif self.event_type == "Sound":
-            #     self.pro_window = SoundProperty()
-            #     self.pro_window.setAttributes(self.attributes)
-            # elif self.event_type == "Text":
-            #     self.pro_window = TextProperty()
-            #     self.pro_window.setAttributes(self.attributes)
-            # elif self.event_type == "Video":
-            #     self.pro_window = VideoProperty()
-            #     self.pro_window.setAttributes(self.attributes)
-            # else:
-            #     self.pro_window = None
-            #     self.name_line.clear()
-            #     self.name_line.setEnabled(False)
-            #     return
-            # if self.event_type == "Image":
-            #     event = ImageProperty()
-            # elif self.event_type == "Sound":
-            #     self.pro_window = SoundProperty()
-            #     self.pro_window.setAttributes(self.attributes)
-            # elif self.event_type == "Text":
-            #     self.pro_window = TextProperty()
-            #     self.pro_window.setAttributes(self.attributes)
-            # elif self.event_type == "Video":
-            #     self.pro_window = VideoProperty()
-            #     self.pro_window.setAttributes(self.attributes)
-            # else:
-            #     self.pro_window = None
-            #     self.name_line.clear()
-            #     self.name_line.setEnabled(False)
-            #     return
+
+            # 设置attributes
+            self.pro_window.setAttributes(self.attributes)
             self.pro_window.ok_bt.clicked.connect(self.ok)
             self.pro_window.cancel_bt.clicked.connect(self.cancel)
             self.pro_window.apply_bt.clicked.connect(self.apply)
@@ -140,8 +115,9 @@ class IconChoose(QWidget):
     def cancel(self):
         self.pro_window.close()
 
-    def openPro(self):
+    def openProWindow(self):
         if self.pro_window:
+            # 设置screen
             if hasattr(self.pro_window, "general"):
                 if hasattr(self.pro_window.general, "setScreen"):
                     screen_devices = Func.getScreen()
@@ -179,7 +155,7 @@ class IconChoose(QWidget):
             else:
                 self.pro_window.setProperties(self.default_properties.get("pro window", {}))
 
-    def setPro(self, pro):
+    def setProWindow(self, pro):
         del self.pro_window
         self.pro_window = pro
         self.pro_window.ok_bt.clicked.connect(self.ok)
@@ -189,7 +165,10 @@ class IconChoose(QWidget):
     def setAttributes(self, attributes: list):
         self.attributes = attributes
         if self.pro_window:
-            self.pro_window.setAttributes(attributes)
+            if self.event_type == Info.SLIDER:
+                self.pro_window.setAttributes([i[1:-1] for i in attributes])
+            else:
+                self.pro_window.setAttributes(attributes)
 
     # 返回当前选择attributes
     def getUsingAttributes(self):

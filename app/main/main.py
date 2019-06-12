@@ -261,18 +261,26 @@ class PsyApplication(QMainWindow):
         :return:
         """
         if Info.FILE_NAME == "":
-            self.saveAs()
+            self.getFileName()
         else:
             self.loadOut()
 
-    def saveAs(self):
+    def getFileName(self) -> bool:
+        """
+        获取文件名
+        :return:
+        """
         options = QFileDialog.Options()
         save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Psy Files (*.ini);", options=options)
         if save_file_name:
             Info.FILE_NAME = save_file_name
-        else:
-            return
-        self.loadOut()
+            return True
+        return False
+
+    def saveAs(self):
+        self.getFileName()
+        if Info.FILE_NAME:
+            self.loadOut()
 
     def loadIn(self):
         options = QFileDialog.Options()
@@ -310,6 +318,7 @@ class PsyApplication(QMainWindow):
             # 加载控件
             structure_tree: list = setting.value("STRUCTURE_TREE")
             self.structure.loadStructure(structure_tree)
+        Func.log(f"{Info.FILE_NAME} loaded successful!")
 
     def loadOut(self):
         # 导出输入设备信息
@@ -328,8 +337,9 @@ class PsyApplication(QMainWindow):
 
         structure_tree: list = self.structure.getStructure("李扬是个大瓜皮")
         self.loadOutTree(structure_tree)
-
         setting.setValue("STRUCTURE_TREE", structure_tree)
+
+        Func.log(f"{Info.FILE_NAME} saved successful!")
 
     def loadOutTree(self, tree):
         if isinstance(tree, list):
@@ -421,12 +431,10 @@ class PsyApplication(QMainWindow):
         super().contextMenuEvent(QContextMenuEvent)
 
     def compile(self):
-        # QMessageBox.information(self, "Compile", "Compile the project", QMessageBox.Ok)
         # check saved or not, if not saved, user should  save first.
         if not Info.FILE_NAME:
-            self.saveAs()
-            if not Info.FILE_NAME:
-                QMessageBox.information(self, "Warning", "You should save before compile.", QMessageBox.Ok)
+            if not self.getFileName():
+                QMessageBox.information(self, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
                 return
 
         # get save path
@@ -448,7 +456,7 @@ class PsyApplication(QMainWindow):
                 print(f"outputDevs({count}).index = '{output_device_index}';", file=f)
                 # counter
                 count += 1
-        Func.log("compile success")
+        Func.log(f"Compile successful!\n{compile_file_name}")
         # except Exception as e:
         #     print(f"compile error {e}")
 

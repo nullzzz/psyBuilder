@@ -67,23 +67,18 @@ class PigComboBox(QComboBox):
         self.currentTextChanged.connect(self.findVar)
 
     def dragEnterEvent(self, e):
-        print("enter")
         if e.mimeData().hasFormat("attributes/move-attribute"):
             e.accept()
-            print("acc")
         else:
             e.ignore()
-            print("ign")
 
     def dropEvent(self, e):
-        print("drop")
         data = e.mimeData().data("attributes/move-attribute")
         stream = QDataStream(data, QIODevice.ReadOnly)
         text = f"[{stream.readQString()}]"
         index = self.findText(text, Qt.MatchExactly)
         if index == -1:
             self.addItem(text)
-        print("come is", text)
         self.setCurrentText(text)
 
     # 检查变量
