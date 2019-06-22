@@ -53,6 +53,8 @@ class GlobalDevice(QWidget):
 
         self.describer = Describer()
         self.describer.portChanged.connect(self.changePort)
+        self.describer.colorChanged.connect(self.changeColor)
+        self.describer.sampleChanged.connect(self.changeSample)
 
         self.ok_bt = QPushButton("OK")
         self.ok_bt.clicked.connect(self.ok)
@@ -92,11 +94,17 @@ class GlobalDevice(QWidget):
         default_properties: dict = self.selected_devices.getInfo()
         self.deviceSelect.emit(self.device_type, default_properties)
 
-    def changeItem(self, device_type: str, device_name: str, device_port: str):
-        self.describer.describe(device_type, device_name, device_port)
+    def changeItem(self, device_type: str, device_name: str, device_port: str, device_color: str, device_sample: str):
+        self.describer.describe(device_type, device_name, device_port, device_color, device_sample)
 
     def changePort(self, port: str):
         self.selected_devices.changeCurrentPort(port)
+
+    def changeColor(self, color: str):
+        self.selected_devices.changeCurrentColor(color)
+
+    def changeSample(self, sample: str):
+        self.selected_devices.changeCurrentSample(sample)
 
     def rename(self, item: Device):
         name: str = item.text()

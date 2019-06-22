@@ -7,7 +7,7 @@ from app.deviceSelection.globalSelection.device import Device
 
 class SelectArea(QListWidget):
     itemDoubleClick = pyqtSignal(QListWidgetItem)
-    itemChanged = pyqtSignal(str, str, str)
+    itemChanged = pyqtSignal(str, str, str, str, str)
 
     def __init__(self, device_type: int = 0, parent=None):
         super(SelectArea, self).__init__(parent)
@@ -101,7 +101,7 @@ class SelectArea(QListWidget):
 
     def changeItem(self, item: Device):
         if item:
-            self.itemChanged.emit(item.getType(), item.getName(), item.getPort())
+            self.itemChanged.emit(item.getType(), item.getName(), item.getPort(), item.getColor(), item.getSample())
 
     # 返回选择设备
     def getInfo(self):
@@ -232,6 +232,14 @@ class SelectArea(QListWidget):
     def changeCurrentPort(self, port: str):
         item: Device = self.currentItem()
         item.setPort(port)
+
+    def changeCurrentColor(self, color: str):
+        item: Device = self.currentItem()
+        item.setColor(color)
+
+    def changeCurrentSample(self, sample: str):
+        item: Device = self.currentItem()
+        item.setSample(sample)
 
     def changeCurrentName(self, name: str):
         item: Device = self.currentItem()

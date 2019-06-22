@@ -445,6 +445,86 @@ class Func:
             print(f"error {e} happens in check validity of drag from structure. [func.py]")
 
     @staticmethod
+    def getWidgetPosition(widget_id: str) -> int:
+        """
+        返回一个widget在timeline中的位置索引，从0开始
+        如果查询的widget_id不存在位置信息，返回-1
+        :param widget_id: 要查询的widget的id
+        :return: 位置信息
+        """
+        # 如果是widget是timeline，不存在位置信息
+        if widget_id.startswith(Info.TIMELINE):
+            return -1
+        #
+        try:
+            node = Info.WID_NODE[widget_id]
+            parent_node = node.parent()
+            return parent_node.indexOfChild(node)
+        except:
+            print(f"error: widget not founded.")
+            return -1
+
+    @staticmethod
+    def getNextWidgetId(widget_id: str) -> str or None:
+        """
+        得到附近下一个widget的wid, 如果要查询的widget_id是末尾或者不存在，返回None
+        :param widget_id:
+        :return:
+        """
+        # 如果是widget是timeline，不存在位置信息
+        if widget_id.startswith(Info.TIMELINE):
+            return None
+        #
+        try:
+            node = Info.WID_NODE[widget_id]
+            parent_node = node.parent()
+            index = parent_node.indexOfChild(node)
+            try:
+                return parent_node.child(index + 1).widget_id
+            except:
+                return None
+        except:
+            print(f"error: widget not founded.")
+            return None
+
+    @staticmethod
+    def getPreviousWidgetId(widget_id: str) -> str or None:
+        """
+        得到附近前一个widget的wid, 如果要查询的widget_id是末尾或者不存在，返回None
+        :param widget_id:
+        :return:
+        """
+        # 如果是widget是timeline，不存在位置信息
+        if widget_id.startswith(Info.TIMELINE):
+            return None
+        #
+        try:
+            node = Info.WID_NODE[widget_id]
+            parent_node = node.parent()
+            index = parent_node.indexOfChild(node)
+            try:
+                return parent_node.child(index - 1).widget_id
+            except:
+                return None
+        except:
+            print(f"error: widget not founded.")
+            return None
+
+    @staticmethod
+    def getWidgetIDInTimeline(timeline_widget_id: str) -> list:
+        """
+        得到一个timeline中所有的widget的widget_id的list，按顺序放置
+        :param timeline_widget_id: timeline的widget_id
+        :return:
+        """
+        try:
+            timeline_node = Info.WID_NODE[timeline_widget_id]
+            return [timeline_node.child(i).widget_id for i in range(timeline_node.childCount())]
+        except:
+            print("error: timeline not founded.")
+            return []
+
+    @staticmethod
     def getTrackingPix(text):
         pix = QPixmap(200, 16)
         pix.fill(QColor(0, 0, 0, 0))

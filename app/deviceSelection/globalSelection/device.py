@@ -27,6 +27,10 @@ class Device(QListWidgetItem):
         else:
             self.port = "null"
 
+        # screen 专属
+        self.back_color = "0,0,0"
+        self.sample = "0"
+
         # 设备标识符
         self.device_id = device_id
 
@@ -54,6 +58,16 @@ class Device(QListWidgetItem):
     def getPort(self):
         return self.port
 
+    def getColor(self):
+        if self.device_type == "screen":
+            return self.back_color
+        return ""
+
+    def getSample(self):
+        if self.device_type == "screen":
+            return self.sample
+        return ""
+
     def setPort(self, port: str):
         if port.startswith("screen"):
             self.port = port.split(".")[-1]
@@ -64,6 +78,12 @@ class Device(QListWidgetItem):
         else:
             self.port = port
 
+    def setColor(self, color):
+        self.back_color = color
+
+    def setSample(self, sample):
+        self.sample = sample
+
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
             self.default_properties = properties
@@ -72,8 +92,12 @@ class Device(QListWidgetItem):
     def loadSetting(self):
         self.setName(self.default_properties["Device Name"])
         self.setPort(self.default_properties["Device Port"])
+        self.setColor(self.default_properties.get("Back Color", "0,0,0"))
+        self.setPort(self.default_properties.get("Multi Sample", "0"))
 
     def getInfo(self) -> dict:
         self.default_properties["Device Name"] = self.text()
         self.default_properties["Device Port"] = self.port
+        self.default_properties["Back Color"] = self.back_color
+        self.default_properties["Multi Sample"] = self.sample
         return self.default_properties

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QDataStream, QIODevice, Qt, QRegExp, QSize
+from PyQt5.QtCore import QDataStream, QIODevice, Qt, QRegExp, QSize, pyqtSignal
 from PyQt5.QtGui import QColor, QIcon, QRegExpValidator, QFont, QPen
 from PyQt5.QtWidgets import QComboBox, QMessageBox, QColorDialog, QLineEdit, QSpinBox, QMainWindow, QItemDelegate, \
     QStyle, QWidget, QHBoxLayout
@@ -121,12 +121,14 @@ class PigLineEdit(QLineEdit):
 
 
 class ColorListEditor(PigComboBox):
+    colorChanged = pyqtSignal(str)
+
     def __init__(self, widget=None):
         super(ColorListEditor, self).__init__(widget)
         self.setEditable(True)
-        self.isValid = True
-        self.isShow = False
-        self.isChoose = False
+        self.is_valid = True
+        self.is_showing = False
+        self.is_chose = False
         self.default_color = ("white", "gray", "black", "red",
                               "orange", "yellow", "green", "blue", "purple")
         self.populateList()
@@ -159,7 +161,7 @@ class ColorListEditor(PigComboBox):
                 self.setFont(QFont("宋体", 9, QFont.Normal))
                 # 取色板
                 if e == "More...":
-                    self.isChoose = True
+                    self.is_chose = True
                     self.setStyleSheet("background: white;")
                     color_rgb = QColorDialog.getColor(Qt.white, self)
                     # 选了颜色
@@ -173,8 +175,8 @@ class ColorListEditor(PigComboBox):
                     # 未选颜色
                     else:
                         self.setCurrentIndex(1)
-                    self.isValid = True
-                    self.isChoose = False
+                    self.is_valid = True
+                    self.is_chose = False
                 # 255,255,255格式rgb
                 elif e[0] in "0123456789":
                     color_rgb = e.split(",")
@@ -187,9 +189,9 @@ class ColorListEditor(PigComboBox):
                             self.insertItem(1, e)
                             self.setItemData(1, color, Qt.DecorationRole)
                             self.setCurrentIndex(1)
-                        self.isValid = True
+                        self.is_valid = True
                     else:
-                        self.isValid = False
+                        self.is_valid = False
                         self.setStyleSheet("background: white")
                 # #ffffff格式rgb
                 elif e[0] == "#" and len(e) == 7:
@@ -199,28 +201,31 @@ class ColorListEditor(PigComboBox):
                         self.setItemData(1, color, Qt.DecorationRole)
                         self.setCurrentIndex(1)
                     self.setStyleSheet("background: {}".format(e))
-                    self.isValid = True
+                    self.is_valid = True
                 elif e in self.default_color:
-                    self.isValid = True
+                    self.is_valid = True
                     self.setStyleSheet("background: {}".format(self.currentText()))
                 else:
-                    self.isValid = False
+                    self.is_valid = False
                     self.setStyleSheet("background: white")
         else:
-            self.isValid = False
+            self.is_valid = False
             self.setStyleSheet("background: white")
+
+        if self.is_valid:
+            self.colorChanged.emit(self.currentText())
 
     # 重写下拉菜单展开
     def showPopup(self):
-        self.isShow = True
+        self.is_showing = True
         self.setStyleSheet("background: white;")
         QComboBox.showPopup(self)
 
     # 重写下拉菜单收起
     def hidePopup(self):
-        self.isShow = False
+        self.is_showing = False
         color = self.currentText()
-        if self.isValid:
+        if self.is_valid:
             if ',' in color:
                 self.setStyleSheet("background: rgb({})".format(color))
             else:
@@ -230,9 +235,9 @@ class ColorListEditor(PigComboBox):
         QComboBox.hidePopup(self)
 
     def focusOutEvent(self, e):
-        if not self.isChoose:
-            if not self.isShow:
-                if not self.isValid:
+        if not self.is_chose:
+            if not self.is_showing:
+                if not self.is_valid:
                     self.setStyleSheet("background: white;")
                     self.setCurrentText("white")
                     QMessageBox.warning(
@@ -245,7 +250,7 @@ class ColorListEditor(PigComboBox):
 
     # 返回当前QColor对象
     def getColor(self):
-        if self.isValid:
+        if self.is_valid:
             return QColor(self.currentText())
         else:
             return Qt.white
