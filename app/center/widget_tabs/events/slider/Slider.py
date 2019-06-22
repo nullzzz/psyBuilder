@@ -1569,7 +1569,7 @@ class Slider(QMainWindow):
                     item.setPos(QPoint(dic['x_pos'], dic['y_pos']))
 
     def clone(self, id):
-        try:
+        # try:
             slider = Slider(widget_id=id)
             slider.pro_window.setProperties(self.pro_window.getInfo())
             for item in self.scene.items():
@@ -1579,5 +1579,5 @@ class Slider(QMainWindow):
                 slider.scene.update()
 
             return slider
-        except Exception as e:
-            print(f"error {e} happens in clone. [slider/Slider.py]")
+        # except Exception as e:
+        #     print(f"error {e} happens in clone. [slider/Slider.py]")

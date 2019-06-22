@@ -462,7 +462,7 @@ class PsyApplication(QMainWindow):
 
         """
         widget是具体的某个控件
-        
+
         widget为Image时，Text\Video\Sound类似的
         filename: str = widget.getFilename()
         output_device: dict = widget.getOutputDevice()
@@ -470,7 +470,7 @@ class PsyApplication(QMainWindow):
             output_name: str = device
             value_or_msg: str = properties.get("Value or Msg", "")
             pulse_duration: str = properties.get("Pulse Duration", "")
-        
+
         widget为If时
         condition: str = widget.getCondition()
         true_event: dict = widget.getTrueWidget() # false_event类似
@@ -478,7 +478,7 @@ class PsyApplication(QMainWindow):
         event_name: str = true_event.get("event name", "")
         widget_id: str = true_event.get("widget id", "")
         widget: Widget = true_event.get("widget", None) # 这个widget就是Slider/Image/...具有若干上述getXXX方法
-        
+
         widget为switch
         switch: str = widget.getSwitch()
         cases: list = widget.getCase()
