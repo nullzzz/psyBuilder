@@ -84,6 +84,8 @@ class DeviceOutDialog(QDialog):
         for device_name, properties in devices.items():
             self.tip.hide()
             device_type = properties.get("Device Type")
+            if device_type == "screen":
+                continue
             device_name = properties.get("Device Name")
             device_port = properties.get("Device Port")
 

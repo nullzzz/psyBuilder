@@ -1,9 +1,13 @@
-from PyQt5.QtCore import QObject, QEvent, pyqtSignal
+from PyQt5.QtCore import QObject, QEvent, pyqtSignal, Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QFormLayout, QMessageBox, QLineEdit
+
+from app.lib import ColorListEditor
 
 
 class Describer(QWidget):
     portChanged = pyqtSignal(str)
+    colorChanged = pyqtSignal(str)
+    sampleChanged = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(Describer, self).__init__(parent=parent)
@@ -11,22 +15,45 @@ class Describer(QWidget):
         self.device_name = QLabel("Unselected")
         self.device_port = QLineEdit("")
         self.port_tip = QLabel("")
+
         self.device_port.textEdited.connect(self.showPortTip)
         self.port: str = ""
+
+        self.is_describing_screen: bool = False
 
         self.setUI()
 
     def setUI(self):
-        layout = QFormLayout()
-        layout.addRow("Device Type:", self.device_type)
-        layout.addRow("Device Name:", self.device_name)
-        layout.addRow("Device Port:", self.device_port)
-        layout.addRow("", self.port_tip)
-        self.setLayout(layout)
+        self.layout = QFormLayout()
+        self.layout.setLabelAlignment(Qt.AlignRight)
+        self.layout.addRow("Device Type:", self.device_type)
+        self.layout.addRow("Device Name:", self.device_name)
+        self.layout.addRow("Device Port:", self.device_port)
+        self.layout.addRow("", self.port_tip)
+        self.setLayout(self.layout)
 
-    def describe(self, device_type, device_name, device_port):
+    def describe(self, device_type, device_name, device_port, color="0,0,0", sample="0"):
         self.device_type.setText(device_type)
         self.device_name.setText(device_name)
+
+        if device_type == "screen":
+            if not self.is_describing_screen:
+                self.bg_color = ColorListEditor()
+                self.bg_color.colorChanged.connect(self.changeColor)
+                self.bg_color.setCurrentText(color)
+                self.multi_sample = QLineEdit(sample)
+                self.multi_sample.textEdited.connect(self.changeSample)
+                self.layout.insertRow(3, "Back Color:", self.bg_color)
+                self.layout.insertRow(4, "Multi Sample:", self.multi_sample)
+            else:
+                self.bg_color.setCurrentText(color)
+                self.multi_sample.setText(sample)
+            self.is_describing_screen = True
+        else:
+            if self.is_describing_screen:
+                self.layout.removeRow(4)
+                self.layout.removeRow(3)
+                self.is_describing_screen = False
 
         if device_type in ("mouse", "keyboard", "game pad"):
             self.device_port.setText("Invalid")
@@ -41,6 +68,7 @@ class Describer(QWidget):
         self.device_name.setText(name)
 
     def eventFilter(self, obj: QObject, e: QEvent):
+        print(e)
         if obj == self.device_port:
             if e.type() == QEvent.FocusOut:
                 port = self.device_port.text()
@@ -52,6 +80,23 @@ class Describer(QWidget):
                     if self.port_line.text() != self.port:
                         self.port = self.port_line.text()
                         self.portChanged.emit(self.port)
+        # print(e.type())
+        # if e.type() == QEvent.FocusOut:
+        #     if obj == self.device_port:
+        #         port = self.device_port.text()
+        #         if not self.checkPort(port):
+        #             QMessageBox.warning(self, "Warning", "Invalid Port!", QMessageBox.Ok)
+        #             self.device_port.setText(self.port)
+        #             self.device_port.setFocus()
+        #         else:
+        #             if self.port_line.text() != self.port:
+        #                 self.port = self.port_line.text()
+        #                 self.portChanged.emit(self.port)
+        #     elif obj == self.bg_color:
+        #         self.colorChanged.emit(self.bg_color.currentText())
+        #     elif obj == self.multi_sample:
+        #         print("emit sample")
+        #         self.sampleChanged.emit(self.multi_sample.text())
         return QWidget.eventFilter(self, obj, e)
 
     def showPortTip(self, port: str):
@@ -66,6 +111,7 @@ class Describer(QWidget):
             self.port_tip.setText("Invalid Port")
         else:
             self.port_tip.setText("")
+            self.portChanged.emit(port)
 
     def checkPort(self, port: str):
         flag: bool = True
@@ -92,3 +138,9 @@ class Describer(QWidget):
         elif device_type == "parallel_port":
             flag = port == "D010"
         return flag
+
+    def changeSample(self, sample):
+        self.sampleChanged.emit(sample)
+
+    def changeColor(self, color):
+        self.colorChanged.emit(color)
