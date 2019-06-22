@@ -8,7 +8,7 @@ tabBar = """
     QTabBar
     {
         qproperty-drawBase: 0;
-        left: 5px; /* move to the right by 5px */
+        left: 5px;
         border-radius: 3px;
     }
 
@@ -370,12 +370,12 @@ menu = """
     QMenu {
     background-color: white;
     border: 1px solid gray;
-    margin: 2px; /* some spacing around the menu */
+    margin: 2px;
 }
 
 QMenu::Item {
     padding: 2px 25px 2px 20px;
-    border: 0.5px solid gray; /* reserve space for selection border */
+    border: 0.5px solid gray;
 }
 
 QMenu::Item:selected {
@@ -383,7 +383,7 @@ QMenu::Item:selected {
     background: rgba(135,206,250);
 }
 
-QMenu::icon:checked { /* appearance of a 'checked' icon */
+QMenu::icon:checked {
     background: gray;
     border: 1px inset gray;
     position: absolute;
