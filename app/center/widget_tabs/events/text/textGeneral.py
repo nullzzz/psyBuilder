@@ -177,13 +177,13 @@ class TextTab1(QWidget):
     def setAll(self):
         texts = self.text_edit.toPlainText().split("\n")
         self.html_font = f"</style></head><body style=\" font-family:'{self.new_font.family()}'; font-size:" \
-                         f"{self.new_font.pointSize()}pt; font-weight:{self.new_font.weight()}; font-style:" \
-                         f"{self.new_font.styleName()};\">"
+            f"{self.new_font.pointSize()}pt; font-weight:{self.new_font.weight()}; font-style:" \
+            f"{self.new_font.styleName()};\">"
         html = self.html_header + self.html_font
         for text in texts:
             html += f"\n<p align=\"{self.align_mode}\"style=\" margin-top:0px; margin-bottom:0px; " \
-                    f"margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent: 0px;\"><span style=\" " \
-                    f"color:{self.fore_color_name}; background-color:{self.back_color_name};\">{text}</span>"
+                f"margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent: 0px;\"><span style=\" " \
+                f"color:{self.fore_color_name}; background-color:{self.back_color_name};\">{text}</span>"
 
         self.text_edit.setHtml(html)
         # 字体的style和划线在html中不体现

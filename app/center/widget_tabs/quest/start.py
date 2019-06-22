@@ -184,7 +184,8 @@ class QuestInit(QWidget):
         self.default_properties["Std. dev. of estimated threshold"] = self.std_dev.text()
         self.default_properties["Desired proportion of correct responses"] = self.desired_proportion.text()
         self.default_properties["Steepness of the Weibull psychometric function(β)"] = self.steepness.text()
-        self.default_properties["Proportion of random responses at maximum stimulus intensity(σ)"] = self.proportion.text()
+        self.default_properties[
+            "Proportion of random responses at maximum stimulus intensity(σ)"] = self.proportion.text()
         self.default_properties["Chance level (γ)"] = self.chance_level.text()
         self.default_properties["Method to determine optimal test value"] = self.method.currentText()
         self.default_properties["Minimum test value"] = self.minimum.text()
@@ -212,7 +213,8 @@ class QuestInit(QWidget):
         self.std_dev.setText(self.default_properties["Std. dev. of estimated threshold"])
         self.desired_proportion.setText(self.default_properties["Desired proportion of correct responses"])
         self.steepness.setText(self.default_properties["Steepness of the Weibull psychometric function(β)"])
-        self.proportion.setText(self.default_properties["Proportion of random responses at maximum stimulus intensity(σ)"])
+        self.proportion.setText(
+            self.default_properties["Proportion of random responses at maximum stimulus intensity(σ)"])
         self.chance_level.setText(self.default_properties["Chance level (γ)"])
         self.method.setCurrentText(self.default_properties["Method to determine optimal test value"])
         self.minimum.setText(self.default_properties["Minimum test value"])

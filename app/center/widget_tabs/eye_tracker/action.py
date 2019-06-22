@@ -41,10 +41,11 @@ class EyeAction(QWidget):
         self.resize(500, 750)
         self.tip1.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip1.setText("Wait")
-        self.tip1.setFont(QFont("Timers", 20,  QFont.Bold))
+        self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip2.setText("Waits for an eye-tracker event")
-        self.status_message.addItems(["Saccade start", "Saccade end", "Fixation start", "Fixation end", "Blink start", "Blink end"])
+        self.status_message.addItems(
+            ["Saccade start", "Saccade end", "Fixation start", "Fixation end", "Blink start", "Blink end"])
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)

@@ -1,6 +1,8 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMovie
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QFrame, QLabel
+
+from app.func import Func
 
 
 class WaitDialog(QDialog):
@@ -18,12 +20,11 @@ class WaitDialog(QDialog):
         frame.setStyleSheet("background-color: transparent;border-radius:10px;")
         frame.setGeometry(0, 0, 70, 80)
 
-        label = QLabel(frame)
-        label.setStyleSheet("background-color:transparent;")
-        label.setGeometry(10, 10, 50, 50)
-        self.movie = QMovie("image/loading.gif")
-        label.setScaledContents(True)
-        label.setMovie(self.movie)
+        self.label = QLabel(frame)
+        self.label.setStyleSheet("background-color:transparent;")
+        self.label.setGeometry(10, 10, 50, 50)
+        self.label.setPixmap(QIcon(Func.getImage("loading/frame-0.png")).pixmap(50, 50))
+        self.label.setScaledContents(True)
 
         tip_label = QLabel(self)
         tip_label.setAlignment(Qt.AlignCenter)
@@ -31,18 +32,29 @@ class WaitDialog(QDialog):
         tip_label.setStyleSheet("color: black;background-color: transparent;")
         tip_label.setGeometry(10, 55, 60, 15)
 
+        # data
+        self.image_index = 0
+        self.image_count = 30
+
     def start(self):
         """
         显示等待窗口
         :return:
         """
-        self.movie.start()
         self.show()
+
+    def change_image(self):
+        """
+        切换下一张图片
+        :return:
+        """
+        self.image_index += 1
+        self.label.setPixmap(QIcon(Func.getImage(f"loading/frame-{self.image_index}.png")).pixmap(50, 50))
+        self.image_index %= self.image_count
 
     def stop(self):
         """
         关闭等待窗口
         :return:
         """
-        self.movie.stop()
         self.close()

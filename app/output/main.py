@@ -1,6 +1,6 @@
-import datetime
 import sys
 
+import datetime
 from PyQt5.QtWidgets import QDockWidget, QTextEdit
 
 

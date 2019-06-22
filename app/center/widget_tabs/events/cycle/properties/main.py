@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QDialog, QFrame, QTabWidget
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QDialog, QTabWidget
 
 from .selection import Selection
 
