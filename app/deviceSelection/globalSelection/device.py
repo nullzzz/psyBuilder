@@ -92,8 +92,12 @@ class Device(QListWidgetItem):
     def loadSetting(self):
         self.setName(self.default_properties["Device Name"])
         self.setPort(self.default_properties["Device Port"])
+        self.setColor(self.default_properties.get("Back Color", "0,0,0"))
+        self.setPort(self.default_properties.get("Multi Sample", "0"))
 
     def getInfo(self) -> dict:
         self.default_properties["Device Name"] = self.text()
         self.default_properties["Device Port"] = self.port
+        self.default_properties["Back Color"] = self.back_color
+        self.default_properties["Multi Sample"] = self.sample
         return self.default_properties
