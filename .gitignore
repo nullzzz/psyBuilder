@@ -1,6 +1,5 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-.idea/
 *.py[cod]
 
 # C extensions
@@ -56,3 +55,9 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# PyCharm
+/.idea
+
+# virtualenv
+/venv

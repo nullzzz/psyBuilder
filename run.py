@@ -1,8 +1,8 @@
 import sys
 
-from PyQt5.QtWidgets import QApplication
+from quamash import QApplication
 
-from main.main import MainWindow
+from app.main.main import PsyApplication
 
 tabBar = """
     QTabBar
@@ -321,11 +321,11 @@ listView = """
     QListView {
     show-decoration-selected: 1; /* make the selection span the entire width of the view */
     }
-    
+
     QListView::Item {
         min-width:80px;
     }
-    
+
     QListView::Item:hover {
         background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                     stop: 0 #FAFBFE, stop: 1 #aad4fe);
@@ -343,26 +343,27 @@ tree = """
     QTreeView::branch:has-siblings:!adjoins-Item {
         border-image: url(image/vline.png) 0;
     }
-    
+
     QTreeView::branch:has-siblings:adjoins-Item {
         border-image: url(image/branch-more.png) 0;
     }
-    
+
     QTreeView::branch:!has-children:!has-siblings:adjoins-Item {
         border-image: url(image/branch-end.png) 0;
     }
-    
+
     QTreeView::branch:has-children:!has-siblings:closed,
     QTreeView::branch:closed:has-children:has-siblings {
         border-image: none;
         image: url(image/branch-closed.png);
     }
-    
+
     QTreeView::branch:open:has-children:!has-siblings,
     QTreeView::branch:open:has-children:has-siblings  {
         border-image: none;
         image: url(image/branch-open.png);
     }
+    ColorListEditor::drop-down {image: url(image/color_down_arrow.png);}
     """
 
 menu = """
@@ -406,18 +407,12 @@ QMenu::indicator {
 """
 
 styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + pushButton + tree + menu + listView
-# styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + lineEdit + pushButton + tree + menu
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-
-    demo = MainWindow()
-
-    demo.showMaximized()
-    # demo.move((app.desktop().width() - demo.width()) / 2,
-    #           (app.desktop().height() - demo.height()) / 2)
-    # demo.properties.my_widget.setMaximumWidth(600)
-    demo.center.setMaximumHeight(app.desktop().height() * 0.8)
+    psy_application = PsyApplication()
+    psy_application.initialize()
+    psy_application.showMaximized()
 
     app.setStyleSheet(styleSheet)
     sys.exit(app.exec_())

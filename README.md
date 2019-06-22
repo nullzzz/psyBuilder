@@ -1,39 +1,79 @@
-<p><big>命名规范</big></p>
-<ul>
-	<li>类名采用大驼峰命名法：ClassDemo</li>
-	<li>函数方法名采用小驼峰命名法：myFunction</li>
-	<li>变量名名采用下划线命名法：a_terrbile_project</li>
-	<li>其余均按照PEP8格式</li>
-</ul>
+# todo list
+### 2019-6-12
+* 啥也不想做
+---
+# 关于Info类的详细说明
+ **数据目前包括**
+* wid_widget: [dict] widget_id -> widget
+* wid_node: [dict] widget_id -> node
+* name_wid: [dict] name -> [widget_id1, .widget_id2..]
+* file_name: [str] 文件名
+---
+# widget具有的基本属性
+## signals
+* propertiesChange: properties -> structure</li>
+## function
+* changeWidgetId(widget_id): 改变widget的widget_id, 因为引用节点删除时可能删除的是源节点
+* clone(widget_id): 返回以widget_id为widget_id的widget
+* getProperties(): 返回properties
+* getInfo(): 导入导出用，返回比getProperties更多的信息
+* restore(dict): 导入导出用
+* setAttributes(list): 设置可选参数，有pro_window的控件在openPro时更新attributes，其他的在apply更新
 
-<p><big>图片文件路径</big></p>
-<ul>
-    <li>为了适配mac：image/xxx</li>
-</ul>
 
-<p><big>events/eyeTriacker/quest接口说明</big></p>
-<ul>
-    <li>clone(): 返回当前事件的深拷贝</li>
-    <li>setAttributs(iterable): 设置变量，就是那个可以变蓝的东西</li>
-    <li>getInfo(): 返回参数，字典类型</li>
-    <li>setProperties(dict): 设置参数，也就是从文件导入的接口</li>
-    <li>getDuration(): 返回事件的duration参数(ms)</li>
-    <li>getUsingAttributes(): 返回使用中的attributes，列表类型</li>
-    <li>getHiddenAttributes(): 返回隐藏属性，字典类型</li>
-</ul>
+# widget信号初始化
+**由main中linkWidgetSignals(widget_id)进行连接信号**
+# 关于参数调用的说明
+每个控件都有若干getXXX()方法，用以获取XXX参数。 e.g.Image
+- getFilename
+- getIsMirrorUpAndDown
+- getIsMirrorLeftAndRight
+- getStretchMode
+- getBackColor
+- getTransparent
+- getClearAfter
+- getScreenName
+- getXAxisCoordinates
+- getYAxisCoordinates
+- getWidth
+- getHeight
+- getBorderColor
+- getBorderWidth
+- getDuration
+- [dict]getOutputDevice
+- [dict]getInputDevice
+#### if
+- getCondition
+- [dict]getTrueWidget
+- [dict]getFalseWidget
+#### switch
+- getSwitch
+- [list]getCase
+## There's another great way.
+***getPropertyByKey(key: str)***
++ 获取指定参数
 
-<p><big>TODO</big></p>
-<ul>
-    <li>【done】单个事件获取timeline的attribute</li>
-    <li>【done】事件绑定事件名</li>
-    <li>【done】以timeline为单位的参数导入导出</li>
-    <li>condition的条件判断</li>
-</ul>
++ 获取指定参数
+## 整个结构的调用
+***在compile中调用self.structure.getStructure()即可得到一颗树，树类只包含了根节点，树的节点类包括了其自身name及id，父节点和所有子节点，方便调用***
++ 可以通过树类的方法print_tree查看树的详细结构
+## Cycle相关
+***包含两个方法***
++ getTimelines：按顺序返回所有timeline，返回格式为\[('timeline_name','timeline_wid'),(),(), ...]，若某行未设置timeline，则为('',''),即为空
++ getAttributes(index)：index为timeline所在行，即上函数所得索引，此函数根据index查找所在行，并返回属性，格式为{"attribute_name":"attribute_value", ...}
+## Attributes相关
+***属性的层次***
++ 第一层timeline为0，依次递增，调用方法，Info.getAttributes(widget_id，是否需要层次信息), 格式为{"attribute_name":layer(int),...}
 
-<p><big>关于导入导出的问题</big></p>
-<ul>
-    <li>timeline和cycle，调用save就可以得到数据</li>
-    <li>调用restore，参数就是save得到的数据，就可以复原</li>
-    <li>但是这个复原我阻止了发信号到structure，因为是structure的复原不会受到这个到影响</li>
-    <li>对于if和switch的复制，之前返回的数据包含了一个类，已经被我修改为属性字典，测试正常</li>
-</ul>
+# 关于控制台输出
++ 函数：Func.log(text: str, error: bool, timer: bool)
++ 参数：text输出文字内容，error是否为报错信息，timer是否输出时间戳
++ 功能：输出提示信息，自动定位文件及行号
++ 示例：
+  ```
+  try: 
+      # some code
+  except Exception as e:
+      Func.printInfo(e, True)
+  ```
+
