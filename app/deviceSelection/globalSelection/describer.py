@@ -131,29 +131,6 @@ class Net(Shower):
         # self.device_port.
         self.device_ip_port.textEdited.connect(lambda x: self.ipPortChanged.emit(x))
 
-        self.setUI()
-
-    def setUI(self):
-        layout = QFormLayout()
-        layout.setLabelAlignment(Qt.AlignRight)
-        layout.addRow("Device Type:", self.device_type)
-        layout.addRow("Device Name:", self.device_name)
-        layout.addRow("IP Address:", self.device_port)
-        layout.addRow("IP Port:", self.device_ip_port)
-        layout.addRow("", self.port_tip)
-        self.setLayout(layout)
-
-    def describe(self, device_type, device_name, device_address, others):
-        super().describe(device_type, device_name, device_address, others)
-        self.device_ip_port.setText(others.get("IP Port", ""))
-
-
-class Parallel(Shower):
-    def __init__(self, parent=None):
-        super(Parallel, self).__init__(parent=parent)
-        self.device_ip_port = QLineEdit()
-        # self.device_port.
-        self.device_ip_port.textEdited.connect(lambda x: self.ipPortChanged.emit(x))
         self.is_client = QCheckBox()
         self.is_client.stateChanged.connect(lambda x: self.clientChanged.emit(x))
         self.setUI()
@@ -163,7 +140,7 @@ class Parallel(Shower):
         layout.setLabelAlignment(Qt.AlignRight)
         layout.addRow("Device Type:", self.device_type)
         layout.addRow("Device Name:", self.device_name)
-        layout.addRow("Device Port:", self.device_port)
+        layout.addRow("IP Address:", self.device_port)
         layout.addRow("IP Port:", self.device_ip_port)
         layout.addRow("Is Client:", self.is_client)
         layout.addRow("", self.port_tip)
@@ -171,8 +148,35 @@ class Parallel(Shower):
 
     def describe(self, device_type, device_name, device_address, others):
         super().describe(device_type, device_name, device_address, others)
-        self.device_port.setText(others.get("IP Port", "25576"))
+        self.device_ip_port.setText(others.get("IP Port", "25576"))
         self.is_client.setChecked(others.get("Is Client", 0))
+
+
+class Parallel(Shower):
+    def __init__(self, parent=None):
+        super(Parallel, self).__init__(parent=parent)
+        # self.device_ip_port = QLineEdit()
+        # self.device_port.
+        # self.device_ip_port.textEdited.connect(lambda x: self.ipPortChanged.emit(x))
+        # self.is_client = QCheckBox()
+        # self.is_client.stateChanged.connect(lambda x: self.clientChanged.emit(x))
+        self.setUI()
+
+    def setUI(self):
+        layout = QFormLayout()
+        layout.setLabelAlignment(Qt.AlignRight)
+        layout.addRow("Device Type:", self.device_type)
+        layout.addRow("Device Name:", self.device_name)
+        layout.addRow("Device Port:", self.device_port)
+        # layout.addRow("IP Port:", self.device_ip_port)
+        # layout.addRow("Is Client:", self.is_client)
+        layout.addRow("", self.port_tip)
+        self.setLayout(layout)
+
+    def describe(self, device_type, device_name, device_address, others):
+        super().describe(device_type, device_name, device_address, others)
+        # self.device_port.setText(others.get("IP Port", "25576"))
+        # self.is_client.setChecked(others.get("Is Client", 0))
 
 
 class Serial(Shower):
