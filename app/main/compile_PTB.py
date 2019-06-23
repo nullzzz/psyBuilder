@@ -32,6 +32,7 @@ def compilePTB(globalSelf):
     with open(compile_file_name, "w") as f:
         #  print function start info
         # import datetime
+        # print(Info.TIMELINE)
 
         cFilenameOnly = os.path.split(compile_file_name)[1].split('.')[0]
         # the help info
@@ -67,19 +68,23 @@ def compilePTB(globalSelf):
         print(f"\t\tcRandSeed = RandStream('mt19937ar','Seed','shuffle');", file=f)
         print(f"\t\tRandStream.setGlobalStream(cRandSeed);", file=f)
         print(f"\t\t%-----------------------------------------------------\\\n", file=f)
-        print(f"\t\thideCursor; % hide mouse cursor\n", file=f)
+        print(f"\t\thideCursor;            % hide mouse cursor\n", file=f)
+        print(f"\t\tif isWin", file=f)
+        print(f"\t\t\tShowHideWinTaskbar(0); % hide the window taskbar\n", file=f)
+        print(f"\t\tend", file=f)
 
 
-        print(f"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", file=f)
-        print(f"% define and initalize input/output devices", file=f)
-        print(f"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", file=f)
+        print(f"\t\t%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", file=f)
+        print(f"\t\t% define and initialize input/output devices", file=f)
+        print(f"\t\t%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", file=f)
         # get output devices, such as global output devices.
         # you can get each widget's device you selected
         print(f"\t\t%----- define output devices --------/", file=f)
         output_devices = Info.OUTPUT_DEVICE_INFO
 
-        print(Info.INPUT_DEVICE_INFO)
-        print(Info.OUTPUT_DEVICE_INFO)
+
+        # print(Info.INPUT_DEVICE_INFO)
+        # print(Info.OUTPUT_DEVICE_INFO)
 
         iMonitor = 1
         iParal   = 1
@@ -171,13 +176,13 @@ def compilePTB(globalSelf):
             print(f"\t\tserialCons = zeros({iSerial-1},1);\n", file=f)
 
             print(f"\t\tfor iCount = 1:numel(serialCons)", file=f)
-            print(f"\t\t\ttcpipCons(iCount) = IOPort('OpenSerialPort',serPort(iCount).port,['BaudRate=',serPort(iCount).baudRate,',DataBits=',serPort(iCount).dataBits]);", file=f)
+            print(f"\t\t\tserialCons(iCount) = IOPort('OpenSerialPort',serPort(iCount).port,['BaudRate=',serPort(iCount).baudRate,',DataBits=',serPort(iCount).dataBits]);", file=f)
             print(f"\t\tend % iCount", file=f)
             print(f"\t\t%--------------------------\\\n", file=f)
         # initialize parallel ports
         if iParal > 1:
             print(f"\n\t\t%--- open parallel ports ----/", file=f)
-            print(f"\n\t\t% for linux we directly use outb under sodo mode ", file=f)
+            print(f"\t\t% for linux we directly use outb under sodo mode ", file=f)
             print(f"\t\tif IsWin", file=f)
             print(f"\t\t\ttry", file=f)
             print(f"\t\t\t\tio64Obj = io64;", file=f)
@@ -191,36 +196,94 @@ def compilePTB(globalSelf):
             print(f"\t\t\terror('curently, we did not support output via parallel under Mac OX!');", file=f)
             print(f"\t\tend % if IsWin", file=f)
             print(f"\t\t%----------------------------\\\n", file=f)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         print(f"\t\t%----------------------------------------\\\n", file=f)
+
+
+
+
+
+        # get widgets in the main timeline
+        cTimelineWidgetIds = Func.getWidgetIDInTimeline(f"{Info.TIMELINE}.0")
+
+        for cWidgetId in cTimelineWidgetIds:
+            cWidget = Info.WID_WIDGET[cWidgetId]
+            print(Func.getWidgetName(cWidgetId))
+            print(cWidget.widget_id)
+            print(Func.getProperties(cWidgetId))
+            print(cWidget.getPropertyByKey('Text'))
+            # print(Func.getScreen)
+
+            # print(dir(cWidget))
+
+        """
+            widget是具体的某个控件
+
+            widget为Image时，Text\Video\Sound类似的
+            filename: str = widget.getFilename()
+            output_device: dict = widget.getOutputDevice()
+            for device, properties in output_device.items():
+                output_name: str = device
+                value_or_msg: str = properties.get("Value or Msg", "")
+                pulse_duration: str = properties.get("Pulse Duration", "")
+
+            widget为If时
+            condition: str = widget.getCondition()
+            true_event: dict = widget.getTrueWidget() # false_event类似
+            stim_type: str = true_event.get("stim type", "")
+            event_name: str = true_event.get("event name", "")
+            widget_id: str = true_event.get("widget id", "")
+            widget: Widget = true_event.get("widget", None) # 这个widget就是Slider/Image/...具有若干上述getXXX方法
+
+            widget为switch
+            switch: str = widget.getSwitch()
+            cases: list = widget.getCase()
+            for case in cases:
+                case: dict
+                case_value: str = case.get("case value", "")
+                stim_type: str = case.get("stim type", "")
+                event_name: str = case.get("event name", "")
+                widget_id: str = case.get("widget id", "")
+                widget: Widget = case.get("widget", None)
+            """
+
+
+
+
+
+        print(f"\t\tPriority(1);                % Turn the priority to high priority", file=f)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         print(f"\t\texpEndTime = datestr(now,'dd-mmm-YYYY:HH:MM:SS'); % record the end time \n", file=f)
         print(f"\t\tsca;                        % Close opened windows", file=f)
         print(f"\t\tShowCursor;                 % Show the hided mouse cursor", file=f)
         print(f"\t\tPriority(0);                % Turn the priority back to normal", file=f)
         print(f"\t\tRestrictKeysForKbCheck([]); % Re-enable all keys\n", file=f)
+        print(f"\t\tif isWin", file=f)
+        print(f"\t\t\tShowHideWinTaskbar(1);      % show the window taskbar.", file=f)
+        print(f"\t\tend\n", file=f)
         print(f"\t\tsave({cFilenameOnly}.filename); % save the results\n", file=f)
 
 
         #  close opend devices
-        print(f"\t%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", file=f)
-        print(f"\t% close opened devices", file=f)
-        print(f"\t%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", file=f)
+        print(f"\t\t%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", file=f)
+        print(f"\t\t% close opened devices", file=f)
+        print(f"\t\t%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", file=f)
         # close TCPIP connections
         if iNetPort > 1:
             print(f"\n\t\t%-- close serial ports --/", file=f)
@@ -236,7 +299,7 @@ def compilePTB(globalSelf):
             print(f"\n\t\t%--- close serial ports ---/", file=f)
 
             print(f"\t\tfor iCount = 1:numel(serialCons)", file=f)
-            print(f"\t\t\tIOPort('Close',tcpipCons(iCount));", file=f)
+            print(f"\t\t\tIOPort('Close',serialCons(iCount));", file=f)
             print(f"\t\tend % iCount", file=f)
             print(f"\t\t%--------------------------\\\n", file=f)
 
@@ -266,8 +329,12 @@ def compilePTB(globalSelf):
         print(f"\t\tShowCursor;                 % Show the hided mouse cursor", file=f)
         print(f"\t\tPriority(0);                % Turn the priority back to normal", file=f)
         print(f"\t\tRestrictKeysForKbCheck([]); % Re-enable all keys\n", file=f)
+        print(f"\t\tif isWin", file=f)
+        print(f"\t\t\tShowHideWinTaskbar(1);      % show the window taskbar", file=f)
+        print(f"\t\tend\n", file=f)
         print(f"\t\tsave('{cFilenameOnly}_debug');", file=f)
         print(f"\t\trethrow({cFilenameOnly}_error);", file=f)
+
         print(f"\tend % try\n", file=f)
 
         print(f"end % function \n\n\n\n\n\n\n", file=f)
@@ -289,33 +356,3 @@ def compilePTB(globalSelf):
     # except Exception as e:
     #     print(f"compile error {e}")
 
-    """
-    widget是具体的某个控件
-
-    widget为Image时，Text\Video\Sound类似的
-    filename: str = widget.getFilename()
-    output_device: dict = widget.getOutputDevice()
-    for device, properties in output_device.items():
-        output_name: str = device
-        value_or_msg: str = properties.get("Value or Msg", "")
-        pulse_duration: str = properties.get("Pulse Duration", "")
-
-    widget为If时
-    condition: str = widget.getCondition()
-    true_event: dict = widget.getTrueWidget() # false_event类似
-    stim_type: str = true_event.get("stim type", "")
-    event_name: str = true_event.get("event name", "")
-    widget_id: str = true_event.get("widget id", "")
-    widget: Widget = true_event.get("widget", None) # 这个widget就是Slider/Image/...具有若干上述getXXX方法
-
-    widget为switch
-    switch: str = widget.getSwitch()
-    cases: list = widget.getCase()
-    for case in cases:
-        case: dict
-        case_value: str = case.get("case value", "")
-        stim_type: str = case.get("stim type", "")
-        event_name: str = case.get("event name", "")
-        widget_id: str = case.get("widget id", "")
-        widget: Widget = case.get("widget", None)
-    """

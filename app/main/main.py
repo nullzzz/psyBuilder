@@ -1,6 +1,7 @@
 import os
 import sys
-import datetime
+# import datetime
+import traceback
 
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
 from PyQt5.QtGui import QIcon
@@ -438,8 +439,9 @@ class PsyApplication(QMainWindow):
     def compile(self):
         try:
             compilePTB(self)
-        except:
+        except Exception:
             Func.log(f"Something went wrong while Compiling!")
+            traceback.print_exc()
 
 
         """
