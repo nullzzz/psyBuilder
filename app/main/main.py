@@ -304,6 +304,7 @@ class PsyApplication(QMainWindow):
             if input_device_info:
                 self.input_devices.setProperties(input_device_info)
             output_device_info = setting.value("OUTPUT_DEVICE_INFO")
+            # print(output_device_info)
             if output_device_info:
                 self.output_devices.setProperties(output_device_info)
             # 恢复布局
@@ -324,6 +325,7 @@ class PsyApplication(QMainWindow):
         # 导出输入设备信息
         input_device_info: dict = Info.INPUT_DEVICE_INFO.copy()
         output_device_info: dict = Info.OUTPUT_DEVICE_INFO.copy()
+        # print(output_device_info)
         # 当前布局信息
         current_dock_layout = self.saveState()
         #
