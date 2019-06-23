@@ -31,7 +31,7 @@ class Device(QListWidgetItem):
         self.back_color = "0,0,0"
         self.sample = "0"
         # parallel
-        self.client: int = 0
+        self.client: int = 1
         # net
         self.ip_port = "25576"
         # serial
