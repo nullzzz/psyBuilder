@@ -435,6 +435,9 @@ class PsyApplication(QMainWindow):
         super().contextMenuEvent(QContextMenuEvent)
 
     def compile(self):
+        compilePTB(self)
+
+        """
         # check saved or not, if not saved, user should  save first.
         if not Info.FILE_NAME:
             if not self.getFileName():
@@ -488,7 +491,7 @@ class PsyApplication(QMainWindow):
         # except Exception as e:
         #     print(f"compile error {e}")
 
-        """
+        
         widget是具体的某个控件
 
         widget为Image时，Text\Video\Sound类似的
