@@ -128,22 +128,22 @@ class SelectArea(QListWidget):
         del_list: list = []
         for new_add in self.add_buffer:
             device_id, device_type, device_name, device_port = new_add
-            print(f"del {device_id}")
             # search the device
             for i in range(self.count()):
-                print(i)
                 device = self.item(i)
                 if device.getDeviceId() == device_id:
-                    del_list.insert(0, i)
+                    del_list.append(i)
                     self.device_count[device_type] -= 1
+        # clear buffer
+        self.add_buffer.clear()
+        del_list.sort(reverse=True)
         for i in del_list:
             self.deleteDevice(i, record=False)
 
         for new_del in self.delete_buffer:
             device_id, device_type, device_name, device_port = new_del
-
             self.createDevice(device_type, device_id, device_name, device_port, record=False)
-
+        self.delete_buffer.clear()
         # 从properties添加
         if self.count() == 0:
             for k, v in self.default_properties.items():

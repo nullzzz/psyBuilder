@@ -112,7 +112,7 @@ class Screen(Shower):
         layout.setLabelAlignment(Qt.AlignRight)
         layout.addRow("Device Type:", self.device_type)
         layout.addRow("Device Name:", self.device_name)
-        layout.addRow("IP Address:", self.device_port)
+        layout.addRow("Screen Index:", self.device_port)
         layout.addRow("Back Color:", self.bg_color)
         layout.addRow("Multi Sample:", self.mu_sample)
         layout.addRow("", self.port_tip)
