@@ -436,7 +436,11 @@ class PsyApplication(QMainWindow):
         super().contextMenuEvent(QContextMenuEvent)
 
     def compile(self):
-        compilePTB(self)
+        try:
+            compilePTB(self)
+        except:
+            Func.log(f"Something went wrong while Compiling!")
+
 
         """
         # check saved or not, if not saved, user should  save first.

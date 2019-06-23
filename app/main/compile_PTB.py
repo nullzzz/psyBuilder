@@ -78,13 +78,16 @@ def compilePTB(globalSelf):
         print(f"\t\t%----- define output devices --------/", file=f)
         output_devices = Info.OUTPUT_DEVICE_INFO
 
+        print(Info.INPUT_DEVICE_INFO)
+        print(Info.OUTPUT_DEVICE_INFO)
+
         iMonitor = 1
         iParal   = 1
         iNetPort = 1
         iSerial  = 1
 
         for output_device in output_devices:
-            print(output_device)
+            # print(output_device)
             # get output device index
             output_device_index = output_device.split('.')[-1]
 
@@ -93,7 +96,7 @@ def compilePTB(globalSelf):
                 print(f"\t\tmonitors({iMonitor}).port       = {output_devices[output_device]['Device Port']};", file=f)
                 print(f"\t\tmonitors({iMonitor}).name       = '{output_devices[output_device]['Device Name']}';", file=f)
                 print(f"\t\tmonitors({iMonitor}).bkColor    = '{output_devices[output_device]['Back Color']}';", file=f)
-                print(f"\t\tmonitors({iMonitor}).muliSample = '{output_devices[output_device]['Multi Sample']}';\n", file=f)
+                print(f"\t\tmonitors({iMonitor}).muliSample = {output_devices[output_device]['Multi Sample']};\n", file=f)
                 # print(f"monitors({iMonitor}).type = '{output_devices[output_device]['Device Type']}';", file=f)
                 # print(f"monitors({iMonitor}).index = '{output_device_index}';", file=f)
                 iMonitor += 1
@@ -109,12 +112,12 @@ def compilePTB(globalSelf):
                 print(f"\t\tTCPIPs({iNetPort}).ipAdd    = '{output_devices[output_device]['Device Port']}';", file=f)
                 print(f"\t\tTCPIPs({iNetPort}).port     =  {output_devices[output_device]['IP Port']};", file=f)
                 print(f"\t\tTCPIPs({iNetPort}).name     = '{output_devices[output_device]['Device Name']}';", file=f)
-                print(f"\t\tTCPIPs({iNetPort}).isClient = {output_devices[output_device]['isClient']};\n", file=f)
+                print(f"\t\tTCPIPs({iNetPort}).isClient = {output_devices[output_device]['Is Client']};\n", file=f)
                 # print(f"TCPIPs({iNetPort}).type = '{output_devices[output_device]['Device Type']}';", file=f)
                 # print(f"TCPIPs({iNetPort}).index = '{output_device_index}';", file=f)
                 iNetPort += 1
             elif output_devices[output_device]['Device Type'] == 'parallel_port':
-                print(f"\t\tparPort({iParal}).port     = {output_devices[output_device]['Device Port']};", file=f)
+                print(f"\t\tparPort({iParal}).port     = hex2dec('{output_devices[output_device]['Device Port']}');", file=f)
                 print(f"\t\tparPort({iParal}).name     = '{output_devices[output_device]['Device Name']}';\n", file=f)
                 # print(f"parPort({iParal}).type = '{output_devices[output_device]['Device Type']}';", file=f)
                 # print(f"parPort({iParal}).index = '{output_device_index}';", file=f)
@@ -135,14 +138,14 @@ def compilePTB(globalSelf):
         print(f"\t\t%----- initalize output devices ---------/", file=f)
         print(f"\n\t\t%--- open windows ---/", file=f)
         print(f"\t\twinIds    = zeros({iMonitor-1},1);", file=f)
-        print(f"\t\twinIfis   = zeros({iMonitor-1},1);", file=f)
+        print(f"\t\twinIFIs   = zeros({iMonitor-1},1);", file=f)
         print(f"\t\tfullRects = zeros({iMonitor-1},4);\n", file=f)
 
         print(f"\t\tfor iWin = 1:numel(monitors)", file=f)
         print(f"\t\t\t[winIds(iWin),fullRects(iWin,:)] = Screen('OpenWindow',monitors(iWin).port,monitors(iWin).bkColor,[],[],[],[],monitors(iWin).muliSample);", file=f)
         print(f"\t\t\tScreen('BlendFunction', winIds(iWin),'GL_SRC_ALPHA','GL_ONE_MINUS_SRC_ALPHA'); % force to most common alpha-blending factors", file=f)
-        print(f"\t\t\twinIfis(iWin) = Screen('GetFlipInterval',winIds(iWin));                        % get inter frame interval (i.e., 1/refresh rate)", file=f)
-        print(f"\t\tend % for iWin = 1:numel(monitors)", file=f)
+        print(f"\t\t\twinIFIs(iWin) = Screen('GetFlipInterval',winIds(iWin));                        % get inter frame interval (i.e., 1/refresh rate)", file=f)
+        print(f"\t\tend % for iWin ", file=f)
 
         print(f"\t\t%--------------------\\\n", file=f)
 
@@ -153,7 +156,7 @@ def compilePTB(globalSelf):
 
             print(f"\t\tfor iCount = 1:numel(TCPIPs)", file=f)
 
-            if output_devices[output_device]['isClient'] == '1':
+            if output_devices[output_device]['Is Client'] == 1:
                 print(f"\t\t\ttcpipCons(iCount) = pnet('tcpconnect',TCPIPs(iCount).ipAdd,TCPIPs(iCount).port);", file=f)
             else:
                 print(f"\t\t\ttcpipCons(iCount) = pnet('tcpsocket',TCPIPs(iCount).port);", file=f)
@@ -179,8 +182,8 @@ def compilePTB(globalSelf):
             print(f"\t\t\ttry", file=f)
             print(f"\t\t\t\tio64Obj = io64;", file=f)
             print(f"\t\t\tcatch", file=f)
-            print(f"\t\t\t\terror('Failed to find io64, please see 'http://apps.usd.edu/coglab/psyc770/IO64.html' for instruction of installation!');", file=f)
-            print(f"\t\t\tend % try", file=f)
+            print(f"\t\t\t\terror('Failed to find io64, please see \"http://apps.usd.edu/coglab/psyc770/IO64.html\" for instruction of installation!');", file=f)
+            print(f"\t\t\tend % try\n", file=f)
             print(f"\t\t\tif 0 ~= io64(ioObj)", file=f)
             print(f"\t\t\t\terror('inputout 64 installation failed!');", file=f)
             print(f"\t\t\tend % if 0 ~= ", file=f)
@@ -240,8 +243,8 @@ def compilePTB(globalSelf):
         # close parallel ports
         if iParal > 1:
             print(f"\n\t\t%--- close parallel ports ---/", file=f)
-            print(f"\t\t% Currently, Under windows io32 (http://apps.usd.edu/coglab/psyc770/IO64.html) need to be closed", file=f)
-            print(f"\t\t% Under Linux, we will use outp (which will required run matlab under sodo mode) to send trigger via parallel ", file=f)
+            print(f"\t\t% Currently, Under windows io64 need to be closed", file=f)
+            print(f"\t\t% Under Linux, we will use outp (which will require running matlab under the sodo mode) to send trigger via parallel ", file=f)
             print(f"\t\tif IsWin", file=f)
             print(f"\t\t\tclear io64;", file=f)
             print(f"\t\tend % if IsWin", file=f)
