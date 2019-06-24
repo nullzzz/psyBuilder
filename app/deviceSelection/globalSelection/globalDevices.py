@@ -51,10 +51,15 @@ class GlobalDevice(QWidget):
         self.selected_devices.itemDoubleClick.connect(self.rename)
         self.selected_devices.itemChanged.connect(self.changeItem)
 
+        # 展示区
         self.describer = Describer()
         self.describer.portChanged.connect(self.changePort)
+        self.describer.ipPortChanged.connect(self.changeIpPort)
         self.describer.colorChanged.connect(self.changeColor)
         self.describer.sampleChanged.connect(self.changeSample)
+        self.describer.baudChanged.connect(self.changeBaud)
+        self.describer.bitsChanged.connect(self.changeBits)
+        self.describer.clientChanged.connect(self.changeClient)
 
         self.ok_bt = QPushButton("OK")
         self.ok_bt.clicked.connect(self.ok)
@@ -94,8 +99,8 @@ class GlobalDevice(QWidget):
         default_properties: dict = self.selected_devices.getInfo()
         self.deviceSelect.emit(self.device_type, default_properties)
 
-    def changeItem(self, device_type: str, device_name: str, device_port: str, device_color: str, device_sample: str):
-        self.describer.describe(device_type, device_name, device_port, device_color, device_sample)
+    def changeItem(self, device_type: str, device_name: str, device_port: str, others: dict):
+        self.describer.describe(device_type, device_name, device_port, others)
 
     def changePort(self, port: str):
         self.selected_devices.changeCurrentPort(port)
@@ -105,6 +110,18 @@ class GlobalDevice(QWidget):
 
     def changeSample(self, sample: str):
         self.selected_devices.changeCurrentSample(sample)
+
+    def changeIpPort(self, ip_port: str):
+        self.selected_devices.changeCurrentIpPort(ip_port)
+
+    def changeClient(self, client: int):
+        self.selected_devices.changeCurrentClient(client)
+
+    def changeBaud(self, baud: str):
+        self.selected_devices.changeCurrentBaud(baud)
+
+    def changeBits(self, bits: str):
+        self.selected_devices.changeCurrentBits(bits)
 
     def rename(self, item: Device):
         name: str = item.text()
@@ -133,6 +150,7 @@ class GlobalDevice(QWidget):
     # 参数导入
     def setProperties(self, properties: dict):
         self.selected_devices.clearAll()
+        # print(properties)
         self.selected_devices.setProperties(properties)
         # 更新全局信息
         if self.device_type:

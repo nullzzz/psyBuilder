@@ -107,7 +107,7 @@ class Structure(QDockWidget):
                 Info.WID_WIDGET[refer_child_wid] = Info.WID_WIDGET[widget_id]
         except Exception as e:
             print(f"error {e} happens in add node for add. [structure/main.py]")
-            Func.log(e, True)
+            Func.log(str(e), True)
 
     def addNodeForCopy(self, parent_widget_id, widget_id, name, old_widget_id):
         try:
@@ -143,7 +143,7 @@ class Structure(QDockWidget):
                 self.referChildrenNodes(refer_child_wid, widget_id)
         except Exception as e:
             print(f"error {e} happens in add node for copy. [structure/main.py]")
-            Func.log(e, True)
+            Func.log(str(e), True)
 
     def addNodeForRefer(self, parent_widget_id, widget_id, name, old_widget_id):
         try:
@@ -177,7 +177,7 @@ class Structure(QDockWidget):
                 self.referChildrenNodes(refer_child_wid, widget_id)
         except Exception as e:
             print(f"error {e} happens in add node for refer. [structure/main.py]")
-            Func.log(e, True)
+            Func.log(str(e), True)
 
     def addNodeForMove(self, parent_wid, widget_id, name):
         # 用来应付一个widget在非引用的timeline之间移动，在新的timeline中添加icon，并且从旧的timeline中删除
@@ -224,7 +224,7 @@ class Structure(QDockWidget):
                 Info.WID_WIDGET[refer_child_wid] = Info.WID_WIDGET[widget_id]
         except Exception as e:
             print(f"error {e} happens in add node for move. [structure/main.py]")
-            Func.log(e, True)
+            Func.log(str(e), True)
 
     def referChildrenNodes(self, widget_id, old_widget_id):
         try:
@@ -251,7 +251,7 @@ class Structure(QDockWidget):
                 node.setExpanded(True)
         except Exception as e:
             print(f"error {e} happen in refer children node. [structure/main.py]")
-            Func.log(e, True)
+            Func.log(str(e), True)
 
     # 在这里只修改而不发送信号，只是接收外部的信号来进行rename
     def renameNode(self, widget_id, name, sender=''):
@@ -353,7 +353,7 @@ class Structure(QDockWidget):
                 del Info.NAME_WID[old_name]
         except Exception as e:
             print(f"error {e} happens in rename node. [structure/main.py]")
-            Func.log(e, True)
+            Func.log(str(e), True)
 
     # 只删除而不发送信号，只是接收外部的信号来进行delete
     def deleteNode(self, widget_id, sender=''):
@@ -403,7 +403,7 @@ class Structure(QDockWidget):
                     widget.changeWidgetId(Info.NAME_WID[name][0])
         except Exception as e:
             print(f"error {e} happens in delete node. [structure/main.py]")
-            Func.log(e, True)
+            Func.log(str(e), True)
 
     def moveNode(self, widget_id, drag_col, target_col):
         try:
@@ -430,7 +430,7 @@ class Structure(QDockWidget):
                         raise Exception("fail to find refer node in refer parent.")
         except Exception as e:
             print(f"error {e} happens in move node in structure. [structure.main.py]")
-            Func.log(e, True)
+            Func.log(str(e), True)
 
     def getStructure(self, requester=None):
         """

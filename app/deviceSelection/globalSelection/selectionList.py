@@ -7,7 +7,7 @@ from app.deviceSelection.globalSelection.device import Device
 
 class SelectArea(QListWidget):
     itemDoubleClick = pyqtSignal(QListWidgetItem)
-    itemChanged = pyqtSignal(str, str, str, str, str)
+    itemChanged = pyqtSignal(str, str, str, dict)
 
     def __init__(self, device_type: int = 0, parent=None):
         super(SelectArea, self).__init__(parent)
@@ -101,7 +101,7 @@ class SelectArea(QListWidget):
 
     def changeItem(self, item: Device):
         if item:
-            self.itemChanged.emit(item.getType(), item.getName(), item.getPort(), item.getColor(), item.getSample())
+            self.itemChanged.emit(item.getType(), item.getName(), item.getPort(), item.getInfo())
 
     # 返回选择设备
     def getInfo(self):
@@ -128,22 +128,22 @@ class SelectArea(QListWidget):
         del_list: list = []
         for new_add in self.add_buffer:
             device_id, device_type, device_name, device_port = new_add
-            print(f"del {device_id}")
             # search the device
             for i in range(self.count()):
-                print(i)
                 device = self.item(i)
                 if device.getDeviceId() == device_id:
-                    del_list.insert(0, i)
+                    del_list.append(i)
                     self.device_count[device_type] -= 1
+        # clear buffer
+        self.add_buffer.clear()
+        del_list.sort(reverse=True)
         for i in del_list:
             self.deleteDevice(i, record=False)
 
         for new_del in self.delete_buffer:
             device_id, device_type, device_name, device_port = new_del
-
             self.createDevice(device_type, device_id, device_name, device_port, record=False)
-
+        self.delete_buffer.clear()
         # 从properties添加
         if self.count() == 0:
             for k, v in self.default_properties.items():
@@ -152,7 +152,7 @@ class SelectArea(QListWidget):
                 device_type = v.get("Device Type")
                 device_name = v.get("Device Name")
                 device_port = v.get("Device Port")
-                self.createDevice(device_id, device_type, device_name, device_port)
+                self.createDevice(device_type, device_id, device_name, device_port)
                 # load count of devices
                 self.device_count[device_type] += 1
         else:
@@ -168,9 +168,9 @@ class SelectArea(QListWidget):
         # 更新显示信息
         item = self.currentItem()
         if item is not None:
-            self.itemChanged.emit(item.getType(), item.getName(), item.getPort())
+            self.itemChanged.emit(item.getType(), item.getName(), item.getPort(), item.getInfo())
         else:
-            self.itemChanged.emit("Unselected", "Unselected", "")
+            self.itemChanged.emit("Unselected", "Unselected", "", {})
 
     def createDeviceId(self, device_type):
         """
@@ -231,15 +231,38 @@ class SelectArea(QListWidget):
 
     def changeCurrentPort(self, port: str):
         item: Device = self.currentItem()
-        item.setPort(port)
+        if isinstance(item, Device):
+            item.setPort(port)
 
     def changeCurrentColor(self, color: str):
         item: Device = self.currentItem()
-        item.setColor(color)
+        if isinstance(item, Device):
+            item.setColor(color)
 
     def changeCurrentSample(self, sample: str):
         item: Device = self.currentItem()
-        item.setSample(sample)
+        if isinstance(item, Device):
+            item.setSample(sample)
+
+    def changeCurrentBaud(self, baud: str):
+        item: Device = self.currentItem()
+        if isinstance(item, Device):
+            item.setBaud(baud)
+
+    def changeCurrentBits(self, bits: str):
+        item: Device = self.currentItem()
+        if isinstance(item, Device):
+            item.setBits(bits)
+
+    def changeCurrentClient(self, client: int):
+        item: Device = self.currentItem()
+        if isinstance(item, Device):
+            item.setClient(client)
+
+    def changeCurrentIpPort(self, ip_port: str):
+        item: Device = self.currentItem()
+        if isinstance(item, Device):
+            item.setIpPort(ip_port)
 
     def changeCurrentName(self, name: str):
         item: Device = self.currentItem()
