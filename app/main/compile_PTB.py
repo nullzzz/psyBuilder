@@ -102,9 +102,8 @@ def compilePTB(globalSelf):
                 print(f"\t\tmonitors({iMonitor}).name       = '{output_devices[output_device]['Device Name']}';", file=f)
                 print(f"\t\tmonitors({iMonitor}).bkColor    = '{output_devices[output_device]['Back Color']}';", file=f)
                 print(f"\t\tmonitors({iMonitor}).muliSample = {output_devices[output_device]['Multi Sample']};\n", file=f)
-                # print(f"monitors({iMonitor}).type = '{output_devices[output_device]['Device Type']}';", file=f)
-                # print(f"monitors({iMonitor}).index = '{output_device_index}';", file=f)
                 iMonitor += 1
+
             elif output_devices[output_device]['Device Type'] == 'network_port':
                 # try:
                 #     Func.log(f"{output_devices[output_device]['Device Port']}")  # print info to the output panel
@@ -121,13 +120,14 @@ def compilePTB(globalSelf):
                 # print(f"TCPIPs({iNetPort}).type = '{output_devices[output_device]['Device Type']}';", file=f)
                 # print(f"TCPIPs({iNetPort}).index = '{output_device_index}';", file=f)
                 iNetPort += 1
+
             elif output_devices[output_device]['Device Type'] == 'parallel_port':
                 print(f"\t\tparPort({iParal}).port     = hex2dec('{output_devices[output_device]['Device Port']}');", file=f)
                 print(f"\t\tparPort({iParal}).name     = '{output_devices[output_device]['Device Name']}';\n", file=f)
                 # print(f"parPort({iParal}).type = '{output_devices[output_device]['Device Type']}';", file=f)
                 # print(f"parPort({iParal}).index = '{output_device_index}';", file=f)
-
                 iParal += 1
+
             elif output_devices[output_device]['Device Type'] == 'serial_port':
                 print(f"\t\tserPort({iSerial}).port     = '{output_devices[output_device]['Device Port']}';", file=f)
                 print(f"\t\tserPort({iSerial}).name     = '{output_devices[output_device]['Device Name']}';", file=f)
@@ -135,7 +135,6 @@ def compilePTB(globalSelf):
                 print(f"\t\tserPort({iSerial}).dataBits = '{output_devices[output_device]['Data Bits']}';\n", file=f)
                 # print(f"serPort({iSerial}).type = '{output_devices[output_device]['Device Type']}';", file=f)
                 # print(f"serPort({iSerial}).index = '{output_device_index}';", file=f)
-
                 iSerial += 1
 
         print(f"\t\t%------------------------------------\\\n", file=f)
