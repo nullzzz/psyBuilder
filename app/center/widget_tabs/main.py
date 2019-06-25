@@ -69,9 +69,10 @@ class WidgetTabs(QTabWidget):
         try:
             cycle: Cycle = Info.WID_WIDGET[widget_id]
             try:
-                pass
+                cycle.timeline_table.timeline_delete.disconnect(self.closeTab)
+                cycle.timeline_table.timeline_delete.connect(self.closeTab)
             except Exception:
-                pass
+                cycle.timeline_table.timeline_delete.connect(self.closeTab)
         except Exception as e:
             print(f"error {e} happens in link timeline signals. [main/main.py]")
 

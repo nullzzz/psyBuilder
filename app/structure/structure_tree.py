@@ -43,8 +43,8 @@ class StructureTree(QTreeWidget):
     def setMenuAndShortcut(self):
         # 菜单
         self.right_button_menu = QMenu()
-        self.delete_action = QAction("delete", self.right_button_menu)
-        self.rename_action = QAction("rename", self.right_button_menu)
+        self.delete_action = QAction("Delete", self.right_button_menu)
+        self.rename_action = QAction("Rename", self.right_button_menu)
         self.delete_action.triggered.connect(self.deleteNode)
         self.rename_action.triggered.connect(self.editNode)
         self.right_button_menu.addAction(self.delete_action)

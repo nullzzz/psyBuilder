@@ -102,7 +102,7 @@ class WidgetIconTable(QTableWidget):
     def setMenuAndShortcut(self):
         self.right_button_menu = QMenu(self)
         # delete action
-        self.delete_action = QAction("delete", self.right_button_menu)
+        self.delete_action = QAction("Delete", self.right_button_menu)
         # copy action
         # self.copy_action = QAction("copy", self.right_button_menu)
 
