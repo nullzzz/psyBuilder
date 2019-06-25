@@ -52,8 +52,10 @@
 ## There's another great way.
 ***getPropertyByKey(key: str)***
 + 获取指定参数
-
-+ 获取指定参数
+### other widgets
+* sound soundDisplay.py from line 265 to line 360
+* text  textDisplay.py  from line 218 to line 353
+* video videoDisplay.py from line 275 to line 391
 ## 整个结构的调用
 ***在compile中调用self.structure.getStructure()即可得到一颗树，树类只包含了根节点，树的节点类包括了其自身name及id，父节点和所有子节点，方便调用***
 + 可以通过树类的方法print_tree查看树的详细结构

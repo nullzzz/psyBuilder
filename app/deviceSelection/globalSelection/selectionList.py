@@ -76,8 +76,8 @@ class SelectArea(QListWidget):
         self.rename_action.triggered.connect(lambda: self.itemDoubleClick.emit(self.currentItem()))
 
         self.delete_action = self.contextMenu.addAction("delete")
-        self.delete_action.triggered.connect(self.deleteDevice)
-        self.clear_action = self.contextMenu.addAction("clear")
+        self.delete_action.triggered.connect(lambda: self.deleteDevice(index=-1))
+        self.clear_action = self.contextMenu.addAction("clear all")
         self.clear_action.triggered.connect(self.clearAll)
 
     def clearAll(self):
@@ -91,7 +91,6 @@ class SelectArea(QListWidget):
             self.device_count[k] = 0
         self.add_buffer.clear()
         self.delete_buffer.clear()
-        # print(self.device_count)
 
     def showContextMenu(self, pos):
         if self.count():
@@ -266,12 +265,11 @@ class SelectArea(QListWidget):
 
     def changeCurrentName(self, name: str):
         item: Device = self.currentItem()
-        old_name: str = item.getName()
-        # print(old_name)
-        # print(self.device_name)
-        self.device_name.remove(old_name)
-        item.setName(name)
-        self.device_name.append(name)
+        if isinstance(item, Device):
+            old_name: str = item.getName()
+            self.device_name.remove(old_name)
+            item.setName(name)
+            self.device_name.append(name)
 
     def checkDeviceName(self, new_name: str):
         if new_name.lower() in self.device_name or new_name == "":

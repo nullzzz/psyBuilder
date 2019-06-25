@@ -82,21 +82,8 @@ class Shower(QWidget):
             flag = port == "D010"
         return flag
 
-    def changeSample(self, sample):
-        self.sampleChanged.emit(sample)
-
-    def changeColor(self, color):
-        self.colorChanged.emit(color)
-
-    def changeBits(self, bits):
-        self.bitsChanged.emit(bits)
-
-    def changeBaud(self, baud):
-        self.baudChanged.emit(baud)
-
-    def changeClient(self, client):
-        self.clientChanged.emit(client)
-
+    def changeName(self, new_name: str):
+        self.device_name.setText(new_name)
 
 class Screen(Shower):
     def __init__(self, parent=None):
@@ -290,7 +277,8 @@ class Describer(QWidget):
         widget = self.layout.currentWidget()
         widget.describe(device_type, device_name, device_port, other)
 
-#
+    def changeName(self, new_name: str):
+        self.layout.currentWidget().changeName(new_name)
 # class Describer(QWidget):
 #     portChanged = pyqtSignal(str)
 #     colorChanged = pyqtSignal(str)
