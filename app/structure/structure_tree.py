@@ -66,12 +66,13 @@ class StructureTree(QTreeWidget):
             #
             if not node:
                 node: StructureNode = self.currentItem()
-            old_name = node.text(0)
-            # 初始timeline不可修改
-            if node.widget_id != f'{Info.TIMELINE}.0':
-                self.old_name = node.text(0)
-                self.edit_wid = node.widget_id
-                self.editItem(node, 0)
+            if node:
+                old_name = node.text(0)
+                # 初始timeline不可修改
+                if node.widget_id != f'{Info.TIMELINE}.0':
+                    self.old_name = node.text(0)
+                    self.edit_wid = node.widget_id
+                    self.editItem(node, 0)
         except Exception as e:
             print(f"error {e} happens in edit node. [structure/structure_tree.py]")
             Func.log(e, True)

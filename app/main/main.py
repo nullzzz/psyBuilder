@@ -1,5 +1,7 @@
 import os
 import sys
+# import datetime
+import traceback
 
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
 from PyQt5.QtGui import QIcon
@@ -18,6 +20,7 @@ from app.output.main import Output
 from app.properties.main import Properties
 from app.structure.main import Structure
 from .wait_dialog import WaitDialog
+from .compile_PTB import compilePTB
 
 
 class PsyApplication(QMainWindow):
@@ -434,65 +437,11 @@ class PsyApplication(QMainWindow):
         super().contextMenuEvent(QContextMenuEvent)
 
     def compile(self):
-        # check saved or not, if not saved, user should  save first.
-        if not Info.FILE_NAME:
-            if not self.getFileName():
-                QMessageBox.information(self, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
-                return
-
-        # get save path
-        compile_file_name = ".".join(Info.FILE_NAME.split('.')[:-1]) + ".m"
-        # open file
-        with open(compile_file_name, "w") as f:
-            # get output devices, such as global output devices.
-            # you can get each widget's device you selected
-            output_devices = Info.OUTPUT_DEVICE_INFO
-            # print data to file
-            count = 1
-            for output_device in output_devices:
-                # get output device index
-                output_device_index = output_device.split('.')[-1]
-                # print and set para: file = f
-                print(f"outputDevs({count}).port = '{output_devices[output_device]['Device Port']}';", file=f)
-                print(f"outputDevs({count}).name = '{output_devices[output_device]['Device Name']}';", file=f)
-                print(f"outputDevs({count}).type = '{output_devices[output_device]['Device Type']}';", file=f)
-                print(f"outputDevs({count}).index = '{output_device_index}';", file=f)
-                # counter
-                count += 1
-        Func.log(f"Compile successful!\n{compile_file_name}")
-        # except Exception as e:
-        #     print(f"compile error {e}")
-
-        """
-        widget是具体的某个控件
-
-        widget为Image时，Text\Video\Sound类似的
-        filename: str = widget.getFilename()
-        output_device: dict = widget.getOutputDevice()
-        for device, properties in output_device.items():
-            output_name: str = device
-            value_or_msg: str = properties.get("Value or Msg", "")
-            pulse_duration: str = properties.get("Pulse Duration", "")
-
-        widget为If时
-        condition: str = widget.getCondition()
-        true_event: dict = widget.getTrueWidget() # false_event类似
-        stim_type: str = true_event.get("stim type", "")
-        event_name: str = true_event.get("event name", "")
-        widget_id: str = true_event.get("widget id", "")
-        widget: Widget = true_event.get("widget", None) # 这个widget就是Slider/Image/...具有若干上述getXXX方法
-
-        widget为switch
-        switch: str = widget.getSwitch()
-        cases: list = widget.getCase()
-        for case in cases:
-            case: dict
-            case_value: str = case.get("case value", "")
-            stim_type: str = case.get("stim type", "")
-            event_name: str = case.get("event name", "")
-            widget_id: str = case.get("widget id", "")
-            widget: Widget = case.get("widget", None)
-        """
+        try:
+            compilePTB(self)
+        except Exception:
+            Func.log(f"Something went wrong while Compiling!")
+            traceback.print_exc()
 
     def about(self):
         QMessageBox.about(self, "About PsyDemo", "NOTHING")
