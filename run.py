@@ -5,7 +5,7 @@ from quamash import QApplication
 from app.main.main import PsyApplication
 
 tabBar = """
-QTabWidget::pane { /* The tab widget frame */
+QTabWidget::pane {
     background-color: rgb(236,236,236);
 }
 
@@ -21,6 +21,8 @@ QTabBar::tab {
     min-height: 26px;
     min-width: 100px;
     text-align: center;
+    font-size:11px;
+    icon-size:
 }
 
 QTabBar::tab:selected{
@@ -281,6 +283,7 @@ QTableView::Item:selected {
 listView = """
     QListView {
         show-decoration-selected: 1;
+         font-size: 12px;
     }
 
     QListView::Item {

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QSize
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QTabBar, QShortcut
 
@@ -19,6 +19,7 @@ class WidgetTabs(QTabWidget):
         self.setMovable(True)
         self.tabBar().setShape(QTabBar.TriangularNorth)
         self.tabBar().setUsesScrollButtons(True)
+        self.tabBar().setIconSize(QSize(12, 12))
 
         # 初始化, 首页是一个timeline
         self.timeline = Timeline(widget_id=f"{Info.TIMELINE}.0")

@@ -32,6 +32,7 @@ class StructureTree(QTreeWidget):
         Info.WID_NODE[f"{Info.TIMELINE}.0"] = timeline_node
         Info.NAME_WID[Info.TIMELINE] = [f'{Info.TIMELINE}.0']
         self.edit_wid = ''
+        self.focus = False
         #
         self.setMenuAndShortcut()
         #
@@ -63,16 +64,17 @@ class StructureTree(QTreeWidget):
 
     def editNode(self, node: StructureNode = None):
         try:
-            #
-            if not node:
-                node: StructureNode = self.currentItem()
-            if node:
-                old_name = node.text(0)
-                # 初始timeline不可修改
-                if node.widget_id != f'{Info.TIMELINE}.0':
-                    self.old_name = node.text(0)
-                    self.edit_wid = node.widget_id
-                    self.editItem(node, 0)
+            # 必须在当前窗口中
+            if self.focus:
+                # 保证node非None
+                if not node:
+                    node: StructureNode = self.currentItem()
+                if node:
+                    # 初始timeline不可修改
+                    if node.widget_id != f'{Info.TIMELINE}.0':
+                        self.old_name = node.text(0)
+                        self.edit_wid = node.widget_id
+                        self.editItem(node, 0)
         except Exception as e:
             print(f"error {e} happens in edit node. [structure/structure_tree.py]")
             Func.log(e, True)
@@ -107,11 +109,33 @@ class StructureTree(QTreeWidget):
             print(f"error {e} happens in rename node. [structure/structure_tree.py]")
             Func.log(e, True)
 
+    def focusInEvent(self, QFocusEvent):
+        """
+        设置focus参数，在当前窗口中，快捷键才能使用
+        :param QFocusEvent:
+        :return:
+        """
+        super(StructureTree, self).focusInEvent(QFocusEvent)
+        # 设置参数，在当前窗口中，快捷键才能使用
+        self.focus = True
+
+    def focusOutEvent(self, QFocusEvent):
+        """
+        改变focus参数
+        :param QFocusEvent:
+        :return:
+        """
+        super(StructureTree, self).focusOutEvent(QFocusEvent)
+        self.focus = False
+
     def deleteNode(self):
-        node: StructureNode = self.currentItem()
-        # 初始timeline不可删除
-        if node and node.widget_id != f'{Info.TIMELINE}.0':
-            self.nodeDelete.emit(node.widget_id, 'structure_tree')
+        try:
+            node: StructureNode = self.currentItem()
+            # 初始timeline不可删除
+            if node and node.widget_id != f'{Info.TIMELINE}.0':
+                self.nodeDelete.emit(node.widget_id, 'structure_tree')
+        except Exception as e:
+            print(f"delete node error. [structure_tree.py]")
 
     def mouseDoubleClickEvent(self, e):
         # super(StructureTree, self).mouseDoubleClickEvent(e)

@@ -8,7 +8,11 @@ from PyQt5.QtWidgets import QWidget
 from app.info import Info
 
 
-class Func:
+class Func(object):
+    """
+    存放一些通用函数
+    """
+
     @staticmethod
     def getWidgetImage(widget_type: str, type: str = 'icon') -> QPixmap or QIcon:
         """
