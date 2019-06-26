@@ -226,6 +226,7 @@ scrollBar = """
 
 toolBar = """
     QToolBar {
+    background-color:rgb(246,246,246);
     max-height: 30px;
     spacing: 3px;
 }
@@ -234,20 +235,16 @@ toolBar = """
 lineEdit = """
     QLineEdit {
         border: 0.5px solid gray;
-        border-radius: 1px;
-        padding: 0 8px;
-        background: white;
-        selection-background-color: darkgray;
-        selection-border-color: darkGray;
-        min-height: 30px
+        border-radius: 0.5px;
     }
 
     QLineEdit:focus {
-        border-color: rgb(153,196,244);
+        background-color: white;
     }
-
+    
     QLineEdit:!enabled {
-        background-color: LightGray;
+        background-color: rgb(234,234,234);
+        border: gray;
     }
     """
 
@@ -275,7 +272,8 @@ QTableView {
     selection-background-color: rgba(204,232,255);
 }
 QTableView::Item:selected {
-        border-radius:4px;
+        background-color:white;
+        border-radius:1px;
         border: 2px solid lightblue;
 }
 """
@@ -373,7 +371,7 @@ QMenu::indicator {
 }
 """
 
-styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + pushButton + tree + menu + listView
+styleSheet = tabBar + dockWidget + mainWindow + scrollBar + tableView + headerView + toolBar + pushButton + tree + menu + listView + lineEdit
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

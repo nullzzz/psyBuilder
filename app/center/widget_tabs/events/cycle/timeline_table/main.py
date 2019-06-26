@@ -1,4 +1,5 @@
 import copy
+
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox, QAbstractItemView
@@ -42,6 +43,7 @@ class TimelineTable(QTableWidget):
         # Alt仿excel复制
         self.is_copying = False
         self.selected_text = ""
+        self.selected_col = -2
 
         # signals
         self.linkSignals()
@@ -57,7 +59,6 @@ class TimelineTable(QTableWidget):
         """
         self.itemChanged.connect(self.addTimeline)
         self.itemChanged.connect(self.deleteTimeline)
-        self.cellClicked.connect(self.selectCell)
 
     def setMenuAndShortcut(self) -> None:
         """
@@ -320,14 +321,10 @@ class TimelineTable(QTableWidget):
         except Exception as e:
             print(f"error {e} happens in clone timeline table. [timeline_table/main.py]")
 
-    def selectCell(self, row: int, column: int):
-        item: QTableWidgetItem = self.item(row, column)
-        self.selected_text = item.text()
-
     def keyPressEvent(self, e: QKeyEvent):
         if e.key() == Qt.Key_Alt:
             self.is_copying = True
-            self.setCursor(Qt.SplitVCursor)
+            self.setCursor(Qt.CrossCursor)
         else:
             QTableWidget.keyPressEvent(self, e)
 
@@ -338,12 +335,36 @@ class TimelineTable(QTableWidget):
         else:
             QTableWidget.keyReleaseEvent(self, e)
 
+    def mouseMoveEvent(self, e):
+        """
+        在滑动时，如果存在按住alt行为，且存在有效的col和row，将刚开始的那个有效item的值与列记录下来
+        :param e:
+        :return:
+        """
+        super(TimelineTable, self).mouseMoveEvent(e)
+        # 如果是已经按住alt，并刚刚开始滑动
+        if self.is_copying and self.selected_col == -2:
+            # 得到行和列
+            row = self.rowAt(e.pos().y())
+            col = self.columnAt(e.pos().x())
+            # 保证行列有效
+            if row in range(0, self.rowCount()) and col in range(0, self.columnCount()):
+                item: QTableWidgetItem = self.item(row, col)
+                self.selected_text = item.text()
+                self.selected_col = col
+
     def mouseReleaseEvent(self, e: QMouseEvent):
+        """
+
+        :param e:
+        :return:
+        """
         try:
-            if self.is_copying and self.selected_text:
+            if self.is_copying and self.selected_col != -2:
                 items = self.selectedItems()
                 for item in items:
-                    item.setText(self.selected_text)
+                    if item.column() == self.selected_col:
+                        item.setText(self.selected_text)
                 # 重置name_count
                 name_count = {}
                 for row in range(self.rowCount()):
@@ -359,6 +380,7 @@ class TimelineTable(QTableWidget):
                         self.timeline_delete.emit(self.name_wid[name])
                         del self.name_wid[name]
                 self.name_count = name_count
+                self.selected_col = -2
         except Exception as e:
             print(f"error {e} happen in copy. [timeline_table/main.py]")
         finally:

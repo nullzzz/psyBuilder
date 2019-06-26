@@ -27,12 +27,9 @@ class AddAttributesDialog(QDialog):
         self.attribute_list.append([self.attribute, self.value])
         add_btn = QPushButton("Add")
         add_btn.clicked.connect(self.addAttributeRow)
-        add_btn.setFixedWidth(120)
         ok_btn = QPushButton("Ok")
         ok_btn.clicked.connect(self.ok)
-        ok_btn.setFixedWidth(120)
         cancel_btn = QPushButton("Cancel")
-        cancel_btn.setFixedWidth(120)
         cancel_btn.clicked.connect(self.cancel)
         # layout
         v_layout = QVBoxLayout()

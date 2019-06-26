@@ -12,11 +12,14 @@ class WidgetIconList(QListWidget):
         # 以Icon为主进行展示
         self.setViewMode(QListView.IconMode)
         # self.setResizeMode(QListView.Adjust)
+        self.setStyleSheet("""
+            margin-top:15px;
+            background-color:transparent;
+        """)
         # 设置横向
         self.setFlow(QListView.LeftToRight)
         self.setWrapping(False)
         self.setMovement(QListView.Static)
-        self.setSpacing(10)
 
         self.setFrameStyle(QFrame.NoFrame)
         # 允许拖拽
@@ -44,7 +47,11 @@ class WidgetIconBar(QTabWidget):
     def __init__(self, parent=None):
         super(WidgetIconBar, self).__init__(parent)
         # 设置最大高度
-        self.setMaximumHeight(125)
+        self.setStyleSheet("""
+            max-height:120px;
+            border-color: rgb(236,236,236);
+            border-bottom: 0px;
+        """)
         # 数据
         self.events = WidgetIconList()
         self.eye_tracker = WidgetIconList()

@@ -13,15 +13,12 @@ class AddAttributeDialog(QDialog):
         # 美化
         self.setWindowTitle("Add Attribute")
         self.setModal(True)
-        self.setFixedSize(300, 250)
         # widget
         self.attribute = QLineEdit()
         self.value = QLineEdit()
         ok_btn = QPushButton("Ok")
         ok_btn.clicked.connect(self.ok)
-        ok_btn.setFixedWidth(120)
         cancel_btn = QPushButton("Cancel")
-        cancel_btn.setFixedWidth(120)
         cancel_btn.clicked.connect(self.cancel)
         # layout
         layout = QFormLayout()

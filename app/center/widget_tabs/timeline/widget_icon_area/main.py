@@ -18,6 +18,10 @@ class WidgetIconArea(QFrame):
 
     def __init__(self, parent=None, widget_id=''):
         super(WidgetIconArea, self).__init__(parent)
+        #
+        self.setStyleSheet("""
+            background-color:rgb(227,227,227);
+        """)
         self.setAcceptDrops(True)
         # data
         self.widget_id = widget_id

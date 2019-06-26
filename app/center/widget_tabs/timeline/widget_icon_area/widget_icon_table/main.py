@@ -36,8 +36,7 @@ class WidgetIconTable(QTableWidget):
         self.setFrameStyle(QFrame.NoFrame)
         self.setShowGrid(False)
         self.setItemDelegate(NoDash())
-        self.setMinimumHeight(400)
-
+        self.setMinimumHeight(300)
         # 数据
         self.widget_id = widget_id
         self.widget_icon_count = 0

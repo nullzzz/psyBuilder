@@ -19,10 +19,10 @@ class Properties(QDialog):
         self.setButtons()
         # 美化
         self.setWindowTitle("properties")
-        self.resize(600, 700)
+        self.resize(600, 420)
         # layout
         layout = QVBoxLayout()
-        layout.addWidget(self.tab, 6)
+        layout.addWidget(self.tab, 7)
         layout.addWidget(self.btns, 1)
         layout.setSpacing(0)
         self.setLayout(layout)
