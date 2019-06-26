@@ -222,10 +222,10 @@ scroll_bar = """
 
 tool_bar = """
     QToolBar {
-    background-color:rgb(246,246,246);
-    max-height: 30px;
-    spacing: 3px;
-}
+        background-color:black;
+        max-height: 28px;
+        spacing: 3px;
+    }
 """
 
 line_edit = """

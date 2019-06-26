@@ -1,7 +1,9 @@
+import datetime
 import sys
 
-import datetime
 from PyQt5.QtWidgets import QDockWidget, QTextEdit
+
+from app.lib import SizeContainerWidget
 
 
 class Output(QDockWidget):
@@ -9,9 +11,10 @@ class Output(QDockWidget):
         super(Output, self).__init__(parent)
 
         self.text_area = QTextEdit()
-        # self.text_area.setEnabled(False)
+        size_container = SizeContainerWidget()
+        size_container.setWidget(self.text_area)
 
-        self.setWidget(self.text_area)
+        self.setWidget(size_container)
 
     def print(self, text, error: bool = False, timer: bool = True):
         if timer:

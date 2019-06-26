@@ -257,6 +257,3 @@ class Cycle(QMainWindow):
         :return:
         """
         return self.getProperties()["order_by_combo"]
-
-    def paste(self):
-        """"""

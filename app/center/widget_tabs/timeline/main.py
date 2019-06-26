@@ -23,7 +23,7 @@ class Timeline(QWidget):
         self.widget_icon_area = WidgetIconArea(self, self.widget_id)
         grid = QGridLayout(self)
         grid.addWidget(self.widget_icon_bar, 0, 0, 1, 1)
-        grid.addWidget(self.widget_icon_area, 1, 0, 10, 1)
+        grid.addWidget(self.widget_icon_area, 1, 0, 1, 1)
         self.setLayout(grid)
 
     def getProperties(self):

@@ -146,6 +146,8 @@ class Func(object):
         :return: 检测结果类型，及对应提示
         """
         if name not in Info.NAME_WID:
+            if not name:
+                return Info.TimelineNameError, ''
             if name[0].isalpha():
                 return Info.TimelineNameRight, ''
             return Info.TimelineNameError, ''

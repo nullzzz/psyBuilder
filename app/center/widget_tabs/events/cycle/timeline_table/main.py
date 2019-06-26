@@ -1,4 +1,5 @@
 import copy
+import re
 
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QKeySequence
@@ -50,6 +51,8 @@ class TimelineTable(QTableWidget):
         self.linkSignals()
         # menu
         self.setMenuAndShortcut()
+        # 当前窗口是否为焦点
+        self.focus = False
 
     def linkSignals(self) -> None:
         """
@@ -434,6 +437,7 @@ class TimelineTable(QTableWidget):
         :param e:
         :return:
         """
+        self.focus = True
         super(TimelineTable, self).focusInEvent(e)
 
     def focusOutEvent(self, e):
@@ -442,6 +446,7 @@ class TimelineTable(QTableWidget):
         :param e:
         :return:
         """
+        self.focus = False
         super(TimelineTable, self).focusOutEvent(e)
 
     def getTimelines(self):
@@ -484,16 +489,225 @@ class TimelineTable(QTableWidget):
         将选中表格数据以excel的格式粘贴到系统粘贴板中
         :return:
         """
-        # 获取系统粘贴板
-        clipboard = QApplication.clipboard()
-        # 获取已选取的区域
-
+        if self.focus:
+            # 获取系统粘贴板
+            clipboard = QApplication.clipboard()
+            # 获取已选取的区域
+            items = self.selectedItems()
+            # 所选非空
+            if items:
+                # 按行对item进行存储
+                row_items = {}
+                first_row = items[0].row()
+                row_items[first_row] = [items[0]]
+                # 对以获取区域进行合法性判断，所选列存在不同即为不合法
+                cols = [items[0].column()]
+                cols_counted = False
+                error = False
+                for item in items[1:]:
+                    # 得到item的位置
+                    row = item.row()
+                    col = item.column()
+                    # 根据item行对item分类存放
+                    if row in row_items:
+                        row_items[row].append(item)
+                    else:
+                        row_items[row] = [item]
+                    # 如果还未统计完成
+                    if not cols_counted:
+                        # 如果行仍为第一行，进行统计
+                        if row == first_row:
+                            cols.append(col)
+                        else:
+                            cols_counted = True
+                            # 已经是下一行了，判断这个item对列是否合理
+                            if col not in cols:
+                                error = True
+                                break
+                    else:
+                        if col not in cols:
+                            error = True
+                            break
+                # 如果检测不合法，报错，否则按照行顺序，复制到粘贴板中
+                if error:
+                    QMessageBox.information(self, 'Warning',
+                                            "This operation can't be performed on multiple selection areas.")
+                else:
+                    # 根据字典对行的记录，由小到大，输入到粘贴板中
+                    copy_text = ""
+                    rows = sorted(row_items)
+                    length = len(cols)
+                    for row in rows:
+                        for i in range(length):
+                            item = row_items[row][i]
+                            if i == length - 1:
+                                if row == rows[-1]:
+                                    copy_text = copy_text + item.text()
+                                else:
+                                    copy_text = copy_text + item.text() + "\n"
+                            else:
+                                copy_text = copy_text + item.text() + "\t"
+                    # 输入到粘贴板中
+                    clipboard.setText(copy_text)
 
     def paste_data(self):
         """
         将系统粘贴板中的数据复制到表格中，具体的判定方法待定
         :return:
         """
+        # 需要focus
+        if not self.focus:
+            return
+
+        # 检测所选择粘贴区域是否合法
+        selete_ranges = self.selectedRanges()
+        # 没选择区域，无所谓
+        if not len(selete_ranges):
+            return
+
+        # 只能有一个选择区域
+        if len(selete_ranges) != 1:
+            QMessageBox.information(self, 'Warning', "This operation can't be performed on multiple selection areas.")
+            return
+
+        # 得到所选区域左上角坐标
+        start_row = selete_ranges[0].topRow()
+        start_col = selete_ranges[0].leftColumn()
+
         # 获取系统粘贴板
         clipboard = QApplication.clipboard()
+        paste_text = clipboard.text()
 
+        # 如果没字，无所谓
+        if not paste_text:
+            return
+
+        # 解析数据
+        paste_rows_data = []
+        # 先检测每行列数是否相同
+        col_length = 0
+        rows_data = re.split(r"\n", paste_text)
+        for first_paste_row_data in rows_data:
+            temp_data = re.split(r"\t", first_paste_row_data)
+            if not col_length:
+                col_length = len(temp_data)
+            else:
+                if len(temp_data) != col_length:
+                    QMessageBox.information(self, 'Warning', "Data is invalid!")
+                    return
+            # 保存数据
+            paste_rows_data.append(temp_data)
+        # 解析出0列
+        if not col_length:
+            QMessageBox.information(self, 'Warning', "Data is invalid!")
+            return
+
+        # 如果影响列中包含timeline所在列，对数据的值进行判断，查看是否存在违法，去重复等等操作
+        end_row = start_row + len(paste_rows_data) - 1
+        if start_col == 1 or (not start_col and col_length > 1):
+            # 粘贴板中的数据
+            paste_timeline_names = []
+            timeline_data_col = 0
+            if not start_col:
+                timeline_data_col = 1
+            for paste_row_data in paste_rows_data:
+                paste_row_data[timeline_data_col] = re.sub(r"\r", "", paste_row_data[timeline_data_col])
+                timeline_name = paste_row_data[timeline_data_col]
+                validity, _ = Func.checkTimelineNameValidity(timeline_name, self.widget_id)
+                if validity == Info.TimelineNameRight or validity == Info.TimelineNameExist or not timeline_name:
+                    paste_timeline_names.append(timeline_name)
+                else:
+                    QMessageBox.information(self, 'Warning', f"Data {timeline_name} in col 'timeline' is invalid!")
+                    return
+                    # 需要被paste区域的数据
+            already_timeline_names = []
+            timeline_end_row = end_row
+            # 如果超出了
+            if timeline_end_row > self.rowCount() - 1:
+                timeline_end_row = self.rowCount() - 1
+            for row in range(start_row, timeline_end_row + 1):
+                # 将非空的timeline加进来
+                already_timeline_names.append(self.item(row, 1).text())
+            # 对两者直接数据进行处理
+            name_res = {}
+            # len(paste_timeline_names) >= len(already_timeline_names)
+            for i in range(len(paste_timeline_names)):
+                # 得到对应数据
+                paste = paste_timeline_names[i]
+                try:
+                    already = already_timeline_names[i]
+                except:
+                    already = ""
+                # 如果paste为""
+                if not paste:
+                    # 如果already不为空，则需要删除，如果为空，无所谓吧
+                    if already:
+                        if already in name_res:
+                            name_res[already] -= 1
+                        else:
+                            name_res[already] = -1
+                else:
+                    # paste不为空，如果相同，无变化，如果不同，删除旧的，增加新的
+                    if paste != already:
+                        if paste in name_res:
+                            name_res[paste] += 1
+                        else:
+                            name_res[paste] = 1
+                        if already:
+                            if already in name_res:
+                                name_res[already] -= 1
+                            else:
+                                name_res[already] = -1
+            # 根据name
+            for name in name_res:
+                if name in self.name_count:
+                    self.name_count[name] += name_res[name]
+                else:
+                    # 必是新增
+                    # 修改数据
+                    self.name_count[name] = name_res[name]
+                    # 进行新增
+                    validity, existed_widget_id = Func.checkTimelineNameValidity(name, self.widget_id)
+                    if validity == Info.TimelineNameRight:
+                        widget_icon = WidgetIcon(widget_type=Info.TIMELINE)
+                        timeline_widget_id = widget_icon.widget_id
+                        self.timeline_add.emit(self.widget_id, timeline_widget_id, name, Info.WidgetAdd, '', False)
+                        self.name_wid[name] = timeline_widget_id
+                    elif validity == Info.TimelineNameExist:
+                        widget_icon = WidgetIcon(widget_type=Info.TIMELINE)
+                        timeline_widget_id = widget_icon.widget_id
+                        self.timeline_add.emit(self.widget_id, timeline_widget_id, name, Info.WidgetRefer,
+                                               existed_widget_id, False)
+                        self.name_wid[name] = timeline_widget_id
+            # 如果此时self.name_count存在数据小于等于0，则进行删除操作
+            names_delete = []
+            for name in self.name_count:
+                if self.name_count[name] <= 0:
+                    names_delete.append(name)
+            for name in names_delete:
+                del self.name_count[name]
+                self.timeline_delete.emit(self.name_wid[name])
+                del self.name_wid[name]
+        # 现在直接放进去数据就可以了！
+        # 先放进去一行，以扩充列
+        count = 0
+        first_paste_row_data = paste_rows_data[0]
+        for i in range(col_length):
+            # 数据
+            item_text = first_paste_row_data[i]
+            # 如果超出列区域
+            if start_col + i >= self.columnCount():
+                self.addAttribute(f"untitled_var_{count}", item_text)
+                count += 1
+            else:
+                self.item(start_row, start_col + i).setText(item_text)
+        # 扩充行
+        rows_add_count = end_row + 1 - self.rowCount()
+        for i in range(rows_add_count):
+            self.addRow()
+        # 放入剩余行
+        for j in range(1, len(paste_rows_data)):
+            paste_row_data = paste_rows_data[j]
+            for i in range(col_length):
+                item_text = paste_row_data[i]
+                self.item(start_row + j, start_col + i).setText(item_text)
