@@ -19,7 +19,60 @@ from app.output.main import Output
 from app.properties.main import Properties
 from app.structure.main import Structure
 from .wait_dialog import WaitDialog
-# class compilePTB:
+
+cIndents = 0
+isPreLineSwitch = 0
+
+def printWithAutoIdent(f, inputStr, *argins):
+    global cIndents
+    global isPreLineSwitch
+
+    incrAfterStr = ('if', 'try', 'switch', 'for', 'while')
+    decreAndIncrStr = ('else', 'elseif', 'otherwise', 'catch')
+
+    #    print(inputStr.split(' ')[0])
+    if inputStr.split(' ')[0] in incrAfterStr:
+        print(f"{inputStr.split(' ')[0]},increase 1")
+        tabStrs = '\t' * cIndents
+        print(f"{tabStrs}{inputStr}".format(*argins), file=f)
+        cIndents += 1
+
+    elif inputStr.split(' ')[0] in decreAndIncrStr:
+        print(f"{inputStr.split(' ')[0]}, -1 and +1")
+        cIndents -= 1
+        tabStrs = '\t' * cIndents
+        print(f"{tabStrs}{inputStr}".format(*argins), file=f)
+        cIndents += 1
+
+    elif 'end' == inputStr.split(' ')[0]:
+        cIndents -= 1
+        tabStrs = '\t' * cIndents
+        print(f"{tabStrs}{inputStr}".format(*argins), file=f)
+    elif 'end%switch' == inputStr.split(' ')[0]:
+        cIndents -= 2
+        tabStrs = '\t' * cIndents
+        print(f"{tabStrs}{inputStr}".format(*argins), file=f)
+
+    elif 'case' == inputStr.split(' ')[0]:
+
+        if 0 == isPreLineSwitch:
+            print(f"{inputStr.split(' ')[0]}, -1")
+            cIndents -= 1
+
+        tabStrs = '\t' * cIndents
+        print(f"{tabStrs}{inputStr}".format(*argins), file=f)
+        cIndents += 1
+
+    else:
+        tabStrs = '\t' * cIndents
+        print(f"{tabStrs}{inputStr}".format(*argins), file=f)
+
+    if 'switch' == inputStr.split(' ')[0]:
+        isPreLineSwitch = 1
+    else:
+        isPreLineSwitch = 0
+
+
 def repTabStr(cIndents):
     return '\t' * cIndents
 
@@ -56,7 +109,7 @@ def compilePTB(globalSelf):
         print(f"{repTabStr(cIndents)}%      begin      ", file=f)
         print(f"{repTabStr(cIndents)}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", file=f)
         
-        # cIndents += 1
+        #
         # get subject information
         print(f"{repTabStr(cIndents)}%----- get subject information -------/", file=f)
         print(f"{repTabStr(cIndents)}{cFilenameOnly} = OpenExp_BCL('{cFilenameOnly}',pwd);", file=f)
