@@ -2,7 +2,8 @@ import copy
 
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QKeySequence
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox, QAbstractItemView, QShortcut, QAction, QMenu
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox, QAbstractItemView, QShortcut, QAction, QMenu, \
+    QApplication
 
 from app.center.widget_tabs.timeline.widget_icon import WidgetIcon
 from app.func import Func
@@ -82,9 +83,9 @@ class TimelineTable(QTableWidget):
         :return:
         """
         # 存在选中区域，则可以复制
-        self.rename_action.setEnabled(False)
+        self.copy_action.setEnabled(False)
         if self.selectedItems():
-            self.rename_action.setEnabled(True)
+            self.copy_action.setEnabled(True)
         self.right_button_menu.exec(self.mapToGlobal(e.pos()))
 
     def addRow(self) -> None:
@@ -483,10 +484,16 @@ class TimelineTable(QTableWidget):
         将选中表格数据以excel的格式粘贴到系统粘贴板中
         :return:
         """
-        print("213")
+        # 获取系统粘贴板
+        clipboard = QApplication.clipboard()
+        # 获取已选取的区域
+
 
     def paste_data(self):
         """
         将系统粘贴板中的数据复制到表格中，具体的判定方法待定
         :return:
         """
+        # 获取系统粘贴板
+        clipboard = QApplication.clipboard()
+
