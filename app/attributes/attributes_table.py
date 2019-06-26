@@ -19,7 +19,7 @@ class AttributesTable(QTableWidget):
         self.setRowCount(0)
         self.setIconSize(QSize(15, 15))
         self.setHorizontalHeaderLabels(["Name"])
-        self.horizontalHeaderItem(0).setFont(QFont("Tahoma", 13, QFont.Bold))
+        self.horizontalHeaderItem(0).setFont(QFont("Tahoma", 12))
         self.setDragEnabled(True)
         # 排序相关
         self.asc = True

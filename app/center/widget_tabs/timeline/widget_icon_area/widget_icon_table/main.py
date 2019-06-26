@@ -36,7 +36,47 @@ class WidgetIconTable(QTableWidget):
         self.setFrameStyle(QFrame.NoFrame)
         self.setShowGrid(False)
         self.setItemDelegate(NoDash())
-        self.setMinimumHeight(300)
+        self.setStyleSheet("""
+            QMenu {
+    background-color: white;
+    border: 0px solid;
+    border-radius: 2px;
+    margin: 2px;
+    min-width: 78px;
+}
+
+QMenu::Item {
+    padding: 2px 25px 2px 20px;
+}
+
+QMenu::Item:selected {
+    border-color: transparent;
+    background: rgb(153,196,244);
+}
+
+QMenu::Item:!enabled {
+    border-color: transparent;
+    background: rgb(211,211,211);
+}
+
+QMenu::icon:checked {
+    background: rgb(210,210,210);
+    border: 0.5px inset rgb(210,210,210);
+    position: absolute;
+}
+
+QMenu::separator {
+    height: 2px;
+    background: lightblue;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+QMenu::indicator {
+    width: 13px;
+    height: 13px;
+}
+        """)
         # 数据
         self.widget_id = widget_id
         self.widget_icon_count = 0

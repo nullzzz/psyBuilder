@@ -34,6 +34,10 @@ class Cycle(QMainWindow):
         self.timeline_table.horizontalHeader().sectionDoubleClicked.connect(self.changeAttribute)
 
     def setMenuAndShortcut(self):
+        """
+        设置菜单和快捷键
+        :return:
+        """
         pass
 
     def setToolbar(self):
@@ -253,3 +257,6 @@ class Cycle(QMainWindow):
         :return:
         """
         return self.getProperties()["order_by_combo"]
+
+    def paste(self):
+        """"""

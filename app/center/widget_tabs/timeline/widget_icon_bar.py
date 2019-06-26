@@ -13,8 +13,9 @@ class WidgetIconList(QListWidget):
         self.setViewMode(QListView.IconMode)
         # self.setResizeMode(QListView.Adjust)
         self.setStyleSheet("""
-            margin-top:15px;
+            margin-top:10px;
             background-color:transparent;
+            max-height:130px;
         """)
         # 设置横向
         self.setFlow(QListView.LeftToRight)
@@ -48,11 +49,18 @@ class WidgetIconBar(QTabWidget):
         super(WidgetIconBar, self).__init__(parent)
         # 设置最大高度
         self.setStyleSheet("""
-            max-height:120px;
-            border-color: rgb(236,236,236);
-            border-bottom: 0px;
+            QTabWidget {
+                max-height:120px;
+            }
+            QTabWidget::pane {
+                background-color:rgb(227,227,227);
+                border:1px solid;
+                border-color: rgb(201,201,201);
+                border-top:1px solid rgb(227,227,227);
+            }
         """)
         # 数据
+        self.setObjectName("icon_bar")
         self.events = WidgetIconList()
         self.eye_tracker = WidgetIconList()
         self.quest = WidgetIconList()

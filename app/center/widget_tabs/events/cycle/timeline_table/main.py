@@ -1,8 +1,9 @@
 import copy
 
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox, QAbstractItemView
+from PyQt5.QtGui import QKeyEvent, QMouseEvent, QKeySequence
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox, QAbstractItemView, QShortcut, QAction, QMenu, \
+    QApplication
 
 from app.center.widget_tabs.timeline.widget_icon import WidgetIcon
 from app.func import Func
@@ -40,8 +41,8 @@ class TimelineTable(QTableWidget):
         # 双击单元格修改
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
 
-        # Alt仿excel复制
-        self.is_copying = False
+        # 按住Alt仿excel复制
+        self.alt_pressed = False
         self.selected_text = ""
         self.selected_col = -2
 
@@ -49,8 +50,6 @@ class TimelineTable(QTableWidget):
         self.linkSignals()
         # menu
         self.setMenuAndShortcut()
-
-        # self.grabKeyboard()
 
     def linkSignals(self) -> None:
         """
@@ -60,12 +59,34 @@ class TimelineTable(QTableWidget):
         self.itemChanged.connect(self.addTimeline)
         self.itemChanged.connect(self.deleteTimeline)
 
-    def setMenuAndShortcut(self) -> None:
+    def setMenuAndShortcut(self):
         """
-
+        设置快捷键和菜单，菜单
         :return:
         """
-        pass
+        # 菜单
+        self.right_button_menu = QMenu()
+        self.copy_action = QAction("Copy", self.right_button_menu)
+        self.paste_action = QAction("Paste", self.right_button_menu)
+        self.right_button_menu.addAction(self.copy_action)
+        self.right_button_menu.addAction(self.paste_action)
+        # 快捷键
+        self.copy_shortcut = QShortcut(QKeySequence("Ctrl+C"), self)
+        self.copy_shortcut.activated.connect(self.copy_data)
+        self.paste_shortcut = QShortcut(QKeySequence("Ctrl+V"), self)
+        self.paste_shortcut.activated.connect(self.paste_data)
+
+    def contextMenuEvent(self, e):
+        """
+        显示菜单
+        :param QContextMenuEvent:
+        :return:
+        """
+        # 存在选中区域，则可以复制
+        self.copy_action.setEnabled(False)
+        if self.selectedItems():
+            self.copy_action.setEnabled(True)
+        self.right_button_menu.exec(self.mapToGlobal(e.pos()))
 
     def addRow(self) -> None:
         """
@@ -148,20 +169,27 @@ class TimelineTable(QTableWidget):
         try:
             old_attribute = self.col_attribute[col]
             old_value = self.attribute_value[old_attribute]
-            # 于旧的名与值比较
+            # 与旧的名与值比较
             if old_attribute == attribute:
+                # 如果与旧名相同，进行修改，且对值进行比较
                 self.attribute_value[attribute] = value
                 for row in range(self.rowCount()):
-                    if self.item(row, col).text() == old_value:
+                    # 如果为空填入新值
+                    if not self.item(row, col).text():
                         self.item(row, col).setText(value)
             else:
+                # 名也变了的话，删除旧的
+                del self.attribute_value[old_attribute]
+                # 判断值是否变化
                 if value != old_value:
                     for row in range(self.rowCount()):
-                        if self.item(row, col).text() == old_value:
+                        # 如果为空填入新值
+                        if not self.item(row, col).text():
                             self.item(row, col).setText(value)
-                else:
-                    del self.attribute_value[old_attribute]
+                # 名字改了，需要修改col_attribute
                 self.col_attribute[col] = attribute
+                # 修改header
+                self.horizontalHeaderItem(col).setText(attribute)
                 self.attribute_value[attribute] = value
         except Exception as e:
             print(f"error {e} happen in change attribute. [timeline_table/main.py]")
@@ -323,14 +351,14 @@ class TimelineTable(QTableWidget):
 
     def keyPressEvent(self, e: QKeyEvent):
         if e.key() == Qt.Key_Alt:
-            self.is_copying = True
+            self.alt_pressed = True
             self.setCursor(Qt.CrossCursor)
         else:
             QTableWidget.keyPressEvent(self, e)
 
     def keyReleaseEvent(self, e: QKeyEvent):
         if e.key() == Qt.Key_Alt:
-            self.is_copying = False
+            self.alt_pressed = False
             self.unsetCursor()
         else:
             QTableWidget.keyReleaseEvent(self, e)
@@ -343,7 +371,7 @@ class TimelineTable(QTableWidget):
         """
         super(TimelineTable, self).mouseMoveEvent(e)
         # 如果是已经按住alt，并刚刚开始滑动
-        if self.is_copying and self.selected_col == -2:
+        if self.alt_pressed and self.selected_col == -2:
             # 得到行和列
             row = self.rowAt(e.pos().y())
             col = self.columnAt(e.pos().x())
@@ -360,7 +388,7 @@ class TimelineTable(QTableWidget):
         :return:
         """
         try:
-            if self.is_copying and self.selected_col != -2:
+            if self.alt_pressed and self.selected_col != -2:
                 items = self.selectedItems()
                 for item in items:
                     if item.column() == self.selected_col:
@@ -400,14 +428,21 @@ class TimelineTable(QTableWidget):
             else:
                 super(TimelineTable, self).mouseDoubleClickEvent(e)
 
-    def focusInEvent(self, *args, **kwargs):
-        self.grabKeyboard()
-        return QTableWidget.focusInEvent(self, *args, **kwargs)
+    def focusInEvent(self, e):
+        """
 
-    def focusOutEvent(self, *args, **kwargs):
-        if not self.is_copying:
-            self.releaseKeyboard()
-        return QTableWidget.focusOutEvent(self, *args, **kwargs)
+        :param e:
+        :return:
+        """
+        super(TimelineTable, self).focusInEvent(e)
+
+    def focusOutEvent(self, e):
+        """
+
+        :param e:
+        :return:
+        """
+        super(TimelineTable, self).focusOutEvent(e)
 
     def getTimelines(self):
         """
@@ -443,3 +478,22 @@ class TimelineTable(QTableWidget):
         except Exception as e:
             print(f"error {e} happen in get attributes. [timeline_table/main.py]")
             return {}
+
+    def copy_data(self):
+        """
+        将选中表格数据以excel的格式粘贴到系统粘贴板中
+        :return:
+        """
+        # 获取系统粘贴板
+        clipboard = QApplication.clipboard()
+        # 获取已选取的区域
+
+
+    def paste_data(self):
+        """
+        将系统粘贴板中的数据复制到表格中，具体的判定方法待定
+        :return:
+        """
+        # 获取系统粘贴板
+        clipboard = QApplication.clipboard()
+
