@@ -32,13 +32,13 @@ def printAutoInd(f,inputStr,*argins):
 
     #    print(inputStr.split(' ')[0])
     if inputStr.split(' ')[0] in incrAfterStr:
-        print(f"{inputStr.split(' ')[0]},increase 1")
+        # print(f"{inputStr.split(' ')[0]},increase 1")
         tabStrs = '\t' * cIndents
         print(f"\n{tabStrs}{inputStr}".format(*argins), file=f)
         cIndents += 1
 
     elif inputStr.split(' ')[0] in decreAndIncrStr:
-        print(f"{inputStr.split(' ')[0]}, -1 and +1")
+        # print(f"{inputStr.split(' ')[0]}, -1 and +1")
         cIndents -= 1
         tabStrs = '\t' * cIndents
         print(f"{tabStrs}{inputStr}".format(*argins), file=f)
@@ -56,7 +56,7 @@ def printAutoInd(f,inputStr,*argins):
     elif 'case' == inputStr.split(' ')[0]:
 
         if 0 == isPreLineSwitch:
-            print(f"{inputStr.split(' ')[0]}, -1")
+            # print(f"{inputStr.split(' ')[0]}, -1")
             cIndents -= 1
 
         tabStrs = '\t' * cIndents
@@ -122,13 +122,10 @@ def compilePTB(globalSelf):
         printAutoInd(f,"cRandSeed = RandStream('mt19937ar','Seed','shuffle');")
         printAutoInd(f,"RandStream.setGlobalStream(cRandSeed);")
         printAutoInd(f,"%-----------------------------------------------------\\\n")
-        printAutoInd(f,"hideCursor;            % hide mouse cursor\n")
-
+        printAutoInd(f,"hideCursor;            % hide mouse cursor")
 
         printAutoInd(f,"if isWin")
-        
         printAutoInd(f,"ShowHideWinTaskbar(0); % hide the window taskbar")
-        
         printAutoInd(f,"end")
 
 
@@ -149,8 +146,8 @@ def compilePTB(globalSelf):
         for input_device in input_devices:
             print(input_device)
             if input_devices[input_device]['Device Type'] == 'keyboard':
-                printAutoInd(f,"KBoards({0}).port     = '{input_devices[input_device]['Device Port']}';",iKeyboard)
-                printAutoInd(f,"KBoards({0}).name     = '{input_devices[input_device]['Device Name']}';\n",iKeyboard)
+                printAutoInd(f,"KBoards({0}).port     = '{1}';",iKeyboard,input_devices[input_device]['Device Port'])
+                printAutoInd(f,"KBoards({0}).name     = '{1}';\n",iKeyboard,input_devices[input_device]['Device Name'])
                 iKeyboard += 1
             elif input_devices[input_device]['Device Type'] == 'mouse':
                 iMouse += 1
@@ -176,10 +173,10 @@ def compilePTB(globalSelf):
             # output_device_index = output_device.split('.')[-1]
 
             if output_devices[output_device]['Device Type'] == 'screen':
-                printAutoInd(f,"monitors({0}).port       =  {output_devices[output_device]['Device Port']};",iMonitor)
-                printAutoInd(f,"monitors({0}).name       = '{output_devices[output_device]['Device Name']}';",iMonitor)
-                printAutoInd(f,"monitors({0}).bkColor    = '{output_devices[output_device]['Back Color']}';",iMonitor)
-                printAutoInd(f,"monitors({0}).muliSample =  {output_devices[output_device]['Multi Sample']};\n",iMonitor)
+                printAutoInd(f,"monitors({0}).port       =  {1};",iMonitor,output_devices[output_device]['Device Port'])
+                printAutoInd(f,"monitors({0}).name       = '{1}';",iMonitor,output_devices[output_device]['Device Name'])
+                printAutoInd(f,"monitors({0}).bkColor    = '{1}';",iMonitor,output_devices[output_device]['Back Color'])
+                printAutoInd(f,"monitors({0}).muliSample =  {1};\n",iMonitor,output_devices[output_device]['Multi Sample'])
                 iMonitor += 1
 
             elif output_devices[output_device]['Device Type'] == 'network_port':
@@ -191,37 +188,37 @@ def compilePTB(globalSelf):
                 #                             QMessageBox.Ok)
                 #     return
 
-                printAutoInd(f,"TCPIPs({0}).ipAdd    = '{output_devices[output_device]['Device Port']}';",iNetPort)
-                printAutoInd(f,"TCPIPs({0}).port     =  {output_devices[output_device]['IP Port']};",iNetPort)
-                printAutoInd(f,"TCPIPs({0}).name     = '{output_devices[output_device]['Device Name']}';",iNetPort)
-                printAutoInd(f,"TCPIPs({0}).isClient = {output_devices[output_device]['Is Client']};\n",iNetPort)
+                printAutoInd(f,"TCPIPs({0}).ipAdd    = '{1}';",iNetPort,output_devices[output_device]['Device Port'])
+                printAutoInd(f,"TCPIPs({0}).port     =  {1};",iNetPort,output_devices[output_device]['IP Port'])
+                printAutoInd(f,"TCPIPs({0}).name     = '{1}';",iNetPort,output_devices[output_device]['Device Name'])
+                printAutoInd(f,"TCPIPs({0}).isClient = {1};\n",iNetPort,output_devices[output_device]['Is Client'])
                 # printAutoInd(f,"TCPIPs({iNetPort}).type = '{output_devices[output_device]['Device Type']}';",)
                 # printAutoInd(f,"TCPIPs({iNetPort}).index = '{output_device_index}';",)
                 iNetPort += 1
 
             elif output_devices[output_device]['Device Type'] == 'parallel_port':
-                printAutoInd(f,"parPort({0}).port     = hex2dec('{output_devices[output_device]['Device Port']}');",iParal)
-                printAutoInd(f,"parPort({0}).name     = '{output_devices[output_device]['Device Name']}';\n",iParal)
+                printAutoInd(f,"parPort({0}).port     = hex2dec('{1}');",iParal,output_devices[output_device]['Device Port'])
+                printAutoInd(f,"parPort({0}).name     = '{1}';\n",iParal,output_devices[output_device]['Device Name'])
                 # printAutoInd(f,"parPort({iParal}).type = '{output_devices[output_device]['Device Type']}';",)
                 # printAutoInd(f,"parPort({iParal}).index = '{output_device_index}';",)
                 iParal += 1
 
             elif output_devices[output_device]['Device Type'] == 'serial_port':
-                printAutoInd(f,"serPort({0}).port     = '{output_devices[output_device]['Device Port']}';",iSerial)
-                printAutoInd(f,"serPort({0}).name     = '{output_devices[output_device]['Device Name']}';",iSerial)
-                printAutoInd(f,"serPort({0}).baudRate = '{output_devices[output_device]['Baud Rate']}';",iSerial)
-                printAutoInd(f,"serPort({0}).dataBits = '{output_devices[output_device]['Data Bits']}';\n",iSerial)
+                printAutoInd(f,"serPort({0}).port     = '{1}';",iSerial,output_devices[output_device]['Device Port'])
+                printAutoInd(f,"serPort({0}).name     = '{1}';",iSerial,output_devices[output_device]['Device Name'])
+                printAutoInd(f,"serPort({0}).baudRate = '{1}';",iSerial,output_devices[output_device]['Baud Rate'])
+                printAutoInd(f,"serPort({0}).dataBits = '{1}';\n",iSerial,output_devices[output_device]['Data Bits'])
                 # printAutoInd(f,"serPort({iSerial}).type = '{output_devices[output_device]['Device Type']}';",)
                 # printAutoInd(f,"serPort({iSerial}).index = '{output_device_index}';",)
                 iSerial += 1
 
         printAutoInd(f,"%------------------------------------\\\n")
 
-        printAutoInd(f,"%----- initalize output devices ---------/")
-        printAutoInd(f,"\n%--- open windows ---/")
-        printAutoInd(f,"winIds    = zeros({iMonitor-1},1);")
-        printAutoInd(f,"winIFIs   = zeros({iMonitor-1},1);")
-        printAutoInd(f,"fullRects = zeros({iMonitor-1},4);\n")
+        printAutoInd(f,"%----- initialize output devices --------/")
+        printAutoInd(f,"%--- open windows ---/")
+        printAutoInd(f,"winIds    = zeros({0},1);",iMonitor-1)
+        printAutoInd(f,"winIFIs   = zeros({0},1);",iMonitor-1)
+        printAutoInd(f,"fullRects = zeros({0},4);",iMonitor-1)
 
         printAutoInd(f,"for iWin = 1:numel(monitors)")
         
@@ -236,7 +233,7 @@ def compilePTB(globalSelf):
         # initialize TCPIP connections
         if iNetPort > 1:
             printAutoInd(f,"%--- open TCPIPs ----/")
-            printAutoInd(f,"tcpipCons = zeros({iNetPort - 1},1);\n")
+            printAutoInd(f,"tcpipCons = zeros({0},1);",iNetPort - 1)
 
             printAutoInd(f,"for iCount = 1:numel(TCPIPs)")
 
@@ -253,7 +250,7 @@ def compilePTB(globalSelf):
         # initialize serial ports
         if iSerial > 1:
             printAutoInd(f,"%--- open serial ports ----/")
-            printAutoInd(f,"serialCons = zeros({iSerial-1},1);\n")
+            printAutoInd(f,"serialCons = zeros({0},1);",iSerial-1)
 
             printAutoInd(f,"for iCount = 1:numel(serialCons)")
             
@@ -275,12 +272,12 @@ def compilePTB(globalSelf):
             
             printAutoInd(f,"error('Failed to find io64, please see \"http://apps.usd.edu/coglab/psyc770/IO64.html\" for instruction of installation!');")
             
-            printAutoInd(f,"end % try\n")
+            printAutoInd(f,"end % try")
             printAutoInd(f,"if 0 ~= io64(ioObj)")
             
             printAutoInd(f,"error('inputout 64 installation failed!');")
             
-            printAutoInd(f,"end % if 0 ~= \n")
+            printAutoInd(f,"end % if 0 ~= ")
             
             printAutoInd(f,"elseif IsOSX")
             
@@ -302,7 +299,7 @@ def compilePTB(globalSelf):
             print(Func.getWidgetName(cWidgetId))
             print(cWidget.widget_id)
             print(Func.getProperties(cWidgetId))
-            print(cWidget.getPropertyByKey('Text'))
+            # print(cWidget.getPropertyByKey('Text'))
             # print(Func.getScreen)
             # print(dir(cWidget))
 
@@ -365,11 +362,11 @@ def compilePTB(globalSelf):
         printAutoInd(f,"ShowCursor;                 % Show the hided mouse cursor")
         printAutoInd(f,"Priority(0);                % Turn the priority back to normal")
         printAutoInd(f,"RestrictKeysForKbCheck([]); % Re-enable all keys\n")
+
         printAutoInd(f,"if isWin",)
-        
         printAutoInd(f,"ShowHideWinTaskbar(1);      % show the window taskbar.")
-        
-        printAutoInd(f,"end\n")
+        printAutoInd(f,"end")
+
         printAutoInd(f,"save({0}.filename); % save the results\n",cFilenameOnly)
 
 
@@ -382,9 +379,7 @@ def compilePTB(globalSelf):
             printAutoInd(f,"%-- close serial ports --/")
 
             printAutoInd(f,"for iCount = 1:numel(tcpipCons)")
-            
             printAutoInd(f,"pnet(tcpipCons(iCount),'close');")
-            
             printAutoInd(f,"end % iCount")
 
             printAutoInd(f,"%------------------------\\\n")
@@ -392,11 +387,8 @@ def compilePTB(globalSelf):
         # close serial ports
         if iSerial > 1:
             printAutoInd(f,"%--- close serial ports ---/")
-
             printAutoInd(f,"for iCount = 1:numel(serialCons)")
-            
             printAutoInd(f,"IOPort('Close',serialCons(iCount));")
-            
             printAutoInd(f,"end % iCount")
             printAutoInd(f,"%--------------------------\\\n")
 
@@ -429,17 +421,17 @@ def compilePTB(globalSelf):
         printAutoInd(f,"sca;                        % Close opened windows")
         printAutoInd(f,"ShowCursor;                 % Show the hided mouse cursor")
         printAutoInd(f,"Priority(0);                % Turn the priority back to normal")
-        printAutoInd(f,"RestrictKeysForKbCheck([]); % Re-enable all keys\n")
+        printAutoInd(f,"RestrictKeysForKbCheck([]); % Re-enable all keys")
+
         printAutoInd(f,"if isWin")
-        
         printAutoInd(f,"ShowHideWinTaskbar(1);      % show the window taskbar")
-        
-        printAutoInd(f,"end\n")
+        printAutoInd(f,"end")
+
         printAutoInd(f,"save('{0}_debug');",cFilenameOnly)
         printAutoInd(f,"rethrow({0}_error);",cFilenameOnly)
 
         
-        printAutoInd(f,"end % try\n")
+        printAutoInd(f,"end % try")
 
         
         printAutoInd(f,"end % function \n\n\n\n\n\n\n")
