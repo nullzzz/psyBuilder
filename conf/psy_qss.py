@@ -334,8 +334,8 @@ tree = """
 menu = """
 QMenu {
     background-color: white;
-    border: 2px solid gray;
-    border-radius: 4px;
+    border: 0px solid;
+    border-radius: 2px;
     margin: 2px;
     min-width: 78px;
 }
