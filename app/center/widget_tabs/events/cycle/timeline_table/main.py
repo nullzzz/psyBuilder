@@ -148,20 +148,27 @@ class TimelineTable(QTableWidget):
         try:
             old_attribute = self.col_attribute[col]
             old_value = self.attribute_value[old_attribute]
-            # 于旧的名与值比较
+            # 与旧的名与值比较
             if old_attribute == attribute:
+                # 如果与旧名相同，进行修改，且对值进行比较
                 self.attribute_value[attribute] = value
                 for row in range(self.rowCount()):
-                    if self.item(row, col).text() == old_value:
+                    # 如果为空填入新值
+                    if not self.item(row, col).text():
                         self.item(row, col).setText(value)
             else:
+                # 名也变了的话，删除旧的
+                del self.attribute_value[old_attribute]
+                # 判断值是否变化
                 if value != old_value:
                     for row in range(self.rowCount()):
-                        if self.item(row, col).text() == old_value:
+                        # 如果为空填入新值
+                        if not self.item(row, col).text():
                             self.item(row, col).setText(value)
-                else:
-                    del self.attribute_value[old_attribute]
+                # 名字改了，需要修改col_attribute
                 self.col_attribute[col] = attribute
+                # 修改header
+                self.horizontalHeaderItem(col).setText(attribute)
                 self.attribute_value[attribute] = value
         except Exception as e:
             print(f"error {e} happen in change attribute. [timeline_table/main.py]")

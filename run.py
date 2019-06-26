@@ -33,7 +33,7 @@ QTabBar::tab:!selected {
 }
 
 QTabBar::tab:hover {
-    background: rgb(189,189,189);
+    background: rgb(211,211,211);
 }
 
 QTabBar::close-button {
