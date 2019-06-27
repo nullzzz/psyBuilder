@@ -20,7 +20,7 @@ class WidgetIconArea(QFrame):
         super(WidgetIconArea, self).__init__(parent)
         #
         self.setStyleSheet("""
-            background-color:rgb(227,227,227);
+            background-color:rgb(255,255,255);
         """)
         self.setAcceptDrops(True)
         # data

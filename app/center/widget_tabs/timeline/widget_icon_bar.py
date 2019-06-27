@@ -53,7 +53,7 @@ class WidgetIconBar(QTabWidget):
                 max-height:120px;
             }
             QTabWidget::pane {
-                background-color:rgb(227,227,227);
+                background-color:rgb(255,255,255);
                 border:1px solid;
                 border-color: rgb(201,201,201);
                 border-top:1px solid rgb(227,227,227);

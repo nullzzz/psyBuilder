@@ -8,33 +8,30 @@ QTabWidget::tab-bar {
 }
 
 QTabBar::tab {
-    background: rgb(236,236,236);
+    background: rgb(246,246,246);
     border: 1px solid rgb(201,201,201);
     border-left: 0.5px solid rgb(201,201,201);
-    margin-top: 6px;
     min-height: 26px;
     min-width: 100px;
     text-align: center;
     font-size:11px;
-    icon-size:
 }
 
 QTabBar::tab:selected{
-    background: rgb(227,227,227);
+    background: rgb(246,246,246);
     border-bottom:0px;
 }
 
 QTabBar::tab:!selected {
-    background: rgb(199,199,199);
+    background: rgb(221,221,221);
 }
 
 QTabBar::tab:hover {
-    background: rgb(211,211,211);
+    background: rgb(198,198,198);
 }
 
 QTabBar::close-button {
     image: url(image/tab_bar/close.ico);
-    margin-top:3px;
 }
 
 QTabBar::close-button:hover {
@@ -80,10 +77,6 @@ dock_widget = """
         text-align: center;
         background: lightgray;
     }
-"""
-
-main_window = """
-
 """
 
 scroll_bar = """
@@ -222,7 +215,7 @@ scroll_bar = """
 
 tool_bar = """
     QToolBar {
-        background-color:black;
+        background-color:rgb(227,227,227);
         max-height: 28px;
         spacing: 3px;
     }
@@ -373,4 +366,4 @@ QMenu::indicator {
 }
 """
 
-style_sheet = tab_bar + dock_widget + main_window + scroll_bar + table_view + header_view + tool_bar + push_button + tree + menu + list_view + line_edit
+style_sheet = tab_bar + dock_widget + scroll_bar + table_view + header_view + tool_bar + push_button + tree + menu + list_view + line_edit

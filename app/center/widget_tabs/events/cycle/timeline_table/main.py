@@ -71,6 +71,8 @@ class TimelineTable(QTableWidget):
         self.right_button_menu = QMenu()
         self.copy_action = QAction("Copy", self.right_button_menu)
         self.paste_action = QAction("Paste", self.right_button_menu)
+        self.copy_action.triggered.connect(self.copy_data)
+        self.paste_action.triggered.connect(self.paste_data)
         self.right_button_menu.addAction(self.copy_action)
         self.right_button_menu.addAction(self.paste_action)
         # 快捷键
@@ -617,7 +619,7 @@ class TimelineTable(QTableWidget):
                 if validity == Info.TimelineNameRight or validity == Info.TimelineNameExist or not timeline_name:
                     paste_timeline_names.append(timeline_name)
                 else:
-                    QMessageBox.information(self, 'Warning', f"Data {timeline_name} in col 'timeline' is invalid!")
+                    QMessageBox.information(self, 'Warning', f"Data '{timeline_name}' is invalid to set in col 'timeline' !")
                     return
                     # 需要被paste区域的数据
             already_timeline_names = []
