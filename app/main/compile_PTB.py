@@ -32,7 +32,7 @@ def printAutoInd(f,inputStr,*argins):
 
     #    print(inputStr.split(' ')[0])
     if inputStr.split(' ')[0] in incrAfterStr:
-        # print(f"{inputStr.split(' ')[0]},increase 1")
+        # print(f"{inputStr}:{cIndents},increase 1")
         tabStrs = '\t' * cIndents
         print(f"\n{tabStrs}{inputStr}".format(*argins), file=f)
         cIndents += 1
@@ -71,6 +71,10 @@ def printAutoInd(f,inputStr,*argins):
         isPreLineSwitch = 1
     else:
         isPreLineSwitch = 0
+
+    if cIndents < 0:
+        cIndents = 0
+
 
 
 # def repTabStr(cIndents):
@@ -449,7 +453,7 @@ def compilePTB(globalSelf):
         
         printAutoInd(f,"end")
         
-        printAutoInd(f,"end\n")
+        printAutoInd(f,"end %  end of subfunction\n")
 
 
 
