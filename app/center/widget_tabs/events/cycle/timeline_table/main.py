@@ -619,7 +619,8 @@ class TimelineTable(QTableWidget):
                 if validity == Info.TimelineNameRight or validity == Info.TimelineNameExist or not timeline_name:
                     paste_timeline_names.append(timeline_name)
                 else:
-                    QMessageBox.information(self, 'Warning', f"Data '{timeline_name}' is invalid to set in col 'timeline' !")
+                    QMessageBox.information(self, 'Warning',
+                                            f"Data '{timeline_name}' is invalid to set in col 'timeline' !")
                     return
                     # 需要被paste区域的数据
             already_timeline_names = []
