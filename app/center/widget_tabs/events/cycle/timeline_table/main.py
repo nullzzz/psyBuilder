@@ -595,13 +595,13 @@ class TimelineTable(QTableWidget):
                 col_length = len(temp_data)
             else:
                 if len(temp_data) != col_length:
-                    QMessageBox.information(self, 'Warning', "Data is invalid!")
+                    QMessageBox.information(self, 'Warning', "Cols split by '\\t' of each row must be same!")
                     return
             # 保存数据
             paste_rows_data.append(temp_data)
         # 解析出0列
         if not col_length:
-            QMessageBox.information(self, 'Warning', "Data is invalid!")
+            QMessageBox.information(self, 'Warning', "Cols split by '\\t' is zero!")
             return
 
         # 如果影响列中包含timeline所在列，对数据的值进行判断，查看是否存在违法，去重复等等操作

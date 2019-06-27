@@ -441,7 +441,7 @@ class Func(object):
                 for timeline_wid in Info.NAME_WID[timeline_name]:
                     node = Info.WID_NODE[timeline_wid].parent()
                     while node:
-                        if node.text() == cycle_name:
+                        if node.text(0) == cycle_name:
                             return False
                         node = node.parent()
                 return True
