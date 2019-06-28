@@ -76,9 +76,22 @@ def printAutoInd(f,inputStr,*argins):
         cIndents = 0
 
 
+def is_contain_ch(check_str):
+    """
+    :param check_str: {str}
+    :return: {bool} True and False for have and have not chinese characters respectively
+    """
+    for ch in check_str:
+        if u'\u4e00' <= ch <= u'\u9fff':
+            return True
+    return False
 
 def printTextWidget(cWidgetId,noStimRelatedCodes):
     cProperties = Func.getProperties(cWidgetId)
+    # if is_contain_ch(cProperties['Text']):
+    # else:
+
+
 
     return noStimRelatedCodes
 
