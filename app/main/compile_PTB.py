@@ -20,7 +20,7 @@ from app.properties.main import Properties
 from app.structure.main import Structure
 from .wait_dialog import WaitDialog
 
-cIndents = 0
+cIndents        = 0
 isPreLineSwitch = 0
 
 def printAutoInd(f,inputStr,*argins):
@@ -77,8 +77,10 @@ def printAutoInd(f,inputStr,*argins):
 
 
 
-# def repTabStr(cIndents):
-#     return '\t' * cIndents
+def printTextWidget(cWidgetId,noStimRelatedCodes):
+    cProperties = Func.getProperties(cWidgetId)
+
+    return noStimRelatedCodes
 
 def compilePTB(globalSelf):
     if not Info.FILE_NAME:
@@ -299,9 +301,16 @@ def compilePTB(globalSelf):
         cTimelineWidgetIds = Func.getWidgetIDInTimeline(f"{Info.TIMELINE}.0")
 
         for cWidgetId in cTimelineWidgetIds:
+            # usually the code section after drawing the current frame's stimuli
+            noStimRelatedCodes = []
+
             cWidget = Info.WID_WIDGET[cWidgetId]
-            print(Func.getWidgetName(cWidgetId))
-            print(cWidget.widget_id)
+            # print(Func.getWidgetName(cWidgetId))
+
+            if 'Text' == cWidget.widget_id.split('.')[0]:
+                noStimRelatedCodes = printTextWidget(cWidgetId,noStimRelatedCodes)
+
+
             print(Func.getProperties(cWidgetId))
             # print(cWidget.getPropertyByKey('Text'))
             # print(Func.getScreen)
