@@ -552,6 +552,18 @@ class Func(object):
                 screens.append(v["Device Name"])
         return screens
 
+    @staticmethod
+    def getDeviceInfoByName(device_name: str) -> dict or None:
+        """
+        由设备名称获取设备信息
+        :param device_name:
+        :return: device info dict
+        """
+        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
+            if device_name == v.get("Device Name"):
+                return v
+        return
+
     # 控制台输出信息
     @staticmethod
     def log(text, error=False, timer=True):

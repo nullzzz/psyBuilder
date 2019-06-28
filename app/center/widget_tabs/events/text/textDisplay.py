@@ -22,6 +22,7 @@ class TextDisplay(QMainWindow):
         self.font = self.pro_window.font
         self.default_properties = self.pro_window.getInfo()
 
+        self.text_label.textChanged.connect(self.changeDisplayText)
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
@@ -62,6 +63,7 @@ class TextDisplay(QMainWindow):
         self.setAttributes(self.attributes)
         screen_devices = Func.getScreen()
         self.pro_window.general.setScreen(screen_devices)
+        self.pro_window.general.text_edit.setHtml(self.html)
         # 阻塞原窗口
         # self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
@@ -164,6 +166,9 @@ class TextDisplay(QMainWindow):
             self.default_properties = properties.copy()
             self.loadSetting()
             self.apply()
+
+    def changeDisplayText(self):
+        self.html = self.text_label.toHtml()
 
     # 设置可选参数
     def setAttributes(self, attributes):
