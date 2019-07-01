@@ -589,8 +589,12 @@ class TimelineTable(QTableWidget):
         # 先检测每行列数是否相同
         col_length = 0
         rows_data = re.split(r"\n", paste_text)
-        for first_paste_row_data in rows_data:
-            temp_data = re.split(r"\t", first_paste_row_data)
+        # windows下，数据以\n结尾，所以会多出一个无效的\n，需要进行删除
+        if not rows_data[-1]:
+            rows_data = rows_data[:-1]
+        # 对每行数据进行分割
+        for row_data in rows_data:
+            temp_data = re.split(r"\t", row_data)
             if not col_length:
                 col_length = len(temp_data)
             else:

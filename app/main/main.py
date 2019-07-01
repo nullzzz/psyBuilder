@@ -19,8 +19,8 @@ from app.info import Info
 from app.output.main import Output
 from app.properties.main import Properties
 from app.structure.main import Structure
-from .wait_dialog import WaitDialog
 from .compile_PTB import compilePTB
+from .wait_dialog import WaitDialog
 
 
 class PsyApplication(QMainWindow):

@@ -1570,14 +1570,14 @@ class Slider(QMainWindow):
 
     def clone(self, id):
         # try:
-            slider = Slider(widget_id=id)
-            slider.pro_window.setProperties(self.pro_window.getInfo())
-            for item in self.scene.items():
-                item1 = item.clone()
-                slider.scene.addItem(item1)
-                item1.setPos(item.scenePos())
-                slider.scene.update()
+        slider = Slider(widget_id=id)
+        slider.pro_window.setProperties(self.pro_window.getInfo())
+        for item in self.scene.items():
+            item1 = item.clone()
+            slider.scene.addItem(item1)
+            item1.setPos(item.scenePos())
+            slider.scene.update()
 
-            return slider
-        # except Exception as e:
-        #     print(f"error {e} happens in clone. [slider/Slider.py]")
+        return slider
+    # except Exception as e:
+    #     print(f"error {e} happens in clone. [slider/Slider.py]")

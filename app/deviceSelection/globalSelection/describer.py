@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QObject, QEvent, pyqtSignal, Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QFormLayout, QMessageBox, QLineEdit, QCheckBox, QStackedLayout
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtWidgets import QWidget, QLabel, QFormLayout, QLineEdit, QCheckBox, QStackedLayout
 
 from app.lib import ColorListEditor
 
@@ -84,6 +84,7 @@ class Shower(QWidget):
 
     def changeName(self, new_name: str):
         self.device_name.setText(new_name)
+
 
 class Screen(Shower):
     def __init__(self, parent=None):
