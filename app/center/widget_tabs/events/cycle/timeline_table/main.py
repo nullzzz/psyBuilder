@@ -318,6 +318,11 @@ class TimelineTable(QTableWidget):
             print(f"error {e} happens in get info. [timeline_table/main.py]")
 
     def restore(self, info):
+        """
+        复原
+        :param info:
+        :return:
+        """
         try:
             # data
             self.col_attribute = info['col_attribute']
@@ -336,6 +341,11 @@ class TimelineTable(QTableWidget):
             print(f"error {e} happens in restore. [cycle/main.py]")
 
     def clone(self, clone_table):
+        """
+        复制
+        :param clone_table:
+        :return:
+        """
         try:
             # data
             clone_table.col_attribute = copy.deepcopy(self.col_attribute)

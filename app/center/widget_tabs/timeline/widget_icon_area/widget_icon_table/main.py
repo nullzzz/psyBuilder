@@ -83,8 +83,8 @@ QMenu::indicator {
         self.edit_row_col = [-1, -1]
         self.is_fill = False
         self.old_name = ''
-        self.up_sign = SignTable(sign="arrow_up.png")
-        self.down_sign = SignTable(sign="arrow_down.png")
+        self.up_sign = SignTable(sign="timeline/arrow_up.png")
+        self.down_sign = SignTable(sign="timeline/arrow_down.png")
 
         # 初始化
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
@@ -384,7 +384,7 @@ QMenu::indicator {
                 self.insertColumn(target_col)
                 self.setWidgetIcon(target_col, widget_id.split('.')[0], widget_id)
                 self.setWidgetName(target_col, widget_name)
-        except Exception:
+        except Exception as e:
             print("error happens in move icon to target. [widget_icon_table/main.py]")
             Func.log(e, True)
 
@@ -456,14 +456,12 @@ QMenu::indicator {
         return info
 
     def restore(self, info):
-        # 清除原来的东西
-        # 我也母鸡会不会有新bug
         try:
-            for col in range(self.widget_icon_count):
+            # 先将timeline中的数据清除, 即删除所有的widget
+            total_count = self.widget_icon_count + 1
+            for i in range(1, total_count):
                 self.removeColumn(1, True)
-        except Exception as e:
-            Func.log(f"Failed to clear current edit status, {e}", True)
-        try:
+            # 再往其中添加
             widget_icon_count = info['widget_icon_count']
             self.is_fill = info['is_fill']
             for i in range(1, widget_icon_count + 1):

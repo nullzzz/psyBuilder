@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QTabWidget, QTabBar, QShortcut
 
 from app.func import Func
 from app.info import Info
-from .events.cycle.main import Cycle
 from .timeline.main import Timeline
 
 
@@ -62,18 +61,19 @@ class WidgetTabs(QTabWidget):
             except Exception:
                 timeline.widget_icon_area.widget_icon_table.widgetOpen.connect(self.openWidget)
                 timeline.widget_icon_area.widget_icon_table.widgetIconNameChange.connect(self.changeTabName)
-                timeline.widget_icon_area.widget_icon_table.widgetIconDelete.connect(self.closeTab)
+                # timeline.widget_icon_area.widget_icon_table.widgetIconDelete.connect(self.closeTab)
         except Exception as e:
             print(f"error {e} happens in link timeline signals. [widget_tabs/main.py]")
 
     def linkCycleSignals(self, widget_id):
         try:
-            cycle: Cycle = Info.WID_WIDGET[widget_id]
-            try:
-                cycle.timeline_table.timeline_delete.disconnect(self.closeTab)
-                cycle.timeline_table.timeline_delete.connect(self.closeTab)
-            except Exception:
-                cycle.timeline_table.timeline_delete.connect(self.closeTab)
+            pass
+            # cycle: Cycle = Info.WID_WIDGET[widget_id]
+            # try:
+            #     cycle.timeline_table.timeline_delete.disconnect(self.closeTab)
+            #     cycle.timeline_table.timeline_delete.connect(self.closeTab)
+            # except Exception:
+            #     cycle.timeline_table.timeline_delete.connect(self.closeTab)
         except Exception as e:
             print(f"error {e} happens in link timeline signals. [main/main.py]")
 
@@ -99,8 +99,12 @@ class WidgetTabs(QTabWidget):
         except Exception as e:
             print(f"error {e} happens in open tab. [widget_tabs/main.py]")
 
-    # 如果某个icon或node被删除，要关闭
-    def closeTab(self, widget_id):
+    def closeTab(self, widget_id) -> None:
+        """
+        如果某个icon或node被删除，要关闭
+        :param widget_id:
+        :return:
+        """
         try:
             if widget_id in Info.WID_WIDGET:
                 index = self.indexOf(Info.WID_WIDGET[widget_id])
@@ -113,8 +117,13 @@ class WidgetTabs(QTabWidget):
         except Exception as e:
             print(f"error {e} happens in close tab. [widget_tabs/main.py]")
 
-    # 如果icon修改或者structure中node修改，要同步修改
     def changeTabName(self, widget_id, widget_name):
+        """
+        如果icon修改或者structure中node修改，要同步修改
+        :param widget_id:
+        :param widget_name:
+        :return:
+        """
         try:
             index = self.indexOf(Info.WID_WIDGET[widget_id])
             if index != -1:

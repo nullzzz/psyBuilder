@@ -19,8 +19,8 @@ from app.info import Info
 from app.output.main import Output
 from app.properties.main import Properties
 from app.structure.main import Structure
+from lib.wait_dialog import WaitDialog
 from .compile_PTB import compilePTB
-from .wait_dialog import WaitDialog
 
 
 class PsyApplication(QMainWindow):
@@ -191,9 +191,10 @@ class PsyApplication(QMainWindow):
         self.structure.widgetSignalsLink.connect(self.linkWidgetSignals)
         self.structure.widgetCreatStart.connect(self.start_wait_dialog)
         self.structure.widgetCreatEnd.connect(self.stop_wait_dialog)
+        self.structure.widgetDelete.connect(self.center.widget_tabs.closeTab)
         self.structure.structure_tree.widgetOpen.connect(self.center.widget_tabs.openWidget)
         self.structure.structure_tree.nodeNameChange.connect(self.center.widget_tabs.changeTabName)
-        self.structure.structure_tree.nodeDelete.connect(self.center.widget_tabs.closeTab)
+        # self.structure.structure_tree.nodeDelete.connect(self.center.widget_tabs.closeTab)
         # center
         self.center.widget_tabs.tabChange.connect(self.properties.showProperties)
         self.center.widget_tabs.tabChange.connect(self.attributes.showAttributes)
@@ -291,21 +292,18 @@ class PsyApplication(QMainWindow):
             self.loadOut()
 
     def loadIn(self):
+        """
+        恢复文件！
+        :return:
+        """
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", "", "Psy File (*.psy;*.ini)", options=options)
-
+        #
         if file_name:
             # 更新文件名
             Info.FILE_NAME = file_name
-            file_name: str
+            # 从文件中读取配置
             setting = QSettings(file_name, QSettings.IniFormat)
-            print(setting)
-            # 复原根节点
-            # 清空原编辑状态就在这儿做
-            root = Info.WID_WIDGET[f"{Info.TIMELINE}.0"]
-            root_info = setting.value(f"{Info.TIMELINE}.0")
-            if root_info:
-                root.restore(root_info)
 
             # 更新输入输出设备
             input_device_info = setting.value("INPUT_DEVICE_INFO")
@@ -318,12 +316,20 @@ class PsyApplication(QMainWindow):
             dock_layout = setting.value("DOCK_LAYOUT")
             if dock_layout:
                 self.restoreState(dock_layout)
+
+            # 恢复widgets
+            # 复原根节点，即初始的Timeline
+            root_timeline: Timeline = Info.WID_WIDGET[f"{Info.TIMELINE}.0"]
+            # 将其数据取出
+            root_timeline_info = setting.value(f"{Info.TIMELINE}.0")
+            # 恢复根节点
+            if root_timeline_info:
+                root_timeline.restore(root_timeline_info)
             # 恢复name_wid
             name_wid: dict = setting.value("NAME_WID")
             if name_wid:
                 Info.NAME_WID = name_wid.copy()
-                Info.NAME_WID = Info.NAME_WID
-            # 加载控件
+            # 恢复structure并恢复widget
             structure_tree: list = setting.value("STRUCTURE_TREE")
             self.structure.loadStructure(structure_tree)
         Func.log(f"{Info.FILE_NAME} loaded successful!")

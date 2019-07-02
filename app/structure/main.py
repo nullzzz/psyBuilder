@@ -21,6 +21,8 @@ class Structure(QDockWidget):
     # 在创建widget时有一个转圈圈 (none -> main)
     widgetCreatStart = pyqtSignal()
     widgetCreatEnd = pyqtSignal()
+    # 当某个widget被彻底删除，即无任何widget指向它后，要关闭tab
+    widgetDelete = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(Structure, self).__init__(parent)
@@ -355,19 +357,26 @@ class Structure(QDockWidget):
             print(f"error {e} happens in rename node. [structure/main.py]")
             Func.log(str(e), True)
 
-    # 只删除而不发送信号，只是接收外部的信号来进行delete
     def deleteNode(self, widget_id, sender=''):
         """
+        只删除而不发送信号，只是接收外部的信号来进行delete
         删除节点，也要删除数据
         删除节点要注意父节点引用下的节点也要删除，其余应该没了
+        关闭widget_tabs已经没有任何wid指向的widget的tab
         """
         try:
             # 先删除icon或者在cycle中的表格的timeline
             if sender == 'structure_tree':
                 Func.deleteItemInWidget(widget_id)
+            # 先递归删除子节点
+            node = Info.WID_NODE[widget_id]
+            children = []
+            self.getChild(node, children, False)
+            for child in children:
+                self.deleteNode(child[1])
+            #
             delete_wid = [widget_id]
             # 源节点
-            node = Info.WID_NODE[widget_id]
             name = node.text(0)
             parent_node: StructureNode = node.parent()
             parent_node.removeChild(node)
@@ -395,6 +404,9 @@ class Structure(QDockWidget):
                     raise Exception("fail to find refer node in refer parent.")
             # 如果这个引用被清空了，删除相应数据
             if not len(Info.NAME_WID[name]):
+                # 删除显示的tab
+                # 如果是timeline或者cycle
+                self.widgetDelete.emit(widget_id)
                 del Info.NAME_WID[name]
             else:
                 # 有一个可能，被删除的节点是源节点，所以要改变源widget的widget_id啊
@@ -452,30 +464,36 @@ class Structure(QDockWidget):
                 return structure_tree
         return WidTree(structure_tree[0])
 
-    def getChild(self, root: StructureNode, sub_tree: list):
+    def getChild(self, root: StructureNode, sub_tree: list, recursive: bool = True):
         """
-        广度优先遍历实现函数
+        广度优先遍历递归得到所有的子节点
         :param root:
-        :param sub_tree:
+        :param sub_tree: 作为载体
         :return:
         """
-        for i in range(root.childCount()):
-            child: StructureNode = root.child(i)
-            if child.widget_id.startswith(Info.CYCLE):
-                child_tree: list = [(child.text(0), child.widget_id)]
-                self.getChild(child, child_tree)
-                sub_tree.append(child_tree)
-            elif child.widget_id.startswith(Info.TIMELINE):
-                child_tree: list = [(child.text(0), child.widget_id)]
-                self.getChild(child, child_tree)
-                sub_tree.append(child_tree)
-            else:
+        if recursive:
+            for i in range(root.childCount()):
+                child: StructureNode = root.child(i)
+                if child.widget_id.startswith(Info.CYCLE):
+                    child_tree: list = [(child.text(0), child.widget_id)]
+                    self.getChild(child, child_tree)
+                    sub_tree.append(child_tree)
+                elif child.widget_id.startswith(Info.TIMELINE):
+                    child_tree: list = [(child.text(0), child.widget_id)]
+                    self.getChild(child, child_tree)
+                    sub_tree.append(child_tree)
+                else:
+                    key: tuple = (child.text(0), child.widget_id)
+                    sub_tree.append(key)
+        else:
+            for i in range(root.childCount()):
+                child: StructureNode = root.child(i)
                 key: tuple = (child.text(0), child.widget_id)
                 sub_tree.append(key)
 
-    # 从文件加载structure
     def loadStructure(self, tree: list):
         """
+        从文件加载structure
         :param tree: 树结构
         :return:
         """
@@ -491,6 +509,7 @@ class Structure(QDockWidget):
 
     def loadWidgetAndNode(self, parent_widget_id: str, widget_name: str, widget_id: str):
         """
+        先在structure中创建node，然后适时创建widget
         :param parent_widget_id: 父控件的widget_id
         :param widget_name: 控件名
         :param widget_id: 待复原控件的widget_id
@@ -505,13 +524,12 @@ class Structure(QDockWidget):
 
             # 相关字典数据
             Info.WID_NODE[widget_id] = node
-            Info.NAME_WID[widget_name].append(widget_id)
 
-            # 创建控件, 连接信号
+            # 创建控件
             Func.createWidget(widget_id)
             setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
             properties = setting.value(widget_id)
             if properties:
                 Func.restore(widget_id, properties)
-
+            # 连接信号
             self.widgetSignalsLink.emit(widget_id)

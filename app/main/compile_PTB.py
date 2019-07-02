@@ -18,7 +18,7 @@ from app.info import Info
 from app.output.main import Output
 from app.properties.main import Properties
 from app.structure.main import Structure
-from .wait_dialog import WaitDialog
+from lib.wait_dialog import WaitDialog
 
 cIndents        = 0
 isPreLineSwitch = 0
