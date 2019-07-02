@@ -87,9 +87,24 @@ def is_contain_ch(check_str):
     return False
 
 def printTextWidget(cWidgetId,noStimRelatedCodes):
+    global cIndents
     cProperties = Func.getProperties(cWidgetId)
     # if is_contain_ch(cProperties['Text']):
     # else:
+
+
+
+    return noStimRelatedCodes
+
+
+def printCycleWdiget(CYCLE, noStimRelatedCodes):
+    global cIndents
+
+    for iRow in range(CYCLE.rowCount()):
+        cRowDict = CYCLE.getAttributes(iRow)
+        print(cRowDict)
+
+
 
 
 
@@ -318,10 +333,14 @@ def compilePTB(globalSelf):
             noStimRelatedCodes = []
 
             cWidget = Info.WID_WIDGET[cWidgetId]
-            # print(Func.getWidgetName(cWidgetId))
+            print(Func.getWidgetName(cWidgetId))
 
             if 'Text' == cWidget.widget_id.split('.')[0]:
-                noStimRelatedCodes = printTextWidget(cWidgetId,noStimRelatedCodes)
+                noStimRelatedCodes = printTextWidget(cWidget,noStimRelatedCodes)
+
+            elif 'Cycle' == cWidget.widget_id.split('.')[0]:
+                print(cWidget.getTimelines())
+                noStimRelatedCodes = printCycleWdiget(cWidget, noStimRelatedCodes)
 
 
             print(Func.getProperties(cWidgetId))
