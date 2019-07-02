@@ -296,23 +296,27 @@ class TimelineTable(QTableWidget):
         except Exception as e:
             print(f"error {e} happens in delete timeline. [timeline_table/main.py]")
 
-    def getInfo(self):
+    def getInfo(self) -> dict:
+        """
+        返回保存所需要的信息
+        :return:
+        """
         try:
             # col_attribute, attribute_value, name_wid, name_count
             info = {
                 'col_attribute': self.col_attribute,
-                'attribute_value': self.col_attribute,
+                'attribute_value': self.attribute_value,
                 'name_wid': self.name_wid,
                 'name_count': self.name_count,
                 'row': self.rowCount(),
                 'col': self.columnCount(),
-                'data': []
+                'table_data': []
             }
             for row in range(self.rowCount()):
                 data = []
                 for col in range(self.columnCount()):
                     data.append(self.item(row, col).text())
-                info['data'].append(data)
+                info['table_data'].append(data)
             return info
         except Exception as e:
             print(f"error {e} happens in get info. [timeline_table/main.py]")
@@ -332,7 +336,7 @@ class TimelineTable(QTableWidget):
             # table
             self.setRowCount(info['row'])
             self.setColumnCount(info['col'])
-            data = info['data']
+            data = info['table_data']
             for row in range(self.rowCount()):
                 for col in range(self.columnCount()):
                     self.setItem(row, col, QTableWidgetItem(data[row][col]))

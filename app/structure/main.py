@@ -369,6 +369,7 @@ class Structure(QDockWidget):
             if sender == 'structure_tree':
                 Func.deleteItemInWidget(widget_id)
             # 先递归删除子节点
+
             node = Info.WID_NODE[widget_id]
             children = []
             self.getChild(node, children, False)
@@ -517,19 +518,37 @@ class Structure(QDockWidget):
         """
         # 判断父节点是否在
         if parent_widget_id in Info.WID_NODE:
+            # 添加节点
             parent = Info.WID_NODE[parent_widget_id]
             node = StructureNode(parent, widget_id)
             node.setText(0, widget_name)
             parent.setExpanded(True)
 
-            # 相关字典数据
+            # wid_node
             Info.WID_NODE[widget_id] = node
 
-            # 创建控件
-            Func.createWidget(widget_id)
-            setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
-            properties = setting.value(widget_id)
-            if properties:
-                Func.restore(widget_id, properties)
-            # 连接信号
-            self.widgetSignalsLink.emit(widget_id)
+            # 如果为源widget(wid_name的值的第一个wid), 创建控件
+            origin_wid = Info.NAME_WID[widget_name][0]
+            if widget_id == origin_wid:
+                # 可能在创建被引用节点时已经创建
+                if widget_id not in Info.WID_WIDGET:
+                    Func.createWidget(widget_id)
+                    setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
+                    properties = setting.value(widget_id)
+                    if properties:
+                        Func.restore(widget_id, properties)
+                    # 连接信号
+                    self.widgetSignalsLink.emit(widget_id)
+            else:
+                # 有可能被引用的节点先于源节点复原
+                if origin_wid not in Info.WID_WIDGET:
+                    # 创建源
+                    Func.createWidget(origin_wid)
+                    setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
+                    properties = setting.value(origin_wid)
+                    if properties:
+                        Func.restore(origin_wid, properties)
+                    # 连接信号
+                    self.widgetSignalsLink.emit(origin_wid)
+                # 要链接过去
+                Info.WID_WIDGET[widget_id] = Info.WID_WIDGET[origin_wid]

@@ -298,12 +298,15 @@ class PsyApplication(QMainWindow):
         """
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", "", "Psy File (*.psy;*.ini)", options=options)
-        #
         if file_name:
             # 更新文件名
             Info.FILE_NAME = file_name
             # 从文件中读取配置
             setting = QSettings(file_name, QSettings.IniFormat)
+
+            # 计数恢复
+            Info.WIDGET_TYPE_ID_COUNT = setting.value("WIDGET_TYPE_ID_COUNT")
+            Info.WIDGET_TYPE_NAME_COUNT = setting.value("WIDGET_TYPE_NAME_COUNT")
 
             # 更新输入输出设备
             input_device_info = setting.value("INPUT_DEVICE_INFO")
@@ -318,18 +321,20 @@ class PsyApplication(QMainWindow):
                 self.restoreState(dock_layout)
 
             # 恢复widgets
-            # 复原根节点，即初始的Timeline
+            # 复原初始的Timeline
             root_timeline: Timeline = Info.WID_WIDGET[f"{Info.TIMELINE}.0"]
             # 将其数据取出
             root_timeline_info = setting.value(f"{Info.TIMELINE}.0")
-            # 恢复根节点
+            # 恢复
             if root_timeline_info:
                 root_timeline.restore(root_timeline_info)
+
             # 恢复name_wid
             name_wid: dict = setting.value("NAME_WID")
             if name_wid:
                 Info.NAME_WID = name_wid.copy()
-            # 恢复structure并恢复widget
+
+            # 恢复structure并恢复剩余widget
             structure_tree: list = setting.value("STRUCTURE_TREE")
             self.structure.loadStructure(structure_tree)
         Func.log(f"{Info.FILE_NAME} loaded successful!")
@@ -338,7 +343,6 @@ class PsyApplication(QMainWindow):
         # 导出输入设备信息
         input_device_info: dict = Info.INPUT_DEVICE_INFO.copy()
         output_device_info: dict = Info.OUTPUT_DEVICE_INFO.copy()
-        print(output_device_info)
         # 当前布局信息
         current_dock_layout = self.saveState()
         #
@@ -349,6 +353,8 @@ class PsyApplication(QMainWindow):
         setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
         setting.setValue("DOCK_LAYOUT", current_dock_layout)
         setting.setValue("NAME_WID", name_wid)
+        setting.setValue("WIDGET_TYPE_NAME_COUNT", Info.WIDGET_TYPE_NAME_COUNT.copy())
+        setting.setValue("WIDGET_TYPE_ID_COUNT", Info.WIDGET_TYPE_ID_COUNT.copy())
 
         structure_tree: list = self.structure.getStructure("李扬是个大瓜皮")
         self.loadOutTree(structure_tree)
@@ -363,7 +369,9 @@ class PsyApplication(QMainWindow):
         elif isinstance(tree, tuple):
             widget_id = tree[1]
             setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
-            setting.setValue(widget_id, Info.WID_WIDGET[widget_id].getInfo())
+            # 只保存源widget的数据，引用创建的wid没有必要保存
+            if widget_id == Info.WID_WIDGET[widget_id].widget_id:
+                setting.setValue(widget_id, Info.WID_WIDGET[widget_id].getInfo())
 
     def resetView(self):
         """

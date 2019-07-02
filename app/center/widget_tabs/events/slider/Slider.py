@@ -1568,16 +1568,25 @@ class Slider(QMainWindow):
                     item.setZValue(dic['z'])
                     item.setPos(QPoint(dic['x_pos'], dic['y_pos']))
 
-    def clone(self, id):
-        # try:
-        slider = Slider(widget_id=id)
+    def clone(self, widget_id: str):
+        """
+        根据传入的widget_id，复制一个widget
+        :param widget_id:
+        :return:
+        """
+        slider = Slider(widget_id=widget_id)
         slider.pro_window.setProperties(self.pro_window.getInfo())
         for item in self.scene.items():
             item1 = item.clone()
             slider.scene.addItem(item1)
             item1.setPos(item.scenePos())
             slider.scene.update()
-
         return slider
-    # except Exception as e:
-    #     print(f"error {e} happens in clone. [slider/Slider.py]")
+
+    def changeWidgetId(self, new_widget_id: str):
+        """
+        修改widget的wid
+        :param new_widget_id:
+        :return:
+        """
+        self.widget_id = new_widget_id

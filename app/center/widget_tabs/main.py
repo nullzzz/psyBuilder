@@ -114,6 +114,7 @@ class WidgetTabs(QTabWidget):
                 for i in range(self.count()):
                     if widget_id == self.widget(i).widget_id:
                         self.removeTab(i)
+                        break
         except Exception as e:
             print(f"error {e} happens in close tab. [widget_tabs/main.py]")
 

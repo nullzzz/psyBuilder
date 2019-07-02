@@ -92,7 +92,7 @@ class Info(object):
         TIMELINE: os.path.join(IMAGE_SOURCE_PATH, "timeline.png"),
     }
 
-    # widget不同类型对应图片
+    # widget不同类型名称的对应数
     WIDGET_TYPE_NAME_COUNT = {
         CYCLE: 0,
         SOUND: 0,
@@ -115,7 +115,7 @@ class Info(object):
         TIMELINE: 1,
     }
 
-    # widget不同类型对应图片
+    # widget不同类型id对应数
     WIDGET_TYPE_ID_COUNT = {
         CYCLE: 0,
         SOUND: 0,
