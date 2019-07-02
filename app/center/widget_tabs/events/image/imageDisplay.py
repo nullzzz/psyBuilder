@@ -1,3 +1,4 @@
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel
@@ -36,7 +37,7 @@ class ImageDisplay(QMainWindow):
         self.isUD = False
         self.isLR = False
         self.stretch_mode = "Both"
-        self.back_color = "white"
+        self.back_color = "255,255,255"
         self.transparent_value = "0"
 
         self.x_pos = "0"
@@ -341,6 +342,13 @@ class ImageDisplay(QMainWindow):
         :return:
         """
         return self.pro_window.frame.border_width.currentText()
+
+    def getFrameBackColor(self) -> str:
+        """
+        返回边框背景色
+        :return:
+        """
+        return self.pro_window.frame.back_color.getColor()
 
     def getDuration(self) -> str:
         """

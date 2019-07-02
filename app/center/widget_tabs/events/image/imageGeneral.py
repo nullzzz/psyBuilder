@@ -3,8 +3,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
     QApplication, QFileDialog, QCompleter, QMessageBox
 
-from app.lib import PigLineEdit, PigComboBox
-from ...colorBobox import ColorListEditor
+from app.lib import PigLineEdit, PigComboBox, ColorListEditor
 
 
 # image event专属页面
@@ -25,7 +24,7 @@ class ImageTab1(QWidget):
             "Back color": "white",
             "Transparent": "100",
             "Clear after": "Yes",
-            "Screen name": "Display"
+            "Screen name": "screen.0"
         }
         # 打开文件
         self.file_name = PigLineEdit()
@@ -40,7 +39,7 @@ class ImageTab1(QWidget):
         self.mirrorLR = QCheckBox("Mirror left/right")
 
         # Rotate
-        self.rotate = PigLineEdit()
+        self.rotate = PigLineEdit("0")
 
         # 拉伸模式
         self.stretch = QCheckBox("Stretch")
@@ -58,7 +57,7 @@ class ImageTab1(QWidget):
         self.stretch_mode.addItems(("Both", "LeftRight", "UpDown"))
         self.transparent.setText("100")
         self.clear_after.addItems(("Yes", "No"))
-        self.screen_name.addItems(["Display"])
+        self.screen_name.addItems(["screen.0"])
 
         # 打开文件按钮布局
         group1 = QGroupBox("")
@@ -160,7 +159,7 @@ class ImageTab1(QWidget):
         self.default_properties["Rotate"] = self.rotate.text()
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
-        self.default_properties["Back color"] = self.back_color.currentText()
+        self.default_properties["Back color"] = self.back_color.getColor()
         # self.default_properties["Transparent"] = self.transparent.value()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear after"] = self.clear_after.currentText()
@@ -177,7 +176,7 @@ class ImageTab1(QWidget):
 
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
-        self.default_properties["Back color"] = self.back_color.currentText()
+        self.default_properties["Back color"] = self.back_color.getColor()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear after"] = self.clear_after.currentText()
         self.default_properties["Screen name"] = self.screen_name.currentText()

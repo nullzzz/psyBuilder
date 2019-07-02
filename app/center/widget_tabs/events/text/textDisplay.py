@@ -30,8 +30,8 @@ class TextDisplay(QMainWindow):
         self.align = "Center"
         self.A_v = "Center"
 
-        self.fore_color = "black"
-        self.back_color = "white"
+        self.fore_color = "0,0,0"
+        self.back_color = "255,255,255"
         self.transparent_value = 100
         self.is_wrap = False
 
@@ -126,10 +126,7 @@ class TextDisplay(QMainWindow):
         self.back_color = self.pro_window.general.back_color.currentText()
         self.transparent_value = self.pro_window.general.transparent.text()
         self.is_wrap = bool(self.pro_window.general.word_wrap.checkState())
-        # self.x_pos = self.pro_window.frame.x_pos.currentText()
-        # self.y_pos = self.pro_window.frame.y_pos.currentText()
-        # self.w_size = self.pro_window.frame.width.currentText()
-        # self.h_size = self.pro_window.frame.height.currentText()
+
         self.x_pos = self.default_properties.get("X position", "0")
         self.y_pos = self.default_properties.get("Y position", "0")
         self.w_size = self.default_properties.get("Width", "100%")
@@ -332,6 +329,13 @@ class TextDisplay(QMainWindow):
         :return:
         """
         return self.pro_window.frame.border_width.currentText()
+
+    def getFrameBackColor(self) -> str:
+        """
+        返回边框背景色
+        :return:
+        """
+        return self.pro_window.frame.back_color.getColor()
 
     def getDuration(self) -> str:
         """

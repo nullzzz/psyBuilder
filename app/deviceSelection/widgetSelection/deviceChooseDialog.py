@@ -82,7 +82,7 @@ class DeviceOutDialog(QDialog):
     # 图片名与设备名相同
     def addDevices(self, devices: dict):
         for device_name, properties in devices.items():
-            self.tip.hide()
+
             device_type = properties.get("Device Type")
             if device_type == "screen":
                 continue
@@ -93,8 +93,4 @@ class DeviceOutDialog(QDialog):
             item.setData(3, properties)
             item.setIcon(QIcon(Func.getImage(f"{device_type}_device")))
             self.devices_list.addItem(item)
-
-            # item = QListWidgetItem(device_name)
-            # item.setData(3, properties)
-            # item.setIcon(QIcon("image/{}_device".format(properties["Device type"])))
-            # self.devices_list.addItem(item)
+            self.tip.hide()

@@ -3,8 +3,7 @@ from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QFormLayout, QGroupBox, QGridLayout, QSpinBox, QLabel
 from PyQt5.QtWidgets import (QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
 
-from app.center.widget_tabs.colorBobox import ColorListEditor
-from app.lib import PigComboBox
+from app.lib import PigComboBox, ColorListEditor
 
 
 class FramePage(QWidget):
