@@ -12,7 +12,6 @@ class Selection(QWidget):
         self.order_combo.addItem("Random")
         self.order_combo.addItem("Random with Replacement")
         self.order_combo.addItem("CounterBalance")
-        self.order_combo.addItem("Offset")
 
         self.no_repeat_after = QComboBox(self.order)
         self.no_repeat_after.addItem("N/A")
@@ -69,7 +68,7 @@ class Selection(QWidget):
             self.order_by_combo.setEnabled(False)
             self.order_by_combo.clear()
             self.order_by_combo.addItem("N/A")
-        if index in (3, 4, 5):
+        if index in (3, 4):
             self.no_repeat_after.setEnabled(False)
             self.no_repeat_after.clear()
             self.no_repeat_after.addItem("N/A")

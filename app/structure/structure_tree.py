@@ -21,8 +21,8 @@ class StructureTree(QTreeWidget):
         # 初始化
         self.setDragEnabled(True)
         self.setColumnCount(1)
-        self.setHeaderLabel("E-Object")
-        self.setHeaderHidden(False)
+        # self.setHeaderLabel("E-Object")
+        self.setHeaderHidden(True)
         timeline_node = StructureNode(self, f'{Info.TIMELINE}.0')
         timeline_node.setText(0, Info.TIMELINE)
         self.addTopLevelItem(timeline_node)

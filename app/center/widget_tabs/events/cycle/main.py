@@ -197,6 +197,11 @@ class Cycle(QMainWindow):
             print(f"error {e} happens in get info. [cycle/main.py]")
 
     def restore(self, info: dict):
+        """
+        读取配置，恢复widget
+        :param info:
+        :return:
+        """
         try:
             self.setProperties(info['properties'])
             self.timeline_table.restore(info['timeline_table'])
@@ -210,6 +215,20 @@ class Cycle(QMainWindow):
         # properties
         clone_cycle.setProperties(self.getProperties())
         return clone_cycle
+
+    def rowCount(self) -> int:
+        """
+        返回table共有多少行
+        :return:
+        """
+        return self.timeline_table.rowCount()
+
+    def columnCount(self) -> int:
+        """
+        返回table共有多少列
+        :return:
+        """
+        return self.timeline_table.columnCount()
 
     def getHiddenAttribute(self):
         hidden_attr = {

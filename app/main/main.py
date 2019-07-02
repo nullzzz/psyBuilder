@@ -299,7 +299,7 @@ class PsyApplication(QMainWindow):
             Info.FILE_NAME = file_name
             file_name: str
             setting = QSettings(file_name, QSettings.IniFormat)
-
+            print(setting)
             # 复原根节点
             # 清空原编辑状态就在这儿做
             root = Info.WID_WIDGET[f"{Info.TIMELINE}.0"]
@@ -312,7 +312,6 @@ class PsyApplication(QMainWindow):
             if input_device_info:
                 self.input_devices.setProperties(input_device_info)
             output_device_info = setting.value("OUTPUT_DEVICE_INFO")
-            print(output_device_info)
             if output_device_info:
                 self.output_devices.setProperties(output_device_info)
             # 恢复布局
