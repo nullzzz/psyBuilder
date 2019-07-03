@@ -1,6 +1,7 @@
 import os
 import sys
 import datetime
+import re
 
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
 from PyQt5.QtGui import QIcon
@@ -103,14 +104,28 @@ def printCycleWdiget(CYCLE, noStimRelatedCodes):
     for iRow in range(CYCLE.rowCount()):
         cRowDict = CYCLE.getAttributes(iRow)
         print(cRowDict)
-
-
-
-
-
     return noStimRelatedCodes
 
+
+
+
+def parseAllowKeys(enabledKBKeysList,allowKeyStr):
+    splittedStrs = re.split('({\w*})',allowKeyStr)
+
+    for item in splittedStrs:
+        if item[0] == '{':
+            item = re.sub('[{}]','',item)
+            enabledKBKeysList.append(item)
+        else:
+            for char in item:
+                enabledKBKeysList.append(char)
+
+
+
+
 def compilePTB(globalSelf):
+    enabledKBKeysList = []
+
     if not Info.FILE_NAME:
         if not globalSelf.getFileName():
             QMessageBox.information(globalSelf, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
@@ -137,7 +152,7 @@ def compilePTB(globalSelf):
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f,"%      begin      ")
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        
+
         #
         # get subject information
         printAutoInd(f,"%----- get subject information -------/",)
@@ -247,6 +262,7 @@ def compilePTB(globalSelf):
                 iSerial += 1
 
         printAutoInd(f,"%------------------------------------\\\n")
+        printAutoInd(f,"disableSomeKbKeys; % restrictKeysForKbCheck")
 
         printAutoInd(f,"%----- initialize output devices --------/")
         printAutoInd(f,"%--- open windows ---/")
@@ -255,11 +271,11 @@ def compilePTB(globalSelf):
         printAutoInd(f,"fullRects = zeros({0},4);",iMonitor-1)
 
         printAutoInd(f,"for iWin = 1:numel(monitors)")
-        
+
         printAutoInd(f,"[winIds(iWin),fullRects(iWin,:)] = Screen('OpenWindow',monitors(iWin).port,monitors(iWin).bkColor,[],[],[],[],monitors(iWin).muliSample);")
         printAutoInd(f,"Screen('BlendFunction', winIds(iWin),'GL_SRC_ALPHA','GL_ONE_MINUS_SRC_ALPHA'); % force to most common alpha-blending factors")
         printAutoInd(f,"winIFIs(iWin) = Screen('GetFlipInterval',winIds(iWin));                        % get inter frame interval (i.e., 1/refresh rate)")
-        
+
         printAutoInd(f,"end % for iWin ")
 
         printAutoInd(f,"%--------------------\\\n")
@@ -276,7 +292,7 @@ def compilePTB(globalSelf):
             else:
                 printAutoInd(f,"tcpipCons(iCount) = pnet('tcpsocket',TCPIPs(iCount).port);")
 
-            
+
             printAutoInd(f,"end % iCount")
 
             printAutoInd(f,"%----------------------\\\n")
@@ -287,9 +303,9 @@ def compilePTB(globalSelf):
             printAutoInd(f,"serialCons = zeros({0},1);",iSerial-1)
 
             printAutoInd(f,"for iCount = 1:numel(serialCons)")
-            
+
             printAutoInd(f,"serialCons(iCount) = IOPort('OpenSerialPort',serPort(iCount).port,['BaudRate=',serPort(iCount).baudRate,',DataBits=',serPort(iCount).dataBits]);")
-            
+
             printAutoInd(f,"end % iCount")
             printAutoInd(f,"%--------------------------\\\n")
         # initialize parallel ports
@@ -297,26 +313,26 @@ def compilePTB(globalSelf):
             printAutoInd(f,"%--- open parallel ports ----/")
             printAutoInd(f,"% for linux we directly use outb under sodo mode ")
             printAutoInd(f,"if IsWin")
-            
+
             printAutoInd(f,"try")
-            
+
             printAutoInd(f,"io64Obj = io64;")
-            
+
             printAutoInd(f,"catch")
-            
+
             printAutoInd(f,"error('Failed to find io64, please see \"http://apps.usd.edu/coglab/psyc770/IO64.html\" for instruction of installation!');")
-            
+
             printAutoInd(f,"end % try")
             printAutoInd(f,"if 0 ~= io64(ioObj)")
-            
+
             printAutoInd(f,"error('inputout 64 installation failed!');")
-            
+
             printAutoInd(f,"end % if 0 ~= ")
-            
+
             printAutoInd(f,"elseif IsOSX")
-            
+
             printAutoInd(f,"error('curently, we did not support output via parallel under Mac OX!');")
-            
+
             printAutoInd(f,"end % if IsWin")
             printAutoInd(f,"%----------------------------\\\n")
         printAutoInd(f,"%----------------------------------------\\\n")
@@ -443,9 +459,9 @@ def compilePTB(globalSelf):
             printAutoInd(f,"% Currently, Under windows io64 need to be closed")
             printAutoInd(f,"% Under Linux, we will use outp (which will require running matlab under the sodo mode) to send trigger via parallel ")
             printAutoInd(f,"if IsWin")
-            
+
             printAutoInd(f,"clear io64;")
-            
+
             printAutoInd(f,"end % if IsWin")
             printAutoInd(f,"% Under windows io64 need to be closed")
             printAutoInd(f,"%----------------------------\\\n")
@@ -459,9 +475,9 @@ def compilePTB(globalSelf):
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f,"% end of the experiment",)
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
-        
+
         printAutoInd(f,"catch {0}_error\n",cFilenameOnly)
-        
+
 
         printAutoInd(f,"sca;                        % Close opened windows")
         printAutoInd(f,"ShowCursor;                 % Show the hided mouse cursor")
@@ -475,26 +491,35 @@ def compilePTB(globalSelf):
         printAutoInd(f,"save('{0}_debug');",cFilenameOnly)
         printAutoInd(f,"rethrow({0}_error);",cFilenameOnly)
 
-        
+
         printAutoInd(f,"end % try")
 
-        
+
         printAutoInd(f,"end % function \n\n\n\n\n\n\n")
 
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f,"% subfun 1: detectAbortKey")
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
-        printAutoInd(f,"function detectAbortKey_bcl(abortKeyCode)\n")
-        
+
         printAutoInd(f,"[keyIsDown, Noused, keyCode] = responseCheck(-1);")
         printAutoInd(f,"if keyCode(abortKeyCode)")
-        
+
         printAutoInd(f,"error('The experiment was aborted by the experimenter!');")
-        
+
         printAutoInd(f,"end")
-        
-        printAutoInd(f,"end %  end of subfunction\n")
+
+        printAutoInd(f,"end %  end of subfunction\n\n\n")
+
+
+
+        printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f,"% subfun 2: disableSomeKeys")
+        printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+
+        printAutoInd(f,"function disableSomeKbKeys()\n")
+        printAutoInd(f,"{0}{1}{2}\n","RestrictKeysForKbCheck(KbName({",''.join("'"+ cItem +"'," for cItem in enabledKBKeysList)[:-1],"}));")
+        printAutoInd(f,"end %  end of subfun2\n")
 
 
 
