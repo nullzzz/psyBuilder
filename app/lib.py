@@ -258,6 +258,12 @@ class ColorListEditor(PigComboBox):
                     pass
         QComboBox.focusOutEvent(self, e)
 
+    def setCurrentText(self, text: str) -> None:
+        for k, v in self.color_map.items():
+            if text == v:
+                text = k
+        return QComboBox.setCurrentText(self, text)
+
     # 返回当前颜色R,G,B
     def getColor(self):
         color_name = self.currentText()
