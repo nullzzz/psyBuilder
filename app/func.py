@@ -531,6 +531,19 @@ class Func(object):
             return []
 
     @staticmethod
+    def isWidgetType(widget_id: str, widget_type: str):
+        """
+        根据输入的widget_id来判断是不是输入的类型
+        :param widget_id: 需要判断的id
+        :param widget_type: 需要确定的类型
+        :return:
+        """
+        try:
+            return widget_id.split('.')[0] == widget_type
+        except:
+            return False
+
+    @staticmethod
     def getTrackingPix(text):
         pix = QPixmap(200, 16)
         pix.fill(QColor(0, 0, 0, 0))
