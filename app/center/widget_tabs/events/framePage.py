@@ -3,8 +3,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QComboBox, QWidget, QLabel, \
     QMessageBox, QCompleter
 
-from app.center.widget_tabs.colorBobox import ColorListEditor
-from app.lib import PigComboBox, PigLineEdit
+from app.lib import PigComboBox, PigLineEdit, ColorListEditor
 
 
 class FramePage(QWidget):
@@ -16,7 +15,7 @@ class FramePage(QWidget):
             "Y position": "0",
             "Width": "100%",
             "Height": "100%",
-            "Border color": "white",
+            "Border color": "255,255,255",
             "Border width": "0"
         }
         # up
@@ -30,8 +29,8 @@ class FramePage(QWidget):
         self.height.installEventFilter(self)
         # down
         self.border_color = ColorListEditor()
-        # self.border_width = QSpinBox()
         self.border_width = PigLineEdit()
+        self.back_color = ColorListEditor()
         self.setUI()
 
     # 生成frame页面
@@ -42,31 +41,16 @@ class FramePage(QWidget):
         self.y_pos.setEditable(True)
         self.x_pos.setInsertPolicy(QComboBox.NoInsert)
         self.y_pos.setInsertPolicy(QComboBox.NoInsert)
-        self.x_pos.lineEdit().returnPressed.connect(self.finalCheck)
-        self.y_pos.lineEdit().returnPressed.connect(self.finalCheck)
-        self.x_pos.lineEdit().textChanged.connect(self.findVar)
-        self.x_pos.lineEdit().returnPressed.connect(self.finalCheck)
-        self.y_pos.lineEdit().textChanged.connect(self.findVar)
-        self.y_pos.lineEdit().returnPressed.connect(self.finalCheck)
 
         self.border_width.setText("0")
-        # valid_num = QRegExp("\[\w+\]|\d+%?")
-        # self.x_pos.setValidator(QRegExpValidator(valid_num))
-        # self.y_pos.setValidator(QRegExpValidator(valid_num))
 
         self.width.addItems(("100%", "75%", "50%", "25%"))
         self.width.setEditable(True)
-        # self.width.setValidator(QRegExpValidator(valid_num))
         self.width.setInsertPolicy(QComboBox.NoInsert)
-        self.width.lineEdit().textChanged.connect(self.findVar)
-        self.width.lineEdit().returnPressed.connect(self.finalCheck)
 
         self.height.addItems(("100%", "75%", "50%", "25%"))
         self.height.setEditable(True)
-        # self.height.setValidator(QRegExpValidator(valid_num))
         self.height.setInsertPolicy(QComboBox.NoInsert)
-        self.height.lineEdit().textChanged.connect(self.findVar)
-        self.height.lineEdit().returnPressed.connect(self.finalCheck)
 
         l1 = QLabel("X position:")
         l2 = QLabel("Y position:")
@@ -74,12 +58,14 @@ class FramePage(QWidget):
         l4 = QLabel("Height:")
         l5 = QLabel("Border Color:")
         l6 = QLabel("Border Width:")
+        l7 = QLabel("Back Color:")
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         group1 = QGroupBox("Geometry")
         layout1 = QGridLayout()
         layout1.addWidget(l1, 0, 0)
@@ -96,6 +82,7 @@ class FramePage(QWidget):
         layout2 = QFormLayout()
         layout2.addRow(l5, self.border_color)
         layout2.addRow(l6, self.border_width)
+        layout2.addRow(l7, self.back_color)
         layout2.setVerticalSpacing(20)
         group2.setLayout(layout2)
 
@@ -103,23 +90,6 @@ class FramePage(QWidget):
         layout.addWidget(group1)
         layout.addWidget(group2)
         self.setLayout(layout)
-
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color:black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                temp.clear()
 
     # 设置可选属性
     def setAttributes(self, attributes):
@@ -159,9 +129,9 @@ class FramePage(QWidget):
         else:
             self.default_properties["Height"] = "100%"
             self.height.setCurrentText("100%")
-        self.default_properties["Border color"] = self.border_color.currentText()
-        # self.default_properties["Border width"] = self.border_width.value()
+        self.default_properties["Border color"] = self.border_color.getColor()
         self.default_properties["Border width"] = self.border_width.text()
+        self.default_properties["Frame color"] = self.back_color.getColor()
         return self.default_properties
 
     def getProperties(self):
@@ -170,8 +140,9 @@ class FramePage(QWidget):
         self.default_properties["Y position"] = self.y_pos.currentText()
         self.default_properties["Width"] = self.width.currentText()
         self.default_properties["Height"] = self.height.currentText()
-        self.default_properties["Border color"] = self.border_color.currentText()
+        self.default_properties["Border color"] = self.border_color.getColor()
         self.default_properties["Border width"] = self.border_width.text()
+        self.default_properties["Frame color"] = self.back_color.getColor()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -186,6 +157,7 @@ class FramePage(QWidget):
         self.height.setCurrentText(self.default_properties["Height"])
         self.border_color.setCurrentText(self.default_properties["Border color"])
         self.border_width.setText(self.default_properties["Border width"])
+        self.back_color.setCurrentText(self.default_properties["Frame color"])
 
     def clone(self):
         clone_page = FramePage()

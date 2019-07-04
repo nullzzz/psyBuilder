@@ -113,7 +113,6 @@ class PigLineEdit(QLineEdit):
     def findVar(self, text: str):
         if text.startswith("[") and text.endswith("]"):
             self.setStyleSheet("color: blue")
-            print(text)
             self.setFont(QFont("Timers", 9, QFont.Bold))
         else:
             self.setStyleSheet("color: black")
@@ -122,6 +121,17 @@ class PigLineEdit(QLineEdit):
 
 class ColorListEditor(PigComboBox):
     colorChanged = pyqtSignal(str)
+    color_map: dict = {
+        "white": "255,255,255",
+        "gray": "128,128,128",
+        "black": "0,0,0",
+        "red": "255,0,0",
+        "orange": "255,165,0",
+        "yellow": "255,255,0",
+        "green": "0,255,0",
+        "blue": "0,0,255",
+        "purple": "128,0,128",
+    }
 
     def __init__(self, widget=None):
         super(ColorListEditor, self).__init__(widget)
@@ -213,7 +223,7 @@ class ColorListEditor(PigComboBox):
             self.setStyleSheet("background: white")
 
         if self.is_valid:
-            self.colorChanged.emit(self.currentText())
+            self.colorChanged.emit(self.getColor())
 
     # 重写下拉菜单展开
     def showPopup(self):
@@ -248,12 +258,16 @@ class ColorListEditor(PigComboBox):
                     pass
         QComboBox.focusOutEvent(self, e)
 
-    # 返回当前QColor对象
+    def setCurrentText(self, text: str) -> None:
+        for k, v in self.color_map.items():
+            if text == v:
+                text = k
+        return QComboBox.setCurrentText(self, text)
+
+    # 返回当前颜色R,G,B
     def getColor(self):
-        if self.is_valid:
-            return QColor(self.currentText())
-        else:
-            return Qt.white
+        color_name = self.currentText()
+        return self.color_map.get(color_name, color_name)
 
 
 class T(QMainWindow, BaseWidget):

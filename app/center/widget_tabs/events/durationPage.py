@@ -59,10 +59,8 @@ class DurationPage(QWidget):
     # 生成duration页面
     def setUI(self):
         group0 = QGroupBox()
-        self.duration.addItems(("(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000"))
+        self.duration.addItems(("(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000", "0~200"))
         self.duration.setEditable(True)
-        self.duration.lineEdit().textChanged.connect(self.findVar)
-        self.duration.lineEdit().returnPressed.connect(self.finalCheck)
 
         layout0 = QHBoxLayout()
         layout0.addWidget(QLabel("Duration(ms):"), 1)
@@ -104,23 +102,6 @@ class DurationPage(QWidget):
         layout.addWidget(group1, 6)
         layout.addWidget(group2, 6)
         self.setLayout(layout)
-
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color:black")
-            self.sender().setFont(QFont("SimSun", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                temp.clear()
 
     # 弹出输入设备选择框
     def showInDevices(self):

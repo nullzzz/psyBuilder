@@ -366,6 +366,13 @@ class VideoDisplay(QMainWindow):
         """
         return self.pro_window.frame.border_width.currentText()
 
+    def getFrameBackColor(self) -> str:
+        """
+        返回边框背景色
+        :return:
+        """
+        return self.pro_window.frame.back_color.getColor()
+
     def getDuration(self) -> str:
         """
         返回duration

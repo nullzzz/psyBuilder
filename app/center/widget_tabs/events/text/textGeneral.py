@@ -6,8 +6,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
 # text event专属页面
 # 文本颜色设置为全体文本
 # 对齐方式也是
-from app.center.widget_tabs.colorBobox import ColorListEditor
-from app.lib import PigComboBox, PigLineEdit
+from app.lib import PigComboBox, PigLineEdit, ColorListEditor
 
 
 class TextTab1(QWidget):
@@ -25,9 +24,9 @@ class TextTab1(QWidget):
         self.default_properties = {
             "Text": "",
             "Alignment": "Center",
-            "Fore color": "black",
-            "Back color": "white",
-            "Screen name": "Display",
+            "Fore color": "0,0,0",
+            "Back color": "255,255,255",
+            "Screen name": "screen.0",
             "Transparent": 100,
             "Font": "SimSun",
             "Word wrap": 0,
@@ -84,11 +83,8 @@ class TextTab1(QWidget):
         self.align.addItems(["Center", "Left", "Right", "Justify"])
         self.clear_after.addItems(["Yes", "No"])
 
-        # self.transparent.setMaximum(100)
-        # self.transparent.setSuffix("%")
-        # self.transparent.setValue(100)
         self.transparent.setText("100%")
-        self.screen_name.addItems(["Display"])
+        self.screen_name.addItems(["screen.0"])
 
         group1 = QGroupBox("Text")
         layout1 = QGridLayout()
@@ -118,23 +114,6 @@ class TextTab1(QWidget):
         layout.addWidget(group1, 1)
         layout.addWidget(group2, 1)
         self.setLayout(layout)
-
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color: black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                temp.clear()
 
     def colorChange(self, color):
         if "," in color:
@@ -206,8 +185,8 @@ class TextTab1(QWidget):
         self.default_properties["Html"] = self.html
         self.default_properties["Text"] = self.text_edit.toPlainText()
         self.default_properties["Alignment"] = self.align.currentText()
-        self.default_properties["Fore color"] = self.fore_color.currentText()
-        self.default_properties["Back color"] = self.back_color.currentText()
+        self.default_properties["Fore color"] = self.fore_color.getColor()
+        self.default_properties["Back color"] = self.back_color.getColor()
         self.default_properties["Screen name"] = self.screen_name.currentText()
         self.default_properties["Transparent"] = self.transparent.text()
         # self.default_properties["Transparent"] = self.transparent.value()

@@ -2,8 +2,7 @@ from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtWidgets import QPushButton, QSpinBox, QGridLayout, QLabel, QFileDialog, QMessageBox, QCompleter, QWidget
 
-from app.lib import PigComboBox, PigLineEdit
-from ...colorBobox import ColorListEditor
+from app.lib import PigComboBox, PigLineEdit, ColorListEditor
 
 
 class VideoTab1(QWidget):
@@ -17,7 +16,7 @@ class VideoTab1(QWidget):
             "Aspect ratio": "Default",
             "Playback rate": "1",
             "Clear after": "Yes",
-            "Screen name": "Display"
+            "Screen name": "screen.0"
         }
         # general
         self.file_name = PigLineEdit()
@@ -29,7 +28,6 @@ class VideoTab1(QWidget):
         self.start_pos = PigLineEdit()
         self.end_pos = PigLineEdit()
 
-        self.back_color = ColorListEditor()
         # 倍速
         self.playback_rate = PigComboBox()
         self.playback_rate_tip = QLabel()
@@ -41,7 +39,7 @@ class VideoTab1(QWidget):
         self.setUI()
 
     def setUI(self):
-        valid_pos = QRegExp("(\d{1,2}:\d{1,2}:\d{2}\.\d{3})|(\[\w+\])")
+        valid_pos = QRegExp(r"(\d{1,2}:\d{1,2}:\d{2}\.\d{3})|(\[\w+\])")
         self.start_pos.setText("00:00:00.000")
         self.start_pos.setMinimumWidth(120)
         self.end_pos.setText("99:99:99.999")
@@ -56,7 +54,7 @@ class VideoTab1(QWidget):
         self.playback_rate.currentTextChanged.connect(self.pbTip)
         self.aspect_ratio.addItems(["Default", "Ignore", "Keep", "KeepByExpanding"])
 
-        self.screen_name.addItems(["Display"])
+        self.screen_name.addItems(["screen.0"])
         self.clear_after.addItems(["Yes", "No"])
 
         l0 = QLabel("File Name:")
@@ -174,8 +172,6 @@ class VideoTab1(QWidget):
         self.start_pos.setText(self.default_properties["Start position"])
         self.end_pos.setText(self.default_properties["End position"])
         self.aspect_ratio.setCurrentText(self.default_properties["Aspect ratio"])
-        # self.back_color.setCurrentText(self.default_properties["Back color"])
         self.playback_rate.setCurrentText(self.default_properties["Playback rate"])
-        # self.transparent.setValue(self.default_properties["Transparent"])
         self.clear_after.setCurrentText(self.default_properties["Clear after"])
         self.screen_name.setCurrentText(self.default_properties["Screen name"])

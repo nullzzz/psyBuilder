@@ -13,7 +13,8 @@ from app.lib import NoDash
 
 
 class TimelineTable(QTableWidget):
-    # timeline新增 (cycle_widget_id, timeline_widget_id, name, flag, existed_timeline_widget_id, refresh(False) -> structure)
+    # timeline新增 (cycle_widget_id, timeline_widget_id, name, flag, existed_timeline_widget_id, refresh(False) ->
+    # structure)
     timeline_add = pyqtSignal(str, str, str, int, str, bool)
     # timeline删除，如果timeline_table中的某个name的timeline全部消失，要将structure中该node删除 (wid -> structure)
     timeline_delete = pyqtSignal(str)

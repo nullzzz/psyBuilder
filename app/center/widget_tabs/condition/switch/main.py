@@ -19,7 +19,6 @@ class Switch(QWidget):
         super(Switch, self).__init__(parent)
         #
         self.widget_id = widget_id
-        self.attributes: list = []
         self.using_attributes: list = []
         #
         self.switch_area = SwitchCondition()
@@ -37,7 +36,8 @@ class Switch(QWidget):
         self.apply_bt = QPushButton("Apply")
         self.apply_bt.clicked.connect(self.apply)
 
-        self.setAttributes(Func.getAttributes(self.widget_id))
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
 
         self.setUI()
 
@@ -65,6 +65,8 @@ class Switch(QWidget):
     def apply(self):
         self.getProperties()
         self.propertiesChange.emit(self.default_properties)
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
 
     def getInfo(self):
         return self.getProperties()
