@@ -87,26 +87,18 @@ def is_contain_ch(check_str):
             return True
     return False
 
-def printTextWidget(cWidgetId,noStimRelatedCodes):
-    global cIndents
-    cProperties = Func.getProperties(cWidgetId)
-    # if is_contain_ch(cProperties['Text']):
-    # else:
 
+def dataStrConvert(dataStr):
+    # convert string to neither a string or a num
+    # e.g.,
+    # 2.00 to 2.0
+    # abcd to 'abcd'
+    try:
+        outData = float(dataStr)
+    except:
+        outData = "'"+dataStr+"'"
 
-
-    return noStimRelatedCodes
-
-
-def printCycleWdiget(CYCLE, noStimRelatedCodes):
-    global cIndents
-
-    for iRow in range(CYCLE.rowCount()):
-        cRowDict = CYCLE.getAttributes(iRow)
-        print(cRowDict)
-    return noStimRelatedCodes
-
-
+    return outData
 
 
 def parseAllowKeys(enabledKBKeysList,allowKeyStr):
@@ -121,10 +113,66 @@ def parseAllowKeys(enabledKBKeysList,allowKeyStr):
                 enabledKBKeysList.append(char)
 
 
+def printTimelineWidget(cWidget,f,attributesSetDict,parsedAttributesSetDict):
+    cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
+    print(cTimelineWidgetIds)
+    # to be continue ...
+
+
+def printTextWidget(cWidget,noStimRelatedCodes):
+    global cIndents
+    cProperties = Func.getProperties(cWidget.widget_id)
+    # to be continue ...
+
+
+
+    return noStimRelatedCodes
+
+
+def printCycleWdiget(CYCLE,f, noStimRelatedCodes):
+    global cIndents
+
+    # create the design matrix  (table) for the current cycle
+    startExpStr = Func.getWidgetName(CYCLE.widget_id) + '.att = cell2table({...'
+    printAutoInd(f,'% create the designMatrix of the current cycle (loop)')
+    printAutoInd(f,'{0}',startExpStr)
+
+    for iRow in range(CYCLE.rowCount()):
+        cRowDict = CYCLE.getAttributes(iRow)
+        if 0 == iRow:
+            endExpStr = "},'VariableNames',{" + ''.join("'"+key+"' " for key, value in cRowDict.items()) + "});"
+
+        if '' == cRowDict['Weight']:
+            cRepeat = 1
+        else:
+            cRepeat = int(dataStrConvert(cRowDict['Weight']))
+
+        for iRep in range(cRepeat):
+            printAutoInd(f,'{0}',"".join(dataStrConvert(value) + " " for key, value in cRowDict.items())+";...")
+
+
+    printAutoInd(f,'{0}\n',endExpStr)
+
+    # to be continue ...
+
+    return noStimRelatedCodes
+
+
+
+
+
+
+
 
 
 def compilePTB(globalSelf):
-    enabledKBKeysList = []
+
+    enabledKBKeysList        = []
+    attributesSetDict        = {'sessionNum':[0,''],'subAge':[0,''],'subName':[0,''],'subSex':[0,''],'subNum':[0,''],'subHandless':[0,'']}
+    parsedAttributesSetDict  = {'sessionNum':[0,''],'subAge':[0,''],'subName':[0,''],'subSex':[0,''],'subNum':[0,''],'subHandless':[0,'']}
+
+
+    # attributesSetDict.setdefault('sessionNum',0)
 
     if not Info.FILE_NAME:
         if not globalSelf.getFileName():
@@ -262,6 +310,7 @@ def compilePTB(globalSelf):
                 iSerial += 1
 
         printAutoInd(f,"%------------------------------------\\\n")
+
         printAutoInd(f,"disableSomeKbKeys; % restrictKeysForKbCheck")
 
         printAutoInd(f,"%----- initialize output devices --------/")
@@ -271,11 +320,9 @@ def compilePTB(globalSelf):
         printAutoInd(f,"fullRects = zeros({0},4);",iMonitor-1)
 
         printAutoInd(f,"for iWin = 1:numel(monitors)")
-
         printAutoInd(f,"[winIds(iWin),fullRects(iWin,:)] = Screen('OpenWindow',monitors(iWin).port,monitors(iWin).bkColor,[],[],[],[],monitors(iWin).muliSample);")
         printAutoInd(f,"Screen('BlendFunction', winIds(iWin),'GL_SRC_ALPHA','GL_ONE_MINUS_SRC_ALPHA'); % force to most common alpha-blending factors")
         printAutoInd(f,"winIFIs(iWin) = Screen('GetFlipInterval',winIds(iWin));                        % get inter frame interval (i.e., 1/refresh rate)")
-
         printAutoInd(f,"end % for iWin ")
 
         printAutoInd(f,"%--------------------\\\n")
@@ -303,9 +350,7 @@ def compilePTB(globalSelf):
             printAutoInd(f,"serialCons = zeros({0},1);",iSerial-1)
 
             printAutoInd(f,"for iCount = 1:numel(serialCons)")
-
             printAutoInd(f,"serialCons(iCount) = IOPort('OpenSerialPort',serPort(iCount).port,['BaudRate=',serPort(iCount).baudRate,',DataBits=',serPort(iCount).dataBits]);")
-
             printAutoInd(f,"end % iCount")
             printAutoInd(f,"%--------------------------\\\n")
         # initialize parallel ports
@@ -315,32 +360,29 @@ def compilePTB(globalSelf):
             printAutoInd(f,"if IsWin")
 
             printAutoInd(f,"try")
-
             printAutoInd(f,"io64Obj = io64;")
-
             printAutoInd(f,"catch")
-
             printAutoInd(f,"error('Failed to find io64, please see \"http://apps.usd.edu/coglab/psyc770/IO64.html\" for instruction of installation!');")
-
             printAutoInd(f,"end % try")
+
             printAutoInd(f,"if 0 ~= io64(ioObj)")
-
             printAutoInd(f,"error('inputout 64 installation failed!');")
-
             printAutoInd(f,"end % if 0 ~= ")
 
             printAutoInd(f,"elseif IsOSX")
-
             printAutoInd(f,"error('curently, we did not support output via parallel under Mac OX!');")
-
             printAutoInd(f,"end % if IsWin")
             printAutoInd(f,"%----------------------------\\\n")
+
         printAutoInd(f,"%----------------------------------------\\\n")
 
+        printAutoInd(f, "Priority(1);                % Turn the priority to high priority")
 
 
+        # start to handle all the widgets
+        printTimelineWidget( Info.WID_WIDGET[f"{Info.TIMELINE}.0"],f,attributesSetDict,parsedAttributesSetDict)
 
-
+        """
         # get widgets in the main timeline
         cTimelineWidgetIds = Func.getWidgetIDInTimeline(f"{Info.TIMELINE}.0")
 
@@ -356,7 +398,7 @@ def compilePTB(globalSelf):
 
             elif 'Cycle' == cWidget.widget_id.split('.')[0]:
                 print(cWidget.getTimelines())
-                noStimRelatedCodes = printCycleWdiget(cWidget, noStimRelatedCodes)
+                noStimRelatedCodes = printCycleWdiget(cWidget,f, noStimRelatedCodes)
 
 
             print(Func.getProperties(cWidgetId))
@@ -364,7 +406,6 @@ def compilePTB(globalSelf):
             # print(Func.getScreen)
             # print(dir(cWidget))
 
-        """
             widget是具体的某个控件
 
             widget为Image时，Text\Video\Sound类似的
@@ -399,7 +440,7 @@ def compilePTB(globalSelf):
 
 
 
-        printAutoInd(f,"Priority(1);                % Turn the priority to high priority")
+
 
 
 
