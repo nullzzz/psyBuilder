@@ -498,7 +498,7 @@ def compilePTB(globalSelf):
         if iParal > 1:
             printAutoInd(f,"%--- close parallel ports ---/")
             printAutoInd(f,"% Currently, Under windows io64 need to be closed")
-            printAutoInd(f,"% Under Linux, we will use outp (which will require running matlab under the sodo mode) to send trigger via parallel ")
+            printAutoInd(f,"% Under Linux, we will use outp (which will require running matlab under the sudo mode) to send trigger via parallel ")
             printAutoInd(f,"if IsWin")
 
             printAutoInd(f,"clear io64;")
@@ -542,7 +542,7 @@ def compilePTB(globalSelf):
         printAutoInd(f,"% subfun 1: detectAbortKey")
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
-
+        printAutoInd(f, "function detectAbortKey()\n")
         printAutoInd(f,"[keyIsDown, Noused, keyCode] = responseCheck(-1);")
         printAutoInd(f,"if keyCode(abortKeyCode)")
 
