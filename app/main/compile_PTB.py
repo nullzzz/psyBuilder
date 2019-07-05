@@ -107,7 +107,7 @@ def parseAllowKeys(enabledKBKeysList,allowKeyStr):
 
     for item in splittedStrs:
         if item[0] == '{':
-            item = re.sub('[{}]','',item)
+            item = re.sub('[\{\}]','',item)
             enabledKBKeysList.append(item)
         else:
             for char in item:
