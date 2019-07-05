@@ -23,6 +23,7 @@ from lib.wait_dialog import WaitDialog
 
 cIndents        = 0
 isPreLineSwitch = 0
+cLoopLevel      = 0
 
 def printAutoInd(f,inputStr,*argins):
     global cIndents
@@ -115,6 +116,20 @@ def parseAllowKeys(enabledKBKeysList,allowKeyStr):
 
 def printTimelineWidget(cWidget,f,attributesSetDict,parsedAttributesSetDict):
     cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
+
+    for cWidgetId in cTimelineWidgetIds:
+        cWidget = Info.WID_WIDGET[cWidgetId]
+
+        if Info.CYCLE == cWidget.widget_id.split('.')[0]:
+            noStimRelatedCodes = printCycleWdiget(cWidget, f,attributesSetDict,parsedAttributesSetDict, noStimRelatedCodes)
+
+        if Info.TEXT == cWidget.widget_id.split('.')[0]:
+            noStimRelatedCodes = printTextWidget(cWidget, noStimRelatedCodes)
+
+        elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
+            print(cWidget.getTimelines())
+            # noStimRelatedCodes = printImageWdiget(cWidget, f, noStimRelatedCodes)
+
     print(cTimelineWidgetIds)
     # to be continue ...
 
@@ -129,18 +144,28 @@ def printTextWidget(cWidget,noStimRelatedCodes):
     return noStimRelatedCodes
 
 
-def printCycleWdiget(CYCLE,f, noStimRelatedCodes):
-    global cIndents
+def printCycleWdiget(CYCLE, f, attributesSetDict, parsedAttributesSetDict, noStimRelatedCodes):
+    global cLoopLevel
+
+    # for each ref to the cycle function, increase the level by 1
+    cLoopLevel += 1
+
+    attributesSetDict       = attributesSetDict.copy()
+    parsedAttributesSetDict = parsedAttributesSetDict()
 
     # create the design matrix  (table) for the current cycle
     startExpStr = Func.getWidgetName(CYCLE.widget_id) + '.att = cell2table({...'
-    printAutoInd(f,'% create the designMatrix of the current cycle (loop)')
-    printAutoInd(f,'{0}',startExpStr)
+    printAutoInd(f, '% create the designMatrix of the current cycle (loop)')
+
+    printAutoInd(f, '{0}', startExpStr)
 
     for iRow in range(CYCLE.rowCount()):
         cRowDict = CYCLE.getAttributes(iRow)
         if 0 == iRow:
             endExpStr = "},'VariableNames',{" + ''.join("'"+key+"' " for key, value in cRowDict.items()) + "});"
+            # update the attributes set dictionary
+            for key in cRowDict.keys():
+                attributesSetDict.setdefault(key)
 
         if '' == cRowDict['Weight']:
             cRepeat = 1
