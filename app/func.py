@@ -112,8 +112,8 @@ class Func(object):
         :param name: 需要检测的name
         :return: 是否合法
         """
-        if not re.match(r"^[a-zA-Z][a-zA-Z_0-9]*$", name):
-            return False, 'The name must start with a letter and only contain numbers，letter and _'
+        if not re.match(r"^[a-zA-Z].*$", name):
+            return False, 'The name must start with a letter.'
         return not (name in Info.NAME_WID), 'Name has already existed.'
 
     @staticmethod

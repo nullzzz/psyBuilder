@@ -29,7 +29,7 @@ class TimelineTable(QTableWidget):
         # data
         self.widget_id = widget_id
         self.col_attribute = ["Weight", "Timeline"]
-        self.attribute_value = {"Weight": '', "Timeline": ''}
+        self.attribute_value = {"Weight": '1', "Timeline": ''}
         self.old_timeline_name = ''
         self.edit_row = -2
         self.name_wid = {}
@@ -65,7 +65,7 @@ class TimelineTable(QTableWidget):
         """
         self.itemChanged.connect(self.addTimeline)
         self.itemChanged.connect(self.deleteTimeline)
-        self.itemChanged.connect(self.valueChange)
+        self.itemChanged.connect(self.weightChange)
 
     def setMenuAndShortcut(self):
         """
@@ -270,7 +270,8 @@ class TimelineTable(QTableWidget):
                             del self.name_wid[self.old_timeline_name]
                 elif validity == Info.TimelineNameError:
                     item.setText(self.old_timeline_name)
-                    QMessageBox.information(self, 'Warning', "The value must start with a letter and only contain numbers，letter and _")
+                    QMessageBox.information(self, 'Warning',
+                                            "The value must start with a letter and only contain numbers，letter and _")
                 elif validity == Info.TimelineTypeError:
                     item.setText(self.old_timeline_name)
                     QMessageBox.information(self, 'Warning', "Can't refer different type widget.")
@@ -741,31 +742,24 @@ class TimelineTable(QTableWidget):
                 item_text = paste_row_data[i]
                 self.item(start_row + j, start_col + i).setText(item_text)
 
-    def valueChange(self, item: QTableWidgetItem) -> None:
+    def weightChange(self, item: QTableWidgetItem) -> None:
         """
-        当非timeline列值发送改变时，检查其合法性
+        当widget列值发生改变时，检查其合法性
         :param item:
         :return:
         """
         # 非timeline列
-        if item.column() != 1:
+        if item.column() == 0:
             new_value = item.text()
             # 如果为空无所谓
             if not new_value:
-                return None
-            # 如果为weight只能为整数
-            if item.column() == 0:
-                if re.match(r"^[0-9]+$", new_value):
-                    self.old_value = ""
-                    return None
-                tip = "value must be positive integer."
-            else:
-                # 非空需要当要求为第一个为字母，剩余只能为数字字母下滑线
-                if re.match(r"^[a-zA-Z][a-zA-Z_0-9]*$", new_value):
-                    self.old_value = ""
-                    return None
-                tip = "The value must start with a letter and only contain numbers，letter and _"
-            # 如果不符合，恢复成原来数据
-            QMessageBox.information(self, "warning", tip)
+                QMessageBox.information(self, "warning", "value must be positive integer.")
+                item.setText(self.old_value)
+                self.old_value = ""
+                return
+            if re.match(r"^[0-9]+$", new_value):
+                self.old_value = ""
+                return
+            QMessageBox.information(self, "warning", "value must be positive integer.")
             item.setText(self.old_value)
             self.old_value = ""
