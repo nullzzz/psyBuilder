@@ -1,5 +1,6 @@
 import copy
 import os
+import re
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QPainter, QColor
@@ -111,8 +112,8 @@ class Func(object):
         :param name: 需要检测的name
         :return: 是否合法
         """
-        if not name[0].isalpha():
-            return False, 'Name must be started with letter'
+        if not re.match(r"^[a-zA-Z][a-zA-Z_0-9]*$", name):
+            return False, 'The name must start with a letter and only contain numbers，letter and _'
         return not (name in Info.NAME_WID), 'Name has already existed.'
 
     @staticmethod
@@ -148,7 +149,7 @@ class Func(object):
         if name not in Info.NAME_WID:
             if not name:
                 return Info.TimelineNameError, ''
-            if name[0].isalpha():
+            if re.match(r"^[a-zA-Z][a-zA-Z_0-9]*$", name):
                 return Info.TimelineNameRight, ''
             return Info.TimelineNameError, ''
         else:
