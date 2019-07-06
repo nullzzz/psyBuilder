@@ -24,6 +24,8 @@ class WidgetTabs(QTabWidget):
         self.timeline = Timeline(widget_id=f"{Info.TIMELINE}.0")
         Info.WID_WIDGET[f"{Info.TIMELINE}.0"] = self.timeline
         self.addTab(self.timeline, Func.getWidgetImage(Info.TIMELINE, 'icon'), Info.TIMELINE)
+        # 保存widget.widget_id对应的最新的widget_id，因为可能是引用
+        self.wid_latest = {f"{Info.TIMELINE}.0": f"{Info.TIMELINE}.0"}
         #
         self.setMenuAndShortcut()
         #
@@ -33,7 +35,7 @@ class WidgetTabs(QTabWidget):
         # 关闭tab
         self.tabCloseRequested.connect(self.removeTab)
         # 当前tab变化会引起：attributes和properties的变化
-        self.currentChanged.connect(self.showProperties)
+        self.currentChanged.connect(self.showPropertiesAttributes)
 
     def linkWidgetSignals(self, widget_id):
         # 通用信号
@@ -87,6 +89,7 @@ class WidgetTabs(QTabWidget):
         try:
             if widget_id in Info.WID_WIDGET:
                 widget = Info.WID_WIDGET[widget_id]
+                self.wid_latest[widget.widget_id] = widget_id
                 index = self.indexOf(widget)
                 if index != -1:
                     self.setCurrentIndex(index)
@@ -132,10 +135,14 @@ class WidgetTabs(QTabWidget):
         except Exception as e:
             print(f"error {e} happens in change tab name. [widget_tabs/main.py]")
 
-    def showProperties(self, index):
+    def showPropertiesAttributes(self, index):
         try:
             if index != -1:
                 widget = self.widget(index)
-                self.tabChange.emit(widget.widget_id)
+                # 把这边改了就好啊！
+                try:
+                    self.tabChange.emit(self.wid_latest[widget.widget_id])
+                except:
+                    self.tabChange.emit(widget.widget_id)
         except Exception as e:
             print(f"error {e} happens in show properties. [widget_tabs/main.py]")

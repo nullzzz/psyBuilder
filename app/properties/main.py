@@ -16,11 +16,16 @@ class Properties(QDockWidget):
         size_container_widget.setWidget(self.properties_table)
         self.setWidget(size_container_widget)
 
-    def showProperties(self, widget_pro):
-        if isinstance(widget_pro, str):
-            properties = Func.getProperties(widget_pro)
-        elif isinstance(widget_pro, dict):
-            properties = widget_pro
+    def showProperties(self, wid_or_data):
+        """
+        将控件的properties显示
+        :param wid_or_data: 
+        :return: 
+        """
+        if isinstance(wid_or_data, str):
+            properties = Func.getProperties(wid_or_data)
+        elif isinstance(wid_or_data, dict):
+            properties = wid_or_data
         else:
             raise ValueError
         # 将properties table清空

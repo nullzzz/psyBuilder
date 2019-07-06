@@ -322,19 +322,31 @@ class Func(object):
                 child_node = node_parent.child(i)
                 if child_node.widget_id == widget_id:
                     break
+                # cycle不要
+                if Func.isWidgetType(child_node.widget_id, Info.CYCLE):
+                    continue
                 for attribute in Info.WID_WIDGET[child_node.widget_id].getHiddenAttribute():
                     attributes[f"{child_node.text(0)}.{attribute}"] = layer_count
+        # 其第一次父cycle的hide属性也要
         # 往上递归
+        first_parent = True
         node = Info.WID_NODE[widget_id].parent()
         layer_count -= 1
         while node:
-            # 每逢cycle要获得一次属性
-            if node.widget_id.startswith(Info.CYCLE):
+            # 每逢cycle要获得一次属性，且格式特殊
+            if Func.isWidgetType(node.widget_id, Info.CYCLE):
                 cycle = Info.WID_WIDGET[node.widget_id]
-                for attribute in cycle.timeline_table.col_attribute[2:]:
-                    # 去重，只保留最近的值
-                    if attribute not in attributes:
-                        attributes[attribute] = layer_count
+                cycle_name = node.text(0)
+                for attribute in cycle.timeline_table.col_attribute:
+                    # # 去重，只保留最近的值
+                    # if attribute not in attributes:
+                    #     attributes[f"{cycle_name}.attr.{attribute}"] = layer_count
+                    attributes[f"{cycle_name}.attr.{attribute}"] = layer_count
+                #
+                if first_parent:
+                    for attribute in Info.WID_WIDGET[node.widget_id].getHiddenAttribute():
+                        attributes[f"{node.text(0)}.{attribute}"] = layer_count
+                    first_parent = False
             layer_count -= 1
             node = node.parent()
         # 是否需要详细信息
