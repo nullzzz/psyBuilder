@@ -89,11 +89,19 @@ class WidgetTabs(QTabWidget):
         try:
             if widget_id in Info.WID_WIDGET:
                 widget = Info.WID_WIDGET[widget_id]
-                self.wid_latest[widget.widget_id] = widget_id
                 index = self.indexOf(widget)
                 if index != -1:
-                    self.setCurrentIndex(index)
+                    # 如果根本没改变
+                    if index == self.currentIndex():
+                        # 但是打开的widget不是同一个wid，则需要改变attributes
+                        if widget_id != self.wid_latest[widget.widget_id]:
+                            self.tabChange.emit(widget_id)
+                            self.wid_latest[widget.widget_id] = widget_id
+                    else:
+                        self.wid_latest[widget.widget_id] = widget_id
+                        self.setCurrentIndex(index)
                 else:
+                    self.wid_latest[widget.widget_id] = widget_id
                     self.setCurrentIndex(
                         self.addTab(widget, Func.getWidgetImage(widget_id.split('.')[0], 'icon'),
                                     Func.getWidgetName(widget_id)))
