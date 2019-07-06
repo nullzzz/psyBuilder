@@ -24,8 +24,6 @@ class WidgetTabs(QTabWidget):
         self.timeline = Timeline(widget_id=f"{Info.TIMELINE}.0")
         Info.WID_WIDGET[f"{Info.TIMELINE}.0"] = self.timeline
         self.addTab(self.timeline, Func.getWidgetImage(Info.TIMELINE, 'icon'), Info.TIMELINE)
-        # 保存widget.widget_id对应的最新的widget_id，因为可能是引用
-        self.wid_latest = {f"{Info.TIMELINE}.0": f"{Info.TIMELINE}.0"}
         #
         self.setMenuAndShortcut()
         #
@@ -94,14 +92,14 @@ class WidgetTabs(QTabWidget):
                     # 如果根本没改变
                     if index == self.currentIndex():
                         # 但是打开的widget不是同一个wid，则需要改变attributes
-                        if widget_id != self.wid_latest[widget.widget_id]:
+                        if widget_id != widget.current_wid:
                             self.tabChange.emit(widget_id)
-                            self.wid_latest[widget.widget_id] = widget_id
+                            widget.current_wid = widget_id
                     else:
-                        self.wid_latest[widget.widget_id] = widget_id
+                        widget.current_wid = widget_id
                         self.setCurrentIndex(index)
                 else:
-                    self.wid_latest[widget.widget_id] = widget_id
+                    widget.current_wid = widget_id
                     self.setCurrentIndex(
                         self.addTab(widget, Func.getWidgetImage(widget_id.split('.')[0], 'icon'),
                                     Func.getWidgetName(widget_id)))
@@ -148,9 +146,6 @@ class WidgetTabs(QTabWidget):
             if index != -1:
                 widget = self.widget(index)
                 # 把这边改了就好啊！
-                try:
-                    self.tabChange.emit(self.wid_latest[widget.widget_id])
-                except:
-                    self.tabChange.emit(widget.widget_id)
+                self.tabChange.emit(widget.current_wid)
         except Exception as e:
             print(f"error {e} happens in show properties. [widget_tabs/main.py]")

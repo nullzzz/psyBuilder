@@ -14,6 +14,8 @@ class EyeCalibrate(QWidget):
     def __init__(self, parent=None, widget_id=''):
         super(EyeCalibrate, self).__init__(parent)
         self.widget_id = widget_id
+        self.current_wid = widget_id
+
 
         self.attributes = []
 

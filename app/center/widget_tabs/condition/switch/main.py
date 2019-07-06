@@ -19,6 +19,7 @@ class Switch(QWidget):
         super(Switch, self).__init__(parent)
         #
         self.widget_id = widget_id
+        self.current_wid = widget_id
         self.using_attributes: list = []
         #
         self.switch_area = SwitchCondition()

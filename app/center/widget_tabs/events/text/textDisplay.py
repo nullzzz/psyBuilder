@@ -14,6 +14,7 @@ class TextDisplay(QMainWindow):
     def __init__(self, parent=None, widget_id=''):
         super(TextDisplay, self).__init__(parent)
         self.widget_id = widget_id
+        self.current_wid = widget_id
         self.attributes = []
         self.text_label = QTextEdit()
         self.pro_window = TextProperty()

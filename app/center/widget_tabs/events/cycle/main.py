@@ -18,6 +18,7 @@ class Cycle(QMainWindow):
         super(Cycle, self).__init__(parent)
         # data
         self.widget_id = widget_id
+        self.current_wid = widget_id
         # widget
         self.timeline_table = TimelineTable(widget_id=self.widget_id)
         self.properties = Properties()

@@ -15,6 +15,8 @@ class EndR(QWidget):
     def __init__(self, parent=None, widget_id=''):
         super(EndR, self).__init__(parent)
         self.widget_id = widget_id
+        self.current_wid = widget_id
+
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)

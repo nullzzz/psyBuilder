@@ -15,6 +15,8 @@ class Close(QWidget):
         super(Close, self).__init__(parent)
 
         self.widget_id = widget_id
+        self.current_wid = widget_id
+
 
         self.attributes: list = []
 

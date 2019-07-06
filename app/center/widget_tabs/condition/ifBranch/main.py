@@ -22,6 +22,7 @@ class IfBranch(QWidget):
         super(IfBranch, self).__init__(parent)
 
         self.widget_id = widget_id
+        self.current_wid = widget_id
 
         self.attributes: list = []
         self.using_attributes: list = []

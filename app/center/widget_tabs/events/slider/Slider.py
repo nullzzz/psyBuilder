@@ -927,6 +927,7 @@ class Slider(QMainWindow):
     def __init__(self, widget_id):
         super(Slider, self).__init__()
         self.widget_id = widget_id
+        self.current_wid = widget_id
         self.attributes = []
         try:
             self.attributes = Func.getAttributes(self.widget_id)
