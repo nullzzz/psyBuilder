@@ -101,6 +101,13 @@ def dataStrConvert(dataStr):
 
     return outData
 
+def isRefValue(inputStr):
+    tempMatchObj = re.match("^\[.*\]$", inputStr)
+
+    if tempMatchObj:
+        return True
+    return False
+
 
 def parseAllowKeys(enabledKBKeysList,allowKeyStr):
     splittedStrs = re.split('({\w*})',allowKeyStr)
