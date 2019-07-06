@@ -455,6 +455,7 @@ class PsyApplication(QMainWindow):
 
     def compile(self):
         try:
+            # self.structure.getStructure().print_tree()
             compilePTB(self)
         except Exception:
             Func.log(f"Something went wrong while Compiling!")
