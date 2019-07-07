@@ -32,7 +32,7 @@ def throwCompileErrorInfo(inputStr):
 
     msg.setText(inputStr)
     # msg.setInformativeText("This is additional information")
-    msg.setWindowTitle("!Attention!")
+    msg.setWindowTitle("    Attention!   ")
     # msg.setDetailedText("The details are as follows:")
     # msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
     msg.setStandardButtons(QMessageBox.Ok)
@@ -270,7 +270,8 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
                     # assign the refered value to the current rowDict
                     cRowDict[key] = attributesSetDict[valueStr][2]
                 else:
-                    Func.log(f"The cited attribute '{valueStr}' was not exist for the current widget {cWidgetName}",1)
+                    throwCompileErrorInfo(f"The cited attribute '{valueStr}' \nis not available for {cWidgetName}")
+                    # Func.log(f"The cited attribute '{valueStr}' was not exist for the current widget {cWidgetName}",1)
 
             # isRgbFormat = re.match("^\d+,\d+,\d+$", cRowDict[key])
             isRgbFormat = isRgbStr(cRowDict[key])
@@ -301,8 +302,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
     for iTimeline_name, iTimeline_id in cTimeLineList:
         if '' == iTimeline_id:
-            throwCompileErrorInfo(f"{iTimeline_name}:timeline should be specified!")
-            # raise Exception(f"{iTimeline_name}:timeline should be specified!")
+            throwCompileErrorInfo(f"In {cWidgetName}: Timeline should not be empty!")
         else:
             printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel)
 
