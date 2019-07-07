@@ -33,8 +33,7 @@ class TextDisplay(QMainWindow):
 
         self.fore_color = "0,0,0"
         self.back_color = "255,255,255"
-        self.transparent_value = 100
-        self.is_wrap = False
+        self.transparent_value = "100"
 
         self.x_pos = "0"
         self.y_pos = "0"
@@ -76,9 +75,8 @@ class TextDisplay(QMainWindow):
             self.preview = Preview(self.x_pos, self.y_pos, self.w_size, self.h_size)
             # self.preview.text.setStyleSheet("background-color:{}".format(self.back_color))
             self.preview.setWindowModality(Qt.ApplicationModal)
-            self.preview.setFont(self.font)
             self.preview.setHtml(self.html)
-            self.preview.setWrap(self.is_wrap)
+            self.preview.setFont(self.pro_window.general.text_edit.font())
             self.preview.showFullScreen()
             self.preview.moveText()
             self.preview.setTransparent(self.transparent_value)
@@ -88,9 +86,9 @@ class TextDisplay(QMainWindow):
             self.t.setSingleShot(True)
         except AttributeError as ae:
             QMessageBox.warning(self, "Unknown Error", f"Please contact the developers!", QMessageBox.Ok)
-        except Exception as e:
-            print(e)
-            print(type(e))
+        # except Exception as e:
+        #     print(e)
+        #     print(type(e))
 
     def setPro(self, pro: TextProperty):
         del self.pro_window
@@ -110,23 +108,15 @@ class TextDisplay(QMainWindow):
         self.getInfo()
         self.parseProperties()
         self.text_label.setHtml(self.html)
-        self.text_label.setFont(self.font)
-        if self.is_wrap:
-            self.text_label.setWordWrapMode(QTextOption.WordWrap)
-        else:
-            self.text_label.setWordWrapMode(QTextOption.NoWrap)
         # 发送信号
         self.propertiesChange.emit(self.default_properties)
 
     # 获取参数
     def parseProperties(self):
         self.html = self.pro_window.html
-        self.font = self.pro_window.font
-        self.align = self.pro_window.general.align.currentText()
-        self.fore_color = self.pro_window.general.fore_color.currentText()
-        self.back_color = self.pro_window.general.back_color.currentText()
+        self.fore_color = self.pro_window.general.fore_color.getColor()
+        self.back_color = self.pro_window.general.back_color.getColor()
         self.transparent_value = self.pro_window.general.transparent.text()
-        self.is_wrap = bool(self.pro_window.general.word_wrap.checkState())
 
         self.x_pos = self.default_properties.get("X position", "0")
         self.y_pos = self.default_properties.get("Y position", "0")
@@ -144,23 +134,16 @@ class TextDisplay(QMainWindow):
     # 返回设置参数
     def getInfo(self):
         self.html = self.pro_window.html
-        self.font = self.pro_window.font
         self.default_properties = self.pro_window.getInfo()
-        return {**self.default_properties, **{"font": self.font}}
+        return self.default_properties
 
     def getProperties(self):
         self.html = self.pro_window.html
-        self.font = self.pro_window.font
         self.default_properties = self.pro_window.getInfo()
         return self.default_properties
 
     def restore(self, properties: dict):
         if properties:
-            try:
-                self.html = properties.pop("Html")
-                self.font = properties.pop("font")
-            except KeyError:
-                self.font = QFont("SimSun", 12)
             self.default_properties = properties.copy()
             self.loadSetting()
             self.apply()
@@ -194,7 +177,7 @@ class TextDisplay(QMainWindow):
             self.apply()
 
     def loadSetting(self):
-        self.pro_window.setOther(self.html, self.font)
+        self.pro_window.setOther(self.html)
         self.pro_window.setProperties(self.default_properties)
 
     def clone(self, new_id):
