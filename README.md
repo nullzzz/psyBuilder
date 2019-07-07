@@ -44,7 +44,7 @@
 - [dict]getInputDevice
 #### if
 - getCondition
-- [dict]getTrueWidget
+- [dict]getTrueWidget~~~~~~~~
 - [dict]getFalseWidget
 #### switch
 - getSwitch
