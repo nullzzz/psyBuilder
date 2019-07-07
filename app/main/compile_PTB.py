@@ -25,6 +25,21 @@ cIndents          = 0
 isPreLineSwitch   = 0
 enabledKBKeysList = []
 # cLoopLevel      = 0
+def throwCompileErrorInfo(inputStr):
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Critical)
+    msg.setWindowIcon(QIcon(Func.getImage("icon.png")))
+
+    msg.setText(inputStr)
+    # msg.setInformativeText("This is additional information")
+    msg.setWindowTitle("!Attention!")
+    # msg.setDetailedText("The details are as follows:")
+    # msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+    msg.setStandardButtons(QMessageBox.Ok)
+    # msg.buttonClicked.connect(msgbtn)
+
+    msg.exec_()
+    raise Exception(inputStr)
 
 def printAutoInd(f,inputStr,*argins):
     global cIndents
@@ -144,18 +159,62 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
 
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
-
         if Info.CYCLE == cWidget.widget_id.split('.')[0]:
 
             noStimRelatedCodes = printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes)
 
-        if Info.TEXT == cWidget.widget_id.split('.')[0]:
+        elif Info.TEXT == cWidget.widget_id.split('.')[0]:
             noStimRelatedCodes = printTextWidget(cWidget, f, attributesSetDict, noStimRelatedCodes)
 
         elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
             pass
+        elif Info.SOUND == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.SLIDER == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.OPEN == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.DC == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.CALIBRATION == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.ACTION == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.STARTR == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.ENDR == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.CLOSE == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.QUEST_INIT == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.QUEST_GET_VALUE == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.QUEST_UPDATE == cWidget.widget_id.split('.')[0]:
+            pass
             # noStimRelatedCodes = printImageWdiget(cWidget, f, noStimRelatedCodes)
 
+    # CYCLE = "Cycle"
+    # SOUND = "Sound"
+    # TEXT = "Text"
+    # IMAGE = "Image"
+    # VIDEO = "Video"
+    # SLIDER = "Slider"
+    # OPEN = "Open"
+    # DC = "DC"
+    # CALIBRATION = "Calibration"
+    # ACTION = "Action"
+    # STARTR = "StartR"
+    # ENDR = "EndR"
+    # CLOSE = "Close"
+    # QUEST_INIT = "QuestInit"
+    # QUEST_UPDATE = "QuestUpdate"
+    # QUEST_GET_VALUE = "QuestGetValue"
+    # IF = "If"
+    # SWITCH = "Switch"
+    # TIMELINE = "Timeline"
     # print(cTimelineWidgetIds)
     # to be continue ...
 
@@ -242,7 +301,8 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
     for iTimeline_name, iTimeline_id in cTimeLineList:
         if '' == iTimeline_id:
-            pass #Func.log("timeline should not be empty:-(", True)
+            throwCompileErrorInfo(f"{iTimeline_name}:timeline should be specified!")
+            # raise Exception(f"{iTimeline_name}:timeline should be specified!")
         else:
             printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel)
 
