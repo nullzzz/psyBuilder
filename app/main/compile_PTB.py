@@ -101,12 +101,14 @@ def dataStrConvert(dataStr):
 
     return outData
 
-def isRefValue(inputStr):
+def getRefValue(inputStr):
     tempMatchObj = re.match("^\[.*\]$", inputStr)
 
     if tempMatchObj:
-        return True
-    return False
+        inputStr = re.sub("[\[\]]", '', inputStr)
+        return [True,inputStr]
+
+    return [False,inputStr]
 
 
 def parseAllowKeys(enabledKBKeysList,allowKeyStr):
@@ -121,20 +123,23 @@ def parseAllowKeys(enabledKBKeysList,allowKeyStr):
                 enabledKBKeysList.append(char)
 
 
-def printTimelineWidget(cWidget,f,attributesSetDict,parsedAttributesSetDict):
+def printTimelineWidget(cWidget,f,attributesSetDict):
+    noStimRelatedCodes = []
+
     cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
 
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
 
         if Info.CYCLE == cWidget.widget_id.split('.')[0]:
-            noStimRelatedCodes = printCycleWdiget(cWidget, f,attributesSetDict,parsedAttributesSetDict, noStimRelatedCodes)
+            print(cWidget.getTimelines())
+            noStimRelatedCodes = printCycleWdiget(cWidget, f,attributesSetDict, noStimRelatedCodes)
 
         if Info.TEXT == cWidget.widget_id.split('.')[0]:
             noStimRelatedCodes = printTextWidget(cWidget, noStimRelatedCodes)
 
         elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
-            print(cWidget.getTimelines())
+            pass
             # noStimRelatedCodes = printImageWdiget(cWidget, f, noStimRelatedCodes)
 
     print(cTimelineWidgetIds)
@@ -151,36 +156,61 @@ def printTextWidget(cWidget,noStimRelatedCodes):
     return noStimRelatedCodes
 
 
-def printCycleWdiget(CYCLE, f, attributesSetDict, parsedAttributesSetDict, noStimRelatedCodes):
+def printCycleWdiget(cWidget, f,attributesSetDict, noStimRelatedCodes):
     global cLoopLevel
 
     # for each ref to the cycle function, increase the level by 1
     cLoopLevel += 1
 
     attributesSetDict       = attributesSetDict.copy()
-    parsedAttributesSetDict = parsedAttributesSetDict()
+    cWidgetName = Func.getWidgetName(cWidget.widget_id)
+
+    attributesSetDict.setdefault(f"{cWidgetName}.cLoop",[cLoopLevel,f"iLoop_{cLoopLevel}"])
+    attributesSetDict.setdefault(f"{cWidgetName}.rowNums",[cLoopLevel,f"size({cLoopLevel}.attr,1)"])
 
     # create the design matrix  (table) for the current cycle
-    startExpStr = Func.getWidgetName(CYCLE.widget_id) + '.att = cell2table({...'
+    startExpStr = cWidgetName + '.attr = cell2table({...'
     printAutoInd(f, '% create the designMatrix of the current cycle (loop)')
 
     printAutoInd(f, '{0}', startExpStr)
 
-    for iRow in range(CYCLE.rowCount()):
-        cRowDict = CYCLE.getAttributes(iRow)
+    for iRow in range(cWidget.rowCount()):
+        cRowDict = cWidget.getAttributes(iRow)
         if 0 == iRow:
-            endExpStr = "},'VariableNames',{" + ''.join("'"+key+"' " for key, value in cRowDict.items()) + "});"
+            endExpStr = "},'VariableNames',{" + ''.join("'"+key+"' " for key in cRowDict.keys()) + "});"
             # update the attributes set dictionary
             for key in cRowDict.keys():
-                attributesSetDict.setdefault(key)
+                attributesSetDict.setdefault(f"{cWidgetName}.attr.{key}",[cLoopLevel,f"{cWidgetName}.attr.{key}{{iLoop{cLoopLevel}}}"])
+            print('-----cAttributes set -----------')
+            print(attributesSetDict)
+        # handle the references and the values in colorType
+        for key, value in cRowDict.items():
+
+            # deal with the color format values (string)
+            isRefValue, valueStr = getRefValue(value)
+
+            if isRefValue:
+                if valueStr in attributesSetDict:
+                    # assign the refered value to the current rowDict
+                    cRowDict[key] = attributesSetDict[valueStr][2]
+                else:
+                    Func.log(f"The cited attribute '{valueStr}' was not exist for the current widget {cWidgetName}",1)
+
+            isRgbFormat = re.match("^\d+,\d+,\d+$", cRowDict[key])
+
+            if isRgbFormat:
+                # transform the RGB to include a pair of square brackets
+                cRowDict[key] = f"[{isRgbFormat[0]}]"
 
         if '' == cRowDict['Weight']:
             cRepeat = 1
         else:
-            cRepeat = int(dataStrConvert(cRowDict['Weight']))
+            # print('---------------------------------')
+            # print(dataStrConvert(cRowDict['Weight']))
+            cRepeat = dataStrConvert(cRowDict['Weight'])
 
-        for iRep in range(cRepeat):
-            printAutoInd(f,'{0}',"".join(dataStrConvert(value) + " " for key, value in cRowDict.items())+";...")
+        for iRep in range(int(cRepeat)):
+            printAutoInd(f,'{0}',"".join(str(dataStrConvert(value)) + " " for key, value in cRowDict.items())+";...")
 
 
     printAutoInd(f,'{0}\n',endExpStr)
@@ -200,8 +230,8 @@ def printCycleWdiget(CYCLE, f, attributesSetDict, parsedAttributesSetDict, noSti
 def compilePTB(globalSelf):
 
     enabledKBKeysList        = []
-    attributesSetDict        = {'sessionNum':[0,''],'subAge':[0,''],'subName':[0,''],'subSex':[0,''],'subNum':[0,''],'subHandless':[0,'']}
-    parsedAttributesSetDict  = {'sessionNum':[0,''],'subAge':[0,''],'subName':[0,''],'subSex':[0,''],'subNum':[0,''],'subHandless':[0,'']}
+    attributesSetDict        = {'sessionNum':[0,'SubInfo.session'],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
+    # parsedAttributesSetDict  = {'sessionNum':[0,'SubInfo.session'],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
 
 
     # attributesSetDict.setdefault('sessionNum',0)
@@ -236,7 +266,7 @@ def compilePTB(globalSelf):
         #
         # get subject information
         printAutoInd(f,"%----- get subject information -------/",)
-        printAutoInd(f,"{0} = OpenExp_BCL('{1}',pwd);",cFilenameOnly,cFilenameOnly)
+        printAutoInd(f,"subInfo = OpenExp_BCL('{1}',fileparts(mfilename('fullpath')));",cFilenameOnly)
         printAutoInd(f,"close(gcf);")
         printAutoInd(f,"%-------------------------------------\\\n")
 
@@ -412,7 +442,7 @@ def compilePTB(globalSelf):
 
 
         # start to handle all the widgets
-        printTimelineWidget( Info.WID_WIDGET[f"{Info.TIMELINE}.0"],f,attributesSetDict,parsedAttributesSetDict)
+        printTimelineWidget( Info.WID_WIDGET[f"{Info.TIMELINE}.0"],f,attributesSetDict)
 
         """
         # get widgets in the main timeline
