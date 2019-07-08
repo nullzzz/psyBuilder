@@ -59,7 +59,7 @@ class TextTab1(QWidget):
         self.flip_horizontal = PigComboBox()
         self.flip_horizontal.addItems(("False", "True"))
         self.flip_vertical = PigComboBox()
-        self.flip_vertical.addItems(("True", "False"))
+        self.flip_vertical.addItems(("False", "True"))
 
         self.font_box = QFontComboBox()
         self.font_box.currentFontChanged.connect(self.fontChange)
@@ -69,6 +69,7 @@ class TextTab1(QWidget):
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
         self.style_box.currentTextChanged.connect(self.fontChange)
         self.font_size_box = PigComboBox()
+        self.font_size_box.setEditable(True)
         for i in range(8, 72, 2):
             self.font_size_box.addItem(str(i))
 
@@ -94,7 +95,7 @@ class TextTab1(QWidget):
         l40 = QLabel("flip Horizontal:")
         l42 = QLabel("flip Vertical:")
 
-        l50 = QLabel("Font:")
+        l50 = QLabel("Font Family:")
         l52 = QLabel("Style:")
         l60 = QLabel("Font Size:")
 
@@ -154,9 +155,9 @@ class TextTab1(QWidget):
         layout2.addWidget(self.flip_vertical, 4, 3)
 
         layout2.addWidget(l50, 5, 0)
-        layout2.addWidget(self.font_box, 5, 1)
-        layout2.addWidget(l52, 5, 2)
-        layout2.addWidget(self.style_box, 5, 3)
+        layout2.addWidget(self.font_box, 5, 1, 1, 3)
+        layout2.addWidget(l52, 6, 2)
+        layout2.addWidget(self.style_box, 6, 3)
         layout2.addWidget(l60, 6, 0)
         layout2.addWidget(self.font_size_box, 6, 1)
         group2.setLayout(layout2)
@@ -194,10 +195,12 @@ class TextTab1(QWidget):
             self.text_edit.setLineWrapColumnOrWidth(80)
 
     def fontChange(self):
-        font = self.font_box.currentFont()
+        f = self.font_box.currentFont().family()
+
         size = self.font_size_box.currentText()
         size = int(size) if size.isdigit() else 8
-
+        font = self.text_edit.currentFont()
+        font.setFamily(f)
         font.setPointSize(size)
 
         style = self.style_box.currentText()
@@ -256,8 +259,6 @@ class TextTab1(QWidget):
         self.text_edit.setFont(self.new_font)
 
     def apply(self):
-        # Func.log(str(self.text_edit.toHtml()))
-        # print(self.text_edit.toHtml())
         self.html = self.text_edit.toHtml()
 
     def getInfo(self):
@@ -273,6 +274,7 @@ class TextTab1(QWidget):
         self.default_properties["Clear after"] = self.clear_after.currentText()
         self.default_properties["Font family"] = self.font_box.currentText()
         self.default_properties["Font size"] = self.font_size_box.currentText()
+        self.default_properties["Wrapat chars"] = self.word_wrap.text()
         self.default_properties["Style"] = self.style_box.currentText()
         self.default_properties["Flip horizontal"] = self.flip_horizontal.currentText()
         self.default_properties["Flip vertical"] = self.flip_vertical.currentText()
@@ -286,7 +288,6 @@ class TextTab1(QWidget):
 
     def loadSetting(self):
         self.text_edit.setHtml(self.html)
-        self.text_edit.setFont(self.font)
 
         self.align_x.setCurrentText(self.default_properties["Alignment X"])
         self.align_y.setCurrentText(self.default_properties["Alignment Y"])
@@ -294,7 +295,7 @@ class TextTab1(QWidget):
         self.back_color.setCurrentText(self.default_properties["Back color"])
         self.screen_name.setCurrentText(self.default_properties["Screen name"])
         self.transparent.setText(self.default_properties["Transparent"])
-        self.word_wrap.setCheckState(self.default_properties["Word wrap"])
+        self.word_wrap.setText(self.default_properties["Wrapat chars"])
         self.clear_after.setCurrentText(self.default_properties["Clear after"])
         self.font_box.setCurrentText(self.default_properties["Font family"])
         self.font_size_box.setCurrentText(self.default_properties["Font size"])

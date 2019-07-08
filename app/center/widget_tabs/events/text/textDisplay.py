@@ -63,7 +63,7 @@ class TextDisplay(QMainWindow):
         self.setAttributes(self.attributes)
         screen_devices = Func.getScreen()
         self.pro_window.general.setScreen(screen_devices)
-        self.pro_window.general.text_edit.setHtml(self.html)
+        # self.pro_window.general.text_edit.setHtml(self.html)
         # 阻塞原窗口
         # self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
@@ -215,19 +215,26 @@ class TextDisplay(QMainWindow):
         else:
             return self.pro_window.general.text_edit.toPlainText()
 
-    def getAlignment(self) -> str:
+    def getAlignmentX(self) -> str:
         """
         返回文字对齐方式
         :return:
         """
-        return self.pro_window.general.align.currentText()
+        return self.pro_window.general.align_x.currentText()
+
+    def getAlignmentY(self) -> str:
+        """
+        返回文字对齐方式
+        :return:
+        """
+        return self.pro_window.general.align_y.currentText()
 
     def getForceColor(self) -> str:
         """
         返回前景色
         :return:
         """
-        return self.pro_window.general.fore_color.currentText()
+        return self.pro_window.general.fore_color.getColor()
 
     def getScreenName(self) -> str:
         """
@@ -241,7 +248,7 @@ class TextDisplay(QMainWindow):
         返回背景颜色
         :return:
         """
-        return self.pro_window.general.back_color.currentText()
+        return self.pro_window.general.back_color.getColor()
 
     def getTransparent(self) -> str:
         """
@@ -257,20 +264,26 @@ class TextDisplay(QMainWindow):
         """
         return self.pro_window.general.clear_after.currentText()
 
-    def getFontInfo(self) -> str:
+    def getFontFamily(self) -> str:
         """
         返回字体信息
         :return:
         """
-        # todo
-        return "字体"
+        return self.pro_window.general.font_box.currentText()
 
-    def getIsWordWrap(self) -> bool:
+    def getFontPointSize(self) -> str:
+        """
+        返回字体大小
+        :return:
+        """
+        return self.pro_window.general.font_size_box.currentText()
+
+    def getWrapatChar(self) -> str:
         """
         返回是否换行
         :return:
         """
-        return self.is_wrap
+        return self.pro_window.general.word_wrap.text()
 
     def getXAxisCoordinates(self) -> str:
         """

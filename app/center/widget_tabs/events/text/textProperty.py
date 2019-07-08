@@ -80,15 +80,12 @@ class TextProperty(QWidget):
             self.loadSetting()
 
     def loadSetting(self):
-        # self.general.setProperties(self.default_properties.get("general", {}), self.html, self.font)
-        # self.frame.setProperties(self.default_properties.get("frame", {}))
-        # self.duration.setProperties(self.default_properties.get("duration", {}))
-        self.general.setProperties(self.default_properties, self.html, self.font)
+        self.general.setProperties(self.default_properties, self.html)
         self.frame.setProperties(self.default_properties)
         self.duration.setProperties(self.default_properties)
 
     def clone(self):
         clone_page = TextProperty()
-        clone_page.setOther(self.html, self.font)
+        clone_page.setOther(self.html)
         clone_page.setProperties(self.default_properties)
         return clone_page
