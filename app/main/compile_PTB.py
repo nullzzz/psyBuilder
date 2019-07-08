@@ -48,15 +48,13 @@ def printAutoInd(f,inputStr,*argins):
     incrAfterStr    = ('if','try','switch','for','while')
     decreAndIncrStr = ('else','elseif','otherwise','catch')
 
-    #    print(inputStr.split(' ')[0])
+
     if inputStr.split(' ')[0] in incrAfterStr:
-        # print(f"{inputStr}:{cIndents},increase 1")
         tabStrs = '\t' * cIndents
         print(f"\n{tabStrs}{inputStr}".format(*argins), file=f)
         cIndents += 1
 
     elif inputStr.split(' ')[0] in decreAndIncrStr:
-        # print(f"{inputStr.split(' ')[0]}, -1 and +1")
         cIndents -= 1
         tabStrs = '\t' * cIndents
         print(f"{tabStrs}{inputStr}".format(*argins), file=f)
@@ -74,7 +72,6 @@ def printAutoInd(f,inputStr,*argins):
     elif 'case' == inputStr.split(' ')[0]:
 
         if 0 == isPreLineSwitch:
-            # print(f"{inputStr.split(' ')[0]}, -1")
             cIndents -= 1
 
         tabStrs = '\t' * cIndents
@@ -299,12 +296,29 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
     # handle each timeline
     cTimeLineList = cWidget.getTimelines()
+    # squeeze the timelines
+    cTimelineSet = {''}
 
-    for iTimeline_name, iTimeline_id in cTimeLineList:
+    for iTimeline in cTimeLineList:
+        cTimelineSet.add(iTimeline[1])
+    cTimelineSet.discard('')
+
+
+    print(cTimelineSet)
+
+    printAutoInd(f, '% switch across timeline types')
+    printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
+
+    for iTimeline_id in cTimelineSet:
         if '' == iTimeline_id:
             throwCompileErrorInfo(f"In {cWidgetName}: Timeline should not be empty!")
         else:
+            printAutoInd(f, 'case {0}', f"{Func.getWidgetName(iTimeline_id)}")
             printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel)
+
+    printAutoInd(f, 'otherwise ')
+    printAutoInd(f, '% do nothing ')
+    printAutoInd(f, 'end%switch ')
 
     # cycle.getTimelines() -> list: 按顺序进行返回所有设置的timeline
     # 格式为[[timeline_name, timeline_widget_id], [], ...]
@@ -712,7 +726,7 @@ def compilePTB(globalSelf):
         printAutoInd(f,"% subfun 1: detectAbortKey")
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
-        printAutoInd(f, "function detectAbortKey()\n")
+        printAutoInd(f, "function detectAbortKey(abortKeyCode)\n")
         printAutoInd(f,"[keyIsDown, Noused, keyCode] = responseCheck(-1);")
         printAutoInd(f,"if keyCode(abortKeyCode)")
 
