@@ -23,6 +23,8 @@ class Structure(QDockWidget):
     widgetCreatEnd = pyqtSignal()
     # 当某个widget被彻底删除，即无任何widget指向它后，要关闭tab
     widgetDelete = pyqtSignal(str)
+    # 当有widget发生修改（新增、删除、重命名）时，在修改完成后，发送一个刷新attributes的信号
+    widgetModify = pyqtSignal()
 
     def __init__(self, parent=None):
         super(Structure, self).__init__(parent)
@@ -70,6 +72,8 @@ class Structure(QDockWidget):
         self.widgetCreatEnd.emit()
         if refresh:
             QApplication.processEvents()
+        # modify
+        self.widgetModify.emit()
 
     def addNodeForAdd(self, parent_widget_id, widget_id, name):
         """
@@ -353,6 +357,8 @@ class Structure(QDockWidget):
                 # data
                 Info.NAME_WID[name] = Info.NAME_WID[old_name]
                 del Info.NAME_WID[old_name]
+            # 发送widget修改信号
+            self.widgetModify.emit()
         except Exception as e:
             print(f"error {e} happens in rename node. [structure/main.py]")
             Func.log(str(e), True)
@@ -414,6 +420,9 @@ class Structure(QDockWidget):
                 widget = Info.WID_WIDGET[Info.NAME_WID[name][0]]
                 if widget.widget_id in delete_wid:
                     widget.changeWidgetId(Info.NAME_WID[name][0])
+
+            # modify
+            self.widgetModify.emit()
         except Exception as e:
             print(f"error {e} happens in delete node. [structure/main.py]")
             Func.log(str(e), True)

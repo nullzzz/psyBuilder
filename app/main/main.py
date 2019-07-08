@@ -192,6 +192,7 @@ class PsyApplication(QMainWindow):
         self.structure.widgetCreatStart.connect(self.start_wait_dialog)
         self.structure.widgetCreatEnd.connect(self.stop_wait_dialog)
         self.structure.widgetDelete.connect(self.center.widget_tabs.closeTab)
+        self.structure.widgetModify.connect(self.attributes.refresh)
         self.structure.structure_tree.widgetOpen.connect(self.center.widget_tabs.openWidget)
         self.structure.structure_tree.nodeNameChange.connect(self.center.widget_tabs.changeTabName)
         # self.structure.structure_tree.nodeDelete.connect(self.center.widget_tabs.closeTab)
