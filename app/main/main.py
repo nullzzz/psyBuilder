@@ -28,7 +28,7 @@ class PsyApplication(QMainWindow):
         super(PsyApplication, self).__init__(parent)
 
         # ui
-        self.setWindowTitle("Psy")
+        self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(QIcon(Func.getImage("icon.png")))
 
         menu_bar = self.menuBar()
