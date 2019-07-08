@@ -9,6 +9,8 @@ class Preview(QDialog):
     def __init__(self, start_x=0, start_y=0, width=100, height=100):
         super(Preview, self).__init__()
         self.text = QTextEdit(self)
+        self.text.setLineWrapMode(3)
+        self.text.setLineWrapColumnOrWidth(80)
         self.label = QLabel(self)
         self.label.setStyleSheet("background-color: transparent;")
         self.label.resize(400, 150)
@@ -16,10 +18,6 @@ class Preview(QDialog):
         pix = QPixmap()
         pix.load(Func.getImage("preview_tip"))
         self.label.setPixmap(pix)
-        # self.text.setTextColor(text.textColor())
-        # self.text.setText(text.toPlainText())
-        # self.text.setFont(text.font())
-        # self.text.setHtml(text.toHtml())
         self.text.setReadOnly(True)
         screen = QDesktopWidget().screenGeometry()
         if "%" in start_x:
@@ -65,7 +63,8 @@ class Preview(QDialog):
         self.label.move(0, 0)
 
     # 透明度
-    def setTransparent(self, transparent_value=80):
+    def setTransparent(self, transparent_value: str = "80"):
+        transparent_value = int(transparent_value) if transparent_value.isdigit() else 80
         self.setWindowOpacity(transparent_value / 100)
 
     def setStartPos(self, x, y):

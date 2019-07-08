@@ -17,15 +17,9 @@ class TextProperty(QWidget):
         self.duration = DurationPage()
 
         self.html = self.general.html
-        self.font = self.general.font
 
         self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
-        # todo 这里是可能出bug的
-        # self.default_properties = {
-        #     "general": self.general.getInfo(),
-        #     "frame": self.frame.getInfo(),
-        #     "duration": self.duration.getInfo()
-        # }
+
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.frame, "frame")
         self.tab.addTab(self.duration, "duration")
@@ -69,7 +63,6 @@ class TextProperty(QWidget):
     def getInfo(self):
         self.general.apply()
         self.html = self.general.html
-        self.font = self.general.font
         self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
         return self.default_properties
 
@@ -78,9 +71,8 @@ class TextProperty(QWidget):
         self.frame.setAttributes(attributes)
         self.duration.setAttributes(attributes)
 
-    def setOther(self, html: str = "", font: QFont = QFont("SimSun", 12)):
+    def setOther(self, html: str = ""):
         self.html = html
-        self.font = font
 
     def setProperties(self, properties: dict):
         if properties:
@@ -88,15 +80,12 @@ class TextProperty(QWidget):
             self.loadSetting()
 
     def loadSetting(self):
-        # self.general.setProperties(self.default_properties.get("general", {}), self.html, self.font)
-        # self.frame.setProperties(self.default_properties.get("frame", {}))
-        # self.duration.setProperties(self.default_properties.get("duration", {}))
-        self.general.setProperties(self.default_properties, self.html, self.font)
+        self.general.setProperties(self.default_properties, self.html)
         self.frame.setProperties(self.default_properties)
         self.duration.setProperties(self.default_properties)
 
     def clone(self):
         clone_page = TextProperty()
-        clone_page.setOther(self.html, self.font)
+        clone_page.setOther(self.html)
         clone_page.setProperties(self.default_properties)
         return clone_page

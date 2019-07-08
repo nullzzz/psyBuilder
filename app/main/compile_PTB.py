@@ -21,9 +21,25 @@ from app.properties.main import Properties
 from app.structure.main import Structure
 from lib.wait_dialog import WaitDialog
 
-cIndents        = 0
-isPreLineSwitch = 0
-cLoopLevel      = 0
+cIndents          = 0
+isPreLineSwitch   = 0
+enabledKBKeysList = []
+# cLoopLevel      = 0
+def throwCompileErrorInfo(inputStr):
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Critical)
+    msg.setWindowIcon(QIcon(Func.getImage("icon.png")))
+
+    msg.setText(inputStr)
+    # msg.setInformativeText("This is additional information")
+    msg.setWindowTitle("    Attention!   ")
+    # msg.setDetailedText("The details are as follows:")
+    # msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+    msg.setStandardButtons(QMessageBox.Ok)
+    # msg.buttonClicked.connect(msgbtn)
+
+    msg.exec_()
+    raise Exception(inputStr)
 
 def printAutoInd(f,inputStr,*argins):
     global cIndents
@@ -32,15 +48,13 @@ def printAutoInd(f,inputStr,*argins):
     incrAfterStr    = ('if','try','switch','for','while')
     decreAndIncrStr = ('else','elseif','otherwise','catch')
 
-    #    print(inputStr.split(' ')[0])
+
     if inputStr.split(' ')[0] in incrAfterStr:
-        # print(f"{inputStr}:{cIndents},increase 1")
         tabStrs = '\t' * cIndents
         print(f"\n{tabStrs}{inputStr}".format(*argins), file=f)
         cIndents += 1
 
     elif inputStr.split(' ')[0] in decreAndIncrStr:
-        # print(f"{inputStr.split(' ')[0]}, -1 and +1")
         cIndents -= 1
         tabStrs = '\t' * cIndents
         print(f"{tabStrs}{inputStr}".format(*argins), file=f)
@@ -58,7 +72,6 @@ def printAutoInd(f,inputStr,*argins):
     elif 'case' == inputStr.split(' ')[0]:
 
         if 0 == isPreLineSwitch:
-            # print(f"{inputStr.split(' ')[0]}, -1")
             cIndents -= 1
 
         tabStrs = '\t' * cIndents
@@ -94,12 +107,34 @@ def dataStrConvert(dataStr):
     # e.g.,
     # 2.00 to 2.0
     # abcd to 'abcd'
+    # [12,12,12] to [12,12,12]
     try:
         outData = float(dataStr)
     except:
-        outData = "'"+dataStr+"'"
-
+        if re.match("^\[\d+,\d+,\d+\]$", dataStr):
+            outData = dataStr
+        else:
+            outData = "'"+dataStr+"'"
     return outData
+
+# add curly brackets
+def addCurlyBrackets(inputStr):
+    outputStr = "{"+str(inputStr)+"}"
+    return outputStr
+
+def getRefValue(inputStr):
+    tempMatchObj = re.match("^\[.*\]$", inputStr)
+
+    if tempMatchObj:
+        inputStr = re.sub("[\[\]]", '', inputStr)
+        return [True,inputStr]
+
+    return [False,inputStr]
+
+def isRgbStr(inputStr):
+    isRgbFormat = re.match("^\d+,\d+,\d+$", inputStr)
+    return isRgbFormat
+
 
 
 def parseAllowKeys(enabledKBKeysList,allowKeyStr):
@@ -114,28 +149,75 @@ def parseAllowKeys(enabledKBKeysList,allowKeyStr):
                 enabledKBKeysList.append(char)
 
 
-def printTimelineWidget(cWidget,f,attributesSetDict,parsedAttributesSetDict):
+def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
+    noStimRelatedCodes = []
+
     cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
 
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
-
         if Info.CYCLE == cWidget.widget_id.split('.')[0]:
-            noStimRelatedCodes = printCycleWdiget(cWidget, f,attributesSetDict,parsedAttributesSetDict, noStimRelatedCodes)
 
-        if Info.TEXT == cWidget.widget_id.split('.')[0]:
-            noStimRelatedCodes = printTextWidget(cWidget, noStimRelatedCodes)
+            noStimRelatedCodes = printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes)
+
+        elif Info.TEXT == cWidget.widget_id.split('.')[0]:
+            noStimRelatedCodes = printTextWidget(cWidget, f, attributesSetDict, noStimRelatedCodes)
 
         elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
-            print(cWidget.getTimelines())
+            pass
+        elif Info.SOUND == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.SLIDER == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.OPEN == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.DC == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.CALIBRATION == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.ACTION == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.STARTR == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.ENDR == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.CLOSE == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.QUEST_INIT == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.QUEST_GET_VALUE == cWidget.widget_id.split('.')[0]:
+            pass
+        elif Info.QUEST_UPDATE == cWidget.widget_id.split('.')[0]:
+            pass
             # noStimRelatedCodes = printImageWdiget(cWidget, f, noStimRelatedCodes)
 
-    print(cTimelineWidgetIds)
+    # CYCLE = "Cycle"
+    # SOUND = "Sound"
+    # TEXT = "Text"
+    # IMAGE = "Image"
+    # VIDEO = "Video"
+    # SLIDER = "Slider"
+    # OPEN = "Open"
+    # DC = "DC"
+    # CALIBRATION = "Calibration"
+    # ACTION = "Action"
+    # STARTR = "StartR"
+    # ENDR = "EndR"
+    # CLOSE = "Close"
+    # QUEST_INIT = "QuestInit"
+    # QUEST_UPDATE = "QuestUpdate"
+    # QUEST_GET_VALUE = "QuestGetValue"
+    # IF = "If"
+    # SWITCH = "Switch"
+    # TIMELINE = "Timeline"
+    # print(cTimelineWidgetIds)
     # to be continue ...
 
 
-def printTextWidget(cWidget,noStimRelatedCodes):
-    global cIndents
+def printTextWidget(cWidget,f,attributesSetDict ,noStimRelatedCodes):
+    global enabledKBKeysList
     cProperties = Func.getProperties(cWidget.widget_id)
     # to be continue ...
 
@@ -144,41 +226,172 @@ def printTextWidget(cWidget,noStimRelatedCodes):
     return noStimRelatedCodes
 
 
-def printCycleWdiget(CYCLE, f, attributesSetDict, parsedAttributesSetDict, noStimRelatedCodes):
-    global cLoopLevel
-
-    # for each ref to the cycle function, increase the level by 1
+def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes):
+    # global cLoopLevel
+    # start from 1 to compatible with MATLAB
     cLoopLevel += 1
 
     attributesSetDict       = attributesSetDict.copy()
-    parsedAttributesSetDict = parsedAttributesSetDict()
+    cWidgetName = Func.getWidgetName(cWidget.widget_id)
+
+    # cLoopIterStr = f"iLoop_{cLoopLevel}"
+
+    attributesSetDict.setdefault(f"{cWidgetName}.cLoop",[cLoopLevel,f"iLoop_{cLoopLevel}"])
+    attributesSetDict.setdefault(f"{cWidgetName}.rowNums",[cLoopLevel,f"size({cLoopLevel}.attr,1)"])
+
+    cLoopIterStr = attributesSetDict[f"{cWidgetName}.cLoop"][1]
 
     # create the design matrix  (table) for the current cycle
-    startExpStr = Func.getWidgetName(CYCLE.widget_id) + '.att = cell2table({...'
+    startExpStr = cWidgetName + '.attr = cell2table({...'
     printAutoInd(f, '% create the designMatrix of the current cycle (loop)')
 
     printAutoInd(f, '{0}', startExpStr)
 
-    for iRow in range(CYCLE.rowCount()):
-        cRowDict = CYCLE.getAttributes(iRow)
+    for iRow in range(cWidget.rowCount()):
+        cRowDict = cWidget.getAttributes(iRow)
         if 0 == iRow:
-            endExpStr = "},'VariableNames',{" + ''.join("'"+key+"' " for key, value in cRowDict.items()) + "});"
+            endExpStr = "},'VariableNames',{" + ''.join("'"+key+"' " for key in cRowDict.keys()) + "});"
             # update the attributes set dictionary
             for key in cRowDict.keys():
-                attributesSetDict.setdefault(key)
+                attributesSetDict.setdefault(f"{cWidgetName}.attr.{key}",[cLoopLevel,f"{cWidgetName}.attr.{key}{{iLoop{cLoopLevel}}}"])
+            # print('-----cAttributes set -----------')
+            # print(attributesSetDict)
+        # handle the references and the values in colorType
+        for key, value in cRowDict.items():
+
+            # get the referenced var value
+            isRefValue, valueStr = getRefValue(value)
+
+            if isRefValue:
+                if valueStr in attributesSetDict:
+                    # assign the refered value to the current rowDict
+                    cRowDict[key] = attributesSetDict[valueStr][2]
+                else:
+                    throwCompileErrorInfo(f"The cited attribute '{valueStr}' \nis not available for {cWidgetName}")
+                    # Func.log(f"The cited attribute '{valueStr}' was not exist for the current widget {cWidgetName}",1)
+
+            # isRgbFormat = re.match("^\d+,\d+,\d+$", cRowDict[key])
+            isRgbFormat = isRgbStr(cRowDict[key])
+
+            if isRgbFormat:
+                # transform the RGB to include a pair of square brackets
+                # print('find RGB')
+                # print(isRgbFormat[0])
+                cRowDict[key] = f"[{isRgbFormat[0]}]"
 
         if '' == cRowDict['Weight']:
             cRepeat = 1
         else:
-            cRepeat = int(dataStrConvert(cRowDict['Weight']))
+            cRepeat = dataStrConvert(cRowDict['Weight'])
 
-        for iRep in range(cRepeat):
-            printAutoInd(f,'{0}',"".join(dataStrConvert(value) + " " for key, value in cRowDict.items())+";...")
+        for iRep in range(int(cRepeat)):
+            # print("".join(str(dataStrConvert(value)) + " " for key, value in cRowDict.items()))
+            printAutoInd(f,'{0}',"".join(addCurlyBrackets(dataStrConvert(value)) + " " for key, value in cRowDict.items())+";...")
 
 
     printAutoInd(f,'{0}\n',endExpStr)
+    # cycling
+    printAutoInd(f, '% looping across each row of the {0}.attr:{1}',cWidgetName , cLoopIterStr)
+    printAutoInd(f, 'for {0} = size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
 
+    # handle each timeline
+    cTimeLineList = cWidget.getTimelines()
+    # squeeze the timelines
+    cTimelineSet = {''}
+
+    for iTimeline in cTimeLineList:
+        cTimelineSet.add(iTimeline[1])
+    cTimelineSet.discard('')
+
+
+    print(cTimelineSet)
+
+    printAutoInd(f, '% switch across timeline types')
+    printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
+
+    for iTimeline_id in cTimelineSet:
+        if '' == iTimeline_id:
+            throwCompileErrorInfo(f"In {cWidgetName}: Timeline should not be empty!")
+        else:
+            printAutoInd(f, 'case {0}', f"{Func.getWidgetName(iTimeline_id)}")
+            printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel)
+
+    printAutoInd(f, 'otherwise ')
+    printAutoInd(f, '% do nothing ')
+    printAutoInd(f, 'end%switch ')
+
+    # cycle.getTimelines() -> list: 按顺序进行返回所有设置的timeline
+    # 格式为[[timeline_name, timeline_widget_id], [], ...]
+    # 如果某行为空则改行对应的数据为['', '']
+
+    """
+     # get widgets in the main timeline
+     cTimelineWidgetIds = Func.getWidgetIDInTimeline(f"{Info.TIMELINE}.0")
+
+     for cWidgetId in cTimelineWidgetIds:
+         # usually the code section after drawing the current frame's stimuli
+         noStimRelatedCodes = []
+
+         cWidget = Info.WID_WIDGET[cWidgetId]
+         print(Func.getWidgetName(cWidgetId))
+
+         if 'Text' == cWidget.widget_id.split('.')[0]:
+             noStimRelatedCodes = printTextWidget(cWidget,noStimRelatedCodes)
+
+         elif 'Cycle' == cWidget.widget_id.split('.')[0]:
+             print(cWidget.getTimelines())
+             noStimRelatedCodes = printCycleWdiget(cWidget,f, noStimRelatedCodes)
+
+
+         print(Func.getProperties(cWidgetId))
+         # print(cWidget.getPropertyByKey('Text'))
+         # print(Func.getScreen)
+         # print(dir(cWidget))
+
+         widget是具体的某个控件
+
+         widget为Image时，Text\Video\Sound类似的
+         filename: str = widget.getFilename()
+         output_device: dict = widget.getOutputDevice()
+         for device, properties in output_device.items():
+             output_name: str = device
+             value_or_msg: str = properties.get("Value or Msg", "")
+             pulse_duration: str = properties.get("Pulse Duration", "")
+
+         widget为If时
+         condition: str = widget.getCondition()
+         true_event: dict = widget.getTrueWidget() # false_event类似
+         stim_type: str = true_event.get("stim type", "")
+         event_name: str = true_event.get("event name", "")
+         widget_id: str = true_event.get("widget id", "")
+         widget: Widget = true_event.get("widget", None) # 这个widget就是Slider/Image/...具有若干上述getXXX方法
+
+         widget为switch
+         switch: str = widget.getSwitch()
+         cases: list = widget.getCase()
+         for case in cases:
+             case: dict
+             case_value: str = case.get("case value", "")
+             stim_type: str = case.get("stim type", "")
+             event_name: str = case.get("event name", "")
+             widget_id: str = case.get("widget id", "")
+             widget: Widget = case.get("widget", None)
+         """
+
+
+
+
+
+
+
+    printAutoInd(f, 'end % {0}', cLoopIterStr)
     # to be continue ...
+
+
+
+
+
+
 
     return noStimRelatedCodes
 
@@ -191,10 +404,8 @@ def printCycleWdiget(CYCLE, f, attributesSetDict, parsedAttributesSetDict, noSti
 
 
 def compilePTB(globalSelf):
-
-    enabledKBKeysList        = []
-    attributesSetDict        = {'sessionNum':[0,''],'subAge':[0,''],'subName':[0,''],'subSex':[0,''],'subNum':[0,''],'subHandless':[0,'']}
-    parsedAttributesSetDict  = {'sessionNum':[0,''],'subAge':[0,''],'subName':[0,''],'subSex':[0,''],'subNum':[0,''],'subHandless':[0,'']}
+    attributesSetDict        = {'sessionNum':[0,'SubInfo.session'],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
+    # parsedAttributesSetDict  = {'sessionNum':[0,'SubInfo.session'],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
 
 
     # attributesSetDict.setdefault('sessionNum',0)
@@ -229,7 +440,7 @@ def compilePTB(globalSelf):
         #
         # get subject information
         printAutoInd(f,"%----- get subject information -------/",)
-        printAutoInd(f,"{0} = OpenExp_BCL('{1}',pwd);",cFilenameOnly,cFilenameOnly)
+        printAutoInd(f,"subInfo = OpenExp_BCL('{0}',fileparts(mfilename('fullpath')));",cFilenameOnly)
         printAutoInd(f,"close(gcf);")
         printAutoInd(f,"%-------------------------------------\\\n")
 
@@ -405,61 +616,9 @@ def compilePTB(globalSelf):
 
 
         # start to handle all the widgets
-        printTimelineWidget( Info.WID_WIDGET[f"{Info.TIMELINE}.0"],f,attributesSetDict,parsedAttributesSetDict)
-
-        """
-        # get widgets in the main timeline
-        cTimelineWidgetIds = Func.getWidgetIDInTimeline(f"{Info.TIMELINE}.0")
-
-        for cWidgetId in cTimelineWidgetIds:
-            # usually the code section after drawing the current frame's stimuli
-            noStimRelatedCodes = []
-
-            cWidget = Info.WID_WIDGET[cWidgetId]
-            print(Func.getWidgetName(cWidgetId))
-
-            if 'Text' == cWidget.widget_id.split('.')[0]:
-                noStimRelatedCodes = printTextWidget(cWidget,noStimRelatedCodes)
-
-            elif 'Cycle' == cWidget.widget_id.split('.')[0]:
-                print(cWidget.getTimelines())
-                noStimRelatedCodes = printCycleWdiget(cWidget,f, noStimRelatedCodes)
+        printTimelineWidget( Info.WID_WIDGET[f"{Info.TIMELINE}.0"],f,attributesSetDict,0)
 
 
-            print(Func.getProperties(cWidgetId))
-            # print(cWidget.getPropertyByKey('Text'))
-            # print(Func.getScreen)
-            # print(dir(cWidget))
-
-            widget是具体的某个控件
-
-            widget为Image时，Text\Video\Sound类似的
-            filename: str = widget.getFilename()
-            output_device: dict = widget.getOutputDevice()
-            for device, properties in output_device.items():
-                output_name: str = device
-                value_or_msg: str = properties.get("Value or Msg", "")
-                pulse_duration: str = properties.get("Pulse Duration", "")
-
-            widget为If时
-            condition: str = widget.getCondition()
-            true_event: dict = widget.getTrueWidget() # false_event类似
-            stim_type: str = true_event.get("stim type", "")
-            event_name: str = true_event.get("event name", "")
-            widget_id: str = true_event.get("widget id", "")
-            widget: Widget = true_event.get("widget", None) # 这个widget就是Slider/Image/...具有若干上述getXXX方法
-
-            widget为switch
-            switch: str = widget.getSwitch()
-            cases: list = widget.getCase()
-            for case in cases:
-                case: dict
-                case_value: str = case.get("case value", "")
-                stim_type: str = case.get("stim type", "")
-                event_name: str = case.get("event name", "")
-                widget_id: str = case.get("widget id", "")
-                widget: Widget = case.get("widget", None)
-            """
 
 
 
@@ -567,7 +726,7 @@ def compilePTB(globalSelf):
         printAutoInd(f,"% subfun 1: detectAbortKey")
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
-        printAutoInd(f, "function detectAbortKey()\n")
+        printAutoInd(f, "function detectAbortKey(abortKeyCode)\n")
         printAutoInd(f,"[keyIsDown, Noused, keyCode] = responseCheck(-1);")
         printAutoInd(f,"if keyCode(abortKeyCode)")
 

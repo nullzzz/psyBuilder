@@ -252,8 +252,6 @@ class ColorListEditor(PigComboBox):
                     self.setCurrentText("white")
                     QMessageBox.warning(
                         self, "Warning", "Invalid Color!", QMessageBox.Ok)
-                    # self.lineEdit().clear()
-                    # self.setFocus()
                 else:
                     pass
         QComboBox.focusOutEvent(self, e)
