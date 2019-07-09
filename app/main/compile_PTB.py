@@ -330,11 +330,11 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
     # handle each timeline
     cTimeLineList = cWidget.getTimelines()
     # squeeze the timelines
-    cTimelineSet = {}
+    cTimelineSet = set()
 
     for iTimeline in cTimeLineList:
         cTimelineSet.add(iTimeline[1])
-    # cTimelineSet.discard('')
+
 
 
     print(cTimelineSet)
