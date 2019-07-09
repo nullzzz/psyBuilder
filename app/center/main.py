@@ -9,3 +9,13 @@ class Center(QDockWidget):
         # set UI
         self.widget_tabs = WidgetTabs(self)
         self.setWidget(self.widget_tabs)
+
+    def isFocused(self) -> bool:
+        """
+
+        :return:
+        """
+        try:
+            return self.widget_tabs.currentWidget().widget_icon_area.widget_icon_table.focus
+        except:
+            return False

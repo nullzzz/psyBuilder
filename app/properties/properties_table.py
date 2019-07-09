@@ -14,7 +14,7 @@ class PropertiesTable(QTableWidget):
         self.horizontalHeader().setStretchLastSection(True)
         # 基础设置
         self.setColumnCount(2)
-        self.setColumnWidth(0, 130)
+        self.setColumnWidth(0, 160)
 
     def addProperty(self, property_name: str, property_value: str):
         try:

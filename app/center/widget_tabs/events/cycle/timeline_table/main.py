@@ -295,7 +295,7 @@ class TimelineTable(QTableWidget):
         :return:
         """
         try:
-            if self.edit_row == item.row() and item.column() == 1 and not item.text():
+            if self.edit_row == item.row() and item.column() == 1 and self.old_timeline_name and not item.text():
                 self.edit_row = -2
                 self.name_count[self.old_timeline_name] -= 1
                 if not self.name_count[self.old_timeline_name]:

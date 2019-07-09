@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QByteArray, QDataStream, QIODevice, QMimeData, QPoint, pyqtSignal
-from PyQt5.QtGui import QPixmap, QDrag, QKeySequence
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QFrame, QLabel, QMenu, QAction, QShortcut, QMessageBox, \
+from PyQt5.QtGui import QPixmap, QDrag
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QFrame, QLabel, QMenu, QAction, QMessageBox, \
     QAbstractItemView
 
 from app.func import Func
@@ -85,7 +85,7 @@ QMenu::indicator {
         self.old_name = ''
         self.up_sign = SignTable(sign="timeline/arrow_up.png")
         self.down_sign = SignTable(sign="timeline/arrow_down.png")
-
+        self.focus = False
         # 初始化
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
         # 行
@@ -146,10 +146,9 @@ QMenu::indicator {
         # self.copy_action = QAction("copy", self.right_button_menu)
 
         self.right_button_menu.addAction(self.delete_action)
-        # self.right_button_menu.addAction(self.copy_action)
         # short cut
-        self.delete_shortcut = QShortcut(QKeySequence("BackSpace"), self)
-        self.delete_shortcut.activated.connect(self.deleteWidgetIcon)
+        # self.delete_shortcut = QShortcut(QKeySequence("BackSpace"), self)
+        # self.delete_shortcut.activated.connect(self.deleteWidgetIcon)
 
     def contextMenuEvent(self, e):
         try:
@@ -474,3 +473,34 @@ QMenu::indicator {
         except Exception as e:
             print(f"error {e} happens in restore. [widget_icon_table/main.py]")
             Func.log(e, True)
+
+    def focusInEvent(self, QFocusEvent):
+        """
+        得到焦点进行记录
+        :param QFocusEvent:
+        :return:
+        """
+        super(WidgetIconTable, self).focusInEvent(QFocusEvent)
+        self.focus = True
+
+    def focusOutEvent(self, QFocusEvent):
+        """
+        在失去焦点时进行记录
+        :param QFocusEvent:
+        :return:
+        """
+        super(WidgetIconTable, self).focusOutEvent(QFocusEvent)
+        self.focus = False
+
+    def deleteShortcut(self):
+        """
+        删除快捷键对应功能函数
+        :return:
+        """
+        try:
+            col = self.currentColumn()
+            # 如果col有效
+            if col in range(1, self.widget_icon_count + 1):
+                self.removeColumn(col, True)
+        except:
+            pass

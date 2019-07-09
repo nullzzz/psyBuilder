@@ -561,3 +561,10 @@ class Structure(QDockWidget):
                     self.widgetSignalsLink.emit(origin_wid)
                 # 要链接过去
                 Info.WID_WIDGET[widget_id] = Info.WID_WIDGET[origin_wid]
+
+    def isFocused(self):
+        """
+
+        :return:
+        """
+        return self.structure_tree.focus
