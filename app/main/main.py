@@ -466,7 +466,7 @@ class PsyApplication(QMainWindow):
             # self.structure.getStructure().print_tree()
             compilePTB(self)
         except Exception as compileError:
-            Func.log(str(compileError),True,False)
+            Func.log(str(compileError), True, False)
             traceback.print_exc()
 
     def about(self):
