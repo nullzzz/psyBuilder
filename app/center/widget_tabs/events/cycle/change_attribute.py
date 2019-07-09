@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
-
+import re
 
 class ChangeAttributeDialog(QDialog):
     # (attribute, value -> cycle )
@@ -51,6 +51,11 @@ class ChangeAttributeDialog(QDialog):
     def ok(self):
         attribute = self.attribute.text()
         value = self.value.text()
+        # 如果是weight,必须是数字
+        if attribute == "Weight":
+            if not re.match(r"^[0-9]+$", value):
+                QMessageBox.information(self, 'Warning', 'Value must be positive number.')
+                return
         if attribute == self.old_attribute:
             if value != self.old_value:
                 self.attributeData.emit(self.col, attribute, value)

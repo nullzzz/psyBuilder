@@ -137,3 +137,6 @@ class Info(object):
         SWITCH: 0,
         TIMELINE: 1,
     }
+
+    # drag
+    FromAttributeToLineEdit = "attributes/move-attribute"

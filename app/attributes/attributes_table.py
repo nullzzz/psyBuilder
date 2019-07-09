@@ -3,6 +3,7 @@ from PyQt5.QtGui import QIcon, QFont, QDrag
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 
 from app.func import Func
+from app.info import Info
 from app.lib import NoDash
 
 
@@ -58,7 +59,7 @@ class AttributesTable(QTableWidget):
             stream.writeQString(text)
 
             mime_data = QMimeData()
-            mime_data.setData("attributes/move-attribute", data)
+            mime_data.setData(Info.FromAttributeToLineEdit, data)
 
             drag = QDrag(self)
             drag.setMimeData(mime_data)

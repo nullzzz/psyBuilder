@@ -1,15 +1,15 @@
 import copy
 import re
 
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import QDataStream, QIODevice, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QKeySequence
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox, QAbstractItemView, QShortcut, QAction, QMenu, \
-    QApplication
+from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QShortcut, QAction, QMenu, QApplication, QMessageBox
 
 from app.center.widget_tabs.timeline.widget_icon import WidgetIcon
 from app.func import Func
 from app.info import Info
-from app.lib import NoDash
+from app.lib import NoDash, PigLineEdit
+from .timeline_table_item import TimelineTableItem as QTableWidgetItem
 
 
 class TimelineTable(QTableWidget):
@@ -40,6 +40,8 @@ class TimelineTable(QTableWidget):
         self.setColumnCount(2)
         self.setHorizontalHeaderLabels(self.col_attribute)
         self.addRow()
+        # 允许拖拽
+        self.setAcceptDrops(True)
         # 双击单元格修改
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
 
@@ -56,7 +58,11 @@ class TimelineTable(QTableWidget):
         self.focus = False
 
         # 在任意修改时要检测合法性
-        self.old_value = ""
+        self.old_weight_value = ""
+
+        #
+        self.line_edit = None
+        self.edit_attribute_pos = (-1, -1)
 
     def linkSignals(self) -> None:
         """
@@ -108,9 +114,7 @@ class TimelineTable(QTableWidget):
             self.insertRow(self.rowCount())
             # 根据attribute设置内容
             self.setItem(self.rowCount() - 1, 0, QTableWidgetItem(self.attribute_value[self.col_attribute[0]]))
-            item = QTableWidgetItem(self.attribute_value[self.col_attribute[1]])
-            item.setFlags(Qt.ItemIsEnabled)
-            self.setItem(self.rowCount() - 1, 1, item)
+            self.setItem(self.rowCount() - 1, 1, QTableWidgetItem(self.attribute_value[self.col_attribute[1]]))
             for col in range(0, len(self.col_attribute)):
                 self.setItem(self.rowCount() - 1, col, QTableWidgetItem(self.attribute_value[self.col_attribute[col]]))
         except Exception as e:
@@ -412,6 +416,7 @@ class TimelineTable(QTableWidget):
         :param e:
         :return:
         """
+        QTableWidget.mouseReleaseEvent(self, e)
         try:
             if self.alt_pressed and self.selected_col != -2:
                 items = self.selectedItems()
@@ -436,25 +441,38 @@ class TimelineTable(QTableWidget):
                 self.selected_col = -2
         except Exception as e:
             print(f"error {e} happen in copy. [timeline_table/main.py]")
-        finally:
-            QTableWidget.mouseReleaseEvent(self, e)
 
     def mouseDoubleClickEvent(self, e):
+        """
+                通过监听双击事件来记录修改前的旧值。
+                :param e:
+                :return:
+                """
+        # 双击位置所在行列
         row = self.rowAt(e.pos().y())
         col = self.columnAt(e.pos().x())
-        if col != 1:
-            super(TimelineTable, self).mouseDoubleClickEvent(e)
-            # 保存旧值
-            if row != -1:
-                self.old_value = self.item(row, col).text()
-        else:
-            if row != -1:
-                self.setFocus()
-                self.old_timeline_name = self.item(row, col).text()
-                self.editItem(self.item(row, col))
-                self.edit_row = row
-            else:
+        # 有效行
+        if row != -1:
+            if col == 0:
+                # weight
+                self.old_weight_value = self.item(row, col).text()
+                # 弹出编辑框
                 super(TimelineTable, self).mouseDoubleClickEvent(e)
+            elif col == 1:
+                # timeline
+                self.old_timeline_name = self.item(row, col).text()
+                self.edit_row = row
+                # 弹出编辑框
+                super(TimelineTable, self).mouseDoubleClickEvent(e)
+            elif col != -1:
+                # 其余attribute，在编辑时使用自定义的lineEdit，使其可以接受变量
+                current_value = self.item(row, col).text()
+                line_edit = PigLineEdit()
+                line_edit.setText(current_value)
+                self.line_edit = line_edit
+                line_edit.editingFinished.connect(self.revertToItem)
+                self.edit_attribute_pos = (row, col)
+                self.setCellWidget(row, col, self.line_edit)
 
     def focusInEvent(self, e):
         """
@@ -754,12 +772,74 @@ class TimelineTable(QTableWidget):
             # 如果为空无所谓
             if not new_value:
                 QMessageBox.information(self, "warning", "value must be positive integer.")
-                item.setText(self.old_value)
-                self.old_value = ""
+                item.setText(self.old_weight_value)
+                self.old_weight_value = ""
                 return
             if re.match(r"^[0-9]+$", new_value):
-                self.old_value = ""
+                self.old_weight_value = ""
                 return
             QMessageBox.information(self, "warning", "value must be positive integer.")
-            item.setText(self.old_value)
-            self.old_value = ""
+            item.setText(self.old_weight_value)
+            self.old_weight_value = ""
+
+    def revertToItem(self):
+        """
+        在编辑时被专成了line edit，在编辑完成后需要转回item
+        :return:
+        """
+        # 保证有效
+        if self.edit_attribute_pos[0] != -1:
+            row, col = self.edit_attribute_pos
+            # 移除lineWidget
+            self.removeCellWidget(row, col)
+            value = self.line_edit.text()
+            item = QTableWidgetItem(value)
+            self.edit_attribute_pos = (-1, -1)
+            self.setItem(row, col, item)
+
+    def dragEnterEvent(self, e):
+        """
+        拖拽进入
+        :param e:
+        :return:
+        """
+        # 符合要求
+        if e.mimeData().hasFormat(Info.FromAttributeToLineEdit):
+            e.accept()
+        else:
+            e.ignore()
+
+    def dragMoveEvent(self, e):
+        """
+        拖拽移动
+        :param e:
+        :return:
+        """
+        # 符合要求
+        if e.mimeData().hasFormat(Info.FromAttributeToLineEdit):
+            e.accept()
+        else:
+            e.ignore()
+
+    def dropEvent(self, e):
+        """
+        拖拽结束
+        :param e:
+        :return:
+        """
+        # 符合要求
+        if e.mimeData().hasFormat(Info.FromAttributeToLineEdit):
+            # 根据位置找到准确的item，并将其放入
+            row = self.rowAt(e.pos().y())
+            col = self.columnAt(e.pos().x())
+            # 有效行、有效列（不能是weight和timeline）
+            if row != -1 and col >= 2:
+                data = e.mimeData().data(Info.FromAttributeToLineEdit)
+                stream = QDataStream(data, QIODevice.ReadOnly)
+                text = f"[{stream.readQString()}]"
+                self.item(row, col).setText(text)
+                e.accept()
+            else:
+                e.ignore()
+        else:
+            e.ignore()
