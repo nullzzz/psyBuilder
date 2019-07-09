@@ -20,7 +20,9 @@ TODOLIST
 	1）添加一个del快捷键删除structure 和Timeline中的widgets
 	2）修改：attributes界面的"Name"修改为 "Sort"
 
+2) sound 里面增加  sound name：
 
+3）output device里面也需要增加一个widgettype，sound
 """
 2) Text Display:
 
