@@ -38,7 +38,7 @@ class ImageDisplay(QMainWindow):
         self.isUD = False
         self.isLR = False
         self.stretch_mode = "Both"
-        self.back_color = "255,255,255"
+        self.frame_fill_color = "255,255,255"
         self.transparent_value = "0"
 
         self.x_pos = "0"
@@ -79,7 +79,7 @@ class ImageDisplay(QMainWindow):
         if self.file:
             try:
                 self.preview = Preview(self.file, self.pix, self.x_pos, self.y_pos, self.w_size, self.h_size)
-                self.preview.setStyleSheet("background-color:{}".format(self.back_color))
+                self.preview.setStyleSheet("background-color:{}".format(self.frame_fill_color))
                 self.preview.setTransparent(int(self.transparent_value))
                 self.preview.setWindowModality(Qt.ApplicationModal)
                 self.preview.showFullScreen()
@@ -105,7 +105,7 @@ class ImageDisplay(QMainWindow):
     def apply(self):
         self.getInfo()
         self.parseProperties()
-        self.label.setStyleSheet(f"background-color:{self.back_color}")
+        self.label.setStyleSheet(f"background-color:{self.frame_fill_color}")
         # 加载图片文件
         if self.file:
             if QFileInfo(self.file).isFile():
@@ -126,7 +126,7 @@ class ImageDisplay(QMainWindow):
         self.isLR = self.pro_window.general.mirrorLR.checkState()
         self.isStretch = self.pro_window.general.stretch.checkState()
         self.stretch_mode = self.pro_window.general.stretch_mode.currentText()
-        self.back_color = self.pro_window.general.back_color.currentText()
+        self.frame_fill_color = self.pro_window.frame.back_color.getColor()
         self.transparent_value = self.pro_window.general.transparent.text()
         self.x_pos = self.default_properties.get("X position", "0")
         self.y_pos = self.default_properties.get("Y position", "0")
@@ -181,7 +181,6 @@ class ImageDisplay(QMainWindow):
         self.pro_window = pro
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
-        # self.pro.cancel_bt.clicked.connect(self.testBt)
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
     # 设置可选参数
@@ -267,12 +266,12 @@ class ImageDisplay(QMainWindow):
             return self.stretch_mode
         return ""
 
-    def getBackColor(self) -> str:
-        """
-        返回背景颜色
-        :return:
-        """
-        return self.back_color
+    # def getBackColor(self) -> str:
+    #     """
+    #     返回背景颜色
+    #     :return:
+    #     """
+    #     return self.back_color
 
     def getTransparent(self) -> str:
         """
@@ -344,7 +343,7 @@ class ImageDisplay(QMainWindow):
         """
         return self.pro_window.frame.border_width.currentText()
 
-    def getFrameBackColor(self) -> str:
+    def getFrameFillColor(self) -> str:
         """
         返回边框背景色
         :return:

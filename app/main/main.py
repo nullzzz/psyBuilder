@@ -169,6 +169,9 @@ class PsyApplication(QMainWindow):
 
         self.linkSignals()
 
+        # 导入配置
+        # Func.getConfig()
+
     def initialize(self):
         """
         开场的动画效果，及初始ui大小设置
@@ -280,10 +283,12 @@ class PsyApplication(QMainWindow):
         获取文件名
         :return:
         """
-        options = QFileDialog.Options()
-        save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Psy Files (*.ini);", options=options)
+        file_dialog = QFileDialog(self)
+        save_file_name, _ = file_dialog.getSaveFileName(self, "Save file", Info.FILE_DIRECTORY, "Psy Files (*.psy);")
         if save_file_name:
             Info.FILE_NAME = save_file_name
+            Info.FILE_DIRECTORY = "/".join(save_file_name.split("/")[:-1])
+            Info.CONFIG.setValue("directory", Info.FILE_DIRECTORY)
             return True
         return False
 
@@ -297,11 +302,12 @@ class PsyApplication(QMainWindow):
         恢复文件！
         :return:
         """
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", "", "Psy File (*.psy;*.ini)", options=options)
+        file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)")
         if file_name:
             # 更新文件名
             Info.FILE_NAME = file_name
+            Info.FILE_DIRECTORY = "/".join(file_name.split("/")[:-1])
+            Info.CONFIG.setValue("directory", Info.FILE_DIRECTORY)
             # 从文件中读取配置
             setting = QSettings(file_name, QSettings.IniFormat)
 
@@ -338,7 +344,7 @@ class PsyApplication(QMainWindow):
             # 恢复structure并恢复剩余widget
             structure_tree: list = setting.value("STRUCTURE_TREE")
             self.structure.loadStructure(structure_tree)
-        Func.log(f"{Info.FILE_NAME} loaded successful!")
+            Func.log(f"{Info.FILE_NAME} loaded successful!")
 
     def loadOut(self):
         # 导出输入设备信息

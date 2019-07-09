@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QApplication, QFileDialog, QCompleter, QMessageBox
+    QApplication, QFileDialog, QCompleter, QMessageBox, QFormLayout
 
 from app.lib import PigLineEdit, PigComboBox, ColorListEditor
 
@@ -28,8 +28,6 @@ class ImageTab1(QWidget):
         }
         # 打开文件
         self.file_name = PigLineEdit()
-        self.file_name.textChanged.connect(self.findVar)
-        self.file_name.returnPressed.connect(self.finalCheck)
 
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
@@ -46,7 +44,7 @@ class ImageTab1(QWidget):
         self.stretch_mode = PigComboBox()
 
         # 背景色、透明度、Clear&Screen
-        self.back_color = ColorListEditor()
+        # self.back_color = ColorListEditor()
         self.transparent = PigLineEdit()
         self.clear_after = PigComboBox()
         self.screen_name = PigComboBox()
@@ -81,23 +79,12 @@ class ImageTab1(QWidget):
         group1.setLayout(layout1)
 
         group2 = QGroupBox("")
-        layout2 = QGridLayout()
-        l1 = QLabel("Back Color:")
-        l2 = QLabel("Transparent:")
-        l3 = QLabel("Clear After:")
-        l4 = QLabel("Screen Name:")
-        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        layout2.addWidget(l1, 0, 0)
-        layout2.addWidget(self.back_color, 0, 1)
-        layout2.addWidget(l2, 0, 2)
-        layout2.addWidget(self.transparent, 0, 3)
-        layout2.addWidget(l3, 1, 0)
-        layout2.addWidget(self.clear_after, 1, 1)
-        layout2.addWidget(l4, 1, 2)
-        layout2.addWidget(self.screen_name, 1, 3)
+        layout2 = QFormLayout()
+        layout2.setVerticalSpacing(10)
+        layout2.setLabelAlignment(Qt.AlignRight)
+        layout2.addRow("Transparent:", self.transparent)
+        layout2.addRow("Clear After:", self.clear_after)
+        layout2.addRow("Screen Name:", self.screen_name)
 
         group2.setLayout(layout2)
 
@@ -120,26 +107,10 @@ class ImageTab1(QWidget):
         else:
             self.stretch_mode.setEnabled(False)
 
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color: black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                temp.clear()
-
     def setAttributes(self, attributes):
         self.attributes = attributes
         self.file_name.setCompleter(QCompleter(self.attributes))
+        self.rotate.setCompleter(QCompleter(self.attributes))
 
     def setScreen(self, screen: list):
         selected = self.screen_name.currentText()
@@ -159,7 +130,7 @@ class ImageTab1(QWidget):
         self.default_properties["Rotate"] = self.rotate.text()
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
-        self.default_properties["Back color"] = self.back_color.getColor()
+        # self.default_properties["Back color"] = self.back_color.getColor()
         # self.default_properties["Transparent"] = self.transparent.value()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear after"] = self.clear_after.currentText()
@@ -173,10 +144,9 @@ class ImageTab1(QWidget):
         self.default_properties["Mirror left/right"] = bool(self.mirrorLR.checkState())
 
         self.default_properties["Rotate"] = self.rotate.text()
-
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
-        self.default_properties["Back color"] = self.back_color.getColor()
+        # self.default_properties["Back color"] = self.back_color.getColor()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear after"] = self.clear_after.currentText()
         self.default_properties["Screen name"] = self.screen_name.currentText()

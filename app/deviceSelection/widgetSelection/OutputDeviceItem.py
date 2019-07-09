@@ -71,7 +71,7 @@ class ItemWidget(QWidget):
         self.pulse_dur = PigComboBox()
         self.pulse_dur.setEditable(True)
         self.pulse_dur.setInsertPolicy(QComboBox.NoInsert)
-        self.pulse_dur.addItems(["End of Duration", "0", "100", "200", "300", "400", "500"])
+        self.pulse_dur.addItems(["End of Duration", "10", "20", "30", "40", "50"])
 
         valid_num = QRegExp("\[\w+\]|\d+|End of Duration")
         self.pulse_dur.setValidator(QRegExpValidator(valid_num))
