@@ -24,22 +24,27 @@ from lib.wait_dialog import WaitDialog
 cIndents          = 0
 isPreLineSwitch   = 0
 enabledKBKeysList = []
-# cLoopLevel      = 0
+
+inputDevNameIdxDict = {}
+outputDevNameIdxDict = {}
+
 def throwCompileErrorInfo(inputStr):
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Critical)
     msg.setWindowIcon(QIcon(Func.getImage("icon.png")))
 
     msg.setText(inputStr)
-    # msg.setInformativeText("This is additional information")
     msg.setWindowTitle("    Attention!   ")
+    msg.setStandardButtons(QMessageBox.Ok)
+    # msg.setInformativeText("This is additional information")
     # msg.setDetailedText("The details are as follows:")
     # msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-    msg.setStandardButtons(QMessageBox.Ok)
     # msg.buttonClicked.connect(msgbtn)
-
     msg.exec_()
     raise Exception(inputStr)
+
+
+
 
 def printAutoInd(f,inputStr,*argins):
     global cIndents
@@ -92,15 +97,16 @@ def printAutoInd(f,inputStr,*argins):
 
 
 def is_contain_ch(check_str):
-    """
-    :param check_str: {str}
-    :return: {bool} True and False for have and have not chinese characters respectively
-    """
+    # :param check_str: {str}
+    # :return: {bool} True and False for have and have not chinese characters respectively
     for ch in check_str:
         if u'\u4e00' <= ch <= u'\u9fff':
             return True
     return False
 
+def isRgbStr(inputStr):
+    isRgbFormat = re.match("^\d+,\d+,\d+$", inputStr)
+    return isRgbFormat
 
 def dataStrConvert(dataStr):
     # convert string to neither a string or a num
@@ -117,10 +123,22 @@ def dataStrConvert(dataStr):
             outData = "'"+dataStr+"'"
     return outData
 
+
+
 # add curly brackets
 def addCurlyBrackets(inputStr):
-    outputStr = "{"+str(inputStr)+"}"
+    # outputStr = "{"+str(inputStr)+"}"
+    outputStr = f"{{{inputStr}}}"
     return outputStr
+
+
+
+# add square brackets
+def addSquBrackets(inputStr):
+    outputStr = f"[{inputStr}]"
+    return outputStr
+
+
 
 def getRefValue(inputStr):
     tempMatchObj = re.match("^\[.*\]$", inputStr)
@@ -131,13 +149,12 @@ def getRefValue(inputStr):
 
     return [False,inputStr]
 
-def isRgbStr(inputStr):
-    isRgbFormat = re.match("^\d+,\d+,\d+$", inputStr)
-    return isRgbFormat
 
 
 
-def parseAllowKeys(enabledKBKeysList,allowKeyStr):
+def parseAllowKeys(allowKeyStr):
+    global enabledKBKeysList
+
     splittedStrs = re.split('({\w*})',allowKeyStr)
 
     for item in splittedStrs:
@@ -161,7 +178,7 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
             noStimRelatedCodes = printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes)
 
         elif Info.TEXT == cWidget.widget_id.split('.')[0]:
-            noStimRelatedCodes = printTextWidget(cWidget, f, attributesSetDict, noStimRelatedCodes)
+            noStimRelatedCodes = printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, noStimRelatedCodes)
 
         elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
             pass
@@ -216,9 +233,27 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
     # to be continue ...
 
 
-def printTextWidget(cWidget,f,attributesSetDict ,noStimRelatedCodes):
-    global enabledKBKeysList
+def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict
+
+    print(inputDevNameIdxDict)
+    print(outputDevNameIdxDict)
+
     cProperties = Func.getProperties(cWidget.widget_id)
+
+    if is_contain_ch(cProperties['Text']):
+        cProperties['Text'] = "double('"+cProperties['Text']+"')"
+
+    # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
+    # [, flipVertical][, vSpacing][, righttoleft][, winRect])
+
+    print(f"line 243: {cProperties}")
+
+    output_device= cWidget.getOutputDevice()
+    for device, properties in output_device.items():
+        # print(device)
+        value_or_msg   = properties.get("Value or Msg", "")
+        pulse_duration = properties.get("Pulse Duration", "")
     # to be continue ...
 
 
@@ -275,8 +310,6 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
             if isRgbFormat:
                 # transform the RGB to include a pair of square brackets
-                # print('find RGB')
-                # print(isRgbFormat[0])
                 cRowDict[key] = f"[{isRgbFormat[0]}]"
 
         if '' == cRowDict['Weight']:
@@ -297,11 +330,11 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
     # handle each timeline
     cTimeLineList = cWidget.getTimelines()
     # squeeze the timelines
-    cTimelineSet = {''}
+    cTimelineSet = set()
 
     for iTimeline in cTimeLineList:
         cTimelineSet.add(iTimeline[1])
-    cTimelineSet.discard('')
+
 
 
     print(cTimelineSet)
@@ -318,7 +351,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
     printAutoInd(f, 'otherwise ')
     printAutoInd(f, '% do nothing ')
-    printAutoInd(f, 'end%switch ')
+    printAutoInd(f, 'end%switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
 
     # cycle.getTimelines() -> list: 按顺序进行返回所有设置的timeline
     # 格式为[[timeline_name, timeline_widget_id], [], ...]
@@ -404,17 +437,23 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
 
 def compilePTB(globalSelf):
+    global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict
+
+    inputDevNameIdxDict = {}
+    outputDevNameIdxDict = {}
+
+    enabledKBKeysList = []
+    enabledKBKeysList.append('escape')
+
     attributesSetDict        = {'sessionNum':[0,'SubInfo.session'],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
-    # parsedAttributesSetDict  = {'sessionNum':[0,'SubInfo.session'],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
 
-
-    # attributesSetDict.setdefault('sessionNum',0)
 
     if not Info.FILE_NAME:
         if not globalSelf.getFileName():
             QMessageBox.information(globalSelf, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
             return
 
+    globalSelf.save()
     # get save path
     compile_file_name = ".".join(Info.FILE_NAME.split('.')[:-1]) + ".m"
     # open file
@@ -469,7 +508,8 @@ def compilePTB(globalSelf):
         # you can get each widget's device you selected
         output_devices = Info.OUTPUT_DEVICE_INFO
         input_devices  = Info.INPUT_DEVICE_INFO
-
+        # print('-------------')
+        # print(output_devices)
         printAutoInd(f,"%------ define input devices --------/")
         iKeyboard = 1
         iGamepad  = 1
@@ -477,7 +517,9 @@ def compilePTB(globalSelf):
         iMouse    = 1
 
         for input_device in input_devices:
-            print(input_device)
+            # create a map dict to map device name (key) to device ID (value)
+            inputDevNameIdxDict.update({input_devices[input_device]['Device Name']:input_device})
+            # print(input_device)
             if input_devices[input_device]['Device Type'] == 'keyboard':
                 printAutoInd(f,"KBoards({0}).port     = '{1}';",iKeyboard,input_devices[input_device]['Device Port'])
                 printAutoInd(f,"KBoards({0}).name     = '{1}';\n",iKeyboard,input_devices[input_device]['Device Name'])
@@ -500,49 +542,40 @@ def compilePTB(globalSelf):
         iNetPort = 1
         iSerial  = 1
 
+        print(output_devices)
+
         for output_device in output_devices:
-            # print(output_device)
-            # get output device index
-            # output_device_index = output_device.split('.')[-1]
 
             if output_devices[output_device]['Device Type'] == 'screen':
+                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"winIds({iMonitor})"})
+
                 printAutoInd(f,"monitors({0}).port       =  {1};",iMonitor,output_devices[output_device]['Device Port'])
                 printAutoInd(f,"monitors({0}).name       = '{1}';",iMonitor,output_devices[output_device]['Device Name'])
                 printAutoInd(f,"monitors({0}).bkColor    = '{1}';",iMonitor,output_devices[output_device]['Back Color'])
                 printAutoInd(f,"monitors({0}).muliSample =  {1};\n",iMonitor,output_devices[output_device]['Multi Sample'])
                 iMonitor += 1
-
             elif output_devices[output_device]['Device Type'] == 'network_port':
-                # try:
-                #     Func.log(f"{output_devices[output_device]['Device Port']}")  # print info to the output panel
-                #     cIpAddress, cPortValue = output_devices[output_device]['Device Port'].split(':')
-                # except:
-                #     QMessageBox.information(globalSelf, "Warning",  "Output device '{}''s IPPort '{}' should be in format:\n 'IPAdress:Port'".format(output_devices[output_device]['Device Name'],output_devices[output_device]['Device Port']),
-                #                             QMessageBox.Ok)
-                #     return
 
+                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"tcpipCons({iNetPort})"})
                 printAutoInd(f,"TCPIPs({0}).ipAdd    = '{1}';",iNetPort,output_devices[output_device]['Device Port'])
                 printAutoInd(f,"TCPIPs({0}).port     =  {1};",iNetPort,output_devices[output_device]['IP Port'])
                 printAutoInd(f,"TCPIPs({0}).name     = '{1}';",iNetPort,output_devices[output_device]['Device Name'])
                 printAutoInd(f,"TCPIPs({0}).isClient = {1};\n",iNetPort,output_devices[output_device]['Is Client'])
-                # printAutoInd(f,"TCPIPs({iNetPort}).type = '{output_devices[output_device]['Device Type']}';",)
-                # printAutoInd(f,"TCPIPs({iNetPort}).index = '{output_device_index}';",)
                 iNetPort += 1
 
             elif output_devices[output_device]['Device Type'] == 'parallel_port':
+                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"parPort({iParal}).port"})
                 printAutoInd(f,"parPort({0}).port     = hex2dec('{1}');",iParal,output_devices[output_device]['Device Port'])
                 printAutoInd(f,"parPort({0}).name     = '{1}';\n",iParal,output_devices[output_device]['Device Name'])
-                # printAutoInd(f,"parPort({iParal}).type = '{output_devices[output_device]['Device Type']}';",)
-                # printAutoInd(f,"parPort({iParal}).index = '{output_device_index}';",)
                 iParal += 1
 
             elif output_devices[output_device]['Device Type'] == 'serial_port':
+
+                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"serialCons({iSerial})"})
                 printAutoInd(f,"serPort({0}).port     = '{1}';",iSerial,output_devices[output_device]['Device Port'])
                 printAutoInd(f,"serPort({0}).name     = '{1}';",iSerial,output_devices[output_device]['Device Name'])
                 printAutoInd(f,"serPort({0}).baudRate = '{1}';",iSerial,output_devices[output_device]['Baud Rate'])
                 printAutoInd(f,"serPort({0}).dataBits = '{1}';\n",iSerial,output_devices[output_device]['Data Bits'])
-                # printAutoInd(f,"serPort({iSerial}).type = '{output_devices[output_device]['Device Type']}';",)
-                # printAutoInd(f,"serPort({iSerial}).index = '{output_device_index}';",)
                 iSerial += 1
 
         printAutoInd(f,"%------------------------------------\\\n")
