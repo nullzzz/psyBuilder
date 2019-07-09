@@ -17,6 +17,7 @@ class TextDisplay(QMainWindow):
         self.current_wid = widget_id
         self.attributes = []
         self.text_label = QTextEdit()
+        self.text_label.setReadOnly(True)
         self.pro_window = TextProperty()
 
         self.html = self.pro_window.html

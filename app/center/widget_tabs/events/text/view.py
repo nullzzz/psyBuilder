@@ -65,7 +65,7 @@ class Preview(QDialog):
     # 透明度
     def setTransparent(self, transparent_value: str = "80"):
         transparent_value = int(transparent_value) if transparent_value.isdigit() else 80
-        self.setWindowOpacity(transparent_value / 100)
+        self.setWindowOpacity(1 - transparent_value / 100)
 
     def setStartPos(self, x, y):
         self.start_x = x

@@ -29,7 +29,7 @@ class Preview(QDialog):
             self.height_factor = int(height)
 
     def setTransparent(self, transparent_value=80):
-        self.setWindowOpacity(transparent_value / 100)
+        self.setWindowOpacity(1 - transparent_value / 100)
 
     def setStartPos(self, x, y):
         self.start_x = x

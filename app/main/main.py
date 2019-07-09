@@ -173,16 +173,8 @@ class PsyApplication(QMainWindow):
         self.delete_shortcut = QShortcut(QKeySequence("BackSpace"), self)
         self.delete_shortcut.activated.connect(self.handle_delete_shortcut)
 
-    def handle_delete_shortcut(self):
-        """
-        对于delete快捷键进行,进行判断然后调用对应功能
-        :return:
-        """
-        # 如果是center，则是timeline的删除快捷键，否则可能是structure的删除快捷键
-        if self.center.isFocused():
-            self.center.widget_tabs.currentWidget().widget_icon_area.widget_icon_table.deleteShortcut()
-        elif self.structure.isFocused():
-            self.structure.structure_tree.deleteNode()
+        # 导入配置
+        # Func.getConfig()
 
     def initialize(self):
         """
@@ -474,7 +466,7 @@ class PsyApplication(QMainWindow):
             # self.structure.getStructure().print_tree()
             compilePTB(self)
         except Exception as compileError:
-            Func.log(str(compileError), True, False)
+            Func.log(str(compileError),True,False)
             traceback.print_exc()
 
     def about(self):
@@ -535,3 +527,14 @@ class PsyApplication(QMainWindow):
         """
         self.wait_timer.stop()
         self.wait_dialog.stop()
+
+    def handle_delete_shortcut(self):
+        """
+        对于delete快捷键进行,进行判断然后调用对应功能
+        :return:
+        """
+        # 如果是center，则是timeline的删除快捷键，否则可能是structure的删除快捷键
+        if self.center.isFocused():
+            self.center.widget_tabs.currentWidget().widget_icon_area.widget_icon_table.deleteShortcut()
+        elif self.structure.isFocused():
+            self.structure.structure_tree.deleteNode()

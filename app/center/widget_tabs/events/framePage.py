@@ -131,7 +131,7 @@ class FramePage(QWidget):
             self.height.setCurrentText("100%")
         self.default_properties["Border color"] = self.border_color.getColor()
         self.default_properties["Border width"] = self.border_width.text()
-        self.default_properties["Frame color"] = self.back_color.getColor()
+        self.default_properties["Frame fill color"] = self.back_color.getColor()
         return self.default_properties
 
     def getProperties(self):
@@ -142,7 +142,7 @@ class FramePage(QWidget):
         self.default_properties["Height"] = self.height.currentText()
         self.default_properties["Border color"] = self.border_color.getColor()
         self.default_properties["Border width"] = self.border_width.text()
-        self.default_properties["Frame color"] = self.back_color.getColor()
+        self.default_properties["Frame fill color"] = self.back_color.getColor()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -157,7 +157,7 @@ class FramePage(QWidget):
         self.height.setCurrentText(self.default_properties["Height"])
         self.border_color.setCurrentText(self.default_properties["Border color"])
         self.border_width.setText(self.default_properties["Border width"])
-        self.back_color.setCurrentText(self.default_properties["Frame color"])
+        self.back_color.setCurrentText(self.default_properties["Frame fill color"])
 
     def clone(self):
         clone_page = FramePage()

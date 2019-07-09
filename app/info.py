@@ -1,5 +1,7 @@
 import os
 
+from PyQt5.QtCore import QSettings
+
 
 class Info(object):
     """
@@ -33,6 +35,9 @@ class Info(object):
 
     # 当前导入导出文件名
     FILE_NAME: str = ""
+
+    CONFIG = QSettings("./operation.config", QSettings.IniFormat)
+    FILE_DIRECTORY: str = CONFIG.value("directory")
 
     # 区分不同的添加情况
     WidgetAdd = 0
