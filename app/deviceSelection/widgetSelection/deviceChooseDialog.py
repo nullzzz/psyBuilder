@@ -41,10 +41,9 @@ class DeviceInDialog(QDialog):
             self.tip.hide()
             device_type = properties.get("Device Type")
             device_name = properties.get("Device Name")
-            device_port = properties.get("Device Port")
-
             item = QListWidgetItem(device_name)
-            item.setData(3, properties)
+            item.setData(3, device_id)
+            item.setData(4, device_name)
             item.setIcon(QIcon(Func.getImage(f"{device_type}_device")))
             self.devices_list.addItem(item)
 
@@ -81,16 +80,15 @@ class DeviceOutDialog(QDialog):
     # devices: dict
     # 图片名与设备名相同
     def addDevices(self, devices: dict):
-        for device_name, properties in devices.items():
+        for device_id, properties in devices.items():
 
             device_type = properties.get("Device Type")
             if device_type == "screen":
                 continue
             device_name = properties.get("Device Name")
-            device_port = properties.get("Device Port")
 
             item = QListWidgetItem(device_name)
-            item.setData(3, properties)
+            item.setData(3, device_id)
             item.setIcon(QIcon(Func.getImage(f"{device_type}_device")))
             self.devices_list.addItem(item)
             self.tip.hide()

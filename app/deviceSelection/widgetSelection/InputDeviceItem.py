@@ -11,19 +11,20 @@ from app.lib import PigComboBox, PigLineEdit
 class DeviceInItem(QListWidgetItem):
     varColor = "blue"
 
-    def __init__(self, name: str, device_type: str, parent=None):
+    def __init__(self, name: str, device_id: str, parent=None):
         super(DeviceInItem, self).__init__(name, parent)
         self.attributes = []
         self.name = name
-        self.device_type = device_type
+        self.device_id = device_id
+        self.device_type = device_id.split(".")[0]
         self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
         """
         :device_type: 0一般类型，1那个啥eye的类型
         """
-        if device_type != "eye":
+        if self.device_type != "eye":
             self.default_properties = {
                 "Device name": "",
-                "Device type": self.device_type,
+                "Device type": self.device_id,
                 "Allowable": "",
                 "Correct": "",
                 "RT window": "",
@@ -36,7 +37,7 @@ class DeviceInItem(QListWidgetItem):
         else:
             self.default_properties = {
                 "Device name": "",
-                "Device type": self.device_type,
+                "Device type": self.device_id,
                 "Action": "",
                 "ROA": "",
                 "ROA action": "",
@@ -87,7 +88,7 @@ class DeviceInItem(QListWidgetItem):
     def setPro(self):
         self.end_action.addItems(["Terminate", "(None)"])
         self.action.addItems(["Fixation", "Saccade"])
-        if self.device_type != "eye":
+        if self.device_id != "eye":
             layout1 = QFormLayout()
             layout1.addRow("Response:", self.device_label)
             layout1.addRow("Allowable:", self.allowable)
@@ -171,7 +172,7 @@ class DeviceInItem(QListWidgetItem):
 
     def getInfo(self) -> dict:
         # todo：当初说的啥眼动设备，属性不一样，现在还不知道是啥子
-        if self.device_type != "eye":
+        if self.device_id != "eye":
             self.default_properties["Allowable"] = self.allowable.text()
             self.default_properties["Correct"] = self.correct.text()
             self.default_properties["RT window"] = self.RT_window.currentText()
@@ -193,7 +194,7 @@ class DeviceInItem(QListWidgetItem):
         self.loadSetting()
 
     def loadSetting(self):
-        if self.device_type != "eye":
+        if self.device_id != "eye":
             self.allowable.setText(self.default_properties["Allowable"])
             self.correct.setText(self.default_properties["Correct"])
             self.RT_window.setCurrentText(self.default_properties["RT window"])

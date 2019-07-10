@@ -10,21 +10,25 @@ from app.lib import PigComboBox, PigLineEdit
 class DeviceOutItem(QListWidgetItem):
     varColor = "blue"
 
-    def __init__(self, name: str, device_type: str, parent=None):
-        super(DeviceOutItem, self).__init__(name, parent)
+    def __init__(self, device_name: str, device_id: str, parent=None):
+        super(DeviceOutItem, self).__init__(device_name, parent)
         self.attributes = []
-        self.name = name
-        self.device_type = device_type
+        self.device_name = device_name
+        self.device_id = device_id
+        self.device_type = device_id.split(".")[0]
         self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
 
         self.default_properties = {
-            "Device name": self.name,
+            "Device id": self.device_id,
+            "Device name": self.device_name,
             "Device type": self.device_type,
             "Value or Msg": "",
             "Pulse Duration": ""
         }
 
-        self.devices = []
+        self.value_or_msg = ""
+        self.pulse_duration = "End of Duration"
+
         self.pro = ItemWidget()
 
     # 设置可选属性
@@ -39,13 +43,11 @@ class DeviceOutItem(QListWidgetItem):
         DeviceOutItem.varColor = color
 
     def getInfo(self) -> dict:
-        # self.default_properties.clear()
         self.default_properties["Value or Msg"] = self.pro.value.text()
         self.default_properties["Pulse Duration"] = self.pro.pulse_dur.currentText()
         return self.default_properties
 
     def getInProperties(self) -> dict:
-        # self.default_properties.clear()
         self.default_properties["Value or Msg"] = self.pro.value.text()
         self.default_properties["Pulse Duration"] = self.pro.pulse_dur.currentText()
         return self.default_properties
@@ -57,6 +59,15 @@ class DeviceOutItem(QListWidgetItem):
     def loadSetting(self):
         self.pro.value.setText(self.default_properties["Value or Msg"])
         self.pro.pulse_dur.setCurrentText(self.default_properties["Pulse Duration"])
+
+    def changeValueOrMessage(self, value_or_msg: str):
+        self.value_or_msg = value_or_msg
+
+    def changePulseDuration(self, pulse_duration: str):
+        self.pulse_duration = pulse_duration
+
+    def getValue(self):
+        return self.value_or_msg, self.pulse_duration
 
 
 class ItemWidget(QWidget):
