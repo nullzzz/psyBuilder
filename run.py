@@ -15,6 +15,6 @@ if __name__ == '__main__':
         from conf.windows_qss import style_sheet
     else:
         from conf.mac_qss import style_sheet
-    # app.setStyleSheet(style_sheet)
+    app.setStyleSheet(style_sheet)
     # 运行
     sys.exit(app.exec_())
