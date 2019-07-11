@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QRegExp, Qt, QObject, QEvent, pyqtSignal
 from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QMessageBox
+from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QMessageBox, QCompleter
 
 from app.lib import PigLineEdit, PigComboBox
 
@@ -44,6 +44,10 @@ class OutDeviceInfoAtDuration(QWidget):
         v, p = value
         self.value.setText(v)
         self.pulse_dur.setCurrentText(p)
+
+    def setAttributes(self, attributes):
+        self.value.setCompleter(QCompleter(self.attributes))
+        self.pulse_dur.setCompleter(QCompleter(self.attributes))
 
     def eventFilter(self, obj: QObject, e: QEvent):
         if obj == self.pulse_dur:

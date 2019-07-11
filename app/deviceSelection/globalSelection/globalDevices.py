@@ -17,6 +17,7 @@ class GlobalDevice(QWidget):
     OutputDevice = 1
     # 发送到duration的类变量中最为合适 (device_type, devices: name->type)
     deviceSelect = pyqtSignal(int, dict)
+    deviceNameChanged = pyqtSignal(str, str)
 
     def __init__(self, io_type=0, parent=None):
         super(GlobalDevice, self).__init__(parent)
@@ -130,12 +131,13 @@ class GlobalDevice(QWidget):
         text, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
         if ok and text != '':
             text: str
-            if " " in text or (text.lower() in self.selected_devices.device_name and item_name != text.lower()):
+            if text.lower() in self.selected_devices.device_name and item_name != text.lower():
                 QMessageBox.warning(self, f"{text} is invalid!", "Device name must be unique and without spaces",
                                     QMessageBox.Ok)
             else:
                 self.selected_devices.changeCurrentName(text)
                 self.describer.changeName(text)
+                self.deviceNameChanged.emit(item.device_id, text)
 
     # 参数导出, 记录到Info
     def getInfo(self):

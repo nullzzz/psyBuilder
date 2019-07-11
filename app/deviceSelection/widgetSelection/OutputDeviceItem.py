@@ -19,17 +19,15 @@ class DeviceOutItem(QListWidgetItem):
         self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
 
         self.default_properties = {
-            "Device id": self.device_id,
-            "Device name": self.device_name,
-            "Device type": self.device_type,
+            "Device Id": self.device_id,
+            "Device Name": self.device_name,
+            "Device Type": self.device_type,
             "Value or Msg": "",
             "Pulse Duration": ""
         }
 
         self.value_or_msg = ""
         self.pulse_duration = "End of Duration"
-
-        self.pro = ItemWidget()
 
     # 设置可选属性
     def setAttributes(self, attributes):
@@ -43,13 +41,15 @@ class DeviceOutItem(QListWidgetItem):
         DeviceOutItem.varColor = color
 
     def getInfo(self) -> dict:
-        self.default_properties["Value or Msg"] = self.pro.value.text()
-        self.default_properties["Pulse Duration"] = self.pro.pulse_dur.currentText()
+        self.default_properties["Device Name"] = self.device_name
+        self.default_properties["Value or Msg"] = self.value_or_msg
+        self.default_properties["Pulse Duration"] = self.pulse_duration
         return self.default_properties
 
     def getInProperties(self) -> dict:
-        self.default_properties["Value or Msg"] = self.pro.value.text()
-        self.default_properties["Pulse Duration"] = self.pro.pulse_dur.currentText()
+        self.default_properties["Device Name"] = self.device_name
+        self.default_properties["Value or Msg"] = self.value_or_msg
+        self.default_properties["Pulse Duration"] = self.pulse_duration
         return self.default_properties
 
     def setProperties(self, device_info: dict):
@@ -57,8 +57,8 @@ class DeviceOutItem(QListWidgetItem):
         self.loadSetting()
 
     def loadSetting(self):
-        self.pro.value.setText(self.default_properties["Value or Msg"])
-        self.pro.pulse_dur.setCurrentText(self.default_properties["Pulse Duration"])
+        self.value_or_msg = self.default_properties["Value or Msg"]
+        self.pulse_duration = self.default_properties["Pulse Duration"]
 
     def changeValueOrMessage(self, value_or_msg: str):
         self.value_or_msg = value_or_msg
@@ -68,6 +68,16 @@ class DeviceOutItem(QListWidgetItem):
 
     def getValue(self):
         return self.value_or_msg, self.pulse_duration
+
+    def getDeviceId(self) -> str:
+        return self.device_id
+
+    def getDeviceName(self) -> str:
+        return self.device_name
+
+    def changeDeviceName(self, new_name: str):
+        self.device_name = new_name
+        self.setText(new_name)
 
 
 class ItemWidget(QWidget):

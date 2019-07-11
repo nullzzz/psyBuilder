@@ -164,7 +164,7 @@ class ImageTab1(QWidget):
         self.rotate.setText(self.default_properties["Rotate"])
         self.stretch.setChecked(self.default_properties["Stretch"])
         self.stretch_mode.setCurrentText(self.default_properties["Stretch mode"])
-        self.back_color.setCurrentText(self.default_properties["Back color"])
+        # self.back_color.setCurrentText(self.default_properties["Back color"])
         # self.transparent.setValue(self.default_properties["Transparent"])
         self.transparent.setText(self.default_properties["Transparent"])
         self.clear_after.setCurrentText(self.default_properties["Clear after"])
