@@ -296,7 +296,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
             # get the referenced var value
             isRefValue, valueStr = getRefValue(value)
-
+            #
             if isRefValue:
                 if valueStr in attributesSetDict:
                     # assign the refered value to the current rowDict
