@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 # import datetime
 import traceback
@@ -8,7 +9,6 @@ from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMessageBox, QShortcut
 
 from app.attributes.main import Attributes
-import re
 from app.center.main import Center
 from app.center.widget_tabs.events.cycle.main import Cycle
 from app.center.widget_tabs.events.durationPage import DurationPage
