@@ -6,6 +6,7 @@ from app.center.widget_tabs.events.outDevicePro import OutDeviceInfoAtDuration
 from app.deviceSelection.widgetSelection.InputDeviceItem import DeviceInItem
 from app.deviceSelection.widgetSelection.OutputDeviceItem import DeviceOutItem
 from app.deviceSelection.widgetSelection.deviceChooseDialog import DeviceOutDialog, DeviceInDialog
+from app.deviceSelection.widgetSelection.deviceShowArea import ShowArea
 from app.lib import PigComboBox
 
 
@@ -28,18 +29,22 @@ class DurationPage(QWidget):
         self.duration.installEventFilter(self)
         # output device
         # 输出设备
-        self.selected_out_devices = []
-        self.out_devices = QListWidget()
-        self.out_devices.currentItemChanged.connect(self.deviceOutChanged)
+        # self.selected_out_devices = []
+        # self.out_devices = QListWidget()
+        # self.out_devices.currentItemChanged.connect(self.deviceOutChanged)
+        self.out_devices = ShowArea()
         # 参数
         self.out_info = OutDeviceInfoAtDuration()
+        self.out_devices.itemChanged.connect(self.out_info.showInfo)
+        self.out_devices.areaStatus.connect(self.controlOutDevice)
         self.out_info.valueOrMessageChanged.connect(lambda x: self.out_devices.currentItem().changeValueOrMessage(x))
         self.out_info.pulseDurationChanged.connect(lambda x: self.out_devices.currentItem().changePulseDuration(x))
         self.out_info.hide()
+
         self.out_add_bt = QPushButton("+")
         self.out_add_bt.clicked.connect(self.showOutDevices)
         self.out_del_bt = QPushButton("-")
-        self.out_del_bt.clicked.connect(self.removeOutDevices)
+        self.out_del_bt.clicked.connect(self.out_devices.delOutDevice)
         self.out_del_bt.setEnabled(False)
         self.out_tip = QLabel("Add output device(s) first")
         self.out_tip.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -47,7 +52,8 @@ class DurationPage(QWidget):
         # input device
         self.in_stack1 = QStackedWidget()
         self.in_stack2 = QStackedWidget()
-        self.in_tip1 = QLabel("Add input device(s) first")
+        # self.in_tip1 = QLabel("Add input device(s) first")
+        self.in_tip1 = QLabel("正在output重构中，input可能会受影响，请暂停使用")
         self.in_tip2 = QLabel("Resp Trigger:")
         self.in_tip1.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.in_tip2.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -148,7 +154,7 @@ class DurationPage(QWidget):
             device_name: str = temp.text()
             device_id: str = temp.data(3)
             item = DeviceOutItem(device_name, device_id)
-            self.addOutDevice(item)
+            self.out_devices.addOutDevice(item)
             self.out_devices_dialog.close()
         else:
             self.out_devices_dialog.close()
@@ -160,11 +166,24 @@ class DurationPage(QWidget):
         if index != -1:
             self.delInDevice(index)
 
+    def controlOutDevice(self, status: int):
+        if status == 0:
+            self.out_del_bt.setEnabled(False)
+            self.out_tip.show()
+            self.out_info.hide()
+        elif status == -1:
+            self.out_add_bt.setEnabled(False)
+        else:
+            self.out_add_bt.setEnabled(True)
+            self.out_del_bt.setEnabled(True)
+            self.out_info.show()
+            self.out_tip.hide()
+
     # 移除输出设备
-    def removeOutDevices(self):
-        index = self.out_devices.currentRow()
-        if index != -1:
-            self.delOutDevice(index)
+    # def removeOutDevices(self):
+    #     index = self.out_devices.currentRow()
+    #     if index != -1:
+    #         self.delOutDevice(index)
 
     # 选中输入设备改变
     def deviceInChanged(self, e):
@@ -174,47 +193,47 @@ class DurationPage(QWidget):
             self.in_stack2.setCurrentIndex(index)
 
     # 选中输出设备改变
-    def deviceOutChanged(self, e):
-        if e:
-            self.out_info.showInfo(e.getValue())
-            # index = self.out_devices.row(e)
-            # self.out_info.setCurrentIndex(index)
+    # def deviceOutChanged(self, e):
+    #     if e:
+    #         self.out_info.showInfo(e.getValue())
+    # index = self.out_devices.row(e)
+    # self.out_info.setCurrentIndex(index)
 
-    def addOutDevice(self, item: DeviceOutItem):
-        device_name = item.text()
-        # 提示信息
-        if self.out_devices.count() == 0:
-            self.out_tip.hide()
-            self.out_info.show()
-        if device_name not in self.selected_out_devices:
-            self.selected_out_devices.append(device_name)
-            self.out_devices.addItem(item)
-            self.out_devices.setCurrentItem(item)
-            # 设置可选变量
-            # item.setAttributes(self.attributes)
-            # 设置trigger输出设备
-            for i in range(self.in_devices.count()):
-                self.in_devices.item(i).resp_trigger_out.addItem(device_name)
-            if self.out_devices.count():
-                self.out_del_bt.setEnabled(True)
-        else:
-            self.out_devices_dialog.close()
-            QMessageBox.warning(self, "Warning", f"Device {device_name} has been selected", QMessageBox.Ok)
+    # def addOutDevice(self, item: DeviceOutItem):
+    #     device_name = item.text()
+    #     # 提示信息
+    #     if self.out_devices.count() == 0:
+    #         self.out_tip.hide()
+    #         self.out_info.show()
+    #     if device_name not in self.selected_out_devices:
+    #         self.selected_out_devices.append(device_name)
+    #         self.out_devices.addItem(item)
+    #         self.out_devices.setCurrentItem(item)
+    #         # 设置可选变量
+    #         # item.setAttributes(self.attributes)
+    #         # 设置trigger输出设备
+    #         for i in range(self.in_devices.count()):
+    #             self.in_devices.item(i).resp_trigger_out.addItem(device_name)
+    #         if self.out_devices.count():
+    #             self.out_del_bt.setEnabled(True)
+    #     else:
+    #         self.out_devices_dialog.close()
+    #         QMessageBox.warning(self, "Warning", f"Device {device_name} has been selected", QMessageBox.Ok)
 
-    def delOutDevice(self, index: int):
-        item = self.out_devices.takeItem(index)
-        self.selected_out_devices.remove(item.text())
-        # 移除trigger可选输出设备
-        for i in range(self.in_devices.count()):
-            self.in_devices.item(i).resp_trigger_out.removeItem(index)
-        if self.out_devices.count() == 0:
-            self.out_del_bt.setEnabled(False)
-            self.out_tip.show()
-            self.out_info.hide()
-        # 限制输出设备数为4
-        elif self.out_devices.count() < 4:
-            self.out_add_bt.setEnabled(True)
-        del item
+    # def delOutDevice(self, index: int):
+    #     item = self.out_devices.takeItem(index)
+    #     self.selected_out_devices.remove(item.text())
+    #     # 移除trigger可选输出设备
+    #     for i in range(self.in_devices.count()):
+    #         self.in_devices.item(i).resp_trigger_out.removeItem(index)
+    #     if self.out_devices.count() == 0:
+    #         self.out_del_bt.setEnabled(False)
+    #         self.out_tip.show()
+    #         self.out_info.hide()
+    #     # 限制输出设备数为4
+    #     elif self.out_devices.count() < 4:
+    #         self.out_add_bt.setEnabled(True)
+    #     del item
 
     def addInDevice(self, item: DeviceInItem):
         device_name = item.text()
@@ -254,26 +273,27 @@ class DurationPage(QWidget):
     def setAttributes(self, attributes: list):
         self.attributes = attributes
         self.duration.setCompleter(QCompleter(self.attributes))
+        self.out_info.setAttributes(attributes)
         for i in range(self.in_devices.count()):
             self.in_devices.item(i).setAttributes(attributes)
-        for i in range(self.out_devices.count()):
-            self.out_devices.item(i).setAttributes(attributes)
+        # for i in range(self.out_devices.count()):
+        #     self.out_devices.item(i).setAttributes(attributes)
 
     # 返回参数
     def getInfo(self):
         self.default_properties.clear()
         in_info = {}
-        out_info = {}
+        # out_info = {}
         for i in range(self.in_devices.count()):
             key = self.in_devices.item(i).text()
             in_info[key] = self.in_devices.item(i).getInfo().copy()
-        for i in range(self.out_devices.count()):
-            key = self.out_devices.item(i).text()
-            out_info[key] = self.out_devices.item(i).getInfo().copy()
+        # for i in range(self.out_devices.count()):
+        #     key = self.out_devices.item(i).text()
+        #     out_info[key] = self.out_devices.item(i).getInfo().copy()
 
         self.default_properties["Duration"] = self.duration.currentText()
         self.default_properties["Input devices"] = in_info
-        self.default_properties["Output devices"] = out_info
+        self.default_properties["Output devices"] = self.out_devices.getInfo().copy()
         return self.default_properties
 
     # 设置参数
@@ -287,30 +307,31 @@ class DurationPage(QWidget):
         self.duration.setCurrentText(self.default_properties["Duration"])
         # out
         del_index = []
-        for i in range(self.out_devices.count()):
-            device = self.out_devices.item(i)
-            if device.text() in self.default_properties["Output devices"].keys():
-                device.loadSetting()
-            # 新增的删掉
-            else:
-                del_index.append(i)
-        # 这里要从索引大的开始删，不然后面的索引值会变
-        for i in sorted(del_index, reverse=True):
-            self.delOutDevice(i)
-        # 删掉的加上
+        # for i in range(self.out_devices.count()):
+        #     device = self.out_devices.item(i)
+        #     if device.text() in self.default_properties["Output devices"].keys():
+        #         device.loadSetting()
+        #     # 新增的删掉
+        #     else:
+        #         del_index.append(i)
+        # # 这里要从索引大的开始删，不然后面的索引值会变
+        # for i in sorted(del_index, reverse=True):
+        #     self.delOutDevice(i)
+        # # 删掉的加上
         current_devices = []
-        for i in range(self.out_devices.count()):
-            current_devices.append(self.out_devices.item(i).text())
-        deleted_out_devices = [device for device in self.default_properties["Output devices"].keys()
-                               if device not in current_devices]
-        for device in deleted_out_devices:
-            device_info: dict = self.default_properties["Output devices"][device]
-            device_name = device_info["Device name"]
-            device_type = device_info["Device type"]
-            item = DeviceOutItem(device_name, device_type)
-            item.setProperties(device_info)
-            self.addOutDevice(item)
-        del_index.clear()
+        # for i in range(self.out_devices.count()):
+        #     current_devices.append(self.out_devices.item(i).text())
+        # deleted_out_devices = [device for device in self.default_properties["Output devices"].keys()
+        #                        if device not in current_devices]
+        # for device in deleted_out_devices:
+        #     device_info: dict = self.default_properties["Output devices"][device]
+        #     device_name = device_info["Device name"]
+        #     device_type = device_info["Device type"]
+        #     item = DeviceOutItem(device_name, device_type)
+        #     item.setProperties(device_info)
+        #     self.addOutDevice(item)
+        # del_index.clear()
+        self.out_devices.setProperties(self.default_properties.get("Output devices"))
         # in
         for i in range(self.in_devices.count()):
             device = self.in_devices.item(i)
