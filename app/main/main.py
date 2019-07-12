@@ -8,6 +8,7 @@ from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMessageBox, QShortcut
 
 from app.attributes.main import Attributes
+import re
 from app.center.main import Center
 from app.center.widget_tabs.events.cycle.main import Cycle
 from app.center.widget_tabs.events.durationPage import DurationPage
@@ -290,6 +291,9 @@ class PsyApplication(QMainWindow):
         options = QFileDialog.Options()
         save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Psy Files (*.ini);", options=options)
         if save_file_name:
+            # mac os下不会提供默认文件名称
+            if not re.search(r"(\.psy|\.ini)$", save_file_name):
+                save_file_name = save_file_name + ".psy"
             Info.FILE_NAME = save_file_name
             return True
         return False
