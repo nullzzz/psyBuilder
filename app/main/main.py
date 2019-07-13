@@ -292,13 +292,13 @@ class PsyApplication(QMainWindow):
         获取文件名
         :return:
         """
-        options = QFileDialog.Options()
-        save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Psy Files (*.ini);", options=options)
+        save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", Info.FILE_DIRECTORY, "Psy Files (*.psy);")
         if save_file_name:
             # mac os下不会提供默认文件名称
             if not re.search(r"(\.psy|\.ini)$", save_file_name):
                 save_file_name = save_file_name + ".psy"
             Info.FILE_NAME = save_file_name
+            Info.FILE_DIRECTORY = os.path.dirname(save_file_name)
             return True
         return False
 
@@ -313,12 +313,13 @@ class PsyApplication(QMainWindow):
         :return:
         """
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", "", "Psy File (*.psy;*.ini)", options=options)
-        if file_name:
+        open_file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)", options=options)
+        if open_file_name:
             # 更新文件名
-            Info.FILE_NAME = file_name
+            Info.FILE_NAME = open_file_name
+            Info.FILE_DIRECTORY = os.path.dirname(open_file_name)
             # 从文件中读取配置
-            setting = QSettings(file_name, QSettings.IniFormat)
+            setting = QSettings(open_file_name, QSettings.IniFormat)
 
             # 计数恢复
             Info.WIDGET_TYPE_ID_COUNT = setting.value("WIDGET_TYPE_ID_COUNT")
