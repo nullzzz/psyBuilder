@@ -16,6 +16,7 @@ from app.deviceSelection.globalSelection.globalDevices import GlobalDevice
 from app.deviceSelection.progressBar import LoadingTip
 from app.func import Func
 from app.info import Info
+from app.init import writeToRegistry
 from app.output.main import Output
 from app.properties.main import Properties
 from app.structure.main import Structure
@@ -114,14 +115,17 @@ class PsyApplication(QMainWindow):
 
         # help menu
         help_menu = menu_bar.addMenu("&Help")
+        reg_action = QAction("&Registry", self)
         about_action = QAction("&About", self)
         about_Qt_action = QAction("&About Qt", self)
         check_for_update = QAction("&Check for updates", self)
 
+        reg_action.triggered.connect(self.registry)
         about_action.triggered.connect(self.about)
         about_Qt_action.triggered.connect(QApplication.instance().aboutQt)
         check_for_update.triggered.connect(self.checkUpdate)
 
+        help_menu.addAction(reg_action)
         help_menu.addAction(about_action)
         help_menu.addAction(about_Qt_action)
         help_menu.addAction(check_for_update)
@@ -468,6 +472,18 @@ class PsyApplication(QMainWindow):
         except Exception as compileError:
             Func.log(str(compileError), True, False)
             traceback.print_exc()
+
+    def registry(self):
+        if Info.IS_REGISTER == "yes":
+            QMessageBox.about(self, "Registry", "Already registry")
+        else:
+            try:
+                writeToRegistry(Func.getPsyIconPath())
+                Info.CONFIG.setValue("register", "yes")
+                QMessageBox.about(self, "Registry", "Registry Successful!")
+                Info.IS_REGISTER = "yes"
+            except Exception:
+                QMessageBox.about(self, "Registry", "Registry Failed!")
 
     def about(self):
         QMessageBox.about(self, "About PsyDemo", "NOTHING")

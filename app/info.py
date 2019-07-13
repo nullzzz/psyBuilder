@@ -36,8 +36,9 @@ class Info(object):
     # 当前导入导出文件名
     FILE_NAME: str = ""
 
-    CONFIG = QSettings("./operation.config", QSettings.IniFormat)
+    CONFIG = QSettings("./operation.ini", QSettings.IniFormat)
     FILE_DIRECTORY: str = CONFIG.value("directory")
+    IS_REGISTER: str = CONFIG.value("register")
 
     # 区分不同的添加情况
     WidgetAdd = 0

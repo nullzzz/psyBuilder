@@ -42,6 +42,10 @@ class Func(object):
         return os.path.join(Info.IMAGE_SOURCE_PATH, image_name)
 
     @staticmethod
+    def getPsyIconPath() -> str:
+        return os.path.join(Info.IMAGE_SOURCE_PATH, "psy.ico")
+
+    @staticmethod
     def restore(widget_id: str, properties: dict) -> None:
         """
         复原控件属性
