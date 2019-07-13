@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 # import datetime
 import traceback
@@ -294,6 +295,9 @@ class PsyApplication(QMainWindow):
         options = QFileDialog.Options()
         save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Psy Files (*.ini);", options=options)
         if save_file_name:
+            # mac os下不会提供默认文件名称
+            if not re.search(r"(\.psy|\.ini)$", save_file_name):
+                save_file_name = save_file_name + ".psy"
             Info.FILE_NAME = save_file_name
             return True
         return False
