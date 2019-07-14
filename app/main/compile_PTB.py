@@ -53,6 +53,7 @@ def printAutoInd(f,inputStr,*argins):
     incrAfterStr    = ('if','try','switch','for','while')
     decreAndIncrStr = ('else','elseif','otherwise','catch')
 
+    # isinstance(f,'list')
 
     if inputStr.split(' ')[0] in incrAfterStr:
         tabStrs = '\t' * cIndents
@@ -108,19 +109,65 @@ def isRgbStr(inputStr):
     isRgbFormat = re.match("^\d+,\d+,\d+$", inputStr)
     return isRgbFormat
 
-def dataStrConvert(dataStr):
+def pyStr2MatlabStr(inputStr):
+    if isinstance(inputStr, str):
+        inputStr = re.sub("'","''",inputStr)
+    return inputStr
+
+def parsePercentStr(inputStr):
+    if inputStr.endswith('%'):
+        outputValue = float(inputStr[:-1])/100
+    else:
+        outputValue = float(inputStr)
+
+    return outputValue
+
+
+def addedTransparentToRGBStr(RGBStr,transparentStr):
+
+    transparentValue = parsePercentStr(transparentStr)
+
+    if re.match("^\d+,\d+,\d+$", RGBStr):
+        RGBStr = f"[{RGBStr},{transparentValue}]"
+    elif re.match("^\[\d+,\d+,\d+\]$", RGBStr):
+        RGBStr = re.sub("]",f"{transparentValue}]",RGBStr)
+    else:
+        raise Exception(f"the input parameter 'RGBStr' is not a RGB format String!")
+
+
+
+
+
+
+def dataStrConvert(dataStr,addSingleQuotes = True):
     # convert string to neither a string or a num
     # e.g.,
-    # 2.00 to 2.0
-    # abcd to 'abcd'
-    # [12,12,12] to [12,12,12]
-    try:
-        outData = float(dataStr)
-    except:
-        if re.match("^\[\d+,\d+,\d+\]$", dataStr):
-            outData = dataStr
-        else:
-            outData = "'"+dataStr+"'"
+    # "2"    to 2
+    # "2.00" to 2.0
+    # "abcd" to "'abcd'"
+    # "[12,12,12]" to "[12,12,12]"
+    #  "12,12,12"  to "[12,12,12]"
+
+    if isinstance(dataStr,str):
+        try:
+            outData = int(dataStr)
+        except:
+            try:
+                outData = float(dataStr)
+            except:
+                if re.match("^\[\d+,\d+,\d+\]$", dataStr):
+                    outData = dataStr
+                elif re.match("^\d+,\d+,\d+$", dataStr):
+                    outData = addSquBrackets(dataStr)
+                else:
+                    if addSingleQuotes:
+                        outData = "'"+pyStr2MatlabStr(dataStr)+"'"
+                    else:
+                        outData = dataStr
+
+    else:
+        outData = dataStr
+
     return outData
 
 
@@ -139,16 +186,31 @@ def addSquBrackets(inputStr):
     return outputStr
 
 
+def isRef(inputStr):
+    if isinstance(inputStr,str):
+        tempMatchObj = re.match("^\[.*\]$", inputStr)
+        if tempMatchObj:
+            return True
 
-def getRefValue(inputStr):
-    tempMatchObj = re.match("^\[.*\]$", inputStr)
+    return False
 
-    if tempMatchObj:
-        inputStr = re.sub("[\[\]]", '', inputStr)
-        return [True,inputStr]
 
-    return [False,inputStr]
 
+def getRefValue(cwidget, inputStr,attributesSetDict):
+
+    if isinstance(inputStr, str):
+        tempMatchObj = re.match("^\[.*\]$", inputStr)
+
+        if tempMatchObj:
+            inputStr = re.sub("[\[\]]", '', inputStr)
+
+
+            if inputStr in attributesSetDict:
+                inputStr = attributesSetDict[inputStr][2]
+            else:
+                throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cwidget.widget_id)}")
+
+    return inputStr
 
 
 
@@ -236,13 +298,80 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
 def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict
 
+    # Step 1: print out previous widget's no stimuli related codes
+    for cRowStr in noStimRelatedCodes:
+        printAutoInd(f,cRowStr)
+    # clear out the print buffer
+    noStimRelatedCodes.clear()
+
+    # Step 2: print out help info for the current widget
+    printAutoInd(f,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    printAutoInd(f,'%loop:{0}, event{1}: {2}',cLoopLevel,Func.getWidgetPosition(cWidget.widget_id) +1,Func.getWidgetName(cWidget.widget_id))
+    printAutoInd(f,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
+
     print(inputDevNameIdxDict)
     print(outputDevNameIdxDict)
 
     cProperties = Func.getProperties(cWidget.widget_id)
 
+    #  handle the text content
+    cProperties['Text'] = getRefValue(cWidget,cProperties['Text'],attributesSetDict)
+
     if is_contain_ch(cProperties['Text']):
-        cProperties['Text'] = "double('"+cProperties['Text']+"')"
+        cProperties['Text'] = "double('"+pyStr2MatlabStr(cProperties['Text'])+"')"
+    else:
+        cProperties['Text'] = "'" + pyStr2MatlabStr(cProperties['Text']) + "'"
+
+    # check the alignment X parameter:
+    alignmentX =dataStrConvert(getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict), isRef(cProperties['Alignment X']))
+
+
+    # check the alignment X parameter:
+    alignmentY =dataStrConvert(getRefValue(cWidget, cProperties['Alignment Y'], attributesSetDict), isRef(cProperties['Alignment X']))
+
+
+
+
+    # check the flip hor parameter:
+    flipHorStr = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
+
+    if "False" == flipHorStr:
+        flipHorStr = "1"
+    elif "True" == flipHorStr:
+        flipHorStr = "0"
+    else:
+        throwCompileErrorInfo("the value of 'Flip horizontal' should be of {'False' or 'True'}  OR of {'1','0'}")
+
+
+    # check the flip ver parameter:
+    flipVerStr = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
+
+    if "False" == flipVerStr:
+        flipHorStr = "1"
+    elif "True" == flipVerStr:
+        flipVerStr = "0"
+    else:
+        throwCompileErrorInfo("the value of 'Flip vertical' should be of {'False' or 'True'}  OR of {'1','0'}")
+
+
+    # check the color parameter:
+    fontColorStr =dataStrConvert(getRefValue(cWidget, cProperties['Fore color'], attributesSetDict), isRef(cProperties['Alignment X']))
+
+    #  to be continue.....
+
+    cWinStr = f"winIds({outputDevNameIdxDict.get( getRefValue(cWidget,cWidget.getScreenName(),attributesSetDict) )})"
+
+    printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3}，{4}，{5}，{6}，{7},[],[],{8})",\
+                   cWinStr,\
+                   cProperties['Text'],\
+                   alignmentX,\
+                   alignmentY,\
+                   addedTransparentToRGBStr( dataStrConvert(getRefValue(cWidget,cProperties['Fore color'])),dataStrConvert(getRefValue(cWidget,cProperties['Transparent'])) ),\
+                   dataStrConvert(getRefValue(cWidget,cProperties['Wrapat chars'],attributesSetDict)),\
+                   flipHorStr,\
+                   flipVerStr,\
+                   )
 
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
@@ -250,6 +379,8 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     print(f"line 243: {cProperties}")
 
     output_device= cWidget.getOutputDevice()
+
+    print(output_device)
     for device, properties in output_device.items():
         # print(device)
         value_or_msg   = properties.get("Value or Msg", "")
@@ -262,14 +393,12 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
 
 
 def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes):
-    # global cLoopLevel
     # start from 1 to compatible with MATLAB
     cLoopLevel += 1
 
     attributesSetDict       = attributesSetDict.copy()
     cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
-    # cLoopIterStr = f"iLoop_{cLoopLevel}"
 
     attributesSetDict.setdefault(f"{cWidgetName}.cLoop",[cLoopLevel,f"iLoop_{cLoopLevel}"])
     attributesSetDict.setdefault(f"{cWidgetName}.rowNums",[cLoopLevel,f"size({cLoopLevel}.attr,1)"])
@@ -295,29 +424,30 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
         for key, value in cRowDict.items():
 
             # get the referenced var value
-            isRefValue, valueStr = getRefValue(value)
+            cRowDict[key] = getRefValue(cWidget,value,attributesSetDict)
             #
-            if isRefValue:
-                if valueStr in attributesSetDict:
-                    # assign the refered value to the current rowDict
-                    cRowDict[key] = attributesSetDict[valueStr][2]
-                else:
-                    throwCompileErrorInfo(f"The cited attribute '{valueStr}' \nis not available for {cWidgetName}")
-                    # Func.log(f"The cited attribute '{valueStr}' was not exist for the current widget {cWidgetName}",1)
+            # if isRefValue:
+            #     if valueStr in attributesSetDict:
+            #         # assign the refered value to the current rowDict
+            #         cRowDict[key] = attributesSetDict[valueStr][2]
+            #     else:
+            #         throwCompileErrorInfo(f"The cited attribute '{valueStr}' \nis not available for {cWidgetName}")
+            #         # Func.log(f"The cited attribute '{valueStr}' was not exist for the current widget {cWidgetName}",1)
 
             # isRgbFormat = re.match("^\d+,\d+,\d+$", cRowDict[key])
-            isRgbFormat = isRgbStr(cRowDict[key])
 
-            if isRgbFormat:
-                # transform the RGB to include a pair of square brackets
-                cRowDict[key] = f"[{isRgbFormat[0]}]"
+            # isRgbFormat = isRgbStr(cRowDict[key])
+            #
+            # if isRgbFormat:
+            #     # transform the RGB to include a pair of square brackets
+            #     cRowDict[key] = f"[{isRgbFormat[0]}]"
 
         if '' == cRowDict['Weight']:
             cRepeat = 1
         else:
             cRepeat = dataStrConvert(cRowDict['Weight'])
 
-        for iRep in range(int(cRepeat)):
+        for iRep in range(cRepeat):
             # print("".join(str(dataStrConvert(value)) + " " for key, value in cRowDict.items()))
             printAutoInd(f,'{0}',"".join(addCurlyBrackets(dataStrConvert(value)) + " " for key, value in cRowDict.items())+";...")
 
@@ -334,8 +464,6 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
     for iTimeline in cTimeLineList:
         cTimelineSet.add(iTimeline[1])
-
-
 
     print(cTimelineSet)
 
@@ -547,7 +675,7 @@ def compilePTB(globalSelf):
         for output_device in output_devices:
 
             if output_devices[output_device]['Device Type'] == 'screen':
-                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"winIds({iMonitor})"})
+                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"{iMonitor}"})
 
                 printAutoInd(f,"monitors({0}).port       =  {1};",iMonitor,output_devices[output_device]['Device Port'])
                 printAutoInd(f,"monitors({0}).name       = '{1}';",iMonitor,output_devices[output_device]['Device Name'])
