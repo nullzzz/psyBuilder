@@ -53,7 +53,7 @@ class SoundTab1(QWidget):
         self.loop = PigComboBox()
 
         self.sound_device = PigComboBox()
-        self.sound_device.currentTextChanged(self.changeDevice)
+        self.sound_device.currentTextChanged.connect(self.changeDevice)
         self.using_device_id = ""
 
         self.setGeneral()
