@@ -8,8 +8,6 @@ from app.lib import PigComboBox, PigLineEdit
 
 # 重写上方输出设备list widget的item
 class DeviceOutItem(QListWidgetItem):
-    varColor = "blue"
-
     def __init__(self, device_name: str, device_id: str, parent=None):
         super(DeviceOutItem, self).__init__(device_name, parent)
         self.attributes = []

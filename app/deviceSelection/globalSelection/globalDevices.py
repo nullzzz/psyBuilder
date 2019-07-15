@@ -38,7 +38,7 @@ class GlobalDevice(QWidget):
 
         # device_list是写死的
         if io_type:
-            self.devices = ("serial_port", "parallel_port", "network_port", "screen")
+            self.devices = ("serial_port", "parallel_port", "network_port", "screen", "sound")
             self.setWindowTitle("Output Devices")
         else:
             self.devices = ("mouse", "keyboard", "response box", "game pad")
@@ -137,7 +137,7 @@ class GlobalDevice(QWidget):
             else:
                 self.selected_devices.changeCurrentName(text)
                 self.describer.changeName(text)
-                self.deviceNameChanged.emit(item.device_id, text)
+                self.deviceNameChanged.emit(item.getDeviceId(), text)
 
     # 参数导出, 记录到Info
     def getInfo(self):

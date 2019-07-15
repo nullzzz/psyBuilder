@@ -24,6 +24,8 @@ class Device(QListWidgetItem):
             self.port = "com1"
         elif device_type == "screen":
             self.port = "0"
+        elif device_type == "sound":
+            self.port = "1"
         else:
             self.port = "null"
 

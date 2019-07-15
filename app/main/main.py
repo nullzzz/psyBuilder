@@ -90,12 +90,15 @@ class PsyApplication(QMainWindow):
         view_menu.addAction(self.default_action)
 
         # devices menu
-        self.input_devices = GlobalDevice(io_type=0)
+        self.input_devices = GlobalDevice(io_type=Info.INPUT_DEVICE)
         self.input_devices.setWindowModality(Qt.ApplicationModal)
         self.input_devices.ok()
-        self.output_devices = GlobalDevice(io_type=1)
+        self.output_devices = GlobalDevice(io_type=Info.OUTPUT_DEVICE)
         self.output_devices.setWindowModality(Qt.ApplicationModal)
         self.output_devices.ok()
+
+        self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
+        self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
         devices_menu = menu_bar.addMenu("&Devices")
 
         output_devices_action = QAction("&Output Devices", self)

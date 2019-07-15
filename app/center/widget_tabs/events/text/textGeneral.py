@@ -114,8 +114,8 @@ class TextTab1(QWidget):
         l52.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l60.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        self.align_x.addItems(["Center", "Left", "Right", "Justify"])
-        self.align_y.addItem("Center")
+        self.align_x.addItems(["center", "left", "right", "wrapat", "justifytomax"])
+        self.align_y.addItem("center")
 
         self.clear_after.addItems(["Yes", "No"])
 
@@ -179,13 +179,13 @@ class TextTab1(QWidget):
     def alignChange(self, align_mode: str):
         # html中要小写
         self.align_mode = align_mode.lower()
-        if align_mode == "Center":
+        if align_mode == "center":
             self.text_edit.setAlignment(Qt.AlignCenter)
-        elif align_mode == "Left":
+        elif align_mode == "left":
             self.text_edit.setAlignment(Qt.AlignLeft)
-        elif align_mode == "Right":
+        elif align_mode == "right":
             self.text_edit.setAlignment(Qt.AlignRight)
-        elif align_mode == "justify":
+        elif align_mode == "justifytomax":
             self.text_edit.setAlignment(Qt.AlignJustify)
 
     def wrapChange(self, chars: str):

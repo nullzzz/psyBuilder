@@ -19,15 +19,14 @@ class Shower(QWidget):
         self.device_name = QLabel("Unselected")
         self.device_port = QLineEdit("")
         self.device_port.textEdited.connect(self.showAddressTip)
-
         self.port_tip = QLabel("")
 
-    def setUI(self):
+    def setBasicUI(self, port_tip: str = "Device Port:"):
         layout = QFormLayout()
         layout.setLabelAlignment(Qt.AlignRight)
         layout.addRow("Device Type:", self.device_type)
         layout.addRow("Device Name:", self.device_name)
-        layout.addRow("Device Port:", self.device_port)
+        layout.addRow(port_tip, self.device_port)
         layout.addRow("", self.port_tip)
         self.setLayout(layout)
 
@@ -80,6 +79,8 @@ class Shower(QWidget):
                 flag = False
         elif device_type == "parallel_port":
             flag = port == "D010"
+        elif device_type == "sound":
+            flag = port.isdigit()
         return flag
 
     def changeName(self, new_name: str):
@@ -236,13 +237,16 @@ class Describer(QWidget):
         self.net = Net(self)
         self.parallel = Parallel(self)
         self.serial = Serial(self)
+        self.sound = Shower(self)
+        self.sound.setBasicUI("Index:")
         self.other = Shower(self)
-        self.other.setUI()
+        self.other.setBasicUI()
 
         self.screen.portChanged.connect(lambda x: self.portChanged.emit(x))
         self.net.portChanged.connect(lambda x: self.portChanged.emit(x))
         self.parallel.portChanged.connect(lambda x: self.portChanged.emit(x))
         self.serial.portChanged.connect(lambda x: self.portChanged.emit(x))
+        self.sound.portChanged.connect(lambda x: self.portChanged.emit(x))
         self.other.portChanged.connect(lambda x: self.portChanged.emit(x))
 
         self.screen.colorChanged.connect(lambda x: self.colorChanged.emit(x))
@@ -261,10 +265,12 @@ class Describer(QWidget):
         self.layout.addWidget(self.parallel)
         self.layout.addWidget(self.screen)
         self.layout.addWidget(self.serial)
+        self.layout.addWidget(self.sound)
         self.layout.addWidget(self.other)
         self.setLayout(self.layout)
 
     def describe(self, device_type, device_name, device_port, other: dict):
+        print(device_type)
         if device_type == "network_port":
             self.layout.setCurrentIndex(0)
         elif device_type == "parallel_port":
@@ -273,8 +279,10 @@ class Describer(QWidget):
             self.layout.setCurrentIndex(2)
         elif device_type == "serial_port":
             self.layout.setCurrentIndex(3)
-        else:
+        elif device_type == "sound":
             self.layout.setCurrentIndex(4)
+        else:
+            self.layout.setCurrentIndex(5)
         widget = self.layout.currentWidget()
         widget.describe(device_type, device_name, device_port, other)
 

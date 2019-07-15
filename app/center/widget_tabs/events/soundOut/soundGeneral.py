@@ -55,7 +55,7 @@ class SoundTab1(QWidget):
         self.setGeneral()
 
     def setGeneral(self):
-        valid_input = QRegExp("(\d+)|(\[[_\d\w]+\]")
+        valid_input = QRegExp(r"(\d+)|(\[[_\d\w]+\]")
         self.start_offset.setValidator(QRegExpValidator(valid_input, self))
         self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
         self.buffer_mode.addItems(["Buffered", "Streaming"])

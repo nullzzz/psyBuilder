@@ -46,6 +46,23 @@ class Func(object):
         return os.path.join(Info.IMAGE_SOURCE_PATH, "psy.ico")
 
     @staticmethod
+    def getIOType(device_type: str) -> int:
+        device_type = device_type.split(".")[0]
+        if device_type in("network_port", "parallel_port", "serial_port", "screen", "sound"):
+            return Info.OUTPUT_DEVICE
+        return Info.INPUT_DEVICE
+
+    @staticmethod
+    def changeCertainDeviceNameWhileUsing(device_id: str, device_name):
+        for widget_ids in Info.NAME_WID.values():
+            for widget_id in widget_ids:
+                widget_type = widget_id.split(".")[0]
+                if widget_type in ("Image", "Sound", "Video", "Slider", "Text"):
+                    widget = Info.WID_WIDGET[widget_id]
+                    widget.pro_window.duration.changeCertainDeviceName(device_id, device_name)
+                    widget.apply()
+
+    @staticmethod
     def restore(widget_id: str, properties: dict) -> None:
         """
         复原控件属性

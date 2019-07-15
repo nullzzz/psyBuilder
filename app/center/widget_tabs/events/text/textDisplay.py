@@ -17,7 +17,7 @@ class TextDisplay(QMainWindow):
         self.current_wid = widget_id
         self.attributes = []
         self.text_label = QTextEdit()
-        self.text_label.setReadOnly(True)
+        # self.text_label.setReadOnly(True)
         self.pro_window = TextProperty()
 
         self.html = self.pro_window.html
@@ -108,7 +108,9 @@ class TextDisplay(QMainWindow):
     def apply(self):
         self.getInfo()
         self.parseProperties()
-        self.text_label.setHtml(self.html)
+        # self.text_label.setDocument(self.pro_window.general.text_edit.document())
+        # self.text_label.setHtml(self.html)
+        # self.text_label.setFont(self.pro_window.general.text_edit.font())
         # 发送信号
         self.propertiesChange.emit(self.default_properties)
 
@@ -151,6 +153,8 @@ class TextDisplay(QMainWindow):
 
     def changeDisplayText(self):
         self.html = self.text_label.toHtml()
+        self.pro_window.general.text_edit.setDocument(self.text_label.document())
+        # self.pro_window.general.text_edit.setFont(self.text_label.font())
 
     # 设置可选参数
     def setAttributes(self, attributes):
