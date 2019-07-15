@@ -804,7 +804,7 @@ class TimelineTable(QTableWidget):
         :return:
         """
         # 符合要求
-        if e.mimeData().hasFormat(Info.FromAttributeToLineEdit):
+        if e.mimeData().hasFormat(Info.DragFromAttributeToLineEdit):
             e.accept()
         else:
             e.ignore()
@@ -816,7 +816,7 @@ class TimelineTable(QTableWidget):
         :return:
         """
         # 符合要求
-        if e.mimeData().hasFormat(Info.FromAttributeToLineEdit):
+        if e.mimeData().hasFormat(Info.DragFromAttributeToLineEdit):
             e.accept()
         else:
             e.ignore()
@@ -828,13 +828,13 @@ class TimelineTable(QTableWidget):
         :return:
         """
         # 符合要求
-        if e.mimeData().hasFormat(Info.FromAttributeToLineEdit):
+        if e.mimeData().hasFormat(Info.DragFromAttributeToLineEdit):
             # 根据位置找到准确的item，并将其放入
             row = self.rowAt(e.pos().y())
             col = self.columnAt(e.pos().x())
             # 有效行、有效列（不能是weight和timeline）
             if row != -1 and col >= 2:
-                data = e.mimeData().data(Info.FromAttributeToLineEdit)
+                data = e.mimeData().data(Info.DragFromAttributeToLineEdit)
                 stream = QDataStream(data, QIODevice.ReadOnly)
                 text = f"[{stream.readQString()}]"
                 self.item(row, col).setText(text)

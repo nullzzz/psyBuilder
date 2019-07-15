@@ -147,4 +147,5 @@ class Info(object):
     }
 
     # drag
-    FromAttributeToLineEdit = "attributes/move-attribute"
+    DragFromAttributeToLineEdit = "attributes/move-attribute"
+    DragFromWidgetIconBarToWidgetIconArea = "widget_icon_bar/widget_icon_type"

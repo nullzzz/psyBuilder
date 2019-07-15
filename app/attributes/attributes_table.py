@@ -59,7 +59,7 @@ class AttributesTable(QTableWidget):
             stream.writeQString(text)
 
             mime_data = QMimeData()
-            mime_data.setData(Info.FromAttributeToLineEdit, data)
+            mime_data.setData(Info.DragFromAttributeToLineEdit, data)
 
             drag = QDrag(self)
             drag.setMimeData(mime_data)
