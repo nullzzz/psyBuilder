@@ -421,11 +421,11 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # 11) check the parameter winRect
 
     #
-    #
-    cProperties['X position']
-    cProperties['Y position']
-    cProperties['Width']
-    cProperties['Height']
+    sx = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
+    sy = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
+    cWdith = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
+    cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
+
 
     printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3}，{4}，{5}，{6}，{7},[],{8},{9})", \
                  cWinStr, \
