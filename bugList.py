@@ -13,9 +13,12 @@
 
 
 
-
-
 # TODOLIST
+text widget --> frame-->Geometry--> X position, Y position 默认值均应为50%
+text widget --> general: 'Alignment X' 可选值为 'center','left','right','wrapat','justifytomax'  注意大小写,其余的除开变量引用外，只能输入数值 （不能为负数，可以是小数），不过propertieis里面的返回还是以字符串的形式返回哈
+
+text widget --> general: 'Alignment Y' 可选值为 'center'注意大小写,其余的除开变量引用外，只能输入数值（不能为负数，可以是小数），不过propertieis里面的返回还是以字符串的形式返回哈
+
 # 1)
 	# 1）添加一个del快捷键删除structure 和Timeline中的widgets
 	# 2）修改：attributes界面的"Name"修改为 "Sort"

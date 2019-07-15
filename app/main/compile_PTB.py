@@ -130,24 +130,26 @@ def addedTransparentToRGBStr(RGBStr,transparentStr):
     if re.match("^\d+,\d+,\d+$", RGBStr):
         RGBStr = f"[{RGBStr},{transparentValue}]"
     elif re.match("^\[\d+,\d+,\d+\]$", RGBStr):
-        RGBStr = re.sub("]",f"{transparentValue}]",RGBStr)
+        RGBStr = re.sub("]",f",{transparentValue}]",RGBStr)
+    elif isRef(RGBStr):
+        RGBStr = f"[{RGBStr},{transparentStr}]"
     else:
-        raise Exception(f"the input parameter 'RGBStr' is not a RGB format String!")
+        raise Exception(f"the input parameter 'RGBStr' is not a RGB format String\n should be of R,G,B, [R,G,B], or referred values!")
 
 
 
 
 
 
-def dataStrConvert(dataStr,addSingleQuotes = True):
+def dataStrConvert(dataStr):
     # convert string to neither a string or a num
     # e.g.,
-    # "2"    to 2
-    # "2.00" to 2.0
-    # "abcd" to "'abcd'"
-    # "[12,12,12]" to "[12,12,12]"
-    #  "12,12,12"  to "[12,12,12]"
-
+    # 1） "2"    to 2
+    # 2） "2.00" to 2.0
+    # 3） "abcd" to "'abcd'"
+    # 4） "[12,12,12]" to "[12,12,12]"
+    # 5） "12,12,12"  to "[12,12,12]"
+    # 6） is a referred value will do nothing
     if isinstance(dataStr,str):
         try:
             outData = int(dataStr)
@@ -160,12 +162,12 @@ def dataStrConvert(dataStr,addSingleQuotes = True):
                 elif re.match("^\d+,\d+,\d+$", dataStr):
                     outData = addSquBrackets(dataStr)
                 else:
-                    if addSingleQuotes:
+                    if isRef(dataStr):
                         outData = "'"+pyStr2MatlabStr(dataStr)+"'"
                     else:
                         outData = dataStr
 
-    else:
+    else: # in case there is something wrong
         outData = dataStr
 
     return outData
@@ -315,7 +317,11 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
 
     cProperties = Func.getProperties(cWidget.widget_id)
 
-    #  handle the text content
+    # 1) get the win id info in matlab format winIds(idNum)
+
+    cWinStr = f"winIds({outputDevNameIdxDict.get(getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict))})"
+
+    # 2) handle the text content
     cProperties['Text'] = getRefValue(cWidget,cProperties['Text'],attributesSetDict)
 
     if is_contain_ch(cProperties['Text']):
@@ -323,28 +329,29 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     else:
         cProperties['Text'] = "'" + pyStr2MatlabStr(cProperties['Text']) + "'"
 
-    # check the alignment X parameter:
-    alignmentX =dataStrConvert(getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict), isRef(cProperties['Alignment X']))
+    # 3) check the alignment X parameter:
+    alignmentX =dataStrConvert(getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
 
 
-    # check the alignment X parameter:
-    alignmentY =dataStrConvert(getRefValue(cWidget, cProperties['Alignment Y'], attributesSetDict), isRef(cProperties['Alignment X']))
+    # 4) check the alignment X parameter:
+    alignmentY =dataStrConvert(getRefValue(cWidget, cProperties['Alignment Y'], attributesSetDict))
 
 
 
 
-    # check the flip hor parameter:
+    # 5) check the flip hor parameter:
     flipHorStr = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
 
     if "False" == flipHorStr:
         flipHorStr = "1"
+
     elif "True" == flipHorStr:
         flipHorStr = "0"
     else:
         throwCompileErrorInfo("the value of 'Flip horizontal' should be of {'False' or 'True'}  OR of {'1','0'}")
 
 
-    # check the flip ver parameter:
+    # 6) check the flip ver parameter:
     flipVerStr = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
 
     if "False" == flipVerStr:
@@ -355,23 +362,20 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
         throwCompileErrorInfo("the value of 'Flip vertical' should be of {'False' or 'True'}  OR of {'1','0'}")
 
 
-    # check the color parameter:
-    fontColorStr =dataStrConvert(getRefValue(cWidget, cProperties['Fore color'], attributesSetDict), isRef(cProperties['Alignment X']))
+    # 7) check the color parameter:
+    fontColorStr =dataStrConvert(getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
 
-    #  to be continue.....
-
-    cWinStr = f"winIds({outputDevNameIdxDict.get( getRefValue(cWidget,cWidget.getScreenName(),attributesSetDict) )})"
-
-    printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3}，{4}，{5}，{6}，{7},[],[],{8})",\
-                   cWinStr,\
-                   cProperties['Text'],\
-                   alignmentX,\
-                   alignmentY,\
-                   addedTransparentToRGBStr( dataStrConvert(getRefValue(cWidget,cProperties['Fore color'])),dataStrConvert(getRefValue(cWidget,cProperties['Transparent'])) ),\
-                   dataStrConvert(getRefValue(cWidget,cProperties['Wrapat chars'],attributesSetDict)),\
-                   flipHorStr,\
-                   flipVerStr,\
-                   )
+    # 10)
+    printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3}，{4}，{5}，{6}，{7},[],[],{8})", \
+                 cWinStr, \
+                 cProperties['Text'], \
+                 alignmentX, \
+                 alignmentY, \
+                 addedTransparentToRGBStr( dataStrConvert(getRefValue(cWidget,cProperties['Fore color'])),dataStrConvert(getRefValue(cWidget,cProperties['Transparent'])) ), \
+                 dataStrConvert(getRefValue(cWidget,cProperties['Wrapat chars'],attributesSetDict)), \
+                 flipHorStr, \
+                 flipVerStr, \
+                 )
 
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
