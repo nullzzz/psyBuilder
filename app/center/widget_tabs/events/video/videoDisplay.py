@@ -16,7 +16,6 @@ class VideoDisplay(QMainWindow):
         self.widget_id = widget_id
         self.current_wid = widget_id
 
-
         self.attributes: set = ()
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)

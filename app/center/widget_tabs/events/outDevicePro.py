@@ -46,6 +46,7 @@ class OutDeviceInfoAtDuration(QWidget):
         self.pulse_dur.setCurrentText(p)
 
     def setAttributes(self, attributes):
+        self.attributes = attributes
         self.value.setCompleter(QCompleter(self.attributes))
         self.pulse_dur.setCompleter(QCompleter(self.attributes))
 

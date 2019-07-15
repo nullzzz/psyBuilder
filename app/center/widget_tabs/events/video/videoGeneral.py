@@ -2,6 +2,7 @@ from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtWidgets import QPushButton, QSpinBox, QGridLayout, QLabel, QFileDialog, QMessageBox, QCompleter, QWidget
 
+from app.func import Func
 from app.lib import PigComboBox, PigLineEdit, ColorListEditor
 
 
@@ -36,6 +37,9 @@ class VideoTab1(QWidget):
 
         self.screen_name = PigComboBox()
         self.clear_after = PigComboBox()
+
+        self.screen_name.currentTextChanged.connect(self.changeDevice)
+        self.using_device_id = "screen.0"
         self.setUI()
 
     def setUI(self):
@@ -103,6 +107,9 @@ class VideoTab1(QWidget):
         else:
             self.playback_rate_tip.setText("")
 
+    def changeDevice(self, device_name):
+        self.using_device_id = Func.getDeviceIdByName(device_name)
+
     # 打开文件夹
     def openFile(self):
         options = QFileDialog.Options()
@@ -152,6 +159,10 @@ class VideoTab1(QWidget):
         self.screen_name.addItems(screen)
         if selected in screen:
             self.screen_name.setCurrentText(selected)
+        else:
+            new_name = Func.getDeviceNameById(self.using_device_id)
+            if new_name:
+                self.screen_name.setCurrentText(new_name)
 
     def getInfo(self):
         self.default_properties["File name"] = self.file_name.text()
@@ -160,7 +171,10 @@ class VideoTab1(QWidget):
         self.default_properties["Aspect ratio"] = self.aspect_ratio.currentText()
         self.default_properties["Playback rate"] = self.playback_rate.currentText()
         self.default_properties["Clear after"] = self.clear_after.currentText()
-        self.default_properties["Screen name"] = self.screen_name.currentText()
+        if Func.getDeviceNameById(self.using_device_id):
+            self.default_properties["Screen name"] = Func.getDeviceNameById(self.using_device_id)
+        else:
+            self.default_properties["Screen name"] = self.screen_name.currentText()
         return self.default_properties
 
     def setProperties(self, properties: dict):

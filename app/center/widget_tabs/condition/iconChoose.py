@@ -99,7 +99,7 @@ class IconChoose(QWidget):
             self.pro_window.cancel_bt.clicked.connect(self.cancel)
             self.pro_window.apply_bt.clicked.connect(self.apply)
 
-        self.name_line.setText(f"Untitled-{self.event_type}{int(time.time() % 10000)}")
+        self.name_line.setText(f"Untitled_{self.event_type}{int(time.time() % 10000)}")
         self.name_line.setEnabled(True)
 
     def changeName(self, new_name: str):

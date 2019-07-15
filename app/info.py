@@ -21,6 +21,8 @@ class Info(object):
     # 输入输出设备
     INPUT_DEVICE_INFO: dict = {}
     OUTPUT_DEVICE_INFO: dict = {}
+    INPUT_DEVICE = 0
+    OUTPUT_DEVICE = 1
     # 设备id计数
     device_count: dict = {
         "serial_port": 0,

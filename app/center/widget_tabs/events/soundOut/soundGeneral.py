@@ -3,6 +3,7 @@ from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
     QApplication, QFileDialog, QCompleter, QMessageBox, QFormLayout
 
+from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
 
 
@@ -43,7 +44,6 @@ class SoundTab1(QWidget):
         self.pan.setText("0")
         self.pan.textChanged.connect(self.findVar)
         self.pan.returnPressed.connect(self.finalCheck)
-        # self.pan = QSpinBox()
 
         self.buffer_size = PigLineEdit()
         self.buffer_mode = PigComboBox()
@@ -52,10 +52,14 @@ class SoundTab1(QWidget):
         self.stop_offset = PigLineEdit()
         self.loop = PigComboBox()
 
+        self.sound_device = PigComboBox()
+        self.sound_device.currentTextChanged(self.changeDevice)
+        self.using_device_id = ""
+
         self.setGeneral()
 
     def setGeneral(self):
-        valid_input = QRegExp("(\d+)|(\[[_\d\w]+\]")
+        valid_input = QRegExp(r"(\d+)|(\[[_\d\w]+\]")
         self.start_offset.setValidator(QRegExpValidator(valid_input, self))
         self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
         self.buffer_mode.addItems(["Buffered", "Streaming"])
@@ -63,20 +67,14 @@ class SoundTab1(QWidget):
         self.buffer_size.setText("5000")
         self.start_offset.setText("0")
         self.stop_offset.setText("0")
-        # self.volume.setRange(0, 100)
         self.volume.setEnabled(False)
-        # self.pan.setRange(-1000, 1000)
         self.pan.setEnabled(False)
         self.buffer_size.textChanged.connect(self.findVar)
         self.start_offset.textChanged.connect(self.findVar)
         self.stop_offset.textChanged.connect(self.findVar)
-        # self.volume.textChanged.connect(self.findVar)
-        # self.pan.textChanged.connect(self.findVar)
         self.buffer_size.returnPressed.connect(self.finalCheck)
         self.start_offset.returnPressed.connect(self.finalCheck)
         self.stop_offset.returnPressed.connect(self.finalCheck)
-        # self.volume.returnPressed.connect(self.finalCheck)
-        # self.pan.returnPressed.connect(self.finalCheck)
         l0 = QLabel("File Name:")
         l1 = QLabel("Buffer Size (ms):")
         l2 = QLabel("Buffer Mode:")
@@ -117,6 +115,7 @@ class SoundTab1(QWidget):
         layout2.addRow("\tvolume:", self.volume)
         layout2.addRow(self.pan_control)
         layout2.addRow("\tpan:", self.pan)
+        layout2.addRow("Sound Device:", self.sound_device)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
@@ -132,6 +131,9 @@ class SoundTab1(QWidget):
         if file_name:
             self.file_name.setText(file_name)
 
+    def changeDevice(self, device_name):
+        self.using_device_id = Func.getDeviceIdByName(device_name)
+
     def volumeChecked(self, e):
         if e == 2:
             self.volume.setEnabled(True)
@@ -143,6 +145,17 @@ class SoundTab1(QWidget):
             self.pan.setEnabled(True)
         else:
             self.pan.setEnabled(False)
+
+    def setSound(self, sound: list):
+        selected = self.sound_device.currentText()
+        self.sound_device.clear()
+        self.sound_device.addItems(sound)
+        if selected in sound:
+            self.sound_device.setCurrentText(selected)
+        else:
+            new_name = Func.getDeviceNameById(self.using_device_id)
+            if new_name:
+                self.sound_device.setCurrentText(new_name)
 
     # 检查变量
     def findVar(self, text):
@@ -169,6 +182,7 @@ class SoundTab1(QWidget):
         self.stop_offset.setCompleter(QCompleter(self.attributes))
         self.volume.setCompleter(QCompleter(self.attributes))
         self.pan.setCompleter(QCompleter(self.attributes))
+        self.sound_device.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         self.default_properties.clear()
@@ -185,6 +199,10 @@ class SoundTab1(QWidget):
         self.default_properties["Pan control"] = self.pan_control.checkState()
         # self.default_properties["Pan"] = self.pan.value()
         self.default_properties["Pan"] = self.pan.text()
+        if Func.getDeviceNameById(self.using_device_id):
+            self.default_properties["Sound device"] = Func.getDeviceNameById(self.using_device_id)
+        else:
+            self.default_properties["Sound device"] = self.sound_device.currentText()
 
         return self.default_properties
 
@@ -206,6 +224,8 @@ class SoundTab1(QWidget):
         self.pan_control.setCheckState(self.default_properties["Pan control"])
         # self.pan.setValue(self.default_properties["Pan"])
         self.pan.setText(self.default_properties["Pan"])
+
+        self.sound_device.setCurrentText((self.default_properties["Sound device"]))
 
     def clone(self):
         clone_page = SoundTab1()

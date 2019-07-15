@@ -55,6 +55,7 @@ class ImageProperty(QWidget):
                   (screen.height() - size.height()) / 2)
 
     def getInfo(self):
+        self.default_properties.clear()
         self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
         return self.default_properties
 

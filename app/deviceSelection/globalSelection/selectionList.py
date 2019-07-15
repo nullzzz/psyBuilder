@@ -22,7 +22,8 @@ class SelectArea(QListWidget):
             "serial_port": 0,
             "parallel_port": 0,
             "network_port": 0,
-            "screen": 0
+            "screen": 0,
+            "sound": 0
         }
 
         # 存放当前选择设备名，避免重复，只通过create\delete操作

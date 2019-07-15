@@ -14,6 +14,8 @@ class TextProperty(QWidget):
 
         self.general = TextTab1()
         self.frame = FramePage()
+        self.frame.x_pos.setCurrentText("50%")
+        self.frame.y_pos.setCurrentText("50%")
         self.duration = DurationPage()
 
         self.html = self.general.html

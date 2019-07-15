@@ -91,6 +91,8 @@ class SoundDisplay(QMainWindow):
     def openPro(self):
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
+        sound_devices = Func.getSound()
+        self.pro_window.general.setSound(sound_devices)
         # 阻塞原窗口
         # self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)

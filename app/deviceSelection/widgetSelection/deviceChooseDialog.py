@@ -83,7 +83,7 @@ class DeviceOutDialog(QDialog):
         for device_id, properties in devices.items():
 
             device_type = properties.get("Device Type")
-            if device_type == "screen":
+            if device_type == "screen" or device_type == "sound":
                 continue
             device_name = properties.get("Device Name")
 
