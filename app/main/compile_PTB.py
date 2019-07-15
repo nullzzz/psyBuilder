@@ -421,7 +421,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # 11) check the parameter winRect
 
     #
-
+    #
     cProperties['X position']
     cProperties['Y position']
     cProperties['Width']

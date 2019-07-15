@@ -186,3 +186,5 @@ dmypy.json
 .pyre/
 
 /app/main/compile_PTB.py
+/.gitignore
+!/lib/wait_dialog.py
