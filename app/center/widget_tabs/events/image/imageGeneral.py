@@ -3,6 +3,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
     QApplication, QFileDialog, QCompleter, QMessageBox, QFormLayout
 
+from app.func import Func
 from app.lib import PigLineEdit, PigComboBox, ColorListEditor
 
 
@@ -48,7 +49,8 @@ class ImageTab1(QWidget):
         self.transparent = PigLineEdit()
         self.clear_after = PigComboBox()
         self.screen_name = PigComboBox()
-
+        self.screen_name.currentTextChanged.connect(self.changeDevice)
+        self.using_device_id = "screen.0"
         self.setGeneral()
 
     def setGeneral(self):
@@ -93,6 +95,9 @@ class ImageTab1(QWidget):
         layout.addWidget(group2)
         self.setLayout(layout)
 
+    def changeDevice(self, device_name):
+        self.using_device_id = Func.getDeviceIdByName(device_name)
+
     # 打开文件夹
     def openFile(self):
         options = QFileDialog.Options()
@@ -118,6 +123,10 @@ class ImageTab1(QWidget):
         self.screen_name.addItems(screen)
         if selected in screen:
             self.screen_name.setCurrentText(selected)
+        else:
+            new_name = Func.getDeviceNameById(self.using_device_id)
+            if new_name:
+                self.screen_name.setCurrentText(new_name)
 
     def getInfo(self):
         """
@@ -134,7 +143,10 @@ class ImageTab1(QWidget):
         # self.default_properties["Transparent"] = self.transparent.value()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear after"] = self.clear_after.currentText()
-        self.default_properties["Screen name"] = self.screen_name.currentText()
+        if Func.getDeviceNameById(self.using_device_id):
+            self.default_properties["Screen name"] = Func.getDeviceNameById(self.using_device_id)
+        else:
+            self.default_properties["Screen name"] = self.screen_name.currentText()
         return self.default_properties
 
     def getProperties(self):
@@ -149,7 +161,10 @@ class ImageTab1(QWidget):
         # self.default_properties["Back color"] = self.back_color.getColor()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear after"] = self.clear_after.currentText()
-        self.default_properties["Screen name"] = self.screen_name.currentText()
+        if Func.getDeviceNameById(self.using_device_id):
+            self.default_properties["Screen name"] = Func.getDeviceNameById(self.using_device_id)
+        else:
+            self.default_properties["Screen name"] = self.screen_name.currentText()
         return self.default_properties
 
     def setProperties(self, properties: dict):

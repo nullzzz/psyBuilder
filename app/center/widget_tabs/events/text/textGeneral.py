@@ -70,11 +70,12 @@ class TextTab1(QWidget):
         self.style_box.currentTextChanged.connect(self.fontChange)
         self.font_size_box = PigComboBox()
         self.font_size_box.setEditable(True)
-        for i in range(8, 72, 2):
+        for i in range(12, 72, 2):
             self.font_size_box.addItem(str(i))
 
         self.font_size_box.currentIndexChanged.connect(self.fontChange)
-
+        self.screen_name.currentTextChanged.connect(self.changeDevice)
+        self.using_device_id = "screen.0"
         self.setUI()
 
     def setUI(self):
@@ -167,6 +168,9 @@ class TextTab1(QWidget):
         layout.addWidget(group2, 2)
         self.setLayout(layout)
 
+    def changeDevice(self, device_name):
+        self.using_device_id = Func.getDeviceIdByName(device_name)
+
     def colorChange(self, color):
         r, g, b = [int(x) for x in color.split(",")]
         if self.sender() == self.fore_color:
@@ -239,6 +243,10 @@ class TextTab1(QWidget):
         self.screen_name.addItems(screen)
         if selected in screen:
             self.screen_name.setCurrentText(selected)
+        else:
+            new_name = Func.getDeviceNameById(self.using_device_id)
+            if new_name:
+                self.screen_name.setCurrentText(new_name)
 
     # 处理html获得格式
     # 对齐方式、颜色、内容
@@ -269,7 +277,10 @@ class TextTab1(QWidget):
         self.default_properties["Alignment Y"] = self.align_y.currentText()
         self.default_properties["Fore color"] = self.fore_color.getColor()
         self.default_properties["Back color"] = self.back_color.getColor()
-        self.default_properties["Screen name"] = self.screen_name.currentText()
+        if Func.getDeviceNameById(self.using_device_id):
+            self.default_properties["Screen name"] = Func.getDeviceNameById(self.using_device_id)
+        else:
+            self.default_properties["Screen name"] = self.screen_name.currentText()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear after"] = self.clear_after.currentText()
         self.default_properties["Font family"] = self.font_box.currentText()

@@ -270,7 +270,6 @@ class Describer(QWidget):
         self.setLayout(self.layout)
 
     def describe(self, device_type, device_name, device_port, other: dict):
-        print(device_type)
         if device_type == "network_port":
             self.layout.setCurrentIndex(0)
         elif device_type == "parallel_port":

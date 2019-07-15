@@ -48,7 +48,7 @@ class Func(object):
     @staticmethod
     def getIOType(device_type: str) -> int:
         device_type = device_type.split(".")[0]
-        if device_type in("network_port", "parallel_port", "serial_port", "screen", "sound"):
+        if device_type in ("network_port", "parallel_port", "serial_port", "screen", "sound"):
             return Info.OUTPUT_DEVICE
         return Info.INPUT_DEVICE
 
@@ -601,6 +601,14 @@ class Func(object):
         return screens
 
     @staticmethod
+    def getSound() -> list:
+        sounds = []
+        for k, v in Info.OUTPUT_DEVICE_INFO.items():
+            if k.startswith("sound"):
+                sounds.append(v["Device Name"])
+        return sounds
+
+    @staticmethod
     def getDeviceInfoByName(device_name: str) -> dict or None:
         """
         由设备名称获取设备信息
@@ -611,6 +619,22 @@ class Func(object):
             if device_name == v.get("Device Name"):
                 return v
         return
+
+    @staticmethod
+    def getDeviceNameById(device_id: str):
+        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
+            if device_id == k:
+                # print(627)
+                # print(v.get("Device Name"))
+                return v.get("Device Name")
+        return ""
+
+    @staticmethod
+    def getDeviceIdByName(device_name: str):
+        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
+            if device_name == v.get("Device Name"):
+                return k
+        return ""
 
     # 控制台输出信息
     @staticmethod

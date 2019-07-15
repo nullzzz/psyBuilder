@@ -1,57 +1,21 @@
 # %%%%%%%%%%%%%%  Bugs       %%%%%%%%%%%%%%%%%%
-# 1) 设备中的设备名称如果在使用后被修改，貌似其余使用的地方获得的device name还是先前的，能不能设备名已修改，相应的各个widget对应的device name 也修改呢
 
-# 2）一个bug哈，在text中，有两个地方都有Back Color,一个在general 一个在frame中，可能是这个原因在通过Func.getProperties(cWidget.widget_id)取得的properties中只有一个 Back color 的特征值
 
-# 3）刚才确认了下刚才的bug的确存在：bug2：如果是load出先前保存的，对于widget的一些信息，如screen name 的信息，通过 Func.getProperties(cWidget.widget_id)出来的变成了默认值 （而非修改过的设备名称），尽管手动点开后再图形界面中是正确的 (也就是联动触发问题)
 
-# 4）先前已经解决的问题由出现了：（text widget中，直接输入的文字，在打开熟悉后general tab  会被清空）
-
-# 5）所有widget， transparent默认值设为0%，也就是完全不透明
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
 # TODOLIST
-text widget --> frame-->Geometry--> X position, Y position 默认值均应为50%
-text widget --> general: 'Alignment X' 可选值为 'center','left','right','wrapat','justifytomax'  注意大小写,其余的除开变量引用外，只能输入数值 （不能为负数，可以是小数），不过propertieis里面的返回还是以字符串的形式返回哈
-
-text widget --> general: 'Alignment Y' 可选值为 'center'注意大小写,其余的除开变量引用外，只能输入数值（不能为负数，可以是小数），不过propertieis里面的返回还是以字符串的形式返回哈
 
 # 1)
-	# 1）添加一个del快捷键删除structure 和Timeline中的widgets
-	# 2）修改：attributes界面的"Name"修改为 "Sort"
+# 1）添加一个del快捷键删除structure 和Timeline中的widgets
+
 
 # 2) sound 里面增加  sound name：
 
-# 3）output device里面也需要增加一个widgettype，sound
-"""
-2) Text Display:
 
-a: General界面加一个underline选项；
-
-: Gerneral Table:
-
-d:	Aligment X:'center','right','centerblock','left','justifytomax' or  a number
-e:	Aligment Y:'center',or a number
-
-	#替换word wrap为：Wrapat chars: {'None'},or a number 80
-f:	flipHorizontal:{'False'}
-g:	flipVertical:{'True'}
-
-h:	Style:{'normal_0'},'bold_2','italic_4','underline_8', 'outline_16', 'condense_32','extend_64' OR a number between 0-64
-
-	Screen Name: Default ('screen.0');
-	"""
-
-# Frame:
-
-   # + Frame Fill Color: (FrameBK Color:)
-   # + Transparant: (0%)
-
-
-# Image：- General:Back Color 去除
 
 # Silder：
 
@@ -63,11 +27,6 @@ h:	Style:{'normal_0'},'bold_2','italic_4','underline_8', 'outline_16', 'condense
 
 
 """"
-所有duration:
-
-选项中增加一个范围选项
-默认：
-0~200
 
 
 
@@ -85,11 +44,6 @@ Cycle：
 
 # Pan control:待定
 
-"""
-image:
-
-	1) rotate 默认为0
-"""
 # slide：
 #
 # 0）slider 属性框里面增加 + frame table （内容同单独的image 里面的frame）
