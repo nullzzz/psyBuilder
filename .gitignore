@@ -183,3 +183,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/.gitignore
+/app/main/compile_PTB.py
