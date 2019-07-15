@@ -377,9 +377,11 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     alignmentY =dataStrConvert(*getRefValue(cWidget, cProperties['Alignment Y'], attributesSetDict))
 
 
+    # 5) check the color parameter:
+    fontColorStr    = dataStrConvert(*getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
+    fontTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Transparent'], attributesSetDict))
 
-
-    # 5) check the flip hor parameter:
+    # 7) check the flip hor parameter:
     flipHorStr = dataStrConvert(*getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict))
 
     if "'False'" == flipHorStr:
@@ -391,7 +393,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
         throwCompileErrorInfo("the value of 'Flip horizontal' should be of {'False' or 'True'}  OR of {'1','0'}")
 
 
-    # 6) check the flip ver parameter:
+    # 8) check the flip ver parameter:
     flipVerStr = dataStrConvert(*getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict))
 
     if "'False'" == flipVerStr:
@@ -402,27 +404,40 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
         throwCompileErrorInfo("the value of 'Flip vertical' should be of {'False' or 'True'}  OR of {'1','0'}")
 
 
-    # 7) check the color parameter:
-    fontColorStr =dataStrConvert(*getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
+    # 10) check the flip ver parameter:
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Right to left'], attributesSetDict)
+    rightToLeft = dataStrConvert(cRefedValue, isRef)
 
-    # 10) check the parameter winRect
+    if "'False'" == flipVerStr:
+        flipHorStr = "1"
+    elif "'True'" == flipVerStr:
+        flipVerStr = "0"
+    else:
+        if isRef == False:
+            throwCompileErrorInfo("the value of 'Flip vertical' should be of {'False' or 'True'}  OR of {'1','0'}")
+
+
+
+    # 11) check the parameter winRect
 
     #
+
     cProperties['X position']
     cProperties['Y position']
     cProperties['Width']
     cProperties['Height']
 
-    printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3}，{4}，{5}，{6}，{7},[],[],{8})", \
+    printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3}，{4}，{5}，{6}，{7},[],{8},{9})", \
                  cWinStr, \
                  cProperties['Text'], \
                  alignmentX, \
                  alignmentY, \
-                 addedTransparentToRGBStr( dataStrConvert(getRefValue(cWidget,cProperties['Fore color'])), ), \
+                 addedTransparentToRGBStr(fontColorStr,fontTransparent), \
                  dataStrConvert(*getRefValue(cWidget,cProperties['Wrapat chars'],attributesSetDict)), \
                  flipHorStr, \
                  flipVerStr, \
-                 )
+                 rightToLeft, \
+                 rightToLeft)
 
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
