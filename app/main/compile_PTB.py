@@ -97,17 +97,46 @@ def printAutoInd(f,inputStr,*argins):
         cIndents = 0
 
 
-def is_contain_ch(check_str):
+def isContainChStr(inputStr):
     # :param check_str: {str}
     # :return: {bool} True and False for have and have not chinese characters respectively
-    for ch in check_str:
+    for ch in inputStr:
         if u'\u4e00' <= ch <= u'\u9fff':
             return True
     return False
 
 def isRgbStr(inputStr):
-    isRgbFormat = re.match("^\d+,\d+,\d+$", inputStr)
+    isRgbFormat = re.fullmatch("^\d+,\d+,\d+$", inputStr)
     return isRgbFormat
+
+def isRgbWithBracketsStr(inputStr):
+    isRgbFormat = re.fullmatch("^\[\d+,\d+,\d+\]$", inputStr)
+    return isRgbFormat
+
+def isNumStr(inputStr):
+    return re.fullmatch("([\d]*\.[\d$]+)|\d*", inputStr)
+
+def isIntStr(inputStr):
+    return re.fullmatch("\d*", inputStr)
+
+def isFloatStr(inputStr):
+    return re.fullmatch("([\d]*\.[\d$]+)", inputStr)
+
+def isPercentStr(inputStr):
+    return re.fullmatch("([\d]*\.[\d]+%$)|(\d*%$)", inputStr)
+
+
+def isRefStr(inputStr):
+    if isinstance(inputStr,str):
+
+        if isRgbWithBracketsStr(inputStr):
+            return False
+
+        if re.match("^\[.*\]$", inputStr):
+            return True
+
+    return False
+
 
 def pyStr2MatlabStr(inputStr):
     if isinstance(inputStr, str):
@@ -115,10 +144,12 @@ def pyStr2MatlabStr(inputStr):
     return inputStr
 
 def parsePercentStr(inputStr):
-    if inputStr.endswith('%'):
+    if isPercentStr(inputStr):
         outputValue = float(inputStr[:-1])/100
-    else:
+    elif isNumStr(inputStr):
         outputValue = float(inputStr)
+    else:
+        outputValue = inputStr
 
     return outputValue
 
@@ -127,21 +158,21 @@ def addedTransparentToRGBStr(RGBStr,transparentStr):
 
     transparentValue = parsePercentStr(transparentStr)
 
-    if re.match("^\d+,\d+,\d+$", RGBStr):
+    if isRgbStr(RGBStr):
         RGBStr = f"[{RGBStr},{transparentValue}]"
-    elif re.match("^\[\d+,\d+,\d+\]$", RGBStr):
+    elif isRgbWithBracketsStr(RGBStr):
         RGBStr = re.sub("]",f",{transparentValue}]",RGBStr)
-    elif isRef(RGBStr):
+    elif isRefStr(RGBStr):
         RGBStr = f"[{RGBStr},{transparentStr}]"
     else:
         raise Exception(f"the input parameter 'RGBStr' is not a RGB format String\n should be of R,G,B, [R,G,B], or referred values!")
 
+    return RGBStr
 
 
 
 
-
-def dataStrConvert(dataStr):
+def dataStrConvert(dataStr,isRef = False):
     # convert string to neither a string or a num
     # e.g.,
     # 1） "2"    to 2
@@ -151,24 +182,33 @@ def dataStrConvert(dataStr):
     # 5） "12,12,12"  to "[12,12,12]"
     # 6） is a referred value will do nothing
     if isinstance(dataStr,str):
-        try:
+
+        if isPercentStr(dataStr):
+            outData = parsePercentStr(dataStr)
+
+        elif isRgbWithBracketsStr(dataStr):
+            outData = dataStr
+
+        elif isRgbStr(dataStr):
+            outData = addSquBrackets(dataStr)
+
+        elif isIntStr(dataStr):
             outData = int(dataStr)
-        except:
-            try:
-                outData = float(dataStr)
-            except:
-                if re.match("^\[\d+,\d+,\d+\]$", dataStr):
-                    outData = dataStr
-                elif re.match("^\d+,\d+,\d+$", dataStr):
-                    outData = addSquBrackets(dataStr)
-                else:
-                    if isRef(dataStr):
-                        outData = "'"+pyStr2MatlabStr(dataStr)+"'"
-                    else:
-                        outData = dataStr
+
+        elif isFloatStr(dataStr):
+            outData = float(dataStr)
+
+        elif isRefStr(dataStr):
+            outData = dataStr # maybe a bug
+
+        else:
+            if isRef:
+                outData = dataStr  # maybe a bug
+            else:
+                outData = addSingleQuotes(pyStr2MatlabStr(dataStr) ) # maybe a bug
 
     else: # in case there is something wrong
-        outData = dataStr
+        raise Exception(f"the input dataStr:{dataStr} is not a string!")
 
     return outData
 
@@ -183,36 +223,34 @@ def addCurlyBrackets(inputStr):
 
 
 # add square brackets
+def addSingleQuotes(inputStr):
+    outputStr = f"'{inputStr}'"
+    return outputStr
+
+# add square brackets
 def addSquBrackets(inputStr):
     outputStr = f"[{inputStr}]"
     return outputStr
 
 
-def isRef(inputStr):
-    if isinstance(inputStr,str):
-        tempMatchObj = re.match("^\[.*\]$", inputStr)
-        if tempMatchObj:
-            return True
-
-    return False
-
 
 
 def getRefValue(cwidget, inputStr,attributesSetDict):
+    isRefValue = False
 
     if isinstance(inputStr, str):
-        tempMatchObj = re.match("^\[.*\]$", inputStr)
 
-        if tempMatchObj:
+        isRefValue = isRefStr(inputStr)
+
+        if isRefValue:
             inputStr = re.sub("[\[\]]", '', inputStr)
-
 
             if inputStr in attributesSetDict:
                 inputStr = attributesSetDict[inputStr][2]
             else:
                 throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cwidget.widget_id)}")
 
-    return inputStr
+    return [inputStr,isRefValue]
 
 
 
@@ -319,60 +357,69 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
 
     # 1) get the win id info in matlab format winIds(idNum)
 
-    cWinStr = f"winIds({outputDevNameIdxDict.get(getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict))})"
+    cScreenName, noused = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
+
+    cWinStr = f"winIds({outputDevNameIdxDict.get(cScreenName)})"
 
     # 2) handle the text content
-    cProperties['Text'] = getRefValue(cWidget,cProperties['Text'],attributesSetDict)
+    cProperties['Text'],noused = getRefValue(cWidget,cProperties['Text'],attributesSetDict)
 
-    if is_contain_ch(cProperties['Text']):
+    if isContainChStr(cProperties['Text']):
         cProperties['Text'] = "double('"+pyStr2MatlabStr(cProperties['Text'])+"')"
     else:
         cProperties['Text'] = "'" + pyStr2MatlabStr(cProperties['Text']) + "'"
 
     # 3) check the alignment X parameter:
-    alignmentX =dataStrConvert(getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
+    alignmentX =dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
 
 
     # 4) check the alignment X parameter:
-    alignmentY =dataStrConvert(getRefValue(cWidget, cProperties['Alignment Y'], attributesSetDict))
+    alignmentY =dataStrConvert(*getRefValue(cWidget, cProperties['Alignment Y'], attributesSetDict))
 
 
 
 
     # 5) check the flip hor parameter:
-    flipHorStr = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
+    flipHorStr = dataStrConvert(*getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict))
 
-    if "False" == flipHorStr:
+    if "'False'" == flipHorStr:
         flipHorStr = "1"
 
-    elif "True" == flipHorStr:
+    elif "'True'" == flipHorStr:
         flipHorStr = "0"
     else:
         throwCompileErrorInfo("the value of 'Flip horizontal' should be of {'False' or 'True'}  OR of {'1','0'}")
 
 
     # 6) check the flip ver parameter:
-    flipVerStr = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
+    flipVerStr = dataStrConvert(*getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict))
 
-    if "False" == flipVerStr:
+    if "'False'" == flipVerStr:
         flipHorStr = "1"
-    elif "True" == flipVerStr:
+    elif "'True'" == flipVerStr:
         flipVerStr = "0"
     else:
         throwCompileErrorInfo("the value of 'Flip vertical' should be of {'False' or 'True'}  OR of {'1','0'}")
 
 
     # 7) check the color parameter:
-    fontColorStr =dataStrConvert(getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
+    fontColorStr =dataStrConvert(*getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
 
-    # 10)
+    # 10) check the parameter winRect
+
+    #
+    cProperties['X position']
+    cProperties['Y position']
+    cProperties['Width']
+    cProperties['Height']
+
     printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3}，{4}，{5}，{6}，{7},[],[],{8})", \
                  cWinStr, \
                  cProperties['Text'], \
                  alignmentX, \
                  alignmentY, \
-                 addedTransparentToRGBStr( dataStrConvert(getRefValue(cWidget,cProperties['Fore color'])),dataStrConvert(getRefValue(cWidget,cProperties['Transparent'])) ), \
-                 dataStrConvert(getRefValue(cWidget,cProperties['Wrapat chars'],attributesSetDict)), \
+                 addedTransparentToRGBStr( dataStrConvert(getRefValue(cWidget,cProperties['Fore color'])), ), \
+                 dataStrConvert(*getRefValue(cWidget,cProperties['Wrapat chars'],attributesSetDict)), \
                  flipHorStr, \
                  flipVerStr, \
                  )
@@ -428,23 +475,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
         for key, value in cRowDict.items():
 
             # get the referenced var value
-            cRowDict[key] = getRefValue(cWidget,value,attributesSetDict)
-            #
-            # if isRefValue:
-            #     if valueStr in attributesSetDict:
-            #         # assign the refered value to the current rowDict
-            #         cRowDict[key] = attributesSetDict[valueStr][2]
-            #     else:
-            #         throwCompileErrorInfo(f"The cited attribute '{valueStr}' \nis not available for {cWidgetName}")
-            #         # Func.log(f"The cited attribute '{valueStr}' was not exist for the current widget {cWidgetName}",1)
-
-            # isRgbFormat = re.match("^\d+,\d+,\d+$", cRowDict[key])
-
-            # isRgbFormat = isRgbStr(cRowDict[key])
-            #
-            # if isRgbFormat:
-            #     # transform the RGB to include a pair of square brackets
-            #     cRowDict[key] = f"[{isRgbFormat[0]}]"
+            cRowDict[key], noused = getRefValue(cWidget,value,attributesSetDict)
 
         if '' == cRowDict['Weight']:
             cRepeat = 1
