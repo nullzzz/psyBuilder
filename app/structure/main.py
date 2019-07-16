@@ -562,9 +562,11 @@ class Structure(QDockWidget):
                 # 要链接过去
                 Info.WID_WIDGET[widget_id] = Info.WID_WIDGET[origin_wid]
 
-    def isFocused(self):
+    def isFocused(self) -> int:
         """
-
+        返回当前窗口是否为焦点
         :return:
         """
-        return self.structure_tree.focus
+        if self.structure_tree.focus:
+            return Info.StructureFocused
+        return Info.NotFocused

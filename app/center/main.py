@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QDockWidget
 
+from app.info import Info
 from .widget_tabs.main import WidgetTabs
 
 
@@ -12,10 +13,17 @@ class Center(QDockWidget):
 
     def isFocused(self) -> bool:
         """
-
+        返回当前焦点在何窗口
         :return:
         """
         try:
-            return self.widget_tabs.currentWidget().widget_icon_area.widget_icon_table.focus
+            if self.widget_tabs.currentWidget().widget_icon_area.widget_icon_table.focus:
+                return Info.TimelineFocused
+            return Info.NotFocused
         except:
-            return False
+            try:
+                if self.widget_tabs.currentWidget().timeline_table.focus:
+                    return Info.CycleFocused
+                return Info.NotFocused
+            except:
+                return Info.NotFocused

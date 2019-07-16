@@ -1,5 +1,4 @@
 import copy
-import json
 import os
 import re
 
@@ -466,10 +465,18 @@ class Func(object):
             print(f"error {e} happens in rename timeline in cycle. [func.py]")
 
     @staticmethod
-    def checkValidityDragFromStructure(target_timeline_wid, widget_id: str):
+    def checkDragValidityFromStructure(target_timeline_wid: str, widget_id: str) -> bool:
+        # todo：timeline可以引用，那这个需求就是错的了。
+        """
+        当从structure中拖拽至timeline时，
+        对于cycle的拖拽，因其下面挂着timeline，如果不进行处理，会导致类似死锁。
+        :param target_timeline_wid: 目标的timeline的wid
+        :param widget_id: 被拖拽的wid
+        :return: 合法性
+        """
         try:
             # 只需检测cycle
-            if widget_id.startswith(Info.CYCLE):
+            if Func.isWidgetType(widget_id, Info.CYCLE):
                 # 检测目标的timeline的自身包括引用节点上面有没有父节点name是cycle的name
                 cycle_name = Info.WID_NODE[widget_id].text(0)
                 timeline_name = Info.WID_NODE[target_timeline_wid].text(0)
@@ -480,8 +487,7 @@ class Func(object):
                             return False
                         node = node.parent()
                 return True
-            else:
-                return True
+            return True
         except Exception as e:
             print(f"error {e} happens in check validity of drag from structure. [func.py]")
 

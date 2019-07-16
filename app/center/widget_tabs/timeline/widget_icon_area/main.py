@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QDataStream, QIODevice
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QMessageBox, QApplication
+from PyQt5.QtWidgets import QFrame, QVBoxLayout, QMessageBox
 
 from app.func import Func
 from app.info import Info
@@ -39,16 +39,16 @@ class WidgetIconArea(QFrame):
 
     def dragEnterEvent(self, e):
         try:
-            if e.mimeData().hasFormat("widget_icon_bar/widget_icon_type") or \
+            if e.mimeData().hasFormat(Info.DragFromWidgetIconBarToWidgetIconArea) or \
                     e.mimeData().hasFormat("widget_icon_table/copy-col") or \
                     e.mimeData().hasFormat("widget_icon_table/move-col") or \
                     e.mimeData().hasFormat("structure_tree/move-wid") or \
                     e.mimeData().hasFormat("structure_tree/copy-wid") or \
                     e.mimeData().hasFormat("structure_tree/refer-wid"):
-                # 先对从widget bar中拖拽类型进行过滤
-                if e.mimeData().hasFormat("widget_icon_bar/widget_icon_type"):
+                # 从widget bar中拖拽类型进行过滤
+                if e.mimeData().hasFormat(Info.DragFromWidgetIconBarToWidgetIconArea):
                     # 从widget icon bar拖拽到widget icon area中
-                    data = e.mimeData().data("widget_icon_bar/widget_icon_type")
+                    data = e.mimeData().data(Info.DragFromWidgetIconBarToWidgetIconArea)
                     stream = QDataStream(data, QIODevice.ReadOnly)
                     # 读取当前拖拽widget类型
                     widget_type = stream.readQString()
@@ -56,16 +56,23 @@ class WidgetIconArea(QFrame):
                     if widget_type in ['widget_type_1', 'widget_type_2', '...']:
                         e.ignore()
                         return None
-                # 根据不同类型读取id
-                data = e.mimeData().data("structure_tree/move-wid")
-                if e.mimeData().hasFormat("structure_tree/copy-wid"):
+                # 如果是从structure中拖拽过来，需要进行一个有效性的判断，根据不同类型读取id
+                # 引用的拖拽只局限于同一cycle中所属的timeline
+                data = None
+                if e.mimeData().hasFormat("structure_tree/move-wid"):
+                    data = e.mimeData().data("structure_tree/move-wid")
+                elif e.mimeData().hasFormat("structure_tree/copy-wid"):
                     data = e.mimeData().data("structure_tree/copy-wid")
                 elif e.mimeData().hasFormat("structure_tree/refer-wid"):
                     data = e.mimeData().data("structure_tree/refer-wid")
-                stream = QDataStream(data, QIODevice.ReadOnly)
-                widget_id = stream.readQString()
-                # 检测widget_id是否违法
-                if Func.checkValidityDragFromStructure(self.widget_id, widget_id):
+                accept = True
+                if data:
+                    stream = QDataStream(data, QIODevice.ReadOnly)
+                    widget_id = stream.readQString()
+                    # 检测widget_id是否违法
+                    accept = Func.checkDragValidityFromStructure(self.widget_id, widget_id)
+                # end
+                if accept:
                     # sign显示
                     self.signShow.emit(e.pos().x())
                     e.setDropAction(Qt.CopyAction)
@@ -80,7 +87,7 @@ class WidgetIconArea(QFrame):
 
     def dragMoveEvent(self, e):
         try:
-            if e.mimeData().hasFormat("widget_icon_bar/widget_icon_type") or \
+            if e.mimeData().hasFormat(Info.DragFromWidgetIconBarToWidgetIconArea) or \
                     e.mimeData().hasFormat("widget_icon_table/copy-col") or \
                     e.mimeData().hasFormat("widget_icon_table/move-col") or \
                     e.mimeData().hasFormat("structure_tree/move-wid") or \
@@ -99,7 +106,6 @@ class WidgetIconArea(QFrame):
         try:
             if e.mimeData().hasFormat("widget_icon_bar/widget_icon_type"):
                 # 隐藏箭头
-                QApplication.processEvents()
                 self.signHide.emit()
                 # 从widget icon bar拖拽到widget icon area中
                 data = e.mimeData().data("widget_icon_bar/widget_icon_type")
@@ -117,15 +123,10 @@ class WidgetIconArea(QFrame):
                 if target_col != -1 and target_col < drag_col:
                     self.widget_icon_table.moveWidgetIcon(drag_col, target_col)
                 # end
-                QApplication.processEvents()
                 self.widgetIconAdd.emit(self.widget_id, widget_id, name, Info.WidgetAdd, '')
-                QApplication.processEvents()
                 self.widgetIconMove.emit(widget_id, drag_col, target_col)
-                QApplication.processEvents()
                 e.setDropAction(Qt.CopyAction)
-                QApplication.processEvents()
                 e.accept()
-                QApplication.processEvents()
             elif e.mimeData().hasFormat("widget_icon_table/move-col"):
                 # widget icon table中widget icon的移动
                 data = e.mimeData().data("widget_icon_table/move-col")
@@ -142,17 +143,12 @@ class WidgetIconArea(QFrame):
                     target_col = self.widget_icon_table.getColumnToBack(e.pos().x())
                     self.widget_icon_table.moveWidgetIcon(drag_col, target_col)
                 # end
-                QApplication.processEvents()
                 self.signHide.emit()
-                QApplication.processEvents()
                 if target_col != -1:
                     self.widgetIconMove.emit(self.widget_icon_table.cellWidget(1, target_col).widget_id, drag_col,
                                              target_col)
-                QApplication.processEvents()
                 e.setDropAction(Qt.CopyAction)
-                QApplication.processEvents()
                 e.accept()
-                QApplication.processEvents()
             elif e.mimeData().hasFormat("widget_icon_table/copy-col"):
                 # widget icon table中widget icon的复制
                 data = e.mimeData().data("widget_icon_table/copy-col")
@@ -173,17 +169,11 @@ class WidgetIconArea(QFrame):
                 if target_col != -1 and target_col < drag_col:
                     self.widget_icon_table.moveWidgetIcon(drag_col, target_col)
                 # end
-                QApplication.processEvents()
                 self.signHide.emit()
-                QApplication.processEvents()
                 self.widgetIconAdd.emit(self.widget_id, new_widget_id, name, Info.WidgetCopy, old_widget_id)
-                QApplication.processEvents()
                 self.widgetIconMove.emit(new_widget_id, drag_col, target_col)
-                QApplication.processEvents()
                 e.setDropAction(Qt.CopyAction)
-                QApplication.processEvents()
                 e.accept()
-                QApplication.processEvents()
             elif e.mimeData().hasFormat("structure_tree/move-wid"):
                 # move要将原有的删除
                 data = e.mimeData().data("structure_tree/move-wid")
@@ -210,17 +200,12 @@ class WidgetIconArea(QFrame):
                         target_col = self.widget_icon_table.getColumnToBack(e.pos().x())
                         self.widget_icon_table.moveWidgetIcon(drag_col, target_col)
                     # end
-                    QApplication.processEvents()
                     self.signHide.emit()
-                    QApplication.processEvents()
                     if target_col != -1:
                         self.widgetIconMove.emit(self.widget_icon_table.cellWidget(1, target_col).widget_id, drag_col,
                                                  target_col)
-                    QApplication.processEvents()
                     e.setDropAction(Qt.CopyAction)
-                    QApplication.processEvents()
                     e.accept()
-                    QApplication.processEvents()
                 else:
                     # 相当于add一个已有widget_id的widget_icon
                     # 先直接放入末尾(非最后一列的意思)，因为这样省事
@@ -237,13 +222,9 @@ class WidgetIconArea(QFrame):
                     self.widgetIconAdd.emit(self.widget_id, widget_id, name, Info.WidgetMove, '')
                     self.widgetIconMove.emit(widget_id, drag_col, target_col)
                     # end
-                    QApplication.processEvents()
                     self.signHide.emit()
-                    QApplication.processEvents()
                     e.setDropAction(Qt.CopyAction)
-                    QApplication.processEvents()
                     e.accept()
-                    QApplication.processEvents()
             elif e.mimeData().hasFormat("structure_tree/copy-wid"):
                 data = e.mimeData().data("structure_tree/copy-wid")
                 stream = QDataStream(data, QIODevice.ReadOnly)
@@ -262,17 +243,11 @@ class WidgetIconArea(QFrame):
                     self.widget_icon_table.moveWidgetIcon(drag_col, target_col)
 
                 # end
-                QApplication.processEvents()
                 self.signHide.emit()
-                QApplication.processEvents()
                 self.widgetIconAdd.emit(self.widget_id, new_widget_id, name, Info.WidgetCopy, old_widget_id)
-                QApplication.processEvents()
                 self.widgetIconMove.emit(new_widget_id, drag_col, target_col)
-                QApplication.processEvents()
                 e.setDropAction(Qt.CopyAction)
-                QApplication.processEvents()
                 e.accept()
-                QApplication.processEvents()
             elif e.mimeData().hasFormat("structure_tree/refer-wid"):
                 data = e.mimeData().data("structure_tree/refer-wid")
                 stream = QDataStream(data, QIODevice.ReadOnly)
@@ -298,17 +273,12 @@ class WidgetIconArea(QFrame):
                         target_col = self.widget_icon_table.getColumnToBack(e.pos().x())
                         self.widget_icon_table.moveWidgetIcon(drag_col, target_col)
                     # end
-                    QApplication.processEvents()
                     self.signHide.emit()
-                    QApplication.processEvents()
                     if target_col != -1:
                         self.widgetIconMove.emit(self.widget_icon_table.cellWidget(1, target_col).widget_id, drag_col,
                                                  target_col)
-                    QApplication.processEvents()
                     e.setDropAction(Qt.CopyAction)
-                    QApplication.processEvents()
                     e.accept()
-                    QApplication.processEvents()
                 else:
                     widget_type = old_widget_id.split('.')[0]
                     # 先直接放入末尾(非最后一列)，因为这样省事
@@ -323,34 +293,19 @@ class WidgetIconArea(QFrame):
                         self.widget_icon_table.moveWidgetIcon(drag_col, target_col)
 
                     # end
-                    QApplication.processEvents()
                     self.signHide.emit()
-                    QApplication.processEvents()
-                    QApplication.processEvents()
                     self.widgetIconAdd.emit(self.widget_id, new_widget_id, name, Info.WidgetRefer, old_widget_id)
-                    QApplication.processEvents()
                     self.widgetIconMove.emit(new_widget_id, drag_col, target_col)
-                    QApplication.processEvents()
                     e.setDropAction(Qt.CopyAction)
-                    QApplication.processEvents()
                     e.accept()
-                    QApplication.processEvents()
                 # end
-                QApplication.processEvents()
                 self.signHide.emit()
-                QApplication.processEvents()
                 e.setDropAction(Qt.CopyAction)
-                QApplication.processEvents()
                 e.accept()
-                QApplication.processEvents()
             else:
-                QApplication.processEvents()
                 e.ignore()
-                QApplication.processEvents()
         except Exception as e:
-            QApplication.processEvents()
             self.signHide.emit()
-            QApplication.processEvents()
             print(f"error {e} happens in drop in widget icon area. [widget_icon_area/main.py]")
 
     def dragLeaveEvent(self, e):
