@@ -1,9 +1,13 @@
-import winreg
-import ctypes, sys
-from subprocess import check_call
+import ctypes
+import sys
 
 
 def writeToRegistry(ico_path: str, file_suffix: str = "psy"):
+    try:
+        import winreg
+    except:
+        print("Winreg not founded")
+        return
     if ctypes.windll.shell32.IsUserAnAdmin():
         key = winreg.HKEY_CLASSES_ROOT
         a = winreg.CreateKey(key, f".{file_suffix}")
@@ -26,7 +30,8 @@ def refresh():
 
     result = ctypes.c_long()
     SendMessageTimeoutW = ctypes.windll.user32.SendMessageTimeoutW
-    SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, u'Environment', SMTO_ABORTIFHUNG, 5000, ctypes.byref(result))
+    SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, u'Environment', SMTO_ABORTIFHUNG, 5000,
+                        ctypes.byref(result))
 
 
 if __name__ == "__main__":

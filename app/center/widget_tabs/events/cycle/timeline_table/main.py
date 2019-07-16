@@ -82,15 +82,20 @@ class TimelineTable(QTableWidget):
         self.right_button_menu = QMenu()
         self.copy_action = QAction("Copy", self.right_button_menu)
         self.paste_action = QAction("Paste", self.right_button_menu)
+        self.clear_action = QAction("Clear", self.right_button_menu)
         self.copy_action.triggered.connect(self.copy_data)
         self.paste_action.triggered.connect(self.paste_data)
+        self.clear_action.triggered.connect(self.clear_data)
         self.right_button_menu.addAction(self.copy_action)
         self.right_button_menu.addAction(self.paste_action)
+        self.right_button_menu.addAction(self.clear_action)
         # 快捷键
-        self.copy_shortcut = QShortcut(QKeySequence("Ctrl+C"), self)
+        self.copy_shortcut = QShortcut(QKeySequence(QKeySequence.Copy), self)
         self.copy_shortcut.activated.connect(self.copy_data)
-        self.paste_shortcut = QShortcut(QKeySequence("Ctrl+V"), self)
+        self.paste_shortcut = QShortcut(QKeySequence(QKeySequence.Paste), self)
         self.paste_shortcut.activated.connect(self.paste_data)
+        self.clear_shortcut = QShortcut(QKeySequence(QKeySequence.Delete), self)
+        self.clear_shortcut.activated.connect(self.clear_data)
 
     def contextMenuEvent(self, e):
         """
@@ -603,19 +608,19 @@ class TimelineTable(QTableWidget):
             return
 
         # 检测所选择粘贴区域是否合法
-        selete_ranges = self.selectedRanges()
+        select_ranges = self.selectedRanges()
         # 没选择区域，无所谓
-        if not len(selete_ranges):
+        if not len(select_ranges):
             return
 
         # 只能有一个选择区域
-        if len(selete_ranges) != 1:
+        if len(select_ranges) != 1:
             QMessageBox.information(self, 'Warning', "This operation can't be performed on multiple selection areas.")
             return
 
         # 得到所选区域左上角坐标
-        start_row = selete_ranges[0].topRow()
-        start_col = selete_ranges[0].leftColumn()
+        start_row = select_ranges[0].topRow()
+        start_col = select_ranges[0].leftColumn()
 
         # 获取系统粘贴板
         clipboard = QApplication.clipboard()
@@ -843,3 +848,45 @@ class TimelineTable(QTableWidget):
                 e.ignore()
         else:
             e.ignore()
+
+    def clear_data(self):
+        """
+        将选中区域清空
+        :return:
+        """
+        # 获取选中区域, 支持多重区域选中
+        # 对选中区域的列进行检查，如果用户尝试清空weight，报错
+        select_ranges = self.selectedRanges()
+        select_areas = []
+        for select_range in select_ranges:
+            top_row = select_range.topRow()
+            bottom_row = select_range.bottomRow()
+            left_column = select_range.leftColumn()
+            right_column = select_range.rightColumn()
+            # 如果包含weight列，报错
+            if 0 in range(left_column, right_column + 1):
+                QMessageBox.information(self, "warning", "Weight can't be cleared.")
+                return
+            select_areas.append([range(top_row, bottom_row + 1), range(left_column, right_column + 1)])
+        # 对每一个选中区域进行清空
+        timeline_names = {}
+        for select_area in select_areas:
+            for row in select_area[0]:
+                for col in select_area[1]:
+                    # 对每个单元格进行清空，如果涉及到timeline列，要进行一个计数迭代
+                    if col == 1:
+                        timeline_name = self.item(row, col).text()
+                        if timeline_name:
+                            # 计数减1
+                            self.name_count[timeline_name] -= 1
+                            # 记录被删除的timeline_name
+                            timeline_names[timeline_name] = ""
+                    # 清空
+                    self.item(row, col).setText("")
+        # 对timeline_names进行timeline的清空
+        for timeline_name in timeline_names:
+            # 如果该timeline_name的计数为0，删除
+            if not self.name_count[timeline_name]:
+                del self.name_count[timeline_name]
+                self.timeline_delete.emit(self.name_wid[timeline_name])
+                del self.name_wid[timeline_name]

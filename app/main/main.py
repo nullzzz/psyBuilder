@@ -177,9 +177,15 @@ class PsyApplication(QMainWindow):
 
         self.linkSignals()
 
-        # delete short cut
+        # delete shortcut
         self.delete_shortcut = QShortcut(QKeySequence("BackSpace"), self)
         self.delete_shortcut.activated.connect(self.handle_delete_shortcut)
+
+        # save shortcut
+        self.save_shortcut = QShortcut(QKeySequence(QKeySequence.Save), self)
+        self.save_shortcut.activated.connect(self.save)
+        self.save_as_shortcut = QShortcut(QKeySequence(QKeySequence.SaveAs), self)
+        self.save_as_shortcut.activated.connect(self.saveAs)
 
         # 导入配置
         # Func.getConfig()
@@ -316,7 +322,8 @@ class PsyApplication(QMainWindow):
         :return:
         """
         options = QFileDialog.Options()
-        open_file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)", options=options)
+        open_file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)",
+                                                        options=options)
         if open_file_name:
             # 更新文件名
             Info.FILE_NAME = open_file_name
@@ -557,8 +564,13 @@ class PsyApplication(QMainWindow):
         对于delete快捷键进行,进行判断然后调用对应功能
         :return:
         """
-        # 如果是center，则是timeline的删除快捷键，否则可能是structure的删除快捷键
-        if self.center.isFocused():
+        # 如果是center，则是timeline的删除快捷键或者是cycle的清空，否则可能是structure的删除快捷键
+        focus = self.center.isFocused()
+        if focus == Info.CycleFocused:
+            self.center.widget_tabs.currentWidget().timeline_table.clear_data()
+        elif focus == Info.TimelineFocused:
             self.center.widget_tabs.currentWidget().widget_icon_area.widget_icon_table.deleteShortcut()
-        elif self.structure.isFocused():
-            self.structure.structure_tree.deleteNode()
+        else:
+            focus = self.structure.isFocused()
+            if focus == Info.StructureFocused:
+                self.structure.structure_tree.deleteNode()

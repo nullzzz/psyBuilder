@@ -149,3 +149,9 @@ class Info(object):
     # drag
     DragFromAttributeToLineEdit = "attributes/move-attribute"
     DragFromWidgetIconBarToWidgetIconArea = "widget_icon_bar/widget_icon_type"
+
+    # focus
+    NotFocused = 0
+    TimelineFocused = 1
+    CycleFocused = 2
+    StructureFocused = 3
