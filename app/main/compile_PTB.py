@@ -28,6 +28,7 @@ enabledKBKeysList = []
 inputDevNameIdxDict = {}
 outputDevNameIdxDict = {}
 
+previousColorFontDict = {}
 
 
 def throwCompileErrorInfo(inputStr):
@@ -151,6 +152,17 @@ def isRefStr(inputStr):
 
     return False
 
+def booleanTransStr(inputStr,isRef):
+
+    if inputStr.lower() in ["'yes'","'true'",'yes','true']:
+        inputStr = "1"
+    elif inputStr.lower() in ["'no'","'false'",'no','false']:
+        inputStr = "0"
+    else:
+        if isRef == False:
+            throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False' or 'True']  OR of ['1','0']")
+
+    return inputStr
 
 def pyStr2MatlabStr(inputStr):
     if isinstance(inputStr, str):
@@ -198,7 +210,7 @@ def addedTransparentToRGBStr(RGBStr,transparentStr):
 
 
 
-def dataStrConvert(dataStr,isRef = False):
+def dataStrConvert(dataStr,isRef = False, transMATStr = False):
     # convert string to neither a string or a num
     # e.g.,
     # 1） "2"    to 2
@@ -233,7 +245,10 @@ def dataStrConvert(dataStr,isRef = False):
                 if isRef:
                     outData = dataStr  # maybe a bug
                 else:
-                    outData = addSingleQuotes(pyStr2MatlabStr(dataStr) ) # maybe a bug
+                    if transMATStr:
+                        outData = addSingleQuotes(pyStr2MatlabStr(dataStr) ) # maybe a bug
+                    else:
+                        outData = addSingleQuotes(dataStr)  # maybe a bug
         else:
             outData = "'[]'"
 
@@ -367,7 +382,7 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
 
 
 def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
-    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict,previousColorFontDict
 
     # Step 1: print out previous widget's no stimuli related codes
     for cRowStr in noStimRelatedCodes:
@@ -387,7 +402,6 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     cProperties = Func.getProperties(cWidget.widget_id)
 
     # 1) get the win id info in matlab format winIds(idNum)
-
     cScreenName, noused = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
 
     cWinStr = f"winIds({outputDevNameIdxDict.get(cScreenName)})"
@@ -411,7 +425,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # 5) check the color parameter:
     fontColorStr    = dataStrConvert(*getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
     fontTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Transparent'], attributesSetDict))
-    print(f"line 411  {fontTransparent}")
+    # print(f"line 411  {fontTransparent}")
 
     # if isinstance(fontTransparent,(int,float)) and fontTransparent == 0:
     #     fontColorAll = fontColorStr
@@ -422,40 +436,18 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # 7) check the flip hor parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
     flipHorStr = dataStrConvert(cRefedValue, isRef)
-
-    if "'False'" == flipHorStr:
-        flipHorStr = "1"
-
-    elif "'True'" == flipHorStr:
-        flipHorStr = "0"
-    else:
-        throwCompileErrorInfo("the value of 'Flip horizontal' should be of {'False' or 'True'}  OR of {'1','0'}")
-
+    flipHorStr = booleanTransStr(dataStrConvert(flipHorStr, isRef), isRef)
 
     # 8) check the flip ver parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip vertical'], attributesSetDict)
     flipVerStr = dataStrConvert(cRefedValue, isRef)
-
-    if "'False'" == flipVerStr:
-        flipHorStr = "1"
-    elif "'True'" == flipVerStr:
-        flipVerStr = "0"
-    else:
-        if isRef == False:
-            throwCompileErrorInfo("the value of 'Flip vertical' should be of {'False' or 'True'}  OR of {'1','0'}")
+    flipVerStr = booleanTransStr(dataStrConvert(flipVerStr, isRef), isRef)
 
     """
     # 10) check the right to left parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Right to left'], attributesSetDict)
     rightToLeft = dataStrConvert(cRefedValue, isRef)
-
-    if "'False'" == flipVerStr:
-        flipHorStr = "1"
-    elif "'True'" == flipVerStr:
-        flipVerStr = "0"
-    else:
-        if isRef == False:
-            throwCompileErrorInfo("the value of 'Flip vertical' should be of {'False' or 'True'}  OR of {'1','0'}")
+    rightToLeft = booleanTransStr(dataStrConvert(rightToLeft, isRef), isRef)
     """
     rightToLeft = 0
 
@@ -476,14 +468,20 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     borderWidth    = dataStrConvert(*getRefValue(cWidget, cProperties['Border width'], attributesSetDict))
     frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame fill color'], attributesSetDict))
 
+    # if f"preFrameFillColor" not in previousColorFontDict:
     # frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
 
-    frameTransparent = 0
+    frameTransparent = 1
 
+
+
+    if (frameFillColor == previousColorFontDict[cScreenName]) and (frameTransparent in [1,255]):
+        printAutoInd(f, "Screen('FillRect',winIds({0}),{1},{2});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr)
+
+    # draw the frame only when the frame color is different from the frame fill color
     if borderColor != frameFillColor:
-        printAutoInd(f, "Screen('FillRect',winIds({0}),{1},{2});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr,borderWidth)
+        printAutoInd(f, "Screen('frameRect',winIds({0}),{1},{2},{3});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr,borderWidth)
 
-    printAutoInd(f, "Screen('FillRect',winIds({0}),{1},{2});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr)
 
 
 
@@ -505,11 +503,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
 
     clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-
-    if "'Yes'" == clearAfter:
-        clearAfter = "1"
-    elif "'No'" == clearAfter:
-        clearAfter = "0"
+    clearAfter = booleanTransStr(dataStrConvert(clearAfter, isRef), isRef)
 
     printAutoInd(f, "Screen('DrawingFinished',winIds({0}),{1});",cWinStr,clearAfter)
 
@@ -693,12 +687,16 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
 
 def compilePTB(globalSelf):
-    global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict,cIndents
+    global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict,cIndents,previousColorFontDict
+
+    previousColorFontDict.update({'clearAfter',"0"})
 
     cIndents = 0
 
     inputDevNameIdxDict = {}
     outputDevNameIdxDict = {}
+
+    previousColorFontDict = {}
 
     enabledKBKeysList = []
     enabledKBKeysList.append('escape')
@@ -753,6 +751,7 @@ def compilePTB(globalSelf):
         printAutoInd(f,"RandStream.setGlobalStream(cRandSeed);")
         printAutoInd(f,"%-----------------------------------------------------\\\n")
         printAutoInd(f,"hideCursor;            % hide mouse cursor")
+        printAutoInd(f,"commandwindow;         % bring the command window into front")
 
         printAutoInd(f,"if isWin")
         printAutoInd(f,"ShowHideWinTaskbar(0); % hide the window taskbar")
@@ -806,6 +805,8 @@ def compilePTB(globalSelf):
 
             if output_devices[output_device]['Device Type'] == 'screen':
                 outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"{iMonitor}"})
+
+                previousColorFontDict.update({output_devices[output_device]['Device Name']:addSquBrackets(output_devices[output_device]['Back Color'])})
 
                 printAutoInd(f,"monitors({0}).port       =  {1};",iMonitor,output_devices[output_device]['Device Port'])
                 printAutoInd(f,"monitors({0}).name       = '{1}';",iMonitor,output_devices[output_device]['Device Name'])
