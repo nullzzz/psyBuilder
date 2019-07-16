@@ -164,6 +164,28 @@ def booleanTransStr(inputStr,isRef):
 
     return inputStr
 
+
+def fontStyleTransStr(inputStr):
+    if inputStr == "'normal_0'":
+        inputStr = '0'
+    elif inputStr == "'bold_1'":
+        inputStr = '1'
+    elif inputStr == "'italic_2'":
+        inputStr = '2'
+    elif inputStr == "'underline_4'":
+        inputStr = '4'
+    elif inputStr == "'outline_8'":
+        inputStr = '8'
+    elif inputStr == "'overline_16'":
+        inputStr = '16'
+    elif inputStr == "'condense_32'":
+        inputStr = '32'
+    elif inputStr == "'extend_64'":
+        inputStr = '64'
+
+    return inputStr
+
+
 def pyStr2MatlabStr(inputStr):
     if isinstance(inputStr, str):
         inputStr = re.sub("'","''",inputStr)
@@ -401,6 +423,8 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
 
     cProperties = Func.getProperties(cWidget.widget_id)
 
+
+
     # 1) get the win id info in matlab format winIds(idNum)
     cScreenName, noused = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
 
@@ -410,7 +434,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     cProperties['Text'],noused = getRefValue(cWidget,cProperties['Text'],attributesSetDict)
 
     if isContainChStr(cProperties['Text']):
-        cProperties['Text'] = "double('"+pyStr2MatlabStr(cProperties['Text'])+"')"
+        cProperties['Text'] = "["+ "".join(f"{ord(value)} " for value in cProperties['Text']) +"]"
     else:
         cProperties['Text'] = "'" + pyStr2MatlabStr(cProperties['Text']) + "'"
 
@@ -425,29 +449,19 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # 5) check the color parameter:
     fontColorStr    = dataStrConvert(*getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
     fontTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Transparent'], attributesSetDict))
-    # print(f"line 411  {fontTransparent}")
-
-    # if isinstance(fontTransparent,(int,float)) and fontTransparent == 0:
-    #     fontColorAll = fontColorStr
-    # else:
-    #     fontColorAll = addedTransparentToRGBStr(fontColorStr, f"{fontTransparent}*255")
-
 
     # 7) check the flip hor parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
-    flipHorStr = dataStrConvert(cRefedValue, isRef)
-    flipHorStr = booleanTransStr(dataStrConvert(flipHorStr, isRef), isRef)
+    flipHorStr = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
 
     # 8) check the flip ver parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip vertical'], attributesSetDict)
-    flipVerStr = dataStrConvert(cRefedValue, isRef)
-    flipVerStr = booleanTransStr(dataStrConvert(flipVerStr, isRef), isRef)
+    flipVerStr = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
 
     """
     # 10) check the right to left parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Right to left'], attributesSetDict)
-    rightToLeft = dataStrConvert(cRefedValue, isRef)
-    rightToLeft = booleanTransStr(dataStrConvert(rightToLeft, isRef), isRef)
+    rightToLeft = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
     """
     rightToLeft = 0
 
@@ -463,6 +477,46 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
 
     frameRectStr = f"makeFrameRect({sx}, {sy}, {cWdith}, {cHeight}, fullRects({outputDevNameIdxDict.get(cScreenName)},:))"
 
+
+    # set the font name size color style:
+    fontName = dataStrConvert(*getRefValue(cWidget, cProperties['Font family'], attributesSetDict))
+
+    fontSize = dataStrConvert(*getRefValue(cWidget, cProperties['Font size'], attributesSetDict))
+
+    fontStyle = dataStrConvert(*getRefValue(cWidget, cProperties['Style'], attributesSetDict))
+    fontStyle = fontStyleTransStr(fontStyle)
+
+    fontBkColor = dataStrConvert(*getRefValue(cWidget, cProperties['Back color'], attributesSetDict))
+
+    # print('------------------------------------/')
+    # print(fontName)
+    # print(fontSize)
+    # print(fontStyle)
+    # print(fontBkColor)
+    # print('------------------------------------\\')
+    #
+    # print(previousColorFontDict)
+
+    #  font name
+    if previousColorFontDict['fontName'] != fontName:
+        printAutoInd(f, "Screen('TextFont',winIds({0}),{1});", cWinStr, fontName)
+        previousColorFontDict.update({'fontName': fontName})
+
+    # font size
+    if previousColorFontDict['fontSize'] != fontSize:
+        printAutoInd(f, "Screen('TextSize',winIds({0}),{1});", cWinStr, fontSize)
+        previousColorFontDict.update({'fontSize': fontSize})
+
+    # font style
+    if previousColorFontDict['fontStyle'] != fontStyle:
+        printAutoInd(f, "Screen('TextStyle',winIds({0}),{1});", cWinStr, fontStyle)
+        previousColorFontDict.update({'fontStyle': fontStyle})
+
+    # font background color
+    if previousColorFontDict['fontBkColor'] != fontBkColor:
+        printAutoInd(f, "Screen('TextBackgroundColor\n',winIds({0}),{1});", cWinStr, fontBkColor)
+        previousColorFontDict.update({'fontBkColor': fontBkColor})
+
     # before we draw the formattedtext， we draw the frame rect first:
     borderColor    = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
     borderWidth    = dataStrConvert(*getRefValue(cWidget, cProperties['Border width'], attributesSetDict))
@@ -471,8 +525,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # if f"preFrameFillColor" not in previousColorFontDict:
     # frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
 
-    frameTransparent = 1
-
+    frameTransparent = 1 # suppose we have added this parameter
 
 
     if (frameFillColor == previousColorFontDict[cScreenName]) and (frameTransparent in [1,255]):
@@ -482,11 +535,10 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     if borderColor != frameFillColor:
         printAutoInd(f, "Screen('frameRect',winIds({0}),{1},{2},{3});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr,borderWidth)
 
+        # cRefedValue, isRef = getRefValue(cWidget, cProperties['Font family'], attributesSetDict)
 
 
-
-
-
+    #  print out the text
     printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3},{4},{5},{6},{7},[],{8},{9});", \
                  cWinStr, \
                  cProperties['Text'], \
@@ -502,8 +554,8 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
 
-    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-    clearAfter = booleanTransStr(dataStrConvert(clearAfter, isRef), isRef)
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Clear after'], attributesSetDict)
+    clearAfter         = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
 
     printAutoInd(f, "Screen('DrawingFinished',winIds({0}),{1});",cWinStr,clearAfter)
 
@@ -689,14 +741,20 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 def compilePTB(globalSelf):
     global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict,cIndents,previousColorFontDict
 
-    previousColorFontDict.update({'clearAfter',"0"})
+    previousColorFontDict = {}
+
+    previousColorFontDict.update({'clearAfter':"0"})
+    previousColorFontDict.update({'fontName':"simSun"})
+    previousColorFontDict.update({'fontSize':"12"})
+    previousColorFontDict.update({'fontStyle':"0"})
+    previousColorFontDict.update({'fontBkColor':"[259,0,0]"}) # we give the bkcolor an impossible initial value
+    # previousColorFontDict.update({'clearAfter':"0"})
 
     cIndents = 0
 
     inputDevNameIdxDict = {}
     outputDevNameIdxDict = {}
 
-    previousColorFontDict = {}
 
     enabledKBKeysList = []
     enabledKBKeysList.append('escape')
@@ -713,10 +771,11 @@ def compilePTB(globalSelf):
     # get save path
     compile_file_name = ".".join(Info.FILE_NAME.split('.')[:-1]) + ".m"
     # open file
-    with open(compile_file_name, "w") as f:
+    with open(compile_file_name, "w", encoding="GBK") as f:
         #  print function start info
         cFilenameOnly = os.path.split(compile_file_name)[1].split('.')[0]
         # the help info
+
         printAutoInd(f,"function {0}()",cFilenameOnly)
         printAutoInd(f,"% function generated by PTB Builder 0.1")
         printAutoInd(f,"% If you use PTB Builder for your research, then we would appreciate your citing our work in your paper:")
