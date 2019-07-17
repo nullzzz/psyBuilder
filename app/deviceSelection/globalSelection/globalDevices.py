@@ -153,7 +153,6 @@ class GlobalDevice(QWidget):
     # 参数导入
     def setProperties(self, properties: dict):
         self.selected_devices.clearAll()
-        # print(properties)
         self.selected_devices.setProperties(properties)
         # 更新全局信息
         if self.device_type:

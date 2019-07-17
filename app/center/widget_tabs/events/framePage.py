@@ -15,8 +15,11 @@ class FramePage(QWidget):
             "Y position": "0",
             "Width": "100%",
             "Height": "100%",
+            "Enable": "yes",
             "Border color": "255,255,255",
-            "Border width": "0"
+            "Border width": "0",
+            "Frame fill color": "255,255,255",
+            "Frame transparent": "100%"
         }
         # up
         self.x_pos = PigComboBox()
@@ -28,10 +31,21 @@ class FramePage(QWidget):
         self.width.installEventFilter(self)
         self.height.installEventFilter(self)
         # down
+        self.enable = PigComboBox()
+        self.enable.addItems(("yes", "no"))
+        self.enable.currentTextChanged.connect(self.operationAble)
         self.border_color = ColorListEditor()
         self.border_width = PigLineEdit()
         self.back_color = ColorListEditor()
+        self.transparent = PigLineEdit()
+        # self.transparent.setSuffix("%")
         self.setUI()
+
+    def operationAble(self, signal):
+        self.border_color.setEnabled(signal == "yes")
+        self.border_width.setEnabled(signal == "yes")
+        self.back_color.setEnabled(signal == "yes")
+        self.transparent.setEnabled(signal == "yes")
 
     # 生成frame页面
     def setUI(self):
@@ -56,16 +70,20 @@ class FramePage(QWidget):
         l2 = QLabel("Y position:")
         l3 = QLabel("Width:")
         l4 = QLabel("Height:")
+        l45 = QLabel("Enable:")
         l5 = QLabel("Border Color:")
         l6 = QLabel("Border Width:")
         l7 = QLabel("Back Color:")
+        l8 = QLabel("Transparent:")
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l45.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l8.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         group1 = QGroupBox("Geometry")
         layout1 = QGridLayout()
         layout1.addWidget(l1, 0, 0)
@@ -80,9 +98,12 @@ class FramePage(QWidget):
 
         group2 = QGroupBox("Border")
         layout2 = QFormLayout()
+
+        layout2.addRow(l45, self.enable)
         layout2.addRow(l5, self.border_color)
         layout2.addRow(l6, self.border_width)
         layout2.addRow(l7, self.back_color)
+        layout2.addRow(l8, self.transparent)
         layout2.setVerticalSpacing(20)
         group2.setLayout(layout2)
 
@@ -129,9 +150,11 @@ class FramePage(QWidget):
         else:
             self.default_properties["Height"] = "100%"
             self.height.setCurrentText("100%")
+        self.default_properties["Enable"] = self.enable.currentText()
         self.default_properties["Border color"] = self.border_color.getColor()
         self.default_properties["Border width"] = self.border_width.text()
         self.default_properties["Frame fill color"] = self.back_color.getColor()
+        self.default_properties["Frame transparent"] = self.transparent.text()
         return self.default_properties
 
     def getProperties(self):
@@ -140,9 +163,11 @@ class FramePage(QWidget):
         self.default_properties["Y position"] = self.y_pos.currentText()
         self.default_properties["Width"] = self.width.currentText()
         self.default_properties["Height"] = self.height.currentText()
+        self.default_properties["Enable"] = self.enable.currentText()
         self.default_properties["Border color"] = self.border_color.getColor()
         self.default_properties["Border width"] = self.border_width.text()
         self.default_properties["Frame fill color"] = self.back_color.getColor()
+        self.default_properties["Frame transparent"] = self.transparent.text()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -155,9 +180,11 @@ class FramePage(QWidget):
         self.y_pos.setCurrentText(self.default_properties["Y position"])
         self.width.setCurrentText(self.default_properties["Width"])
         self.height.setCurrentText(self.default_properties["Height"])
+        self.enable.setCurrentText( self.default_properties["Enable"])
         self.border_color.setCurrentText(self.default_properties["Border color"])
         self.border_width.setText(self.default_properties["Border width"])
         self.back_color.setCurrentText(self.default_properties["Frame fill color"])
+        self.transparent.setText(self.default_properties["Frame transparent"])
 
     def clone(self):
         clone_page = FramePage()

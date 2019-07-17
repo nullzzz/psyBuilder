@@ -33,7 +33,7 @@ class Device(QListWidgetItem):
         self.back_color = "0,0,0"
         self.sample = "0"
         # parallel
-        self.client: int = 1
+        self.is_client: int = 1
         # net
         self.ip_port = "25576"
         # serial
@@ -77,7 +77,7 @@ class Device(QListWidgetItem):
         return ""
 
     def setPort(self, port: str):
-        if port.startswith("screen"):
+        if port.startswith("screen") or port.startswith("sound"):
             self.port = port.split(".")[-1]
         elif port.startswith("serial_port"):
             self.port = f"com{port.split('.')[-1]}"
@@ -99,7 +99,7 @@ class Device(QListWidgetItem):
         self.data_bits = bits
 
     def setClient(self, client):
-        self.client = client
+        self.is_client = client
 
     def setIpPort(self, ip_port):
         self.ip_port = ip_port
@@ -114,6 +114,10 @@ class Device(QListWidgetItem):
         self.setPort(self.default_properties["Device Port"])
         self.setColor(self.default_properties.get("Back Color", "0,0,0"))
         self.setPort(self.default_properties.get("Multi Sample", "0"))
+        self.setBaud(self.default_properties.get("Baud Rate", "9600"))
+        self.setBits(self.default_properties.get("Data Bits", "8"))
+        self.setIpPort(self.default_properties.get("IP Port", "25576"))
+        self.setClient(self.default_properties.get("Is Client", "1"))
 
     def getInfo(self) -> dict:
         self.default_properties["Device Name"] = self.text()
@@ -123,5 +127,5 @@ class Device(QListWidgetItem):
         self.default_properties["Baud Rate"] = self.baud_rate
         self.default_properties["Data Bits"] = self.data_bits
         self.default_properties["IP Port"] = self.ip_port
-        self.default_properties["Is Client"] = self.client
+        self.default_properties["Is Client"] = self.is_client
         return self.default_properties

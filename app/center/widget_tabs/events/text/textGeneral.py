@@ -75,6 +75,9 @@ class TextTab1(QWidget):
 
         self.font_size_box.currentIndexChanged.connect(self.fontChange)
         self.screen_name.currentTextChanged.connect(self.changeDevice)
+
+        self.right_to_left = PigComboBox()
+        self.right_to_left.addItems(("no", "yes"))
         self.using_device_id = "screen.0"
         self.setUI()
 
@@ -99,6 +102,7 @@ class TextTab1(QWidget):
         l50 = QLabel("Font Family:")
         l52 = QLabel("Style:")
         l60 = QLabel("Font Size:")
+        l70 = QLabel("Right to Left:")
 
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l00.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -114,6 +118,7 @@ class TextTab1(QWidget):
         l50.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l52.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l60.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l70.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         self.align_x.addItems(["center", "left", "right", "wrapat", "justifytomax"])
         self.align_y.addItem("center")
@@ -161,6 +166,8 @@ class TextTab1(QWidget):
         layout2.addWidget(self.style_box, 6, 3)
         layout2.addWidget(l60, 6, 0)
         layout2.addWidget(self.font_size_box, 6, 1)
+        layout2.addWidget(l70, 7, 0)
+        layout2.addWidget(self.right_to_left, 7, 1)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
@@ -289,6 +296,7 @@ class TextTab1(QWidget):
         self.default_properties["Style"] = self.style_box.currentText()
         self.default_properties["Flip horizontal"] = self.flip_horizontal.currentText()
         self.default_properties["Flip vertical"] = self.flip_vertical.currentText()
+        self.default_properties["Right to left"] = self.right_to_left.currentText()
 
         return self.default_properties
 
@@ -314,6 +322,7 @@ class TextTab1(QWidget):
 
         self.flip_horizontal.setCurrentText(self.default_properties["Flip horizontal"])
         self.flip_vertical.setCurrentText(self.default_properties["Flip vertical"])
+        self.right_to_left.setCurrentText(self.default_properties["Right to left"])
 
     def clone(self):
         clone_page = TextTab1()

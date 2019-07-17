@@ -97,6 +97,9 @@ class PigLineEdit(QLineEdit):
         self.setAcceptDrops(True)
         self.textChanged.connect(self.findVar)
 
+        self.suffix: str = ""
+        self.textChanged.connect(self.addSuffix)
+
     def dragEnterEvent(self, e):
         if e.mimeData().hasFormat("attributes/move-attribute"):
             e.accept()
@@ -117,6 +120,21 @@ class PigLineEdit(QLineEdit):
         else:
             self.setStyleSheet("color: black")
             self.setFont(QFont("宋体", 9, QFont.Normal))
+
+    def setSuffix(self, suffix: str):
+        self.suffix = suffix
+
+    def setText(self, a0: str) -> None:
+        if not a0.endswith(self.suffix):
+            text = a0 + self.suffix
+        else:
+            text = a0
+        return QLineEdit.setText(self, text)
+
+    def addSuffix(self, text: str):
+        if text != "" and not text.endswith(self.suffix):
+            self.setText(text.replace(self.suffix, "") + self.suffix)
+            self.cursorForward(False)
 
 
 class ColorListEditor(PigComboBox):

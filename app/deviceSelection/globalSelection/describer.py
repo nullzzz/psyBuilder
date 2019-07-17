@@ -238,7 +238,7 @@ class Describer(QWidget):
         self.parallel = Parallel(self)
         self.serial = Serial(self)
         self.sound = Shower(self)
-        self.sound.setBasicUI("Index:")
+        self.sound.setBasicUI("Device Index:")
         self.other = Shower(self)
         self.other.setBasicUI()
 
