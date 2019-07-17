@@ -1,18 +1,7 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtWidgets import QCompleter, QMessageBox, QListWidgetItem, QLabel, QWidget, QComboBox, QFormLayout, \
-    QGridLayout
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QListWidgetItem
 
 from app.func import Func
-# 重写下方输入设备
-from app.lib import PigComboBox, PigLineEdit
-
-from PyQt5.QtCore import Qt, QRegExp, QObject, QEvent
-from PyQt5.QtGui import QIcon, QFont, QRegExpValidator
-from PyQt5.QtWidgets import QCompleter, QMessageBox, QComboBox, QFormLayout, QListWidgetItem, QWidget
-
-from app.func import Func
-from app.lib import PigComboBox, PigLineEdit
 
 
 class DeviceInItem(QListWidgetItem):
@@ -30,8 +19,8 @@ class DeviceInItem(QListWidgetItem):
             "Device Type": self.device_type,
             "Allowable": "",
             "Correct": "",
-            "RT window": "",
-            "End action": "",
+            "RT Window": "",
+            "End Action": "",
             "Right": "",
             "Wrong": "",
             "No Resp": "",

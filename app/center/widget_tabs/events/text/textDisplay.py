@@ -290,6 +290,13 @@ class TextDisplay(QMainWindow):
         """
         return self.pro_window.general.word_wrap.text()
 
+    def getRightToLeft(self) ->str:
+        """
+        返回right to left
+        :return:
+        """
+        return self.pro_window.general.right_to_left.currentText()
+
     def getXAxisCoordinates(self) -> str:
         """
         返回x坐标值
@@ -303,6 +310,17 @@ class TextDisplay(QMainWindow):
         :return:
         """
         return self.y_pos
+
+    def getEnable(self) -> str:
+        """
+        返回frame enable
+        :return:
+        """
+        return self.pro_window.frame.enable.currentText()
+
+    def getFrameTransparent(self) -> str:
+        """返回frame transparent"""
+        return self.pro_window.frame.transparent.text()
 
     def getWidth(self) -> str:
         """

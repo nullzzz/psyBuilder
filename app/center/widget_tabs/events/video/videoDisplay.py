@@ -353,6 +353,17 @@ class VideoDisplay(QMainWindow):
         """
         return self.pro_window.frame.height.currentText()
 
+    def getEnable(self) -> str:
+        """
+        返回frame enable
+        :return:
+        """
+        return self.pro_window.frame.enable.currentText()
+
+    def getFrameTransparent(self) -> str:
+        """返回frame transparent"""
+        return self.pro_window.frame.transparent.text()
+
     def getBorderColor(self) -> str:
         """
         返回边框颜色

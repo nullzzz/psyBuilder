@@ -689,7 +689,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 def compilePTB(globalSelf):
     global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict,cIndents,previousColorFontDict
 
-    previousColorFontDict.update({'clearAfter',"0"})
+    previousColorFontDict.update({'clearAfter':"0"})
 
     cIndents = 0
 
