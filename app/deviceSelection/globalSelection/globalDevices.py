@@ -13,8 +13,6 @@ class GlobalDevice(QWidget):
     """
     :param io_type: 输出、输入设备
     """
-    InputDevice = 0
-    OutputDevice = 1
     # 发送到duration的类变量中最为合适 (device_type, devices: name->type)
     deviceSelect = pyqtSignal(int, dict)
     deviceNameChanged = pyqtSignal(str, str)
@@ -37,7 +35,7 @@ class GlobalDevice(QWidget):
         self.device_type = io_type
 
         # device_list是写死的
-        if io_type:
+        if io_type == Info.OUTPUT_DEVICE:
             self.devices = ("serial_port", "parallel_port", "network_port", "screen", "sound")
             self.setWindowTitle("Output Devices")
         else:
@@ -61,7 +59,8 @@ class GlobalDevice(QWidget):
         self.describer.baudChanged.connect(self.changeBaud)
         self.describer.bitsChanged.connect(self.changeBits)
         self.describer.clientChanged.connect(self.changeClient)
-
+        self.describer.samplingRateChanged.connect(self.changeSamplingRate)
+        # 按键区
         self.ok_bt = QPushButton("OK")
         self.ok_bt.clicked.connect(self.ok)
         self.cancel_bt = QPushButton("Cancel")
@@ -115,8 +114,11 @@ class GlobalDevice(QWidget):
     def changeIpPort(self, ip_port: str):
         self.selected_devices.changeCurrentIpPort(ip_port)
 
-    def changeClient(self, client: int):
+    def changeClient(self, client: str):
         self.selected_devices.changeCurrentClient(client)
+
+    def changeSamplingRate(self, sampling_rate: str):
+        self.selected_devices.changeCurrentSamplingRate(sampling_rate)
 
     def changeBaud(self, baud: str):
         self.selected_devices.changeCurrentBaud(baud)
@@ -159,15 +161,3 @@ class GlobalDevice(QWidget):
             Info.OUTPUT_DEVICE_INFO.update(properties)
         else:
             Info.INPUT_DEVICE_INFO.update(properties)
-
-
-if __name__ == "__main__":
-    import sys
-
-    app = QApplication(sys.argv)
-
-    t = GlobalDevice(1)
-
-    t.show()
-
-    sys.exit(app.exec())

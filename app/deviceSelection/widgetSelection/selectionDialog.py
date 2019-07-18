@@ -3,13 +3,14 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QListWidgetItem, QGridLayout, QDialog, QListWidget, QPushButton, QListView, QLabel
 
 from app.func import Func
+from app.info import Info
 
 
 class SelectionDialog(QDialog):
     def __init__(self, io_type: int = 0, parent=None):
         super(SelectionDialog, self).__init__(parent)
         self.devices_list = QListWidget()
-        if io_type == 0:
+        if io_type == Info.INPUT_DEVICE:
             self.tip = QLabel("Please choose input device(s) from menu bar first!")
             self.setWindowTitle("Choose Input Device(s)")
         else:

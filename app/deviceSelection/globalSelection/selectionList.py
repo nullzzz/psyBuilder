@@ -99,7 +99,7 @@ class SelectArea(QListWidget):
             if item:
                 self.contextMenu.exec_(QCursor.pos())  # 在鼠标位置显示
 
-    def changeItem(self, item: Device):
+    def changeItem(self, item: Device, item_1: Device):
         if item:
             self.itemChanged.emit(item.getType(), item.getName(), item.getPort(), item.getInfo())
 
@@ -110,8 +110,8 @@ class SelectArea(QListWidget):
         self.delete_buffer.clear()
 
         # 更新default_properties
+        self.default_properties.clear()
         for i in range(self.count()):
-            # 我也不知道为什么要加copy，不加的话
             key = self.item(i).getDeviceId()
             info: dict = self.item(i).getInfo()
             self.default_properties[key] = info.copy()
@@ -200,7 +200,13 @@ class SelectArea(QListWidget):
         self.device_name.remove(device_name.lower())
         # 记录到缓冲区
         if record:
-            self.delete_buffer.append((device_id, device_type, device_name, device_port))
+            record_flag = True
+            for i in self.add_buffer:
+                if device_id == i[0]:
+                    record_flag = False
+                    break
+            if record_flag:
+                self.delete_buffer.append((device_id, device_type, device_name, device_port))
 
     def createDevice(self, device_type, device_id=None, device_name=None, device_port=None, record: bool = True):
         """
@@ -254,10 +260,15 @@ class SelectArea(QListWidget):
         if isinstance(item, Device):
             item.setBits(bits)
 
-    def changeCurrentClient(self, client: int):
+    def changeCurrentClient(self, client: str):
         item: Device = self.currentItem()
         if isinstance(item, Device):
             item.setClient(client)
+
+    def changeCurrentSamplingRate(self, sampling_rate: str):
+        item: Device = self.currentItem()
+        if isinstance(item, Device):
+            item.setSamplingRate(sampling_rate)
 
     def changeCurrentIpPort(self, ip_port: str):
         item: Device = self.currentItem()

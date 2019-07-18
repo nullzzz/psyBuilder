@@ -1,6 +1,6 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QIcon, QTextOption, QFont
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QTextEdit
 
 from app.center.widget_tabs.events.text.textProperty import TextProperty

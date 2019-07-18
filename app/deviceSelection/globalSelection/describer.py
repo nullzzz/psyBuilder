@@ -10,8 +10,9 @@ class Shower(QWidget):
     sampleChanged = pyqtSignal(str)
     ipPortChanged = pyqtSignal(str)
     baudChanged = pyqtSignal(str)
-    bitsChanged = pyqtSignal(int)
-    clientChanged = pyqtSignal(int)
+    bitsChanged = pyqtSignal(str)
+    clientChanged = pyqtSignal(str)
+    samplingRateChanged = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(Shower, self).__init__(parent)
@@ -21,12 +22,12 @@ class Shower(QWidget):
         self.device_port.textEdited.connect(self.showAddressTip)
         self.port_tip = QLabel("")
 
-    def setBasicUI(self, port_tip: str = "Device Port:"):
+    def setUI(self):
         layout = QFormLayout()
         layout.setLabelAlignment(Qt.AlignRight)
         layout.addRow("Device Type:", self.device_type)
         layout.addRow("Device Name:", self.device_name)
-        layout.addRow(port_tip, self.device_port)
+        layout.addRow("Device Port:", self.device_port)
         layout.addRow("", self.port_tip)
         self.setLayout(layout)
 
@@ -117,11 +118,9 @@ class Net(Shower):
     def __init__(self, parent=None):
         super(Net, self).__init__(parent=parent)
         self.device_ip_port = QLineEdit()
-        # self.device_port.
         self.device_ip_port.textEdited.connect(lambda x: self.ipPortChanged.emit(x))
-
         self.is_client = QCheckBox()
-        self.is_client.stateChanged.connect(lambda x: self.clientChanged.emit(x))
+        self.is_client.stateChanged.connect(self.changeClient)
         self.setUI()
 
     def setUI(self):
@@ -138,34 +137,13 @@ class Net(Shower):
     def describe(self, device_type, device_name, device_address, others):
         super().describe(device_type, device_name, device_address, others)
         self.device_ip_port.setText(others.get("IP Port", "25576"))
-        self.is_client.setChecked(others.get("Is Client", 0))
+        self.is_client.setChecked(others.get("Is Client", "yes") == "yes")
 
-
-class Parallel(Shower):
-    def __init__(self, parent=None):
-        super(Parallel, self).__init__(parent=parent)
-        # self.device_ip_port = QLineEdit()
-        # self.device_port.
-        # self.device_ip_port.textEdited.connect(lambda x: self.ipPortChanged.emit(x))
-        # self.is_client = QCheckBox()
-        # self.is_client.stateChanged.connect(lambda x: self.clientChanged.emit(x))
-        self.setUI()
-
-    def setUI(self):
-        layout = QFormLayout()
-        layout.setLabelAlignment(Qt.AlignRight)
-        layout.addRow("Device Type:", self.device_type)
-        layout.addRow("Device Name:", self.device_name)
-        layout.addRow("Device Port:", self.device_port)
-        # layout.addRow("IP Port:", self.device_ip_port)
-        # layout.addRow("Is Client:", self.is_client)
-        layout.addRow("", self.port_tip)
-        self.setLayout(layout)
-
-    def describe(self, device_type, device_name, device_address, others):
-        super().describe(device_type, device_name, device_address, others)
-        # self.device_port.setText(others.get("IP Port", "25576"))
-        # self.is_client.setChecked(others.get("Is Client", 0))
+    def changeClient(self, state):
+        if state:
+            self.clientChanged.emit("yes")
+        else:
+            self.clientChanged.emit("no")
 
 
 class Serial(Shower):
@@ -195,31 +173,26 @@ class Serial(Shower):
         self.data_bits.setText(others.get("Data Bits", "8"))
 
 
-# class Serial(Shower):
-#     def __init__(self):
-#         super(Serial, self).__init__()
-#         self.baud_rate = QLineEdit()
-#         # self.device_port.
-#         self.baud_rate.textEdited.connect(lambda x: self.baudChanged.emit(x))
-#         self.data_bits = QLineEdit()
-#         self.data_bits.textEdited.connect(lambda x: self.bitsChanged.emit(x))
-#         self.setUI()
-#
-#     def setUI(self):
-#         layout = QFormLayout()
-#         layout.setLabelAlignment(Qt.AlignRight)
-#         layout.addRow("Device Type:", self.device_type)
-#         layout.addRow("Device Name:", self.device_name)
-#         layout.addRow("Device Port:", self.device_address)
-#         layout.addRow("Baud Rate:", self.baud_rate)
-#         layout.addRow("Data Bits:", self.data_bits)
-#         layout.addRow("", self.port_tip)
-#         self.setLayout(layout)
-#
-#     def describe(self, device_type, device_name, device_address, others):
-#         super().describe(device_type, device_name, device_address, others)
-#         self.baud_rate.setText(others.get("baud", "9600"))
-#         self.data_bits.setText(others.get("bits", "8"))
+class Sound(Shower):
+    def __init__(self, parent=None):
+        super(Sound, self).__init__(parent=parent)
+        self.sampling_rate = QLineEdit("auto")
+        self.sampling_rate.textEdited.connect(lambda x: self.baudChanged.emit(x))
+        self.setUI()
+
+    def setUI(self):
+        layout = QFormLayout()
+        layout.setLabelAlignment(Qt.AlignRight)
+        layout.addRow("Device Type:", self.device_type)
+        layout.addRow("Device Name:", self.device_name)
+        layout.addRow("Device Index:", self.device_port)
+        layout.addRow("Sampling Rate:", self.sampling_rate)
+        layout.addRow("", self.port_tip)
+        self.setLayout(layout)
+
+    def describe(self, device_type, device_name, device_address, others):
+        super().describe(device_type, device_name, device_address, others)
+        self.sampling_rate.setText(others.get("Sampling Rate", "auto"))
 
 
 class Describer(QWidget):
@@ -228,23 +201,21 @@ class Describer(QWidget):
     sampleChanged = pyqtSignal(str)
     ipPortChanged = pyqtSignal(str)
     baudChanged = pyqtSignal(str)
-    bitsChanged = pyqtSignal(int)
-    clientChanged = pyqtSignal(int)
+    bitsChanged = pyqtSignal(str)
+    clientChanged = pyqtSignal(str)
+    samplingRateChanged = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(Describer, self).__init__(parent=parent)
         self.screen = Screen(self)
         self.net = Net(self)
-        self.parallel = Parallel(self)
         self.serial = Serial(self)
-        self.sound = Shower(self)
-        self.sound.setBasicUI("Device Index:")
+        self.sound = Sound(self)
         self.other = Shower(self)
-        self.other.setBasicUI()
+        self.other.setUI()
 
         self.screen.portChanged.connect(lambda x: self.portChanged.emit(x))
         self.net.portChanged.connect(lambda x: self.portChanged.emit(x))
-        self.parallel.portChanged.connect(lambda x: self.portChanged.emit(x))
         self.serial.portChanged.connect(lambda x: self.portChanged.emit(x))
         self.sound.portChanged.connect(lambda x: self.portChanged.emit(x))
         self.other.portChanged.connect(lambda x: self.portChanged.emit(x))
@@ -254,34 +225,33 @@ class Describer(QWidget):
         self.serial.baudChanged.connect(lambda x: self.baudChanged.emit(x))
         self.serial.bitsChanged.connect(lambda x: self.bitsChanged.emit(x))
 
-        self.parallel.clientChanged.connect(lambda x: self.clientChanged.emit(x))
+        self.net.clientChanged.connect(lambda x: self.clientChanged.emit(x))
 
         self.net.ipPortChanged.connect(lambda x: self.ipPortChanged.emit(x))
+
+        self.sound.samplingRateChanged.connect(lambda x: self.samplingRateChanged.emit(x))
         self.setUI()
 
     def setUI(self):
         self.layout = QStackedLayout()
         self.layout.addWidget(self.net)
-        self.layout.addWidget(self.parallel)
         self.layout.addWidget(self.screen)
         self.layout.addWidget(self.serial)
         self.layout.addWidget(self.sound)
         self.layout.addWidget(self.other)
         self.setLayout(self.layout)
 
-    def describe(self, device_type, device_name, device_port, other: dict):
+    def describe(self, device_type: str, device_name: str, device_port: str, other: dict):
         if device_type == "network_port":
             self.layout.setCurrentIndex(0)
-        elif device_type == "parallel_port":
-            self.layout.setCurrentIndex(1)
         elif device_type == "screen":
-            self.layout.setCurrentIndex(2)
+            self.layout.setCurrentIndex(1)
         elif device_type == "serial_port":
-            self.layout.setCurrentIndex(3)
+            self.layout.setCurrentIndex(2)
         elif device_type == "sound":
-            self.layout.setCurrentIndex(4)
+            self.layout.setCurrentIndex(3)
         else:
-            self.layout.setCurrentIndex(5)
+            self.layout.setCurrentIndex(4)
         widget = self.layout.currentWidget()
         widget.describe(device_type, device_name, device_port, other)
 
