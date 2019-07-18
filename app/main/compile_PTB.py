@@ -47,7 +47,11 @@ def throwCompileErrorInfo(inputStr):
     raise Exception(inputStr)
 
 
+def debugPrint(input):
+    isDebug = True
 
+    if isDebug:
+        print(input)
 
 def printAutoInd(f,inputStr,*argins):
     global cIndents
@@ -160,7 +164,17 @@ def booleanTransStr(inputStr,isRef):
         inputStr = "0"
     else:
         if isRef == False:
-            throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False' or 'True']  OR of ['1','0']")
+            throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False','True','Yes','No','1', or '0'] ")
+
+    return inputStr
+
+def dontClearTransStr(inputStr):
+    if inputStr == "'clear_0'":
+        inputStr = "0"
+    elif inputStr == "'notClear_1'":
+        inputStr = "1"
+    elif inputStr == "'doNothing_2'":
+        inputStr = "2"
 
     return inputStr
 
@@ -215,17 +229,18 @@ def addedTransparentToRGBStr(RGBStr,transparentStr):
         else:
             transparentValue = transparentValue*255
     else:
-        transparentValue = f"{transparentValue}*255"
+        if transparentValue != '[]':
+            transparentValue = f"{transparentValue}*255"
 
-
-    if isRgbStr(RGBStr):
-        RGBStr = f"[{RGBStr},{transparentValue}]"
-    elif isRgbWithBracketsStr(RGBStr):
-        RGBStr = re.sub("]",f",{transparentValue}]",RGBStr)
-    elif isRefStr(RGBStr):
-        RGBStr = f"[{RGBStr},{transparentStr}]"
-    else:
-        raise Exception(f"the input parameter 'RGBStr' is not a RGB format String\n should be of R,G,B, [R,G,B], or referred values!")
+    if transparentValue != '[]':
+        if isRgbStr(RGBStr):
+            RGBStr = f"[{RGBStr},{transparentValue}]"
+        elif isRgbWithBracketsStr(RGBStr):
+            RGBStr = re.sub("]",f",{transparentValue}]",RGBStr)
+        elif isRefStr(RGBStr):
+            RGBStr = f"[{RGBStr},{transparentStr}]"
+        else:
+            raise Exception(f"the input parameter 'RGBStr' is not a RGB format String\n should be of R,G,B, [R,G,B], or referred values!")
 
     return RGBStr
 
@@ -272,7 +287,9 @@ def dataStrConvert(dataStr,isRef = False, transMATStr = False):
                     else:
                         outData = addSingleQuotes(dataStr)  # maybe a bug
         else:
-            outData = "'[]'"
+            outData = "[]"
+
+            debugPrint(f"find an empty input:{dataStr}")
 
     else: # in case there is something wrong
         # raise Exception(f"the input dataStr:{dataStr} is not a string!")
@@ -399,32 +416,30 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
     # IF = "If"
     # SWITCH = "Switch"
     # TIMELINE = "Timeline"
-    # print(cTimelineWidgetIds)
     # to be continue ...
 
 
 def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict,previousColorFontDict
 
-    # Step 1: print out previous widget's no stimuli related codes
-    for cRowStr in noStimRelatedCodes:
-        printAutoInd(f,cRowStr)
-    # clear out the print buffer
-    noStimRelatedCodes.clear()
 
-    # Step 2: print out help info for the current widget
-    printAutoInd(f,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    printAutoInd(f,'%loop:{0}, event{1}: {2}',cLoopLevel,Func.getWidgetPosition(cWidget.widget_id) +1,Func.getWidgetName(cWidget.widget_id))
-    printAutoInd(f,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    if Func.getWidgetPosition(cWidget.widget_id) == 0:
+        # Step 2: print out help info for the current widget
+        printAutoInd(f,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(f,'%loop:{0}, event{1}: {2}',cLoopLevel,Func.getWidgetPosition(cWidget.widget_id) +1,Func.getWidgetName(cWidget.widget_id))
+        printAutoInd(f,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 
-    print(inputDevNameIdxDict)
-    print(outputDevNameIdxDict)
+    debugPrint("-- dev name id map---/")
+    debugPrint(inputDevNameIdxDict)
+    debugPrint(outputDevNameIdxDict)
+    debugPrint("----------------------\\")
 
     cProperties = Func.getProperties(cWidget.widget_id)
 
-
-
+    # ------------------------------------------------
+    # Step 1: draw the stimuli for the current widget
+    # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
     cScreenName, noused = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
 
@@ -458,17 +473,13 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip vertical'], attributesSetDict)
     flipVerStr = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
 
-    """
+
     # 10) check the right to left parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Right to left'], attributesSetDict)
     rightToLeft = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
-    """
-    rightToLeft = 0
 
 
     # 11) check the parameter winRect
-
-    #
     sx      = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
     sy      = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
     cWdith  = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
@@ -488,34 +499,43 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
 
     fontBkColor = dataStrConvert(*getRefValue(cWidget, cProperties['Back color'], attributesSetDict))
 
-    # print('------------------------------------/')
-    # print(fontName)
-    # print(fontSize)
-    # print(fontStyle)
-    # print(fontBkColor)
-    # print('------------------------------------\\')
-    #
-    # print(previousColorFontDict)
+    debugPrint('------------------------------------/')
+    debugPrint(fontName)
+    debugPrint(fontSize)
+    debugPrint(fontStyle)
+    debugPrint(fontBkColor)
 
+    debugPrint('previous saved color font info:')
+    debugPrint(previousColorFontDict)
+    debugPrint('------------------------------------\\')
+
+    isChangeFontPars = False
     #  font name
     if previousColorFontDict['fontName'] != fontName:
-        printAutoInd(f, "Screen('TextFont',winIds({0}),{1});", cWinStr, fontName)
+        printAutoInd(f, "Screen('TextFont',{0},{1});", cWinStr, fontName)
         previousColorFontDict.update({'fontName': fontName})
+        isChangeFontPars = True
 
     # font size
     if previousColorFontDict['fontSize'] != fontSize:
-        printAutoInd(f, "Screen('TextSize',winIds({0}),{1});", cWinStr, fontSize)
+        printAutoInd(f, "Screen('TextSize',{0},{1});", cWinStr, fontSize)
         previousColorFontDict.update({'fontSize': fontSize})
+        isChangeFontPars = True
 
     # font style
     if previousColorFontDict['fontStyle'] != fontStyle:
-        printAutoInd(f, "Screen('TextStyle',winIds({0}),{1});", cWinStr, fontStyle)
+        printAutoInd(f, "Screen('TextStyle',{0},{1});", cWinStr, fontStyle)
         previousColorFontDict.update({'fontStyle': fontStyle})
+        isChangeFontPars = True
 
     # font background color
     if previousColorFontDict['fontBkColor'] != fontBkColor:
-        printAutoInd(f, "Screen('TextBackgroundColor\n',winIds({0}),{1});", cWinStr, fontBkColor)
+        printAutoInd(f, "Screen('TextBackgroundColor',{0},{1});", cWinStr, fontBkColor)
         previousColorFontDict.update({'fontBkColor': fontBkColor})
+        isChangeFontPars = True
+
+    if isChangeFontPars:
+        printAutoInd(f, "")
 
     # before we draw the formattedtext， we draw the frame rect first:
     borderColor    = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
@@ -523,23 +543,26 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame fill color'], attributesSetDict))
 
     # if f"preFrameFillColor" not in previousColorFontDict:
-    # frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
+    frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
 
-    frameTransparent = 1 # suppose we have added this parameter
+    debugPrint(f"frameTransparent: {frameTransparent}")
 
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
+    isBkFrameEnable = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
 
-    if (frameFillColor == previousColorFontDict[cScreenName]) and (frameTransparent in [1,255]):
-        printAutoInd(f, "Screen('FillRect',winIds({0}),{1},{2});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr)
+    if isBkFrameEnable == '1':
 
-    # draw the frame only when the frame color is different from the frame fill color
-    if borderColor != frameFillColor:
-        printAutoInd(f, "Screen('frameRect',winIds({0}),{1},{2},{3});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr,borderWidth)
+        # if (frameFillColor == previousColorFontDict[cScreenName]) and (frameTransparent in [1,255]):
+        if (frameFillColor != previousColorFontDict[cScreenName]):
+            printAutoInd(f, "Screen('FillRect',{0},{1},{2});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr)
 
-        # cRefedValue, isRef = getRefValue(cWidget, cProperties['Font family'], attributesSetDict)
+        # draw the frame only when the frame color is different from the frame fill color
+        if borderColor != frameFillColor:
+            printAutoInd(f, "Screen('frameRect',{0},{1},{2},{3});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr,borderWidth)
 
 
     #  print out the text
-    printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3},{4},{5},{6},{7},[],{8},{9});", \
+    printAutoInd(f,"DrawFormattedText({0},{1},{2},{3},{4},{5},{6},{7},[],{8},{9});", \
                  cWinStr, \
                  cProperties['Text'], \
                  alignmentX, \
@@ -554,19 +577,67 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
 
+    # clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Dont Clear After'], attributesSetDict))
+    # clearAfter = dontClearAfterTransStr(clearAfter)
+
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Clear after'], attributesSetDict)
     clearAfter         = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
 
-    printAutoInd(f, "Screen('DrawingFinished',winIds({0}),{1});",cWinStr,clearAfter)
+    printAutoInd(f, "Screen('DrawingFinished',{0},{1});",cWinStr,clearAfter)
+    printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event")
+    # -------------------------------------------------------------
+    # Step 2: print out previous widget's no stimuli related codes
+    # -------------------------------------------------------------
+    for cRowStr in noStimRelatedCodes:
+        printAutoInd(f,cRowStr)
+    # clear out the print buffer
+    noStimRelatedCodes.clear()
+
+    # -------------------------------------------------------------
+    # Step 3: print out title of the current widget
+    # -------------------------------------------------------------
+    if Func.getWidgetPosition(cWidget.widget_id) > 0:
+        # Step 2: print out help info for the current widget
+        printAutoInd(f,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(f,'%loop:{0}, event{1}: {2}',cLoopLevel,Func.getWidgetPosition(cWidget.widget_id) +1,Func.getWidgetName(cWidget.widget_id))
+        printAutoInd(f,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    # Flip the Screen
+    if Func.getWidgetPosition(cWidget.widget_id) == 0:
+        printAutoInd(f, "% for first event, flip immediately.. ")
+        printAutoInd(f, "Screen('Flip',{0},{1},{2});",cWinStr,0,clearAfter)
+    else:
+        printAutoInd(f, "Screen('Flip',{0},{1},{2});", cWinStr, 0, clearAfter)
+
+    # [VBLTimestamp StimulusOnsetTime FlipTimestamp Missed Beampos] = Screen('Flip', windowPtr[, when]
+    # [, dontclear][, dontsync] [, multiflip]);
 
 
-    print(f"line 243: {cProperties}")
+
+
+
+
+
+
+
+
+    debugPrint(f"{cWidget.widget_id}: cProperties:")
+    debugPrint(f" a= {cProperties}")
+    debugPrint(f"------------------------\\")
+
+
+
+
+
+
+
+
 
     output_device= cWidget.getOutputDevice()
 
-    print(output_device)
+    debugPrint(f"{cWidget.widget_id}: outputDevice:\n o ={output_device}")
+
     for device, properties in output_device.items():
-        # print(device)
+        # debugPrint(device)
         value_or_msg   = properties.get("Value or Msg", "")
         pulse_duration = properties.get("Pulse Duration", "")
     # to be continue ...
@@ -602,8 +673,8 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
             # update the attributes set dictionary
             for key in cRowDict.keys():
                 attributesSetDict.setdefault(f"{cWidgetName}.attr.{key}",[cLoopLevel,f"{cWidgetName}.attr.{key}{{iLoop{cLoopLevel}}}"])
-            # print('-----cAttributes set -----------')
-            # print(attributesSetDict)
+            # debugPrint('-----cAttributes set -----------')
+            # debugPrint(attributesSetDict)
         # handle the references and the values in colorType
         for key, value in cRowDict.items():
 
@@ -622,7 +693,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
             cRepeat = dataStrConvert(cRowDict['Weight'])
 
         for iRep in range(cRepeat):
-            # print("".join(str(dataStrConvert(value)) + " " for key, value in cRowDict.items()))
+            # debugPrint("".join(str(dataStrConvert(value)) + " " for key, value in cRowDict.items()))
             printAutoInd(f,'{0}',"".join(addCurlyBrackets(dataStrConvert(value)) + " " for key, value in cRowDict.items())+";...")
 
 
@@ -639,7 +710,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
     for iTimeline in cTimeLineList:
         cTimelineSet.add(iTimeline[1])
 
-    print(cTimelineSet)
+    debugPrint(cTimelineSet)
 
     printAutoInd(f, '% switch across timeline types')
     printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
@@ -752,14 +823,14 @@ def compilePTB(globalSelf):
 
     cIndents = 0
 
-    inputDevNameIdxDict = {}
+    inputDevNameIdxDict  = {}
     outputDevNameIdxDict = {}
 
 
     enabledKBKeysList = []
     enabledKBKeysList.append('escape')
 
-    attributesSetDict        = {'sessionNum':[0,'SubInfo.session'],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
+    attributesSetDict = {'sessionNum':[0,'SubInfo.session'],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
 
 
     if not Info.FILE_NAME:
@@ -824,27 +895,29 @@ def compilePTB(globalSelf):
         # you can get each widget's device you selected
         output_devices = Info.OUTPUT_DEVICE_INFO
         input_devices  = Info.INPUT_DEVICE_INFO
-        # print('-------------')
-        # print(output_devices)
+        debugPrint('-------------/')
+        debugPrint(output_devices)
+        debugPrint('-------------\\\n')
         printAutoInd(f,"%------ define input devices --------/")
         iKeyboard = 1
         iGamepad  = 1
         iRespBox  = 1
         iMouse    = 1
 
-        for input_device in input_devices:
+        for inputDevId,cDevice  in input_devices.items():
+
             # create a map dict to map device name (key) to device ID (value)
-            inputDevNameIdxDict.update({input_devices[input_device]['Device Name']:input_device})
-            # print(input_device)
-            if input_devices[input_device]['Device Type'] == 'keyboard':
-                printAutoInd(f,"KBoards({0}).port     = '{1}';",iKeyboard,input_devices[input_device]['Device Port'])
-                printAutoInd(f,"KBoards({0}).name     = '{1}';\n",iKeyboard,input_devices[input_device]['Device Name'])
+            inputDevNameIdxDict.update({cDevice['Device Name']:inputDevId})
+            # debugPrint(input_device)
+            if cDevice['Device Type'] == 'keyboard':
+                printAutoInd(f,"KBoards({0}).port     = '{1}';",iKeyboard,cDevice['Device Port'])
+                printAutoInd(f,"KBoards({0}).name     = '{1}';\n",iKeyboard,cDevice['Device Name'])
                 iKeyboard += 1
-            elif input_devices[input_device]['Device Type'] == 'mouse':
+            elif cDevice['Device Type'] == 'mouse':
                 iMouse += 1
-            elif input_devices[input_device]['Device Type'] == 'game pad':
+            elif cDevice['Device Type'] == 'game pad':
                 iGamepad += 1
-            elif input_devices[input_device]['Device Type'] == 'response box':
+            elif cDevice['Device Type'] == 'response box':
                 iRespBox += 1
 
         # if u'\u4e00' <= char <= u'\u9fa5':  # 判断是否是汉字
@@ -857,44 +930,57 @@ def compilePTB(globalSelf):
         iParal   = 1
         iNetPort = 1
         iSerial  = 1
+        iSound   = 1
 
-        print(output_devices)
+        debugPrint(output_devices)
 
-        for output_device in output_devices:
+        for outDev_Id, cDevice in output_devices.items():
 
-            if output_devices[output_device]['Device Type'] == 'screen':
-                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"{iMonitor}"})
+            if cDevice['Device Type'] == 'screen':
+                outputDevNameIdxDict.update({cDevice['Device Name']:f"{iMonitor}"})
 
-                previousColorFontDict.update({output_devices[output_device]['Device Name']:addSquBrackets(output_devices[output_device]['Back Color'])})
+                previousColorFontDict.update({cDevice['Device Name']:addSquBrackets(cDevice['Back Color'])})
 
-                printAutoInd(f,"monitors({0}).port       =  {1};",iMonitor,output_devices[output_device]['Device Port'])
-                printAutoInd(f,"monitors({0}).name       = '{1}';",iMonitor,output_devices[output_device]['Device Name'])
-                printAutoInd(f,"monitors({0}).bkColor    = '{1}';",iMonitor,output_devices[output_device]['Back Color'])
-                printAutoInd(f,"monitors({0}).muliSample =  {1};\n",iMonitor,output_devices[output_device]['Multi Sample'])
+                printAutoInd(f,"monitors({0}).port       =  {1};",iMonitor,cDevice['Device Port'])
+                printAutoInd(f,"monitors({0}).name       = '{1}';",iMonitor,cDevice['Device Name'])
+                printAutoInd(f,"monitors({0}).bkColor    = [{1}];",iMonitor,cDevice['Back Color'])
+                printAutoInd(f,"monitors({0}).muliSample =  {1};\n",iMonitor,cDevice['Multi Sample'])
                 iMonitor += 1
-            elif output_devices[output_device]['Device Type'] == 'network_port':
+            elif cDevice['Device Type'] == 'network_port':
 
-                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"tcpipCons({iNetPort})"})
-                printAutoInd(f,"TCPIPs({0}).ipAdd    = '{1}';",iNetPort,output_devices[output_device]['Device Port'])
-                printAutoInd(f,"TCPIPs({0}).port     =  {1};",iNetPort,output_devices[output_device]['IP Port'])
-                printAutoInd(f,"TCPIPs({0}).name     = '{1}';",iNetPort,output_devices[output_device]['Device Name'])
-                printAutoInd(f,"TCPIPs({0}).isClient = {1};\n",iNetPort,output_devices[output_device]['Is Client'])
+                outputDevNameIdxDict.update({cDevice['Device Name']:f"tcpipCons({iNetPort})"})
+                printAutoInd(f,"TCPIPs({0}).ipAdd    = '{1}';",iNetPort,cDevice['Device Port'])
+                printAutoInd(f,"TCPIPs({0}).port     =  {1};",iNetPort,cDevice['IP Port'])
+                printAutoInd(f,"TCPIPs({0}).name     = '{1}';",iNetPort,cDevice['Device Name'])
+                printAutoInd(f,"TCPIPs({0}).isClient = {1};\n",iNetPort,cDevice['Is Client'])
                 iNetPort += 1
 
-            elif output_devices[output_device]['Device Type'] == 'parallel_port':
-                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"parPort({iParal}).port"})
-                printAutoInd(f,"parPort({0}).port     = hex2dec('{1}');",iParal,output_devices[output_device]['Device Port'])
-                printAutoInd(f,"parPort({0}).name     = '{1}';\n",iParal,output_devices[output_device]['Device Name'])
+            elif cDevice['Device Type'] == 'parallel_port':
+                outputDevNameIdxDict.update({cDevice['Device Name']:f"parPort({iParal}).port"})
+                printAutoInd(f,"parPort({0}).port     = hex2dec('{1}');",iParal,cDevice['Device Port'])
+                printAutoInd(f,"parPort({0}).name     = '{1}';\n",iParal,cDevice['Device Name'])
                 iParal += 1
 
-            elif output_devices[output_device]['Device Type'] == 'serial_port':
+            elif cDevice['Device Type'] == 'serial_port':
 
-                outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"serialCons({iSerial})"})
-                printAutoInd(f,"serPort({0}).port     = '{1}';",iSerial,output_devices[output_device]['Device Port'])
-                printAutoInd(f,"serPort({0}).name     = '{1}';",iSerial,output_devices[output_device]['Device Name'])
-                printAutoInd(f,"serPort({0}).baudRate = '{1}';",iSerial,output_devices[output_device]['Baud Rate'])
-                printAutoInd(f,"serPort({0}).dataBits = '{1}';\n",iSerial,output_devices[output_device]['Data Bits'])
+                outputDevNameIdxDict.update({cDevice['Device Name']:f"serialCons({iSerial})"})
+                printAutoInd(f,"serPort({0}).port     = '{1}';",iSerial,cDevice['Device Port'])
+                printAutoInd(f,"serPort({0}).name     = '{1}';",iSerial,cDevice['Device Name'])
+                printAutoInd(f,"serPort({0}).baudRate = '{1}';",iSerial,cDevice['Baud Rate'])
+                printAutoInd(f,"serPort({0}).dataBits = '{1}';\n",iSerial,cDevice['Data Bits'])
                 iSerial += 1
+
+            elif cDevice['Device Type'] == 'sound':
+
+                outputDevNameIdxDict.update({cDevice['Device Name']:f"serialCons({iSound})"})
+                printAutoInd(f,"audioDevs({0}).idx      = {1};",iSound,cDevice['Device Port'])
+                printAutoInd(f,"audioDevs({0}).name     = '{1}';",iSound,cDevice['Device Name'])
+                if 'auto' == cDevice['Sampling Rate']:
+                    printAutoInd(f,"audioDevs({0}).fs       = []; % the default value in PTB is 48000 Hz\n",iSound)
+                else:
+                    printAutoInd(f,"audioDevs({0}).fs       = {1};\n",iSound,cDevice['Sampling Rate'])
+
+                iSound += 1
 
         printAutoInd(f,"%------------------------------------\\\n")
 
@@ -921,7 +1007,7 @@ def compilePTB(globalSelf):
 
             printAutoInd(f,"for iCount = 1:numel(TCPIPs)")
 
-            if output_devices[output_device]['Is Client'] == 1:
+            if cDevice['Is Client'] == 1:
                 printAutoInd(f,"tcpipCons(iCount) = pnet('tcpconnect',TCPIPs(iCount).ipAdd,TCPIPs(iCount).port);")
             else:
                 printAutoInd(f,"tcpipCons(iCount) = pnet('tcpsocket',TCPIPs(iCount).port);")
@@ -960,6 +1046,20 @@ def compilePTB(globalSelf):
             printAutoInd(f,"error('curently, we did not support output via parallel under Mac OX!');")
             printAutoInd(f,"end % if IsWin")
             printAutoInd(f,"%----------------------------\\\n")
+
+        #  initialize audio output devices
+        if iSound > 1:
+
+            printAutoInd(f, "%--open output audio devs----/")
+            printAutoInd(f, "InitializePsychSound(1);\n")
+            printAutoInd(f,"audioDevs = zeros({0},1);",iSound-1)
+            # printAutoInd(f,"audioFs = getAudioFsFromFristAudioFile;")
+
+            printAutoInd(f,"for iCount = 1:numel(audioDevs)")
+            printAutoInd(f,"audioDevs(iCount) = PsychPortAudio('Open',audioDevs(iCount).idx,1,[],audioDevs(iCount).fs,2);",)
+            printAutoInd(f,"end % iCount")
+            printAutoInd(f, "%----------------------------\\\n")
+
 
         printAutoInd(f,"%----------------------------------------\\\n")
 
@@ -1032,15 +1132,22 @@ def compilePTB(globalSelf):
         # close parallel ports
         if iParal > 1:
             printAutoInd(f,"%--- close parallel ports ---/")
-            printAutoInd(f,"% Currently, Under windows io64 need to be closed")
-            printAutoInd(f,"% Under Linux, we will use outp (which will require running matlab under the sudo mode) to send trigger via parallel ")
             printAutoInd(f,"if IsWin")
 
             printAutoInd(f,"clear io64;")
 
             printAutoInd(f,"end % if IsWin")
-            printAutoInd(f,"% Under windows io64 need to be closed")
             printAutoInd(f,"%----------------------------\\\n")
+
+        # close psychPortAudio device
+        if iSound > 1:
+            # PsychPortAudio('Close'[, pahandle]);
+            printAutoInd(f, "%--- close outputAudio devs--/")
+
+            printAutoInd(f,"for iCount = 1:numel(serialCons)")
+            printAutoInd(f,"PsychPortAudio('Close', audioDevs(iCount));")
+            printAutoInd(f,"end % iCount")
+            printAutoInd(f, "%----------------------------\\\n")
 
 
 
@@ -1062,10 +1169,55 @@ def compilePTB(globalSelf):
 
         printAutoInd(f,"if isWin")
         printAutoInd(f,"ShowHideWinTaskbar(1);      % show the window taskbar")
-        printAutoInd(f,"end")
+        printAutoInd(f,"end ")
+
+        # close TCPIP connections
+        if iNetPort > 1:
+            printAutoInd(f,"close serial ports:")
+
+            printAutoInd(f,"for iCount = 1:numel(tcpipCons)")
+            printAutoInd(f,"pnet(tcpipCons(iCount),'close');")
+            printAutoInd(f,"end % iCount")
+            #
+            # printAutoInd(f,"%------------------------\\\n")
+
+        # close serial ports
+        if iSerial > 1:
+            printAutoInd(f,"%close serial ports: ")
+            printAutoInd(f,"for iCount = 1:numel(serialCons)")
+            printAutoInd(f,"IOPort('Close',serialCons(iCount));")
+            printAutoInd(f,"end % iCount")
+            # printAutoInd(f,"%--------------------------\\\n")
+
+        # close parallel ports
+        if iParal > 1:
+            printAutoInd(f,"%close parallel ports")
+            printAutoInd(f,"if IsWin")
+
+            printAutoInd(f,"clear io64;")
+
+            printAutoInd(f,"end % if IsWin")
+            printAutoInd(f,"% Under windows io64 need to be closed")
+
+            # printAutoInd(f,"%----------------------------\\\n")
+
+        # close psychPortAudio device
+        if iSound > 1:
+
+            printAutoInd(f, "%close outputAudio devs:")
+
+            printAutoInd(f,"for iCount = 1:numel(serialCons)")
+            printAutoInd(f,"PsychPortAudio('Close', audioDevs(iCount));")
+            printAutoInd(f,"end % iCount")
+            # printAutoInd(f, "%----------------------------\\\n")
 
         printAutoInd(f,"save('{0}_debug');",cFilenameOnly)
         printAutoInd(f,"rethrow({0}_error);",cFilenameOnly)
+
+        #
+
+
+
 
 
         printAutoInd(f,"end % try")
