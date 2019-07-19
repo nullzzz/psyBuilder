@@ -16,7 +16,7 @@ class VideoTab1(QWidget):
             "End position": "99:99:99.999",
             "Aspect ratio": "Default",
             "Playback rate": "1",
-            "Clear after": "Yes",
+            "Clear after": "clear_0",
             "Screen name": "screen.0"
         }
         # general
@@ -59,7 +59,7 @@ class VideoTab1(QWidget):
         self.aspect_ratio.addItems(["Default", "Ignore", "Keep", "KeepByExpanding"])
 
         self.screen_name.addItems(["screen.0"])
-        self.clear_after.addItems(["Yes", "No"])
+        self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
         l0 = QLabel("File Name:")
         l1 = QLabel("Start Position:")
@@ -67,7 +67,7 @@ class VideoTab1(QWidget):
         l3 = QLabel("Playback Rate:")
         l4 = QLabel("Aspect Ratio:")
         l5 = QLabel("Screen Name:")
-        l6 = QLabel("Clear After:")
+        l6 = QLabel("Dont Clear After:")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)

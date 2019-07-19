@@ -28,6 +28,9 @@ enabledKBKeysList = []
 inputDevNameIdxDict = {}
 outputDevNameIdxDict = {}
 
+previousColorFontDict = {}
+
+
 def throwCompileErrorInfo(inputStr):
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Critical)
@@ -114,16 +117,28 @@ def isRgbWithBracketsStr(inputStr):
     return isRgbFormat
 
 def isNumStr(inputStr):
-    return re.fullmatch("([\d]*\.[\d$]+)|\d*", inputStr)
+    if isinstance(inputStr, str):
+        return re.fullmatch("([\d]*\.[\d$]+)|\d*", inputStr)
+
+    return False
 
 def isIntStr(inputStr):
-    return re.fullmatch("\d*", inputStr)
+    if isinstance(inputStr, str):
+        return re.fullmatch("\d*", inputStr)
+
+    return False
 
 def isFloatStr(inputStr):
-    return re.fullmatch("([\d]*\.[\d$]+)", inputStr)
+    if isinstance(inputStr, str):
+        return re.fullmatch("([\d]*\.[\d$]+)", inputStr)
+
+    return False
 
 def isPercentStr(inputStr):
-    return re.fullmatch("([\d]*\.[\d]+%$)|(\d*%$)", inputStr)
+    if isinstance(inputStr, str):
+        return re.fullmatch("([\d]*\.[\d]+%$)|(\d*%$)", inputStr)
+
+    return False
 
 
 def isRefStr(inputStr):
@@ -137,6 +152,17 @@ def isRefStr(inputStr):
 
     return False
 
+def booleanTransStr(inputStr,isRef):
+
+    if inputStr.lower() in ["'yes'","'true'",'yes','true']:
+        inputStr = "1"
+    elif inputStr.lower() in ["'no'","'false'",'no','false']:
+        inputStr = "0"
+    else:
+        if isRef == False:
+            throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False' or 'True']  OR of ['1','0']")
+
+    return inputStr
 
 def pyStr2MatlabStr(inputStr):
     if isinstance(inputStr, str):
@@ -144,10 +170,13 @@ def pyStr2MatlabStr(inputStr):
     return inputStr
 
 def parsePercentStr(inputStr):
-    if isPercentStr(inputStr):
-        outputValue = float(inputStr[:-1])/100
-    elif isNumStr(inputStr):
-        outputValue = float(inputStr)
+    if isinstance(inputStr,str):
+        if isPercentStr(inputStr):
+            outputValue = float(inputStr[:-1])/100
+        elif isNumStr(inputStr):
+            outputValue = float(inputStr)
+        else:
+            outputValue = inputStr
     else:
         outputValue = inputStr
 
@@ -157,6 +186,15 @@ def parsePercentStr(inputStr):
 def addedTransparentToRGBStr(RGBStr,transparentStr):
 
     transparentValue = parsePercentStr(transparentStr)
+
+    if isinstance(transparentValue,(int,float)):
+        if transparentValue == 1:
+            return RGBStr
+        else:
+            transparentValue = transparentValue*255
+    else:
+        transparentValue = f"{transparentValue}*255"
+
 
     if isRgbStr(RGBStr):
         RGBStr = f"[{RGBStr},{transparentValue}]"
@@ -172,7 +210,7 @@ def addedTransparentToRGBStr(RGBStr,transparentStr):
 
 
 
-def dataStrConvert(dataStr,isRef = False):
+def dataStrConvert(dataStr,isRef = False, transMATStr = False):
     # convert string to neither a string or a num
     # e.g.,
     # 1） "2"    to 2
@@ -183,32 +221,40 @@ def dataStrConvert(dataStr,isRef = False):
     # 6） is a referred value will do nothing
     if isinstance(dataStr,str):
 
-        if isPercentStr(dataStr):
-            outData = parsePercentStr(dataStr)
+        if dataStr:
 
-        elif isRgbWithBracketsStr(dataStr):
-            outData = dataStr
+            if isPercentStr(dataStr):
+                outData = parsePercentStr(dataStr)
 
-        elif isRgbStr(dataStr):
-            outData = addSquBrackets(dataStr)
+            elif isRgbWithBracketsStr(dataStr):
+                outData = dataStr
 
-        elif isIntStr(dataStr):
-            outData = int(dataStr)
+            elif isRgbStr(dataStr):
+                outData = addSquBrackets(dataStr)
 
-        elif isFloatStr(dataStr):
-            outData = float(dataStr)
+            elif isIntStr(dataStr):
+                outData = int(dataStr)
 
-        elif isRefStr(dataStr):
-            outData = dataStr # maybe a bug
+            elif isFloatStr(dataStr):
+                outData = float(dataStr)
 
-        else:
-            if isRef:
-                outData = dataStr  # maybe a bug
+            elif isRefStr(dataStr):
+                outData = dataStr # maybe a bug
+
             else:
-                outData = addSingleQuotes(pyStr2MatlabStr(dataStr) ) # maybe a bug
+                if isRef:
+                    outData = dataStr  # maybe a bug
+                else:
+                    if transMATStr:
+                        outData = addSingleQuotes(pyStr2MatlabStr(dataStr) ) # maybe a bug
+                    else:
+                        outData = addSingleQuotes(dataStr)  # maybe a bug
+        else:
+            outData = "'[]'"
 
     else: # in case there is something wrong
-        raise Exception(f"the input dataStr:{dataStr} is not a string!")
+        # raise Exception(f"the input dataStr:{dataStr} is not a string!")
+        outData = dataStr
 
     return outData
 
@@ -336,7 +382,7 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
 
 
 def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
-    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict,previousColorFontDict
 
     # Step 1: print out previous widget's no stimuli related codes
     for cRowStr in noStimRelatedCodes:
@@ -356,7 +402,6 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     cProperties = Func.getProperties(cWidget.widget_id)
 
     # 1) get the win id info in matlab format winIds(idNum)
-
     cScreenName, noused = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
 
     cWinStr = f"winIds({outputDevNameIdxDict.get(cScreenName)})"
@@ -380,54 +425,69 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # 5) check the color parameter:
     fontColorStr    = dataStrConvert(*getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
     fontTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Transparent'], attributesSetDict))
+    # print(f"line 411  {fontTransparent}")
+
+    # if isinstance(fontTransparent,(int,float)) and fontTransparent == 0:
+    #     fontColorAll = fontColorStr
+    # else:
+    #     fontColorAll = addedTransparentToRGBStr(fontColorStr, f"{fontTransparent}*255")
+
 
     # 7) check the flip hor parameter:
-    flipHorStr = dataStrConvert(*getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict))
-
-    if "'False'" == flipHorStr:
-        flipHorStr = "1"
-
-    elif "'True'" == flipHorStr:
-        flipHorStr = "0"
-    else:
-        throwCompileErrorInfo("the value of 'Flip horizontal' should be of {'False' or 'True'}  OR of {'1','0'}")
-
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
+    flipHorStr = dataStrConvert(cRefedValue, isRef)
+    flipHorStr = booleanTransStr(dataStrConvert(flipHorStr, isRef), isRef)
 
     # 8) check the flip ver parameter:
-    flipVerStr = dataStrConvert(*getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict))
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip vertical'], attributesSetDict)
+    flipVerStr = dataStrConvert(cRefedValue, isRef)
+    flipVerStr = booleanTransStr(dataStrConvert(flipVerStr, isRef), isRef)
 
-    if "'False'" == flipVerStr:
-        flipHorStr = "1"
-    elif "'True'" == flipVerStr:
-        flipVerStr = "0"
-    else:
-        throwCompileErrorInfo("the value of 'Flip vertical' should be of {'False' or 'True'}  OR of {'1','0'}")
-
-
-    # 10) check the flip ver parameter:
+    """
+    # 10) check the right to left parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Right to left'], attributesSetDict)
     rightToLeft = dataStrConvert(cRefedValue, isRef)
-
-    if "'False'" == flipVerStr:
-        flipHorStr = "1"
-    elif "'True'" == flipVerStr:
-        flipVerStr = "0"
-    else:
-        if isRef == False:
-            throwCompileErrorInfo("the value of 'Flip vertical' should be of {'False' or 'True'}  OR of {'1','0'}")
-
+    rightToLeft = booleanTransStr(dataStrConvert(rightToLeft, isRef), isRef)
+    """
+    rightToLeft = 0
 
 
     # 11) check the parameter winRect
 
     #
-    sx = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
-    sy = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
-    cWdith = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
+    sx      = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
+    sy      = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
+    cWdith  = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
     cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
 
 
-    printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3}，{4}，{5}，{6}，{7},[],{8},{9})", \
+    frameRectStr = f"makeFrameRect({sx}, {sy}, {cWdith}, {cHeight}, fullRects({outputDevNameIdxDict.get(cScreenName)},:))"
+
+    # before we draw the formattedtext， we draw the frame rect first:
+    borderColor    = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
+    borderWidth    = dataStrConvert(*getRefValue(cWidget, cProperties['Border width'], attributesSetDict))
+    frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame fill color'], attributesSetDict))
+
+    # if f"preFrameFillColor" not in previousColorFontDict:
+    # frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
+
+    frameTransparent = 1
+
+
+
+    if (frameFillColor == previousColorFontDict[cScreenName]) and (frameTransparent in [1,255]):
+        printAutoInd(f, "Screen('FillRect',winIds({0}),{1},{2});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr)
+
+    # draw the frame only when the frame color is different from the frame fill color
+    if borderColor != frameFillColor:
+        printAutoInd(f, "Screen('frameRect',winIds({0}),{1},{2},{3});",cWinStr,addedTransparentToRGBStr(frameFillColor,frameTransparent),frameRectStr,borderWidth)
+
+
+
+
+
+
+    printAutoInd(f,"DrawFormattedText(winIds({0}),{1},{2},{3},{4},{5},{6},{7},[],{8},{9});", \
                  cWinStr, \
                  cProperties['Text'], \
                  alignmentX, \
@@ -437,10 +497,16 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
                  flipHorStr, \
                  flipVerStr, \
                  rightToLeft, \
-                 rightToLeft)
+                 frameRectStr)
 
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
+
+    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
+    clearAfter = booleanTransStr(dataStrConvert(clearAfter, isRef), isRef)
+
+    printAutoInd(f, "Screen('DrawingFinished',winIds({0}),{1});",cWinStr,clearAfter)
+
 
     print(f"line 243: {cProperties}")
 
@@ -490,7 +556,13 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
         for key, value in cRowDict.items():
 
             # get the referenced var value
-            cRowDict[key], noused = getRefValue(cWidget,value,attributesSetDict)
+            cValue = getRefValue(cWidget,value,attributesSetDict)
+
+            if isPercentStr(cValue):
+                cValue = parsePercentStr(cValue)
+
+            cRowDict[key], noused = cValue
+
 
         if '' == cRowDict['Weight']:
             cRepeat = 1
@@ -524,7 +596,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
         if '' == iTimeline_id:
             throwCompileErrorInfo(f"In {cWidgetName}: Timeline should not be empty!")
         else:
-            printAutoInd(f, 'case {0}', f"{Func.getWidgetName(iTimeline_id)}")
+            printAutoInd(f, 'case {0}', f"{addSingleQuotes(Func.getWidgetName(iTimeline_id))}")
             printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel)
 
     printAutoInd(f, 'otherwise ')
@@ -615,10 +687,16 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
 
 def compilePTB(globalSelf):
-    global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict
+    global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict,cIndents,previousColorFontDict
+
+    previousColorFontDict.update({'clearAfter':"0"})
+
+    cIndents = 0
 
     inputDevNameIdxDict = {}
     outputDevNameIdxDict = {}
+
+    previousColorFontDict = {}
 
     enabledKBKeysList = []
     enabledKBKeysList.append('escape')
@@ -673,6 +751,7 @@ def compilePTB(globalSelf):
         printAutoInd(f,"RandStream.setGlobalStream(cRandSeed);")
         printAutoInd(f,"%-----------------------------------------------------\\\n")
         printAutoInd(f,"hideCursor;            % hide mouse cursor")
+        printAutoInd(f,"commandwindow;         % bring the command window into front")
 
         printAutoInd(f,"if isWin")
         printAutoInd(f,"ShowHideWinTaskbar(0); % hide the window taskbar")
@@ -726,6 +805,8 @@ def compilePTB(globalSelf):
 
             if output_devices[output_device]['Device Type'] == 'screen':
                 outputDevNameIdxDict.update({output_devices[output_device]['Device Name']:f"{iMonitor}"})
+
+                previousColorFontDict.update({output_devices[output_device]['Device Name']:addSquBrackets(output_devices[output_device]['Back Color'])})
 
                 printAutoInd(f,"monitors({0}).port       =  {1};",iMonitor,output_devices[output_device]['Device Port'])
                 printAutoInd(f,"monitors({0}).name       = '{1}';",iMonitor,output_devices[output_device]['Device Name'])
@@ -937,7 +1018,7 @@ def compilePTB(globalSelf):
         printAutoInd(f,"% subfun 1: detectAbortKey")
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
-        printAutoInd(f, "function detectAbortKey(abortKeyCode)\n")
+        printAutoInd(f, "function detectAbortKey(abortKeyCode)")
         printAutoInd(f,"[keyIsDown, Noused, keyCode] = responseCheck(-1);")
         printAutoInd(f,"if keyCode(abortKeyCode)")
 
@@ -953,9 +1034,36 @@ def compilePTB(globalSelf):
         printAutoInd(f,"% subfun 2: disableSomeKeys")
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
-        printAutoInd(f,"function disableSomeKbKeys()\n")
+        printAutoInd(f,"function disableSomeKbKeys()")
         printAutoInd(f,"{0}{1}{2}\n","RestrictKeysForKbCheck(KbName({",''.join("'"+ cItem +"'," for cItem in enabledKBKeysList)[:-1],"}));")
         printAutoInd(f,"end %  end of subfun2\n")
+
+
+        printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f,"% subfun 3: makeFrameRect")
+        printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+
+        printAutoInd(f,"function outRect = makeFrameRect(x, y, frameWidth, frameHight, fullRect)")
+        printAutoInd(f,"if x <= 1")
+        printAutoInd(f,"x = x*fullRect(3);")
+        printAutoInd(f,"end % if")
+
+        printAutoInd(f,"if y <= 1")
+        printAutoInd(f,"y = y*fullRect(4);")
+        printAutoInd(f,"end % if")
+
+
+        printAutoInd(f,"if frameWidth <= 1")
+        printAutoInd(f,"frameWidth = frameWidth*fullRect(3);")
+        printAutoInd(f,"end % if")
+
+        printAutoInd(f,"if frameHight <= 1")
+        printAutoInd(f,"frameHight = frameHigh*fullRect(4);")
+        printAutoInd(f,"end % if")
+
+        printAutoInd(f,"outRect = CenterRectOnPointd([0, 0, frameWidth, frameHight], x, y);")
+
+        printAutoInd(f,"end %  end of subfun3")
 
 
 

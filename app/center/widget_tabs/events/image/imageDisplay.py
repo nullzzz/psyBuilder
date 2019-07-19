@@ -301,6 +301,17 @@ class ImageDisplay(QMainWindow):
         """
         return self.pro_window.general.rotate.text()
 
+    def getEnable(self) -> str:
+        """
+        返回frame enable
+        :return:
+        """
+        return self.pro_window.frame.enable.currentText()
+
+    def getFrameTransparent(self) -> str:
+        """返回frame transparent"""
+        return self.pro_window.frame.transparent.text()
+
     def getXAxisCoordinates(self) -> str:
         """
         返回x坐标值

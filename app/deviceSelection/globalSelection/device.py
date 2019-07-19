@@ -9,7 +9,6 @@ class Device(QListWidgetItem):
     :param device_type: 串、并、网口、
     :param device_id: 设备标识符
     """
-
     def __init__(self, device_type: str, device_id: str = None, parent=None):
         super(Device, self).__init__(device_type, parent)
         # 设备类型
@@ -33,14 +32,16 @@ class Device(QListWidgetItem):
         self.back_color = "0,0,0"
         self.sample = "0"
         # parallel
-        self.client: int = 1
+        self.is_client: str = "yes"
         # net
-        self.ip_port = "25576"
+        self.ip_port: str = "25576"
         # serial
-        self.baud_rate = "9600"
-        self.data_bits = "8"
+        self.baud_rate: str = "9600"
+        self.data_bits: str = "8"
+        # sound
+        self.sampling_rate: str = "auto"
         # 设备标识符
-        self.device_id = device_id
+        self.device_id: str = device_id
 
         # 设置图标
         self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
@@ -63,21 +64,26 @@ class Device(QListWidgetItem):
     def getName(self) -> str:
         return self.text()
 
-    def getPort(self):
+    def getPort(self) -> str:
         return self.port
 
-    def getColor(self):
+    def getColor(self) -> str:
         if self.device_type == "screen":
             return self.back_color
         return ""
 
-    def getSample(self):
+    def getSample(self) -> str:
         if self.device_type == "screen":
             return self.sample
         return ""
 
+    def getSamplingRate(self) -> str:
+        if self.device_type == "sound":
+            return self.sampling_rate
+        return ""
+
     def setPort(self, port: str):
-        if port.startswith("screen"):
+        if port.startswith("screen") or port.startswith("sound"):
             self.port = port.split(".")[-1]
         elif port.startswith("serial_port"):
             self.port = f"com{port.split('.')[-1]}"
@@ -86,23 +92,26 @@ class Device(QListWidgetItem):
         else:
             self.port = port
 
-    def setColor(self, color):
+    def setColor(self, color: str):
         self.back_color = color
 
-    def setSample(self, sample):
+    def setSample(self, sample: str):
         self.sample = sample
 
-    def setBaud(self, baud):
+    def setBaud(self, baud: str):
         self.baud_rate = baud
 
-    def setBits(self, bits):
+    def setBits(self, bits: str):
         self.data_bits = bits
 
-    def setClient(self, client):
-        self.client = client
+    def setClient(self, client: str):
+        self.is_client = client
 
-    def setIpPort(self, ip_port):
+    def setIpPort(self, ip_port: str):
         self.ip_port = ip_port
+
+    def setSamplingRate(self, sampling_rate: str):
+        self.sampling_rate = sampling_rate
 
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
@@ -114,6 +123,11 @@ class Device(QListWidgetItem):
         self.setPort(self.default_properties["Device Port"])
         self.setColor(self.default_properties.get("Back Color", "0,0,0"))
         self.setPort(self.default_properties.get("Multi Sample", "0"))
+        self.setBaud(self.default_properties.get("Baud Rate", "9600"))
+        self.setBits(self.default_properties.get("Data Bits", "8"))
+        self.setIpPort(self.default_properties.get("IP Port", "25576"))
+        self.setClient(self.default_properties.get("Is Client", "1"))
+        self.setSamplingRate(self.default_properties.get("Sampling Rate", "auto"))
 
     def getInfo(self) -> dict:
         self.default_properties["Device Name"] = self.text()
@@ -123,5 +137,6 @@ class Device(QListWidgetItem):
         self.default_properties["Baud Rate"] = self.baud_rate
         self.default_properties["Data Bits"] = self.data_bits
         self.default_properties["IP Port"] = self.ip_port
-        self.default_properties["Is Client"] = self.client
+        self.default_properties["Is Client"] = self.is_client
+        self.default_properties["Sampling Rate"] = self.sampling_rate
         return self.default_properties

@@ -1,4 +1,3 @@
-from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
 
 from app.center.widget_tabs.events.durationPage import DurationPage

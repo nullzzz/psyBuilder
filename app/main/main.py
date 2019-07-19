@@ -17,7 +17,7 @@ from app.deviceSelection.globalSelection.globalDevices import GlobalDevice
 from app.deviceSelection.progressBar import LoadingTip
 from app.func import Func
 from app.info import Info
-from app.init import writeToRegistry
+from app.registry import writeToRegistry
 from app.output.main import Output
 from app.properties.main import Properties
 from app.structure.main import Structure
