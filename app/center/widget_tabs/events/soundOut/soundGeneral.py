@@ -23,7 +23,8 @@ class SoundTab1(QWidget):
             "Volume control": 0,
             "Volume": "100",
             "Pan control": 0,
-            "Pan": "0"
+            "Pan": "0",
+            "Sound Device": ""
         }
         self.file_name = PigLineEdit()
         self.file_name.textChanged.connect(self.findVar)
@@ -37,7 +38,6 @@ class SoundTab1(QWidget):
         self.volume.setText("0")
         self.volume.textChanged.connect(self.findVar)
         self.volume.returnPressed.connect(self.finalCheck)
-        # self.volume = QSpinBox()
         self.pan_control = QCheckBox("Pan control")
         self.pan_control.stateChanged.connect(self.panChecked)
         self.pan = PigLineEdit()
@@ -192,18 +192,15 @@ class SoundTab1(QWidget):
         self.default_properties["Start offset"] = self.start_offset.text()
         self.default_properties["Stop offset"] = self.stop_offset.text()
         self.default_properties["Loop"] = self.loop.currentText()
-        self.default_properties["Volume control"] = self.volume_control.checkState()
-        # self.default_properties["Volume"] = self.volume.value()
-        self.default_properties["Volume"] = self.volume.text()
 
+        self.default_properties["Volume control"] = self.volume_control.checkState()
+        self.default_properties["Volume"] = self.volume.text()
         self.default_properties["Pan control"] = self.pan_control.checkState()
-        # self.default_properties["Pan"] = self.pan.value()
         self.default_properties["Pan"] = self.pan.text()
         if Func.getDeviceNameById(self.using_device_id):
             self.default_properties["Sound device"] = Func.getDeviceNameById(self.using_device_id)
         else:
             self.default_properties["Sound device"] = self.sound_device.currentText()
-
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -218,13 +215,9 @@ class SoundTab1(QWidget):
         self.stop_offset.setText(self.default_properties["Stop offset"])
         self.loop.setCurrentText(self.default_properties["Loop"])
         self.volume_control.setCheckState(self.default_properties["Volume control"])
-        # self.volume.setValue(self.default_properties["Volume"])
         self.volume.setText(self.default_properties["Volume"])
-
         self.pan_control.setCheckState(self.default_properties["Pan control"])
-        # self.pan.setValue(self.default_properties["Pan"])
         self.pan.setText(self.default_properties["Pan"])
-
         self.sound_device.setCurrentText((self.default_properties["Sound device"]))
 
     def clone(self):

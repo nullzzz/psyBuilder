@@ -90,7 +90,7 @@ class TextTab1(QWidget):
         l02 = QLabel("Fore Color:")
         l12 = QLabel("Back Color:")
 
-        l20 = QLabel("Clear After:")
+        l20 = QLabel("Dont Clear After:")
         l22 = QLabel("Screen Name:")
 
         l30 = QLabel("Transparent:")
@@ -123,7 +123,7 @@ class TextTab1(QWidget):
         self.align_x.addItems(["center", "left", "right", "wrapat", "justifytomax"])
         self.align_y.addItem("center")
 
-        self.clear_after.addItems(["Yes", "No"])
+        self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
         self.transparent.setText("100%")
         self.screen_name.addItems(["screen.0"])

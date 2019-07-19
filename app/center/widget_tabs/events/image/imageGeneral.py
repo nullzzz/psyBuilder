@@ -56,7 +56,7 @@ class ImageTab1(QWidget):
     def setGeneral(self):
         self.stretch_mode.addItems(("Both", "LeftRight", "UpDown"))
         self.transparent.setText("100")
-        self.clear_after.addItems(("Yes", "No"))
+        self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
         self.screen_name.addItems(["screen.0"])
 
         # 打开文件按钮布局
@@ -85,7 +85,7 @@ class ImageTab1(QWidget):
         layout2.setVerticalSpacing(10)
         layout2.setLabelAlignment(Qt.AlignRight)
         layout2.addRow("Transparent:", self.transparent)
-        layout2.addRow("Clear After:", self.clear_after)
+        layout2.addRow("Dont Clear After:", self.clear_after)
         layout2.addRow("Screen Name:", self.screen_name)
 
         group2.setLayout(layout2)
@@ -139,8 +139,6 @@ class ImageTab1(QWidget):
         self.default_properties["Rotate"] = self.rotate.text()
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
-        # self.default_properties["Back color"] = self.back_color.getColor()
-        # self.default_properties["Transparent"] = self.transparent.value()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear after"] = self.clear_after.currentText()
         if Func.getDeviceNameById(self.using_device_id):
