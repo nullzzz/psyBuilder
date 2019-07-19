@@ -142,7 +142,6 @@ class StructureTree(QTreeWidget):
         if self.currentItem():
             self.widgetOpen.emit(self.currentItem().widget_id)
 
-    # todo drag
     def mouseMoveEvent(self, e):
         try:
             node: StructureNode = self.itemAt(e.pos())

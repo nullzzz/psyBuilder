@@ -32,13 +32,12 @@ class FramePage(QWidget):
         self.height.installEventFilter(self)
         # down
         self.enable = PigComboBox()
-        self.enable.addItems(("yes", "no"))
         self.enable.currentTextChanged.connect(self.operationAble)
         self.border_color = ColorListEditor()
         self.border_width = PigLineEdit()
         self.back_color = ColorListEditor()
-        self.transparent = PigLineEdit()
-        # self.transparent.setSuffix("%")
+        self.transparent = PigLineEdit("100")
+        self.enable.addItems(("no", "yes"))
         self.setUI()
 
     def operationAble(self, signal):
@@ -96,7 +95,7 @@ class FramePage(QWidget):
         layout1.addWidget(self.height, 1, 3)
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("Border")
+        group2 = QGroupBox("Border and background")
         layout2 = QFormLayout()
 
         layout2.addRow(l45, self.enable)
