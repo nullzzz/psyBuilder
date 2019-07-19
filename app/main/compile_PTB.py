@@ -436,6 +436,9 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     debugPrint("----------------------\\")
 
     cProperties = Func.getProperties(cWidget.widget_id)
+    debugPrint(f"{cWidget.widget_id} properties:")
+    debugPrint(f"{cProperties}")
+    debugPrint("-------------------------------\\")
 
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
@@ -577,7 +580,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
 
-    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Dont Clear After'], attributesSetDict))
+    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
     clearAfter = dontClearAfterTransStr(clearAfter)
 
     # cRefedValue, isRef = getRefValue(cWidget, cProperties['Clear after'], attributesSetDict)
@@ -607,6 +610,13 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
         printAutoInd(f, "Screen('Flip',{0},{1},{2});",cWinStr,0,clearAfter)
     else:
         printAutoInd(f, "Screen('Flip',{0},{1},{2});", cWinStr, 0, clearAfter)
+
+    # ------------------------------------------------------------
+    # Step 4: send output messages
+    # ------------------------------------------------------------
+
+
+
 
     # [VBLTimestamp StimulusOnsetTime FlipTimestamp Missed Beampos] = Screen('Flip', windowPtr[, when]
     # [, dontclear][, dontsync] [, multiflip]);
@@ -1325,7 +1335,7 @@ def compilePTB(globalSelf):
         printAutoInd(f,"case 'Session'")
         printAutoInd(f,"cCBRow = rem(str2double(subInfo.session),nRows);")
         printAutoInd(f,"if cCBRow == 0")
-        printAutoInd(f,"cCBRow = cCBRow;")
+        printAutoInd(f,"cCBRow = nRows;")
         printAutoInd(f,"end")
         printAutoInd(f,"cShuffledIdx = cShuffledIdx(cCBRow);")
 
