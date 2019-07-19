@@ -168,7 +168,7 @@ def booleanTransStr(inputStr,isRef):
 
     return inputStr
 
-def dontClearTransStr(inputStr):
+def dontClearAfterTransStr(inputStr):
     if inputStr == "'clear_0'":
         inputStr = "0"
     elif inputStr == "'notClear_1'":
@@ -577,11 +577,11 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
 
-    # clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Dont Clear After'], attributesSetDict))
-    # clearAfter = dontClearAfterTransStr(clearAfter)
+    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Dont Clear After'], attributesSetDict))
+    clearAfter = dontClearAfterTransStr(clearAfter)
 
-    cRefedValue, isRef = getRefValue(cWidget, cProperties['Clear after'], attributesSetDict)
-    clearAfter         = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
+    # cRefedValue, isRef = getRefValue(cWidget, cProperties['Clear after'], attributesSetDict)
+    # clearAfter         = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
 
     printAutoInd(f, "Screen('DrawingFinished',{0},{1});",cWinStr,clearAfter)
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event")
@@ -656,7 +656,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
 
     attributesSetDict.setdefault(f"{cWidgetName}.cLoop",[cLoopLevel,f"iLoop_{cLoopLevel}"])
-    attributesSetDict.setdefault(f"{cWidgetName}.rowNums",[cLoopLevel,f"size({cLoopLevel}.attr,1)"])
+    attributesSetDict.setdefault(f"{cWidgetName}.rowNums",[cLoopLevel,f"size({cWidgetName}.attr,1)"])
 
     cLoopIterStr = attributesSetDict[f"{cWidgetName}.cLoop"][1]
 
@@ -673,8 +673,6 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
             # update the attributes set dictionary
             for key in cRowDict.keys():
                 attributesSetDict.setdefault(f"{cWidgetName}.attr.{key}",[cLoopLevel,f"{cWidgetName}.attr.{key}{{iLoop{cLoopLevel}}}"])
-            # debugPrint('-----cAttributes set -----------')
-            # debugPrint(attributesSetDict)
         # handle the references and the values in colorType
         for key, value in cRowDict.items():
 
@@ -698,6 +696,23 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
 
     printAutoInd(f,'{0}\n',endExpStr)
+
+
+    # Shuffle the designMatrix:
+    debugPrint('----------------/')
+    debugPrint(dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict)))
+    debugPrint('----------------\\')
+
+    cycleOrderStr   = dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict))
+    cycleOrderByStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrderBy(), attributesSetDict))
+
+    # attributesSetDict.setdefault(f"{cWidgetName}.rowNums", [cLoopLevel, f"size({cWidgetName}.attr,1)"])
+
+    printAutoInd(f, "%---Shuffle the DesignMatrix-----/")
+    printAutoInd(f, 'cShuffledIdx = ShuffleCycleOrder({0},{1},{2},subInfo);', attributesSetDict[f"{cWidgetName}.rowNums"][1], cycleOrderStr,cycleOrderByStr)
+    printAutoInd(f, '{0}.attr = {0}.attr(cShuffledIdx,:);',cWidgetName)
+    printAutoInd(f, "%--------------------------------\\\n")
+
     # cycling
     printAutoInd(f, '% looping across each row of the {0}.attr:{1}',cWidgetName , cLoopIterStr)
     printAutoInd(f, 'for {0} = size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
@@ -1273,6 +1288,63 @@ def compilePTB(globalSelf):
         printAutoInd(f,"end % if")
 
         printAutoInd(f,"outRect = CenterRectOnPointd([0, 0, frameWidth, frameHight], x, y);")
+
+        printAutoInd(f,"end %  end of subfun3")
+
+
+
+
+        printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f,"% subfun 4: ShuffleCycleOrder")
+        printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+
+        printAutoInd(f,"function cShuffledIdx = ShuffleCycleOrder(nRows,orderStr,orderByStr,subInfo)")
+        printAutoInd(f,"cShuffledIdx = 1:nRows;")
+        printAutoInd(f,"switch orderStr")
+        printAutoInd(f,"case 'Sequential'")
+        # printAutoInd(f,"cShuffledIdx = 1:nRows;")
+
+        printAutoInd(f,"case 'Random'")
+        printAutoInd(f,"cShuffledIdx = Shuffle(cShuffledIdx);")
+
+        printAutoInd(f,"case 'Random with Replacement'")
+        printAutoInd(f,"cShuffledIdx = Randi(nRows,[nRows,1]);")
+
+        printAutoInd(f,"case 'CountBalance'")
+        printAutoInd(f,"switch orderByStr")
+        printAutoInd(f,"case 'N/A'")
+        # printAutoInd(f,"cShuffledIdx = 1:nRows;")
+
+        printAutoInd(f,"case 'Subject'")
+        printAutoInd(f,"cCBRow = rem(str2double(subInfo.num),nRows);")
+        printAutoInd(f,"if cCBRow == 0")
+        printAutoInd(f,"cCBRow = nRows;")
+        printAutoInd(f,"end")
+        printAutoInd(f,"cShuffledIdx = cShuffledIdx(cCBRow);")
+
+        printAutoInd(f,"case 'Session'")
+        printAutoInd(f,"cCBRow = rem(str2double(subInfo.session),nRows);")
+        printAutoInd(f,"if cCBRow == 0")
+        printAutoInd(f,"cCBRow = cCBRow;")
+        printAutoInd(f,"end")
+        printAutoInd(f,"cShuffledIdx = cShuffledIdx(cCBRow);")
+
+        printAutoInd(f,"case 'Run'")
+        printAutoInd(f,"cCBRow = rem(str2double(subInfo.num),nRows);")
+        printAutoInd(f,"if cCBRow == 0")
+        printAutoInd(f,"cCBRow = nRows;")
+        printAutoInd(f,"end")
+        printAutoInd(f,"cShuffledIdx = cShuffledIdx(cCBRow);")
+
+        printAutoInd(f,"otherwise")
+        printAutoInd(f,"error('Order By should be of {{''Run'',''Subject'',''Session'',''N/A''}}');")
+        printAutoInd(f,"end%switch")
+
+
+
+        printAutoInd(f,"otherwise")
+        printAutoInd(f,"error('order methods should be of {{''Sequential'',''Random'',''Random with Replacement'',''CountBalance''}}');")
+        printAutoInd(f,"end%switch")
 
         printAutoInd(f,"end %  end of subfun3")
 
