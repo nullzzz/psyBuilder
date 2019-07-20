@@ -69,7 +69,6 @@ class InDeviceRespAtDuration(QWidget):
             self.resp_trigger_out.setCurrentIndex(0)
 
     def changeOutput(self, current_name: str):
-        print(current_name)
         for k, v in self.using_output_device.items():
             if current_name == v:
                 self.current_output_device_id = k
