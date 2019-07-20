@@ -14,9 +14,6 @@ from app.lib import PigComboBox
 
 
 class DurationPage(QWidget):
-    OUTPUT_DEVICES = {}
-    INPUT_DEVICES = {}
-
     def __init__(self, parent=None):
         super(DurationPage, self).__init__(parent)
 
@@ -129,7 +126,7 @@ class DurationPage(QWidget):
     # 弹出输入设备选择框
     def showInDevices(self):
         self.in_devices_dialog = DeviceInDialog()
-        self.in_devices_dialog.addDevices(DurationPage.INPUT_DEVICES)
+        self.in_devices_dialog.addDevices(Info.INPUT_DEVICE_INFO)
 
         self.in_devices_dialog.ok_bt.clicked.connect(self.selectIn)
         self.in_devices_dialog.cancel_bt.clicked.connect(self.in_devices_dialog.close)
@@ -142,7 +139,7 @@ class DurationPage(QWidget):
     def showOutDevices(self):
         self.out_devices_dialog = DeviceOutDialog()
 
-        self.out_devices_dialog.addDevices(DurationPage.OUTPUT_DEVICES)
+        self.out_devices_dialog.addDevices(Info.OUTPUT_DEVICE_INFO)
         self.out_devices_dialog.ok_bt.clicked.connect(self.selectOut)
         self.out_devices_dialog.cancel_bt.clicked.connect(self.out_devices_dialog.close)
         self.out_devices_dialog.setWindowModality(Qt.ApplicationModal)

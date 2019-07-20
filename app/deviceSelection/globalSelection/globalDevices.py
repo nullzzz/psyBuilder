@@ -147,10 +147,8 @@ class GlobalDevice(QWidget):
         device_info: dict = self.selected_devices.getInfo()
         if self.device_type:
             Info.OUTPUT_DEVICE_INFO = device_info.copy()
-            DurationPage.OUTPUT_DEVICES = device_info
         else:
             Info.INPUT_DEVICE_INFO = device_info.copy()
-            DurationPage.INPUT_DEVICES = device_info
 
     # 参数导入
     def setProperties(self, properties: dict):
