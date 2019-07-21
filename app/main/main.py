@@ -526,7 +526,7 @@ class PsyApplication(QMainWindow):
                 QMessageBox.about(self, "Registry", "Registry Failed!")
 
     def about(self):
-        QMessageBox.about(self, "About PsyDemo", "NOTHING")
+        QMessageBox.about(self, "About PTB Builder 0.1", "A free GUI to generate experimental codes for PTB\nDepartment of Psychology,Soochow University ")
 
     def checkUpdate(self):
         self.bar = LoadingTip()
