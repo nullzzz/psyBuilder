@@ -7,6 +7,8 @@ class Info(object):
     """
     info类，主要存放一些配置信息及数据
     """
+    # 编译平台：linux\windows\mac
+    PLATFORM: str = "linux"
 
     # 保存widget_tabs的 (widget_id -> widget)
     WID_WIDGET = {}
