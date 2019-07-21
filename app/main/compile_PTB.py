@@ -826,7 +826,7 @@ def compilePTB(globalSelf):
     enabledKBKeysList = []
     enabledKBKeysList.append('escape')
 
-    attributesSetDict = {'sessionNum':[0,'SubInfo.session'],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
+    attributesSetDict = {'sessionNum':[0,'SubInfo.session',{}],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
 
     debugPrint(f"{Info.PLATFORM}")
 
