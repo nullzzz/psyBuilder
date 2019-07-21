@@ -36,7 +36,7 @@ class FramePage(QWidget):
         self.border_color = ColorListEditor()
         self.border_width = PigLineEdit()
         self.back_color = ColorListEditor()
-        self.transparent = PigLineEdit("100")
+        self.transparent = PigLineEdit("100%")
         self.enable.addItems(("no", "yes"))
         self.setUI()
 
