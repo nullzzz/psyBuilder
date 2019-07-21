@@ -665,3 +665,34 @@ class Func(object):
     @staticmethod
     def log(text, error=False, timer=True):
         pass
+
+    @staticmethod
+    def getParentWid(wid: str) -> str:
+        """
+        根据输入的wid参数，得到他的父节点的wid
+        :param wid: 输入的参数
+        :return: 父节点的wid， 如果没有父节点返回“”
+        """
+        try:
+            return Info.WID_NODE[wid].parent().widget_id
+        except:
+            return ""
+
+    @staticmethod
+    def getWidLevel(wid: str) -> int:
+        """
+        通过输入的wid得到该widget所在层级，从0开始累加，即最初始的timeline为0，往后递增
+        :param wid: 输入的wid
+        :return: 如果wid不存在，返回-1
+        """
+        try:
+            node = Info.WID_NODE[wid]
+        except:
+            return -1
+        # 不断迭代，直至父结点为空
+        level = 0
+        node = node.parent()
+        while node:
+            node = node.parent()
+            level += 1
+        return level
