@@ -1,7 +1,6 @@
 import os
 import re
 import sys
-# import datetime
 import traceback
 
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
@@ -111,10 +110,30 @@ class PsyApplication(QMainWindow):
 
         # build menu
         build_menu = menu_bar.addMenu("&Building")
+        build_menu.addSection("what")
+
+        platform_menu = build_menu.addMenu("&Platform")
+        self.linux_action = QAction("&Linux", self)
+        self.linux_action.setChecked(True)
+        self.windows_action = QAction("&Windows", self)
+        self.mac_action = QAction("&Mac", self)
+        icon = QIcon(Func.getImage("dock_visible.png"))
+        self.linux_action.setIcon(icon)
+        self.windows_action.setIcon(icon)
+        self.windows_action.setIconVisibleInMenu(False)
+        self.mac_action.setIcon(icon)
+        self.mac_action.setIconVisibleInMenu(False)
+
+        self.linux_action.triggered.connect(self.changePlatform)
+        self.windows_action.triggered.connect(self.changePlatform)
+        self.mac_action.triggered.connect(self.changePlatform)
+        platform_menu.addAction(self.linux_action)
+        platform_menu.addAction(self.windows_action)
+        platform_menu.addAction(self.mac_action)
+
         compile_action = QAction("&Compile", self)
-
+        compile_action.setShortcut("Ctrl+F5")
         compile_action.triggered.connect(self.compile)
-
         build_menu.addAction(compile_action)
 
         # help menu
@@ -479,6 +498,12 @@ class PsyApplication(QMainWindow):
 
     def contextMenuEvent(self, QContextMenuEvent):
         super().contextMenuEvent(QContextMenuEvent)
+
+    def changePlatform(self, c):
+        self.linux_action.setIconVisibleInMenu(self.sender() is self.linux_action)
+        self.windows_action.setIconVisibleInMenu(self.sender() is self.windows_action)
+        self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
+        Info.PLATFORM = self.sender().text().lstrip("&").lower()
 
     def compile(self):
         try:
