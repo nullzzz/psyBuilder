@@ -61,7 +61,8 @@ def printAutoInd(f,inputStr,*argins):
     incrAfterStr    = ('if','try','switch','for','while')
     decreAndIncrStr = ('else','elseif','otherwise','catch')
 
-    # isinstance(f,'list')
+    if isinstance(f,'list'):
+        debugPrint('list')
 
     if inputStr.split(' ')[0] in incrAfterStr:
         tabStrs = '\t' * cIndents
