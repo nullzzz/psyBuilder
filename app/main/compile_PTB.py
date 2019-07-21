@@ -639,7 +639,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
     for iTimeline in cTimeLineList:
         cTimelineSet.add(iTimeline[1])
 
-    print(cTimelineSet)
+    debugPrint(cTimelineSet)
 
     printAutoInd(f, '% switch across timeline types')
     printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
@@ -668,20 +668,20 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
          noStimRelatedCodes = []
 
          cWidget = Info.WID_WIDGET[cWidgetId]
-         print(Func.getWidgetName(cWidgetId))
+         debugPrint(Func.getWidgetName(cWidgetId))
 
          if 'Text' == cWidget.widget_id.split('.')[0]:
              noStimRelatedCodes = printTextWidget(cWidget,noStimRelatedCodes)
 
          elif 'Cycle' == cWidget.widget_id.split('.')[0]:
-             print(cWidget.getTimelines())
+             debugPrint(cWidget.getTimelines())
              noStimRelatedCodes = printCycleWdiget(cWidget,f, noStimRelatedCodes)
 
 
-         print(Func.getProperties(cWidgetId))
-         # print(cWidget.getPropertyByKey('Text'))
-         # print(Func.getScreen)
-         # print(dir(cWidget))
+         debugPrint(Func.getProperties(cWidgetId))
+         # debugPrint(cWidget.getPropertyByKey('Text'))
+         # debugPrint(Func.getScreen)
+         # debugPrint(dir(cWidget))
 
          widget是具体的某个控件
 
@@ -815,8 +815,8 @@ def compilePTB(globalSelf):
         # you can get each widget's device you selected
         output_devices = Info.OUTPUT_DEVICE_INFO
         input_devices  = Info.INPUT_DEVICE_INFO
-        # print('-------------')
-        # print(output_devices)
+        # debugPrint('-------------')
+        # debugPrint(output_devices)
         printAutoInd(f,"%------ define input devices --------/")
         iKeyboard = 1
         iGamepad  = 1
@@ -826,7 +826,7 @@ def compilePTB(globalSelf):
         for input_device in input_devices:
             # create a map dict to map device name (key) to device ID (value)
             inputDevNameIdxDict.update({input_devices[input_device]['Device Name']:input_device})
-            # print(input_device)
+            # debugPrint(input_device)
             if input_devices[input_device]['Device Type'] == 'keyboard':
                 printAutoInd(f,"KBoards({0}).port     = '{1}';",iKeyboard,input_devices[input_device]['Device Port'])
                 printAutoInd(f,"KBoards({0}).name     = '{1}';\n",iKeyboard,input_devices[input_device]['Device Name'])
