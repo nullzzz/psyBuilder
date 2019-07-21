@@ -3,6 +3,7 @@ import sys
 import datetime
 import re
 
+
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMessageBox
