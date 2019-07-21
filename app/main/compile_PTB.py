@@ -753,9 +753,8 @@ def compilePTB(globalSelf):
         printAutoInd(f,"hideCursor;            % hide mouse cursor")
         printAutoInd(f,"commandwindow;         % bring the command window into front")
 
-        if
-        printAutoInd(f,"ShowHideWinTaskbar(0); % hide the window taskbar")
-        printAutoInd(f,"end")
+        if Info.PLATFORM == 'windows':
+            printAutoInd(f,"ShowHideWinTaskbar(0); % hide the window taskbar")
 
 
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
