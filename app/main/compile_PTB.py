@@ -332,6 +332,7 @@ def addSquBrackets(inputStr):
 
 def getRefValue(cwidget, inputStr,attributesSetDict):
     isRefValue = False
+    # valueSet   = set()
 
     if isinstance(inputStr, str):
 
@@ -344,13 +345,53 @@ def getRefValue(cwidget, inputStr,attributesSetDict):
                 # debugPrint(f"{inputStr}, {isRefValue}")
                 # debugPrint(attributesSetDict)
                 inputStr = attributesSetDict[inputStr][1]
+                # valueSet = attributesSetDict[inputStr][2]
                 # debugPrint(f"{inputStr},{isRefValue}")
             else:
                 throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cwidget.widget_id)}")
 
     return [inputStr,isRefValue]
 
+def getRefValueSet(cwidget, inputStr,attributesSetDict):
+    isRefValue = False
+    valueSet   = set()
 
+    if isinstance(inputStr, str):
+
+        isRefValue = isRefStr(inputStr)
+
+        if isRefValue:
+            inputStr = re.sub("[\[\]]", '', inputStr)
+
+            if inputStr in attributesSetDict:
+                # debugPrint( attributesSetDict[inputStr])
+                valueSet = attributesSetDict[inputStr][2]
+                inputStr = attributesSetDict[inputStr][1]
+            else:
+                throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cwidget.widget_id)}")
+
+    return [inputStr,isRefValue,valueSet]
+
+"""
+def getCycleColValueSet(cWidget,key,attributesSetDict):
+    colValueSet = {}
+
+    for iRow in range(cWidget.rowCount()):
+        cRowDict = cWidget.getAttributes(iRow)
+
+        cValue, isRefValue = getRefValue(cWidget, cRowDict[key], attributesSetDict)
+
+        if isRefValue:
+            foundStr = re.search('[\.a-zA-Z0-9_]*\{',cValue).group(0)[0:-1]
+            if foundStr:
+                attributesSetDict[foundStr][2]
+            # f"{cWidgetName}.attr.{key}{{{cLoopIterStr}}}"
+
+        else:
+            colValueSet.add(cRowDict[key])
+
+    return colValueSet
+"""
 
 def parseAllowKeys(allowKeyStr):
     global enabledKBKeysList
@@ -457,17 +498,17 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
-    cScreenName, noused = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
+    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
 
     cWinStr = f"winIds({outputDevNameIdxDict.get(cScreenName)})"
 
     # 2) handle the text content
-    cProperties['Text'],noused = getRefValue(cWidget,cProperties['Text'],attributesSetDict)
+    cProperties['Text'],ign = getRefValue(cWidget,cProperties['Text'],attributesSetDict)
 
     if isContainChStr(cProperties['Text']):
         cProperties['Text'] = "["+ "".join(f"{ord(value)} " for value in cProperties['Text']) +"]"
     else:
-        cProperties['Text'] = "'" + pyStr2MatlabStr(cProperties['Text']) + "'"
+        cProperties['Text'] = addSingleQuotes(pyStr2MatlabStr(cProperties['Text']))
 
     # 3) check the alignment X parameter:
     alignmentX =dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
@@ -661,7 +702,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
             printAutoInd(f,"pnet({0},'write',{1});",outputDevNameIdxDict.get(cDevName),msgValue)
 
         elif devType == 'serial_port':
-            printAutoInd(f,"[noused, when] = IOPort('Write', {0}, {1});",outputDevNameIdxDict.get(cDevName),msgValue)
+            printAutoInd(f,"[ign, when] = IOPort('Write', {0}, {1});",outputDevNameIdxDict.get(cDevName),msgValue)
 
 
     # -------------------------------------------------------------
@@ -699,8 +740,8 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
     cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
 
-    attributesSetDict.setdefault(f"{cWidgetName}.cLoop",[cLoopLevel,f"iLoop_{cLoopLevel}"])
-    attributesSetDict.setdefault(f"{cWidgetName}.rowNums",[cLoopLevel,f"size({cWidgetName}.attr,1)"])
+    attributesSetDict.setdefault(f"{cWidgetName}.cLoop",[cLoopLevel,f"iLoop_{cLoopLevel}",{f"iLoop_{cLoopLevel}"}])
+    attributesSetDict.setdefault(f"{cWidgetName}.rowNums",[cLoopLevel,f"size({cWidgetName}.attr,1)",{f"size({cWidgetName}.attr,1)"}])
 
     cLoopIterStr = attributesSetDict[f"{cWidgetName}.cLoop"][1]
 
@@ -715,10 +756,8 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
         if 0 == iRow:
             endExpStr = "},'VariableNames',{" + ''.join("'"+key+"' " for key in cRowDict.keys()) + "});"
             # update the attributes set dictionary
-            for key in cRowDict.keys():
-                attributesSetDict.setdefault(f"{cWidgetName}.attr.{key}",[cLoopLevel,f"{cWidgetName}.attr.{key}{{{cLoopIterStr}}}"])
-        # handle the references and the values in colorType
 
+        # handle the references and the values in colorType
         # --- replaced the percentageStr
         for key, value in cRowDict.items():
             # debugPrint(f"c = {cRowDict}")
@@ -729,6 +768,25 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
                 cValue       = parsePercentStr(cValue)
                 cRowDict[key]= cValue
 
+        # loop again to get the values set for each attribute
+        for key, value in cRowDict.items():
+            preValueSet = set()
+
+            cAttributeName = f"{cWidgetName}.attr.{key}"
+
+            # debugPrint(value)
+
+            cValue, isRefValue, cRefValueSet = getRefValueSet(cWidget,value,attributesSetDict)
+
+            if isRefValue == False:
+                cRefValueSet = set([cValue])
+
+            if cAttributeName in attributesSetDict:
+                preValueSet = attributesSetDict[cAttributeName][2]
+
+            attributesSetDict.update({cAttributeName:[cLoopLevel,f"{cAttributeName}{{{cLoopIterStr}}}",cRefValueSet.union(preValueSet)]})
+
+        # print out the design matrix of the current Cycle
 
         if '' == cRowDict['Weight']:
             cRepeat = 1
@@ -738,14 +796,15 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
         for iRep in range(cRepeat):
             printAutoInd(f,'{0}',"".join(addCurlyBrackets(dataStrConvert( *getRefValue(cWidget,value,attributesSetDict) ) ) + " " for key, value in cRowDict.items())+";...")
 
+    # debugPrint('- attributesSet after each cycle----------/')
+    # debugPrint(attributesSetDict)
+    # debugPrint('-----------------------------------------\\')
 
     printAutoInd(f,'{0}\n',endExpStr)
 
 
     # Shuffle the designMatrix:
-    debugPrint('----------------/')
-    debugPrint(dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict)))
-    debugPrint('----------------\\')
+
 
     cycleOrderStr   = dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict))
     cycleOrderByStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrderBy(), attributesSetDict))
@@ -814,7 +873,7 @@ def compilePTB(globalSelf):
     previousColorFontDict.update({'fontSize':"12"})
     previousColorFontDict.update({'fontStyle':"0"})
     previousColorFontDict.update({'fontBkColor':"[259,0,0]"}) # we give the bkcolor an impossible initial value
-    # previousColorFontDict.update({'clearAfter':"0"})
+
 
     cIndents   = 0
     cLoopLevel = 0
@@ -826,7 +885,7 @@ def compilePTB(globalSelf):
     enabledKBKeysList = []
     enabledKBKeysList.append('escape')
 
-    attributesSetDict = {'sessionNum':[0,'SubInfo.session',{}],'subAge':[0,'SubInfo.age'],'subName':[0,'SubInfo.name'],'subSex':[0,'SubInfo.sex'],'subNum':[0,'SubInfo.num'],'subHandness':[0,'SubInfo.hand']}
+    attributesSetDict = {'sessionNum':[0,'SubInfo.session',{'SubInfo.session'}],'subAge':[0,'SubInfo.age',{'SubInfo.age'}],'subName':[0,'SubInfo.name',{'SubInfo.name'}],'subSex':[0,'SubInfo.sex',{'SubInfo.sex'}],'subNum':[0,'SubInfo.num',{'SubInfo.num'}],'subHandness':[0,'SubInfo.hand',{'SubInfo.hand'}]}
 
     debugPrint(f"{Info.PLATFORM}")
 
@@ -1217,7 +1276,7 @@ def compilePTB(globalSelf):
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
         printAutoInd(f, "function detectAbortKey(abortKeyCode)")
-        printAutoInd(f,"[keyIsDown, Noused, keyCode] = responseCheck(-1);")
+        printAutoInd(f,"[keyIsDown, ign, keyCode] = responseCheck(-1);")
         printAutoInd(f,"if keyCode(abortKeyCode)")
 
         printAutoInd(f,"error('The experiment was aborted by the experimenter!');")
