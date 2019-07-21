@@ -64,6 +64,7 @@ def printAutoInd(f,inputStr,*argins):
     if isinstance(f,'list'):
         debugPrint('list')
 
+
     if inputStr.split(' ')[0] in incrAfterStr:
         tabStrs = '\t' * cIndents
         print(f"\n{tabStrs}{inputStr}".format(*argins), file=f)
