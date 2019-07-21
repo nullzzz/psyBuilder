@@ -31,6 +31,7 @@ outputDevNameIdxDict = {}
 previousColorFontDict = {}
 
 
+
 def throwCompileErrorInfo(inputStr):
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Critical)
@@ -47,7 +48,11 @@ def throwCompileErrorInfo(inputStr):
     raise Exception(inputStr)
 
 
+def debugPrint(input):
+    isDebug = True
 
+    if isDebug:
+        print(input)
 
 def printAutoInd(f,inputStr,*argins):
     global cIndents
@@ -108,6 +113,11 @@ def isContainChStr(inputStr):
             return True
     return False
 
+def isSingleQuotedStr(inputStr):
+    if inputStr.startswith("'") and inputStr.endswith("'"):
+        return True
+    return False
+
 def isRgbStr(inputStr):
     isRgbFormat = re.fullmatch("^\d+,\d+,\d+$", inputStr)
     return isRgbFormat
@@ -121,6 +131,7 @@ def isNumStr(inputStr):
         return re.fullmatch("([\d]*\.[\d$]+)|\d*", inputStr)
 
     return False
+
 
 def isIntStr(inputStr):
     if isinstance(inputStr, str):
@@ -160,13 +171,48 @@ def booleanTransStr(inputStr,isRef):
         inputStr = "0"
     else:
         if isRef == False:
-            throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False' or 'True']  OR of ['1','0']")
+            throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False','True','Yes','No','1', or '0'] ")
 
     return inputStr
 
+def dontClearAfterTransStr(inputStr):
+    if inputStr == "'clear_0'":
+        inputStr = "0"
+    elif inputStr == "'notClear_1'":
+        inputStr = "1"
+    elif inputStr == "'doNothing_2'":
+        inputStr = "2"
+
+    return inputStr
+
+
+def fontStyleTransStr(inputStr):
+    if inputStr == "'normal_0'":
+        inputStr = '0'
+    elif inputStr == "'bold_1'":
+        inputStr = '1'
+    elif inputStr == "'italic_2'":
+        inputStr = '2'
+    elif inputStr == "'underline_4'":
+        inputStr = '4'
+    elif inputStr == "'outline_8'":
+        inputStr = '8'
+    elif inputStr == "'overline_16'":
+        inputStr = '16'
+    elif inputStr == "'condense_32'":
+        inputStr = '32'
+    elif inputStr == "'extend_64'":
+        inputStr = '64'
+
+    return inputStr
+
+
 def pyStr2MatlabStr(inputStr):
     if isinstance(inputStr, str):
+        if isSingleQuotedStr(inputStr):
+            inputStr = inputStr[1:-1]
         inputStr = re.sub("'","''",inputStr)
+        # inputStr = re.sub(r"\\\%","%",inputStr)
     return inputStr
 
 def parsePercentStr(inputStr):
@@ -193,17 +239,18 @@ def addedTransparentToRGBStr(RGBStr,transparentStr):
         else:
             transparentValue = transparentValue*255
     else:
-        transparentValue = f"{transparentValue}*255"
+        if transparentValue != '[]':
+            transparentValue = f"{transparentValue}*255"
 
-
-    if isRgbStr(RGBStr):
-        RGBStr = f"[{RGBStr},{transparentValue}]"
-    elif isRgbWithBracketsStr(RGBStr):
-        RGBStr = re.sub("]",f",{transparentValue}]",RGBStr)
-    elif isRefStr(RGBStr):
-        RGBStr = f"[{RGBStr},{transparentStr}]"
-    else:
-        raise Exception(f"the input parameter 'RGBStr' is not a RGB format String\n should be of R,G,B, [R,G,B], or referred values!")
+    if transparentValue != '[]':
+        if isRgbStr(RGBStr):
+            RGBStr = f"[{RGBStr},{transparentValue}]"
+        elif isRgbWithBracketsStr(RGBStr):
+            RGBStr = re.sub("]",f",{transparentValue}]",RGBStr)
+        elif isRefStr(RGBStr):
+            RGBStr = f"[{RGBStr},{transparentStr}]"
+        else:
+            raise Exception(f"the input parameter 'RGBStr' is not a RGB format String\n should be of R,G,B, [R,G,B], or referred values!")
 
     return RGBStr
 
@@ -242,6 +289,7 @@ def dataStrConvert(dataStr,isRef = False, transMATStr = False):
                 outData = dataStr # maybe a bug
 
             else:
+                # debugPrint(f"{dataStr},{isRef}")
                 if isRef:
                     outData = dataStr  # maybe a bug
                 else:
@@ -250,7 +298,9 @@ def dataStrConvert(dataStr,isRef = False, transMATStr = False):
                     else:
                         outData = addSingleQuotes(dataStr)  # maybe a bug
         else:
-            outData = "'[]'"
+            outData = "[]"
+
+            debugPrint(f"find an empty input:{dataStr}")
 
     else: # in case there is something wrong
         # raise Exception(f"the input dataStr:{dataStr} is not a string!")
@@ -292,7 +342,10 @@ def getRefValue(cwidget, inputStr,attributesSetDict):
             inputStr = re.sub("[\[\]]", '', inputStr)
 
             if inputStr in attributesSetDict:
-                inputStr = attributesSetDict[inputStr][2]
+                # debugPrint(f"{inputStr}, {isRefValue}")
+                # debugPrint(attributesSetDict)
+                inputStr = attributesSetDict[inputStr][1]
+                # debugPrint(f"{inputStr},{isRefValue}")
             else:
                 throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cwidget.widget_id)}")
 
@@ -312,7 +365,6 @@ def parseAllowKeys(allowKeyStr):
         else:
             for char in item:
                 enabledKBKeysList.append(char)
-
 
 def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
     noStimRelatedCodes = []
@@ -755,7 +807,6 @@ def compilePTB(globalSelf):
 
         if Info.PLATFORM == 'windows':
             printAutoInd(f,"ShowHideWinTaskbar(0); % hide the window taskbar")
-
 
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f,"% define and initialize input/output devices")
