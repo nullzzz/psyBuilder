@@ -118,8 +118,8 @@ class SoundTab1(QWidget):
         layout1.addWidget(self.repetitions, 5, 1)
         group1.setLayout(layout1)
 
-        l6 = QLabel("Volume Control (0~1):")
-        l7 = QLabel("Latency Bias (ms):")
+        # l6 = QLabel("Volume Control (0~1):")
+        # l7 = QLabel("Latency Bias (ms):")
 
         l8 = QLabel("Sound Device:")
         l9 = QLabel("Wait For Start:")
@@ -133,16 +133,16 @@ class SoundTab1(QWidget):
         layout2 = QGridLayout()
 
         # layout2.addWidget(l6, 0, 0, 1, 1)
-        layout2.addWidget(self.volume_control, 0, 0, 1, 1)
-        layout2.addWidget(self.volume, 0, 1, 1, 1)
-        layout2.addWidget(l8, 0, 2, 1, 1)
-        layout2.addWidget(self.sound_device, 0, 3, 1, 2)
+        layout2.addWidget(self.volume_control, 0, 0,)
+        layout2.addWidget(self.volume, 0, 1,)
+        layout2.addWidget(l8, 0, 2)
+        layout2.addWidget(self.sound_device, 0, 3)
 
         # layout2.addWidget(l7, 1, 0, 1, 1)
-        layout2.addWidget(self.latency_bias, 1, 0, 1, 1)
-        layout2.addWidget(self.bias_time, 1, 1, 1, 1)
-        layout2.addWidget(l9, 1, 2, 1, 1)
-        layout2.addWidget(self.wait_for_start, 1, 3, 1, 2)
+        layout2.addWidget(self.latency_bias, 1, 0)
+        layout2.addWidget(self.bias_time, 1, 1)
+        layout2.addWidget(l9, 1, 2)
+        layout2.addWidget(self.wait_for_start, 1, 3)
 
         group2.setLayout(layout2)
 
