@@ -24,7 +24,8 @@ class SoundTab1(QWidget):
             "Volume": "100",
             "Pan control": 0,
             "Pan": "0",
-            "Sound Device": ""
+            "Sound Device": "",
+            "Wait for start": "No"
         }
         self.file_name = PigLineEdit()
         self.file_name.textChanged.connect(self.findVar)
@@ -55,6 +56,9 @@ class SoundTab1(QWidget):
         self.sound_device = PigComboBox()
         self.sound_device.currentTextChanged.connect(self.changeDevice)
         self.using_device_id = ""
+
+        self.wait_for_start = PigComboBox()
+        self.wait_for_start.addItems(("No", "Yes"))
 
         self.setGeneral()
 
@@ -116,6 +120,7 @@ class SoundTab1(QWidget):
         layout2.addRow(self.pan_control)
         layout2.addRow("\tpan:", self.pan)
         layout2.addRow("Sound Device:", self.sound_device)
+        layout2.addRow("Wait For Start:", self.wait_for_start)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
@@ -174,7 +179,7 @@ class SoundTab1(QWidget):
                 QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
                 temp.clear()
 
-    def setAttributes(self, attributes):
+    def setAttributes(self, attributes: list):
         self.attributes = attributes
         self.file_name.setCompleter(QCompleter(self.attributes))
         self.buffer_size.setCompleter(QCompleter(self.attributes))
@@ -183,6 +188,7 @@ class SoundTab1(QWidget):
         self.volume.setCompleter(QCompleter(self.attributes))
         self.pan.setCompleter(QCompleter(self.attributes))
         self.sound_device.setCompleter(QCompleter(self.attributes))
+        self.wait_for_start.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         self.default_properties.clear()
@@ -201,6 +207,8 @@ class SoundTab1(QWidget):
             self.default_properties["Sound device"] = Func.getDeviceNameById(self.using_device_id)
         else:
             self.default_properties["Sound device"] = self.sound_device.currentText()
+        self.default_properties["Wait for start"] = self.wait_for_start.currentText()
+
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -219,6 +227,7 @@ class SoundTab1(QWidget):
         self.pan_control.setCheckState(self.default_properties["Pan control"])
         self.pan.setText(self.default_properties["Pan"])
         self.sound_device.setCurrentText((self.default_properties["Sound device"]))
+        self.wait_for_start.setCurrentText(self.default_properties["Wait for start"])
 
     def clone(self):
         clone_page = SoundTab1()
