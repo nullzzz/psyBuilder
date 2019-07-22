@@ -233,6 +233,7 @@ class QuestInit(QWidget):
         :return:
         """
         hidden_attr = {
+            "cValue": ""
         }
         return hidden_attr
 

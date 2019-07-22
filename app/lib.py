@@ -78,7 +78,8 @@ class PigComboBox(QComboBox):
         text = f"[{stream.readQString()}]"
         index = self.findText(text, Qt.MatchExactly)
         if index == -1:
-            self.addItem(text)
+            if self.insertPolicy() != QComboBox.NoInsert:
+                self.addItem(text)
         self.setCurrentText(text)
 
     # 检查变量
@@ -98,7 +99,7 @@ class PigLineEdit(QLineEdit):
         self.textChanged.connect(self.findVar)
 
         self.suffix: str = ""
-        self.textChanged.connect(self.addSuffix)
+        # self.textChanged.connect(self.addSuffix)
 
     def dragEnterEvent(self, e):
         if e.mimeData().hasFormat("attributes/move-attribute"):
@@ -124,17 +125,23 @@ class PigLineEdit(QLineEdit):
     def setSuffix(self, suffix: str):
         self.suffix = suffix
 
-    def setText(self, a0: str) -> None:
-        if not a0.endswith(self.suffix):
-            text = a0 + self.suffix
-        else:
-            text = a0
-        return QLineEdit.setText(self, text)
+    # def setText(self, a0: str) -> None:
+    #     if not a0.endswith(self.suffix):
+    #         text = a0 + self.suffix
+    #     else:
+    #         text = a0
+    #     return QLineEdit.setText(self, text)
 
     def addSuffix(self, text: str):
         if text != "" and not text.endswith(self.suffix):
             self.setText(text.replace(self.suffix, "") + self.suffix)
             self.cursorForward(False)
+
+    def focusOutEvent(self, e):
+        print("out")
+        print(e)
+        if not self.text().endswith(self.suffix):
+            self.setText(self.text() + self.suffix)
 
 
 class ColorListEditor(PigComboBox):
@@ -154,19 +161,20 @@ class ColorListEditor(PigComboBox):
     def __init__(self, widget=None):
         super(ColorListEditor, self).__init__(widget)
         self.setEditable(True)
-        self.is_valid = True
+        self.is_valid: int = 1
         self.is_showing = False
         self.is_chose = False
         self.default_color = ("white", "gray", "black", "red",
                               "orange", "yellow", "green", "blue", "purple")
         self.populateList()
 
-        self.currentTextChanged.connect(self.changeColor)
+        self.editTextChanged.connect(self.changeColor)
+
         self.setStyleSheet("background: {}".format(self.currentText()))
         # 支持输入255,255,255及#ffffff格式rgb
         valid_rgb = QRegExp(
-            "((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{"
-            "6}|white|gray|black|red|orange|yellow|green|blue|purple")
+            r"((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{6}|"
+            r"white|gray|black|red|orange|yellow|green|blue|purple|\[\w+\]")
         self.setValidator(QRegExpValidator(valid_rgb, self))
         self.setInsertPolicy(QComboBox.NoInsert)
 
@@ -184,6 +192,7 @@ class ColorListEditor(PigComboBox):
             if e.startswith("["):
                 self.setStyleSheet("color: blue")
                 self.setFont(QFont("Timers", 9, QFont.Bold))
+                self.is_valid = 2
             else:
                 self.setStyleSheet("color: black")
                 self.setFont(QFont("宋体", 9, QFont.Normal))
@@ -203,7 +212,7 @@ class ColorListEditor(PigComboBox):
                     # 未选颜色
                     else:
                         self.setCurrentIndex(1)
-                    self.is_valid = True
+                    self.is_valid = 1
                     self.is_chose = False
                 # 255,255,255格式rgb
                 elif e[0] in "0123456789":
@@ -217,9 +226,9 @@ class ColorListEditor(PigComboBox):
                             self.insertItem(1, e)
                             self.setItemData(1, color, Qt.DecorationRole)
                             self.setCurrentIndex(1)
-                        self.is_valid = True
+                        self.is_valid = 1
                     else:
-                        self.is_valid = False
+                        self.is_valid = 0
                         self.setStyleSheet("background: white")
                 # #ffffff格式rgb
                 elif e[0] == "#" and len(e) == 7:
@@ -229,18 +238,18 @@ class ColorListEditor(PigComboBox):
                         self.setItemData(1, color, Qt.DecorationRole)
                         self.setCurrentIndex(1)
                     self.setStyleSheet("background: {}".format(e))
-                    self.is_valid = True
+                    self.is_valid = 1
                 elif e in self.default_color:
-                    self.is_valid = True
+                    self.is_valid = 1
                     self.setStyleSheet("background: {}".format(self.currentText()))
                 else:
-                    self.is_valid = False
+                    self.is_valid = 0
                     self.setStyleSheet("background: white")
         else:
-            self.is_valid = False
+            self.is_valid = 0
             self.setStyleSheet("background: white")
 
-        if self.is_valid:
+        if self.is_valid == 1:
             self.colorChanged.emit(self.getColor())
 
     # 重写下拉菜单展开
@@ -289,3 +298,7 @@ class ColorListEditor(PigComboBox):
 class T(QMainWindow, BaseWidget):
     def __init__(self, parent=None):
         super(T, self).__init__(parent)
+
+
+if __name__ == "__main__":
+    pass

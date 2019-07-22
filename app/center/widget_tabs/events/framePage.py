@@ -118,6 +118,10 @@ class FramePage(QWidget):
         self.y_pos.setCompleter(QCompleter(self.attributes))
         self.width.setCompleter(QCompleter(self.attributes))
         self.height.setCompleter(QCompleter(self.attributes))
+        self.transparent.setCompleter(QCompleter(self.attributes))
+        self.back_color.setCompleter(QCompleter(self.attributes))
+        self.border_color.setCompleter(QCompleter(self.attributes))
+        self.border_width.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         """

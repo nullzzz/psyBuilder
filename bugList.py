@@ -1,6 +1,3 @@
-Device---> screen:
-	resolution:[]x[]/auto
-	refreshRate: auto
 # %%%%%%%%%%%%%%  Bugs       %%%%%%%%%%%%%%%%%%
 1) color input 的地方有一个bug：
 
@@ -10,7 +7,6 @@ Device---> screen:
 
 3）整体关于引用时候预览的问题：如果某个特征是引用的话，预览的时候不好处理，我们这么解决，如果该属性是引用，则预览的时候直接调用该属性的默认值（仅限预览的时候哈）
 
-4） buiding下面的plantform 没有保存。
 
 
 

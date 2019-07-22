@@ -1,10 +1,9 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QApplication, QFileDialog, QCompleter, QMessageBox, QFormLayout
+    QApplication, QFileDialog, QCompleter, QFormLayout
 
 from app.func import Func
-from app.lib import PigLineEdit, PigComboBox, ColorListEditor
+from app.lib import PigLineEdit, PigComboBox
 
 
 # image event专属页面
@@ -47,6 +46,7 @@ class ImageTab1(QWidget):
         # 背景色、透明度、Clear&Screen
         # self.back_color = ColorListEditor()
         self.transparent = PigLineEdit()
+        self.transparent.setSuffix("%")
         self.clear_after = PigComboBox()
         self.screen_name = PigComboBox()
         self.screen_name.currentTextChanged.connect(self.changeDevice)
@@ -116,6 +116,9 @@ class ImageTab1(QWidget):
         self.attributes = attributes
         self.file_name.setCompleter(QCompleter(self.attributes))
         self.rotate.setCompleter(QCompleter(self.attributes))
+        self.transparent.setCompleter(QCompleter(self.attributes))
+        self.clear_after.setCompleter(QCompleter(self.attributes))
+        self.screen_name.setCompleter(QCompleter(self.attributes))
 
     def setScreen(self, screen: list):
         selected = self.screen_name.currentText()

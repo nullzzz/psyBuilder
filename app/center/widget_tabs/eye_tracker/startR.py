@@ -1,10 +1,10 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, \
-    QCompleter, QMessageBox
+    QCompleter
 
 from app.func import Func
-from app.lib import PigLineEdit
+from app.lib import PigLineEdit, PigComboBox
 
 
 class StartR(QWidget):
@@ -23,11 +23,12 @@ class StartR(QWidget):
         self.attributes = []
 
         self.default_properties = {
-            "Status message": ""
+            "Status message": "",
+            "Sync to next event flip": "no",
         }
         self.status_message = PigLineEdit()
-        self.status_message.textChanged.connect(self.findVar)
-        self.status_message.returnPressed.connect(self.finalCheck)
+        self.sync_to_next_event_flip = PigComboBox()
+        self.sync_to_next_event_flip.addItems(("no", "yes"))
 
         self.msg = ""
         self.bt_ok = QPushButton("OK")
@@ -56,6 +57,8 @@ class StartR(QWidget):
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
         layout1.addWidget(QLabel("Statue Message:"), 2, 0, 1, 1)
         layout1.addWidget(self.status_message, 2, 1, 1, 1)
+        layout1.addWidget(QLabel("Sync to Next Event Flip:"), 3, 0, 1, 1)
+        layout1.addWidget(self.sync_to_next_event_flip, 3, 1, 1, 1)
 
         layout2 = QHBoxLayout()
         layout2.addStretch(10)
@@ -83,22 +86,6 @@ class StartR(QWidget):
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color:black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                temp.clear()
-
     def setAttributes(self, attributes):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
         self.status_message.setCompleter(QCompleter(self.attributes))
@@ -119,6 +106,7 @@ class StartR(QWidget):
 
     def getInfo(self):
         self.default_properties["Statue message"] = self.status_message.text()
+        self.default_properties["Sync to next event flip"] = self.sync_to_next_event_flip.currentText()
         return self.default_properties
 
     def getProperties(self):
@@ -138,6 +126,7 @@ class StartR(QWidget):
 
     def loadSetting(self):
         self.status_message.setText(self.default_properties["Statue message"])
+        self.sync_to_next_event_flip.setText(self.default_properties["Sync to next event flip"])
 
     def clone(self, new_id: str):
         clone_widget = StartR(widget_id=new_id)
@@ -157,6 +146,9 @@ class StartR(QWidget):
 
     def getStatusMessage(self) -> str:
         return self.status_message.text()
+
+    def getSyncToNextEventFlip(self) -> str:
+        return self.sync_to_next_event_flip.currentText()
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)

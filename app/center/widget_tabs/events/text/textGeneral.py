@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QApplication, QTextEdit, QFontComboBox
+from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QApplication, QTextEdit, \
+    QFontComboBox, QCompleter
 
 from app.func import Func
 from app.lib import PigComboBox, PigLineEdit, ColorListEditor
@@ -243,6 +244,20 @@ class TextTab1(QWidget):
 
     def setAttributes(self, attributes):
         self.attributes = attributes
+        self.align_x.setCompleter(QCompleter(self.attributes))
+        self.align_y.setCompleter(QCompleter(self.attributes))
+        self.fore_color.setCompleter(QCompleter(self.attributes))
+        self.back_color.setCompleter(QCompleter(self.attributes))
+        self.clear_after.setCompleter(QCompleter(self.attributes))
+        self.screen_name.setCompleter(QCompleter(self.attributes))
+        self.transparent.setCompleter(QCompleter(self.attributes))
+        self.word_wrap.setCompleter(QCompleter(self.attributes))
+        self.flip_vertical.setCompleter(QCompleter(self.attributes))
+        self.flip_horizontal.setCompleter(QCompleter(self.attributes))
+        self.font_box.setCompleter(QCompleter(self.attributes))
+        self.font_size_box.setCompleter(QCompleter(self.attributes))
+        self.style_box.setCompleter(QCompleter(self.attributes))
+        self.right_to_left.setCompleter(QCompleter(self.attributes))
 
     def setScreen(self, screen: list):
         selected = self.screen_name.currentText()

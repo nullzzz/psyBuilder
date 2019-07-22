@@ -16,10 +16,10 @@ class SoundTab1(QWidget):
         self.default_properties = {
             "File name": "",
             "Buffer size": "5000",
-            "Buffer mode": "Buffered",
+            "Refill mode": "Buffered",
             "Start offset": "0",
             "Stop offset": "0",
-            "Loop": "Yes",
+            "Repetitions": "Yes",
             "Volume control": 0,
             "Volume": "100",
             "Pan control": 0,
@@ -39,19 +39,19 @@ class SoundTab1(QWidget):
         self.volume.setText("0")
         self.volume.textChanged.connect(self.findVar)
         self.volume.returnPressed.connect(self.finalCheck)
-        self.pan_control = QCheckBox("Pan control")
-        self.pan_control.stateChanged.connect(self.panChecked)
-        self.pan = PigLineEdit()
-        self.pan.setText("0")
-        self.pan.textChanged.connect(self.findVar)
-        self.pan.returnPressed.connect(self.finalCheck)
+        self.latency_bias = QCheckBox("Latency Bias")
+        self.latency_bias.stateChanged.connect(self.panChecked)
+        self.bias_time = PigLineEdit()
+        self.bias_time.setText("0")
+        self.bias_time.textChanged.connect(self.findVar)
+        self.bias_time.returnPressed.connect(self.finalCheck)
 
         self.buffer_size = PigLineEdit()
-        self.buffer_mode = PigComboBox()
+        self.refill_mode = PigComboBox()
 
         self.start_offset = PigLineEdit()
         self.stop_offset = PigLineEdit()
-        self.loop = PigComboBox()
+        self.repetitions = PigComboBox()
 
         self.sound_device = PigComboBox()
         self.sound_device.currentTextChanged.connect(self.changeDevice)
@@ -66,13 +66,13 @@ class SoundTab1(QWidget):
         valid_input = QRegExp(r"(\d+)|(\[[_\d\w]+\]")
         self.start_offset.setValidator(QRegExpValidator(valid_input, self))
         self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
-        self.buffer_mode.addItems(["Buffered", "Streaming"])
-        self.loop.addItems(["Yes", "No"])
+        self.refill_mode.addItems(["Buffered", "Streaming"])
+        self.repetitions.addItems(["Yes", "No"])
         self.buffer_size.setText("5000")
         self.start_offset.setText("0")
         self.stop_offset.setText("0")
         self.volume.setEnabled(False)
-        self.pan.setEnabled(False)
+        self.bias_time.setEnabled(False)
         self.buffer_size.textChanged.connect(self.findVar)
         self.start_offset.textChanged.connect(self.findVar)
         self.stop_offset.textChanged.connect(self.findVar)
@@ -81,10 +81,10 @@ class SoundTab1(QWidget):
         self.stop_offset.returnPressed.connect(self.finalCheck)
         l0 = QLabel("File Name:")
         l1 = QLabel("Buffer Size (ms):")
-        l2 = QLabel("Buffer Mode:")
+        l2 = QLabel("Refill Mode:")
         l3 = QLabel("Start Offset (ms):")
         l4 = QLabel("Stop Offset (ms):")
-        l5 = QLabel("Loop:")
+        l5 = QLabel("Repetitions:")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -102,7 +102,7 @@ class SoundTab1(QWidget):
         layout1.addWidget(self.buffer_size, 1, 1)
 
         layout1.addWidget(l2, 2, 0)
-        layout1.addWidget(self.buffer_mode, 2, 1)
+        layout1.addWidget(self.refill_mode, 2, 1)
 
         layout1.addWidget(l3, 3, 0)
         layout1.addWidget(self.start_offset, 3, 1)
@@ -110,15 +110,15 @@ class SoundTab1(QWidget):
         layout1.addWidget(self.stop_offset, 4, 1)
 
         layout1.addWidget(l5, 5, 0)
-        layout1.addWidget(self.loop, 5, 1)
+        layout1.addWidget(self.repetitions, 5, 1)
         group1.setLayout(layout1)
 
         group2 = QGroupBox()
         layout2 = QFormLayout()
         layout2.addRow(self.volume_control)
         layout2.addRow("\tvolume:", self.volume)
-        layout2.addRow(self.pan_control)
-        layout2.addRow("\tpan:", self.pan)
+        layout2.addRow(self.latency_bias)
+        layout2.addRow("\tBias time (ms):", self.bias_time)
         layout2.addRow("Sound Device:", self.sound_device)
         layout2.addRow("Wait For Start:", self.wait_for_start)
         group2.setLayout(layout2)
@@ -147,9 +147,9 @@ class SoundTab1(QWidget):
 
     def panChecked(self, e):
         if e == 2:
-            self.pan.setEnabled(True)
+            self.bias_time.setEnabled(True)
         else:
-            self.pan.setEnabled(False)
+            self.bias_time.setEnabled(False)
 
     def setSound(self, sound: list):
         selected = self.sound_device.currentText()
@@ -186,7 +186,7 @@ class SoundTab1(QWidget):
         self.start_offset.setCompleter(QCompleter(self.attributes))
         self.stop_offset.setCompleter(QCompleter(self.attributes))
         self.volume.setCompleter(QCompleter(self.attributes))
-        self.pan.setCompleter(QCompleter(self.attributes))
+        self.bias_time.setCompleter(QCompleter(self.attributes))
         self.sound_device.setCompleter(QCompleter(self.attributes))
         self.wait_for_start.setCompleter(QCompleter(self.attributes))
 
@@ -194,15 +194,15 @@ class SoundTab1(QWidget):
         self.default_properties.clear()
         self.default_properties["File name"] = self.file_name.text()
         self.default_properties["Buffer size"] = self.buffer_size.text()
-        self.default_properties["Buffer mode"] = self.buffer_mode.currentText()
+        self.default_properties["Refill mode"] = self.refill_mode.currentText()
         self.default_properties["Start offset"] = self.start_offset.text()
         self.default_properties["Stop offset"] = self.stop_offset.text()
-        self.default_properties["Loop"] = self.loop.currentText()
+        self.default_properties["Repetitions"] = self.repetitions.currentText()
 
         self.default_properties["Volume control"] = self.volume_control.checkState()
         self.default_properties["Volume"] = self.volume.text()
-        self.default_properties["Pan control"] = self.pan_control.checkState()
-        self.default_properties["Pan"] = self.pan.text()
+        self.default_properties["Latency bias"] = self.latency_bias.checkState()
+        self.default_properties["Bias time"] = self.bias_time.text()
         if Func.getDeviceNameById(self.using_device_id):
             self.default_properties["Sound device"] = Func.getDeviceNameById(self.using_device_id)
         else:
@@ -218,14 +218,14 @@ class SoundTab1(QWidget):
     def loadSetting(self):
         self.file_name.setText(self.default_properties["File name"])
         self.buffer_size.setText(self.default_properties["Buffer size"])
-        self.buffer_mode.setCurrentText(self.default_properties["Buffer mode"])
+        self.refill_mode.setCurrentText(self.default_properties["Refill mode"])
         self.start_offset.setText(self.default_properties["Start offset"])
         self.stop_offset.setText(self.default_properties["Stop offset"])
-        self.loop.setCurrentText(self.default_properties["Loop"])
+        self.repetitions.setCurrentText(self.default_properties["Repetitions"])
         self.volume_control.setCheckState(self.default_properties["Volume control"])
         self.volume.setText(self.default_properties["Volume"])
-        self.pan_control.setCheckState(self.default_properties["Pan control"])
-        self.pan.setText(self.default_properties["Pan"])
+        self.latency_bias.setCheckState(self.default_properties["Latency bias"])
+        self.bias_time.setText(self.default_properties["Bias time"])
         self.sound_device.setCurrentText((self.default_properties["Sound device"]))
         self.wait_for_start.setCurrentText(self.default_properties["Wait for start"])
 

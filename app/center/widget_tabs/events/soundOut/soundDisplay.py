@@ -282,12 +282,12 @@ class SoundDisplay(QMainWindow):
         """
         return self.pro_window.general.buffer_size.text()
 
-    def getBufferMode(self) -> str:
+    def getRefillMode(self) -> str:
         """
-        返回Buffer Mode
+        返回Refill Mode
         :return:
         """
-        return self.pro_window.general.buffer_mode.currentText()
+        return self.pro_window.general.refill_mode.currentText()
 
     def getStartOffset(self) -> str:
         """
@@ -303,12 +303,12 @@ class SoundDisplay(QMainWindow):
         """
         return self.pro_window.general.stop_offset.text()
 
-    def getLoop(self) -> str:
+    def getRepetitions(self) -> str:
         """
         返回Loop
         :return:
         """
-        return self.pro_window.general.loop.currentText()
+        return self.pro_window.general.repetitions.currentText()
 
     def getIsVolumeControl(self) -> bool:
         """
@@ -324,19 +324,19 @@ class SoundDisplay(QMainWindow):
         """
         return self.pro_window.general.volume.text()
 
-    def getIsPanControl(self) -> bool:
+    def getIsLatencyBias(self) -> bool:
         """
         返回Pan控制
         :return:
         """
-        return bool(self.pro_window.general.pan_control.checkState())
+        return bool(self.pro_window.general.latency_bias.checkState())
 
-    def getPan(self) -> str:
+    def getBiasTime(self) -> str:
         """
         返回pan
         :return:
         """
-        return self.pro_window.general.pan.text()
+        return self.pro_window.general.bias_time.text()
 
     def getDuration(self) -> str:
         """
