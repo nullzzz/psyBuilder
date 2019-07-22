@@ -257,6 +257,22 @@ class Cycle(QMainWindow):
         """
         return self.timeline_table.getAttributes(row)
 
+    def getAttributeValues(self, col: int) -> list:
+        """
+        通过输入的列索引，返回该列对应的attribute的所有value的一个列表
+        :param col: 列缩影s
+        :return: value的list
+        """
+        # col有效
+        if col < 0 or col >= self.timeline_table.columnCount():
+            raise Exception("invalid col index.")
+        #
+        values = []
+        # 遍历每行，将值取出
+        for row in range(self.rowCount()):
+            values.append(self.item(row, col).text())
+        return values
+
     def getOrder(self) -> str:
         """
         得到设置界面中order的值

@@ -148,6 +148,9 @@ class StructureTree(QTreeWidget):
             if node:
                 widget_id = node.widget_id
                 if not widget_id.startswith(Info.TIMELINE):
+                    # cycle禁止move、copy和refer
+                    if Func.isWidgetType(widget_id, Info.CYCLE):
+                        return
                     # copy
                     if e.modifiers() == Qt.ControlModifier:
                         self.copyDrag(widget_id)

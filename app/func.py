@@ -174,6 +174,15 @@ class Func(object):
                 return Info.TimelineNameRight, ''
             return Info.TimelineNameError, ''
         else:
+            # 如果已经存在，且为同一个cycle下的timeline，则返回正确，否则返回出错
+            cycle_node = Info.WID_NODE[cycle_widget_id]
+            # 因为timeline已经不允许引用了，所以不会出现父节点为不同的cycle，所以直接判断cycle下是否有那个name即可
+            try:
+                for index in range(cycle_node.childCount()):
+                    if cycle_node.child(index).text(0) == name:
+                        return Info.TimelineNameRight, ""
+            except Exception as e:
+                print(e)
             return Info.TimelineParentError, ""
             # 需求要求timeline不能引用，说不定哪天让我改回来，现将下方代码注释
             # widget_id = Info.NAME_WID[name][0]
@@ -467,7 +476,7 @@ class Func(object):
             print(f"error {e} happens in rename timeline in cycle. [func.py]")
 
     @staticmethod
-    def checkDragValidityFromStructure(target_timeline_wid: str, widget_id: str) -> bool:
+    def checkReferValidity(target_timeline_wid: str, widget_id: str) -> bool:
         """
         当从structure中拖拽至timeline时，
         对于cycle的拖拽，因其下面挂着timeline，如果不进行处理，会导致类似死锁。
@@ -476,26 +485,17 @@ class Func(object):
         :return: 合法性
         """
         try:
-            # 需求要求引用只局限于一个同一个cycle下的timeline，说不定哪天让我改回来，现将下方代码注释
-            # # 只需检测cycle
-            # if Func.isWidgetType(widget_id, Info.CYCLE):
-            #     # 检测目标的timeline的自身包括引用节点上面有没有父节点name是cycle的name
-            #     cycle_name = Info.WID_NODE[widget_id].text(0)
-            #     timeline_name = Info.WID_NODE[target_timeline_wid].text(0)
-            #     for timeline_wid in Info.NAME_WID[timeline_name]:
-            #         node = Info.WID_NODE[timeline_wid].parent()
-            #         while node:
-            #             if node.text(0) == cycle_name:
-            #                 return False
-            #             node = node.parent()
-            #     return True
-            # return True
-
+            # 如果目标timeline下已经存在该wid或者引用，即存在name相同的widget，返回可以引用
+            timeline_node = Info.WID_NODE[target_timeline_wid]
+            name = Info.WID_NODE[widget_id].text(0)
+            for index in range(timeline_node.childCount()):
+                if timeline_node.child(index).text(0) == name:
+                    return True
             # 先确定被拖拽的widget所属的cycle是否与target的timeline所属的cycle是否为同一个
             # target_timeline不能是第一层timeline，因为它没有父cycle
             if target_timeline_wid == f"{Info.TIMELINE}.0":
                 return False
-            cycle_1_wid = Info.WID_NODE[target_timeline_wid].parent().widget_id
+            cycle_1_wid = timeline_node.parent().widget_id
             # 根据widget得到父timeline
             node = Info.WID_NODE[widget_id]
             parent_timeline = node.parent()
