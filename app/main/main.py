@@ -366,6 +366,10 @@ class PsyApplication(QMainWindow):
             if dock_layout:
                 self.restoreState(dock_layout)
 
+            platform = setting.value("PLATFORM")
+            Info.PLATFORM = platform
+            self.changePlatform(platform)
+
             # 恢复widgets
             # 复原初始的Timeline
             root_timeline: Timeline = Info.WID_WIDGET[f"{Info.TIMELINE}.0"]
@@ -391,7 +395,6 @@ class PsyApplication(QMainWindow):
         output_device_info: dict = Info.OUTPUT_DEVICE_INFO.copy()
         # 当前布局信息
         current_dock_layout = self.saveState()
-        #
         name_wid = Info.NAME_WID.copy()
 
         setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
@@ -406,6 +409,8 @@ class PsyApplication(QMainWindow):
         self.loadOutTree(structure_tree)
         setting.setValue("STRUCTURE_TREE", structure_tree)
 
+        # 当前输出平台
+        setting.setValue("PLATFORM", Info.PLATFORM)
         Func.log(f"{Info.FILE_NAME} saved successful!")
 
     def loadOutTree(self, tree):
@@ -500,10 +505,17 @@ class PsyApplication(QMainWindow):
         super().contextMenuEvent(QContextMenuEvent)
 
     def changePlatform(self, c):
-        self.linux_action.setIconVisibleInMenu(self.sender() is self.linux_action)
-        self.windows_action.setIconVisibleInMenu(self.sender() is self.windows_action)
-        self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
-        Info.PLATFORM = self.sender().text().lstrip("&").lower()
+        if isinstance(c, bool):
+            self.linux_action.setIconVisibleInMenu(self.sender() is self.linux_action)
+            self.windows_action.setIconVisibleInMenu(self.sender() is self.windows_action)
+            self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
+            Info.PLATFORM = self.sender().text().lstrip("&").lower()
+        elif isinstance(c, str):
+            print(c)
+            platform = c if c else "linux"
+            self.linux_action.setIconVisibleInMenu(platform == "linux")
+            self.windows_action.setIconVisibleInMenu(platform == "windows")
+            self.mac_action.setIconVisibleInMenu(platform == "mac")
 
     def compile(self):
         try:
@@ -526,7 +538,8 @@ class PsyApplication(QMainWindow):
                 QMessageBox.about(self, "Registry", "Registry Failed!")
 
     def about(self):
-        QMessageBox.about(self, "About PTB Builder 0.1", "A free GUI to generate experimental codes for PTB\nDepartment of Psychology,Soochow University ")
+        QMessageBox.about(self, "About PTB Builder 0.1",
+                          "A free GUI to generate experimental codes for PTB\nDepartment of Psychology,Soochow University ")
 
     def checkUpdate(self):
         self.bar = LoadingTip()
