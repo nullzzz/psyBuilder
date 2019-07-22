@@ -22,8 +22,8 @@ class SoundTab1(QWidget):
             "Repetitions": "Yes",
             "Volume control": 0,
             "Volume": "100",
-            "Pan control": 0,
-            "Pan": "0",
+            "Latency Bias": 0,
+            "Bias time": "0",
             "Sound Device": "",
             "Wait for start": "No"
         }
@@ -33,14 +33,14 @@ class SoundTab1(QWidget):
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
-        self.volume_control = QCheckBox("Volume control")
+        self.volume_control = QCheckBox("")#Volume control
         self.volume_control.stateChanged.connect(self.volumeChecked)
         self.volume = PigLineEdit()
         self.volume.setText("0")
         self.volume.textChanged.connect(self.findVar)
         self.volume.returnPressed.connect(self.finalCheck)
-        self.latency_bias = QCheckBox("Latency Bias")
-        self.latency_bias.stateChanged.connect(self.panChecked)
+        self.latency_bias = QCheckBox("")#Latency Bias
+        self.latency_bias.stateChanged.connect(self.latencyBiasChecked)
         self.bias_time = PigLineEdit()
         self.bias_time.setText("0")
         self.bias_time.textChanged.connect(self.findVar)
@@ -113,19 +113,38 @@ class SoundTab1(QWidget):
         layout1.addWidget(self.repetitions, 5, 1)
         group1.setLayout(layout1)
 
+        l6 = QLabel("Volume control (0~1):")
+        l7 = QLabel("Latency bias (ms):")
+
+        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
         group2 = QGroupBox()
-        layout2 = QFormLayout()
-        layout2.addRow(self.volume_control)
-        layout2.addRow("\tvolume:", self.volume)
-        layout2.addRow(self.latency_bias)
-        layout2.addRow("\tBias time (ms):", self.bias_time)
-        layout2.addRow("Sound Device:", self.sound_device)
-        layout2.addRow("Wait For Start:", self.wait_for_start)
+        layout2 = QGridLayout()
+
+        layout2.addWidget(l6, 0, 0, 1, 1)
+        layout2.addWidget(self.volume_control, 0, 1, 1, 1)
+        layout2.addWidget(self.volume, 0, 3, 1, 1)
+
+        layout2.addWidget(l7, 1, 0, 1, 1)
+        layout2.addWidget(self.latency_bias, 1, 1, 1, 1)
+        layout2.addWidget(self.bias_time, 1, 3, 1, 1)
+
         group2.setLayout(layout2)
 
+
+        group3  = QGroupBox()
+        layout3 = QFormLayout()
+
+        layout3.addRow("Sound Device:", self.sound_device)
+        layout3.addRow("Wait For Start:", self.wait_for_start)
+        group3.setLayout(layout3)
+
         layout = QVBoxLayout()
-        layout.addWidget(group1, 2)
+
+        layout.addWidget(group1, 4)
         layout.addWidget(group2, 1)
+        layout.addWidget(group3, 1)
         self.setLayout(layout)
 
     # 打开文件夹
@@ -145,7 +164,7 @@ class SoundTab1(QWidget):
         else:
             self.volume.setEnabled(False)
 
-    def panChecked(self, e):
+    def latencyBiasChecked(self, e):
         if e == 2:
             self.bias_time.setEnabled(True)
         else:
