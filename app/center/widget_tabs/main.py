@@ -18,7 +18,7 @@ class WidgetTabs(QTabWidget):
         self.setMovable(True)
         self.tabBar().setShape(QTabBar.TriangularNorth)
         self.tabBar().setUsesScrollButtons(True)
-        self.tabBar().setIconSize(QSize(12, 12))
+        self.tabBar().setIconSize(QSize(16, 16))
 
         # 初始化, 首页是一个timeline
         self.timeline = Timeline(widget_id=f"{Info.TIMELINE}.0")

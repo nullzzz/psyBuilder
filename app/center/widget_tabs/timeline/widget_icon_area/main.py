@@ -58,19 +58,16 @@ class WidgetIconArea(QFrame):
                         return None
                 # 如果是从structure中拖拽过来，需要进行一个有效性的判断，根据不同类型读取id
                 # 引用的拖拽只局限于同一cycle中所属的timeline
-                data = None
-                if e.mimeData().hasFormat("structure_tree/move-wid"):
-                    data = e.mimeData().data("structure_tree/move-wid")
-                elif e.mimeData().hasFormat("structure_tree/copy-wid"):
-                    data = e.mimeData().data("structure_tree/copy-wid")
-                elif e.mimeData().hasFormat("structure_tree/refer-wid"):
-                    data = e.mimeData().data("structure_tree/refer-wid")
+                # 引用时需要检测widget_id是否违法，即是否在同一层的cycle所挂timeline
+                # 其他地方：timeline和cycle被禁止一切了，直接无法从structure中拖出
+                # 所以其他的复制等等，不需要判断
                 accept = True
-                if data:
+                if e.mimeData().hasFormat("structure_tree/refer-wid"):
+                    data = e.mimeData().data("structure_tree/refer-wid")
                     stream = QDataStream(data, QIODevice.ReadOnly)
                     widget_id = stream.readQString()
-                    # 检测widget_id是否违法
-                    accept = Func.checkDragValidityFromStructure(self.widget_id, widget_id)
+                    # 检查合法性
+                    accept = Func.checkReferValidity(self.widget_id, widget_id)
                 # end
                 if accept:
                     # sign显示
