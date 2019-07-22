@@ -13,6 +13,8 @@ class Shower(QWidget):
     bitsChanged = pyqtSignal(str)
     clientChanged = pyqtSignal(str)
     samplingRateChanged = pyqtSignal(str)
+    resolutionChanged = pyqtSignal(str)
+    refreshRateChanged = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(Shower, self).__init__(parent)
@@ -95,6 +97,10 @@ class Screen(Shower):
         self.bg_color.colorChanged.connect(lambda x: self.colorChanged.emit(x))
         self.mu_sample = QLineEdit()
         self.mu_sample.textEdited.connect(lambda x: self.sampleChanged.emit(x))
+        self.resolution = QLineEdit("auto")
+        self.resolution.textEdited.connect(lambda x: self.refreshRateChanged.emit(x))
+        self.refresh_rate = QLineEdit("auto")
+        self.refresh_rate.textEdited.connect(lambda x: self.refreshRateChanged.emit(x))
         self.setUI()
 
     def setUI(self):
@@ -105,6 +111,8 @@ class Screen(Shower):
         layout.addRow("Screen Index:", self.device_port)
         layout.addRow("Back Color:", self.bg_color)
         layout.addRow("Multi Sample:", self.mu_sample)
+        layout.addRow("Resolution:", self.resolution)
+        layout.addRow("RefreshRate:", self.refresh_rate)
         layout.addRow("", self.port_tip)
         self.setLayout(layout)
 
@@ -112,6 +120,8 @@ class Screen(Shower):
         super().describe(device_type, device_name, device_port, others)
         self.bg_color.setCurrentText(others.get("Back Color", "0,0,0"))
         self.mu_sample.setText(others.get("Multi Sample", ""))
+        self.resolution.setText(others.get("Resolution", "auto"))
+        self.refresh_rate.setText(others.get("Refresh Rate", "auto"))
 
 
 class Net(Shower):
@@ -204,6 +214,8 @@ class Describer(QWidget):
     bitsChanged = pyqtSignal(str)
     clientChanged = pyqtSignal(str)
     samplingRateChanged = pyqtSignal(str)
+    resolutionChanged = pyqtSignal(str)
+    refreshRateChanged = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(Describer, self).__init__(parent=parent)
@@ -221,6 +233,8 @@ class Describer(QWidget):
         self.other.portChanged.connect(lambda x: self.portChanged.emit(x))
 
         self.screen.colorChanged.connect(lambda x: self.colorChanged.emit(x))
+        self.screen.resolutionChanged.connect(lambda x: self.resolutionChanged.emit(x))
+        self.screen.refreshRateChanged.connect(lambda x: self.refreshRateChanged.emit(x))
 
         self.serial.baudChanged.connect(lambda x: self.baudChanged.emit(x))
         self.serial.bitsChanged.connect(lambda x: self.bitsChanged.emit(x))

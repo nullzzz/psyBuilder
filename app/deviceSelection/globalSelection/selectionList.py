@@ -283,6 +283,16 @@ class SelectArea(QListWidget):
             item.setName(name)
             self.device_name.append(name)
 
+    def changeCurrentResolution(self, resolution: str):
+        item: Device = self.currentItem()
+        if isinstance(item, Device):
+            item.setResolution(resolution)
+
+    def changeCurrentRefreshRate(self, refresh_rate: str):
+        item: Device = self.currentItem()
+        if isinstance(item, Device):
+            item.setResolution(refresh_rate)
+
     def checkDeviceName(self, new_name: str):
         if new_name.lower() in self.device_name or new_name == "":
             return False

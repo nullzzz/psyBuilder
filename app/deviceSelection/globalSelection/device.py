@@ -9,6 +9,7 @@ class Device(QListWidgetItem):
     :param device_type: 串、并、网口、
     :param device_id: 设备标识符
     """
+
     def __init__(self, device_type: str, device_id: str = None, parent=None):
         super(Device, self).__init__(device_type, parent)
         # 设备类型
@@ -31,6 +32,8 @@ class Device(QListWidgetItem):
         # screen 专属
         self.back_color = "0,0,0"
         self.sample = "0"
+        self.resolution = "auto"
+        self.refresh_rate = "auto"
         # parallel
         self.is_client: str = "yes"
         # net
@@ -82,6 +85,12 @@ class Device(QListWidgetItem):
             return self.sampling_rate
         return ""
 
+    def getResolution(self) -> str:
+        return self.resolution
+
+    def getRefreshRate(self) -> str:
+        return self.refresh_rate
+
     def setPort(self, port: str):
         if port.startswith("screen") or port.startswith("sound"):
             self.port = port.split(".")[-1]
@@ -118,6 +127,12 @@ class Device(QListWidgetItem):
             self.default_properties = properties
             self.loadSetting()
 
+    def setResolution(self, resolution):
+        self.resolution = resolution
+
+    def setRefreshRate(self, refresh_rate):
+        self.refresh_rate = refresh_rate
+
     def loadSetting(self):
         self.setName(self.default_properties["Device Name"])
         self.setPort(self.default_properties["Device Port"])
@@ -128,6 +143,8 @@ class Device(QListWidgetItem):
         self.setIpPort(self.default_properties.get("IP Port", "25576"))
         self.setClient(self.default_properties.get("Is Client", "1"))
         self.setSamplingRate(self.default_properties.get("Sampling Rate", "auto"))
+        self.setResolution(self.default_properties.get("Resolution", "auto"))
+        self.setRefreshRate(self.default_properties.get("Refresh Rate", "auto"))
 
     def getInfo(self) -> dict:
         self.default_properties["Device Name"] = self.text()
@@ -139,4 +156,7 @@ class Device(QListWidgetItem):
         self.default_properties["IP Port"] = self.ip_port
         self.default_properties["Is Client"] = self.is_client
         self.default_properties["Sampling Rate"] = self.sampling_rate
+        self.default_properties["Resolution"] = self.resolution
+        self.default_properties["Refresh Rate"] = self.refresh_rate
+
         return self.default_properties

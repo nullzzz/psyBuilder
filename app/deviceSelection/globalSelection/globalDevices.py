@@ -60,6 +60,8 @@ class GlobalDevice(QWidget):
         self.describer.bitsChanged.connect(self.changeBits)
         self.describer.clientChanged.connect(self.changeClient)
         self.describer.samplingRateChanged.connect(self.changeSamplingRate)
+        self.describer.resolutionChanged.connect(self.changeResolution)
+        self.describer.refreshRateChanged.connect(self.changeRefreshRate)
         # 按键区
         self.ok_bt = QPushButton("OK")
         self.ok_bt.clicked.connect(self.ok)
@@ -119,6 +121,12 @@ class GlobalDevice(QWidget):
 
     def changeSamplingRate(self, sampling_rate: str):
         self.selected_devices.changeCurrentSamplingRate(sampling_rate)
+
+    def changeResolution(self, resolution: str):
+        self.selected_devices.changeCurentResolution(resolution)
+
+    def changeRefreshRate(self, refresh_rate: str):
+        self.selected_devices.changeCurrentRefreshRate(refresh_rate)
 
     def changeBaud(self, baud: str):
         self.selected_devices.changeCurrentBaud(baud)
