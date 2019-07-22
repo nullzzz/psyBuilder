@@ -16,7 +16,7 @@ class SoundTab1(QWidget):
         self.default_properties = {
             "File name": "",
             "Buffer size": "5000",
-            "Refill mode": "Buffered",
+            "Stream refill": "0",
             "Start offset": "0",
             "Stop offset": "0",
             "Repetitions": "0",
@@ -51,7 +51,7 @@ class SoundTab1(QWidget):
         self.bias_time.returnPressed.connect(self.finalCheck)
 
         self.buffer_size = PigLineEdit()
-        self.refill_mode = PigComboBox()
+        self.stream_refill = PigComboBox()
 
         self.start_offset = PigLineEdit()
         self.stop_offset = PigLineEdit()
@@ -70,7 +70,7 @@ class SoundTab1(QWidget):
         valid_input = QRegExp(r"(\d+)|(\[[_\d\w]+\]")
         self.start_offset.setValidator(QRegExpValidator(valid_input, self))
         self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
-        self.refill_mode.addItems(["Buffered", "Streaming"])
+        self.stream_refill.addItems(["0", "1","2"])
         # self.repetitions.addItems(["Yes", "No"])
         self.repetitions.setText("0")
         self.buffer_size.setText("5000")
@@ -86,7 +86,7 @@ class SoundTab1(QWidget):
         self.stop_offset.returnPressed.connect(self.finalCheck)
         l0 = QLabel("File Name:")
         l1 = QLabel("Buffer Size (ms):")
-        l2 = QLabel("Refill Mode:")
+        l2 = QLabel("Stream Refill:")
         l3 = QLabel("Start Offset (ms):")
         l4 = QLabel("Stop Offset (ms):")
         l5 = QLabel("Repetitions:")
@@ -107,7 +107,7 @@ class SoundTab1(QWidget):
         layout1.addWidget(self.buffer_size, 1, 1)
 
         layout1.addWidget(l2, 2, 0)
-        layout1.addWidget(self.refill_mode, 2, 1)
+        layout1.addWidget(self.stream_refill, 2, 1)
 
         layout1.addWidget(l3, 3, 0)
         layout1.addWidget(self.start_offset, 3, 1)
@@ -227,7 +227,7 @@ class SoundTab1(QWidget):
         self.default_properties.clear()
         self.default_properties["File name"] = self.file_name.text()
         self.default_properties["Buffer size"] = self.buffer_size.text()
-        self.default_properties["Refill mode"] = self.refill_mode.currentText()
+        self.default_properties["Stream refill"] = self.stream_refill.currentText()
         self.default_properties["Start offset"] = self.start_offset.text()
         self.default_properties["Stop offset"] = self.stop_offset.text()
         self.default_properties["Repetitions"] = self.repetitions.text()
@@ -252,7 +252,7 @@ class SoundTab1(QWidget):
     def loadSetting(self):
         self.file_name.setText(self.default_properties["File name"])
         self.buffer_size.setText(self.default_properties["Buffer size"])
-        self.refill_mode.setCurrentText(self.default_properties["Refill mode"])
+        self.stream_refill.setCurrentText(self.default_properties["Stream refill"])
         self.start_offset.setText(self.default_properties["Start offset"])
         self.stop_offset.setText(self.default_properties["Stop offset"])
         # self.repetitions.setCurrentText(self.default_properties["Repetitions"])
