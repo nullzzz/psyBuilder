@@ -264,7 +264,7 @@ class Cycle(QMainWindow):
         :return: value的list
         """
         # col有效
-        if col < 0 or col >= self.columnCount():
+        if col < 0 or col >= self.timeline_table.columnCount():
             raise Exception("invalid col index.")
         #
         values = []
