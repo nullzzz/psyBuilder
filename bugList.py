@@ -13,6 +13,36 @@
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+所有控件中涉及的File Name用相对路径（图片，声音等），即相对于程序保存目录的路径
+
+Sound:
+
+	Gernral:
+		1) loop: 改为可以输入数字的，默认为0
+		2）把Loop在界面上的呈现文字修改为Repetitions
+		3) 在下面的界面处增加一个waitForStart的选择框（Yes和No两个选项，默认值No），不可以手动输入，可以引用变量
+		4) Volume control 下面的volume，可以输入的范围是-1 - 1，既可以是1个数字(num1)，也可以是两个数字（中间逗号，num1,num2）
+		5) 将Pan control (同现在一样默认不选中)和pan，替换为 Latency Bias和Bias time (ms)：（只能输入数字，可以引用）
+		6) 把Buffer Mode：修改为Refill Mode：默认值0，下拉选择菜单可选值0,1,2，不可以直接输入，可以引用 （放到第一栏的最下面）
+
+Eyetracker：
+		Log:
+
+ 	    1)下面的对话框搞成直接拖拉attributes过来，允许多个（非引用）
+ 	    startR：
+ 	     	1）增加一个可选项，Sync to Next Event Flip: yes or no,不可以输入，可以引用的风格；默认值No
+
+ 	    2）open下面。eyelink选项里面，增加，
+ 	    Sacade Velocity Threshold:
+ 	    Saccade Acceleration Threshold
+
+
+QUEST：
+	initial后，增加一个对应的attributes，widgetName.cValue
+
+	QUESTUpdate中增加一个下拉菜单，QuestName: 从多个可能的 Quest中选择
+
+	block掉QUESTGETVALUE得widget
 
 
 # TODOLIST
