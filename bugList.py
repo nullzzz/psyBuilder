@@ -1,3 +1,6 @@
+Device---> screen:
+	resolution:[]x[]/auto
+	refreshRate: auto
 # %%%%%%%%%%%%%%  Bugs       %%%%%%%%%%%%%%%%%%
 1) color input 的地方有一个bug：
 
@@ -11,7 +14,7 @@
 
 
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 所有控件中涉及的File Name用相对路径（图片，声音等），即相对于程序保存目录的路径
 
@@ -32,9 +35,13 @@ Eyetracker：
  	    startR：
  	     	1）增加一个可选项，Sync to Next Event Flip: yes or no,不可以输入，可以引用的风格；默认值No
 
- 	    2）open下面。eyelink选项里面，增加，
+ 	    2）open下面。eyelink选项里面，增加，(这4个了增加的风格同SMI)
  	    Sacade Velocity Threshold:
  	    Saccade Acceleration Threshold
+		ip address:
+ 		ip port
+
+		3) eye tracker 下所有的（除开open）widget下面增加一个eyeTrackerName（widgetName）
 
 
 QUEST：
@@ -115,10 +122,17 @@ Cycle：
 # 7）另外能否增加一个功能，鼠标按着拖拽一个区域，自动选中区域中所有，以进行删除
 
 
-# 8）另外在上面的工具栏中，增加一个下拉菜单显示所有对象的一个list，这样也可以通过这里来选择对象
+# 8）另外在上面的工具栏中，增加一个下拉菜单显示所有对象的一个list，这样也可以通过这里来选择对象。右边加一个属性按钮，点击该按钮弹出属性
 
 
 # 9）另外，text中，在选中字框的时候需要有一个右键，有删除，前移后移动，属性的选项（属性里面有位置，字体等信息），另外工具栏中关于text的部分需要增加一个背景色的功能
+
+# 10)text 需要有属性框，具体参照于鹏
+#
+# 11）text编辑状态下，在其它地方点击鼠标应该退出编辑状态
+#
+# 12）所有widget选中右键，菜单，del，bring front，bring back，properties
+
 
 
 # 9）另外，在工具栏中，增加一个小属性按钮用于选中某一个子widget的时候，点他弹出来属性选项（同现在其他的双击效果一样）
