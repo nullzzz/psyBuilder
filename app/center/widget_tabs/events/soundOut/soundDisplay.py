@@ -143,7 +143,7 @@ class SoundDisplay(QMainWindow):
         self.propertiesChange.emit(self.getInfo())
 
     def parseProperties(self):
-        if self.pro_window.general.repetitions.currentText() == "Yes":
+        if self.pro_window.general.repetitions.text() != "0":
             self.is_loop = True
         else:
             self.is_loop = False
