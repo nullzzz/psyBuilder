@@ -42,6 +42,7 @@ class SoundTab1(QWidget):
         self.volume.setText("0")
         self.volume.textChanged.connect(self.findVar)
         self.volume.returnPressed.connect(self.finalCheck)
+
         self.latency_bias = QCheckBox("Latency Bias (ms):")  # Latency Bias
         self.latency_bias.setLayoutDirection(Qt.RightToLeft)
 
@@ -119,16 +120,11 @@ class SoundTab1(QWidget):
         layout1.addWidget(self.repetitions, 5, 1)
         group1.setLayout(layout1)
 
-        # l6 = QLabel("Volume Control (0~1):")
-        # l7 = QLabel("Latency Bias (ms):")
+        l6 = QLabel("Sound Device:")
+        l7 = QLabel("Wait For Start:")
 
-        l8 = QLabel("Sound Device:")
-        l9 = QLabel("Wait For Start:")
-
-        # l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l8.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l9.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         group2 = QGroupBox()
         layout2 = QGridLayout()
@@ -136,29 +132,23 @@ class SoundTab1(QWidget):
         # layout2.addWidget(l6, 0, 0, 1, 1)
         layout2.addWidget(self.volume_control, 0, 0, )
         layout2.addWidget(self.volume, 0, 1, )
-        layout2.addWidget(l8, 0, 2)
+        layout2.addWidget(l6, 0, 2)
         layout2.addWidget(self.sound_device, 0, 3)
 
         # layout2.addWidget(l7, 1, 0, 1, 1)
         layout2.addWidget(self.latency_bias, 1, 0)
         layout2.addWidget(self.bias_time, 1, 1)
-        layout2.addWidget(l9, 1, 2)
+        layout2.addWidget(l7, 1, 2)
         layout2.addWidget(self.wait_for_start, 1, 3)
 
         group2.setLayout(layout2)
 
-        # group3  = QGroupBox()
-        # layout3 = QFormLayout()
-        #
-        # layout3.addRow("Sound Device:", self.sound_device)
-        # layout3.addRow("Wait For Start:", self.wait_for_start)
-        # group3.setLayout(layout3)
 
         layout = QVBoxLayout()
 
         layout.addWidget(group1, 2)
         layout.addWidget(group2, 1)
-        # layout.addWidget(group3, 1)
+
         self.setLayout(layout)
 
     # 打开文件夹
