@@ -1,10 +1,11 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QEvent, QObject
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QWidget, QLabel, QLineEdit, QCheckBox, QPushButton, QHBoxLayout, \
-    QMessageBox, QCompleter
+    QCompleter
 
 from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class EyeDC(QWidget):
@@ -16,7 +17,6 @@ class EyeDC(QWidget):
 
         self.widget_id = widget_id
         self.current_wid = widget_id
-
 
         self.attributes = []
 

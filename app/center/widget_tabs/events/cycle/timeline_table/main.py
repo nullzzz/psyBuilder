@@ -3,12 +3,13 @@ import re
 
 from PyQt5.QtCore import QDataStream, QIODevice, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QKeySequence
-from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QShortcut, QAction, QMenu, QApplication, QMessageBox
+from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QShortcut, QAction, QMenu, QApplication,QCompleter
 
 from app.center.widget_tabs.timeline.widget_icon import WidgetIcon
 from app.func import Func
 from app.info import Info
 from app.lib import NoDash, PigLineEdit
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from .timeline_table_item import TimelineTableItem as QTableWidgetItem
 
 

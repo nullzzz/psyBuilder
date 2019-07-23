@@ -1,11 +1,12 @@
 from PyQt5.QtCore import pyqtSignal, QUrl, Qt, QFileInfo
 from PyQt5.QtGui import QIcon
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaPlaylist
-from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QToolBar, QPushButton, QMessageBox, QSlider, QWidget, \
+from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QToolBar, QPushButton, QSlider, QWidget, \
     QGridLayout, QLabel, QVBoxLayout
 
 from app.center.widget_tabs.events.soundOut.soundProperty import SoundProperty
 from app.func import Func
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class SoundDisplay(QMainWindow):

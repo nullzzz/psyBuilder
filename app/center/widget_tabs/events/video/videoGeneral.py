@@ -1,9 +1,10 @@
 from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator, QFont
-from PyQt5.QtWidgets import QPushButton, QSpinBox, QGridLayout, QLabel, QFileDialog, QMessageBox, QCompleter, QWidget
+from PyQt5.QtWidgets import QPushButton, QSpinBox, QGridLayout, QLabel, QFileDialog, QCompleter, QWidget
 
 from app.func import Func
-from app.lib import PigComboBox, PigLineEdit, ColorListEditor
+from app.lib import PigComboBox, PigLineEdit
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class VideoTab1(QWidget):

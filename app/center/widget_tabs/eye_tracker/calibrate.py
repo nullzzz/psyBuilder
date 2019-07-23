@@ -1,10 +1,11 @@
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, \
-    QGridLayout, QMessageBox, QCompleter
+    QGridLayout, QCompleter
 
 from app.func import Func
 from app.lib import PigComboBox, PigLineEdit
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class EyeCalibrate(QWidget):
@@ -15,7 +16,6 @@ class EyeCalibrate(QWidget):
         super(EyeCalibrate, self).__init__(parent)
         self.widget_id = widget_id
         self.current_wid = widget_id
-
 
         self.attributes = []
 

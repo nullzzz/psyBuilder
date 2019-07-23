@@ -5,7 +5,7 @@ from PyQt5.QtGui import (QBrush, QColor, QFont, QIcon, QIntValidator, QPainter,
 from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QGraphicsItem,
                              QGraphicsLineItem, QGraphicsPolygonItem,
                              QGraphicsScene, QGraphicsTextItem, QGraphicsView, QGridLayout, QGraphicsPixmapItem,
-                             QHBoxLayout, QLabel, QMainWindow, QMenu, QMessageBox, QSizePolicy, QToolBox, QToolButton,
+                             QHBoxLayout, QLabel, QMainWindow, QMenu, QSizePolicy, QToolBox, QToolButton,
                              QWidget, QPushButton, QColorDialog)
 
 from app.center.widget_tabs.events.slider.SliderProperty import SliderProperty
@@ -17,6 +17,7 @@ from app.center.widget_tabs.events.slider.snow import snowProperty
 from app.center.widget_tabs.events.slider.sound import SoundProperty
 from app.center.widget_tabs.events.slider.viedeo import VideoProperty
 from app.func import Func
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class Button(QPushButton):

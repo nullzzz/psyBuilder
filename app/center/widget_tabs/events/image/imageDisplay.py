@@ -1,7 +1,8 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
-from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QLabel
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 from app.func import Func
 from .imageProperty import ImageProperty

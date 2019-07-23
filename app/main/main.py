@@ -5,7 +5,7 @@ import traceback
 
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMessageBox, QShortcut
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QShortcut
 
 from app.attributes.main import Attributes
 from app.center.main import Center
@@ -16,10 +16,11 @@ from app.deviceSelection.globalSelection.globalDevices import GlobalDevice
 from app.deviceSelection.progressBar import LoadingTip
 from app.func import Func
 from app.info import Info
-from app.registry import writeToRegistry
 from app.output.main import Output
 from app.properties.main import Properties
+from app.registry import writeToRegistry
 from app.structure.main import Structure
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from lib.wait_dialog import WaitDialog
 from .compile_PTB import compilePTB
 
@@ -197,7 +198,9 @@ class PsyApplication(QMainWindow):
         self.linkSignals()
 
         # delete shortcut
-        self.delete_shortcut = QShortcut(QKeySequence("BackSpace"), self)
+        self.backspace_shortcut = QShortcut(QKeySequence("BackSpace"), self)
+        self.backspace_shortcut.activated.connect(self.handle_delete_shortcut)
+        self.delete_shortcut = QShortcut(QKeySequence("Delete"), self)
         self.delete_shortcut.activated.connect(self.handle_delete_shortcut)
 
         # save shortcut

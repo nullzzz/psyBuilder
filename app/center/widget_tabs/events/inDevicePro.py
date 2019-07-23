@@ -1,9 +1,6 @@
-from PyQt5.QtCore import QRegExp, Qt, QObject, QEvent, pyqtSignal
-from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QMessageBox, QCompleter, QGridLayout, QLabel
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QCompleter, QGridLayout, QLabel
 
-from app.func import Func
-from app.info import Info
 from app.lib import PigLineEdit, PigComboBox
 
 

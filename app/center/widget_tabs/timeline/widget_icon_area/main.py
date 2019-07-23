@@ -1,8 +1,9 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QDataStream, QIODevice
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
 from app.func import Func
 from app.info import Info
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from .widget_icon_table.main import WidgetIconTable
 
 

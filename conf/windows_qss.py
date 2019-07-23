@@ -14,7 +14,6 @@ QTabBar::tab {
     min-height: 36px;
     min-width: 100px;
     text-align: center;
-    font-size:18px;
 }
 
 QTabBar::tab:selected{

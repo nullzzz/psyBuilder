@@ -1,10 +1,11 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, \
-    QMessageBox, QCompleter
+    QCompleter
 
 from app.func import Func
 from app.lib import PigLineEdit
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class QuestUpdate(QWidget):
@@ -15,7 +16,6 @@ class QuestUpdate(QWidget):
         super(QuestUpdate, self).__init__(parent)
         self.widget_id = widget_id
         self.current_wid = widget_id
-
 
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()

@@ -1,10 +1,11 @@
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QComboBox, QGridLayout, QLabel, QGroupBox, QMessageBox, QCompleter
+from PyQt5.QtWidgets import QComboBox, QGridLayout, QLabel, QGroupBox, QCompleter
 
 from app.center.widget_tabs.condition.addDeleteButton import AddDeleteButton
 from app.center.widget_tabs.condition.iconChoose import IconChoose
 from app.lib import PigComboBox
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class Case(QGroupBox):

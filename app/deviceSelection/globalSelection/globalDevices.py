@@ -1,12 +1,12 @@
 from PyQt5.QtCore import QSize, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QApplication, QListView, QFrame, \
-    QPushButton, QInputDialog, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
+    QPushButton, QInputDialog, QLineEdit
 
-from app.center.widget_tabs.events.durationPage import DurationPage
 from app.deviceSelection.globalSelection.describer import Describer
 from app.deviceSelection.globalSelection.device import Device
 from app.deviceSelection.globalSelection.selectionList import SelectArea
 from app.info import Info
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class GlobalDevice(QWidget):

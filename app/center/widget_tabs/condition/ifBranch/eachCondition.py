@@ -1,9 +1,10 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QComboBox, QFrame, QHBoxLayout, QLabel, QCompleter, QMessageBox
+from PyQt5.QtWidgets import QComboBox, QFrame, QHBoxLayout, QLabel, QCompleter
 
 from app.center.widget_tabs.condition.addDeleteButton import AddDeleteButton
 from app.lib import PigComboBox, PigLineEdit
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class EachCondition(QFrame):

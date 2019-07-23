@@ -1,7 +1,9 @@
 from PyQt5.QtCore import QDataStream, QIODevice, Qt, QRegExp, QSize, pyqtSignal
 from PyQt5.QtGui import QColor, QIcon, QRegExpValidator, QFont, QPen
-from PyQt5.QtWidgets import QComboBox, QMessageBox, QColorDialog, QLineEdit, QSpinBox, QMainWindow, QItemDelegate, \
+from PyQt5.QtWidgets import QComboBox, QColorDialog, QLineEdit, QSpinBox, QMainWindow, QItemDelegate, \
     QStyle, QWidget, QHBoxLayout
+
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class NoDash(QItemDelegate):
@@ -140,6 +142,8 @@ class PigLineEdit(QLineEdit):
     def focusOutEvent(self, e):
         print("out")
         print(e)
+        # 这个必须要的，不然自带的editingFinished信号发不出去了
+        super(PigLineEdit, self).focusOutEvent(e)
         if not self.text().endswith(self.suffix):
             self.setText(self.text() + self.suffix)
 

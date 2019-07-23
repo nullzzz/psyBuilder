@@ -1,10 +1,11 @@
 from PyQt5.QtCore import Qt, QRegExp
 from PyQt5.QtGui import QRegExpValidator, QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QApplication, QFileDialog, QCompleter, QMessageBox, QFormLayout
+    QApplication, QFileDialog, QCompleter
 
 from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 # soundOut event专属页面
@@ -33,7 +34,7 @@ class SoundTab1(QWidget):
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
-        self.volume_control = QCheckBox("Volume Control (0~1):")#Volume control
+        self.volume_control = QCheckBox("Volume Control (0~1):")  # Volume control
         self.volume_control.setLayoutDirection(Qt.RightToLeft)
 
         self.volume_control.stateChanged.connect(self.volumeChecked)
@@ -41,7 +42,7 @@ class SoundTab1(QWidget):
         self.volume.setText("0")
         self.volume.textChanged.connect(self.findVar)
         self.volume.returnPressed.connect(self.finalCheck)
-        self.latency_bias = QCheckBox("Latency Bias (ms):")#Latency Bias
+        self.latency_bias = QCheckBox("Latency Bias (ms):")  # Latency Bias
         self.latency_bias.setLayoutDirection(Qt.RightToLeft)
 
         self.latency_bias.stateChanged.connect(self.latencyBiasChecked)
@@ -70,7 +71,7 @@ class SoundTab1(QWidget):
         valid_input = QRegExp(r"(\d+)|(\[[_\d\w]+\]")
         self.start_offset.setValidator(QRegExpValidator(valid_input, self))
         self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
-        self.stream_refill.addItems(["0", "1","2"])
+        self.stream_refill.addItems(["0", "1", "2"])
         # self.repetitions.addItems(["Yes", "No"])
         self.repetitions.setText("0")
         self.buffer_size.setText("5000")
@@ -133,8 +134,8 @@ class SoundTab1(QWidget):
         layout2 = QGridLayout()
 
         # layout2.addWidget(l6, 0, 0, 1, 1)
-        layout2.addWidget(self.volume_control, 0, 0,)
-        layout2.addWidget(self.volume, 0, 1,)
+        layout2.addWidget(self.volume_control, 0, 0, )
+        layout2.addWidget(self.volume, 0, 1, )
         layout2.addWidget(l8, 0, 2)
         layout2.addWidget(self.sound_device, 0, 3)
 
@@ -145,7 +146,6 @@ class SoundTab1(QWidget):
         layout2.addWidget(self.wait_for_start, 1, 3)
 
         group2.setLayout(layout2)
-
 
         # group3  = QGroupBox()
         # layout3 = QFormLayout()

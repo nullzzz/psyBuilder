@@ -1,8 +1,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QMessageBox, QCompleter
+from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QCompleter
 
 from app.lib import PigComboBox
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class SwitchCondition(QWidget):

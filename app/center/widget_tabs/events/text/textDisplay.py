@@ -1,11 +1,12 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QTextEdit
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QTextEdit
 
 from app.center.widget_tabs.events.text.textProperty import TextProperty
 from app.center.widget_tabs.events.text.view import Preview
 from app.func import Func
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class TextDisplay(QMainWindow):
@@ -290,7 +291,7 @@ class TextDisplay(QMainWindow):
         """
         return self.pro_window.general.word_wrap.text()
 
-    def getRightToLeft(self) ->str:
+    def getRightToLeft(self) -> str:
         """
         返回right to left
         :return:

@@ -1,11 +1,10 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, \
-    QMessageBox, \
-    QCompleter
+from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QCompleter
 
 from app.func import Func
 from app.lib import PigLineEdit
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class EndR(QWidget):

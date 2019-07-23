@@ -1,8 +1,9 @@
 from PyQt5.QtCore import QRegExp, Qt, QObject, QEvent, pyqtSignal
 from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QMessageBox, QCompleter
+from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QCompleter
 
 from app.lib import PigLineEdit, PigComboBox
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class OutDeviceInfoAtDuration(QWidget):

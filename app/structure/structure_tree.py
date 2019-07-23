@@ -1,9 +1,10 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMimeData, QPoint
 from PyQt5.QtGui import QKeySequence, QDrag
-from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction, QShortcut, QMessageBox
+from PyQt5.QtWidgets import QTreeWidget, QMenu, QAction, QShortcut
 
 from app.func import Func
 from app.info import Info
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from .structure_node import StructureNode
 
 

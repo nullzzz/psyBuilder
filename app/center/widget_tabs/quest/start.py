@@ -1,10 +1,11 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QFormLayout, QMessageBox,
+from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QFormLayout,
                              QCompleter)
 
 from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class QuestInit(QWidget):

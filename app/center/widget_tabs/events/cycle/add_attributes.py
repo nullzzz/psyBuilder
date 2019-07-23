@@ -2,7 +2,9 @@ import re
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QDialog, QScrollArea, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, \
-    QMessageBox, QVBoxLayout
+    QVBoxLayout
+
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class AddAttributesDialog(QDialog):

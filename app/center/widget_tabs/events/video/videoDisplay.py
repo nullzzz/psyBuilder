@@ -2,8 +2,8 @@ from PyQt5.QtCore import Qt, QUrl, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPalette, QKeyEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel, QSizePolicy
-
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QLabel, QSizePolicy
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from app.func import Func
 from .videoProperty import VideoProperty
 

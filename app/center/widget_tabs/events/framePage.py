@@ -1,9 +1,9 @@
 from PyQt5.QtCore import Qt, QObject, QEvent
-from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QComboBox, QWidget, QLabel, \
-    QMessageBox, QCompleter
+    QCompleter
 
 from app.lib import PigComboBox, PigLineEdit, ColorListEditor
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class FramePage(QWidget):
@@ -183,7 +183,7 @@ class FramePage(QWidget):
         self.y_pos.setCurrentText(self.default_properties["Y position"])
         self.width.setCurrentText(self.default_properties["Width"])
         self.height.setCurrentText(self.default_properties["Height"])
-        self.enable.setCurrentText( self.default_properties["Enable"])
+        self.enable.setCurrentText(self.default_properties["Enable"])
         self.border_color.setCurrentText(self.default_properties["Border color"])
         self.border_width.setText(self.default_properties["Border width"])
         self.back_color.setCurrentText(self.default_properties["Frame fill color"])
