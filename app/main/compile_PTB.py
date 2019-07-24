@@ -38,12 +38,13 @@ def throwCompileErrorInfo(inputStr):
 
     msg.setText(inputStr)
     msg.setWindowTitle("    Attention!   ")
+
     msg.setStandardButtons(QMessageBox.Ok)
     # msg.setInformativeText("This is additional information")
     # msg.setDetailedText("The details are as follows:")
     # msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
     # msg.buttonClicked.connect(msgbtn)
-    msg.exec_()
+    sys.exit(msg.exec_())
     raise Exception(inputStr)
 
 
@@ -408,7 +409,7 @@ def parseAllowKeys(allowKeyStr):
 
 
 def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
-    noStimRelatedCodes = []
+    delayedPrintCodes = {'codesJustAfterFip':[],'respCodes':[]}
 
     cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
 
@@ -416,10 +417,10 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
         cWidget = Info.WID_WIDGET[cWidgetId]
         if Info.CYCLE == cWidget.widget_id.split('.')[0]:
 
-            noStimRelatedCodes = printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes)
+            delayedPrintCodes = printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
 
         elif Info.TEXT == cWidget.widget_id.split('.')[0]:
-            noStimRelatedCodes = printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, noStimRelatedCodes)
+            delayedPrintCodes = printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
         elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
             pass
@@ -449,7 +450,7 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
             pass
         elif Info.QUEST_UPDATE == cWidget.widget_id.split('.')[0]:
             pass
-            # noStimRelatedCodes = printImageWdiget(cWidget, f, noStimRelatedCodes)
+            # delayedPrintCodes = printImageWdiget(cWidget, f, delayedPrintCodes)
 
     # CYCLE = "Cycle"
     # SOUND = "Sound"
@@ -473,7 +474,7 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
     # to be continue ...
 
 
-def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
+def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
     global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict,previousColorFontDict
 
 
@@ -645,10 +646,10 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     # -------------------------------------------------------------
     # Step 2: print out previous widget's no stimuli related codes
     # -------------------------------------------------------------
-    for cRowStr in noStimRelatedCodes:
+    for cRowStr in delayedPrintCodes['respCodes']:
         printAutoInd(f,cRowStr)
     # clear out the print buffer
-    noStimRelatedCodes.clear()
+    delayedPrintCodes.update({'respCodes':[]})
 
     # -------------------------------------------------------------
     # Step 3: print out title of the current widget
@@ -665,8 +666,18 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
     else:
         printAutoInd(f, "Screen('Flip',{0},{1},{2});\n", cWinStr, 0, clearAfter)
 
+
+    # -------------------------------------------------------------
+    # Step 4: print out previous widget's no stimuli related codes
+    # -------------------------------------------------------------
+    for cRowStr in delayedPrintCodes['codesJustAfterFip']:
+        printAutoInd(f,cRowStr)
+    # clear out the print buffer
+    delayedPrintCodes.update({'codesJustAfterFip':[]})
+
+
     # ------------------------------------------------------------
-    # Step 4: send output messages
+    # Step 5: send output messages
     # ------------------------------------------------------------
 
     debugPrint(f"------------------------\\")
@@ -707,11 +718,11 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
 
     # -------------------------------------------------------------
     #  we need to draw stim for next widget
-    # so here after we will print any code into noStimRelatedCodes
+    # so here after we will print any code into delayedPrintCodes
     # -------------------------------------------------------------
 
     # ------------------------------------------------------------------
-    # Step 5: acquire responses
+    # Step 6: acquire responses
     # ------------------------------------------------------------------
 
 
@@ -729,10 +740,10 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,noStimRelatedCodes):
 
 
 
-    return noStimRelatedCodes
+    return delayedPrintCodes
 
 
-def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes):
+def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes):
     # start from 1 to compatible with MATLAB
     cLoopLevel += 1
 
@@ -853,7 +864,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, noStimRelatedCodes
 
 
 
-    return noStimRelatedCodes
+    return delayedPrintCodes
 
 
 
