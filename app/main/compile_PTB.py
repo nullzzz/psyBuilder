@@ -279,11 +279,29 @@ def addSquBrackets(inputStr):
     return outputStr
 
 
+def getWidLoopLevel(wid: str) -> int:
+    """
+    :only cycle can increase the loop level
+    :param wid: 输入的wid
+    :return: 如果wid不存在，返回-1
+    """
+    try:
+        node = Info.WID_NODE[wid]
+    except:
+        return -1
+    # 不断迭代，直至父结点为空
+    loopLevel = 1
+
+    node      = node.parent()
+    while node:
+        node = node.parent()
+        if Func.isWidgetType(node.widget_id,Info.CYCLE):
+            loopLevel += 1
+    return loopLevel
 
 
 def getRefValue(cwidget, inputStr,attributesSetDict):
     isRefValue = False
-    # valueSet   = set()
 
     if isinstance(inputStr, str):
 
@@ -494,7 +512,7 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel, delayedPrintCode
     # to be continue ...
 
 
-def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
+def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict,previousColorFontDict
 
 
@@ -693,7 +711,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
     for cRowStr in delayedPrintCodes['codesAfFip']:
         printAutoInd(f,cRowStr)
     # clear out the print buffer
-    delayedPrintCodes.update({'codesJustAfterFip':[]})
+    delayedPrintCodes.update({'codesAfFip':[]})
 
 
     # ------------------------------------------------------------
@@ -737,7 +755,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
 
 
     # -------------------------------------------------------------
-    #  we need to draw stim for next widget
+    #  we need to dummily draw stim for the next widget
     # so here after we will print any code into delayedPrintCodes
     # -------------------------------------------------------------
 
@@ -928,7 +946,28 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
     debugPrint(f"b = {Info.WID_NODE}")
     debugPrint(f"c = {Info.WID_WIDGET}")
 
-    # c = Info.WID_NODE['Text.0']
+    bePrintList = []
+    for key in Info.WID_NODE.keys():
+        bePrintList.append(key)
+
+    print(f"{bePrintList}")
+
+    for key in Info.WID_NODE.keys():
+        print("----- wdiget info -----")
+        try:
+            node = Info.WID_NODE[key]
+            level = 0
+            # node = node.parent()
+            print(f"{node.widget_id}:{level}")
+            while node:
+                node = node.parent()
+                level += 1
+                print(f"{node.widget_id}:{level}")
+        except:
+            pass
+        # 不断迭代，直至父结点为空
+
+
 
 
     if not Info.FILE_NAME:
