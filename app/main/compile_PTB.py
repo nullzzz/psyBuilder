@@ -21,14 +21,13 @@ from app.properties.main import Properties
 from app.structure.main import Structure
 from lib.wait_dialog import WaitDialog
 
-cIndents          = 0
-isPreLineSwitch   = 0
-enabledKBKeysList = []
+cIndents           = 0
+isPreLineSwitch    = 0
+enabledKBKeysList  = []
 isDummyPrint       = False
 
-inputDevNameIdxDict = {}
-outputDevNameIdxDict = {}
-
+inputDevNameIdxDict   = {}
+outputDevNameIdxDict  = {}
 previousColorFontDict = {}
 
 
@@ -45,7 +44,7 @@ def throwCompileErrorInfo(inputStr):
     # msg.setDetailedText("The details are as follows:")
     # msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
     # msg.buttonClicked.connect(msgbtn)
-    sys.exit(msg.exec_())
+    msg.exec_()
     raise Exception(inputStr)
 
 
@@ -112,6 +111,15 @@ def isRefStr(inputStr):
             return True
 
     return False
+
+def isContainCycleTL(widgetId) -> bool:
+    cTimelineWidgetIds = Func.getWidgetIDInTimeline(widgetId)
+
+    for cWidgetId in cTimelineWidgetIds:
+        if Func.isWidgetType(cWidgetId,Info.CYCLE):
+            return True
+    return False
+
 
 def booleanTransStr(inputStr,isRef):
 
@@ -277,6 +285,29 @@ def addSingleQuotes(inputStr):
 def addSquBrackets(inputStr):
     outputStr = f"[{inputStr}]"
     return outputStr
+
+def getCycleRealRows(widgetId) -> int:
+    cCycle     = Info.WID_WIDGET[widgetId]
+    weightList = cCycle.getAttributeValues(0)
+
+    sumValue = 0
+
+    for cWeightStr in weightList:
+        sumValue = sumValue + dataStrConvert(cWeightStr)
+
+    return sumValue
+
+    # cCycle.getOrder()
+
+
+
+def getMaxLoopLevel() -> int:
+
+    maxLoopLevel = -1
+
+    for cWidgetId in Info.WID_NODE.keys():
+        maxLoopLevel = max(maxLoopLevel,getWidLoopLevel(cWidgetId))
+    return maxLoopLevel
 
 
 def getWidLoopLevel(wid: str) -> int:
@@ -448,12 +479,12 @@ def printAutoInd(f,inputStr,*argins):
 
 
 def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel, delayedPrintCodes):
-    # delayedPrintCodes = {'codesJustAfterFip':[],'respCodes':[]}
 
     cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
 
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
+
         if Info.CYCLE == cWidget.widget_id.split('.')[0]:
             delayedPrintCodes = printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
 
@@ -510,6 +541,7 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel, delayedPrintCode
     # SWITCH = "Switch"
     # TIMELINE = "Timeline"
     # to be continue ...
+
 
 
 def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
@@ -784,7 +816,6 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
 def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes):
     # start from 1 to compatible with MATLAB
     cLoopLevel += 1
-
     attributesSetDict       = attributesSetDict.copy()
     cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
@@ -836,7 +867,6 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
             attributesSetDict.update({cAttributeName:[cLoopLevel,f"{cAttributeName}{{{cLoopIterStr}}}",cRefValueSet.union(preValueSet)]})
 
         # print out the design matrix of the current Cycle
-
         if '' == cRowDict['Weight']:
             cRepeat = 1
         else:
@@ -845,18 +875,18 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
         for iRep in range(cRepeat):
             printAutoInd(f,'{0}',"".join(addCurlyBrackets(dataStrConvert( *getRefValue(cWidget,value,attributesSetDict) ) ) + " " for key, value in cRowDict.items())+";...")
 
-    # debugPrint('- attributesSet after each cycle----------/')
-    # debugPrint(attributesSetDict)
-    # debugPrint('-----------------------------------------\\')
-
     printAutoInd(f,'{0}\n',endExpStr)
-
-
     # Shuffle the designMatrix:
-
-
     cycleOrderStr   = dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict))
     cycleOrderByStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrderBy(), attributesSetDict))
+
+    #  to make sure the weight is one for countbalance selection of order ----/
+    if cycleOrderStr == "'CounterBalance'":
+        cCycleWeightList = cWidget.getAttributeValues(0)
+        for cLineWeight in cCycleWeightList:
+            if dataStrConvert(cLineWeight) != 1:
+                throwCompileErrorInfo(f"Found an uncompatible error in Cycle {Func.getWidgetName(cWidget.widget_id)}:\nFor CounterBalance selection, the timeline weight should be 1")
+    # ------------------------------------------------------------------------\
 
     # attributesSetDict.setdefault(f"{cWidgetName}.rowNums", [cLoopLevel, f"size({cWidgetName}.attr,1)"])
 
@@ -868,6 +898,11 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
     # cycling
     printAutoInd(f, '% looping across each row of the {0}.attr:{1}',cWidgetName , cLoopIterStr)
     printAutoInd(f, 'for {0} = size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
+
+    cLoopOpIdxStr = cLoopIterStr + "_opIdx"
+
+    printAutoInd(f, "opRowIdx = opRowIdx + 1; % set the output variables row num")
+    printAutoInd(f, "{0} = opRowIdx;",cLoopOpIdxStr)
 
     # handle each timeline
     cTimeLineList = cWidget.getTimelines()
@@ -886,7 +921,8 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
         if '' == iTimeline_id:
             throwCompileErrorInfo(f"In {cWidgetName}: Timeline should not be empty!")
         else:
-            printAutoInd(f, 'case {0}', f"{addSingleQuotes(Func.getWidgetName(iTimeline_id))}")
+            printAutoInd(f, 'case {0}', f"{addSingleQuotes(Func.getWidgetName(iTimeline_id) )}")
+            # printAutoInd(f, "{0}_rIdx    = opRowIdx;", Func.getWidgetName(iTimeline_id))
             printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel,delayedPrintCodes)
 
     printAutoInd(f, 'otherwise ')
@@ -952,20 +988,20 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
 
     print(f"{bePrintList}")
 
-    for key in Info.WID_NODE.keys():
-        print("----- wdiget info -----")
-        try:
-            node = Info.WID_NODE[key]
-            level = 0
-            # node = node.parent()
-            print(f"{node.widget_id}:{level}")
-            while node:
-                node = node.parent()
-                level += 1
-                print(f"{node.widget_id}:{level}")
-        except:
-            pass
-        # 不断迭代，直至父结点为空
+    # for key in Info.WID_NODE.keys():
+    #     print("----- wdiget info -----")
+    #     try:
+    #         node = Info.WID_NODE[key]
+    #         level = 0
+    #         # node = node.parent()
+    #         print(f"{node.widget_id}:{level}")
+    #         while node:
+    #             node = node.parent()
+    #             level += 1
+    #             print(f"{node.widget_id}:{level}")
+    #     except:
+    #         pass
+    #     # 不断迭代，直至父结点为空
 
 
 
@@ -1018,11 +1054,11 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
         printAutoInd(f,"RandStream.setGlobalStream(cRandSeed);")
         printAutoInd(f,"%-----------------------------------------------------\\\n")
         printAutoInd(f,"hideCursor;            % hide mouse cursor")
-        printAutoInd(f,"commandwindow;         % bring the command window into front")
 
         if Info.PLATFORM == 'windows':
             printAutoInd(f,"ShowHideWinTaskbar(0); % hide the window taskbar")
 
+        printAutoInd(f, "commandwindow;         % bring the command window into front")
 
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f,"% define and initialize input/output devices")
@@ -1199,7 +1235,9 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
 
         printAutoInd(f,"%----------------------------------------\\\n")
 
-        printAutoInd(f, "Priority(1);                % Turn the priority to high priority")
+        printAutoInd(f, "Priority(1);      % Turn the priority to high priority")
+        printAutoInd(f, "opRowIdx = 1; % set the output variables row num")
+        printAutoInd(f, "iLoop_0_opIdx = opRowIdx;")
 
 
         # start to handle all the widgets
@@ -1422,7 +1460,7 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
         printAutoInd(f,"case 'Random with Replacement'")
         printAutoInd(f,"cShuffledIdx = Randi(nRows,[nRows,1]);")
 
-        printAutoInd(f,"case 'CountBalance'")
+        printAutoInd(f,"case 'CounterBalance'")
         printAutoInd(f,"switch orderByStr")
         printAutoInd(f,"case 'N/A'")
 
@@ -1454,7 +1492,7 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
 
 
         printAutoInd(f,"otherwise")
-        printAutoInd(f,"error('order methods should be of {{''Sequential'',''Random'',''Random with Replacement'',''CountBalance''}}');")
+        printAutoInd(f,"error('order methods should be of {{''Sequential'',''Random'',''Random with Replacement'',''CounterBalance''}}');")
         printAutoInd(f,"end%switch")
 
         printAutoInd(f,"end %  end of subfun3")
@@ -1462,6 +1500,8 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
 
     if isDummyPrint == False:
         Func.log(f"Compile successful!:{compile_file_name}") # print info to the output panel
+
+
 
     return cInfo
 
