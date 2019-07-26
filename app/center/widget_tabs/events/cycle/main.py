@@ -269,8 +269,8 @@ class Cycle(QMainWindow):
         #
         values = []
         # 遍历每行，将值取出
-        for row in range(self.rowCount()):
-            values.append(self.item(row, col).text())
+        for row in range(self.timeline_table.rowCount()):
+            values.append(self.timeline_table.item(row, col).text())
         return values
 
     def getOrder(self) -> str:
