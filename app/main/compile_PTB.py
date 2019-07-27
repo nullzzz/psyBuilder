@@ -25,7 +25,7 @@ cIndents           = 0
 isPreLineSwitch    = 0
 enabledKBKeysList  = []
 isDummyPrint       = False
-
+# incrOpRowNum       = 0 #
 inputDevNameIdxDict   = {}
 outputDevNameIdxDict  = {}
 previousColorFontDict = {}
@@ -296,9 +296,6 @@ def getCycleRealRows(widgetId) -> int:
         sumValue = sumValue + dataStrConvert(cWeightStr)
 
     return sumValue
-
-    # cCycle.getOrder()
-
 
 
 def getMaxLoopLevel() -> int:
@@ -899,7 +896,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
     printAutoInd(f, '% looping across each row of the {0}.attr:{1}',cWidgetName , cLoopIterStr)
     printAutoInd(f, 'for {0} = size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
 
-    cLoopOpIdxStr = cLoopIterStr + "_opIdx"
+    cLoopOpIdxStr = cLoopIterStr + "_cOpR"
 
     printAutoInd(f, "opRowIdx = opRowIdx + 1; % set the output variables row num")
     printAutoInd(f, "{0} = opRowIdx;",cLoopOpIdxStr)
@@ -911,8 +908,6 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
 
     for iTimeline in cTimeLineList:
         cTimelineSet.add(iTimeline[1])
-
-    # debugPrint(cTimelineSet)
 
     printAutoInd(f, '% switch across timeline types')
     printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
@@ -932,13 +927,38 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
     printAutoInd(f, 'end % {0}', cLoopIterStr)
     # to be continue ...
 
-
-
-
-
-
-
     return delayedPrintCodes
+
+""" unuseless, because the timeline type will dependent on selected input when the selection order is counterbalanced
+def dummyRunTimeline(cWidget):
+    global incrOpRowNum
+
+    incrOpRowNum   += 1
+    cTimelineRowIdx = incrOpRowNum
+
+    cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
+
+    for cWidgetId in cTimelineWidgetIds:
+        cWidget = Info.WID_WIDGET[cWidgetId]
+
+        if Info.CYCLE == cWidget.widget_id.split('.')[0]:
+            dummyRunCycle(cWidget)
+        else:
+            pass
+
+def dummyRunCycle(cWidget):
+
+
+def getOutputnRows(globalSelf):
+    global  incrOpRowNum
+    incrOpRowNum = 0
+
+    dummyRunTimeline(Info.WID_WIDGET[f"{Info.TIMELINE}.0"])
+
+
+    return incrOpRowNum
+"""
+
 
 
 
@@ -1237,7 +1257,7 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
 
         printAutoInd(f, "Priority(1);      % Turn the priority to high priority")
         printAutoInd(f, "opRowIdx = 1; % set the output variables row num")
-        printAutoInd(f, "iLoop_0_opIdx = opRowIdx;")
+        printAutoInd(f, "iLoop_0_cOpR = opRowIdx;")
 
 
         # start to handle all the widgets
