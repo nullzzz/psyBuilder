@@ -192,16 +192,6 @@ def booleanTransStr(inputStr,isRef):
 
     return inputStr
 
-def parseDurationStr(inputStr):
-    inputStr = removeSingleQuotes(inputStr)
-
-    if inputStr == "(Infinite)":
-        inputStr = "0"
-    elif re.fullmatch("\d+~\d+",inputStr):
-        cDurRange = re.fullmatch("\d+~\d+",inputStr)
-        inputStr = f"{cDurRange[0]},{cDurRange[1]}"
-
-    return inputStr
 
 def dontClearAfterTransStr(inputStr):
     if inputStr == "'clear_0'":
@@ -288,20 +278,6 @@ def pyStr2MatlabStr(inputStr):
 #         outputValue = inputStr
 #
 #     return outputValue
-
-
-def parsePercentStr(inputStr):
-    if isinstance(inputStr,str):
-        if isPercentStr(inputStr):
-            outputValue = float(inputStr[:-1])/-100
-        elif isNumStr(inputStr):
-            outputValue = float(inputStr)
-        else:
-            outputValue = inputStr
-    else:
-        outputValue = inputStr
-
-    return outputValue
 
 
 def addedTransparentToRGBStr(RGBStr,transparentStr):
@@ -547,6 +523,33 @@ def parseAllowKeys(allowKeyStr):
             for char in item:
                 enabledKBKeysList.append(char)
 
+
+def parseDurationStr(inputStr):
+    if isinstance(inputStr, str):
+        inputStr = removeSingleQuotes(inputStr)
+
+        if inputStr == "(Infinite)":
+            inputStr = "0"
+        elif re.fullmatch("\d+~\d+",inputStr):
+            cDurRange = re.fullmatch("\d+~\d+",inputStr)
+            inputStr = f"{cDurRange[0]},{cDurRange[1]}"
+
+    return inputStr
+
+def parsePercentStr(inputStr):
+    if isinstance(inputStr,str):
+        if isPercentStr(inputStr):
+            outputValue = float(inputStr[:-1])/-100
+        elif isNumStr(inputStr):
+            outputValue = float(inputStr)
+        else:
+            outputValue = inputStr
+    else:
+        outputValue = inputStr
+
+    return outputValue
+
+
 def printDelayedCodes(delayedPrintCodes,keyName,inputStr,*argins):
     global isDummyPrint
 
@@ -708,6 +711,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     debugPrint(f"{cProperties}")
     debugPrint("-------------------------------\\")
 
+    debugPrint(f"line 714: {attributesSetDict}")
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
@@ -981,43 +985,34 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
         cRowDict = cWidget.getAttributes(iRow)
         if 0 == iRow:
             endExpStr = "},'VariableNames',{" + ''.join("'"+key+"' " for key in cRowDict.keys()) + "});"
-            # update the attributes set dictionary
 
-        # handle the references and the values in special format (e.g., percent, duration)
         for key, value in cRowDict.items():
             # get the referenced var value
-            cValue, isRefValue = getRefValue(cWidget,value,attributesSetDict)
+            cValue, isRefValue, cRefValueSet = getRefValueSet(cWidget, value, attributesSetDict)
 
             cKeyAttrName = f"{Func.getWidgetName(cWidget.widget_id)}.attr.{key}"
 
+            # handle the references and the values in special format (e.g., percent, duration)
             # --- replaced the percentageStr--------/
             if  cKeyAttrName in spFormatVarDict:
-                # if spFormatVarDict[cKeyAttrName] == 'trans':
-                #     # print(f"line 980: {spFormatVarDict}")
-                #     cValue       = parseTransStr(cValue)
-                #     cRowDict[key]= cValue
                 if spFormatVarDict[cKeyAttrName] == 'percent':
                     cValue        = parsePercentStr(cValue)
                     cRowDict[key] = cValue
+
                 elif spFormatVarDict[cKeyAttrName] == 'dur':
                     cValue        = parseDurationStr(cValue)
                     cRowDict[key] = cValue
-
-        # loop again to get the values set for each attribute
-        for key, value in cRowDict.items():
-            preValueSet = set()
+            # --------------------------------------\
 
             cAttributeName = f"{cWidgetName}.attr.{key}"
-
-            # debugPrint(value)
-
-            cValue, isRefValue, cRefValueSet = getRefValueSet(cWidget,value,attributesSetDict)
 
             if isRefValue == False:
                 cRefValueSet = set([cValue])
 
             if cAttributeName in attributesSetDict:
                 preValueSet = attributesSetDict[cAttributeName][2]
+            else:
+                preValueSet = set()
 
             attributesSetDict.update({cAttributeName:[cLoopLevel,f"{cAttributeName}{{{cLoopIterStr}}}",cRefValueSet.union(preValueSet)]})
 
@@ -1160,11 +1155,10 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
     #-------------------------------------------\
     debugPrint(f"cCompilePlantform: {Info.PLATFORM}")
 
-    print(f"line 1144: {spFormatVarDict}")
     # only replaced percent vars that will be reffred by % with - value /100
     spFormatVarDict = getSepcialFormatAtts()
 
-    print(f"line 1148: {spFormatVarDict}")
+    debugPrint(f"line 1148: {spFormatVarDict}")
 
 
     # debugPrint(f"b = {Info.WID_NODE}")
