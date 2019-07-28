@@ -173,6 +173,41 @@ def pyStr2MatlabStr(inputStr):
         # inputStr = re.sub(r"\\\%","%",inputStr)
     return inputStr
 
+def parseDurationStr(cWidget,attributesSetDict):
+    isInfiniteDur = False
+
+    cRefedValue, isRef,valueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
+    duration                    = dataStrConvert(cRefedValue, isRef)
+
+    if isRef:
+        #----- check ref values -----/
+        for value in valueSet:
+            if isinstance(value, str):
+                value = removeSingleQuotes(value)
+                if value == "(Infinite)" :
+                    pass
+                elif re.fullmatch("\d+~\d+", value):
+                    pass
+                else:
+                    throwCompileErrorInfo(
+                        "Duration (ms) should be of: (Infinite), an int number,\n or an int range: startNum(int)~endNum(int) !!")
+        #----------------------------\
+    else:
+        if isinstance(duration,str):
+            duration = removeSingleQuotes(duration)
+
+            if duration == "(Infinite)":
+                isInfiniteDur = True
+            elif re.fullmatch("\d+~\d+",duration):
+                duration = duration.split('~')
+                cRefedValue = f"Randi({int(duration[1])-int(duration[0]) +1}) + {int(duration[0])-1}"
+            else:
+                throwCompileErrorInfo("Duration (ms) should be of ('Infinite'), an int number,\n or an int range: startNum(int)~endNum(int) !!")
+
+    return cRefedValue,isInfiniteDur,isRef
+
+
+
 def parsePercentStr(inputStr):
     if isinstance(inputStr,str):
         if isPercentStr(inputStr):
@@ -286,6 +321,12 @@ def addSquBrackets(inputStr):
     outputStr = f"[{inputStr}]"
     return outputStr
 
+def removeSingleQuotes(inputStr):
+    if isinstance(inputStr,str):
+        if re.fullmatch("'\S+'",inputStr): # anything but a space
+            inputStr = inputStr[1:-1]
+    return inputStr
+
 def getCycleRealRows(widgetId) -> int:
     cCycle     = Info.WID_WIDGET[widgetId]
     weightList = cCycle.getAttributeValues(0)
@@ -361,7 +402,6 @@ def getRefValueSet(cwidget, inputStr,attributesSetDict):
             inputStr = re.sub("[\[\]]", '', inputStr)
 
             if inputStr in attributesSetDict:
-                # debugPrint( attributesSetDict[inputStr])
                 valueSet = attributesSetDict[inputStr][2]
                 inputStr = attributesSetDict[inputStr][1]
             else:
@@ -542,7 +582,9 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel, delayedPrintCode
 
 
 def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
-    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict,previousColorFontDict
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict,previousColorFontDict,isDummyPrint
+
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR" # define the ouput var's row num
 
 
     if Func.getWidgetPosition(cWidget.widget_id) == 0:
@@ -624,15 +666,15 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
 
     fontBkColor = dataStrConvert(*getRefValue(cWidget, cProperties['Back color'], attributesSetDict))
 
-    debugPrint('------------------------------------/')
-    debugPrint(fontName)
-    debugPrint(fontSize)
-    debugPrint(fontStyle)
-    debugPrint(fontBkColor)
-
-    debugPrint('previous saved color font info:')
-    debugPrint(previousColorFontDict)
-    debugPrint('------------------------------------\\')
+    # debugPrint('------------------------------------/')
+    # debugPrint(fontName)
+    # debugPrint(fontSize)
+    # debugPrint(fontStyle)
+    # debugPrint(fontBkColor)
+    #
+    # debugPrint('previous saved color font info:')
+    # debugPrint(previousColorFontDict)
+    # debugPrint('------------------------------------\\')
 
     isChangeFontPars = False
     #  font name
@@ -705,8 +747,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
     clearAfter = dontClearAfterTransStr(clearAfter)
 
-    # cRefedValue, isRef = getRefValue(cWidget, cProperties['Clear after'], attributesSetDict)
-    # clearAfter         = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
+
 
     printAutoInd(f, "Screen('DrawingFinished',{0},{1});\n",cWinStr,clearAfter)
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event")
@@ -729,11 +770,14 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     # Flip the Screen
     if Func.getWidgetPosition(cWidget.widget_id) == 0:
         printAutoInd(f, "% for first event, flip immediately.. ")
-        printAutoInd(f, "Screen('Flip',{0},{1},{2});\n",cWinStr,0,clearAfter)
+        f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n",cWinStr,0,clearAfter,Func.getWidgetName(cWidget.widget_id),cOpRowIdxStr)
     else:
-        printAutoInd(f, "Screen('Flip',{0},{1},{2});\n", cWinStr, 0, clearAfter)
+
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n",cWinStr,0,clearAfter,Func.getWidgetName(cWidget.widget_id),cOpRowIdxStr)
 
 
+    durValue, isInfiniteDur, isRef= parseDurationStr(cWidget, attributesSetDict)
     # -------------------------------------------------------------
     # Step 4: print out previous widget's no stimuli related codes
     # -------------------------------------------------------------
