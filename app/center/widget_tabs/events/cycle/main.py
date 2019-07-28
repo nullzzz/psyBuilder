@@ -273,6 +273,7 @@ class Cycle(QMainWindow):
             values.append(self.timeline_table.item(row, col).text())
         return values
 
+
     def getOrder(self) -> str:
         """
         得到设置界面中order的值

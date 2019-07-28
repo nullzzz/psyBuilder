@@ -21,13 +21,13 @@ from app.properties.main import Properties
 from app.structure.main import Structure
 from lib.wait_dialog import WaitDialog
 
-cIndents          = 0
-isPreLineSwitch   = 0
-enabledKBKeysList = []
-
-inputDevNameIdxDict = {}
-outputDevNameIdxDict = {}
-
+cIndents           = 0
+isPreLineSwitch    = 0
+enabledKBKeysList  = []
+isDummyPrint       = False
+# incrOpRowNum       = 0 #
+inputDevNameIdxDict   = {}
+outputDevNameIdxDict  = {}
 previousColorFontDict = {}
 
 
@@ -44,7 +44,7 @@ def throwCompileErrorInfo(inputStr):
     # msg.setDetailedText("The details are as follows:")
     # msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
     # msg.buttonClicked.connect(msgbtn)
-    sys.exit(msg.exec_())
+    msg.exec_()
     raise Exception(inputStr)
 
 
@@ -53,57 +53,6 @@ def debugPrint(input):
 
     if isDebug:
         print(input)
-
-def printAutoInd(f,inputStr,*argins):
-    global cIndents
-    global isPreLineSwitch
-
-    incrAfterStr    = ('if','try','switch','for','while')
-    decreAndIncrStr = ('else','elseif','otherwise','catch')
-
-    # isinstance(f,'list')
-
-    if inputStr.split(' ')[0] in incrAfterStr:
-        tabStrs = '\t' * cIndents
-        print(f"\n{tabStrs}{inputStr}".format(*argins), file=f)
-        cIndents += 1
-
-    elif inputStr.split(' ')[0] in decreAndIncrStr:
-        cIndents -= 1
-        tabStrs = '\t' * cIndents
-        print(f"{tabStrs}{inputStr}".format(*argins), file=f)
-        cIndents += 1
-
-    elif 'end' == inputStr.split(' ')[0]:
-        cIndents -= 1
-        tabStrs = '\t' * cIndents
-        print(f"{tabStrs}{inputStr}\n".format(*argins), file=f)
-    elif 'end%switch' == inputStr.split(' ')[0]:
-        cIndents -= 2
-        tabStrs = '\t' * cIndents
-        print(f"{tabStrs}{inputStr}\n".format(*argins), file=f)
-
-    elif 'case' == inputStr.split(' ')[0]:
-
-        if 0 == isPreLineSwitch:
-            cIndents -= 1
-
-        tabStrs = '\t' * cIndents
-        print(f"{tabStrs}{inputStr}".format(*argins), file=f)
-        cIndents += 1
-
-    else:
-        tabStrs = '\t' * cIndents
-        print(f"{tabStrs}{inputStr}".format(*argins), file=f)
-
-    if 'switch' == inputStr.split(' ')[0]:
-        isPreLineSwitch = 1
-    else:
-        isPreLineSwitch = 0
-
-    if cIndents < 0:
-        cIndents = 0
-
 
 def isContainChStr(inputStr):
     # :param check_str: {str}
@@ -163,6 +112,15 @@ def isRefStr(inputStr):
 
     return False
 
+def isContainCycleTL(widgetId) -> bool:
+    cTimelineWidgetIds = Func.getWidgetIDInTimeline(widgetId)
+
+    for cWidgetId in cTimelineWidgetIds:
+        if Func.isWidgetType(cWidgetId,Info.CYCLE):
+            return True
+    return False
+
+
 def booleanTransStr(inputStr,isRef):
 
     if inputStr.lower() in ["'yes'","'true'",'yes','true']:
@@ -214,6 +172,41 @@ def pyStr2MatlabStr(inputStr):
         inputStr = re.sub("'","''",inputStr)
         # inputStr = re.sub(r"\\\%","%",inputStr)
     return inputStr
+
+def parseDurationStr(cWidget,attributesSetDict):
+    isInfiniteDur = False
+
+    cRefedValue, isRef,valueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
+    duration                    = dataStrConvert(cRefedValue, isRef)
+
+    if isRef:
+        #----- check ref values -----/
+        for value in valueSet:
+            if isinstance(value, str):
+                value = removeSingleQuotes(value)
+                if value == "(Infinite)" :
+                    pass
+                elif re.fullmatch("\d+~\d+", value):
+                    pass
+                else:
+                    throwCompileErrorInfo(
+                        "Duration (ms) should be of: (Infinite), an int number,\n or an int range: startNum(int)~endNum(int) !!")
+        #----------------------------\
+    else:
+        if isinstance(duration,str):
+            duration = removeSingleQuotes(duration)
+
+            if duration == "(Infinite)":
+                isInfiniteDur = True
+            elif re.fullmatch("\d+~\d+",duration):
+                duration = duration.split('~')
+                cRefedValue = f"Randi({int(duration[1])-int(duration[0]) +1}) + {int(duration[0])-1}"
+            else:
+                throwCompileErrorInfo("Duration (ms) should be of ('Infinite'), an int number,\n or an int range: startNum(int)~endNum(int) !!")
+
+    return cRefedValue,isInfiniteDur,isRef
+
+
 
 def parsePercentStr(inputStr):
     if isinstance(inputStr,str):
@@ -328,12 +321,56 @@ def addSquBrackets(inputStr):
     outputStr = f"[{inputStr}]"
     return outputStr
 
+def removeSingleQuotes(inputStr):
+    if isinstance(inputStr,str):
+        if re.fullmatch("'\S+'",inputStr): # anything but a space
+            inputStr = inputStr[1:-1]
+    return inputStr
 
+def getCycleRealRows(widgetId) -> int:
+    cCycle     = Info.WID_WIDGET[widgetId]
+    weightList = cCycle.getAttributeValues(0)
+
+    sumValue = 0
+
+    for cWeightStr in weightList:
+        sumValue = sumValue + dataStrConvert(cWeightStr)
+
+    return sumValue
+
+
+def getMaxLoopLevel() -> int:
+
+    maxLoopLevel = -1
+
+    for cWidgetId in Info.WID_NODE.keys():
+        maxLoopLevel = max(maxLoopLevel,getWidLoopLevel(cWidgetId))
+    return maxLoopLevel
+
+
+def getWidLoopLevel(wid: str) -> int:
+    """
+    :only cycle can increase the loop level
+    :param wid: 输入的wid
+    :return: 如果wid不存在，返回-1
+    """
+    try:
+        node = Info.WID_NODE[wid]
+    except:
+        return -1
+    # 不断迭代，直至父结点为空
+    loopLevel = 1
+
+    node      = node.parent()
+    while node:
+        node = node.parent()
+        if Func.isWidgetType(node.widget_id,Info.CYCLE):
+            loopLevel += 1
+    return loopLevel
 
 
 def getRefValue(cwidget, inputStr,attributesSetDict):
     isRefValue = False
-    # valueSet   = set()
 
     if isinstance(inputStr, str):
 
@@ -365,7 +402,6 @@ def getRefValueSet(cwidget, inputStr,attributesSetDict):
             inputStr = re.sub("[\[\]]", '', inputStr)
 
             if inputStr in attributesSetDict:
-                # debugPrint( attributesSetDict[inputStr])
                 valueSet = attributesSetDict[inputStr][2]
                 inputStr = attributesSetDict[inputStr][1]
             else:
@@ -407,16 +443,86 @@ def parseAllowKeys(allowKeyStr):
             for char in item:
                 enabledKBKeysList.append(char)
 
+def printDelayedCodes(delayedPrintCodes,keyName,inputStr,*argins):
+    global isDummyPrint
 
-def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
-    delayedPrintCodes = {'codesJustAfterFip':[],'respCodes':[]}
+    # delayedPrintCodes = {'codesAfFip': [], 'respCodes': []}
+    if isDummyPrint == False:
+        delayedPrintCodes[keyName].append = f"{inputStr}".format(*argins)
+
+def printAutoInd(f,inputStr,*argins):
+    global cIndents,isPreLineSwitch,isDummyPrint
+
+    incrAfterStr    = ('if','try','switch','for','while')
+    decreAndIncrStr = ('else','elseif','otherwise','catch')
+
+    if inputStr.split(' ')[0] in incrAfterStr:
+        tabStrs = '\t' * cIndents
+
+        if isDummyPrint == False:
+            print(f"\n{tabStrs}{inputStr}".format(*argins), file=f)
+
+        cIndents += 1
+
+    elif inputStr.split(' ')[0] in decreAndIncrStr:
+        cIndents -= 1
+        tabStrs = '\t' * cIndents
+
+        if isDummyPrint == False:
+            print(f"{tabStrs}{inputStr}".format(*argins), file=f)
+
+        cIndents += 1
+
+    elif 'end' == inputStr.split(' ')[0]:
+        cIndents -= 1
+        tabStrs = '\t' * cIndents
+
+        if isDummyPrint == False:
+            print(f"{tabStrs}{inputStr}\n".format(*argins), file=f)
+
+    elif 'end%switch' == inputStr.split(' ')[0]:
+        cIndents -= 2
+        tabStrs = '\t' * cIndents
+
+        if isDummyPrint == False:
+            print(f"{tabStrs}{inputStr}\n".format(*argins), file=f)
+
+    elif 'case' == inputStr.split(' ')[0]:
+
+        if 0 == isPreLineSwitch:
+            cIndents -= 1
+
+        tabStrs = '\t' * cIndents
+
+        if isDummyPrint == False:
+            print(f"{tabStrs}{inputStr}".format(*argins), file=f)
+
+        cIndents += 1
+
+    else:
+        tabStrs = '\t' * cIndents
+
+        if isDummyPrint == False:
+            print(f"{tabStrs}{inputStr}".format(*argins), file=f)
+
+    if 'switch' == inputStr.split(' ')[0]:
+        isPreLineSwitch = 1
+    else:
+        isPreLineSwitch = 0
+
+    if cIndents < 0:
+        cIndents = 0
+
+
+
+def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel, delayedPrintCodes):
 
     cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
 
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
-        if Info.CYCLE == cWidget.widget_id.split('.')[0]:
 
+        if Info.CYCLE == cWidget.widget_id.split('.')[0]:
             delayedPrintCodes = printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
 
         elif Info.TEXT == cWidget.widget_id.split('.')[0]:
@@ -474,8 +580,11 @@ def printTimelineWidget(cWidget,f,attributesSetDict,cLoopLevel):
     # to be continue ...
 
 
-def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
-    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict,previousColorFontDict
+
+def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict,previousColorFontDict,isDummyPrint
+
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR" # define the ouput var's row num
 
 
     if Func.getWidgetPosition(cWidget.widget_id) == 0:
@@ -557,15 +666,15 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
 
     fontBkColor = dataStrConvert(*getRefValue(cWidget, cProperties['Back color'], attributesSetDict))
 
-    debugPrint('------------------------------------/')
-    debugPrint(fontName)
-    debugPrint(fontSize)
-    debugPrint(fontStyle)
-    debugPrint(fontBkColor)
-
-    debugPrint('previous saved color font info:')
-    debugPrint(previousColorFontDict)
-    debugPrint('------------------------------------\\')
+    # debugPrint('------------------------------------/')
+    # debugPrint(fontName)
+    # debugPrint(fontSize)
+    # debugPrint(fontStyle)
+    # debugPrint(fontBkColor)
+    #
+    # debugPrint('previous saved color font info:')
+    # debugPrint(previousColorFontDict)
+    # debugPrint('------------------------------------\\')
 
     isChangeFontPars = False
     #  font name
@@ -638,8 +747,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
     clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
     clearAfter = dontClearAfterTransStr(clearAfter)
 
-    # cRefedValue, isRef = getRefValue(cWidget, cProperties['Clear after'], attributesSetDict)
-    # clearAfter         = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
+
 
     printAutoInd(f, "Screen('DrawingFinished',{0},{1});\n",cWinStr,clearAfter)
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event")
@@ -662,18 +770,21 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
     # Flip the Screen
     if Func.getWidgetPosition(cWidget.widget_id) == 0:
         printAutoInd(f, "% for first event, flip immediately.. ")
-        printAutoInd(f, "Screen('Flip',{0},{1},{2});\n",cWinStr,0,clearAfter)
+        f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n",cWinStr,0,clearAfter,Func.getWidgetName(cWidget.widget_id),cOpRowIdxStr)
     else:
-        printAutoInd(f, "Screen('Flip',{0},{1},{2});\n", cWinStr, 0, clearAfter)
+
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n",cWinStr,0,clearAfter,Func.getWidgetName(cWidget.widget_id),cOpRowIdxStr)
 
 
+    durValue, isInfiniteDur, isRef= parseDurationStr(cWidget, attributesSetDict)
     # -------------------------------------------------------------
     # Step 4: print out previous widget's no stimuli related codes
     # -------------------------------------------------------------
-    for cRowStr in delayedPrintCodes['codesJustAfterFip']:
+    for cRowStr in delayedPrintCodes['codesAfFip']:
         printAutoInd(f,cRowStr)
     # clear out the print buffer
-    delayedPrintCodes.update({'codesJustAfterFip':[]})
+    delayedPrintCodes.update({'codesAfFip':[]})
 
 
     # ------------------------------------------------------------
@@ -717,7 +828,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
 
 
     # -------------------------------------------------------------
-    #  we need to draw stim for next widget
+    #  we need to dummily draw stim for the next widget
     # so here after we will print any code into delayedPrintCodes
     # -------------------------------------------------------------
 
@@ -746,7 +857,6 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel ,delayedPrintCodes):
 def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes):
     # start from 1 to compatible with MATLAB
     cLoopLevel += 1
-
     attributesSetDict       = attributesSetDict.copy()
     cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
@@ -798,7 +908,6 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
             attributesSetDict.update({cAttributeName:[cLoopLevel,f"{cAttributeName}{{{cLoopIterStr}}}",cRefValueSet.union(preValueSet)]})
 
         # print out the design matrix of the current Cycle
-
         if '' == cRowDict['Weight']:
             cRepeat = 1
         else:
@@ -807,18 +916,18 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
         for iRep in range(cRepeat):
             printAutoInd(f,'{0}',"".join(addCurlyBrackets(dataStrConvert( *getRefValue(cWidget,value,attributesSetDict) ) ) + " " for key, value in cRowDict.items())+";...")
 
-    # debugPrint('- attributesSet after each cycle----------/')
-    # debugPrint(attributesSetDict)
-    # debugPrint('-----------------------------------------\\')
-
     printAutoInd(f,'{0}\n',endExpStr)
-
-
     # Shuffle the designMatrix:
-
-
     cycleOrderStr   = dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict))
     cycleOrderByStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrderBy(), attributesSetDict))
+
+    #  to make sure the weight is one for countbalance selection of order ----/
+    if cycleOrderStr == "'CounterBalance'":
+        cCycleWeightList = cWidget.getAttributeValues(0)
+        for cLineWeight in cCycleWeightList:
+            if dataStrConvert(cLineWeight) != 1:
+                throwCompileErrorInfo(f"Found an uncompatible error in Cycle {Func.getWidgetName(cWidget.widget_id)}:\nFor CounterBalance selection, the timeline weight should be 1")
+    # ------------------------------------------------------------------------\
 
     # attributesSetDict.setdefault(f"{cWidgetName}.rowNums", [cLoopLevel, f"size({cWidgetName}.attr,1)"])
 
@@ -831,6 +940,11 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
     printAutoInd(f, '% looping across each row of the {0}.attr:{1}',cWidgetName , cLoopIterStr)
     printAutoInd(f, 'for {0} = size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
 
+    cLoopOpIdxStr = cLoopIterStr + "_cOpR"
+
+    printAutoInd(f, "opRowIdx = opRowIdx + 1; % set the output variables row num")
+    printAutoInd(f, "{0} = opRowIdx;",cLoopOpIdxStr)
+
     # handle each timeline
     cTimeLineList = cWidget.getTimelines()
     # squeeze the timelines
@@ -839,8 +953,6 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
     for iTimeline in cTimeLineList:
         cTimelineSet.add(iTimeline[1])
 
-    # debugPrint(cTimelineSet)
-
     printAutoInd(f, '% switch across timeline types')
     printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
 
@@ -848,8 +960,9 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
         if '' == iTimeline_id:
             throwCompileErrorInfo(f"In {cWidgetName}: Timeline should not be empty!")
         else:
-            printAutoInd(f, 'case {0}', f"{addSingleQuotes(Func.getWidgetName(iTimeline_id))}")
-            printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel)
+            printAutoInd(f, 'case {0}', f"{addSingleQuotes(Func.getWidgetName(iTimeline_id) )}")
+            # printAutoInd(f, "{0}_rIdx    = opRowIdx;", Func.getWidgetName(iTimeline_id))
+            printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel,delayedPrintCodes)
 
     printAutoInd(f, 'otherwise ')
     printAutoInd(f, '% do nothing ')
@@ -858,26 +971,59 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
     printAutoInd(f, 'end % {0}', cLoopIterStr)
     # to be continue ...
 
-
-
-
-
-
-
     return delayedPrintCodes
 
+""" unuseless, because the timeline type will dependent on selected input when the selection order is counterbalanced
+def dummyRunTimeline(cWidget):
+    global incrOpRowNum
+
+    incrOpRowNum   += 1
+    cTimelineRowIdx = incrOpRowNum
+
+    cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
+
+    for cWidgetId in cTimelineWidgetIds:
+        cWidget = Info.WID_WIDGET[cWidgetId]
+
+        if Info.CYCLE == cWidget.widget_id.split('.')[0]:
+            dummyRunCycle(cWidget)
+        else:
+            pass
+
+def dummyRunCycle(cWidget):
 
 
+def getOutputnRows(globalSelf):
+    global  incrOpRowNum
+    incrOpRowNum = 0
+
+    dummyRunTimeline(Info.WID_WIDGET[f"{Info.TIMELINE}.0"])
 
 
+    return incrOpRowNum
+"""
 
 
 
 
 def compilePTB(globalSelf):
-    global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict,cIndents,previousColorFontDict
+    # cInfo = compileCode(globalSelf,True,{})
+    cInfo  = {}
+    compileCode(globalSelf,False,cInfo)
 
-    previousColorFontDict = {}
+
+
+
+
+def compileCode(globalSelf,isDummyCompile,cInfo):
+    global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict,cIndents,previousColorFontDict,isRealPrint
+
+    # -----------initialize global variables ------/
+    isDummyPrint = isDummyCompile
+
+    delayedPrintCodes     = {'codesAfFip': [], 'respCodes': []}
+
+    previousColorFontDict = dict()
 
     previousColorFontDict.update({'clearAfter':"0"})
     previousColorFontDict.update({'fontName':"simSun"})
@@ -885,20 +1031,44 @@ def compilePTB(globalSelf):
     previousColorFontDict.update({'fontStyle':"0"})
     previousColorFontDict.update({'fontBkColor':"[259,0,0]"}) # we give the bkcolor an impossible initial value
 
-
     cIndents   = 0
     cLoopLevel = 0
 
-    inputDevNameIdxDict  = {}
-    outputDevNameIdxDict = {}
+    inputDevNameIdxDict  = dict()
+    outputDevNameIdxDict = dict()
 
-
-    enabledKBKeysList = []
+    enabledKBKeysList = list()
     enabledKBKeysList.append('escape')
 
     attributesSetDict = {'sessionNum':[0,'SubInfo.session',{'SubInfo.session'}],'subAge':[0,'SubInfo.age',{'SubInfo.age'}],'subName':[0,'SubInfo.name',{'SubInfo.name'}],'subSex':[0,'SubInfo.sex',{'SubInfo.sex'}],'subNum':[0,'SubInfo.num',{'SubInfo.num'}],'subHandness':[0,'SubInfo.hand',{'SubInfo.hand'}]}
+    #-------------------------------------------\
+    debugPrint(f"cCompilePlantform: {Info.PLATFORM}")
+    debugPrint(f"b = {Info.WID_NODE}")
+    debugPrint(f"c = {Info.WID_WIDGET}")
 
-    debugPrint(f"{Info.PLATFORM}")
+    bePrintList = []
+    for key in Info.WID_NODE.keys():
+        bePrintList.append(key)
+
+    print(f"{bePrintList}")
+
+    # for key in Info.WID_NODE.keys():
+    #     print("----- wdiget info -----")
+    #     try:
+    #         node = Info.WID_NODE[key]
+    #         level = 0
+    #         # node = node.parent()
+    #         print(f"{node.widget_id}:{level}")
+    #         while node:
+    #             node = node.parent()
+    #             level += 1
+    #             print(f"{node.widget_id}:{level}")
+    #     except:
+    #         pass
+    #     # 不断迭代，直至父结点为空
+
+
+
 
     if not Info.FILE_NAME:
         if not globalSelf.getFileName():
@@ -948,11 +1118,11 @@ def compilePTB(globalSelf):
         printAutoInd(f,"RandStream.setGlobalStream(cRandSeed);")
         printAutoInd(f,"%-----------------------------------------------------\\\n")
         printAutoInd(f,"hideCursor;            % hide mouse cursor")
-        printAutoInd(f,"commandwindow;         % bring the command window into front")
 
         if Info.PLATFORM == 'windows':
             printAutoInd(f,"ShowHideWinTaskbar(0); % hide the window taskbar")
 
+        printAutoInd(f, "commandwindow;         % bring the command window into front")
 
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f,"% define and initialize input/output devices")
@@ -1129,11 +1299,13 @@ def compilePTB(globalSelf):
 
         printAutoInd(f,"%----------------------------------------\\\n")
 
-        printAutoInd(f, "Priority(1);                % Turn the priority to high priority")
+        printAutoInd(f, "Priority(1);      % Turn the priority to high priority")
+        printAutoInd(f, "opRowIdx = 1; % set the output variables row num")
+        printAutoInd(f, "iLoop_0_cOpR = opRowIdx;")
 
 
         # start to handle all the widgets
-        printTimelineWidget( Info.WID_WIDGET[f"{Info.TIMELINE}.0"],f,attributesSetDict,cLoopLevel)
+        printTimelineWidget( Info.WID_WIDGET[f"{Info.TIMELINE}.0"],f,attributesSetDict,cLoopLevel, delayedPrintCodes)
 
 
 
@@ -1352,10 +1524,9 @@ def compilePTB(globalSelf):
         printAutoInd(f,"case 'Random with Replacement'")
         printAutoInd(f,"cShuffledIdx = Randi(nRows,[nRows,1]);")
 
-        printAutoInd(f,"case 'CountBalance'")
+        printAutoInd(f,"case 'CounterBalance'")
         printAutoInd(f,"switch orderByStr")
         printAutoInd(f,"case 'N/A'")
-        # printAutoInd(f,"cShuffledIdx = 1:nRows;")
 
         printAutoInd(f,"case 'Subject'")
         printAutoInd(f,"cCBRow = rem(str2double(subInfo.num),nRows);")
@@ -1385,14 +1556,16 @@ def compilePTB(globalSelf):
 
 
         printAutoInd(f,"otherwise")
-        printAutoInd(f,"error('order methods should be of {{''Sequential'',''Random'',''Random with Replacement'',''CountBalance''}}');")
+        printAutoInd(f,"error('order methods should be of {{''Sequential'',''Random'',''Random with Replacement'',''CounterBalance''}}');")
         printAutoInd(f,"end%switch")
 
         printAutoInd(f,"end %  end of subfun3")
 
 
+    if isDummyPrint == False:
+        Func.log(f"Compile successful!:{compile_file_name}") # print info to the output panel
 
-    Func.log(f"Compile successful!:{compile_file_name}") # print info to the output panel
-    # except Exception as e:
-    #     printAutoInd(f,"compile error {e}")
+
+
+    return cInfo
 
