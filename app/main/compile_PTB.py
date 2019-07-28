@@ -25,7 +25,7 @@ cIndents           = 0
 isPreLineSwitch    = 0
 enabledKBKeysList  = []
 isDummyPrint       = False
-# incrOpRowNum       = 0 #
+spFormatVarDict    = dict()
 inputDevNameIdxDict   = {}
 outputDevNameIdxDict  = {}
 previousColorFontDict = {}
@@ -48,8 +48,67 @@ def throwCompileErrorInfo(inputStr):
     raise Exception(inputStr)
 
 
+
+def updateSpFormatVarDict(propertyValue,formatTypeStr,spFormatVarDict):
+    if isRefStr(propertyValue):
+        propertyValue = propertyValue[1:-1]    # remove the square brackets
+        allRefedCycleAttrs = getAllNestedVars(propertyValue,[])
+
+
+        for cAttrName in allRefedCycleAttrs:
+
+            if cAttrName in spFormatVarDict:
+                if spFormatVarDict[cAttrName] != formatTypeStr:
+                    throwCompileErrorInfo(f"attribute: {cAttrName} are not allowed to be both {formatTypeStr} or {spFormatVarDict[cAttrName]}")
+            else:
+                spFormatVarDict.update({cAttrName:formatTypeStr})
+
+
+def getSepcialFormatAtts():
+    """
+    : special varType:
+    : percentage
+    :
+    """
+    spFormatVarDict = dict()
+
+    for widgetId, cWidget in Info.WID_WIDGET.items():
+        # print(f"line 74 {widgetId}")
+        cProperties = Func.getProperties(widgetId)
+        # print(f"line 76: {cProperties}")
+        if Func.isWidgetType(widgetId,Info.CYCLE):
+            pass
+        elif Func.isWidgetType(widgetId,Info.TEXT):
+            updateSpFormatVarDict(cWidget.getTransparent(),'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getFrameTransparent(),'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Width'],'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
+
+        elif Info.IMAGE == widgetId.split('.')[0]:
+            updateSpFormatVarDict(cWidget.getTransparent(),'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getFrameTransparent(),'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Width'],'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
+        elif Info.SOUND == widgetId.split('.')[0]:
+
+            updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
+        elif Info.IMAGE == widgetId.split('.')[0]:
+            updateSpFormatVarDict(cWidget.getTransparent(),'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getFrameTransparent(),'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Width'],'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
+        elif Info.SLIDER == widgetId.split('.')[0]:
+
+            updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
+
+    return spFormatVarDict
+
+
+
+
+
 def debugPrint(input):
-    isDebug = True
+    isDebug = False
 
     if isDebug:
         print(input)
@@ -133,6 +192,17 @@ def booleanTransStr(inputStr,isRef):
 
     return inputStr
 
+def parseDurationStr(inputStr):
+    inputStr = removeSingleQuotes(inputStr)
+
+    if inputStr == "(Infinite)":
+        inputStr = "0"
+    elif re.fullmatch("\d+~\d+",inputStr):
+        cDurRange = re.fullmatch("\d+~\d+",inputStr)
+        inputStr = f"{cDurRange[0]},{cDurRange[1]}"
+
+    return inputStr
+
 def dontClearAfterTransStr(inputStr):
     if inputStr == "'clear_0'":
         inputStr = "0"
@@ -173,45 +243,57 @@ def pyStr2MatlabStr(inputStr):
         # inputStr = re.sub(r"\\\%","%",inputStr)
     return inputStr
 
-def parseDurationStr(cWidget,attributesSetDict):
-    isInfiniteDur = False
-
-    cRefedValue, isRef,valueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
-    duration                    = dataStrConvert(cRefedValue, isRef)
-
-    if isRef:
-        #----- check ref values -----/
-        for value in valueSet:
-            if isinstance(value, str):
-                value = removeSingleQuotes(value)
-                if value == "(Infinite)" :
-                    pass
-                elif re.fullmatch("\d+~\d+", value):
-                    pass
-                else:
-                    throwCompileErrorInfo(
-                        "Duration (ms) should be of: (Infinite), an int number,\n or an int range: startNum(int)~endNum(int) !!")
-        #----------------------------\
-    else:
-        if isinstance(duration,str):
-            duration = removeSingleQuotes(duration)
-
-            if duration == "(Infinite)":
-                isInfiniteDur = True
-            elif re.fullmatch("\d+~\d+",duration):
-                duration = duration.split('~')
-                cRefedValue = f"Randi({int(duration[1])-int(duration[0]) +1}) + {int(duration[0])-1}"
-            else:
-                throwCompileErrorInfo("Duration (ms) should be of ('Infinite'), an int number,\n or an int range: startNum(int)~endNum(int) !!")
-
-    return cRefedValue,isInfiniteDur,isRef
-
+# def parseDurationStr(cWidget,attributesSetDict):
+#     isInfiniteDur = False
+#
+#     cRefedValue, isRef,valueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
+#     duration                    = dataStrConvert(cRefedValue, isRef)
+#
+#     if isRef:
+#         #----- check ref values -----/
+#         for value in valueSet:
+#             if isinstance(value, str):
+#                 value = removeSingleQuotes(value)
+#                 if value == "(Infinite)" :
+#                     pass
+#                 elif re.fullmatch("\d+~\d+", value):
+#                     pass
+#                 else:
+#                     throwCompileErrorInfo(
+#                         "Duration (ms) should be of: (Infinite), an int number,\n or an int range: startNum(int)~endNum(int) !!")
+#         #----------------------------\
+#     else:
+#         if isinstance(duration,str):
+#             duration = removeSingleQuotes(duration)
+#
+#             if duration == "(Infinite)":
+#                 isInfiniteDur = True
+#             elif re.fullmatch("\d+~\d+",duration):
+#                 duration = duration.split('~')
+#                 cRefedValue = f"Randi({int(duration[1])-int(duration[0]) +1}) + {int(duration[0])-1}"
+#             else:
+#                 throwCompileErrorInfo("Duration (ms) should be of ('Infinite'), an int number,\n or an int range: startNum(int)~endNum(int) !!")
+#
+#     return cRefedValue,isInfiniteDur,isRef
+#
+# def parseTransStr(inputStr):
+#     if isinstance(inputStr,str):
+#         if isPercentStr(inputStr):
+#             outputValue = float(inputStr[:-1])/-100
+#         elif isNumStr(inputStr):
+#             outputValue = float(inputStr)
+#         else:
+#             outputValue = inputStr
+#     else:
+#         outputValue = inputStr
+#
+#     return outputValue
 
 
 def parsePercentStr(inputStr):
     if isinstance(inputStr,str):
         if isPercentStr(inputStr):
-            outputValue = float(inputStr[:-1])/100
+            outputValue = float(inputStr[:-1])/-100
         elif isNumStr(inputStr):
             outputValue = float(inputStr)
         else:
@@ -227,13 +309,13 @@ def addedTransparentToRGBStr(RGBStr,transparentStr):
     transparentValue = parsePercentStr(transparentStr)
 
     if isinstance(transparentValue,(int,float)):
-        if transparentValue == 1:
+        if transparentValue == -1: # for 100%
             return RGBStr
         else:
-            transparentValue = transparentValue*255
+            transparentValue = transparentValue*-255
     else:
         if transparentValue != '[]':
-            transparentValue = f"{transparentValue}*255"
+            transparentValue = f"{transparentValue}*-255"
 
     if transparentValue != '[]':
         if isRgbStr(RGBStr):
@@ -250,7 +332,7 @@ def addedTransparentToRGBStr(RGBStr,transparentStr):
 
 
 
-def dataStrConvert(dataStr,isRef = False, transMATStr = False):
+def dataStrConvert(dataStr,isRef = False, transMATStr = False, transPercent = True):
     # convert string to neither a string or a num
     # e.g.,
     # 1） "2"    to 2
@@ -264,7 +346,10 @@ def dataStrConvert(dataStr,isRef = False, transMATStr = False):
         if dataStr:
 
             if isPercentStr(dataStr):
-                outData = parsePercentStr(dataStr)
+                if transPercent:
+                    outData = parsePercentStr(dataStr)
+                else:
+                    outData = addSingleQuotes(dataStr)
 
             elif isRgbWithBracketsStr(dataStr):
                 outData = dataStr
@@ -327,6 +412,23 @@ def removeSingleQuotes(inputStr):
             inputStr = inputStr[1:-1]
     return inputStr
 
+def getAllNestedVars(inputStr,opVars = [] ) -> set:
+    # debugPrint(f"getallNestedVars: {inputStr}")
+    if isRefStr(inputStr):
+        inputStr = inputStr[1:-1]
+
+    if len(inputStr.split('.')) ==3:
+        opVars.append(inputStr)
+        cCycleName,ign,attName = inputStr.split('.')
+
+        cWidget = Info.WID_WIDGET[Info.NAME_WID[cCycleName][0]]
+
+        for iRow in range(cWidget.rowCount()):
+            cRowDict = cWidget.getAttributes(iRow)
+            getAllNestedVars(cRowDict[attName],opVars)
+
+    return set(opVars)
+
 def getCycleRealRows(widgetId) -> int:
     cCycle     = Info.WID_WIDGET[widgetId]
     weightList = cCycle.getAttributeValues(0)
@@ -346,27 +448,6 @@ def getMaxLoopLevel() -> int:
     for cWidgetId in Info.WID_NODE.keys():
         maxLoopLevel = max(maxLoopLevel,getWidLoopLevel(cWidgetId))
     return maxLoopLevel
-
-
-def getWidLoopLevel(wid: str) -> int:
-    """
-    :only cycle can increase the loop level
-    :param wid: 输入的wid
-    :return: 如果wid不存在，返回-1
-    """
-    try:
-        node = Info.WID_NODE[wid]
-    except:
-        return -1
-    # 不断迭代，直至父结点为空
-    loopLevel = 1
-
-    node      = node.parent()
-    while node:
-        node = node.parent()
-        if Func.isWidgetType(node.widget_id,Info.CYCLE):
-            loopLevel += 1
-    return loopLevel
 
 
 def getRefValue(cwidget, inputStr,attributesSetDict):
@@ -408,6 +489,29 @@ def getRefValueSet(cwidget, inputStr,attributesSetDict):
                 throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cwidget.widget_id)}")
 
     return [inputStr,isRefValue,valueSet]
+
+
+
+def getWidLoopLevel(wid: str) -> int:
+    """
+    :only cycle can increase the loop level
+    :param wid: 输入的wid
+    :return: 如果wid不存在，返回-1
+    """
+    try:
+        node = Info.WID_NODE[wid]
+    except:
+        return -1
+    # 不断迭代，直至父结点为空
+    loopLevel = 1
+
+    node      = node.parent()
+    while node:
+        node = node.parent()
+        if Func.isWidgetType(node.widget_id,Info.CYCLE):
+            loopLevel += 1
+    return loopLevel
+
 
 """
 def getCycleColValueSet(cWidget,key,attributesSetDict):
@@ -771,13 +875,13 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     if Func.getWidgetPosition(cWidget.widget_id) == 0:
         printAutoInd(f, "% for first event, flip immediately.. ")
         f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
-        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n",cWinStr,0,clearAfter,Func.getWidgetName(cWidget.widget_id),cOpRowIdxStr)
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n",Func.getWidgetName(cWidget.widget_id),cOpRowIdxStr,cWinStr,0,clearAfter)
     else:
 
-        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n",cWinStr,0,clearAfter,Func.getWidgetName(cWidget.widget_id),cOpRowIdxStr)
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n",Func.getWidgetName(cWidget.widget_id),cOpRowIdxStr,cWinStr,0,clearAfter)
 
 
-    durValue, isInfiniteDur, isRef= parseDurationStr(cWidget, attributesSetDict)
+    # durValue, isInfiniteDur, isRef= parseDurationStr(cWidget, attributesSetDict)
     # -------------------------------------------------------------
     # Step 4: print out previous widget's no stimuli related codes
     # -------------------------------------------------------------
@@ -855,6 +959,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
 
 
 def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes):
+    global  spFormatVarDict
     # start from 1 to compatible with MATLAB
     cLoopLevel += 1
     attributesSetDict       = attributesSetDict.copy()
@@ -878,16 +983,25 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
             endExpStr = "},'VariableNames',{" + ''.join("'"+key+"' " for key in cRowDict.keys()) + "});"
             # update the attributes set dictionary
 
-        # handle the references and the values in colorType
-        # --- replaced the percentageStr
+        # handle the references and the values in special format (e.g., percent, duration)
         for key, value in cRowDict.items():
-            # debugPrint(f"c = {cRowDict}")
             # get the referenced var value
             cValue, isRefValue = getRefValue(cWidget,value,attributesSetDict)
 
-            if isPercentStr(cValue):
-                cValue       = parsePercentStr(cValue)
-                cRowDict[key]= cValue
+            cKeyAttrName = f"{Func.getWidgetName(cWidget.widget_id)}.attr.{key}"
+
+            # --- replaced the percentageStr--------/
+            if  cKeyAttrName in spFormatVarDict:
+                # if spFormatVarDict[cKeyAttrName] == 'trans':
+                #     # print(f"line 980: {spFormatVarDict}")
+                #     cValue       = parseTransStr(cValue)
+                #     cRowDict[key]= cValue
+                if spFormatVarDict[cKeyAttrName] == 'percent':
+                    cValue        = parsePercentStr(cValue)
+                    cRowDict[key] = cValue
+                elif spFormatVarDict[cKeyAttrName] == 'dur':
+                    cValue        = parseDurationStr(cValue)
+                    cRowDict[key] = cValue
 
         # loop again to get the values set for each attribute
         for key, value in cRowDict.items():
@@ -914,7 +1028,7 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
             cRepeat = dataStrConvert(cRowDict['Weight'])
 
         for iRep in range(cRepeat):
-            printAutoInd(f,'{0}',"".join(addCurlyBrackets(dataStrConvert( *getRefValue(cWidget,value,attributesSetDict) ) ) + " " for key, value in cRowDict.items())+";...")
+            printAutoInd(f,'{0}',"".join(addCurlyBrackets(dataStrConvert( *getRefValue(cWidget,value,attributesSetDict), False,False ) ) + " " for key, value in cRowDict.items())+";...")
 
     printAutoInd(f,'{0}\n',endExpStr)
     # Shuffle the designMatrix:
@@ -1016,7 +1130,8 @@ def compilePTB(globalSelf):
 
 
 def compileCode(globalSelf,isDummyCompile,cInfo):
-    global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict,cIndents,previousColorFontDict,isRealPrint
+    global enabledKBKeysList,inputDevNameIdxDict,outputDevNameIdxDict,cIndents,previousColorFontDict,isRealPrint,spFormatVarDict
+
 
     # -----------initialize global variables ------/
     isDummyPrint = isDummyCompile
@@ -1041,17 +1156,27 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
     enabledKBKeysList.append('escape')
 
     attributesSetDict = {'sessionNum':[0,'SubInfo.session',{'SubInfo.session'}],'subAge':[0,'SubInfo.age',{'SubInfo.age'}],'subName':[0,'SubInfo.name',{'SubInfo.name'}],'subSex':[0,'SubInfo.sex',{'SubInfo.sex'}],'subNum':[0,'SubInfo.num',{'SubInfo.num'}],'subHandness':[0,'SubInfo.hand',{'SubInfo.hand'}]}
+    spFormatVarDict = dict()
     #-------------------------------------------\
     debugPrint(f"cCompilePlantform: {Info.PLATFORM}")
-    debugPrint(f"b = {Info.WID_NODE}")
-    debugPrint(f"c = {Info.WID_WIDGET}")
 
-    bePrintList = []
-    for key in Info.WID_NODE.keys():
-        bePrintList.append(key)
+    print(f"line 1144: {spFormatVarDict}")
+    # only replaced percent vars that will be reffred by % with - value /100
+    spFormatVarDict = getSepcialFormatAtts()
 
-    print(f"{bePrintList}")
+    print(f"line 1148: {spFormatVarDict}")
 
+
+    # debugPrint(f"b = {Info.WID_NODE}")
+    # debugPrint(f"c = {Info.WID_WIDGET}")
+
+    # bePrintList = []
+    # for key in Info.WID_NODE.keys():
+    #     bePrintList.append(key)
+    #
+    # print(f"{bePrintList}")
+    #
+    # checkCycleAtt()
     # for key in Info.WID_NODE.keys():
     #     print("----- wdiget info -----")
     #     try:
@@ -1484,20 +1609,20 @@ def compileCode(globalSelf,isDummyCompile,cInfo):
         printAutoInd(f,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
         printAutoInd(f,"function outRect = makeFrameRect(x, y, frameWidth, frameHight, fullRect)")
-        printAutoInd(f,"if x <= 1")
+        printAutoInd(f,"if x <= 0")
         printAutoInd(f,"x = x*fullRect(3);")
         printAutoInd(f,"end % if")
 
-        printAutoInd(f,"if y <= 1")
+        printAutoInd(f,"if y <= 0")
         printAutoInd(f,"y = y*fullRect(4);")
         printAutoInd(f,"end % if")
 
 
-        printAutoInd(f,"if frameWidth <= 1")
+        printAutoInd(f,"if frameWidth <= 0")
         printAutoInd(f,"frameWidth = frameWidth*fullRect(3);")
         printAutoInd(f,"end % if")
 
-        printAutoInd(f,"if frameHight <= 1")
+        printAutoInd(f,"if frameHight <= 0")
         printAutoInd(f,"frameHight = frameHigh*fullRect(4);")
         printAutoInd(f,"end % if")
 
