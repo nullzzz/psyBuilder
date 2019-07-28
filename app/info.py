@@ -21,6 +21,7 @@ class Info(object):
     NAME_WID: dict = {}
 
     # 输入输出设备
+    QUEST_INFO: dict = {}
     INPUT_DEVICE_INFO: dict = {}
     OUTPUT_DEVICE_INFO: dict = {}
     INPUT_DEVICE = 0

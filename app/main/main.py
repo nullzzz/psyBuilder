@@ -14,6 +14,7 @@ from app.center.widget_tabs.events.durationPage import DurationPage
 from app.center.widget_tabs.timeline.main import Timeline
 from app.deviceSelection.globalSelection.globalDevices import GlobalDevice
 from app.deviceSelection.progressBar import LoadingTip
+from app.deviceSelection.quest.questinit import QuestInit
 from app.func import Func
 from app.info import Info
 from app.output.main import Output
@@ -96,6 +97,8 @@ class PsyApplication(QMainWindow):
         self.output_devices = GlobalDevice(io_type=Info.OUTPUT_DEVICE)
         self.output_devices.setWindowModality(Qt.ApplicationModal)
         self.output_devices.ok()
+        self.quest_init = QuestInit()
+        self.quest_init.setWindowModality(Qt.ApplicationModal)
 
         self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
         self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
@@ -105,9 +108,12 @@ class PsyApplication(QMainWindow):
         input_devices_action = QAction("&Input Devices", self)
         output_devices_action.triggered.connect(lambda: self.showDevices(1))
         input_devices_action.triggered.connect(lambda: self.showDevices(0))
+        quest_init_action = QAction("&Quest", self)
+        quest_init_action.triggered.connect(self.quest_init.show)
 
         devices_menu.addAction(output_devices_action)
         devices_menu.addAction(input_devices_action)
+        devices_menu.addAction(quest_init_action)
 
         # build menu
         build_menu = menu_bar.addMenu("&Building")
@@ -364,6 +370,9 @@ class PsyApplication(QMainWindow):
             output_device_info = setting.value("OUTPUT_DEVICE_INFO")
             if output_device_info:
                 self.output_devices.setProperties(output_device_info)
+            quest_info = setting.value("QUEST_INFO")
+            if quest_info:
+                self.quest_init.setProperties(quest_info)
             # 恢复布局
             dock_layout = setting.value("DOCK_LAYOUT")
             if dock_layout:
@@ -396,6 +405,7 @@ class PsyApplication(QMainWindow):
         # 导出输入设备信息
         input_device_info: dict = Info.INPUT_DEVICE_INFO.copy()
         output_device_info: dict = Info.OUTPUT_DEVICE_INFO.copy()
+        quest_info: dict = Info.QUEST_INFO.copy()
         # 当前布局信息
         current_dock_layout = self.saveState()
         name_wid = Info.NAME_WID.copy()
@@ -403,6 +413,7 @@ class PsyApplication(QMainWindow):
         setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
         setting.setValue("INPUT_DEVICE_INFO", input_device_info)
         setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
+        setting.setValue("QUEST_INFO", quest_info)
         setting.setValue("DOCK_LAYOUT", current_dock_layout)
         setting.setValue("NAME_WID", name_wid)
         setting.setValue("WIDGET_TYPE_NAME_COUNT", Info.WIDGET_TYPE_NAME_COUNT.copy())

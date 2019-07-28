@@ -1,10 +1,12 @@
 from PyQt5.QtCore import QSize, pyqtSignal
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
     QPushButton, QInputDialog, QLineEdit
 
 from app.deviceSelection.globalSelection.describer import Describer
 from app.deviceSelection.globalSelection.device import Device
 from app.deviceSelection.globalSelection.selectionList import SelectArea
+from app.func import Func
 from app.info import Info
 from lib.psy_message_box import PsyMessageBox as QMessageBox
 
@@ -13,8 +15,6 @@ class GlobalDevice(QWidget):
     """
     :param io_type: 输出、输入设备
     """
-    # 发送到duration的类变量中最为合适 (device_type, devices: name->type)
-    deviceSelect = pyqtSignal(int, dict)
     deviceNameChanged = pyqtSignal(str, str)
 
     def __init__(self, io_type=0, parent=None):
@@ -41,6 +41,7 @@ class GlobalDevice(QWidget):
         else:
             self.devices = ("mouse", "keyboard", "response box", "game pad")
             self.setWindowTitle("Input Devices")
+        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
         for device in self.devices:
             self.devices_list.addItem(Device(device))
 
@@ -99,7 +100,6 @@ class GlobalDevice(QWidget):
     def apply(self):
         self.getInfo()
         default_properties: dict = self.selected_devices.getInfo()
-        self.deviceSelect.emit(self.device_type, default_properties)
 
     def changeItem(self, device_type: str, device_name: str, device_port: str, others: dict):
         self.describer.describe(device_type, device_name, device_port, others)
