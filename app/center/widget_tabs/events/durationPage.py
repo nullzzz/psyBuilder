@@ -26,8 +26,9 @@ class DurationPage(QWidget):
         }
         # top
         self.duration = PigComboBox()
-        self.duration.setInsertPolicy(QComboBox.NoInsert)
-        self.duration.installEventFilter(self)
+
+        self.duration.setReg(r"\(Infinite\)|\d+|\d+~\d+")
+        # self.duration.installEventFilter(self)
         # output device
         # 输出设备
         self.out_devices = ShowArea()
@@ -139,7 +140,6 @@ class DurationPage(QWidget):
     # 弹出输出设备选择框
     def showOutDevices(self):
         self.out_devices_dialog = DeviceOutDialog()
-
         self.out_devices_dialog.addDevices(Info.OUTPUT_DEVICE_INFO)
         self.out_devices_dialog.ok_bt.clicked.connect(self.selectOut)
         self.out_devices_dialog.cancel_bt.clicked.connect(self.out_devices_dialog.close)
@@ -240,32 +240,6 @@ class DurationPage(QWidget):
         clone_page = DurationPage()
         clone_page.setProperties(self.default_properties)
         return clone_page
-
-    def eventFilter(self, obj: QObject, e: QEvent):
-        if obj == self.duration:
-            if e.type() == QEvent.FocusOut:
-                text = self.duration.currentText()
-                # 是否是变量
-                if text not in self.attributes:
-                    # 是否是提供选项
-                    if self.duration.findText(text, Qt.MatchCaseSensitive) == -1:
-                        # 输入的数字
-                        if text.isdigit():
-                            pass
-                        else:
-                            # 输入的范围
-                            split = text.split("~")
-                            if len(split) == 2:
-                                if split[0].isdigit() and split[1].isdigit():
-                                    pass
-                                else:
-                                    QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                                    self.duration.setCurrentIndex(0)
-                            else:
-                                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                                self.duration.setCurrentIndex(0)
-
-        return QWidget.eventFilter(self, obj, e)
 
     def changeCertainDeviceName(self, d_id, name):
         io_type = Func.getIOType(d_id)

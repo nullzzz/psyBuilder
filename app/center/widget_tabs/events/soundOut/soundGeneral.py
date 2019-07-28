@@ -1,11 +1,10 @@
 from PyQt5.QtCore import Qt, QRegExp
-from PyQt5.QtGui import QRegExpValidator, QFont
+from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QApplication, QFileDialog, QCompleter
+    QFileDialog, QCompleter
 
 from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
-from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 # soundOut event专属页面
@@ -29,8 +28,6 @@ class SoundTab1(QWidget):
             "Wait for start": "No"
         }
         self.file_name = PigLineEdit()
-        self.file_name.textChanged.connect(self.findVar)
-        self.file_name.returnPressed.connect(self.finalCheck)
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
@@ -40,8 +37,6 @@ class SoundTab1(QWidget):
         self.volume_control.stateChanged.connect(self.volumeChecked)
         self.volume = PigLineEdit()
         self.volume.setText("0")
-        self.volume.textChanged.connect(self.findVar)
-        self.volume.returnPressed.connect(self.finalCheck)
 
         self.latency_bias = QCheckBox("Latency Bias (ms):")  # Latency Bias
         self.latency_bias.setLayoutDirection(Qt.RightToLeft)
@@ -49,14 +44,14 @@ class SoundTab1(QWidget):
         self.latency_bias.stateChanged.connect(self.latencyBiasChecked)
         self.bias_time = PigLineEdit()
         self.bias_time.setText("0")
-        self.bias_time.textChanged.connect(self.findVar)
-        self.bias_time.returnPressed.connect(self.finalCheck)
 
         self.buffer_size = PigLineEdit()
         self.stream_refill = PigComboBox()
 
-        self.start_offset = PigLineEdit()
-        self.stop_offset = PigLineEdit()
+        self.start_offset = PigLineEdit("00:00:00.000")
+        self.start_offset.setInputMask("00:00:00.000")
+        self.stop_offset = PigLineEdit("00:00:00.000")
+        self.stop_offset.setInputMask("00:00:00.000")
         self.repetitions = PigLineEdit()
 
         self.sound_device = PigComboBox()
@@ -69,23 +64,18 @@ class SoundTab1(QWidget):
         self.setGeneral()
 
     def setGeneral(self):
-        valid_input = QRegExp(r"(\d+)|(\[[_\d\w]+\]")
-        self.start_offset.setValidator(QRegExpValidator(valid_input, self))
-        self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
+        # valid_input = QRegExp(r"(\d+)|(\[[_\d\w]+\]")
+        # self.start_offset.setValidator(QRegExpValidator(valid_input, self))
+        # self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
         self.stream_refill.addItems(["0", "1", "2"])
         # self.repetitions.addItems(["Yes", "No"])
         self.repetitions.setText("0")
         self.buffer_size.setText("5000")
-        self.start_offset.setText("0")
-        self.stop_offset.setText("0")
+        # self.start_offset.setText("0")
+        # self.stop_offset.setText("0")
         self.volume.setEnabled(False)
         self.bias_time.setEnabled(False)
-        self.buffer_size.textChanged.connect(self.findVar)
-        self.start_offset.textChanged.connect(self.findVar)
-        self.stop_offset.textChanged.connect(self.findVar)
-        self.buffer_size.returnPressed.connect(self.finalCheck)
-        self.start_offset.returnPressed.connect(self.finalCheck)
-        self.stop_offset.returnPressed.connect(self.finalCheck)
+
         l0 = QLabel("File Name:")
         l1 = QLabel("Buffer Size (ms):")
         l2 = QLabel("Stream Refill:")
@@ -143,7 +133,6 @@ class SoundTab1(QWidget):
 
         group2.setLayout(layout2)
 
-
         layout = QVBoxLayout()
 
         layout.addWidget(group1, 2)
@@ -185,23 +174,6 @@ class SoundTab1(QWidget):
             if new_name:
                 self.sound_device.setCurrentText(new_name)
 
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color: black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                temp.clear()
-
     def setAttributes(self, attributes: list):
         self.attributes = attributes
         self.file_name.setCompleter(QCompleter(self.attributes))
@@ -210,8 +182,8 @@ class SoundTab1(QWidget):
         self.stop_offset.setCompleter(QCompleter(self.attributes))
         self.volume.setCompleter(QCompleter(self.attributes))
         self.bias_time.setCompleter(QCompleter(self.attributes))
-        self.sound_device.setCompleter(QCompleter(self.attributes))
-        self.wait_for_start.setCompleter(QCompleter(self.attributes))
+        # self.sound_device.setCompleter(QCompleter(self.attributes))
+        # self.wait_for_start.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         self.default_properties.clear()
@@ -221,8 +193,6 @@ class SoundTab1(QWidget):
         self.default_properties["Start offset"] = self.start_offset.text()
         self.default_properties["Stop offset"] = self.stop_offset.text()
         self.default_properties["Repetitions"] = self.repetitions.text()
-        # self.default_properties["Repetitions"] = self.repetitions.currentText()
-
         self.default_properties["Volume control"] = self.volume_control.checkState()
         self.default_properties["Volume"] = self.volume.text()
         self.default_properties["Latency bias"] = self.latency_bias.checkState()
@@ -245,7 +215,6 @@ class SoundTab1(QWidget):
         self.stream_refill.setCurrentText(self.default_properties["Stream refill"])
         self.start_offset.setText(self.default_properties["Start offset"])
         self.stop_offset.setText(self.default_properties["Stop offset"])
-        # self.repetitions.setCurrentText(self.default_properties["Repetitions"])
         self.repetitions.setText(self.default_properties["Repetitions"])
         self.volume_control.setCheckState(self.default_properties["Volume control"])
         self.volume.setText(self.default_properties["Volume"])
@@ -258,15 +227,3 @@ class SoundTab1(QWidget):
         clone_page = SoundTab1()
         clone_page.setProperties(self.default_properties)
         return clone_page
-
-
-if __name__ == "__main__":
-    import sys
-
-    app = QApplication(sys.argv)
-
-    t = SoundTab1()
-
-    t.show()
-
-    sys.exit(app.exec())

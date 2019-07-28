@@ -23,20 +23,22 @@ class FramePage(QWidget):
         }
         # up
         self.x_pos = PigComboBox()
+        self.x_pos.setReg(r"\d+%?")
         self.y_pos = PigComboBox()
+        self.y_pos.setReg(r"\d+%?")
         self.width = PigComboBox()
+        self.width.setReg(r"\d+%?")
         self.height = PigComboBox()
-        self.x_pos.installEventFilter(self)
-        self.y_pos.installEventFilter(self)
-        self.width.installEventFilter(self)
-        self.height.installEventFilter(self)
+        self.height.setReg(r"\d+%?")
         # down
         self.enable = PigComboBox()
         self.enable.currentTextChanged.connect(self.operationAble)
         self.border_color = ColorListEditor()
-        self.border_width = PigLineEdit()
+        self.border_width = PigLineEdit("0")
+        self.border_width.setReg(r"\d+")
         self.back_color = ColorListEditor()
         self.transparent = PigLineEdit("100%")
+        self.transparent.setReg(r"[0-9]%|[1-9]\d%|100%")
         self.enable.addItems(("no", "yes"))
         self.setUI()
 
@@ -50,20 +52,19 @@ class FramePage(QWidget):
     def setUI(self):
         self.x_pos.addItems(["0", "25", "50", "75", "100"])
         self.x_pos.setEditable(True)
+        self.x_pos.setReg(r"\d+%?")
+
         self.y_pos.addItems(["0", "25", "50", "75", "100"])
         self.y_pos.setEditable(True)
-        self.x_pos.setInsertPolicy(QComboBox.NoInsert)
-        self.y_pos.setInsertPolicy(QComboBox.NoInsert)
-
-        self.border_width.setText("0")
+        self.y_pos.setReg(r"\d+%?")
 
         self.width.addItems(("100%", "75%", "50%", "25%"))
         self.width.setEditable(True)
-        self.width.setInsertPolicy(QComboBox.NoInsert)
+        self.width.setReg(r"\d+%?")
 
         self.height.addItems(("100%", "75%", "50%", "25%"))
         self.height.setEditable(True)
-        self.height.setInsertPolicy(QComboBox.NoInsert)
+        self.height.setReg(r"\d+%?")
 
         l1 = QLabel("X position:")
         l2 = QLabel("Y position:")
@@ -194,17 +195,3 @@ class FramePage(QWidget):
         clone_page.setProperties(self.default_properties)
         return clone_page
 
-    def eventFilter(self, obj: QObject, e: QEvent):
-        if obj == self.x_pos or obj == self.y_pos:
-            obj: QComboBox
-            if e.type() == QEvent.FocusOut:
-                text: str = obj.currentText()
-                if text not in self.attributes:
-                    if text:
-                        if text[0] == "[":
-                            QMessageBox.warning(self, "Warning", "Invalid Attribute!", buttons=QMessageBox.Ok)
-                            obj.setCurrentIndex(0)
-                    else:
-                        QMessageBox.warning(self, "Warning", "Attribute cannot be none!", QMessageBox.Ok)
-                        obj.setCurrentIndex(0)
-        return QWidget.eventFilter(self, obj, e)

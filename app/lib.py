@@ -1,9 +1,11 @@
+import re
+
 from PyQt5.QtCore import QDataStream, QIODevice, Qt, QRegExp, QSize, pyqtSignal
 from PyQt5.QtGui import QColor, QIcon, QRegExpValidator, QFont, QPen
 from PyQt5.QtWidgets import QComboBox, QColorDialog, QLineEdit, QSpinBox, QMainWindow, QItemDelegate, \
-    QStyle, QWidget, QHBoxLayout
+    QStyle, QWidget, QHBoxLayout, QMessageBox
 
-from lib.psy_message_box import PsyMessageBox as QMessageBox
+from app.func import Func
 
 
 class NoDash(QItemDelegate):
@@ -63,10 +65,17 @@ class PigSinBox(QSpinBox):
 
 
 class PigComboBox(QComboBox):
+    focusLost = pyqtSignal()
+
     def __init__(self, parent=None):
         super(PigComboBox, self).__init__(parent)
         self.setAcceptDrops(True)
+        self.setInsertPolicy(QComboBox.NoInsert)
         self.currentTextChanged.connect(self.findVar)
+        self.focusLost.connect(self.checkValidity)
+        # self.lineEdit().returnPressed.connect(self.checkValidity)
+        self.valid_data: str = ""
+        self.reg_exp = ""
 
     def dragEnterEvent(self, e):
         if e.mimeData().hasFormat("attributes/move-attribute"):
@@ -80,8 +89,7 @@ class PigComboBox(QComboBox):
         text = f"[{stream.readQString()}]"
         index = self.findText(text, Qt.MatchExactly)
         if index == -1:
-            if self.insertPolicy() != QComboBox.NoInsert:
-                self.addItem(text)
+            self.addItem(text)
         self.setCurrentText(text)
 
     # 检查变量
@@ -93,15 +101,37 @@ class PigComboBox(QComboBox):
             self.setStyleSheet("color: black")
             self.setFont(QFont("宋体", 9, QFont.Normal))
 
+    def setReg(self, reg_exp: str):
+        self.reg_exp = reg_exp + r"|\[\w+\]"
+        self.setValidator(QRegExpValidator(QRegExp(self.reg_exp), self))
+
+    def focusOutEvent(self, e):
+        self.focusLost.emit()
+        QComboBox.focusOutEvent(self, e)
+
+    def checkValidity(self):
+        cur = self.currentText()
+        if self.reg_exp != "" and re.fullmatch(self.reg_exp, cur) is None:
+            self.setCurrentText(self.valid_data)
+            QMessageBox.warning(self, "Invalid", f"Invalid Parameter {cur}\nformat must conform to\n {self.reg_exp}")
+        else:
+            self.valid_data = cur
+
 
 class PigLineEdit(QLineEdit):
-    def __init__(self, parent=None):
-        super(PigLineEdit, self).__init__(parent)
+    focusLost = pyqtSignal()
+
+    def __init__(self, *__args):
+        super(PigLineEdit, self).__init__(*__args)
         self.setAcceptDrops(True)
         self.textChanged.connect(self.findVar)
+        self.editingFinished.connect(self.checkValidity)
+        self.returnPressed.connect(self.checkValidity)
+        self.focusLost.connect(self.checkValidity)
+        self.valid_data: str = self.text()
 
         self.suffix: str = ""
-        # self.textChanged.connect(self.addSuffix)
+        self.reg_exp: str = ""
 
     def dragEnterEvent(self, e):
         if e.mimeData().hasFormat("attributes/move-attribute"):
@@ -118,7 +148,7 @@ class PigLineEdit(QLineEdit):
     # 检查变量
     def findVar(self, text: str):
         if text.startswith("[") and text.endswith("]"):
-            self.setStyleSheet("color: blue")
+            self.setStyleSheet("color: red")
             self.setFont(QFont("Timers", 9, QFont.Bold))
         else:
             self.setStyleSheet("color: black")
@@ -127,12 +157,9 @@ class PigLineEdit(QLineEdit):
     def setSuffix(self, suffix: str):
         self.suffix = suffix
 
-    # def setText(self, a0: str) -> None:
-    #     if not a0.endswith(self.suffix):
-    #         text = a0 + self.suffix
-    #     else:
-    #         text = a0
-    #     return QLineEdit.setText(self, text)
+    def setReg(self, reg_exp: str):
+        self.reg_exp = reg_exp + r"|\[\w+\]"
+        self.setValidator(QRegExpValidator(QRegExp(self.reg_exp), self))
 
     def addSuffix(self, text: str):
         if text != "" and not text.endswith(self.suffix):
@@ -140,12 +167,16 @@ class PigLineEdit(QLineEdit):
             self.cursorForward(False)
 
     def focusOutEvent(self, e):
-        print("out")
-        print(e)
-        # 这个必须要的，不然自带的editingFinished信号发不出去了
-        super(PigLineEdit, self).focusOutEvent(e)
-        if not self.text().endswith(self.suffix):
-            self.setText(self.text() + self.suffix)
+        self.focusLost.emit()
+        QLineEdit.focusOutEvent(self, e)
+
+    def checkValidity(self):
+        cur = self.text()
+        if self.reg_exp != "" and re.fullmatch(self.reg_exp, cur) is None:
+            self.setText(self.valid_data)
+            QMessageBox.warning(self, "Invalid", f"Invalid Parameter {cur}\nformat must conform to\n {self.reg_exp}")
+        else:
+            self.valid_data = cur
 
 
 class ColorListEditor(PigComboBox):
@@ -170,11 +201,9 @@ class ColorListEditor(PigComboBox):
         self.is_chose = False
         self.default_color = ("white", "gray", "black", "red",
                               "orange", "yellow", "green", "blue", "purple")
-        self.populateList()
+        self.init()
 
-        self.editTextChanged.connect(self.changeColor)
-
-        self.setStyleSheet("background: {}".format(self.currentText()))
+        self.setStyleSheet("background: {}".format(self.getRGB()))
         # 支持输入255,255,255及#ffffff格式rgb
         valid_rgb = QRegExp(
             r"((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{6}|"
@@ -183,7 +212,7 @@ class ColorListEditor(PigComboBox):
         self.setInsertPolicy(QComboBox.NoInsert)
 
     # 添加默认颜色，白灰黑、红橙黄绿蓝紫
-    def populateList(self):
+    def init(self):
         for i, colorName in enumerate(self.default_color):
             color = QColor(colorName)
             self.insertItem(i, colorName)
@@ -191,9 +220,9 @@ class ColorListEditor(PigComboBox):
         self.insertItem(0, "More...", Qt.DecorationRole)
         self.setItemIcon(0, QIcon("image/more_color.png"))
 
-    def changeColor(self, e):
-        if e:
-            if e.startswith("["):
+    def findVar(self, text: str):
+        if text:
+            if text.startswith("["):
                 self.setStyleSheet("color: blue")
                 self.setFont(QFont("Timers", 9, QFont.Bold))
                 self.is_valid = 2
@@ -201,7 +230,7 @@ class ColorListEditor(PigComboBox):
                 self.setStyleSheet("color: black")
                 self.setFont(QFont("宋体", 9, QFont.Normal))
                 # 取色板
-                if e == "More...":
+                if text == "More...":
                     self.is_chose = True
                     self.setStyleSheet("background: white;")
                     color_rgb = QColorDialog.getColor(Qt.white, self)
@@ -219,15 +248,15 @@ class ColorListEditor(PigComboBox):
                     self.is_valid = 1
                     self.is_chose = False
                 # 255,255,255格式rgb
-                elif e[0] in "0123456789":
-                    color_rgb = e.split(",")
+                elif text[0].isdigit():
+                    color_rgb = text.split(",")
                     if len(color_rgb) == 3 and color_rgb[2] != "":
-                        self.setStyleSheet("background-color: rgb({});".format(e))
+                        self.setStyleSheet("background-color: rgb({});".format(text))
                         # 添加到下拉菜单
-                        if self.findText(e, Qt.MatchExactly) == -1:
+                        if self.findText(text, Qt.MatchExactly) == -1:
                             color = QColor(int(color_rgb[0]), int(
                                 color_rgb[1]), int(color_rgb[2]))
-                            self.insertItem(1, e)
+                            self.insertItem(1, text)
                             self.setItemData(1, color, Qt.DecorationRole)
                             self.setCurrentIndex(1)
                         self.is_valid = 1
@@ -235,15 +264,15 @@ class ColorListEditor(PigComboBox):
                         self.is_valid = 0
                         self.setStyleSheet("background: white")
                 # #ffffff格式rgb
-                elif e[0] == "#" and len(e) == 7:
-                    if self.findText(e) == -1:
-                        color = QColor(e)
-                        self.insertItem(1, e)
+                elif text[0] == "#" and len(text) == 7:
+                    if self.findText(text) == -1:
+                        color = QColor(text)
+                        self.insertItem(1, text)
                         self.setItemData(1, color, Qt.DecorationRole)
                         self.setCurrentIndex(1)
-                    self.setStyleSheet("background: {}".format(e))
+                    self.setStyleSheet("background: {}".format(text))
                     self.is_valid = 1
-                elif e in self.default_color:
+                elif text in self.default_color:
                     self.is_valid = 1
                     self.setStyleSheet("background: {}".format(self.currentText()))
                 else:
@@ -266,7 +295,7 @@ class ColorListEditor(PigComboBox):
     def hidePopup(self):
         self.is_showing = False
         color = self.currentText()
-        if self.is_valid:
+        if self.is_valid == 1:
             if ',' in color:
                 self.setStyleSheet("background: rgb({})".format(color))
             else:
@@ -291,12 +320,35 @@ class ColorListEditor(PigComboBox):
         for k, v in self.color_map.items():
             if text == v:
                 text = k
+                break
         return QComboBox.setCurrentText(self, text)
 
     # 返回当前颜色R,G,B
     def getColor(self):
         color_name = self.currentText()
+        if color_name.startswith("["):
+            return color_name
+        elif color_name.startswith("#"):
+            color_name = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
         return self.color_map.get(color_name, color_name)
+
+    def getRGB(self):
+        color_name = self.currentText()
+        if color_name.startswith("["):
+            color_name = '255,255,255'
+        elif color_name.startswith("#"):
+            color_name = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
+        return self.color_map.get(color_name, color_name)
+
+
+class Tip(QMessageBox):
+    def __init__(self, parent=None):
+        super(Tip, self).__init__(parent=parent)
+        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.addButton(QMessageBox.Abort)
+
+    def tip(self, msg: str):
+        self.setText(msg)
 
 
 class T(QMainWindow, BaseWidget):

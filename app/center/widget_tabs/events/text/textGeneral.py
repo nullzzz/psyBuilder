@@ -10,22 +10,16 @@ from app.lib import PigComboBox, PigLineEdit, ColorListEditor
 class TextTab1(QWidget):
     def __init__(self, parent=None):
         super(TextTab1, self).__init__(parent)
-        self.html_header = (
-            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-            "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-            "p, li { white-space: pre-wrap; }\n")
-        self.html_font = "</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; " \
-                         "font-style:normal;\">"
 
-        self.attributes = []
+        self.attributes: list = []
 
         self.default_properties = {
             "Text": "",
-            "Alignment": "Center",
+            "Alignment": "center",
             "Fore color": "0,0,0",
             "Back color": "255,255,255",
             "Screen name": "screen.0",
-            "Transparent": 100,
+            "Transparent": "100%",
             "Word wrap": 0,
             "Clear after": "Yes"
         }
@@ -52,10 +46,12 @@ class TextTab1(QWidget):
 
         self.clear_after = PigComboBox()
         self.screen_name = PigComboBox()
-        self.transparent = PigLineEdit()
-        self.word_wrap = PigLineEdit()
+        self.transparent = PigLineEdit("100%")
+        self.transparent.setReg(r"0%|[1-9]\d%|100%")
+        self.word_wrap = PigLineEdit("80")
+        self.word_wrap.setReg(r"\d+")
         self.word_wrap.textChanged.connect(self.wrapChange)
-        self.word_wrap.setText("80")
+        self.text_edit.setLineWrapColumnOrWidth(80)
 
         self.flip_horizontal = PigComboBox()
         self.flip_horizontal.addItems(("False", "True"))
@@ -70,6 +66,7 @@ class TextTab1(QWidget):
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
         self.style_box.currentTextChanged.connect(self.fontChange)
         self.font_size_box = PigComboBox()
+        self.font_size_box.setReg(r"\d+")
         self.font_size_box.setEditable(True)
         for i in range(12, 72, 2):
             self.font_size_box.addItem(str(i))
@@ -126,7 +123,6 @@ class TextTab1(QWidget):
 
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
-        self.transparent.setText("100%")
         self.screen_name.addItems(["screen.0"])
 
         group1 = QGroupBox("Text")
@@ -179,8 +175,10 @@ class TextTab1(QWidget):
     def changeDevice(self, device_name):
         self.using_device_id = Func.getDeviceIdByName(device_name)
 
-    def colorChange(self, color):
-        r, g, b = [int(x) for x in color.split(",")]
+    def colorChange(self, color: str):
+        r, g, b = 255, 255, 255
+        if "," in color:
+            r, g, b = [int(x) for x in color.split(",")]
         if self.sender() == self.fore_color:
             self.fore_color_name = color
             self.text_edit.setTextColor(QColor(r, g, b))
@@ -248,16 +246,16 @@ class TextTab1(QWidget):
         self.align_y.setCompleter(QCompleter(self.attributes))
         self.fore_color.setCompleter(QCompleter(self.attributes))
         self.back_color.setCompleter(QCompleter(self.attributes))
-        self.clear_after.setCompleter(QCompleter(self.attributes))
-        self.screen_name.setCompleter(QCompleter(self.attributes))
+        # self.clear_after.setCompleter(QCompleter(self.attributes))
+        # self.screen_name.setCompleter(QCompleter(self.attributes))
         self.transparent.setCompleter(QCompleter(self.attributes))
         self.word_wrap.setCompleter(QCompleter(self.attributes))
-        self.flip_vertical.setCompleter(QCompleter(self.attributes))
-        self.flip_horizontal.setCompleter(QCompleter(self.attributes))
-        self.font_box.setCompleter(QCompleter(self.attributes))
+        # self.flip_vertical.setCompleter(QCompleter(self.attributes))
+        # self.flip_horizontal.setCompleter(QCompleter(self.attributes))
+        # self.font_box.setCompleter(QCompleter(self.attributes))
         self.font_size_box.setCompleter(QCompleter(self.attributes))
         self.style_box.setCompleter(QCompleter(self.attributes))
-        self.right_to_left.setCompleter(QCompleter(self.attributes))
+        # self.right_to_left.setCompleter(QCompleter(self.attributes))
 
     def setScreen(self, screen: list):
         selected = self.screen_name.currentText()
@@ -269,24 +267,6 @@ class TextTab1(QWidget):
             new_name = Func.getDeviceNameById(self.using_device_id)
             if new_name:
                 self.screen_name.setCurrentText(new_name)
-
-    # 处理html获得格式
-    # 对齐方式、颜色、内容
-    def setAll(self):
-        return
-        texts = self.text_edit.toPlainText().split("\n")
-        self.html_font = f"</style></head><body style=\" font-family:'{self.new_font.family()}'; font-size:" \
-            f"{self.new_font.pointSize()}pt; font-weight:{self.new_font.weight()}; font-style:" \
-            f"{self.new_font.styleName()};\">"
-        html = self.html_header + self.html_font
-        for text in texts:
-            html += f"\n<p align=\"{self.align_mode}\"style=\" margin-top:0px; margin-bottom:0px; " \
-                f"margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent: 0px;\"><span style=\" " \
-                f"color:{self.fore_color_name}; background-color:{self.back_color_name};\">{text}</span>"
-
-        self.text_edit.setHtml(html)
-        # 字体的style和划线在html中不体现
-        self.text_edit.setFont(self.new_font)
 
     def apply(self):
         self.html = self.text_edit.toHtml()
@@ -344,14 +324,3 @@ class TextTab1(QWidget):
         clone_page.setProperties(self.default_properties, self.html)
         return clone_page
 
-
-if __name__ == "__main__":
-    import sys
-
-    app = QApplication(sys.argv)
-
-    t = TextTab1()
-
-    t.show()
-
-    sys.exit(app.exec())
