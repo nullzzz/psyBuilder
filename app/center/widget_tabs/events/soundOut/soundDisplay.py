@@ -239,8 +239,11 @@ class SoundDisplay(QMainWindow):
     def getUsingAttributes(self):
         using_attributes: list = []
         self.findAttributes(self.default_properties, using_attributes)
-        print(using_attributes)
+        # print(using_attributes)
         return using_attributes
+
+    def getSelectedWhileUnreachableAttributesAfterMovingOrQuote(self) -> list:
+        return []
 
     def findAttributes(self, properties: dict, using_attributes: list):
         for v in properties.values():

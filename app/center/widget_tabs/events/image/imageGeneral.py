@@ -22,7 +22,7 @@ class ImageTab1(QWidget):
             "Stretch": False,
             "Stretch mode": "Both",
             "Back color": "white",
-            "Transparent": "100",
+            "Transparent": "100%",
             "Clear after": "Yes",
             "Screen name": "screen.0"
         }
@@ -38,6 +38,7 @@ class ImageTab1(QWidget):
 
         # Rotate
         self.rotate = PigLineEdit("0")
+        self.rotate.setReg(r"\[\w+\]|\d+")
 
         # 拉伸模式
         self.stretch = QCheckBox("Stretch")
@@ -45,8 +46,9 @@ class ImageTab1(QWidget):
 
         # 背景色、透明度、Clear&Screen
         # self.back_color = ColorListEditor()
-        self.transparent = PigLineEdit()
-        self.transparent.setSuffix("%")
+        self.transparent = PigLineEdit("100%")
+        self.transparent.setReg(r"[0-9]%|[1-9][0-9]%|100%|\[\w+\]")
+
         self.clear_after = PigComboBox()
         self.screen_name = PigComboBox()
         self.screen_name.currentTextChanged.connect(self.changeDevice)
@@ -55,7 +57,6 @@ class ImageTab1(QWidget):
 
     def setGeneral(self):
         self.stretch_mode.addItems(("Both", "LeftRight", "UpDown"))
-        self.transparent.setText("100")
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
         self.screen_name.addItems(["screen.0"])
 
@@ -117,8 +118,8 @@ class ImageTab1(QWidget):
         self.file_name.setCompleter(QCompleter(self.attributes))
         self.rotate.setCompleter(QCompleter(self.attributes))
         self.transparent.setCompleter(QCompleter(self.attributes))
-        self.clear_after.setCompleter(QCompleter(self.attributes))
-        self.screen_name.setCompleter(QCompleter(self.attributes))
+        # self.clear_after.setCompleter(QCompleter(self.attributes))
+        # self.screen_name.setCompleter(QCompleter(self.attributes))
 
     def setScreen(self, screen: list):
         selected = self.screen_name.currentText()

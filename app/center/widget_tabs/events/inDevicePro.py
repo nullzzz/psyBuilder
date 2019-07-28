@@ -52,7 +52,7 @@ class InDeviceRespAtDuration(QWidget):
         self.right.setCompleter(QCompleter(self.attributes))
         self.wrong.setCompleter(QCompleter(self.attributes))
         self.ignore.setCompleter(QCompleter(self.attributes))
-        self.resp_trigger_out.setCompleter(QCompleter(self.attributes))
+        # self.resp_trigger_out.setCompleter(QCompleter(self.attributes))
 
     def changeOutputDevice(self, output: dict):
         self.using_output_device.clear()
@@ -125,5 +125,5 @@ class InDeviceInfoAtDuration(QWidget):
         self.attributes = attributes
         self.allowable.setCompleter(QCompleter(self.attributes))
         self.correct.setCompleter(QCompleter(self.attributes))
-        self.RT_window.setCompleter(QCompleter(self.attributes))
-        self.end_action.setCompleter(QCompleter(self.attributes))
+        # self.RT_window.setCompleter(QCompleter(self.attributes))
+        # self.end_action.setCompleter(QCompleter(self.attributes))

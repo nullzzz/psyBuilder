@@ -22,8 +22,6 @@ class VideoTab1(QWidget):
         }
         # general
         self.file_name = PigLineEdit()
-        self.file_name.textChanged.connect(self.findVar)
-        self.file_name.returnPressed.connect(self.finalCheck)
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
@@ -50,10 +48,6 @@ class VideoTab1(QWidget):
         self.end_pos.setText("99:99:99.999")
         self.start_pos.setValidator(QRegExpValidator(valid_pos, self))
         self.end_pos.setValidator(QRegExpValidator(valid_pos, self))
-        self.start_pos.textChanged.connect(self.findVar)
-        self.start_pos.returnPressed.connect(self.finalCheck)
-        self.end_pos.textChanged.connect(self.findVar)
-        self.end_pos.returnPressed.connect(self.finalCheck)
 
         self.playback_rate.addItems(["1.0", "1.25", "1.5", "1.75", "2.0", "-1.0"])
         self.playback_rate.currentTextChanged.connect(self.pbTip)
@@ -130,23 +124,6 @@ class VideoTab1(QWidget):
             self.stretch_mode.setEnabled(True)
         else:
             self.stretch_mode.setEnabled(False)
-
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color: black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                temp.clear()
 
     def setAttributes(self, attributes):
         self.attributes = attributes

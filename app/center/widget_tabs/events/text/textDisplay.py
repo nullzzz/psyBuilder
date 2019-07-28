@@ -16,16 +16,16 @@ class TextDisplay(QMainWindow):
         super(TextDisplay, self).__init__(parent)
         self.widget_id = widget_id
         self.current_wid = widget_id
-        self.attributes = []
+        self.attributes: list = []
         self.text_label = QTextEdit()
-        # self.text_label.setReadOnly(True)
+
         self.pro_window = TextProperty()
 
         self.html = self.pro_window.html
         self.font = self.pro_window.font
         self.default_properties = self.pro_window.getInfo()
 
-        self.text_label.textChanged.connect(self.changeDisplayText)
+        self.pro_window.general.text_edit.setDocument(self.text_label.document())
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
@@ -35,14 +35,13 @@ class TextDisplay(QMainWindow):
 
         self.fore_color = "0,0,0"
         self.back_color = "255,255,255"
-        self.transparent_value = "100"
+        self.transparent_value = "100%"
 
         self.x_pos = "0"
         self.y_pos = "0"
         self.w_size = "100%"
         self.h_size = "100%"
         self.setUI()
-        self.setAttributes(["test", "var"])
 
     def setUI(self):
         self.setWindowTitle("Text")
@@ -56,7 +55,7 @@ class TextDisplay(QMainWindow):
         pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
         pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
-        tool.addAction(pre_view)
+        # tool.addAction(pre_view)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
@@ -65,9 +64,6 @@ class TextDisplay(QMainWindow):
         self.setAttributes(self.attributes)
         screen_devices = Func.getScreen()
         self.pro_window.general.setScreen(screen_devices)
-        # self.pro_window.general.text_edit.setHtml(self.html)
-        # 阻塞原窗口
-        # self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
 
@@ -109,9 +105,6 @@ class TextDisplay(QMainWindow):
     def apply(self):
         self.getInfo()
         self.parseProperties()
-        # self.text_label.setDocument(self.pro_window.general.text_edit.document())
-        # self.text_label.setHtml(self.html)
-        # self.text_label.setFont(self.pro_window.general.text_edit.font())
         # 发送信号
         self.propertiesChange.emit(self.default_properties)
 
@@ -155,7 +148,6 @@ class TextDisplay(QMainWindow):
     def changeDisplayText(self):
         self.html = self.text_label.toHtml()
         self.pro_window.general.text_edit.setDocument(self.text_label.document())
-        # self.pro_window.general.text_edit.setFont(self.text_label.font())
 
     # 设置可选参数
     def setAttributes(self, attributes):
