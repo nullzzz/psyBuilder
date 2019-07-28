@@ -158,7 +158,7 @@ class PigLineEdit(QLineEdit):
         self.suffix = suffix
 
     def setReg(self, reg_exp: str):
-        self.reg_exp = reg_exp + r"|\[\w+\]"
+        self.reg_exp = reg_exp + r"|\[[_\d\w]+\]"
         self.setValidator(QRegExpValidator(QRegExp(self.reg_exp), self))
 
     def addSuffix(self, text: str):
