@@ -507,7 +507,7 @@ def parseAllowKeys(allowKeyStr):
                 enabledKBKeysList.append(char)
 
 
-def parseBooleanStr(inputStr, isRef = False):
+def parseBooleanStr(inputStr, isRef=False):
     if inputStr.lower() in ["'yes'", "'true'", 'yes', 'true']:
         inputStr = "1"
     elif inputStr.lower() in ["'no'", "'false'", 'no', 'false']:
@@ -782,10 +782,10 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # 11) check the parameter winRect
     sx = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
     sy = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
-    cWdith = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
+    cWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
     cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
 
-    frameRectStr = f"makeFrameRect({sx}, {sy}, {cWdith}, {cHeight}, fullRects({outputDevNameIdxDict.get(cScreenName)},:))"
+    frameRectStr = f"makeFrameRect({sx}, {sy}, {cWidth}, {cHeight}, fullRects({outputDevNameIdxDict.get(cScreenName)},:))"
 
     # set the font name size color style:
     fontName = dataStrConvert(*getRefValue(cWidget, cProperties['Font family'], attributesSetDict))
@@ -860,16 +860,16 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
                          addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr, borderWidth)
 
     #  print out the text
-    printAutoInd(f, "DrawFormattedText({0},{1},{2},{3},{4},{5},{6},{7},[],{8},{9});", \
-                 cWinStr, \
-                 cProperties['Text'], \
-                 alignmentX, \
-                 alignmentY, \
-                 addedTransparentToRGBStr(fontColorStr, fontTransparent), \
-                 dataStrConvert(*getRefValue(cWidget, cProperties['Wrapat chars'], attributesSetDict)), \
-                 flipHorStr, \
-                 flipVerStr, \
-                 rightToLeft, \
+    printAutoInd(f, "DrawFormattedText({0},{1},{2},{3},{4},{5},{6},{7},[],{8},{9});",
+                 cWinStr,
+                 cProperties['Text'],
+                 alignmentX,
+                 alignmentY,
+                 addedTransparentToRGBStr(fontColorStr, fontTransparent),
+                 dataStrConvert(*getRefValue(cWidget, cProperties['Wrapat chars'], attributesSetDict)),
+                 flipHorStr,
+                 flipVerStr,
+                 rightToLeft,
                  frameRectStr)
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
@@ -1071,13 +1071,13 @@ def printCycleWdiget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     cycleOrderStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict))
     cycleOrderByStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrderBy(), attributesSetDict))
 
-    #  to make sure the weight is one for countbalance selection of order ----/
+    #  to make sure the weight is one for counterbalance selection of order ----/
     if cycleOrderStr == "'CounterBalance'":
         cCycleWeightList = cWidget.getAttributeValues(0)
         for cLineWeight in cCycleWeightList:
             if dataStrConvert(cLineWeight) != 1:
                 throwCompileErrorInfo(
-                    f"Found an uncompatible error in Cycle {Func.getWidgetName(cWidget.widget_id)}:\nFor CounterBalance selection, the timeline weight should be 1")
+                    f"Found an uncompilable error in Cycle {Func.getWidgetName(cWidget.widget_id)}:\nFor CounterBalance selection, the timeline weight should be 1")
     # ------------------------------------------------------------------------\
 
     # attributesSetDict.setdefault(f"{cWidgetName}.rowNums", [cLoopLevel, f"size({cWidgetName}.attr,1)"])
