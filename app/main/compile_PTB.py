@@ -49,19 +49,278 @@ def throwCompileErrorInfo(inputStr):
 
 
 
-def updateSpFormatVarDict(propertyValue,formatTypeStr,spFormatVarDict):
-    if isRefStr(propertyValue):
-        propertyValue = propertyValue[1:-1]    # remove the square brackets
-        allRefedCycleAttrs = getAllNestedVars(propertyValue,[])
+def debugPrint(input):
+    isDebug = False
+
+    if isDebug:
+        print(input)
+
+#
+# def dontClearAfterTransStr(inputStr):
+#     if inputStr == "'clear_0'":
+#         inputStr = "0"
+#     elif inputStr == "'notClear_1'":
+#         inputStr = "1"
+#     elif inputStr == "'doNothing_2'":
+#         inputStr = "2"
+#
+#     return inputStr
+
+def parseBooleanStr(inputStr,isRef):
+
+    if inputStr.lower() in ["'yes'","'true'",'yes','true']:
+        inputStr = "1"
+    elif inputStr.lower() in ["'no'","'false'",'no','false']:
+        inputStr = "0"
+    else:
+        if isRef == False:
+            throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False','True','Yes','No','1', or '0'] ")
+
+    return inputStr
 
 
-        for cAttrName in allRefedCycleAttrs:
+def pyStr2MatlabStr(inputStr):
+    if isinstance(inputStr, str):
+        if isSingleQuotedStr(inputStr):
+            inputStr = inputStr[1:-1]
+        inputStr = re.sub("'","''",inputStr)
+        # inputStr = re.sub(r"\\\%","%",inputStr)
+    return inputStr
 
-            if cAttrName in spFormatVarDict:
-                if spFormatVarDict[cAttrName] != formatTypeStr:
-                    throwCompileErrorInfo(f"attribute: {cAttrName} are not allowed to be both {formatTypeStr} or {spFormatVarDict[cAttrName]}")
+
+# def parseDurationStr(cWidget,attributesSetDict):
+#     isInfiniteDur = False
+#
+#     cRefedValue, isRef,valueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
+#     duration                    = dataStrConvert(cRefedValue, isRef)
+#
+#     if isRef:
+#         #----- check ref values -----/
+#         for value in valueSet:
+#             if isinstance(value, str):
+#                 value = removeSingleQuotes(value)
+#                 if value == "(Infinite)" :
+#                     pass
+#                 elif re.fullmatch("\d+~\d+", value):
+#                     pass
+#                 else:
+#                     throwCompileErrorInfo(
+#                         "Duration (ms) should be of: (Infinite), an int number,\n or an int range: startNum(int)~endNum(int) !!")
+#         #----------------------------\
+#     else:
+#         if isinstance(duration,str):
+#             duration = removeSingleQuotes(duration)
+#
+#             if duration == "(Infinite)":
+#                 isInfiniteDur = True
+#             elif re.fullmatch("\d+~\d+",duration):
+#                 duration = duration.split('~')
+#                 cRefedValue = f"Randi({int(duration[1])-int(duration[0]) +1}) + {int(duration[0])-1}"
+#             else:
+#                 throwCompileErrorInfo("Duration (ms) should be of ('Infinite'), an int number,\n or an int range: startNum(int)~endNum(int) !!")
+#
+#     return cRefedValue,isInfiniteDur,isRef
+#
+# def parseTransStr(inputStr):
+#     if isinstance(inputStr,str):
+#         if isPercentStr(inputStr):
+#             outputValue = float(inputStr[:-1])/-100
+#         elif isNumStr(inputStr):
+#             outputValue = float(inputStr)
+#         else:
+#             outputValue = inputStr
+#     else:
+#         outputValue = inputStr
+#
+#     return outputValue
+
+
+def dataStrConvert(dataStr, isRef = False, transMATStr = False, transPercent = True):
+    # convert string to neither a string or a num
+    # e.g.,
+    # 1） "2"    to 2
+    # 2） "2.00" to 2.0
+    # 3） "abcd" to "'abcd'"
+    # 4） "[12,12,12]" to "[12,12,12]"
+    # 5） "12,12,12"  to "[12,12,12]"
+    # 6） is a referred value will do nothing
+    if isinstance(dataStr, str):
+
+        if dataStr:
+
+            if isPercentStr(dataStr):
+                if transPercent:
+                    outData = parsePercentStr(dataStr)
+                else:
+                    outData = addSingleQuotes(dataStr)
+
+            elif isRgbWithBracketsStr(dataStr):
+                outData = dataStr
+
+            elif isRgbStr(dataStr):
+                outData = addSquBrackets(dataStr)
+
+            elif isIntStr(dataStr):
+                outData = int(dataStr)
+
+            elif isFloatStr(dataStr):
+                outData = float(dataStr)
+
+            elif isRefStr(dataStr):
+                outData = dataStr # maybe a bug
+
             else:
-                spFormatVarDict.update({cAttrName:formatTypeStr})
+                # debugPrint(f"{dataStr},{isRef}")
+                if isRef:
+                    outData = dataStr  # maybe a bug
+                else:
+                    if transMATStr:
+                        outData = addSingleQuotes(pyStr2MatlabStr(dataStr) ) # maybe a bug
+                    else:
+                        outData = addSingleQuotes(dataStr)  # maybe a bug
+        else:
+            outData = "[]"
+
+            debugPrint(f"find an empty input:{dataStr}")
+
+    else: # in case there is something wrong
+        # raise Exception(f"the input dataStr:{dataStr} is not a string!")
+        outData = dataStr
+
+    return outData
+
+
+def addedTransparentToRGBStr(RGBStr,transparentStr):
+
+    transparentValue = parsePercentStr(transparentStr)
+
+    if isinstance(transparentValue,(int,float)):
+        if transparentValue == -1: # for 100%
+            return RGBStr
+        else:
+            transparentValue = transparentValue*-255
+    else:
+        if transparentValue != '[]':
+            transparentValue = f"{transparentValue}*-255"
+
+    if transparentValue != '[]':
+        if isRgbStr(RGBStr):
+            RGBStr = f"[{RGBStr},{transparentValue}]"
+        elif isRgbWithBracketsStr(RGBStr):
+            RGBStr = re.sub("]",f",{transparentValue}]",RGBStr)
+        elif isRefStr(RGBStr):
+            RGBStr = f"[{RGBStr},{transparentStr}]"
+        else:
+            raise Exception(f"the input parameter 'RGBStr' is not a RGB format String\n should be of R,G,B, [R,G,B], or referred values!")
+
+    return RGBStr
+
+
+# add curly brackets
+def addCurlyBrackets(inputStr):
+    # outputStr = "{"+str(inputStr)+"}"
+    outputStr = f"{{{inputStr}}}"
+    return outputStr
+
+
+# add square brackets
+def addSingleQuotes(inputStr):
+    outputStr = f"'{inputStr}'"
+    return outputStr
+
+
+# add square brackets
+def addSquBrackets(inputStr):
+    outputStr = f"[{inputStr}]"
+    return outputStr
+
+
+def removeSingleQuotes(inputStr):
+    if isinstance(inputStr,str):
+        if re.fullmatch("'\S+'",inputStr): # anything but a space
+            inputStr = inputStr[1:-1]
+    return inputStr
+
+
+def getAllNestedVars(inputStr,opVars = [] ) -> set:
+    # debugPrint(f"getallNestedVars: {inputStr}")
+    if isRefStr(inputStr):
+        inputStr = inputStr[1:-1]
+
+    if len(inputStr.split('.')) ==3:
+        opVars.append(inputStr)
+        cCycleName,ign,attName = inputStr.split('.')
+
+        cWidget = Info.WID_WIDGET[Info.NAME_WID[cCycleName][0]]
+
+        for iRow in range(cWidget.rowCount()):
+            cRowDict = cWidget.getAttributes(iRow)
+            getAllNestedVars(cRowDict[attName],opVars)
+
+    return set(opVars)
+
+
+def getCycleRealRows(widgetId) -> int:
+    cCycle     = Info.WID_WIDGET[widgetId]
+    weightList = cCycle.getAttributeValues(0)
+
+    sumValue = 0
+
+    for cWeightStr in weightList:
+        sumValue = sumValue + dataStrConvert(cWeightStr)
+
+    return sumValue
+
+
+def getMaxLoopLevel() -> int:
+
+    maxLoopLevel = -1
+
+    for cWidgetId in Info.WID_NODE.keys():
+        maxLoopLevel = max(maxLoopLevel,getWidLoopLevel(cWidgetId))
+    return maxLoopLevel
+
+
+def getRefValue(cWidget, inputStr,attributesSetDict):
+    isRefValue = False
+
+    if isinstance(inputStr, str):
+
+        isRefValue = isRefStr(inputStr)
+
+        if isRefValue:
+            inputStr = re.sub("[\[\]]", '', inputStr)
+
+            if inputStr in attributesSetDict:
+                # debugPrint(f"{inputStr}, {isRefValue}")
+                # debugPrint(attributesSetDict)
+                inputStr = attributesSetDict[inputStr][1]
+                # valueSet = attributesSetDict[inputStr][2]
+                # debugPrint(f"{inputStr},{isRefValue}")
+            else:
+                throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cWidget.widget_id)}")
+
+    return [inputStr,isRefValue]
+
+
+def getRefValueSet(cWidget, inputStr,attributesSetDict):
+    isRefValue = False
+    valueSet   = set()
+
+    if isinstance(inputStr, str):
+
+        isRefValue = isRefStr(inputStr)
+
+        if isRefValue:
+            inputStr = re.sub("[\[\]]", '', inputStr)
+
+            if inputStr in attributesSetDict:
+                valueSet = attributesSetDict[inputStr][2]
+                inputStr = attributesSetDict[inputStr][1]
+            else:
+                throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cWidget.widget_id)}")
+
+    return [inputStr,isRefValue,valueSet]
 
 
 def getSepcialFormatAtts():
@@ -82,36 +341,92 @@ def getSepcialFormatAtts():
             updateSpFormatVarDict(cWidget.getTransparent(),'percent', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getFrameTransparent(),'percent', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Width'],'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Style'],'fontStyle', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Clear after'],'clearAfter', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Flip horizontal'],'flipHorizontal', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Flip vertical'],'flipVertical', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Right to left'],'rightToLeft', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Enable'],'enableFrame', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
+
+        elif Func.isWidgetType(widgetId,Info.VIDEO):
+            updateSpFormatVarDict(cWidget.getTransparent(),'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getFrameTransparent(),'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Width'],'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
+
+        elif Func.isWidgetType(widgetId,Info.SOUND):
+            updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Wait for start'], 'waitForStart', spFormatVarDict)
 
         elif Info.IMAGE == widgetId.split('.')[0]:
             updateSpFormatVarDict(cWidget.getTransparent(),'percent', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getFrameTransparent(),'percent', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Width'],'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
-        elif Info.SOUND == widgetId.split('.')[0]:
 
+        elif Func.isWidgetType(widgetId,Info.SLIDER):
             updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
-        elif Info.IMAGE == widgetId.split('.')[0]:
-            updateSpFormatVarDict(cWidget.getTransparent(),'percent', spFormatVarDict)
-            updateSpFormatVarDict(cWidget.getFrameTransparent(),'percent', spFormatVarDict)
-            updateSpFormatVarDict(cProperties['Width'],'percent', spFormatVarDict)
-            updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
-        elif Info.SLIDER == widgetId.split('.')[0]:
-
-            updateSpFormatVarDict(cWidget.getDuration(),'dur', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
 
     return spFormatVarDict
 
+def getWidLoopLevel(wid: str) -> int:
+    """
+    :only cycle can increase the loop level
+    :param wid: 输入的wid
+    :return: 如果wid不存在，返回-1
+    """
+    try:
+        node = Info.WID_NODE[wid]
+    except:
+        return -1
+    # 不断迭代，直至父结点为空
+    loopLevel = 1
+
+    node      = node.parent()
+    while node:
+        node = node.parent()
+        if Func.isWidgetType(node.widget_id,Info.CYCLE):
+            loopLevel += 1
+    return loopLevel
 
 
+"""
+def getCycleColValueSet(cWidget,key,attributesSetDict):
+    colValueSet = {}
+
+    for iRow in range(cWidget.rowCount()):
+        cRowDict = cWidget.getAttributes(iRow)
+
+        cValue, isRefValue = getRefValue(cWidget, cRowDict[key], attributesSetDict)
+
+        if isRefValue:
+            foundStr = re.search('[\.a-zA-Z0-9_]*\{',cValue).group(0)[0:-1]
+            if foundStr:
+                attributesSetDict[foundStr][2]
+            # f"{cWidgetName}.attr.{key}{{{cLoopIterStr}}}"
+
+        else:
+            colValueSet.add(cRowDict[key])
+
+    return colValueSet
+"""
 
 
-def debugPrint(input):
-    isDebug = False
+def updateSpFormatVarDict(propertyValue,formatTypeStr,spFormatVarDict):
+    if isRefStr(propertyValue):
+        propertyValue = propertyValue[1:-1]    # remove the square brackets
+        allRefedCycleAttrs = getAllNestedVars(propertyValue,[])
+        for cAttrName in allRefedCycleAttrs:
 
-    if isDebug:
-        print(input)
+            if cAttrName in spFormatVarDict:
+                if spFormatVarDict[cAttrName] != formatTypeStr:
+                    throwCompileErrorInfo(f"attribute: {cAttrName} are not allowed to be both {formatTypeStr} or {spFormatVarDict[cAttrName]}")
+            else:
+                spFormatVarDict.update({cAttrName:formatTypeStr})
 
 def isContainChStr(inputStr):
     # :param check_str: {str}
@@ -180,336 +495,6 @@ def isContainCycleTL(widgetId) -> bool:
     return False
 
 
-def booleanTransStr(inputStr,isRef):
-
-    if inputStr.lower() in ["'yes'","'true'",'yes','true']:
-        inputStr = "1"
-    elif inputStr.lower() in ["'no'","'false'",'no','false']:
-        inputStr = "0"
-    else:
-        if isRef == False:
-            throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False','True','Yes','No','1', or '0'] ")
-
-    return inputStr
-
-
-def dontClearAfterTransStr(inputStr):
-    if inputStr == "'clear_0'":
-        inputStr = "0"
-    elif inputStr == "'notClear_1'":
-        inputStr = "1"
-    elif inputStr == "'doNothing_2'":
-        inputStr = "2"
-
-    return inputStr
-
-
-def fontStyleTransStr(inputStr):
-    if inputStr == "'normal_0'":
-        inputStr = '0'
-    elif inputStr == "'bold_1'":
-        inputStr = '1'
-    elif inputStr == "'italic_2'":
-        inputStr = '2'
-    elif inputStr == "'underline_4'":
-        inputStr = '4'
-    elif inputStr == "'outline_8'":
-        inputStr = '8'
-    elif inputStr == "'overline_16'":
-        inputStr = '16'
-    elif inputStr == "'condense_32'":
-        inputStr = '32'
-    elif inputStr == "'extend_64'":
-        inputStr = '64'
-
-    return inputStr
-
-
-def pyStr2MatlabStr(inputStr):
-    if isinstance(inputStr, str):
-        if isSingleQuotedStr(inputStr):
-            inputStr = inputStr[1:-1]
-        inputStr = re.sub("'","''",inputStr)
-        # inputStr = re.sub(r"\\\%","%",inputStr)
-    return inputStr
-
-# def parseDurationStr(cWidget,attributesSetDict):
-#     isInfiniteDur = False
-#
-#     cRefedValue, isRef,valueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
-#     duration                    = dataStrConvert(cRefedValue, isRef)
-#
-#     if isRef:
-#         #----- check ref values -----/
-#         for value in valueSet:
-#             if isinstance(value, str):
-#                 value = removeSingleQuotes(value)
-#                 if value == "(Infinite)" :
-#                     pass
-#                 elif re.fullmatch("\d+~\d+", value):
-#                     pass
-#                 else:
-#                     throwCompileErrorInfo(
-#                         "Duration (ms) should be of: (Infinite), an int number,\n or an int range: startNum(int)~endNum(int) !!")
-#         #----------------------------\
-#     else:
-#         if isinstance(duration,str):
-#             duration = removeSingleQuotes(duration)
-#
-#             if duration == "(Infinite)":
-#                 isInfiniteDur = True
-#             elif re.fullmatch("\d+~\d+",duration):
-#                 duration = duration.split('~')
-#                 cRefedValue = f"Randi({int(duration[1])-int(duration[0]) +1}) + {int(duration[0])-1}"
-#             else:
-#                 throwCompileErrorInfo("Duration (ms) should be of ('Infinite'), an int number,\n or an int range: startNum(int)~endNum(int) !!")
-#
-#     return cRefedValue,isInfiniteDur,isRef
-#
-# def parseTransStr(inputStr):
-#     if isinstance(inputStr,str):
-#         if isPercentStr(inputStr):
-#             outputValue = float(inputStr[:-1])/-100
-#         elif isNumStr(inputStr):
-#             outputValue = float(inputStr)
-#         else:
-#             outputValue = inputStr
-#     else:
-#         outputValue = inputStr
-#
-#     return outputValue
-
-
-def addedTransparentToRGBStr(RGBStr,transparentStr):
-
-    transparentValue = parsePercentStr(transparentStr)
-
-    if isinstance(transparentValue,(int,float)):
-        if transparentValue == -1: # for 100%
-            return RGBStr
-        else:
-            transparentValue = transparentValue*-255
-    else:
-        if transparentValue != '[]':
-            transparentValue = f"{transparentValue}*-255"
-
-    if transparentValue != '[]':
-        if isRgbStr(RGBStr):
-            RGBStr = f"[{RGBStr},{transparentValue}]"
-        elif isRgbWithBracketsStr(RGBStr):
-            RGBStr = re.sub("]",f",{transparentValue}]",RGBStr)
-        elif isRefStr(RGBStr):
-            RGBStr = f"[{RGBStr},{transparentStr}]"
-        else:
-            raise Exception(f"the input parameter 'RGBStr' is not a RGB format String\n should be of R,G,B, [R,G,B], or referred values!")
-
-    return RGBStr
-
-
-
-
-def dataStrConvert(dataStr,isRef = False, transMATStr = False, transPercent = True):
-    # convert string to neither a string or a num
-    # e.g.,
-    # 1） "2"    to 2
-    # 2） "2.00" to 2.0
-    # 3） "abcd" to "'abcd'"
-    # 4） "[12,12,12]" to "[12,12,12]"
-    # 5） "12,12,12"  to "[12,12,12]"
-    # 6） is a referred value will do nothing
-    if isinstance(dataStr,str):
-
-        if dataStr:
-
-            if isPercentStr(dataStr):
-                if transPercent:
-                    outData = parsePercentStr(dataStr)
-                else:
-                    outData = addSingleQuotes(dataStr)
-
-            elif isRgbWithBracketsStr(dataStr):
-                outData = dataStr
-
-            elif isRgbStr(dataStr):
-                outData = addSquBrackets(dataStr)
-
-            elif isIntStr(dataStr):
-                outData = int(dataStr)
-
-            elif isFloatStr(dataStr):
-                outData = float(dataStr)
-
-            elif isRefStr(dataStr):
-                outData = dataStr # maybe a bug
-
-            else:
-                # debugPrint(f"{dataStr},{isRef}")
-                if isRef:
-                    outData = dataStr  # maybe a bug
-                else:
-                    if transMATStr:
-                        outData = addSingleQuotes(pyStr2MatlabStr(dataStr) ) # maybe a bug
-                    else:
-                        outData = addSingleQuotes(dataStr)  # maybe a bug
-        else:
-            outData = "[]"
-
-            debugPrint(f"find an empty input:{dataStr}")
-
-    else: # in case there is something wrong
-        # raise Exception(f"the input dataStr:{dataStr} is not a string!")
-        outData = dataStr
-
-    return outData
-
-
-
-# add curly brackets
-def addCurlyBrackets(inputStr):
-    # outputStr = "{"+str(inputStr)+"}"
-    outputStr = f"{{{inputStr}}}"
-    return outputStr
-
-
-
-# add square brackets
-def addSingleQuotes(inputStr):
-    outputStr = f"'{inputStr}'"
-    return outputStr
-
-# add square brackets
-def addSquBrackets(inputStr):
-    outputStr = f"[{inputStr}]"
-    return outputStr
-
-def removeSingleQuotes(inputStr):
-    if isinstance(inputStr,str):
-        if re.fullmatch("'\S+'",inputStr): # anything but a space
-            inputStr = inputStr[1:-1]
-    return inputStr
-
-def getAllNestedVars(inputStr,opVars = [] ) -> set:
-    # debugPrint(f"getallNestedVars: {inputStr}")
-    if isRefStr(inputStr):
-        inputStr = inputStr[1:-1]
-
-    if len(inputStr.split('.')) ==3:
-        opVars.append(inputStr)
-        cCycleName,ign,attName = inputStr.split('.')
-
-        cWidget = Info.WID_WIDGET[Info.NAME_WID[cCycleName][0]]
-
-        for iRow in range(cWidget.rowCount()):
-            cRowDict = cWidget.getAttributes(iRow)
-            getAllNestedVars(cRowDict[attName],opVars)
-
-    return set(opVars)
-
-def getCycleRealRows(widgetId) -> int:
-    cCycle     = Info.WID_WIDGET[widgetId]
-    weightList = cCycle.getAttributeValues(0)
-
-    sumValue = 0
-
-    for cWeightStr in weightList:
-        sumValue = sumValue + dataStrConvert(cWeightStr)
-
-    return sumValue
-
-
-def getMaxLoopLevel() -> int:
-
-    maxLoopLevel = -1
-
-    for cWidgetId in Info.WID_NODE.keys():
-        maxLoopLevel = max(maxLoopLevel,getWidLoopLevel(cWidgetId))
-    return maxLoopLevel
-
-
-def getRefValue(cwidget, inputStr,attributesSetDict):
-    isRefValue = False
-
-    if isinstance(inputStr, str):
-
-        isRefValue = isRefStr(inputStr)
-
-        if isRefValue:
-            inputStr = re.sub("[\[\]]", '', inputStr)
-
-            if inputStr in attributesSetDict:
-                # debugPrint(f"{inputStr}, {isRefValue}")
-                # debugPrint(attributesSetDict)
-                inputStr = attributesSetDict[inputStr][1]
-                # valueSet = attributesSetDict[inputStr][2]
-                # debugPrint(f"{inputStr},{isRefValue}")
-            else:
-                throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cwidget.widget_id)}")
-
-    return [inputStr,isRefValue]
-
-def getRefValueSet(cwidget, inputStr,attributesSetDict):
-    isRefValue = False
-    valueSet   = set()
-
-    if isinstance(inputStr, str):
-
-        isRefValue = isRefStr(inputStr)
-
-        if isRefValue:
-            inputStr = re.sub("[\[\]]", '', inputStr)
-
-            if inputStr in attributesSetDict:
-                valueSet = attributesSetDict[inputStr][2]
-                inputStr = attributesSetDict[inputStr][1]
-            else:
-                throwCompileErrorInfo(f"The cited attribute '{inputStr}' \nis not available for {Func.getWidgetName(cwidget.widget_id)}")
-
-    return [inputStr,isRefValue,valueSet]
-
-
-
-def getWidLoopLevel(wid: str) -> int:
-    """
-    :only cycle can increase the loop level
-    :param wid: 输入的wid
-    :return: 如果wid不存在，返回-1
-    """
-    try:
-        node = Info.WID_NODE[wid]
-    except:
-        return -1
-    # 不断迭代，直至父结点为空
-    loopLevel = 1
-
-    node      = node.parent()
-    while node:
-        node = node.parent()
-        if Func.isWidgetType(node.widget_id,Info.CYCLE):
-            loopLevel += 1
-    return loopLevel
-
-
-"""
-def getCycleColValueSet(cWidget,key,attributesSetDict):
-    colValueSet = {}
-
-    for iRow in range(cWidget.rowCount()):
-        cRowDict = cWidget.getAttributes(iRow)
-
-        cValue, isRefValue = getRefValue(cWidget, cRowDict[key], attributesSetDict)
-
-        if isRefValue:
-            foundStr = re.search('[\.a-zA-Z0-9_]*\{',cValue).group(0)[0:-1]
-            if foundStr:
-                attributesSetDict[foundStr][2]
-            # f"{cWidgetName}.attr.{key}{{{cLoopIterStr}}}"
-
-        else:
-            colValueSet.add(cRowDict[key])
-
-    return colValueSet
-"""
-
 def parseAllowKeys(allowKeyStr):
     global enabledKBKeysList
 
@@ -548,6 +533,41 @@ def parsePercentStr(inputStr):
         outputValue = inputStr
 
     return outputValue
+
+
+def parseFontStyleStr(inputStr):
+    if isinstance(inputStr, str):
+        inputStr = removeSingleQuotes(inputStr)
+        if inputStr == "normal_0":
+            inputStr = '0'
+        elif inputStr == "bold_1":
+            inputStr = '1'
+        elif inputStr == "italic_2":
+            inputStr = '2'
+        elif inputStr == "underline_4":
+            inputStr = '4'
+        elif inputStr == "outline_8":
+            inputStr = '8'
+        elif inputStr == "overline_16":
+            inputStr = '16'
+        elif inputStr == "condense_32":
+            inputStr = '32'
+        elif inputStr == "extend_64":
+            inputStr = '64'
+    return inputStr
+
+
+def parseDontClearAfterStr(inputStr):
+    if isinstance(inputStr, str):
+        inputStr = removeSingleQuotes(inputStr)
+
+        if inputStr == "clear_0":
+            inputStr = '0'
+        elif inputStr == "notClear_1":
+            inputStr = '1'
+        elif inputStr == "noNothing_2":
+            inputStr = '2'
+    return inputStr
 
 
 def printDelayedCodes(delayedPrintCodes,keyName,inputStr,*argins):
@@ -731,10 +751,8 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     # 3) check the alignment X parameter:
     alignmentX =dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
 
-
     # 4) check the alignment X parameter:
     alignmentY =dataStrConvert(*getRefValue(cWidget, cProperties['Alignment Y'], attributesSetDict))
-
 
     # 5) check the color parameter:
     fontColorStr    = dataStrConvert(*getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
@@ -742,17 +760,16 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
 
     # 7) check the flip hor parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
-    flipHorStr = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
+    flipHorStr = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
 
     # 8) check the flip ver parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip vertical'], attributesSetDict)
-    flipVerStr = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
+    flipVerStr = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
 
 
     # 10) check the right to left parameter:
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Right to left'], attributesSetDict)
-    rightToLeft = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
-
+    rightToLeft = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
 
     # 11) check the parameter winRect
     sx      = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
@@ -760,9 +777,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     cWdith  = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
     cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
 
-
     frameRectStr = f"makeFrameRect({sx}, {sy}, {cWdith}, {cHeight}, fullRects({outputDevNameIdxDict.get(cScreenName)},:))"
-
 
     # set the font name size color style:
     fontName = dataStrConvert(*getRefValue(cWidget, cProperties['Font family'], attributesSetDict))
@@ -770,7 +785,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     fontSize = dataStrConvert(*getRefValue(cWidget, cProperties['Font size'], attributesSetDict))
 
     fontStyle = dataStrConvert(*getRefValue(cWidget, cProperties['Style'], attributesSetDict))
-    fontStyle = fontStyleTransStr(fontStyle)
+    fontStyle = parseFontStyleStr(fontStyle)
 
     fontBkColor = dataStrConvert(*getRefValue(cWidget, cProperties['Back color'], attributesSetDict))
 
@@ -783,7 +798,6 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     # debugPrint('previous saved color font info:')
     # debugPrint(previousColorFontDict)
     # debugPrint('------------------------------------\\')
-
     isChangeFontPars = False
     #  font name
     if previousColorFontDict['fontName'] != fontName:
@@ -823,7 +837,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
     debugPrint(f"frameTransparent: {frameTransparent}")
 
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
-    isBkFrameEnable = booleanTransStr(dataStrConvert(cRefedValue, isRef), isRef)
+    isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
 
     if isBkFrameEnable == '1':
 
@@ -848,14 +862,11 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
                  flipVerStr, \
                  rightToLeft, \
                  frameRectStr)
-
     # [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring[, sx][, sy][, color][, wrapat][, flipHorizontal]
     # [, flipVertical][, vSpacing][, righttoleft][, winRect])
 
     clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-    clearAfter = dontClearAfterTransStr(clearAfter)
-
-
+    clearAfter = parseDontClearAfterStr(clearAfter)
 
     printAutoInd(f, "Screen('DrawingFinished',{0},{1});\n",cWinStr,clearAfter)
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event")
@@ -916,7 +927,7 @@ def printTextWidget(cWidget,f,attributesSetDict,cLoopLevel,delayedPrintCodes):
         pulseDur = dataStrConvert(*getRefValue(cWidget, properties['Pulse Duration'], attributesSetDict),False)
 
         cDevName   = properties.get("Device Name", "")
-        devType   = properties.get("Device Type", "")
+        devType    = properties.get("Device Type", "")
 
         if devType == 'parallel_port':
 
@@ -1002,6 +1013,36 @@ def printCycleWdiget(cWidget, f,attributesSetDict,cLoopLevel, delayedPrintCodes)
                 elif spFormatVarDict[cKeyAttrName] == 'dur':
                     cValue        = parseDurationStr(cValue)
                     cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'fontStyle':
+                    cValue        = parseFontStyleStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'clearAfter':
+                    cValue        = parseDontClearAfterStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'flipHorizontal':
+                    cValue        = parseBooleanStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'flipVertical':
+                    cValue        = parseBooleanStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'rightToLeft':
+                    cValue        = parseBooleanStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'enableFrame':
+                    cValue        = parseBooleanStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'waitForStart':
+                    cValue        = parseBooleanStr(cValue)
+                    cRowDict[key] = cValue
+
+            #     TO BE CONTINUING... FOR ALL OTHER Special Types
             # --------------------------------------\
 
             cAttributeName = f"{cWidgetName}.attr.{key}"
