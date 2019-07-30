@@ -1281,6 +1281,12 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         # you can get each widget's device you selected
         output_devices = Info.OUTPUT_DEVICE_INFO
         input_devices = Info.INPUT_DEVICE_INFO
+        eyetracker_devices = Info.TRACKER_INFO
+        quest_devices = Info.QUEST_INFO
+
+        print(f"eyetracker: {eyetracker_devices}")
+        print(f"quest: {quest_devices}")
+
         debugPrint('-------------/')
         debugPrint(output_devices)
         debugPrint('-------------\\\n')

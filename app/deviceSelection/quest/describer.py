@@ -91,28 +91,29 @@ class Describer(QWidget):
         self.quest_name.setText(name)
 
     def getInfo(self):
+        self.default_properties["Quest Name"] = self.quest_name.text()
+        self.default_properties["Device Type"] = "quest"
         self.default_properties["Estimated threshold"] = self.estimated_threshold.text()
-        self.default_properties["Std. dev. of estimated threshold"] = self.std_dev.text()
-        self.default_properties["Desired proportion of correct responses"] = self.desired_proportion.text()
-        self.default_properties["Steepness of the Weibull psychometric function(β)"] = self.steepness.text()
-        self.default_properties[
-            "Proportion of random responses at maximum stimulus intensity(σ)"] = self.proportion.text()
-        self.default_properties["Chance level (γ)"] = self.chance_level.text()
-        self.default_properties["Method to determine optimal test value"] = self.method.currentText()
-        self.default_properties["Minimum test value"] = self.minimum.text()
-        self.default_properties["Maximum test value"] = self.maximum.text()
+        self.default_properties["Std dev"] = self.std_dev.text()
+        self.default_properties["Desired proportion"] = self.desired_proportion.text()
+        self.default_properties["Steepness"] = self.steepness.text()
+        self.default_properties["Proportion"] = self.proportion.text()
+        self.default_properties["Chance level"] = self.chance_level.text()
+        self.default_properties["Method"] = self.method.currentText()
+        self.default_properties["Minimum"] = self.minimum.text()
+        self.default_properties["Maximum"] = self.maximum.text()
         self.default_properties["Is log10 transform"] = self.is_log10_transform.currentText()
         return self.default_properties
 
     def loadSetting(self):
+        self.quest_name.setText(self.quest_name["Quest Name"])
         self.estimated_threshold.setText(self.default_properties["Estimated threshold"])
-        self.std_dev.setText(self.default_properties["Std. dev. of estimated threshold"])
-        self.desired_proportion.setText(self.default_properties["Desired proportion of correct responses"])
-        self.steepness.setText(self.default_properties["Steepness of the Weibull psychometric function(β)"])
-        self.proportion.setText(
-            self.default_properties["Proportion of random responses at maximum stimulus intensity(σ)"])
-        self.chance_level.setText(self.default_properties["Chance level (γ)"])
-        self.method.setCurrentText(self.default_properties["Method to determine optimal test value"])
-        self.minimum.setText(self.default_properties["Minimum test value"])
-        self.maximum.setText(self.default_properties["Maximum test value"])
+        self.std_dev.setText(self.default_properties["Std dev"])
+        self.desired_proportion.setText(self.default_properties["Desired proportion"])
+        self.steepness.setText(self.default_properties["Steepness"])
+        self.proportion.setText(self.default_properties["Proportion"])
+        self.chance_level.setText(self.default_properties["Chance level"])
+        self.method.setCurrentText(self.default_properties["Method"])
+        self.minimum.setText(self.default_properties["Minimum"])
+        self.maximum.setText(self.default_properties["Maximum"])
         self.is_log10_transform.setCurrentText(self.default_properties["Is log10 transform"])
