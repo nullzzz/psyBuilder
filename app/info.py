@@ -82,6 +82,12 @@ class Info(object):
     SWITCH = "Switch"
     TIMELINE = "Timeline"
 
+    DEV_NETWORK_PORT  = "network_port"
+    DEV_SCREEN        = "screen"
+    DEV_PARALLEL_PORT = "parallel_port"
+    DEV_SERIAL_PORT   = "serial_port"
+    DEV_SOUND         = "sound"
+
     # 图片保存路径
     IMAGE_SOURCE_PATH = "image"
     # widget不同类型对应图片
