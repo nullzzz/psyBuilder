@@ -31,7 +31,7 @@ class Quest(QListWidgetItem):
     def setName(self, name: str):
         self.setText(name)
 
-    def getQuestId(self) -> str:
+    def getId(self) -> str:
         return self.quest_id
 
     def getName(self) -> str:

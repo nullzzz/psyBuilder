@@ -45,7 +45,7 @@ class WidgetTabs(QTabWidget):
         elif widget_type == Info.CYCLE:
             self.linkCycleSignals(widget_id)
         elif widget_type in (
-                Info.ACTION, Info.CALIBRATION, Info.CLOSE, Info.DC, Info.ENDR, Info.OPEN, Info.STARTR,
+                Info.ACTION, Info.CALIBRATION, Info.Log, Info.DC, Info.ENDR, Info.OPEN, Info.STARTR,
                 Info.QUEST_GET_VALUE,
                 Info.QUEST_INIT, Info.QUEST_UPDATE, Info.IF, Info.SWITCH):
             widget = Info.WID_WIDGET[widget_id]

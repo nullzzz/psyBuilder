@@ -12,7 +12,7 @@ from app.center.main import Center
 from app.center.widget_tabs.events.cycle.main import Cycle
 from app.center.widget_tabs.events.durationPage import DurationPage
 from app.center.widget_tabs.timeline.main import Timeline
-from app.deviceSelection.globalSelection.globalDevices import GlobalDevice
+from app.deviceSelection.IODevice.globalDevices import GlobalDevice
 from app.deviceSelection.progressBar import LoadingTip
 from app.func import Func
 from app.info import Info
@@ -682,7 +682,7 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintC
             pass
         elif Info.ENDR == cWidget.widget_id.split('.')[0]:
             pass
-        elif Info.CLOSE == cWidget.widget_id.split('.')[0]:
+        elif Info.Log == cWidget.widget_id.split('.')[0]:
             pass
         elif Info.QUEST_INIT == cWidget.widget_id.split('.')[0]:
             pass

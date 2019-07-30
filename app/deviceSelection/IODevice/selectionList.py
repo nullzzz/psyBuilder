@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QListWidget, QMenu, QListWidgetItem
 
-from app.deviceSelection.globalSelection.device import Device
+from app.deviceSelection.IODevice.device import Device
 
 
 class SelectArea(QListWidget):
@@ -33,10 +33,6 @@ class SelectArea(QListWidget):
         # 新增缓冲区
         self.add_buffer = []
 
-        # 记录上次apply选择的设备数量
-        # for i in self.device_count.keys():
-        #     self.setProperty(i, 0)
-
         # 记录属性
         self.default_properties = {
 
@@ -60,7 +56,7 @@ class SelectArea(QListWidget):
 
     def dropEvent(self, e):
         source = e.source()
-        device_type = source.currentItem().device_type
+        device_type = source.currentItem().getType()
         self.createDevice(device_type)
 
     def dragEnterEvent(self, e):

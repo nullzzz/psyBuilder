@@ -1,8 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QListWidget
 
-from app.deviceSelection.widgetSelection.InputDeviceItem import DeviceInItem
-from app.deviceSelection.widgetSelection.OutputDeviceItem import DeviceOutItem
+from app.deviceSelection.IODevice.duration.InputDeviceItem import DeviceInItem
+from app.deviceSelection.IODevice.duration.OutputDeviceItem import DeviceOutItem
 from app.info import Info
 
 
