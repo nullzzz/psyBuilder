@@ -27,9 +27,10 @@ class Close(QWidget):
         self.pause_between_msg = PigLineEdit()
 
         self.default_properties = {
-            "Pause between messages": 0,
+            "Pause between messages": "0",
             "Automatically log all variables": 0,
-            "log message": "",
+            "Used attributes": [],
+            "Not used attributes": [],
         }
 
         self.msg = ""
@@ -159,18 +160,29 @@ class Close(QWidget):
             self.loadSetting()
 
     def getInfo(self):
+        self.default_properties.clear()
         self.default_properties["Pause between messages"] = self.pause_between_msg.text()
         self.default_properties["Automatically log all variables"] = self.automatically_log_all_variables.checkState()
-        self.default_properties["log message"] = self.log_msg.toPlainText()
+        ua = []
+        for i in range(self.select_attr.count()):
+            ua.append(self.select_attr.item(i).text())
+        self.default_properties["Used attributes"] = ua
+        nua = []
+        for i in range(self.all_attr.count()):
+            nua.append(self.all_attr.item(i).text())
+        self.default_properties["Not used attributes"] = nua
         return self.default_properties
 
     def getProperties(self):
         return self.getInfo()
 
     def loadSetting(self):
-        self.pause_between_msg.setText(self.default_properties["Pause between message"])
+        self.pause_between_msg.setText(self.default_properties["Pause between messages"])
         self.automatically_log_all_variables.setCheckState(self.default_properties["Automatically log all variables"])
-        self.log_msg.setText(self.default_properties["log message"])
+        self.select_attr.clear()
+        self.select_attr.addItems(self.default_properties["Used attributes"])
+        self.all_attr.clear()
+        self.all_attr.addItems(self.default_properties["Not used attributes"])
 
     def clone(self, new_id: str):
         clone_widget = Close(widget_id=new_id)
@@ -201,9 +213,6 @@ class Close(QWidget):
 
     def getIsAutomaticallyLogAllVariables(self) -> bool:
         return bool(self.automatically_log_all_variables.checkState())
-
-    def getLog(self) -> str:
-        return self.log_msg.toPlainText()
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)

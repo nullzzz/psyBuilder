@@ -45,7 +45,7 @@ class SelectArea(QListWidget):
 
     def dropEvent(self, e):
         source = e.source()
-        quest_type = "quest"
+        quest_type = source.currentItem().getType()
         self.createQuest(quest_type)
 
     def dragEnterEvent(self, e):
@@ -97,7 +97,7 @@ class SelectArea(QListWidget):
         # 更新default_properties
         self.default_properties.clear()
         for i in range(self.count()):
-            key = self.item(i).getQuestId()
+            key = self.item(i).getId()
             info: dict = self.item(i).getInfo()
             self.default_properties[key] = info.copy()
             # {设备标识符： {设备名：“”， 设备类型： “”}}
@@ -116,7 +116,7 @@ class SelectArea(QListWidget):
             # search the quest
             for i in range(self.count()):
                 quest = self.item(i)
-                if quest.getQuestId() == quest_id:
+                if quest.getId() == quest_id:
                     del_list.append(i)
                     self.quest_count[quest_type] -= 1
         # clear buffer
@@ -126,8 +126,8 @@ class SelectArea(QListWidget):
             self.deleteQuest(i, record=False)
 
         for new_del in self.delete_buffer:
-            quest_id, quest_type, quest_name, quest_port = new_del
-            self.createQuest(quest_type, quest_id, quest_name, quest_port, record=False)
+            quest_id, quest_type, quest_name = new_del
+            self.createQuest(quest_type, quest_id, quest_name, record=False)
         self.delete_buffer.clear()
         # 从properties添加
         if self.count() == 0:
@@ -136,15 +136,14 @@ class SelectArea(QListWidget):
                 quest_id = k
                 quest_type = v.get("Quest Type")
                 quest_name = v.get("Quest Name")
-                quest_port = v.get("Quest Port")
-                self.createQuest(quest_type, quest_id, quest_name, quest_port)
+                self.createQuest(quest_type, quest_id, quest_name)
                 # load count of quests
                 self.quest_count[quest_type] += 1
         else:
             self.quest_name.clear()
             for i in range(self.count()):
                 item = self.item(i)
-                quest_id = item.getQuestId()
+                quest_id = item.getId()
                 quest_name = item.getName()
                 self.quest_name.append(quest_name)
                 quest_info = self.default_properties.get(quest_id)
@@ -178,7 +177,7 @@ class SelectArea(QListWidget):
             index = self.currentRow()
         # 被删掉的设备
         del_quest: Quest = self.takeItem(index)
-        quest_id: str = del_quest.getQuestId()
+        quest_id: str = del_quest.getId()
         quest_type: str = del_quest.getType()
         quest_name: str = del_quest.getName()
         self.quest_name.remove(quest_name.lower())

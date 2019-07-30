@@ -28,20 +28,10 @@
 
 # TODOLIST
 
-# 1)output device里面加一个 audio设备，对应的audio里面也加一个输出的选项（就像screen需要选择一样）
-#
-# 2)text的frame里面（理论上图片，等都需要）都需要添加一个 透明选项"Transparent"，后台以命名为frame transparent：
-#
-# 3）text 的general里面，增加一个选项 Right to Left：yes 和 no两个选项，默认值no，风格同 flip Vertical:
-
-# 4) 在2)的基础上，所有frame table 的border里面加一个enable 的下拉选项（yes or no）不可输入其他但是可以引用的style，只有为yes的时候，border 里面的其余4项
-#   border color， border width， back color和transparent 才可操作
-
 # 1)
 # 1）添加一个del快捷键删除structure 和Timeline中的widgets
 
 
-# 2) sound 里面增加  sound name：
 
 
 
@@ -67,10 +57,6 @@ Cycle：
 	4）导入导出问题；
 """
 
-# Sound:
-
-
-# Pan control:待定
 
 # slide：
 #

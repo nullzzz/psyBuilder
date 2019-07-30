@@ -1,17 +1,16 @@
-from PyQt5.QtCore import Qt, QObject, QEvent
-from PyQt5.QtWidgets import QWidget, QComboBox, QPushButton, QLabel, QGroupBox, \
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGroupBox, \
     QHBoxLayout, QGridLayout, QVBoxLayout, QCompleter, QListWidgetItem
 
 from app.center.widget_tabs.events.inDevicePro import InDeviceInfoAtDuration, InDeviceRespAtDuration
 from app.center.widget_tabs.events.outDevicePro import OutDeviceInfoAtDuration
-from app.deviceSelection.widgetSelection.InputDeviceItem import DeviceInItem
-from app.deviceSelection.widgetSelection.OutputDeviceItem import DeviceOutItem
-from app.deviceSelection.widgetSelection.deviceChooseDialog import DeviceOutDialog, DeviceInDialog
-from app.deviceSelection.widgetSelection.deviceShowArea import ShowArea
+from app.deviceSelection.IODevice.duration.InputDeviceItem import DeviceInItem
+from app.deviceSelection.IODevice.duration.OutputDeviceItem import DeviceOutItem
+from app.deviceSelection.IODevice.duration.deviceChooseDialog import DeviceInDialog, DeviceOutDialog
+from app.deviceSelection.IODevice.duration.deviceShowArea import ShowArea
 from app.func import Func
 from app.info import Info
 from app.lib import PigComboBox
-from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class DurationPage(QWidget):

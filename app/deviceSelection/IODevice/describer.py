@@ -96,11 +96,11 @@ class Screen(Shower):
         self.bg_color = ColorListEditor()
         self.bg_color.colorChanged.connect(lambda x: self.colorChanged.emit(x))
         self.mu_sample = QLineEdit()
-        self.mu_sample.textEdited.connect(lambda x: self.sampleChanged.emit(x))
+        self.mu_sample.textChanged.connect(lambda x: self.sampleChanged.emit(x))
         self.resolution = QLineEdit("auto")
-        self.resolution.textEdited.connect(lambda x: self.refreshRateChanged.emit(x))
+        self.resolution.textChanged.connect(lambda x: self.refreshRateChanged.emit(x))
         self.refresh_rate = QLineEdit("auto")
-        self.refresh_rate.textEdited.connect(lambda x: self.refreshRateChanged.emit(x))
+        self.refresh_rate.textChanged.connect(lambda x: self.refreshRateChanged.emit(x))
         self.setUI()
 
     def setUI(self):
@@ -128,7 +128,7 @@ class Net(Shower):
     def __init__(self, parent=None):
         super(Net, self).__init__(parent=parent)
         self.device_ip_port = QLineEdit()
-        self.device_ip_port.textEdited.connect(lambda x: self.ipPortChanged.emit(x))
+        self.device_ip_port.textChanged.connect(lambda x: self.ipPortChanged.emit(x))
         self.is_client = QCheckBox()
         self.is_client.stateChanged.connect(self.changeClient)
         self.setUI()
@@ -160,10 +160,9 @@ class Serial(Shower):
     def __init__(self, parent=None):
         super(Serial, self).__init__(parent=parent)
         self.baud_rate = QLineEdit()
-        # self.device_port.
-        self.baud_rate.textEdited.connect(lambda x: self.baudChanged.emit(x))
+        self.baud_rate.textChanged.connect(lambda x: self.baudChanged.emit(x))
         self.data_bits = QLineEdit()
-        self.data_bits.textEdited.connect(lambda x: self.bitsChanged.emit(x))
+        self.data_bits.textChanged.connect(lambda x: self.bitsChanged.emit(x))
         self.setUI()
 
     def setUI(self):
@@ -187,7 +186,7 @@ class Sound(Shower):
     def __init__(self, parent=None):
         super(Sound, self).__init__(parent=parent)
         self.sampling_rate = QLineEdit("auto")
-        self.sampling_rate.textEdited.connect(lambda x: self.baudChanged.emit(x))
+        self.sampling_rate.textChanged.connect(lambda x: self.baudChanged.emit(x))
         self.setUI()
 
     def setUI(self):

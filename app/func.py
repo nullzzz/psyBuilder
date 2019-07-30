@@ -272,8 +272,8 @@ class Func(object):
         elif widget_type == Info.STARTR:
             from app.center.widget_tabs.eye_tracker.startR import StartR
             widget = StartR(widget_id=widget_id)
-        elif widget_type == Info.CLOSE:
-            from app.center.widget_tabs.eye_tracker.close import Close
+        elif widget_type == Info.Log:
+            from app.center.widget_tabs.eye_tracker.log import Close
             widget = Close(widget_id=widget_id)
         elif widget_type == Info.QUEST_INIT:
             from app.center.widget_tabs.quest.start import QuestInit

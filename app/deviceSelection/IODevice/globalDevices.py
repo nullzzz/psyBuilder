@@ -3,9 +3,9 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
     QPushButton, QInputDialog, QLineEdit
 
-from app.deviceSelection.globalSelection.describer import Describer
-from app.deviceSelection.globalSelection.device import Device
-from app.deviceSelection.globalSelection.selectionList import SelectArea
+from app.deviceSelection.IODevice.describer import Describer
+from app.deviceSelection.IODevice.device import Device
+from app.deviceSelection.IODevice.selectionList import SelectArea
 from app.func import Func
 from app.info import Info
 from lib.psy_message_box import PsyMessageBox as QMessageBox
