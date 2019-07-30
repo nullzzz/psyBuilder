@@ -92,7 +92,7 @@ class Describer(QWidget):
 
     def getInfo(self):
         self.default_properties["Quest Name"] = self.quest_name.text()
-        self.default_properties["Device Type"] = "quest"
+        # self.default_properties["Device Type"] = "quest"
         self.default_properties["Estimated threshold"] = self.estimated_threshold.text()
         self.default_properties["Std dev"] = self.std_dev.text()
         self.default_properties["Desired proportion"] = self.desired_proportion.text()
