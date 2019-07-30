@@ -101,8 +101,6 @@ class SelectArea(QListWidget):
             info: dict = self.item(i).getInfo()
             self.default_properties[key] = info.copy()
             # {设备标识符： {设备名：“”， 设备类型： “”}}
-            print(f"{self.item(i)}")
-            print(f"{self.default_properties}")
         return self.default_properties
 
     def setProperties(self, properties: dict):
