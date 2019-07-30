@@ -26,6 +26,8 @@ class Quest(QListWidgetItem):
         self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.quest_type))))
 
         self.default_properties = {
+            "Quest Type": self.quest_type,
+            "Quest Name": quest_id,
         }
 
     def setName(self, name: str):
@@ -79,6 +81,7 @@ class Quest(QListWidgetItem):
             self.loadSetting()
 
     def loadSetting(self):
+        self.setName(self.default_properties["Quest Name"])
         self.estimated_threshold = self.default_properties["Estimated threshold"]
         self.std_dev = self.default_properties["Std dev"]
         self.desired_proportion = self.default_properties["Desired proportion"]
@@ -92,6 +95,8 @@ class Quest(QListWidgetItem):
 
     def getInfo(self):
         self.default_properties.clear()
+        self.default_properties["Quest Name"] = self.text()
+        self.default_properties["Quest Type"] = self.quest_type
         self.default_properties["Estimated threshold"] = self.estimated_threshold
         self.default_properties["Std dev"] = self.std_dev
         self.default_properties["Desired proportion"] = self.desired_proportion

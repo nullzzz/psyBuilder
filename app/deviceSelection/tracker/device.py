@@ -30,6 +30,8 @@ class Tracker(QListWidgetItem):
         self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.tracker_type))))
 
         self.default_properties = {
+            "Tracker Type": self.tracker_type,
+            "Tracker Name": tracker_id,
         }
 
     def setName(self, name: str):
@@ -128,6 +130,7 @@ class Tracker(QListWidgetItem):
             self.loadSetting()
 
     def loadSetting(self):
+        self.setName(self.default_properties["Tracker Name"])
         self.select_tracker_type = self.default_properties["Select tracker type"]
         self.eye_tracker_datafile = self.default_properties["Eye tracker datafile"]
         self.calibrate_tracker = self.default_properties["Calibrate tracker"]
@@ -144,6 +147,8 @@ class Tracker(QListWidgetItem):
 
     def getInfo(self):
         self.default_properties.clear()
+        self.default_properties["Tracker Name"] = self.text()
+        self.default_properties["Tracker Type"] = self.tracker_type
         self.default_properties["Select tracker type"] = self.select_tracker_type
         self.default_properties["Eye tracker datafile"] = self.eye_tracker_datafile
         self.default_properties["Calibrate tracker"] = self.calibrate_tracker

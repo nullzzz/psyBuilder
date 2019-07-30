@@ -112,7 +112,7 @@ class ShowArea(QListWidget):
 
     def addDevice(self, item, record=True):
         device_name = item.text()
-        device_id = item.getQuestId()
+        device_id = item.getId()
         self.device_id_name[device_id] = device_name
         # 提示信息
         if self.count() == 0:

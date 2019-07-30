@@ -163,4 +163,4 @@ class TrackerInit(QWidget):
         self.selected_devices.clearAll()
         self.selected_devices.setProperties(properties)
         # 更新全局信息
-        Info.QUEST_INFO = properties.copy()
+        Info.TRACKER_INFO = properties.copy()
