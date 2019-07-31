@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout
     QGridLayout, QCheckBox, QTextEdit, QListWidget, QAbstractItemView
 
 from app.func import Func
-from app.lib import PigLineEdit
+from app.lib import PigLineEdit, PigComboBox
 
 
 class Close(QWidget):
@@ -26,11 +26,18 @@ class Close(QWidget):
 
         self.pause_between_msg = PigLineEdit()
 
+
+        self.using_tracker_id = ""
+        self.tracker_info = Func.getTrackerInfo()
+        self.tracker_name = PigComboBox()
+        self.tracker_name.addItems(self.tracker_info.values())
+        self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.default_properties = {
             "Pause between messages": "0",
             "Automatically log all variables": 0,
             "Used attributes": [],
             "Not used attributes": [],
+            "EyeTracker Name": "",
         }
 
         self.msg = ""
@@ -82,7 +89,8 @@ class Close(QWidget):
         layout1.addWidget(QLabel("Pause between messages(ms):"), 2, 0, 1, 1)
         layout1.addWidget(self.pause_between_msg, 2, 1, 1, 1)
         layout1.addWidget(self.automatically_log_all_variables, 3, 1, 1, 1)
-        # layout1.addWidget(self.log_msg, 4, 0, 76, 4)
+        layout1.addWidget(QLabel("EyeTracker Name:"), 4, 0, 1, 1)
+        layout1.addWidget(self.tracker_name, 4, 1, 1, 1)
 
         lay_bt = QVBoxLayout()
         lay_bt.addWidget(self.refresh_bt)
@@ -107,9 +115,31 @@ class Close(QWidget):
         layout.addLayout(layout3)
         self.setLayout(layout)
 
+    def changeTrackerId(self, tracker_name):
+        for k, v in self.tracker_info.items():
+            if v == tracker_name:
+                self.using_tracker_id = k
+                break
+
+    def refresh(self):
+        self.tracker_info = Func.getTrackerInfo()
+        tracker_id = self.using_tracker_id
+        self.tracker_name.clear()
+        self.tracker_name.addItems(self.tracker_info.values())
+        tracker_name = self.tracker_info.get(tracker_id)
+        if tracker_name:
+            self.tracker_name.setCurrentText(tracker_name)
+            self.using_tracker_id = tracker_id
+
+        # 更新attributes
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.getInfo()
+
     def refreshAttr(self):
         self.attributes = Func.getAttributes(self.widget_id)
         self.all_attr.clear()
+        self.select_attr.clear()
         self.all_attr.addItems(self.attributes)
 
     def selectAll(self):
@@ -144,8 +174,6 @@ class Close(QWidget):
 
     def apply(self):
         self.propertiesChange.emit(self.getInfo())
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
 
     def setProperties(self, properties: dict):
         if properties:
@@ -163,6 +191,7 @@ class Close(QWidget):
         self.default_properties.clear()
         self.default_properties["Pause between messages"] = self.pause_between_msg.text()
         self.default_properties["Automatically log all variables"] = self.automatically_log_all_variables.checkState()
+        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
         ua = []
         for i in range(self.select_attr.count()):
             ua.append(self.select_attr.item(i).text())
@@ -179,6 +208,7 @@ class Close(QWidget):
     def loadSetting(self):
         self.pause_between_msg.setText(self.default_properties["Pause between messages"])
         self.automatically_log_all_variables.setCheckState(self.default_properties["Automatically log all variables"])
+        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
         self.select_attr.clear()
         self.select_attr.addItems(self.default_properties["Used attributes"])
         self.all_attr.clear()
@@ -213,6 +243,9 @@ class Close(QWidget):
 
     def getIsAutomaticallyLogAllVariables(self) -> bool:
         return bool(self.automatically_log_all_variables.checkState())
+
+    def getTrackerName(self) -> str:
+        return self.tracker_name.currentText()
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)

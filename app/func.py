@@ -83,6 +83,8 @@ class Func(object):
         :return:
         """
         widget = Info.WID_WIDGET[widget_id]
+        if hasattr(widget, "refresh"):
+            widget.refresh()
         return widget.getProperties()
 
     @staticmethod
@@ -626,6 +628,14 @@ class Func(object):
         return screens
 
     @staticmethod
+    def getScreenInfo() -> dict:
+        info: dict = {}
+        for k, v in Info.OUTPUT_DEVICE_INFO.items():
+            if k.startswith("screen"):
+                info[k] = v["Device Name"]
+        return info
+
+    @staticmethod
     def getSound() -> list:
         sounds = []
         for k, v in Info.OUTPUT_DEVICE_INFO.items():
@@ -660,6 +670,20 @@ class Func(object):
             if device_name == v.get("Device Name"):
                 return k
         return ""
+
+    @staticmethod
+    def getQuestInfo():
+        info: dict = {}
+        for k, v in Info.QUEST_INFO.items():
+            info[k] = v.get("Quest Name")
+        return info
+
+    @staticmethod
+    def getTrackerInfo():
+        info: dict = {}
+        for k, v in Info.TRACKER_INFO.items():
+            info[k] = v.get("Tracker Name")
+        return info
 
     # 控制台输出信息
     @staticmethod

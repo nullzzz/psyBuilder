@@ -103,6 +103,10 @@ class WidgetTabs(QTabWidget):
                     self.setCurrentIndex(
                         self.addTab(widget, Func.getWidgetImage(widget_id.split('.')[0], 'icon'),
                                     Func.getWidgetName(widget_id)))
+                # 双击timeline icon打开某个widget，refresh用于更新screen\quest\tracker\attributes等信息
+                # 2019-07-31
+                if hasattr(self.currentWidget(), "refresh"):
+                    self.currentWidget().refresh()
             else:
                 raise Exception("fail to open tab, because widget can't be found. [widget_tabs/main.py]")
         except Exception as e:

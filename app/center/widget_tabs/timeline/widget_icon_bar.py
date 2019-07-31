@@ -73,7 +73,7 @@ class WidgetIconBar(QTabWidget):
         self.events.addItem(QListWidgetItem(Func.getWidgetImage(Info.VIDEO, 'icon'), Info.VIDEO))
         self.events.addItem(QListWidgetItem(Func.getWidgetImage(Info.SLIDER, 'icon'), Info.SLIDER))
         # eye_tracker
-        self.eye_tracker.addItem(QListWidgetItem(Func.getWidgetImage(Info.OPEN, 'icon'), Info.OPEN))
+        # self.eye_tracker.addItem(QListWidgetItem(Func.getWidgetImage(Info.OPEN, 'icon'), Info.OPEN))
         self.eye_tracker.addItem(QListWidgetItem(Func.getWidgetImage(Info.DC, 'icon'), Info.DC))
         self.eye_tracker.addItem(QListWidgetItem(Func.getWidgetImage(Info.CALIBRATION, 'icon'), Info.CALIBRATION))
         self.eye_tracker.addItem(QListWidgetItem(Func.getWidgetImage(Info.ACTION, 'icon'), Info.ACTION))
@@ -81,9 +81,9 @@ class WidgetIconBar(QTabWidget):
         self.eye_tracker.addItem(QListWidgetItem(Func.getWidgetImage(Info.ENDR, 'icon'), Info.ENDR))
         self.eye_tracker.addItem(QListWidgetItem(Func.getWidgetImage(Info.Log, 'icon'), Info.Log))
         # quest
-        self.quest.addItem(QListWidgetItem(Func.getWidgetImage(Info.QUEST_INIT, 'icon'), Info.QUEST_INIT))
+        # self.quest.addItem(QListWidgetItem(Func.getWidgetImage(Info.QUEST_INIT, 'icon'), Info.QUEST_INIT))
         self.quest.addItem(QListWidgetItem(Func.getWidgetImage(Info.QUEST_UPDATE, 'icon'), Info.QUEST_UPDATE))
-        self.quest.addItem(QListWidgetItem(Func.getWidgetImage(Info.QUEST_GET_VALUE, 'icon'), Info.QUEST_GET_VALUE))
+        # self.quest.addItem(QListWidgetItem(Func.getWidgetImage(Info.QUEST_GET_VALUE, 'icon'), Info.QUEST_GET_VALUE))
         # condition
         self.condition.addItem(QListWidgetItem(Func.getWidgetImage('If', 'icon'), "If"))
         self.condition.addItem(QListWidgetItem(Func.getWidgetImage('Switch', 'icon'), "Switch"))

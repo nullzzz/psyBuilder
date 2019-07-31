@@ -27,7 +27,9 @@ class EyeCalibrate(QWidget):
             "Calibration type": "HV13",
             "Calibration beep": "Yes",
             "Target color": "(foreground)",
-            "Target style": "default"
+            "Target style": "default",
+            "EyeTracker Name": "",
+            "Screen": "screen.0",
         }
 
         self.calibration_type = PigComboBox()
@@ -36,6 +38,18 @@ class EyeCalibrate(QWidget):
         self.target_color.textChanged.connect(self.findVar)
         self.target_color.returnPressed.connect(self.finalCheck)
         self.target_style = PigComboBox()
+
+        self.using_tracker_id: str = ""
+        self.tracker_info = Func.getTrackerInfo()
+        self.tracker_name = PigComboBox()
+        self.tracker_name.addItems(self.tracker_info.values())
+        self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
+
+        self.using_screen_id: str = ""
+        self.screen = PigComboBox()
+        self.screen_info = Func.getScreenInfo()
+        self.screen.addItems(self.screen_info.values())
+        self.screen.currentTextChanged.connect(self.changeScreen)
 
         self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
@@ -54,11 +68,9 @@ class EyeCalibrate(QWidget):
         self.resize(500, 750)
         self.tip1.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip1.setText("Calibration")
-        # self.tip1.setFocusPolicy(Qt.NoFocus)
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip2.setText("Calibration")
-        # self.tip2.setFocusPolicy(Qt.NoFocus)
         self.calibration_type.addItems(["HV9", "HV13", "HV5", "HV3"])
         self.calibration_beep.addItems(["Yes", "No"])
         self.target_color.setText("(foreground)")
@@ -69,11 +81,15 @@ class EyeCalibrate(QWidget):
         l2 = QLabel("Calibration Beep:")
         l3 = QLabel("Target Color:")
         l4 = QLabel("Target Style:")
+        l5 = QLabel("EyeTracker Name:")
+        l6 = QLabel("Screen Name:")
 
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
@@ -86,6 +102,10 @@ class EyeCalibrate(QWidget):
         layout1.addWidget(self.target_color, 4, 1, 1, 1)
         layout1.addWidget(l4, 5, 0, 1, 1)
         layout1.addWidget(self.target_style, 5, 1, 1, 1)
+        layout1.addWidget(l5, 6, 0, 1, 1)
+        layout1.addWidget(self.tracker_name, 6, 1, 1, 1)
+        layout1.addWidget(l6, 7, 0, 1, 1)
+        layout1.addWidget(self.screen, 7, 1, 1, 1)
 
         layout2 = QHBoxLayout()
         layout2.addStretch(10)
@@ -99,6 +119,41 @@ class EyeCalibrate(QWidget):
         layout.addLayout(layout2)
         self.setLayout(layout)
 
+    def changeTrackerId(self, tracker_name):
+        for k, v in self.tracker_info.items():
+            if v == tracker_name:
+                self.using_tracker_id = k
+                break
+
+    def changeScreen(self, screen):
+        for k, v in self.screen_info.items():
+            if v == screen:
+                self.using_screen_id = k
+                break
+
+    def refresh(self):
+        self.tracker_info = Func.getTrackerInfo()
+        tracker_id = self.using_tracker_id
+        self.tracker_name.clear()
+        self.tracker_name.addItems(self.tracker_info.values())
+        tracker_name = self.tracker_info.get(tracker_id)
+        if tracker_name:
+            self.tracker_name.setCurrentText(tracker_name)
+            self.using_tracker_id = tracker_id
+        self.screen_info = Func.getScreenInfo()
+        screen_id = self.using_screen_id
+        self.screen.clear()
+        self.screen.addItems(self.screen_info.values())
+        screen_name = self.screen_info.get(screen_id)
+        if screen_name:
+            self.screen.setCurrentText(screen_name)
+            self.using_screen_id = screen_id
+        # 更新attributes
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+
+        self.getInfo()
+
     def ok(self):
         self.apply()
         self.close()
@@ -109,8 +164,6 @@ class EyeCalibrate(QWidget):
 
     def apply(self):
         self.propertiesChange.emit(self.getInfo())
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
 
     # 检查变量
     def findVar(self, text):
@@ -153,6 +206,8 @@ class EyeCalibrate(QWidget):
         self.default_properties["Calibration beep"] = self.calibration_beep.currentText()
         self.default_properties["Target color"] = self.target_color.text()
         self.default_properties["Target style"] = self.target_style.currentText()
+        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
+        self.default_properties["Screen Name"] = self.screen.currentText()
         return self.default_properties
 
     def getProperties(self):
@@ -175,6 +230,8 @@ class EyeCalibrate(QWidget):
         self.calibration_beep.setCurrentText(self.default_properties["Calibration beep"])
         self.target_color.setText(self.default_properties["Target color"])
         self.target_style.setCurrentText(self.default_properties["Target style"])
+        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
+        self.screen.setCurrentText(self.default_properties["Screen Name"])
 
     def clone(self, new_id: str):
         clone_widget = EyeCalibrate(widget_id=new_id)
@@ -203,6 +260,9 @@ class EyeCalibrate(QWidget):
 
     def getTargetStyle(self) -> str:
         return self.target_style.text()
+
+    def getTrackerName(self) -> str:
+        return self.tracker_name.currentText()
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)

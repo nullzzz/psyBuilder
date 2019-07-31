@@ -25,11 +25,17 @@ class StartR(QWidget):
         self.default_properties = {
             "Status message": "",
             "Sync to next event flip": "no",
+            "EyeTracker Name": "",
         }
         self.status_message = PigLineEdit()
         self.sync_to_next_event_flip = PigComboBox()
         self.sync_to_next_event_flip.addItems(("no", "yes"))
 
+        self.using_tracker_id = ""
+        self.tracker_info = Func.getTrackerInfo()
+        self.tracker_name = PigComboBox()
+        self.tracker_name.addItems(self.tracker_info.values())
+        self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.msg = ""
         self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
@@ -59,6 +65,8 @@ class StartR(QWidget):
         layout1.addWidget(self.status_message, 2, 1, 1, 1)
         layout1.addWidget(QLabel("Sync to Next Event Flip:"), 3, 0, 1, 1)
         layout1.addWidget(self.sync_to_next_event_flip, 3, 1, 1, 1)
+        layout1.addWidget(QLabel("EyeTracker Name:"), 4, 0, 1, 1)
+        layout1.addWidget(self.tracker_name, 4, 1, 1, 1)
 
         layout2 = QHBoxLayout()
         layout2.addStretch(10)
@@ -72,6 +80,27 @@ class StartR(QWidget):
         layout.addLayout(layout2)
         self.setLayout(layout)
 
+    def changeTrackerId(self, tracker_name):
+        for k, v in self.tracker_info.items():
+            if v == tracker_name:
+                self.using_tracker_id = k
+                break
+
+    def refresh(self):
+        self.tracker_info = Func.getTrackerInfo()
+        tracker_id = self.using_tracker_id
+        self.tracker_name.clear()
+        self.tracker_name.addItems(self.tracker_info.values())
+        tracker_name = self.tracker_info.get(tracker_id)
+        if tracker_name:
+            self.tracker_name.setCurrentText(tracker_name)
+            self.using_tracker_id = tracker_id
+
+        # 更新attributes
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.getInfo()
+
     def ok(self):
         self.apply()
         self.close()
@@ -83,8 +112,6 @@ class StartR(QWidget):
     def apply(self):
         self.msg = self.status_message.text()
         self.propertiesChange.emit(self.getInfo())
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
 
     def setAttributes(self, attributes):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
@@ -105,8 +132,10 @@ class StartR(QWidget):
                     using_attributes.append(v[1:-1])
 
     def getInfo(self):
+        self.default_properties.clear()
         self.default_properties["Statue message"] = self.status_message.text()
         self.default_properties["Sync to next event flip"] = self.sync_to_next_event_flip.currentText()
+        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
         return self.default_properties
 
     def getProperties(self):
@@ -127,6 +156,8 @@ class StartR(QWidget):
     def loadSetting(self):
         self.status_message.setText(self.default_properties["Statue message"])
         self.sync_to_next_event_flip.setText(self.default_properties["Sync to next event flip"])
+
+        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
 
     def clone(self, new_id: str):
         clone_widget = StartR(widget_id=new_id)
@@ -149,6 +180,9 @@ class StartR(QWidget):
 
     def getSyncToNextEventFlip(self) -> str:
         return self.sync_to_next_event_flip.currentText()
+
+    def getTrackerName(self) -> str:
+        return self.tracker_name.currentText()
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)

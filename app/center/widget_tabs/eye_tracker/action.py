@@ -1,9 +1,10 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, \
-    QGridLayout, QComboBox
+    QGridLayout
 
 from app.func import Func
+from app.lib import PigComboBox
 
 
 class EyeAction(QWidget):
@@ -15,15 +16,22 @@ class EyeAction(QWidget):
         self.widget_id = widget_id
         self.current_wid = widget_id
 
-
+        self.attributes: list = []
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
-        self.status_message = QComboBox()
+        self.status_message = PigComboBox()
+
+        self.using_tracker_id = ""
+        self.tracker_info = Func.getTrackerInfo()
+        self.tracker_name = PigComboBox()
+        self.tracker_name.addItems(self.tracker_info.values())
+        self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
 
         self.default_properties = {
-            "Status Message": "Saccade start"
+            "Status Message": "Saccade start",
+            "EyeTracker Name": "",
         }
         self.msg = ""
         self.bt_ok = QPushButton("OK")
@@ -54,6 +62,8 @@ class EyeAction(QWidget):
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
         layout1.addWidget(QLabel("Status Message:"), 2, 0, 1, 1)
         layout1.addWidget(self.status_message, 2, 1, 1, 1)
+        layout1.addWidget(QLabel("EyeTracker Name:"), 3, 0, 1, 1)
+        layout1.addWidget(self.tracker_name, 3, 1, 1, 1)
 
         layout2 = QHBoxLayout()
         layout2.addStretch(10)
@@ -66,6 +76,27 @@ class EyeAction(QWidget):
         layout.addStretch(10)
         layout.addLayout(layout2)
         self.setLayout(layout)
+
+    def changeTrackerId(self, tracker_name):
+        for k, v in self.tracker_info.items():
+            if v == tracker_name:
+                self.using_tracker_id = k
+                break
+
+    def refresh(self):
+        self.tracker_info = Func.getTrackerInfo()
+        tracker_id = self.using_tracker_id
+        self.tracker_name.clear()
+        self.tracker_name.addItems(self.tracker_info.values())
+        tracker_name = self.tracker_info.get(tracker_id)
+        if tracker_name:
+            self.tracker_name.setCurrentText(tracker_name)
+            self.using_tracker_id = tracker_id
+
+        # 更新attributes
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.getInfo()
 
     def ok(self):
         self.apply()
@@ -81,6 +112,7 @@ class EyeAction(QWidget):
 
     def getInfo(self):
         self.default_properties["Status Message"] = self.status_message.currentText()
+        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
         return self.default_properties
 
     def getProperties(self):
@@ -100,6 +132,7 @@ class EyeAction(QWidget):
 
     def loadSetting(self):
         self.status_message.setCurrentText(self.default_properties["Statue Message"])
+        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
 
     def clone(self, new_id: str):
         clone_widget = EyeAction(widget_id=new_id)
@@ -127,6 +160,9 @@ class EyeAction(QWidget):
 
     def getStatusMessage(self) -> str:
         return self.status_message.currentText()
+
+    def getTrackerName(self) -> str:
+        return self.tracker_name.currentText()
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
