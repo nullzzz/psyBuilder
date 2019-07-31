@@ -69,6 +69,11 @@ class Switch(QWidget):
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
+    def refresh(self):
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.getInfo()
+
     def getInfo(self):
         return self.getProperties()
 

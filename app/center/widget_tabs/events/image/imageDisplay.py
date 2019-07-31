@@ -66,14 +66,17 @@ class ImageDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        screen_devices = Func.getScreen()
-        self.pro_window.general.setScreen(screen_devices)
-        self.setAttributes(self.attributes)
+        self.refresh()
         # 阻塞原窗口
         # self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
+
+    def refresh(self):
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.pro_window.general.refresh()
+        self.getInfo()
 
     # 预览图片
     def preView(self):

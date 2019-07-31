@@ -1161,8 +1161,6 @@ class Slider(QMainWindow):
         except KeyError as e:
             # condition下的slider在这里出错
             pass
-        screen_devices = Func.getScreen()
-        self.pro_window.general.setScreen(screen_devices)
 
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()

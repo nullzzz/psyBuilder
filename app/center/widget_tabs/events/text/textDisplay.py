@@ -60,12 +60,15 @@ class TextDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
-        screen_devices = Func.getScreen()
-        self.pro_window.general.setScreen(screen_devices)
+        self.refresh()
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
+
+    def refresh(self):
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.pro_window.general.refresh()
+        self.getInfo()
 
     # 预览
     def preView(self):

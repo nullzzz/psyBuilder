@@ -1,5 +1,4 @@
-from PyQt5.QtCore import Qt, QRegExp
-from PyQt5.QtGui import QRegExpValidator
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
     QFileDialog, QCompleter
 
@@ -54,9 +53,15 @@ class SoundTab1(QWidget):
         self.stop_offset.setInputMask("00:00:00.000")
         self.repetitions = PigLineEdit()
 
-        self.sound_device = PigComboBox()
-        self.sound_device.currentTextChanged.connect(self.changeDevice)
+        self.sound = PigComboBox()
+        self.sound.currentTextChanged.connect(self.changeDevice)
         self.using_device_id = ""
+
+        self.using_sound_id: str = ""
+        self.sound = PigComboBox()
+        self.sound_info = Func.getSoundInfo()
+        self.sound.addItems(self.sound_info.values())
+        self.sound.currentTextChanged.connect(self.changeSound)
 
         self.wait_for_start = PigComboBox()
         self.wait_for_start.addItems(("No", "Yes"))
@@ -123,7 +128,7 @@ class SoundTab1(QWidget):
         layout2.addWidget(self.volume_control, 0, 0, )
         layout2.addWidget(self.volume, 0, 1, )
         layout2.addWidget(l6, 0, 2)
-        layout2.addWidget(self.sound_device, 0, 3)
+        layout2.addWidget(self.sound, 0, 3)
 
         # layout2.addWidget(l7, 1, 0, 1, 1)
         layout2.addWidget(self.latency_bias, 1, 0)
@@ -139,6 +144,22 @@ class SoundTab1(QWidget):
         layout.addWidget(group2, 1)
 
         self.setLayout(layout)
+
+    def refresh(self):
+        self.sound_info = Func.getSoundInfo()
+        sound_id = self.using_sound_id
+        self.sound.clear()
+        self.sound.addItems(self.sound_info.values())
+        sound_name = self.sound_info.get(sound_id)
+        if sound_name:
+            self.sound.setCurrentText(sound_name)
+            self.using_sound_id = sound_id
+
+    def changeSound(self, sound):
+        for k, v in self.sound_info.items():
+            if v == sound:
+                self.using_sound_id = k
+                break
 
     # 打开文件夹
     def openFile(self):
@@ -164,15 +185,15 @@ class SoundTab1(QWidget):
             self.bias_time.setEnabled(False)
 
     def setSound(self, sound: list):
-        selected = self.sound_device.currentText()
-        self.sound_device.clear()
-        self.sound_device.addItems(sound)
+        selected = self.sound.currentText()
+        self.sound.clear()
+        self.sound.addItems(sound)
         if selected in sound:
-            self.sound_device.setCurrentText(selected)
+            self.sound.setCurrentText(selected)
         else:
             new_name = Func.getDeviceNameById(self.using_device_id)
             if new_name:
-                self.sound_device.setCurrentText(new_name)
+                self.sound.setCurrentText(new_name)
 
     def setAttributes(self, attributes: list):
         self.attributes = attributes
@@ -197,10 +218,7 @@ class SoundTab1(QWidget):
         self.default_properties["Volume"] = self.volume.text()
         self.default_properties["Latency bias"] = self.latency_bias.checkState()
         self.default_properties["Bias time"] = self.bias_time.text()
-        if Func.getDeviceNameById(self.using_device_id):
-            self.default_properties["Sound device"] = Func.getDeviceNameById(self.using_device_id)
-        else:
-            self.default_properties["Sound device"] = self.sound_device.currentText()
+        self.default_properties["Sound device"] = self.sound.currentText()
         self.default_properties["Wait for start"] = self.wait_for_start.currentText()
 
         return self.default_properties
@@ -220,7 +238,7 @@ class SoundTab1(QWidget):
         self.volume.setText(self.default_properties["Volume"])
         self.latency_bias.setCheckState(self.default_properties["Latency bias"])
         self.bias_time.setText(self.default_properties["Bias time"])
-        self.sound_device.setCurrentText((self.default_properties["Sound device"]))
+        self.sound.setCurrentText((self.default_properties["Sound device"]))
         self.wait_for_start.setCurrentText(self.default_properties["Wait for start"])
 
     def clone(self):

@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QApplication, QTextEdit, \
+from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QTextEdit, \
     QFontComboBox, QCompleter
 
 from app.func import Func
@@ -45,7 +45,6 @@ class TextTab1(QWidget):
         self.back_color.colorChanged.connect(self.colorChange)
 
         self.clear_after = PigComboBox()
-        self.screen_name = PigComboBox()
         self.transparent = PigLineEdit("100%")
         self.transparent.setReg(r"0%|[1-9]\d%|100%")
         self.word_wrap = PigLineEdit("80")
@@ -72,11 +71,16 @@ class TextTab1(QWidget):
             self.font_size_box.addItem(str(i))
 
         self.font_size_box.currentIndexChanged.connect(self.fontChange)
-        self.screen_name.currentTextChanged.connect(self.changeDevice)
 
         self.right_to_left = PigComboBox()
         self.right_to_left.addItems(("no", "yes"))
-        self.using_device_id = "screen.0"
+
+        self.using_screen_id: str = "screen.0"
+        self.screen = PigComboBox()
+        self.screen_info = Func.getScreenInfo()
+        self.screen.addItems(self.screen_info.values())
+        self.screen.currentTextChanged.connect(self.changeScreen)
+
         self.setUI()
 
     def setUI(self):
@@ -123,7 +127,7 @@ class TextTab1(QWidget):
 
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
-        self.screen_name.addItems(["screen.0"])
+        self.screen.addItems(["screen.0"])
 
         group1 = QGroupBox("Text")
         layout1 = QGridLayout()
@@ -145,7 +149,7 @@ class TextTab1(QWidget):
         layout2.addWidget(l20, 2, 0)
         layout2.addWidget(self.clear_after, 2, 1)
         layout2.addWidget(l22, 2, 2)
-        layout2.addWidget(self.screen_name, 2, 3)
+        layout2.addWidget(self.screen, 2, 3)
 
         layout2.addWidget(l30, 3, 0)
         layout2.addWidget(self.transparent, 3, 1)
@@ -172,8 +176,21 @@ class TextTab1(QWidget):
         layout.addWidget(group2, 2)
         self.setLayout(layout)
 
-    def changeDevice(self, device_name):
-        self.using_device_id = Func.getDeviceIdByName(device_name)
+    def refresh(self):
+        self.screen_info = Func.getScreenInfo()
+        screen_id = self.using_screen_id
+        self.screen.clear()
+        self.screen.addItems(self.screen_info.values())
+        screen_name = self.screen_info.get(screen_id)
+        if screen_name:
+            self.screen.setCurrentText(screen_name)
+            self.using_screen_id = screen_id
+
+    def changeScreen(self, screen):
+        for k, v in self.screen_info.items():
+            if v == screen:
+                self.using_screen_id = k
+                break
 
     def colorChange(self, color: str):
         r, g, b = 255, 255, 255
@@ -258,15 +275,15 @@ class TextTab1(QWidget):
         # self.right_to_left.setCompleter(QCompleter(self.attributes))
 
     def setScreen(self, screen: list):
-        selected = self.screen_name.currentText()
-        self.screen_name.clear()
-        self.screen_name.addItems(screen)
+        selected = self.screen.currentText()
+        self.screen.clear()
+        self.screen.addItems(screen)
         if selected in screen:
-            self.screen_name.setCurrentText(selected)
+            self.screen.setCurrentText(selected)
         else:
             new_name = Func.getDeviceNameById(self.using_device_id)
             if new_name:
-                self.screen_name.setCurrentText(new_name)
+                self.screen.setCurrentText(new_name)
 
     def apply(self):
         self.html = self.text_edit.toHtml()
@@ -279,10 +296,7 @@ class TextTab1(QWidget):
         self.default_properties["Alignment Y"] = self.align_y.currentText()
         self.default_properties["Fore color"] = self.fore_color.getColor()
         self.default_properties["Back color"] = self.back_color.getColor()
-        if Func.getDeviceNameById(self.using_device_id):
-            self.default_properties["Screen name"] = Func.getDeviceNameById(self.using_device_id)
-        else:
-            self.default_properties["Screen name"] = self.screen_name.currentText()
+        self.default_properties["Screen name"] = self.screen.currentText()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear after"] = self.clear_after.currentText()
         self.default_properties["Font family"] = self.font_box.currentText()
@@ -307,7 +321,7 @@ class TextTab1(QWidget):
         self.align_y.setCurrentText(self.default_properties["Alignment Y"])
         self.fore_color.setCurrentText(self.default_properties["Fore color"])
         self.back_color.setCurrentText(self.default_properties["Back color"])
-        self.screen_name.setCurrentText(self.default_properties["Screen name"])
+        self.screen.setCurrentText(self.default_properties["Screen name"])
         self.transparent.setText(self.default_properties["Transparent"])
         self.word_wrap.setText(self.default_properties["Wrapat chars"])
         self.clear_after.setCurrentText(self.default_properties["Clear after"])
@@ -323,4 +337,3 @@ class TextTab1(QWidget):
         clone_page = TextTab1()
         clone_page.setProperties(self.default_properties, self.html)
         return clone_page
-

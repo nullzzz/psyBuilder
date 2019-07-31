@@ -103,8 +103,8 @@ class PsyApplication(QMainWindow):
         self.tracker_init = TrackerInit()
         self.tracker_init.setWindowModality(Qt.ApplicationModal)
 
-        self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
-        self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
+        # self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
+        # self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
         devices_menu = menu_bar.addMenu("&Devices")
 
         output_devices_action = QAction("&Output Devices", self)

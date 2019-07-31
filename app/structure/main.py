@@ -85,35 +85,35 @@ class Structure(QDockWidget):
         :param name:
         :return:
         """
-        try:
-            # 先在源节点下添加
-            parent_node = Info.WID_NODE[parent_widget_id]
-            node = StructureNode(parent_node, widget_id)
-            node.setText(0, name)
-            parent_node.setExpanded(True)
+        # try:
+        # 先在源节点下添加
+        parent_node = Info.WID_NODE[parent_widget_id]
+        node = StructureNode(parent_node, widget_id)
+        node.setText(0, name)
+        parent_node.setExpanded(True)
+        # data
+        Info.WID_NODE[widget_id] = node
+        Info.NAME_WID[name] = [widget_id]
+        # 创建控件, 连接信号
+        Func.createWidget(widget_id)
+        self.widgetSignalsLink.emit(widget_id)
+        # 父节点引用
+        widget_type = widget_id.split('.')[0]
+        refer_parent_wids = Func.getReferWidgetIds(parent_widget_id)
+        for refer_parent_wid in refer_parent_wids:
+            refer_parent_node = Info.WID_NODE[refer_parent_wid]
+            # 要为新增节点搞一个widget_id啊
+            refer_child_wid = WidgetIcon(widget_type=widget_type).widget_id
+            refer_child_node = StructureNode(refer_parent_node, refer_child_wid)
+            refer_child_node.setText(0, name)
+            refer_parent_node.setExpanded(True)
             # data
-            Info.WID_NODE[widget_id] = node
-            Info.NAME_WID[name] = [widget_id]
-            # 创建控件, 连接信号
-            Func.createWidget(widget_id)
-            self.widgetSignalsLink.emit(widget_id)
-            # 父节点引用
-            widget_type = widget_id.split('.')[0]
-            refer_parent_wids = Func.getReferWidgetIds(parent_widget_id)
-            for refer_parent_wid in refer_parent_wids:
-                refer_parent_node = Info.WID_NODE[refer_parent_wid]
-                # 要为新增节点搞一个widget_id啊
-                refer_child_wid = WidgetIcon(widget_type=widget_type).widget_id
-                refer_child_node = StructureNode(refer_parent_node, refer_child_wid)
-                refer_child_node.setText(0, name)
-                refer_parent_node.setExpanded(True)
-                # data
-                Info.WID_NODE[refer_child_wid] = refer_child_node
-                Info.NAME_WID[name].append(refer_child_wid)
-                Info.WID_WIDGET[refer_child_wid] = Info.WID_WIDGET[widget_id]
-        except Exception as e:
-            print(f"error {e} happens in add node for add. [structure/main.py]")
-            Func.log(str(e), True)
+            Info.WID_NODE[refer_child_wid] = refer_child_node
+            Info.NAME_WID[name].append(refer_child_wid)
+            Info.WID_WIDGET[refer_child_wid] = Info.WID_WIDGET[widget_id]
+        # except Exception as e:
+        #     print(f"error {e} happens in add node for add. [structure/main.py]")
+        #     Func.log(str(e), True)
 
     def addNodeForCopy(self, parent_widget_id, widget_id, name, old_widget_id):
         try:

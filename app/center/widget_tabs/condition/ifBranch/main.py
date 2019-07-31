@@ -106,6 +106,11 @@ class IfBranch(QWidget):
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
+    def refresh(self):
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.getInfo()
+
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()

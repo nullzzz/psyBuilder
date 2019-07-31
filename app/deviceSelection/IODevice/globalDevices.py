@@ -148,7 +148,7 @@ class GlobalDevice(QWidget):
                 self.selected_devices.changeCurrentName(text)
                 self.describer.changeName(text)
                 self.getInfo()
-                self.deviceNameChanged.emit(item.getDeviceId(), text)
+                # self.deviceNameChanged.emit(item.getDeviceId(), text)
 
     # 参数导出, 记录到Info
     def getInfo(self):

@@ -53,6 +53,12 @@ class Func(object):
 
     @staticmethod
     def changeCertainDeviceNameWhileUsing(device_id: str, device_name):
+        """
+        abort at 2019-8-1
+        :param device_id:
+        :param device_name:
+        :return:
+        """
         for widget_ids in Info.NAME_WID.values():
             for widget_id in widget_ids:
                 widget_type = widget_id.split(".")[0]
@@ -632,6 +638,14 @@ class Func(object):
         info: dict = {}
         for k, v in Info.OUTPUT_DEVICE_INFO.items():
             if k.startswith("screen"):
+                info[k] = v["Device Name"]
+        return info
+
+    @staticmethod
+    def getSoundInfo() -> dict:
+        info: dict = {}
+        for k, v in Info.OUTPUT_DEVICE_INFO.items():
+            if k.startswith("sound"):
                 info[k] = v["Device Name"]
         return info
 
