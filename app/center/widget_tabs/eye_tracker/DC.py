@@ -124,8 +124,8 @@ class EyeDC(QWidget):
         layout1.addWidget(l5, 6, 0, 1, 1)
         layout1.addWidget(self.tracker_name, 6, 1, 1, 1)
 
-        layout1.addWidget(l6, 6, 0, 1, 1)
-        layout1.addWidget(self.screen, 6, 1, 1, 1)
+        layout1.addWidget(l6, 7, 0, 1, 1)
+        layout1.addWidget(self.screen, 7, 1, 1, 1)
 
         layout1.addWidget(self.show_display_with_drift_correction_target, 7, 1, 1, 1)
         layout1.addWidget(self.fixation_triggered, 8, 1, 1, 1)
