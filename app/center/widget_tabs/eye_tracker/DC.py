@@ -25,9 +25,9 @@ class EyeDC(QWidget):
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
         self.default_properties = {
-            "X position": "",
-            "Y position": "",
-            "Target color": "(foreground)",
+            "X position": "50%",
+            "Y position": "50%",
+            "Target color": "128,128,128",
             "Target style": "default",
             "Show display with drift correction target": 0,
             "Fixation triggered": 0,
@@ -82,17 +82,20 @@ class EyeDC(QWidget):
         self.resize(500, 750)
         # self.setStyleSheet("background-color: white;")
         self.tip1.setStyleSheet("border-width:0; border-style:outset; background-color: transparent;")
-        self.tip1.setText("Drift correct")
+        self.tip1.setText("Drift Correction")
         # self.tip1.setFocusPolicy(Qt.NoFocus)
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0; border-style:outset; background-color: transparent;")
-        self.tip2.setText("Perform eye-tracker drift correction")
+        self.tip2.setText("Perform drift correction")
         # self.tip2.setFocusPolicy(Qt.NoFocus)
-        self.target_color.setText("(foreground)")
+        self.target_color.setText("128,128,128")
         self.target_style.addItems(
             ["default", "large filled", "small filled", "large open", "small open", "large cross", "small cross"])
         self.target_color.setEnabled(False)
         self.target_style.setEnabled(False)
+
+        self.x_pos.setText("50%")
+        self.y_pos.setText("50%")
 
         l1 = QLabel("X Position:")
         l2 = QLabel("Y Position:")
@@ -127,8 +130,8 @@ class EyeDC(QWidget):
         layout1.addWidget(l6, 7, 0, 1, 1)
         layout1.addWidget(self.screen, 7, 1, 1, 1)
 
-        layout1.addWidget(self.show_display_with_drift_correction_target, 7, 1, 1, 1)
-        layout1.addWidget(self.fixation_triggered, 8, 1, 1, 1)
+        layout1.addWidget(self.show_display_with_drift_correction_target, 8, 1, 1, 1)
+        layout1.addWidget(self.fixation_triggered, 9, 1, 1, 1)
 
         layout1.setContentsMargins(30, 10, 30, 0)
         layout2 = QHBoxLayout()
