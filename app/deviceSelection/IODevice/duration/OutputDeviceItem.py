@@ -65,6 +65,9 @@ class DeviceOutItem(QListWidgetItem):
     def getValue(self):
         return self.value_or_msg, self.pulse_duration
 
+    def getType(self):
+        return self.device_type
+
     def getDeviceId(self) -> str:
         return self.device_id
 

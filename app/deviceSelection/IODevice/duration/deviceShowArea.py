@@ -7,7 +7,7 @@ from app.info import Info
 
 
 class ShowArea(QListWidget):
-    infoChanged = pyqtSignal(tuple)
+    infoChanged = pyqtSignal(tuple, str)
     respChanged = pyqtSignal(tuple)
     outputDeletedOrChanged = pyqtSignal(str)
     areaStatus = pyqtSignal(int)
@@ -36,7 +36,7 @@ class ShowArea(QListWidget):
 
     def changeItem(self, item):
         if item:
-            self.infoChanged.emit(item.getValue())
+            self.infoChanged.emit(item.getValue(), item.getType())
             if self.device_type == Info.INPUT_DEVICE:
                 self.respChanged.emit(item.getResp())
 
