@@ -148,7 +148,7 @@ class PigLineEdit(QLineEdit):
     # 检查变量
     def findVar(self, text: str):
         if text.startswith("[") and text.endswith("]"):
-            self.setStyleSheet("color: red")
+            self.setStyleSheet("color: blue")
             self.setFont(QFont("Timers", 9, QFont.Bold))
         else:
             self.setStyleSheet("color: black")
@@ -239,9 +239,12 @@ class ColorListEditor(PigComboBox):
                         color_name = color_rgb.name()
                         color_name_ = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
                         self.setStyleSheet("background: {}".format(color_name))
-                        self.insertItem(1, color_name_)
-                        self.setItemData(1, color_rgb, Qt.DecorationRole)
-                        self.setCurrentIndex(1)
+                        # if self.findText(color_name_, Qt.MatchExactly) == -1:
+                        #     self.insertItem(1, color_name_)
+                        #     self.setItemData(1, color_rgb, Qt.DecorationRole)
+                        #     self.setCurrentIndex(1)
+                        # else:
+                        self.setCurrentText(color_name_)
                     # 未选颜色
                     else:
                         self.setCurrentIndex(1)
@@ -274,7 +277,9 @@ class ColorListEditor(PigComboBox):
                     self.is_valid = 1
                 elif text in self.default_color:
                     self.is_valid = 1
-                    self.setStyleSheet("background: {}".format(self.currentText()))
+                    # index = self.findText(text, Qt.MatchExactly)
+                    # self.setCurrentIndex(index)
+                    self.setStyleSheet("background: rgb({})".format(self.color_map.get(text)))
                 else:
                     self.is_valid = 0
                     self.setStyleSheet("background: white")

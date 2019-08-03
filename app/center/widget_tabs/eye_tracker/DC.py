@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QWidget, QLabel, QLineEdit
     QCompleter
 
 from app.func import Func
-from app.lib import PigLineEdit, PigComboBox
+from app.lib import PigLineEdit, PigComboBox, ColorListEditor
 from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
@@ -38,15 +38,9 @@ class EyeDC(QWidget):
         self.x_pos.installEventFilter(self)
         self.y_pos = PigLineEdit()
         self.y_pos.installEventFilter(self)
-        self.target_color = PigLineEdit()
+        self.target_color = ColorListEditor()
+        self.target_color.setCurrentText("128,128,128")
         self.target_style = PigComboBox()
-
-        self.x_pos.textChanged.connect(self.findVar)
-        self.y_pos.textChanged.connect(self.findVar)
-        self.target_color.textChanged.connect(self.findVar)
-        self.x_pos.returnPressed.connect(self.finalCheck)
-        self.y_pos.returnPressed.connect(self.finalCheck)
-        self.target_color.returnPressed.connect(self.finalCheck)
 
         self.show_display_with_drift_correction_target = QCheckBox("Show Display With Drift-Correction Target")
         self.show_display_with_drift_correction_target.stateChanged.connect(self.statueChanged)
@@ -88,7 +82,6 @@ class EyeDC(QWidget):
         self.tip2.setStyleSheet("border-width:0; border-style:outset; background-color: transparent;")
         self.tip2.setText("Perform drift correction")
         # self.tip2.setFocusPolicy(Qt.NoFocus)
-        self.target_color.setText("128,128,128")
         self.target_style.addItems(
             ["default", "large filled", "small filled", "large open", "small open", "large cross", "small cross"])
         self.target_color.setEnabled(False)
@@ -225,7 +218,7 @@ class EyeDC(QWidget):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
         self.x_pos.setCompleter(QCompleter(self.attributes))
         self.y_pos.setCompleter(QCompleter(self.attributes))
-        self.target_color.setCompleter(QCompleter(self.attributes))
+        # self.target_color.setCompleter(QCompleter(self.attributes))
 
     # 返回当前选择attributes
     def getUsingAttributes(self):
@@ -245,7 +238,7 @@ class EyeDC(QWidget):
         self.default_properties.clear()
         self.default_properties["X position"] = self.x_pos.text()
         self.default_properties["Y position"] = self.y_pos.text()
-        self.default_properties["Target color"] = self.target_color.text()
+        self.default_properties["Target color"] = self.target_color.getColor()
         self.default_properties["Target style"] = self.target_style.currentText()
         self.default_properties[
             "Show display with drift correction"] = self.show_display_with_drift_correction_target.checkState()
@@ -272,7 +265,7 @@ class EyeDC(QWidget):
     def loadSetting(self):
         self.x_pos.setText(self.default_properties["X position"])
         self.y_pos.setText(self.default_properties["Y position"])
-        self.target_color.setText(self.default_properties["Target color"])
+        self.target_color.setCurrentText(self.default_properties["Target color"])
         self.target_style.setCurrentText(self.default_properties["Target style"])
         self.show_display_with_drift_correction_target.setCheckState(
             self.default_properties["Show display with drift correction"])

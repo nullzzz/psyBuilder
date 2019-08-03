@@ -349,6 +349,13 @@ class Func(object):
         :return:
         """
         attributes = {"subName": 0, "subNum": 0, "sessionNum": 0, "subSex": 0, "subHandness": 0, "subAge": 0}
+
+        # 添加quest设备全局参数
+        for k, v in Info.QUEST_INFO.items():
+            v: dict
+            quest_name = v.get("Quest Name")
+            attributes[quest_name] = ""
+
         node = Info.WID_NODE[widget_id]
         node_parent = node.parent()
         # 得到到第0层一共多少层

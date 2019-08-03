@@ -24,8 +24,7 @@ class Close(QWidget):
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
 
-        self.pause_between_msg = PigLineEdit()
-
+        self.pause_between_msg = PigLineEdit("1")
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
@@ -33,7 +32,7 @@ class Close(QWidget):
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.default_properties = {
-            "Pause between messages": "0",
+            "Pause between messages": "1",
             "Automatically log all variables": 0,
             "Used attributes": [],
             "Not used attributes": [],

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QPushButton, QLineEdi
     QGridLayout, QCompleter
 
 from app.func import Func
-from app.lib import PigComboBox, PigLineEdit
+from app.lib import PigComboBox, PigLineEdit, ColorListEditor
 from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
@@ -34,9 +34,9 @@ class EyeCalibrate(QWidget):
 
         self.calibration_type = PigComboBox()
         self.calibration_beep = PigComboBox()
-        self.target_color = PigLineEdit()
-        self.target_color.textChanged.connect(self.findVar)
-        self.target_color.returnPressed.connect(self.finalCheck)
+        self.target_color = ColorListEditor()
+        self.target_color.setCurrentText("gray")
+
         self.target_style = PigComboBox()
 
         self.using_tracker_id: str = ""
@@ -73,7 +73,6 @@ class EyeCalibrate(QWidget):
         self.tip2.setText("Calibration")
         self.calibration_type.addItems(["HV9", "HV13", "HV5", "HV3"])
         self.calibration_beep.addItems(["Yes", "No"])
-        self.target_color.setText("(foreground)")
         self.target_style.addItems(
             ["default", "large filled", "small filled", "large open", "small open", "large cross", "small cross"])
 
@@ -184,7 +183,7 @@ class EyeCalibrate(QWidget):
 
     def setAttributes(self, attributes):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
-        self.target_color.setCompleter(QCompleter(self.attributes))
+        # self.target_color.setCompleter(QCompleter(self.attributes))
 
     # 返回当前选择attributes
     def getUsingAttributes(self):
@@ -204,7 +203,7 @@ class EyeCalibrate(QWidget):
         self.default_properties.clear()
         self.default_properties["Calibration type"] = self.calibration_type.currentText()
         self.default_properties["Calibration beep"] = self.calibration_beep.currentText()
-        self.default_properties["Target color"] = self.target_color.text()
+        self.default_properties["Target color"] = self.target_color.getColor()
         self.default_properties["Target style"] = self.target_style.currentText()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
         self.default_properties["Screen Name"] = self.screen.currentText()
@@ -228,7 +227,7 @@ class EyeCalibrate(QWidget):
     def loadSetting(self):
         self.calibration_type.setCurrentText(self.default_properties["Calibration type"])
         self.calibration_beep.setCurrentText(self.default_properties["Calibration beep"])
-        self.target_color.setText(self.default_properties["Target color"])
+        self.target_color.setCurrentText(self.default_properties["Target color"])
         self.target_style.setCurrentText(self.default_properties["Target style"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
         self.screen.setCurrentText(self.default_properties["Screen Name"])
