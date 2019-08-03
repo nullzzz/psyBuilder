@@ -4,8 +4,8 @@ import sys
 import traceback
 
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
-from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QShortcut
+from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QShortcut, QLabel, QGridLayout,QVBoxLayout , QPushButton, QWidget
 
 from app.attributes.main import Attributes
 from app.center.main import Center
@@ -562,10 +562,69 @@ class PsyApplication(QMainWindow):
                 Info.IS_REGISTER = "yes"
             except Exception:
                 QMessageBox.about(self, "Registry", "Registry Failed!")
+    def aboutWidget_ok(self):
+        self.aboutWidget.close()
 
     def about(self):
-        QMessageBox.about(self, "About PTB Builder 0.1",
-                          "A free GUI to generate experimental codes for PTB\nDepartment of Psychology,Soochow University ")
+
+        self.aboutWidget = QWidget()
+        self.aboutWidget.setWindowTitle("About Authors")
+        self.aboutWidget.setWindowModality(2)
+        self.aboutWidget.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.aboutWidget.setWindowFlags(Qt.Window|Qt.WindowCloseButtonHint)
+
+        self.aboutWidget.setAutoFillBackground(True)
+        p = self.palette()
+        p.setColor(QPalette.Background, Qt.white)
+        self.aboutWidget.setPalette(p)
+
+        img00 = QLabel(self)
+        lab01 = QLabel(self)
+
+        img10 = QLabel(self)
+        lab11 = QLabel(self)
+
+        self.closeButton = QPushButton("&Ok")
+        self.closeButton.clicked.connect(self.aboutWidget_ok)
+
+        img00.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
+        lab01.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
+        img10.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
+        lab11.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
+
+        lab01.setText("Personal info")
+        lab11.setText("Personal info")
+        img00.setPixmap(QPixmap(Func.getImage("authorInfoO1.png")))
+        img10.setPixmap(QPixmap(Func.getImage("authorInfoO1.png")))
+
+        layout1 = QGridLayout()
+        layout1.addWidget(img00,0,0)
+        layout1.addWidget(lab01,0,1)
+        layout1.addWidget(img10,1,0)
+        layout1.addWidget(lab11,1,1)
+
+        layout2 = QVBoxLayout()
+        layout2.addWidget(self.closeButton)
+        layout2.setAlignment(Qt.AlignVCenter|Qt.AlignRight)
+
+        layout = QVBoxLayout()
+        layout.addLayout(layout1)
+        layout.addStretch(10)
+        layout.addLayout(layout2)
+
+        self.aboutWidget.setLayout(layout)
+        self.aboutWidget.setMinimumWidth(400)
+        self.aboutWidget.show()
+
+        # self.gridGroupBox.setLayout(aboutUsBox)
+        # self.gridGroupBox.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        # self.gridGroupBox.setWindowTitle("About the authors")
+        # self.gridGroupBox.setWindowModality(2)
+        #
+        # self.gridGroupBox.show()
+
+        # QMessageBox.about(self, "About PTB Builder 0.1",
+        #                   "A free GUI to generate experimental codes for PTB\nDepartment of Psychology,Soochow University ")
 
     def checkUpdate(self):
         self.bar = LoadingTip()
