@@ -354,7 +354,7 @@ class Func(object):
         for k, v in Info.QUEST_INFO.items():
             v: dict
             quest_name = v.get("Quest Name")
-            attributes[quest_name] = ""
+            attributes[f"{quest_name}.cValue"] = ""
 
         node = Info.WID_NODE[widget_id]
         node_parent = node.parent()
