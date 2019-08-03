@@ -5,7 +5,8 @@ import traceback
 
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
 from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QShortcut, QLabel, QGridLayout,QVBoxLayout , QPushButton, QWidget
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QShortcut, QLabel, QGridLayout, \
+    QVBoxLayout, QPushButton, QWidget, QLineEdit
 
 from app.attributes.main import Attributes
 from app.center.main import Center
@@ -584,8 +585,11 @@ class PsyApplication(QMainWindow):
         img10 = QLabel(self)
         lab11 = QLabel(self)
 
-        self.closeButton = QPushButton("&Ok")
-        self.closeButton.clicked.connect(self.aboutWidget_ok)
+        closeButton = QPushButton('&Ok')
+
+
+        closeButton.clicked.connect(self.aboutWidget_ok)
+        closeButton.setAutoDefault(True)
 
         img00.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
         lab01.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
@@ -594,8 +598,8 @@ class PsyApplication(QMainWindow):
 
         lab01.setText("Personal info")
         lab11.setText("Personal info")
-        img00.setPixmap(QPixmap(Func.getImage("authorInfoO1.png")))
-        img10.setPixmap(QPixmap(Func.getImage("authorInfoO1.png")))
+        img00.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))
+        img10.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))
 
         layout1 = QGridLayout()
         layout1.addWidget(img00,0,0)
@@ -604,7 +608,7 @@ class PsyApplication(QMainWindow):
         layout1.addWidget(lab11,1,1)
 
         layout2 = QVBoxLayout()
-        layout2.addWidget(self.closeButton)
+        layout2.addWidget(closeButton)
         layout2.setAlignment(Qt.AlignVCenter|Qt.AlignRight)
 
         layout = QVBoxLayout()
