@@ -569,7 +569,7 @@ class PsyApplication(QMainWindow):
     def about(self):
 
         self.aboutWidget = QWidget()
-        self.aboutWidget.setWindowTitle("About Authors")
+        self.aboutWidget.setWindowTitle("About developers of PTB Builder 0.1")
         self.aboutWidget.setWindowModality(2)
         self.aboutWidget.setWindowIcon(QIcon(Func.getImage("icon.png")))
         self.aboutWidget.setWindowFlags(Qt.Window|Qt.WindowCloseButtonHint)
