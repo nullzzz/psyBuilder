@@ -899,8 +899,14 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     else:
 
         preCScreenFlipTimeStr = historyPropDict[f"{cScreenName}_lastFlipTimeVar"]
-        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n", Func.getWidgetName(cWidget.widget_id),
-                     cOpRowIdxStr, cWinStr,f"cDurs({cWinIdx}) + {preCScreenFlipTimeStr}", clearAfter)
+        printAutoInd(f, f"if cDurs({cWinIdx}) > 0")
+        printAutoInd(f, f"cScrFlipTime = cDurs({cWinIdx}) + {preCScreenFlipTimeStr};")
+        printAutoInd(f, "else ")
+        printAutoInd(f, "cScrFlipTime = 0;")
+        printAutoInd(f, "end ")
+
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3});\n", Func.getWidgetName(cWidget.widget_id),
+                     cOpRowIdxStr, cWinStr, clearAfter)
 
     historyPropDict.update({f"{cScreenName}_lastFlipTimeVar":f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
 
@@ -950,12 +956,9 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
 
 
-    # printAutoInd(f,"cDurs({cWinIdx}) = getDurValue([{0}],{1});",durStr,f"winIFIs({cWinIdx})")
-
-
 
     # -------------------------------------------------------------
-    #  we need to dummily draw stim for the next widget
+    #  we need to dummy draw stim for the next widget
     # so here after we will print any code into delayedPrintCodes
     # -------------------------------------------------------------
 
@@ -965,6 +968,7 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # after drawing the next widget's stimuli, get the duration first
     durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
     durStr = parseDurationStr(durStr)
+
     cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
 
 
@@ -1721,9 +1725,12 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "% subfun 5: getDurValue")
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "function cDur = getDurValue(cDur,cIFI)")
-        printAutoInd(f, "cDur = cDur./1000; % transform the unit from millsecond to second")
+        printAutoInd(f, "if cDur == 0")
+        printAutoInd(f, "return;")
+        printAutoInd(f, "end")
+        printAutoInd(f, "cDur = cDur./1000; % transform the unit from ms to sec")
         printAutoInd(f, "if numel(cDur) > 1")
-        printAutoInd(f, "cDur = Randi(cDur(2) - cDur(1))+cDur(1);")
+        printAutoInd(f, "cDur = Randi(cDur(2) - cDur(1)) + cDur(1);")
         printAutoInd(f, "end ")
         printAutoInd(f, "cDur = (round(cDur/cIFI) -0.5)*cIFI;")
         printAutoInd(f, "end %  end of subfun5")
