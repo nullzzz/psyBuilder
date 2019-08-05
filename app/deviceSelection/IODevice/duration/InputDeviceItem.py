@@ -103,6 +103,9 @@ class DeviceInItem(QListWidgetItem):
     def changeOutput(self, output_device_name: str):
         self.output_device = output_device_name
 
+    def getType(self):
+        return self.device_type
+
     def getValue(self):
         return self.device_name, self.allowable, self.correct, self.rt_window, self.end_action
 
