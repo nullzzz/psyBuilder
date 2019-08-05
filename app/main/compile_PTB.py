@@ -1279,10 +1279,10 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         # get output devices, such as global output devices.
         # you can get each widget's device you selected
-        output_devices = Info.OUTPUT_DEVICE_INFO
-        input_devices = Info.INPUT_DEVICE_INFO
+        output_devices     = Info.OUTPUT_DEVICE_INFO
+        input_devices      = Info.INPUT_DEVICE_INFO
         eyetracker_devices = Info.TRACKER_INFO
-        quest_devices = Info.QUEST_INFO
+        quest_devices      = Info.QUEST_INFO
 
         print(f"eyetracker: {eyetracker_devices}")
         print(f"quest: {quest_devices}")
@@ -1290,6 +1290,50 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         debugPrint('-------------/')
         debugPrint(output_devices)
         debugPrint('-------------\\\n')
+
+        iQuest = 1
+        if len(quest_devices) > 0:
+            printAutoInd(f, "%------- initialize Quests ----------/")
+
+            for quest in quest_devices.values():
+                outputDevNameIdxDict.update({f"{quest['Quest Type']}:{quest['Quest Name']}": f"{iQuest}"})
+
+                printAutoInd(f, "quest({0}) = QuestCreate({1},{2},{3},{4},{5},{6});",
+                             iQuest,
+                             quest['Estimated threshold'],
+                             quest['Std dev'],
+                             quest['Desired proportion'],
+                             quest['Steepness'],
+                             quest['Proportion'],
+                             quest['Chance level'])
+
+                if quest['Is log10 transform'] == 'yes':
+                    printAutoInd(f, "quest({0}).isLog10Trans     = True;", iQuest)
+                else:
+                    printAutoInd(f, "quest({0}).isLog10Trans     = False;", iQuest)
+
+                printAutoInd(f, "quest({0}).maxStimIntensity = {1};", iQuest, quest['Maximum'])
+                printAutoInd(f, "quest({0}).minStimIntensity = {1};\n", iQuest, quest['Minimum'])
+
+                printAutoInd(f,"% get the first stimulus intensity")
+                if   quest['Method'] == 'quantile':
+                    printAutoInd(f,"quest({0}).cValue = QuestQuantile(quest({1}));",iQuest,iQuest)
+                elif quest['Method'] == 'mean':
+                    printAutoInd(f,"quest({0}).cValue = QuestMean(quest({1}));",iQuest,iQuest)
+                elif quest['Method'] == 'mode':
+                    printAutoInd(f,"quest({0}).cValue = QuestMode(quest({1}));",iQuest,iQuest)
+                else:
+                    throwCompileErrorInfo("quest method should be of {'quantile', 'mean', or 'mode'}!!")
+
+                #  intensity transform:
+                printAutoInd(f, "quest({0}) = questValueTrans(quest({1}));\n", iQuest, iQuest)
+
+                attributesSetDict.update({f"{quest['Quest Name']}.cValue":[0,f"quest({iQuest}).cValue",{f"quest({iQuest}).cValue"}]})
+
+                iQuest += 1
+            printAutoInd(f, "%------------------------------------\\")
+
+
         printAutoInd(f, "%------ define input devices --------/")
         iKeyboard = 1
         iGamepad  = 1
@@ -1324,7 +1368,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         iSerial  = 1
         iSound   = 1
 
-        debugPrint(output_devices)
+        # debugPrint(output_devices)
 
         for outDev_Id, cDevice in output_devices.items():
 
@@ -1683,6 +1727,26 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "end ")
         printAutoInd(f, "cDur = (round(cDur/cIFI) -0.5)*cIFI;")
         printAutoInd(f, "end %  end of subfun5")
+
+        iSubFunNum = 6
+
+        if iQuest > 1:
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "% subfun {0}: questValueTrans",iSubFunNum)
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "function quest = questValueTrans(quest)")
+            printAutoInd(f, "if quest.isLog10Trans")
+            printAutoInd(f, "quest.cValue = 10^quest.cValue;")
+            printAutoInd(f, "end ")
+            printAutoInd(f, "quest.cValue = max(quest.cValue,quest.minValue);")
+            printAutoInd(f, "quest.cValue = min(quest.cValue,quest.maxValue);")
+            printAutoInd(f, "end %  end of subfun{0}",iSubFunNum)
+
+        iSubFunNum += 1
+
+
+
+
 
     if not isDummyPrint:
         Func.log(f"Compile successful!:{compile_file_name}")  # print info to the output panel

@@ -242,7 +242,7 @@ class TextDisplay(QMainWindow):
         返回Screen Name
         :return:
         """
-        return self.pro_window.general.screen_name.currentText()
+        return self.pro_window.general.screen.currentText()
 
     def getBackColor(self) -> str:
         """
