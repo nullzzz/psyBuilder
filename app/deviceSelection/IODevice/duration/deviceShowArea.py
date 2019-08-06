@@ -106,7 +106,7 @@ class ShowArea(QListWidget):
         # 更新显示信息
         item = self.currentItem()
         if item is not None:
-            self.infoChanged.emit(item.getValue())
+            self.infoChanged.emit(item.getValue(), item.getType())
             if self.device_type == Info.INPUT_DEVICE:
                 self.respChanged.emit(item.getResp())
 

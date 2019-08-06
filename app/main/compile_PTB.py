@@ -49,7 +49,7 @@ def throwCompileErrorInfo(inputStr):
 
 
 def debugPrint(input):
-    isDebug = False
+    isDebug = True
 
     if isDebug:
         print(input)
@@ -925,12 +925,10 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     debugPrint(f"------------------------\\")
 
     output_device = cWidget.getOutputDevice()
-    debugPrint(f" b= {output_device}")
-
     if len(output_device) > 0:
         printAutoInd(f, "% send output trigger and msg:")
 
-    debugPrint(f"{cWidget.widget_id}: outputDevice:\n o ={output_device}")
+    debugPrint(f"{cWidget.widget_id}: outputDevice:\n o = {output_device}")
 
     for device, properties in output_device.items():
         msgValue = dataStrConvert(*getRefValue(cWidget, properties['Value or Msg'], attributesSetDict), True)

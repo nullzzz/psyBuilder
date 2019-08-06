@@ -19,7 +19,7 @@ class DurationPage(QWidget):
 
         self.attributes = []
         self.default_properties = {
-            "Duration": "(Infinite)",
+            "Duration": "1000",
             "Input devices": {},
             "Output devices": {}
         }
@@ -82,7 +82,7 @@ class DurationPage(QWidget):
     # 生成duration页面
     def setUI(self):
         group0 = QGroupBox()
-        self.duration.addItems(("(Infinite)", "100", "250", "500", "1000", "2000", "3000", "4000", "5000", "0~200"))
+        self.duration.addItems(("1000", "2000", "3000", "4000", "100~500","(Infinite)"))
         self.duration.setEditable(True)
 
         layout0 = QHBoxLayout()
