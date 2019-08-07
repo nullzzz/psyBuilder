@@ -488,6 +488,26 @@ def isContainCycleTL(widgetId) -> bool:
     return False
 
 
+def outPutTriggerCheck(cWidget) -> dict:
+    cOutPutDevices  = cWidget.getOutputDevice()
+    cInputDevices  = cWidget.getInputDevice()
+
+    respTriggerDevNames = set()
+    for cInputDevInfo in cInputDevices.key():
+        cRespTriggerDevName = cInputDevInfo['Output Device']
+        if isRefStr(cRespTriggerDevName):
+            throwCompileErrorInfo(f"'{cRespTriggerDevName}':The response trigger Device should NOT be a variable citation!")
+        respTriggerDevNames.update(cRespTriggerDevName)
+
+    shortPulseDurParallelsDict = dict()
+    for cOpDevInfo in cOutPutDevices.key():
+        if cOpDevInfo['Device Type'] == 'parallel_port':
+            if cOpDevInfo['Device Name'] in respTriggerDevNames:
+                shortPulseDurParallelsDict.update({cOpDevInfo['Device Id']:10})
+
+    return shortPulseDurParallelsDict # temp
+
+
 def parseAllowKeys(allowKeyStr):
     global enabledKBKeysList
 
@@ -928,7 +948,8 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     if len(output_device) > 0:
         printAutoInd(f, "% send output trigger and msg:")
 
-    debugPrint(f"{cWidget.widget_id}: outputDevice:\n o = {output_device}")
+    debugPrint(f"{cWidget.widget_id}: outputDevice:\n a = {output_device}")
+    debugPrint(f"b = {cWidget.getInputDevice()}")
 
     for device, properties in output_device.items():
         msgValue = dataStrConvert(*getRefValue(cWidget, properties['Value or Msg'], attributesSetDict), True)
@@ -969,6 +990,8 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
     cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
 
+    shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
+
 
 
     # debugPrint(f"{cWidget.widget_id}: cProperties:")
@@ -981,7 +1004,6 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         for cValue in cRespCodes:
             printAutoInd(f,cValue)
         cRespCodes = []
-
     #------------------------------------------
     # the last step: upload the delayed codes
     #------------------------------------------
@@ -1298,7 +1320,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
             printAutoInd(f, "%------- initialize Quests ----------/")
 
             for quest in quest_devices.values():
-                outputDevNameIdxDict.update({f"{quest['Quest Type']}:{quest['Quest Name']}": f"{iQuest}"})
+                outputDevNameIdxDict.update({f"{quest['Quest Type']}-{quest['Quest Name']}": f"{iQuest}"})
 
                 printAutoInd(f, "quest({0}) = QuestCreate({1},{2},{3},{4},{5},{6});",
                              iQuest,
