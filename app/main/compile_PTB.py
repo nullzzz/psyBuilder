@@ -994,8 +994,6 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
 
 
-    # debugPrint(f"{cWidget.widget_id}: cProperties:")
-    # debugPrint(f" a= {cProperties}")
 
     # to be continue ...
 
