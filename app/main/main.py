@@ -32,6 +32,8 @@ class PsyApplication(QMainWindow):
     def __init__(self, parent=None):
         super(PsyApplication, self).__init__(parent)
 
+        self.setAttribute(Qt.WA_QuitOnClose, True)
+
         # ui
         self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(QIcon(Func.getImage("icon.png")))
