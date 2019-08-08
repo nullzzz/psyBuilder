@@ -24,6 +24,7 @@ class InDeviceRespAtDuration(QWidget):
         self.ignore.textChanged.connect(lambda x: self.ignoreChanged.emit(x))
         self.resp_trigger_out = QComboBox()
         self.resp_trigger_out.currentTextChanged.connect(self.changeOutput)
+        self.resp_trigger_out.addItem("none")
 
         self.setUI()
 
@@ -52,12 +53,12 @@ class InDeviceRespAtDuration(QWidget):
         self.right.setCompleter(QCompleter(self.attributes))
         self.wrong.setCompleter(QCompleter(self.attributes))
         self.ignore.setCompleter(QCompleter(self.attributes))
-        # self.resp_trigger_out.setCompleter(QCompleter(self.attributes))
 
     def changeOutputDevice(self, output: dict):
         self.using_output_device.clear()
         self.using_output_device = output.copy()
         self.resp_trigger_out.clear()
+        self.resp_trigger_out.addItem("none")
         self.resp_trigger_out.addItems(output.values())
 
         if self.using_output_device.get(self.current_output_device_id):
@@ -70,6 +71,9 @@ class InDeviceRespAtDuration(QWidget):
             if current_name == v:
                 self.current_output_device_id = k
                 break
+        self.right.setEnabled(current_name != "none")
+        self.wrong.setEnabled(current_name != "none")
+        self.ignore.setEnabled(current_name != "none")
         self.outputChanged.emit(current_name)
 
 
@@ -125,5 +129,3 @@ class InDeviceInfoAtDuration(QWidget):
         self.attributes = attributes
         self.allowable.setCompleter(QCompleter(self.attributes))
         self.correct.setCompleter(QCompleter(self.attributes))
-        # self.RT_window.setCompleter(QCompleter(self.attributes))
-        # self.end_action.setCompleter(QCompleter(self.attributes))
