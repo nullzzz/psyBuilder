@@ -410,6 +410,9 @@ class DiagramItem(QGraphicsPolygonItem):
             "P3 Y": "0",
             "P4 X": "0",
             "P4 Y": "0",
+            "Point": [['0', '0'], ['0', '0'], ['0', '0']],# added by yang
+            "start": "0",
+            "end angle": "0",
             "Long axis": "0",
             "Short axis": "0",
             "Border color": "black",
@@ -447,7 +450,20 @@ class DiagramItem(QGraphicsPolygonItem):
             self.pro_window.cancel_bt.clicked.connect(self.cancel)
             self.pro_window.apply_bt.clicked.connect(self.apply)
         elif self.diagramType == self.Step:
-            path.addRect(QRectF(-100, -100, 200, 200))
+            # path.addRect(QRectF(-100, -100, 200, 200))
+            #------ added by yang to plot the triangle -----------------------------------------------/
+            nVertices = 3
+            verticesXY = []
+            for iVertex in range(nVertices):
+                verticesXY.append([int(100 * np.cos(np.pi / 2 - iVertex * 2 * np.pi / nVertices)),
+                                   int(100 * np.sin(iVertex * 2 * np.pi / nVertices - np.pi / 2))])
+                if iVertex == 0:
+                    path.moveTo(verticesXY[iVertex][0], verticesXY[iVertex][1])
+                else:
+                    path.lineTo(verticesXY[iVertex][0], verticesXY[iVertex][1])
+
+            path.lineTo(verticesXY[0][0], verticesXY[0][1])
+            # -----------------------------------------------------------------------------------------\
             self.myPolygon = path.toFillPolygon()
             self.pro_window = polygonProperty('four')
             self.pro_window.ok_bt.clicked.connect(self.ok)
@@ -575,6 +591,7 @@ class DiagramItem(QGraphicsPolygonItem):
     def mouseDoubleClickEvent(self, mouseEvent):
         if self.diagramType != self.Line:
             self.setProperties()
+
             self.pro_window.frame.setProperties(self.default_properties)
             self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
             self.setAttributes(self.attributes)
@@ -655,24 +672,39 @@ class DiagramItem(QGraphicsPolygonItem):
             self.mpolygon = path.toFillPolygon()
         else:
             path = QPainterPath()
-            x1 = int(self.pro_window.frame.default_properties["P1 X"]) - cx
-            y1 = int(self.pro_window.frame.default_properties["P1 Y"]) - cy
-            x2 = int(self.pro_window.frame.default_properties["P2 X"]) - cx
-            y2 = int(self.pro_window.frame.default_properties["P2 Y"]) - cy
-            x3 = int(self.pro_window.frame.default_properties["P3 X"]) - cx
-            y3 = int(self.pro_window.frame.default_properties["P3 Y"]) - cy
-            x4 = int(self.pro_window.frame.default_properties["P4 X"]) - cx
-            y4 = int(self.pro_window.frame.default_properties["P4 Y"]) - cy
+            # print(f"{self.pro_window.frame.default_properties}")
+
+            verticesXY = self.pro_window.frame.default_properties["Point"]
+
+            # added by yang to plot the m-polygon
+            for iVertex in range(len(verticesXY)):
+                if iVertex == 0:
+                    path.moveTo(int(verticesXY[iVertex][0]) - cx + dx, int(verticesXY[iVertex][1]) - cy + dy)
+                else:
+                    path.lineTo(int(verticesXY[iVertex][0]) - cx + dx, int(verticesXY[iVertex][1])  - cy + dy)
+            path.lineTo(int(verticesXY[0][0]) - cx + dx, int(verticesXY[0][1])  - cy + dy)
+
+
+            # x1 = int(self.pro_window.frame.default_properties["P1 X"]) - cx
+            # y1 = int(self.pro_window.frame.default_properties["P1 Y"]) - cy
+            # x2 = int(self.pro_window.frame.default_properties["P2 X"]) - cx
+            # y2 = int(self.pro_window.frame.default_properties["P2 Y"]) - cy
+            # x3 = int(self.pro_window.frame.default_properties["P3 X"]) - cx
+            # y3 = int(self.pro_window.frame.default_properties["P3 Y"]) - cy
+            # x4 = int(self.pro_window.frame.default_properties["P4 X"]) - cx
+            # y4 = int(self.pro_window.frame.default_properties["P4 Y"]) - cy
             # # mpolygon = QPolygonF([
             # #     QPointF(x1, y1), QPointF(x2, y2),
             # #     QPointF(x3, y3), QPointF(x4, y4),
             # #     QPointF(x1, y1)])
             # # path.addPolygon(mpolygon)
-            path.moveTo(x1 + dx, y1 + dy)
-            path.lineTo(x2 + dx, y2 + dy)
-            path.lineTo(x3 + dx, y3 + dy)
-            path.lineTo(x4 + dx, y4 + dy)
-            path.lineTo(x1 + dx, y1 + dy)
+            # path.moveTo(x1 + dx, y1 + dy)
+            # path.lineTo(x2 + dx, y2 + dy)
+            # path.lineTo(x3 + dx, y3 + dy)
+            # path.lineTo(x4 + dx, y4 + dy)
+            # path.lineTo(x1 + dx, y1 + dy)
+
+
             self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
                                int(self.pro_window.frame.default_properties["Center Y"])))
 
@@ -699,16 +731,30 @@ class DiagramItem(QGraphicsPolygonItem):
             else:
                 x = int(self.scenePos().x())
                 y = int(self.scenePos().y())
+                #"Point": [["0", "0"], ["0", "0"], ["0", "0"]]
+                print(f"slider Line 704: {len(self.polygon())}")
+                print(f"slider Line 704: {self.polygon()[0].x()}")
                 self.default_properties["Center X"] = str(int(self.scenePos().x()))
                 self.default_properties["Center Y"] = str(int(self.scenePos().y()))
-                self.default_properties["P1 X"] = str(int(self.polygon()[0].x()) + x)
-                self.default_properties["P1 Y"] = str(int(self.polygon()[0].y()) + y)
-                self.default_properties["P2 X"] = str(int(self.polygon()[1].x()) + x)
-                self.default_properties["P2 Y"] = str(int(self.polygon()[1].y()) + y)
-                self.default_properties["P3 X"] = str(int(self.polygon()[2].x()) + x)
-                self.default_properties["P3 Y"] = str(int(self.polygon()[2].y()) + y)
-                self.default_properties["P4 X"] = str(int(self.polygon()[3].x()) + x)
-                self.default_properties["P4 Y"] = str(int(self.polygon()[3].y()) + y)
+
+                verticesXY = []
+                for iVertex in range(len(self.polygon())-1):
+                    verticesXY.append([str(int(self.polygon()[iVertex].x()) + x),str(int(self.polygon()[iVertex].y()) + y)])
+                    # self.default_properties["Point"] = [[str(int(self.polygon()[0].x()) + x),str(int(self.polygon()[0].y()) + y)],
+                    #                                     [str(int(self.polygon()[1].x()) + x),str(int(self.polygon()[1].y()) + y)],
+                    #                                     [str(int(self.polygon()[2].x()) + x),str(int(self.polygon()[2].y()) + y)]]
+                print(f"line 746 : {verticesXY}")
+                self.default_properties["Point"] = verticesXY
+                self.default_properties["start"] = '0'
+                self.default_properties["end angle"] = '360'
+                # self.default_properties["P1 X"] = str(int(self.polygon()[0].x()) + x)
+                # self.default_properties["P1 Y"] =
+                # self.default_properties["P2 X"] = str(int(self.polygon()[1].x()) + x)
+                # self.default_properties["P2 Y"] = str(int(self.polygon()[1].y()) + y)
+                # self.default_properties["P3 X"] = str(int(self.polygon()[2].x()) + x)
+                # self.default_properties["P3 Y"] = str(int(self.polygon()[2].y()) + y)
+                # self.default_properties["P4 X"] = str(int(self.polygon()[3].x()) + x)
+                # self.default_properties["P4 Y"] = str(int(self.polygon()[3].y()) + y)
         self.default_properties["Border color"] = self.LineColor
         self.default_properties["Border width"] = str(self.LineWidth)
         self.default_properties["Fill color"] = self.ItemColor
@@ -1182,10 +1228,13 @@ class Slider(QMainWindow):
         self.buttonGroup.buttonPressed[int].connect(self.buttonGroupPressed)
 
         layout = QGridLayout()
-        layout.addWidget(self.createCellWidget("Conditional", DiagramItem.Conditional), 0, 0)
-        layout.addWidget(self.createCellWidget("Process", DiagramItem.Step), 1, 0)
-        layout.addWidget(self.createCellWidget("Circle", DiagramItem.Circle), 2, 0)
-        layout.addWidget(self.createCellWidget("Input/Output", DiagramItem.Io), 3, 0)
+        layout.addWidget(self.createCellWidget("Polygon", DiagramItem.Step), 0, 0)
+        layout.addWidget(self.createCellWidget("Circle", DiagramItem.Circle), 1, 0)
+        # layout.addWidget(self.createCellWidget("Polygon", DiagramItem.Conditional), 0, 0)
+        # layout.addWidget(self.createCellWidget("Conditional", DiagramItem.Conditional), 0, 0)
+        # layout.addWidget(self.createCellWidget("Polygon", DiagramItem.Step), 2, 0)
+        # layout.addWidget(self.createCellWidget("Circle", DiagramItem.Circle), 2, 0)
+        # layout.addWidget(self.createCellWidget("Input/Output", DiagramItem.Io), 3, 0)
 
         textButton = Button()
         self.buttonGroup.addButton(textButton, self.InsertTextButton)
@@ -1269,7 +1318,7 @@ class Slider(QMainWindow):
         self.toolBox = QToolBox()
         self.toolBox.setSizePolicy(QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Ignored))
         self.toolBox.setMinimumWidth(itemWidget.sizeHint().width())
-        self.toolBox.addItem(itemWidget, "Basic Flowchart Shapes")
+        self.toolBox.addItem(itemWidget, "Basic Geometries")
         self.toolBox.addItem(backgroundWidget, "Backgrounds")
 
     def createActions(self):

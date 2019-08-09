@@ -11,6 +11,7 @@ class FramePage(QWidget):
     def __init__(self, type, parent=None):
         super(FramePage, self).__init__(parent)
         self.attributes = []
+        self.plabels    = [] # added by yang
         self.type = type
         self.default_properties = {
             "Center X": "0",
@@ -22,6 +23,7 @@ class FramePage(QWidget):
             "Border width": '1',
             "Fill color": "white"
         }
+        # print(f"{self.default_properties}")
         # up
         self.cx_pos = PigComboBox()
         self.cy_pos = PigComboBox()
@@ -139,8 +141,9 @@ class FramePage(QWidget):
         #圆心
         x = int(self.default_properties["Center X"])
         y = int(self.default_properties["Center Y"])
+
         n = len(self.default_properties["Point"])
-        for i in range(len(self.default_properties["Point"])):
+        for i in range(n):
             try:
                 self.default_properties["Point"][i][0] = str(x + int(100 * np.cos(np.pi/2 - i*2*np.pi/n)))
                 self.default_properties["Point"][i][1] = str(y + int(100 * np.sin(i * 2 * np.pi / n - np.pi / 2)))
@@ -161,7 +164,7 @@ class FramePage(QWidget):
         self.playout.addWidget(labely, len(self.pinfo)+1, 2)
         self.playout.addWidget(self.pinfo[-1][1], len(self.pinfo)+1, 3)
 
-        self.plabels = []
+        # self.plabels = [] # a bug here
         self.plabels.append([labelx, labely])
         self.del_bt.setEnabled(True)
 
@@ -352,15 +355,19 @@ class FramePage(QWidget):
         # self.default_properties['P3 Y'] = self.p3y_pos.currentText()
         # self.default_properties['P4 X'] = self.p4x_pos.currentText()
         # self.default_properties['P4 Y'] = self.p4y_pos.currentText()
-        for i in range(len(self.default_properties["Point"])):
-            self.default_properties["Point"][i][0] = self.pinfo[i][0].currentText()
-            self.default_properties["Point"][i][1] = self.pinfo[i][1].currentText()
+        # print(f"pinfo:{len(self.pinfo)}")
+        # print(f"depro:{self.default_properties['Point']}")
+        for iVertex in range(len(self.pinfo)):
+            # print(f"{iVertex}:{self.pinfo[iVertex][0].currentText()}")
+            # print(f"{self.default_properties['Point'][iVertex][0]}")
+            self.default_properties["Point"][iVertex][0] = self.pinfo[iVertex][0].currentText()
+            self.default_properties["Point"][iVertex][1] = self.pinfo[iVertex][1].currentText()
 
-        self.default_properties['start'] = self.La.currentText()
-        self.default_properties['end angle'] = self.Sa.currentText()
+        self.default_properties['start']        = self.La.currentText()
+        self.default_properties['end angle']    = self.Sa.currentText()
         self.default_properties['Border width'] = str(self.border_width.value())
         self.default_properties['Border color'] = self.border_color.currentText()
-        self.default_properties['Fill color'] = self.item_color.currentText()
+        self.default_properties['Fill color']   = self.item_color.currentText()
 
         return self.default_properties
 
@@ -384,6 +391,8 @@ class FramePage(QWidget):
         # self.p3y_pos.setCurrentText(self.default_properties["P3 Y"])
         # self.p4x_pos.setCurrentText(self.default_properties["P4 X"])
         # self.p4y_pos.setCurrentText(self.default_properties["P4 Y"])
+        # print(f"{self.pinfo}")
+        print(f"slider 389: {self.default_properties['Point']}")
         for i in range(len(self.pinfo)):
             self.pinfo[i][0].setCurrentText(self.default_properties["Point"][i][0])
             self.pinfo[i][1].setCurrentText(self.default_properties["Point"][i][1])
@@ -423,6 +432,7 @@ class polygonProperty(QWidget):
 
         self.frame = FramePage(type)
         self.default_properties = {**self.frame.default_properties}
+        # print(f"line 429 {self.default_properties}")
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
