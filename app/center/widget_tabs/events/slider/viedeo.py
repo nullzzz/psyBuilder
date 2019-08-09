@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout)
 from PyQt5.QtWidgets import QWidget
 
-from app.center.widget_tabs.events.video.videoGeneral import VideoTab1
+from .videoG import VideoTab1
 
 
 class VideoProperty(QWidget):

@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBo
 
 from app.center.widget_tabs.events.durationPage import DurationPage
 from app.center.widget_tabs.events.slider.general import SliderTab1
+from app.center.widget_tabs.events.framePage import FramePage
 
 
 class SliderProperty(QWidget):
@@ -12,11 +13,13 @@ class SliderProperty(QWidget):
 
         self.general = SliderTab1()
         self.duration = DurationPage()
+        self.frame = FramePage()
 
         self.tab.addTab(self.general, "General")
         self.tab.addTab(self.duration, "Duration")
+        self.tab.addTab(self.frame, "Frame")
 
-        self.default_properties = {**self.general.getProperties(), **self.duration.default_properties}
+        self.default_properties = {**self.general.getProperties(), **self.duration.default_properties, **self.frame.default_properties}
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
@@ -49,12 +52,14 @@ class SliderProperty(QWidget):
 
     def getInfo(self):
         # 无frame
-        self.default_properties = {**self.duration.getInfo()}
+        self.default_properties = {**self.duration.getInfo(),**self.frame.getInfo(),**self.general.getInfo()}
         return self.default_properties
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
         self.duration.setAttributes(attributes)
+        self.frame.setAttributes(attributes)
+
 
     def setProperties(self, properties: dict):
         self.default_properties = properties
@@ -63,6 +68,7 @@ class SliderProperty(QWidget):
     def loadSetting(self):
         self.general.setProperties(self.default_properties)
         self.duration.setProperties(self.default_properties)
+        self.frame.setProperties(self.default_properties)
 
     def clone(self):
         properties = self.getInfo()

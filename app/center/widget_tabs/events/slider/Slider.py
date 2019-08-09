@@ -5,7 +5,7 @@ from PyQt5.QtGui import (QBrush, QColor, QFont, QIcon, QIntValidator, QPainter,
 from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QGraphicsItem,
                              QGraphicsLineItem, QGraphicsPolygonItem,
                              QGraphicsScene, QGraphicsTextItem, QGraphicsView, QGridLayout, QGraphicsPixmapItem,
-                             QHBoxLayout, QLabel, QMainWindow, QMenu, QSizePolicy, QToolBox, QToolButton,
+                             QHBoxLayout, QLabel, QMainWindow, QMenu, QMessageBox, QSizePolicy, QToolBox, QToolButton,
                              QWidget, QPushButton, QColorDialog)
 
 from app.center.widget_tabs.events.slider.SliderProperty import SliderProperty
@@ -16,9 +16,10 @@ from app.center.widget_tabs.events.slider.polygonitem import polygonProperty
 from app.center.widget_tabs.events.slider.snow import snowProperty
 from app.center.widget_tabs.events.slider.sound import SoundProperty
 from app.center.widget_tabs.events.slider.viedeo import VideoProperty
+from .text import TextTab2
 from app.func import Func
 from lib.psy_message_box import PsyMessageBox as QMessageBox
-
+import numpy as np
 
 class Button(QPushButton):
     def __init__(self):
@@ -1161,6 +1162,8 @@ class Slider(QMainWindow):
         except KeyError as e:
             # condition下的slider在这里出错
             pass
+        screen_devices = Func.getScreen()
+        self.pro_window.general.setScreen(screen_devices)
 
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
