@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QPushButton, QVBoxLayout, \
     QHBoxLayout, QDesktopWidget
 
-from app.center.widget_tabs.events.image.imageGeneral import ImageTab1
+from .imageG import ImageTab1
 
 
 class ImageProperty(QWidget):
