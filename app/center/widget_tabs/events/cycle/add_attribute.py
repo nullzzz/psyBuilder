@@ -1,5 +1,9 @@
+import re
+
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton
+
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class AddAttributeDialog(QDialog):
@@ -40,7 +44,7 @@ class AddAttributeDialog(QDialog):
     def ok(self):
         attribute = self.attribute.text()
         value = self.value.text()
-        if not attribute or not attribute[0].isalpha():
+        if not attribute or not re.match(r"^[a-zA-Z][a-zA-Z_0-9]*$", attribute):
             QMessageBox.information(self, 'Warning', 'Invalid attribute name.')
         elif attribute in self.attribute_exist or attribute in ['Weight', 'Timeline']:
             QMessageBox.information(self, 'Warning', 'Attribute has already existed.')

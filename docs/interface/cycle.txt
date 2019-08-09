@@ -12,6 +12,8 @@ cycle.getAttributes(row: int) -> dict: 按行索引返回该行的数据的一�
                                              格式为{ attribute_name : attribute_value }
                                              如果属性值未填写则为 ''
 
+cycle.getAttributeValues(col: int) -> list: 通过输入的列索引，返回该列对应的attribute的所有value的一个列表
+
 cycle.getOrder() -> str: 得到设置界面中order的值
 
 cycle.getNoRepeatAfter() -> str: 如上类推

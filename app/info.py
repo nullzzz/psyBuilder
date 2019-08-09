@@ -7,6 +7,8 @@ class Info(object):
     """
     info类，主要存放一些配置信息及数据
     """
+    # 编译平台：linux\windows\mac
+    PLATFORM: str = "linux"
 
     # 保存widget_tabs的 (widget_id -> widget)
     WID_WIDGET = {}
@@ -19,6 +21,8 @@ class Info(object):
     NAME_WID: dict = {}
 
     # 输入输出设备
+    QUEST_INFO: dict = {}
+    TRACKER_INFO: dict = {}
     INPUT_DEVICE_INFO: dict = {}
     OUTPUT_DEVICE_INFO: dict = {}
     INPUT_DEVICE = 0
@@ -41,6 +45,10 @@ class Info(object):
     CONFIG = QSettings("./operation.ini", QSettings.IniFormat)
     FILE_DIRECTORY: str = CONFIG.value("directory")
     IS_REGISTER: str = CONFIG.value("register")
+
+    # 限制输入的正则表达式
+    RE_NUMBER = r"\[\w+\]|\d+"
+    RE_FLOAT = r"\[\w+\]|\d+\.\d+"
 
     # 区分不同的添加情况
     WidgetAdd = 0
@@ -67,13 +75,19 @@ class Info(object):
     ACTION = "Action"
     STARTR = "StartR"
     ENDR = "EndR"
-    CLOSE = "Close"
+    Log = "Log"
     QUEST_INIT = "QuestInit"
     QUEST_UPDATE = "QuestUpdate"
     QUEST_GET_VALUE = "QuestGetValue"
     IF = "If"
     SWITCH = "Switch"
     TIMELINE = "Timeline"
+
+    DEV_NETWORK_PORT  = "network_port"
+    DEV_SCREEN        = "screen"
+    DEV_PARALLEL_PORT = "parallel_port"
+    DEV_SERIAL_PORT   = "serial_port"
+    DEV_SOUND         = "sound"
 
     # 图片保存路径
     IMAGE_SOURCE_PATH = "image"
@@ -91,7 +105,7 @@ class Info(object):
         ACTION: os.path.join(IMAGE_SOURCE_PATH, "action_eye.png"),
         STARTR: os.path.join(IMAGE_SOURCE_PATH, "start_eye.png"),
         ENDR: os.path.join(IMAGE_SOURCE_PATH, "end_eye.png"),
-        CLOSE: os.path.join(IMAGE_SOURCE_PATH, "close_eye.png"),
+        Log: os.path.join(IMAGE_SOURCE_PATH, "close_eye.png"),
         QUEST_INIT: os.path.join(IMAGE_SOURCE_PATH, "start_quest.png"),
         QUEST_UPDATE: os.path.join(IMAGE_SOURCE_PATH, "update_quest.png"),
         QUEST_GET_VALUE: os.path.join(IMAGE_SOURCE_PATH, "get_value.png"),
@@ -114,7 +128,7 @@ class Info(object):
         ACTION: 0,
         STARTR: 0,
         ENDR: 0,
-        CLOSE: 0,
+        Log: 0,
         QUEST_INIT: 0,
         QUEST_UPDATE: 0,
         QUEST_GET_VALUE: 0,
@@ -137,7 +151,7 @@ class Info(object):
         ACTION: 0,
         STARTR: 0,
         ENDR: 0,
-        CLOSE: 0,
+        Log: 0,
         QUEST_INIT: 0,
         QUEST_UPDATE: 0,
         QUEST_GET_VALUE: 0,

@@ -1,8 +1,9 @@
 from PyQt5.QtCore import QRegExp, Qt, QObject, QEvent, pyqtSignal
 from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QMessageBox, QCompleter
+from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QCompleter
 
 from app.lib import PigLineEdit, PigComboBox
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class OutDeviceInfoAtDuration(QWidget):
@@ -21,7 +22,7 @@ class OutDeviceInfoAtDuration(QWidget):
         self.pulse_dur.setInsertPolicy(QComboBox.NoInsert)
         self.pulse_dur.addItems(["End of Duration", "10", "20", "30", "40", "50"])
 
-        valid_num = QRegExp("\[\w+\]|\d+|End of Duration")
+        valid_num = QRegExp(r"\[\w+\]|\d+|End of Duration")
         self.pulse_dur.setValidator(QRegExpValidator(valid_num))
         self.pulse_dur.lineEdit().textChanged.connect(lambda x: self.pulseDurationChanged.emit(x))
 
@@ -40,9 +41,10 @@ class OutDeviceInfoAtDuration(QWidget):
         layout.setContentsMargins(10, 20, 10, 0)
         self.setLayout(layout)
 
-    def showInfo(self, value: tuple):
+    def showInfo(self, value: tuple, device_type):
         v, p = value
         self.value.setText(v)
+        self.pulse_dur.setEnabled(device_type == "parallel_port")
         self.pulse_dur.setCurrentText(p)
 
     def setAttributes(self, attributes):

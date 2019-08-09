@@ -1,26 +1,29 @@
 import os
 import re
 import sys
-# import datetime
 import traceback
 
 from PyQt5.QtCore import Qt, QSettings, QTimer, QPropertyAnimation
-from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMessageBox, QShortcut
+from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QShortcut, QLabel, QGridLayout, \
+    QVBoxLayout, QPushButton, QWidget, QLineEdit
 
 from app.attributes.main import Attributes
 from app.center.main import Center
 from app.center.widget_tabs.events.cycle.main import Cycle
 from app.center.widget_tabs.events.durationPage import DurationPage
 from app.center.widget_tabs.timeline.main import Timeline
-from app.deviceSelection.globalSelection.globalDevices import GlobalDevice
+from app.deviceSelection.IODevice.globalDevices import GlobalDevice
 from app.deviceSelection.progressBar import LoadingTip
+from app.deviceSelection.quest.questinit import QuestInit
+from app.deviceSelection.tracker.trackerinit import TrackerInit
 from app.func import Func
 from app.info import Info
-from app.init import writeToRegistry
 from app.output.main import Output
 from app.properties.main import Properties
+from app.registry import writeToRegistry
 from app.structure.main import Structure
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from lib.wait_dialog import WaitDialog
 from .compile_PTB import compilePTB
 
@@ -28,6 +31,8 @@ from .compile_PTB import compilePTB
 class PsyApplication(QMainWindow):
     def __init__(self, parent=None):
         super(PsyApplication, self).__init__(parent)
+
+        self.setAttribute(Qt.WA_QuitOnClose, True)
 
         # ui
         self.setWindowTitle("Psy Builder 0.1")
@@ -96,25 +101,55 @@ class PsyApplication(QMainWindow):
         self.output_devices = GlobalDevice(io_type=Info.OUTPUT_DEVICE)
         self.output_devices.setWindowModality(Qt.ApplicationModal)
         self.output_devices.ok()
+        self.quest_init = QuestInit()
+        self.quest_init.setWindowModality(Qt.ApplicationModal)
+        self.tracker_init = TrackerInit()
+        self.tracker_init.setWindowModality(Qt.ApplicationModal)
 
-        self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
-        self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
+        # self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
+        # self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
         devices_menu = menu_bar.addMenu("&Devices")
 
         output_devices_action = QAction("&Output Devices", self)
         input_devices_action = QAction("&Input Devices", self)
         output_devices_action.triggered.connect(lambda: self.showDevices(1))
         input_devices_action.triggered.connect(lambda: self.showDevices(0))
+        quest_init_action = QAction("&Quest", self)
+        quest_init_action.triggered.connect(self.quest_init.show)
+        tracker_init_action = QAction("&Tracker", self)
+        tracker_init_action.triggered.connect(self.tracker_init.show)
 
         devices_menu.addAction(output_devices_action)
         devices_menu.addAction(input_devices_action)
+        devices_menu.addAction(quest_init_action)
+        devices_menu.addAction(tracker_init_action)
 
         # build menu
         build_menu = menu_bar.addMenu("&Building")
+        build_menu.addSection("what")
+
+        platform_menu = build_menu.addMenu("&Platform")
+        self.linux_action = QAction("&Linux", self)
+        self.linux_action.setChecked(True)
+        self.windows_action = QAction("&Windows", self)
+        self.mac_action = QAction("&Mac", self)
+        icon = QIcon(Func.getImage("dock_visible.png"))
+        self.linux_action.setIcon(icon)
+        self.windows_action.setIcon(icon)
+        self.windows_action.setIconVisibleInMenu(False)
+        self.mac_action.setIcon(icon)
+        self.mac_action.setIconVisibleInMenu(False)
+
+        self.linux_action.triggered.connect(self.changePlatform)
+        self.windows_action.triggered.connect(self.changePlatform)
+        self.mac_action.triggered.connect(self.changePlatform)
+        platform_menu.addAction(self.linux_action)
+        platform_menu.addAction(self.windows_action)
+        platform_menu.addAction(self.mac_action)
+
         compile_action = QAction("&Compile", self)
-
+        compile_action.setShortcut("Ctrl+F5")
         compile_action.triggered.connect(self.compile)
-
         build_menu.addAction(compile_action)
 
         # help menu
@@ -178,7 +213,9 @@ class PsyApplication(QMainWindow):
         self.linkSignals()
 
         # delete shortcut
-        self.delete_shortcut = QShortcut(QKeySequence("BackSpace"), self)
+        self.backspace_shortcut = QShortcut(QKeySequence("BackSpace"), self)
+        self.backspace_shortcut.activated.connect(self.handle_delete_shortcut)
+        self.delete_shortcut = QShortcut(QKeySequence("Delete"), self)
         self.delete_shortcut.activated.connect(self.handle_delete_shortcut)
 
         # save shortcut
@@ -186,9 +223,6 @@ class PsyApplication(QMainWindow):
         self.save_shortcut.activated.connect(self.save)
         self.save_as_shortcut = QShortcut(QKeySequence(QKeySequence.SaveAs), self)
         self.save_as_shortcut.activated.connect(self.saveAs)
-
-        # 导入配置
-        # Func.getConfig()
 
     def initialize(self):
         """
@@ -339,13 +373,27 @@ class PsyApplication(QMainWindow):
             input_device_info = setting.value("INPUT_DEVICE_INFO")
             if input_device_info:
                 self.input_devices.setProperties(input_device_info)
+            Info.INPUT_DEVICE_INFO = input_device_info
             output_device_info = setting.value("OUTPUT_DEVICE_INFO")
             if output_device_info:
                 self.output_devices.setProperties(output_device_info)
+            Info.OUTPUT_DEVICE_INFO = output_device_info
+            quest_info = setting.value("QUEST_INFO")
+            if quest_info:
+                self.quest_init.setProperties(quest_info)
+            Info.QUEST_INFO = quest_info
+            tracker_info = setting.value("TRACKER_INFO")
+            if tracker_info:
+                self.tracker_init.setProperties(tracker_info)
+            Info.TRACKER_INFO = tracker_info
             # 恢复布局
             dock_layout = setting.value("DOCK_LAYOUT")
             if dock_layout:
                 self.restoreState(dock_layout)
+
+            platform = setting.value("PLATFORM")
+            Info.PLATFORM = platform
+            self.changePlatform(platform)
 
             # 恢复widgets
             # 复原初始的Timeline
@@ -370,14 +418,17 @@ class PsyApplication(QMainWindow):
         # 导出输入设备信息
         input_device_info: dict = Info.INPUT_DEVICE_INFO.copy()
         output_device_info: dict = Info.OUTPUT_DEVICE_INFO.copy()
+        quest_info: dict = Info.QUEST_INFO.copy()
+        tracker_info: dict = Info.TRACKER_INFO.copy()
         # 当前布局信息
         current_dock_layout = self.saveState()
-        #
         name_wid = Info.NAME_WID.copy()
 
         setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
         setting.setValue("INPUT_DEVICE_INFO", input_device_info)
         setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
+        setting.setValue("QUEST_INFO", quest_info)
+        setting.setValue("TRACKER_INFO", tracker_info)
         setting.setValue("DOCK_LAYOUT", current_dock_layout)
         setting.setValue("NAME_WID", name_wid)
         setting.setValue("WIDGET_TYPE_NAME_COUNT", Info.WIDGET_TYPE_NAME_COUNT.copy())
@@ -387,6 +438,8 @@ class PsyApplication(QMainWindow):
         self.loadOutTree(structure_tree)
         setting.setValue("STRUCTURE_TREE", structure_tree)
 
+        # 当前输出平台
+        setting.setValue("PLATFORM", Info.PLATFORM)
         Func.log(f"{Info.FILE_NAME} saved successful!")
 
     def loadOutTree(self, tree):
@@ -480,6 +533,19 @@ class PsyApplication(QMainWindow):
     def contextMenuEvent(self, QContextMenuEvent):
         super().contextMenuEvent(QContextMenuEvent)
 
+    def changePlatform(self, c):
+        if isinstance(c, bool):
+            self.linux_action.setIconVisibleInMenu(self.sender() is self.linux_action)
+            self.windows_action.setIconVisibleInMenu(self.sender() is self.windows_action)
+            self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
+            Info.PLATFORM = self.sender().text().lstrip("&").lower()
+        elif isinstance(c, str):
+            print(c)
+            platform = c if c else "linux"
+            self.linux_action.setIconVisibleInMenu(platform == "linux")
+            self.windows_action.setIconVisibleInMenu(platform == "windows")
+            self.mac_action.setIconVisibleInMenu(platform == "mac")
+
     def compile(self):
         try:
             # self.structure.getStructure().print_tree()
@@ -499,9 +565,72 @@ class PsyApplication(QMainWindow):
                 Info.IS_REGISTER = "yes"
             except Exception:
                 QMessageBox.about(self, "Registry", "Registry Failed!")
+    def aboutWidget_ok(self):
+        self.aboutWidget.close()
 
     def about(self):
-        QMessageBox.about(self, "About PsyDemo", "NOTHING")
+
+        self.aboutWidget = QWidget()
+        self.aboutWidget.setWindowTitle("About developers of PTB Builder 0.1")
+        self.aboutWidget.setWindowModality(2)
+        self.aboutWidget.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.aboutWidget.setWindowFlags(Qt.Window|Qt.WindowCloseButtonHint)
+
+        self.aboutWidget.setAutoFillBackground(True)
+        p = self.palette()
+        p.setColor(QPalette.Background, Qt.white)
+        self.aboutWidget.setPalette(p)
+
+        img00 = QLabel(self)
+        lab01 = QLabel(self)
+
+        img10 = QLabel(self)
+        lab11 = QLabel(self)
+
+        closeButton = QPushButton('&Ok')
+
+
+        closeButton.clicked.connect(self.aboutWidget_ok)
+        closeButton.setAutoDefault(True)
+
+        img00.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
+        lab01.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
+        img10.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
+        lab11.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
+
+        lab01.setText("Personal info")
+        lab11.setText("Personal info")
+        img00.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))
+        img10.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))
+
+        layout1 = QGridLayout()
+        layout1.addWidget(img00,0,0)
+        layout1.addWidget(lab01,0,1)
+        layout1.addWidget(img10,1,0)
+        layout1.addWidget(lab11,1,1)
+
+        layout2 = QVBoxLayout()
+        layout2.addWidget(closeButton)
+        layout2.setAlignment(Qt.AlignVCenter|Qt.AlignRight)
+
+        layout = QVBoxLayout()
+        layout.addLayout(layout1)
+        layout.addStretch(10)
+        layout.addLayout(layout2)
+
+        self.aboutWidget.setLayout(layout)
+        self.aboutWidget.setMinimumWidth(400)
+        self.aboutWidget.show()
+
+        # self.gridGroupBox.setLayout(aboutUsBox)
+        # self.gridGroupBox.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        # self.gridGroupBox.setWindowTitle("About the authors")
+        # self.gridGroupBox.setWindowModality(2)
+        #
+        # self.gridGroupBox.show()
+
+        # QMessageBox.about(self, "About PTB Builder 0.1",
+        #                   "A free GUI to generate experimental codes for PTB\nDepartment of Psychology,Soochow University ")
 
     def checkUpdate(self):
         self.bar = LoadingTip()

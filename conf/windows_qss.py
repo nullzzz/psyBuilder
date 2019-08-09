@@ -11,10 +11,9 @@ QTabBar::tab {
     background: rgb(246,246,246);
     border: 1px solid rgb(201,201,201);
     border-left: 0.5px solid rgb(201,201,201);
-    min-height: 26px;
+    min-height: 36px;
     min-width: 100px;
     text-align: center;
-    font-size:11px;
 }
 
 QTabBar::tab:selected{
@@ -258,7 +257,7 @@ push_button = """
 
 table_view = """
 QTableView {
-    selection-background-color: rgba(204,232,255);
+    selection-background-color: rgb(204,232,255);
 }
 QTableView::Item:selected {
         background-color:white;

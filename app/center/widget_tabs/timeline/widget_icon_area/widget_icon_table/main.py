@@ -1,10 +1,11 @@
 from PyQt5.QtCore import Qt, QByteArray, QDataStream, QIODevice, QMimeData, QPoint, pyqtSignal
 from PyQt5.QtGui import QPixmap, QDrag
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QFrame, QLabel, QMenu, QAction, QMessageBox, \
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QFrame, QLabel, QMenu, QAction, \
     QAbstractItemView
 
 from app.func import Func
 from app.lib import NoDash
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from .sign_table import SignTable
 from ...widget_icon import WidgetIcon
 
@@ -147,8 +148,8 @@ QMenu::indicator {
 
         self.right_button_menu.addAction(self.delete_action)
         # short cut
-        # self.delete_shortcut = QShortcut(QKeySequence("BackSpace"), self)
-        # self.delete_shortcut.activated.connect(self.deleteWidgetIcon)
+        # self.backspace_shortcut = QShortcut(QKeySequence("BackSpace"), self)
+        # self.backspace_shortcut.activated.connect(self.deleteWidgetIcon)
 
     def contextMenuEvent(self, e):
         try:

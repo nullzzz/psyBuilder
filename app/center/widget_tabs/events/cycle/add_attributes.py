@@ -1,7 +1,10 @@
+import re
+
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QDialog, QScrollArea, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, \
-    QMessageBox, \
     QVBoxLayout
+
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class AddAttributesDialog(QDialog):
@@ -68,7 +71,7 @@ class AddAttributesDialog(QDialog):
         for attribute_edit, value_edit in self.attribute_list:
             attribute = attribute_edit.text()
             value = value_edit.text()
-            if not attribute or not attribute[0].isalpha():
+            if not attribute or not re.match(r"^[a-zA-Z][a-zA-Z_0-9]*$", attribute):
                 QMessageBox.information(self, 'Warning', 'Invalid attribute name.')
                 flag = False
                 break

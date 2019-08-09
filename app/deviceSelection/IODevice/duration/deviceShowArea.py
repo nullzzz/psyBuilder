@@ -1,13 +1,13 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QListWidget
 
-from app.deviceSelection.widgetSelection.InputDeviceItem import DeviceInItem
-from app.deviceSelection.widgetSelection.OutputDeviceItem import DeviceOutItem
+from app.deviceSelection.IODevice.duration.InputDeviceItem import DeviceInItem
+from app.deviceSelection.IODevice.duration.OutputDeviceItem import DeviceOutItem
 from app.info import Info
 
 
 class ShowArea(QListWidget):
-    infoChanged = pyqtSignal(tuple)
+    infoChanged = pyqtSignal(tuple, str)
     respChanged = pyqtSignal(tuple)
     outputDeletedOrChanged = pyqtSignal(str)
     areaStatus = pyqtSignal(int)
@@ -36,7 +36,7 @@ class ShowArea(QListWidget):
 
     def changeItem(self, item):
         if item:
-            self.infoChanged.emit(item.getValue())
+            self.infoChanged.emit(item.getValue(), item.getType())
             if self.device_type == Info.INPUT_DEVICE:
                 self.respChanged.emit(item.getResp())
 
@@ -48,7 +48,6 @@ class ShowArea(QListWidget):
         self.default_properties.clear()
         # 更新default_properties
         for i in range(self.count()):
-            # 我也不知道为什么要加copy，不加的话
             key = self.item(i).text()
             info: dict = self.item(i).getInfo()
             self.default_properties[key] = info.copy()
@@ -59,7 +58,6 @@ class ShowArea(QListWidget):
         self.default_properties = properties.copy()
         self.loadSetting()
 
-    # 以default_properties导入
     def loadSetting(self):
         # 处理缓冲区
         del_list: list = []
@@ -108,7 +106,7 @@ class ShowArea(QListWidget):
         # 更新显示信息
         item = self.currentItem()
         if item is not None:
-            self.infoChanged.emit(item.getValue())
+            self.infoChanged.emit(item.getValue(), item.getType())
             if self.device_type == Info.INPUT_DEVICE:
                 self.respChanged.emit(item.getResp())
 
@@ -147,7 +145,15 @@ class ShowArea(QListWidget):
         elif self.count() < 4:
             self.areaStatus.emit(1)
         if record:
-            self.delete_buffer.append((device_id, item))
+            # 判断删除的设备是否为新增未确定的设备
+            # 若是，则不需要记录，即未确定设备删除不可恢复
+            record_flag = True
+            for i in self.add_buffer:
+                if device_id == i[0]:
+                    record_flag = False
+                    break
+            if record_flag:
+                self.delete_buffer.append((device_id, item))
 
     def changeDeviceName(self, d_id, name):
         for i in range(self.count()):

@@ -3,10 +3,11 @@ import sys
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, \
-    QGridLayout, QCheckBox, QSpinBox, QMessageBox, QCompleter
+    QGridLayout, QCheckBox, QSpinBox, QCompleter
 
 from app.func import Func
 from app.lib import PigComboBox, PigLineEdit
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class Open(QWidget):
@@ -53,11 +54,11 @@ class Open(QWidget):
         self.force_drift_correction = QCheckBox("Force Drift Correction (For EyeLink 1000)")
         self.pupil_size_mode_tip = QLabel("Pupil Size Mode:")
         self.pupil_size_mode = PigComboBox()
-        self.SMI_IP_address_tip = QLabel("SMI IP Address:")
+        self.SMI_IP_address_tip = QLabel("IP Address:")
         self.SMI_IP_address = PigLineEdit()
-        self.SMI_send_port_number_tip = QLabel("SMI Send Port Number:")
+        self.SMI_send_port_number_tip = QLabel("Send Port Number:")
         self.SMI_send_port_number = QSpinBox()
-        self.SMI_receive_port_number_tip = QLabel("SMI Receive Port Number:")
+        self.SMI_receive_port_number_tip = QLabel("Receive Port Number:")
         self.SMI_receive_port_number = QSpinBox()
         self.tobii_glasses_ipv46_address_tip = QLabel("Tobii Glasses Ipv4/Ipv6_Address:")
         self.tobii_glasses_ipv46_address = PigLineEdit()
@@ -189,6 +190,16 @@ class Open(QWidget):
             self.force_drift_correction.show()
             self.pupil_size_mode_tip.show()
             self.pupil_size_mode.show()
+            self.saccade_velocity_threshold_tip.show()
+            self.saccade_velocity_threshold.show()
+            self.saccade_acceleration_threshold_tip.show()
+            self.saccade_acceleration_threshold.show()
+            self.SMI_IP_address_tip.show()
+            self.SMI_IP_address.show()
+            self.SMI_send_port_number_tip.show()
+            self.SMI_send_port_number.show()
+            self.SMI_receive_port_number_tip.show()
+            self.SMI_receive_port_number.show()
         elif index == 3:
             self.saccade_velocity_threshold_tip.show()
             self.saccade_velocity_threshold.show()

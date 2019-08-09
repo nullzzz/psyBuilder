@@ -1,11 +1,12 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QIcon, QTextOption, QFont
-from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QTextEdit
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QTextEdit
 
 from app.center.widget_tabs.events.text.textProperty import TextProperty
 from app.center.widget_tabs.events.text.view import Preview
 from app.func import Func
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class TextDisplay(QMainWindow):
@@ -15,16 +16,16 @@ class TextDisplay(QMainWindow):
         super(TextDisplay, self).__init__(parent)
         self.widget_id = widget_id
         self.current_wid = widget_id
-        self.attributes = []
+        self.attributes: list = []
         self.text_label = QTextEdit()
-        # self.text_label.setReadOnly(True)
+
         self.pro_window = TextProperty()
 
         self.html = self.pro_window.html
         self.font = self.pro_window.font
         self.default_properties = self.pro_window.getInfo()
 
-        self.text_label.textChanged.connect(self.changeDisplayText)
+        self.pro_window.general.text_edit.setDocument(self.text_label.document())
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
@@ -34,14 +35,13 @@ class TextDisplay(QMainWindow):
 
         self.fore_color = "0,0,0"
         self.back_color = "255,255,255"
-        self.transparent_value = "100"
+        self.transparent_value = "100%"
 
         self.x_pos = "0"
         self.y_pos = "0"
         self.w_size = "100%"
         self.h_size = "100%"
         self.setUI()
-        self.setAttributes(["test", "var"])
 
     def setUI(self):
         self.setWindowTitle("Text")
@@ -55,20 +55,20 @@ class TextDisplay(QMainWindow):
         pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
         pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
-        tool.addAction(pre_view)
+        # tool.addAction(pre_view)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
-        screen_devices = Func.getScreen()
-        self.pro_window.general.setScreen(screen_devices)
-        # self.pro_window.general.text_edit.setHtml(self.html)
-        # 阻塞原窗口
-        # self.pro_window.setWindowModality(Qt.ApplicationModal)
+        self.refresh()
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
+
+    def refresh(self):
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.pro_window.general.refresh()
+        self.getInfo()
 
     # 预览
     def preView(self):
@@ -108,9 +108,6 @@ class TextDisplay(QMainWindow):
     def apply(self):
         self.getInfo()
         self.parseProperties()
-        # self.text_label.setDocument(self.pro_window.general.text_edit.document())
-        # self.text_label.setHtml(self.html)
-        # self.text_label.setFont(self.pro_window.general.text_edit.font())
         # 发送信号
         self.propertiesChange.emit(self.default_properties)
 
@@ -154,7 +151,6 @@ class TextDisplay(QMainWindow):
     def changeDisplayText(self):
         self.html = self.text_label.toHtml()
         self.pro_window.general.text_edit.setDocument(self.text_label.document())
-        # self.pro_window.general.text_edit.setFont(self.text_label.font())
 
     # 设置可选参数
     def setAttributes(self, attributes):
@@ -246,7 +242,7 @@ class TextDisplay(QMainWindow):
         返回Screen Name
         :return:
         """
-        return self.pro_window.general.screen_name.currentText()
+        return self.pro_window.general.screen.currentText()
 
     def getBackColor(self) -> str:
         """
@@ -290,6 +286,13 @@ class TextDisplay(QMainWindow):
         """
         return self.pro_window.general.word_wrap.text()
 
+    def getRightToLeft(self) -> str:
+        """
+        返回right to left
+        :return:
+        """
+        return self.pro_window.general.right_to_left.currentText()
+
     def getXAxisCoordinates(self) -> str:
         """
         返回x坐标值
@@ -303,6 +306,17 @@ class TextDisplay(QMainWindow):
         :return:
         """
         return self.y_pos
+
+    def getEnable(self) -> str:
+        """
+        返回frame enable
+        :return:
+        """
+        return self.pro_window.frame.enable.currentText()
+
+    def getFrameTransparent(self) -> str:
+        """返回frame transparent"""
+        return self.pro_window.frame.transparent.text()
 
     def getWidth(self) -> str:
         """

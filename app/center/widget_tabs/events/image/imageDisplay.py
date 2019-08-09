@@ -1,7 +1,8 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
-from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QLabel
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 from app.func import Func
 from .imageProperty import ImageProperty
@@ -65,14 +66,17 @@ class ImageDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        screen_devices = Func.getScreen()
-        self.pro_window.general.setScreen(screen_devices)
-        self.setAttributes(self.attributes)
+        self.refresh()
         # 阻塞原窗口
         # self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
+
+    def refresh(self):
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.pro_window.general.refresh()
+        self.getInfo()
 
     # 预览图片
     def preView(self):
@@ -300,6 +304,17 @@ class ImageDisplay(QMainWindow):
         :return:
         """
         return self.pro_window.general.rotate.text()
+
+    def getEnable(self) -> str:
+        """
+        返回frame enable
+        :return:
+        """
+        return self.pro_window.frame.enable.currentText()
+
+    def getFrameTransparent(self) -> str:
+        """返回frame transparent"""
+        return self.pro_window.frame.transparent.text()
 
     def getXAxisCoordinates(self) -> str:
         """

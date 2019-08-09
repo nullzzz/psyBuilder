@@ -2,8 +2,8 @@ from PyQt5.QtCore import Qt, QUrl, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPalette, QKeyEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QMessageBox, QLabel, QSizePolicy
-
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QLabel, QSizePolicy
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from app.func import Func
 from .videoProperty import VideoProperty
 
@@ -65,14 +65,17 @@ class VideoDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
-        screen_devices = Func.getScreen()
-        self.pro_window.general.setScreen(screen_devices)
+        self.refresh()
         # 阻塞原窗口
         # self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
+
+    def refresh(self):
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.pro_window.general.refresh()
+        self.getInfo()
 
     def playVideo(self):
         if self.file:
@@ -352,6 +355,17 @@ class VideoDisplay(QMainWindow):
         :return:
         """
         return self.pro_window.frame.height.currentText()
+
+    def getEnable(self) -> str:
+        """
+        返回frame enable
+        :return:
+        """
+        return self.pro_window.frame.enable.currentText()
+
+    def getFrameTransparent(self) -> str:
+        """返回frame transparent"""
+        return self.pro_window.frame.transparent.text()
 
     def getBorderColor(self) -> str:
         """

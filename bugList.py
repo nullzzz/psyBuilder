@@ -1,28 +1,45 @@
-# %%%%%%%%%%%%%%  Bugs       %%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%  Bugs  %%%%%%%%%%%%%%%%%%
+#
+#
+# 3）整体关于引用时候预览的问题：如果某个特征是引用的话，预览的时候不好处理，我们这么解决，如果该属性是引用，则预览的时候直接调用该属性的默认值（仅限预览的时候哈）
+#
+#
+#
+#
+# # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+# 所有控件中涉及的File Name用相对路径（图片，声音等），即相对于程序保存目录的路径
+#
+# Sound:
+# 	Gernral:
+# 		4) Volume control 下面的volume，可以输入的范围是-1 - 1，既可以是1个数字(num1)，也可以是两个数字（中间逗号，num1,num2）
 
+#
+# EYETRACKER
+# 1）在主界面的Eye Tracker Table下：
+#
+# 去除（注释掉）open的widget，（因为我们已经移动到devices下面了）
+#
+# 其余所有widget，需要有一个eyetracker name的下拉选项框，用来选择对应的eyetracker设备（风格啥的同text 里面的screen name：）
+#
+# 2）eyetracker table下面的，DC 和calibration两个widget，需要额外再加一个Screen name：的下拉选择框用来选择相应的刺激呈现的显示设备（风格、功能等的完全同text里面的screen name：）
+#
+# 3）eyetracker table下面的DC 和Calibration中的，targetColor选项框修改为同我们其他地方一样的颜色选项框，默认值设为192,192,192吧
+#
+# QUEST：
+#  4）QUEST Table下，去除questinit（我们已经移动到了device下面了），和 questGetValue(因为我们在设备中增加了对应的隐藏属性)
 
-
-
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+# 	QUESTUpdate中增加一个下拉菜单，QuestName: 从多个可能的 Quest中选择
+#
+# 	block掉QUESTGETVALUE得widget
 
 
 # TODOLIST
-
-# 1)output device里面加一个 audio设备，对应的audio里面也加一个输出的选项（就像screen需要选择一样）
-#
-# 2)text的frame里面（理论上图片，等都需要）都需要添加一个 透明选项"Transparent"，后台以命名为frame transparent：
-#
-# 3）text 的general里面，增加一个选项 Right to Left：yes 和 no两个选项，默认值no，风格同 flip Vertical:
-
-# 4) 在2)的基础上，所有frame table 的border里面加一个enable 的下拉选项（yes or no）不可输入其他但是可以引用的style，只有为yes的时候，border 里面的其余4项
-#   border color， border width， back color和transparent 才可操作
 
 # 1)
 # 1）添加一个del快捷键删除structure 和Timeline中的widgets
 
 
-# 2) sound 里面增加  sound name：
 
 
 
@@ -48,10 +65,6 @@ Cycle：
 	4）导入导出问题；
 """
 
-# Sound:
-
-
-# Pan control:待定
 
 # slide：
 #
@@ -77,10 +90,17 @@ Cycle：
 # 7）另外能否增加一个功能，鼠标按着拖拽一个区域，自动选中区域中所有，以进行删除
 
 
-# 8）另外在上面的工具栏中，增加一个下拉菜单显示所有对象的一个list，这样也可以通过这里来选择对象
+# 8）另外在上面的工具栏中，增加一个下拉菜单显示所有对象的一个list，这样也可以通过这里来选择对象。右边加一个属性按钮，点击该按钮弹出属性
 
 
 # 9）另外，text中，在选中字框的时候需要有一个右键，有删除，前移后移动，属性的选项（属性里面有位置，字体等信息），另外工具栏中关于text的部分需要增加一个背景色的功能
+
+# 10)text 需要有属性框，具体参照于鹏
+#
+# 11）text编辑状态下，在其它地方点击鼠标应该退出编辑状态
+#
+# 12）所有widget选中右键，菜单，del，bring front，bring back，properties
+
 
 
 # 9）另外，在工具栏中，增加一个小属性按钮用于选中某一个子widget的时候，点他弹出来属性选项（同现在其他的双击效果一样）

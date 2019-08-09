@@ -1,11 +1,13 @@
 import platform
 import sys
 
+from PyQt5.QtCore import Qt
 from quamash import QApplication
 
 from app.main.main import PsyApplication
 
 if __name__ == '__main__':
+    # QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     app = QApplication(sys.argv)
     psy_application = PsyApplication()
     psy_application.initialize()

@@ -1,10 +1,11 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, \
-    QMessageBox, QCompleter
+    QCompleter
 
 from app.func import Func
-from app.lib import PigLineEdit
+from app.lib import PigLineEdit, PigComboBox
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class QuestUpdate(QWidget):
@@ -16,16 +17,19 @@ class QuestUpdate(QWidget):
         self.widget_id = widget_id
         self.current_wid = widget_id
 
-
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
         self.attributes = []
         self.default_properties = {"Response variable": "correct"}
-        self.response_variable = PigLineEdit()
-        self.response_variable.textChanged.connect(self.findVar)
-        self.response_variable.returnPressed.connect(self.finalCheck)
+        self.response_variable = PigLineEdit("correct")
+
+        self.quest_info = Func.getQuestInfo()
+        self.quest_name = PigComboBox()
+        self.quest_name.currentTextChanged.connect(self.changeQuestId)
+
+        self.using_quest_id = ""
 
         self.resp = ""
         self.bt_ok = QPushButton("OK")
@@ -40,6 +44,12 @@ class QuestUpdate(QWidget):
 
         self.response_variable.setFocus()
 
+    def changeQuestId(self, quest_name):
+        for k, v in self.quest_info.items():
+            if v == quest_name:
+                self.using_quest_id = k
+                break
+
     def setUI(self):
         self.setWindowTitle("Update")
         self.resize(500, 750)
@@ -48,13 +58,14 @@ class QuestUpdate(QWidget):
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip2.setText("Updates the Quest test value based on a response")
-        self.response_variable.setText("correct")
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
         layout1.addWidget(QLabel("Response Variable (0 or 1):"), 2, 0, 1, 1)
         layout1.addWidget(self.response_variable, 2, 1, 1, 1)
+        layout1.addWidget(QLabel("Quest Name:"), 3, 0, 1, 1)
+        layout1.addWidget(self.quest_name, 3, 1, 1, 1)
 
         layout2 = QHBoxLayout()
         layout2.addStretch(10)
@@ -76,11 +87,25 @@ class QuestUpdate(QWidget):
     def cancel(self):
         self.loadSetting()
 
+    def refresh(self):
+        self.quest_info = Func.getQuestInfo()
+        quest_id = self.using_quest_id
+
+        self.quest_name.clear()
+        self.quest_name.addItems(self.quest_info.values())
+        quest_name = self.quest_info.get(quest_id)
+        if quest_name:
+            self.quest_name.setCurrentText(quest_name)
+            self.using_quest_id = quest_id
+
+        # 更新attributes
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.getInfo()
+
     def apply(self):
         self.resp = self.response_variable.text()
         self.propertiesChange.emit(self.getInfo())
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
 
     # 检查变量
     def findVar(self, text):
@@ -118,7 +143,9 @@ class QuestUpdate(QWidget):
                     using_attributes.append(v[1:-1])
 
     def getInfo(self):
+        self.default_properties.clear()
         self.default_properties["Response variable"] = self.response_variable.text()
+        self.default_properties["Quest name"] = self.quest_name.currentText()
         return self.default_properties
 
     def getProperties(self):
@@ -138,6 +165,7 @@ class QuestUpdate(QWidget):
 
     def loadSetting(self):
         self.response_variable.setText(self.default_properties["Response variable"])
+        self.quest_name.setCurrentText(self.default_properties["Quest name"])
 
     def clone(self, new_id: str):
         clone_widget = QuestUpdate(widget_id=new_id)

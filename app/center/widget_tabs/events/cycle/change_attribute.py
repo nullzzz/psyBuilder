@@ -1,6 +1,10 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 import re
+
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton
+
+from lib.psy_message_box import PsyMessageBox as QMessageBox
+
 
 class ChangeAttributeDialog(QDialog):
     # (attribute, value -> cycle )
@@ -61,7 +65,7 @@ class ChangeAttributeDialog(QDialog):
                 self.attributeData.emit(self.col, attribute, value)
             self.close()
         else:
-            if not attribute or not attribute[0].isalpha():
+            if not attribute or not re.match(r"^[a-zA-Z][a-zA-Z_0-9]*$", attribute):
                 QMessageBox.information(self, 'Warning', 'Invalid attribute name.')
             elif attribute in self.attribute_exist or attribute in ['Weight', 'Timeline']:
                 QMessageBox.information(self, 'Warning', 'Attribute has already existed.')

@@ -1,22 +1,20 @@
 from PyQt5.QtCore import QSize, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QApplication, QListView, QFrame, \
-    QPushButton, QInputDialog, QLineEdit, QMessageBox
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
+    QPushButton, QInputDialog, QLineEdit
 
-from app.center.widget_tabs.events.durationPage import DurationPage
-from app.deviceSelection.globalSelection.describer import Describer
-from app.deviceSelection.globalSelection.device import Device
-from app.deviceSelection.globalSelection.selectionList import SelectArea
+from app.deviceSelection.IODevice.describer import Describer
+from app.deviceSelection.IODevice.device import Device
+from app.deviceSelection.IODevice.selectionList import SelectArea
+from app.func import Func
 from app.info import Info
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class GlobalDevice(QWidget):
     """
     :param io_type: 输出、输入设备
     """
-    InputDevice = 0
-    OutputDevice = 1
-    # 发送到duration的类变量中最为合适 (device_type, devices: name->type)
-    deviceSelect = pyqtSignal(int, dict)
     deviceNameChanged = pyqtSignal(str, str)
 
     def __init__(self, io_type=0, parent=None):
@@ -37,12 +35,13 @@ class GlobalDevice(QWidget):
         self.device_type = io_type
 
         # device_list是写死的
-        if io_type:
+        if io_type == Info.OUTPUT_DEVICE:
             self.devices = ("serial_port", "parallel_port", "network_port", "screen", "sound")
             self.setWindowTitle("Output Devices")
         else:
             self.devices = ("mouse", "keyboard", "response box", "game pad")
             self.setWindowTitle("Input Devices")
+        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
         for device in self.devices:
             self.devices_list.addItem(Device(device))
 
@@ -61,7 +60,10 @@ class GlobalDevice(QWidget):
         self.describer.baudChanged.connect(self.changeBaud)
         self.describer.bitsChanged.connect(self.changeBits)
         self.describer.clientChanged.connect(self.changeClient)
-
+        self.describer.samplingRateChanged.connect(self.changeSamplingRate)
+        self.describer.resolutionChanged.connect(self.changeResolution)
+        self.describer.refreshRateChanged.connect(self.changeRefreshRate)
+        # 按键区
         self.ok_bt = QPushButton("OK")
         self.ok_bt.clicked.connect(self.ok)
         self.cancel_bt = QPushButton("Cancel")
@@ -98,7 +100,6 @@ class GlobalDevice(QWidget):
     def apply(self):
         self.getInfo()
         default_properties: dict = self.selected_devices.getInfo()
-        self.deviceSelect.emit(self.device_type, default_properties)
 
     def changeItem(self, device_type: str, device_name: str, device_port: str, others: dict):
         self.describer.describe(device_type, device_name, device_port, others)
@@ -115,8 +116,17 @@ class GlobalDevice(QWidget):
     def changeIpPort(self, ip_port: str):
         self.selected_devices.changeCurrentIpPort(ip_port)
 
-    def changeClient(self, client: int):
+    def changeClient(self, client: str):
         self.selected_devices.changeCurrentClient(client)
+
+    def changeSamplingRate(self, sampling_rate: str):
+        self.selected_devices.changeCurrentSamplingRate(sampling_rate)
+
+    def changeResolution(self, resolution: str):
+        self.selected_devices.changeCurentResolution(resolution)
+
+    def changeRefreshRate(self, refresh_rate: str):
+        self.selected_devices.changeCurrentRefreshRate(refresh_rate)
 
     def changeBaud(self, baud: str):
         self.selected_devices.changeCurrentBaud(baud)
@@ -138,37 +148,22 @@ class GlobalDevice(QWidget):
                 self.selected_devices.changeCurrentName(text)
                 self.describer.changeName(text)
                 self.getInfo()
-                self.deviceNameChanged.emit(item.getDeviceId(), text)
+                # self.deviceNameChanged.emit(item.getDeviceId(), text)
 
     # 参数导出, 记录到Info
     def getInfo(self):
         device_info: dict = self.selected_devices.getInfo()
         if self.device_type:
             Info.OUTPUT_DEVICE_INFO = device_info.copy()
-            DurationPage.OUTPUT_DEVICES = device_info
         else:
             Info.INPUT_DEVICE_INFO = device_info.copy()
-            DurationPage.INPUT_DEVICES = device_info
 
     # 参数导入
     def setProperties(self, properties: dict):
         self.selected_devices.clearAll()
-        # print(properties)
         self.selected_devices.setProperties(properties)
         # 更新全局信息
         if self.device_type:
             Info.OUTPUT_DEVICE_INFO.update(properties)
         else:
             Info.INPUT_DEVICE_INFO.update(properties)
-
-
-if __name__ == "__main__":
-    import sys
-
-    app = QApplication(sys.argv)
-
-    t = GlobalDevice(1)
-
-    t.show()
-
-    sys.exit(app.exec())

@@ -3,12 +3,13 @@ import re
 
 from PyQt5.QtCore import QDataStream, QIODevice, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QKeySequence
-from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QShortcut, QAction, QMenu, QApplication, QMessageBox
+from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QShortcut, QAction, QMenu, QApplication,QCompleter
 
 from app.center.widget_tabs.timeline.widget_icon import WidgetIcon
 from app.func import Func
 from app.info import Info
 from app.lib import NoDash, PigLineEdit
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from .timeline_table_item import TimelineTableItem as QTableWidgetItem
 
 
@@ -235,63 +236,63 @@ class TimelineTable(QTableWidget):
         :param item:
         :return:
         """
-        try:
-            if self.edit_row == item.row() and item.column() == 1 and item.text():
-                name = item.text()
-                self.edit_row = -2
-                validity, existed_widget_id = Func.checkTimelineNameValidity(name, self.widget_id)
-                if validity == Info.TimelineNameRight:
-                    # 没有出现过是要进行新增的
-                    if name not in self.name_count:
-                        widget_icon = WidgetIcon(widget_type=Info.TIMELINE)
-                        timeline_widget_id = widget_icon.widget_id
-                        self.timeline_add.emit(self.widget_id, timeline_widget_id, name, Info.WidgetAdd, '', False)
-                        self.name_count[name] = 1
-                        self.name_wid[name] = timeline_widget_id
-                    else:
-                        self.name_count[name] += 1
-                    # 如果old_name有效，其被修改后，count-1
-                    if (self.old_timeline_name):
-                        self.name_count[self.old_timeline_name] -= 1
-                        # 如果此cycle中不存在相同名的timeline需要进行删除
-                        if not self.name_count[self.old_timeline_name]:
-                            del self.name_count[self.old_timeline_name]
-                            self.timeline_delete.emit(self.name_wid[self.old_timeline_name])
-                            del self.name_wid[self.old_timeline_name]
-                elif validity == Info.TimelineNameExist:
-                    # 没有出现过是要进行新增的，且是引用
-                    if name not in self.name_count:
-                        widget_icon = WidgetIcon(widget_type=Info.TIMELINE)
-                        timeline_widget_id = widget_icon.widget_id
-                        self.timeline_add.emit(self.widget_id, timeline_widget_id, name, Info.WidgetRefer,
-                                               existed_widget_id, False)
-                        self.name_count[name] = 1
-                        self.name_wid[name] = timeline_widget_id
-                    else:
-                        self.name_count[name] += 1
-                    # 如果old_name有效，其被修改后，count-1
-                    if (self.old_timeline_name):
-                        self.name_count[self.old_timeline_name] -= 1
-                        # 如果此cycle中不存在相同名的timeline需要进行删除
-                        if not self.name_count[self.old_timeline_name]:
-                            del self.name_count[self.old_timeline_name]
-                            self.timeline_delete.emit(self.name_wid[self.old_timeline_name])
-                            del self.name_wid[self.old_timeline_name]
-                elif validity == Info.TimelineNameError:
-                    item.setText(self.old_timeline_name)
-                    QMessageBox.information(self, 'Warning',
-                                            "The value must start with a letter and only contain numbers，letter and _")
-                elif validity == Info.TimelineTypeError:
-                    item.setText(self.old_timeline_name)
-                    QMessageBox.information(self, 'Warning', "Can't refer different type widget.")
-                elif validity == Info.TimelineParentError:
-                    item.setText(self.old_timeline_name)
-                    QMessageBox.information(self, 'Warning', "Can't refer this timeline.")
+        # try:
+        if self.edit_row == item.row() and item.column() == 1 and item.text():
+            name = item.text()
+            self.edit_row = -2
+            validity, existed_widget_id = Func.checkTimelineNameValidity(name, self.widget_id)
+            if validity == Info.TimelineNameRight:
+                # 没有出现过是要进行新增的
+                if name not in self.name_count:
+                    widget_icon = WidgetIcon(widget_type=Info.TIMELINE)
+                    timeline_widget_id = widget_icon.widget_id
+                    self.timeline_add.emit(self.widget_id, timeline_widget_id, name, Info.WidgetAdd, '', False)
+                    self.name_count[name] = 1
+                    self.name_wid[name] = timeline_widget_id
                 else:
-                    raise Exception("Unknown validity type.")
-                self.old_timeline_name = ''
-        except Exception as e:
-            print(f"error {e} happens in add timeline. [timeline_table/main.py]")
+                    self.name_count[name] += 1
+                # 如果old_name有效，其被修改后，count-1
+                if (self.old_timeline_name):
+                    self.name_count[self.old_timeline_name] -= 1
+                    # 如果此cycle中不存在相同名的timeline需要进行删除
+                    if not self.name_count[self.old_timeline_name]:
+                        del self.name_count[self.old_timeline_name]
+                        self.timeline_delete.emit(self.name_wid[self.old_timeline_name])
+                        del self.name_wid[self.old_timeline_name]
+            elif validity == Info.TimelineNameExist:
+                # 没有出现过是要进行新增的，且是引用
+                if name not in self.name_count:
+                    widget_icon = WidgetIcon(widget_type=Info.TIMELINE)
+                    timeline_widget_id = widget_icon.widget_id
+                    self.timeline_add.emit(self.widget_id, timeline_widget_id, name, Info.WidgetRefer,
+                                           existed_widget_id, False)
+                    self.name_count[name] = 1
+                    self.name_wid[name] = timeline_widget_id
+                else:
+                    self.name_count[name] += 1
+                # 如果old_name有效，其被修改后，count-1
+                if (self.old_timeline_name):
+                    self.name_count[self.old_timeline_name] -= 1
+                    # 如果此cycle中不存在相同名的timeline需要进行删除
+                    if not self.name_count[self.old_timeline_name]:
+                        del self.name_count[self.old_timeline_name]
+                        self.timeline_delete.emit(self.name_wid[self.old_timeline_name])
+                        del self.name_wid[self.old_timeline_name]
+            elif validity == Info.TimelineNameError:
+                item.setText(self.old_timeline_name)
+                QMessageBox.information(self, 'Warning',
+                                        "The value must start with a letter and only contain numbers，letter and _")
+            elif validity == Info.TimelineTypeError:
+                item.setText(self.old_timeline_name)
+                QMessageBox.information(self, 'Warning', "Can't refer different type widget.")
+            elif validity == Info.TimelineParentError:
+                item.setText(self.old_timeline_name)
+                QMessageBox.information(self, 'Warning', "Can't refer this timeline.")
+            else:
+                raise Exception("Unknown validity type.")
+            self.old_timeline_name = ''
+        # except Exception as e:
+        #     print(f"error {e} happens in add timeline. [timeline_table/main.py]")
 
     def deleteTimeline(self, item: QTableWidgetItem):
         """

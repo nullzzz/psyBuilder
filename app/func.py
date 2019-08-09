@@ -53,6 +53,12 @@ class Func(object):
 
     @staticmethod
     def changeCertainDeviceNameWhileUsing(device_id: str, device_name):
+        """
+        abort at 2019-8-1
+        :param device_id:
+        :param device_name:
+        :return:
+        """
         for widget_ids in Info.NAME_WID.values():
             for widget_id in widget_ids:
                 widget_type = widget_id.split(".")[0]
@@ -83,6 +89,8 @@ class Func(object):
         :return:
         """
         widget = Info.WID_WIDGET[widget_id]
+        if hasattr(widget, "refresh"):
+            widget.refresh()
         return widget.getProperties()
 
     @staticmethod
@@ -174,24 +182,35 @@ class Func(object):
                 return Info.TimelineNameRight, ''
             return Info.TimelineNameError, ''
         else:
-            widget_id = Info.NAME_WID[name][0]
-            # 类型
-            if widget_id.split('.')[0] == Info.TIMELINE:
-                # 是否存在于父节点
-                # 对于判断想引用的timeline是不是cycle的父节点,
-                # 要确认所有引用的cycle的父节点timeline是不是在name的引用，比较繁琐啊
-                parent_timeline_list = []
-                for cycle_wid in Info.NAME_WID[Info.WID_NODE[cycle_widget_id].text(0)]:
-                    node = Info.WID_NODE[cycle_wid].parent()
-                    while node:
-                        if node.widget_id.startswith(Info.TIMELINE):
-                            parent_timeline_list.append(node.widget_id)
-                        node = node.parent()
-                for timeline_wid in parent_timeline_list:
-                    if timeline_wid in Info.NAME_WID[name]:
-                        return Info.TimelineParentError, ''
-                return Info.TimelineNameExist, widget_id
-            return Info.TimelineTypeError, ''
+            # 如果已经存在，且为同一个cycle下的timeline，则返回正确，否则返回出错
+            cycle_node = Info.WID_NODE[cycle_widget_id]
+            # 因为timeline已经不允许引用了，所以不会出现父节点为不同的cycle，所以直接判断cycle下是否有那个name即可
+            try:
+                for index in range(cycle_node.childCount()):
+                    if cycle_node.child(index).text(0) == name:
+                        return Info.TimelineNameRight, ""
+            except Exception as e:
+                print(e)
+            return Info.TimelineParentError, ""
+            # 需求要求timeline不能引用，说不定哪天让我改回来，现将下方代码注释
+            # widget_id = Info.NAME_WID[name][0]
+            # # 类型
+            # if widget_id.split('.')[0] == Info.TIMELINE:
+            #     # 是否存在于父节点
+            #     # 对于判断想引用的timeline是不是cycle的父节点,
+            #     # 要确认所有引用的cycle的父节点timeline是不是在name的引用，比较繁琐啊
+            #     parent_timeline_list = []
+            #     for cycle_wid in Info.NAME_WID[Info.WID_NODE[cycle_widget_id].text(0)]:
+            #         node = Info.WID_NODE[cycle_wid].parent()
+            #         while node:
+            #             if node.widget_id.startswith(Info.TIMELINE):
+            #                 parent_timeline_list.append(node.widget_id)
+            #             node = node.parent()
+            #     for timeline_wid in parent_timeline_list:
+            #         if timeline_wid in Info.NAME_WID[name]:
+            #             return Info.TimelineParentError, ''
+            #     return Info.TimelineNameExist, widget_id
+            # return Info.TimelineTypeError, ''
 
     @staticmethod
     def delWidget(widget_id: str) -> None:
@@ -261,8 +280,8 @@ class Func(object):
         elif widget_type == Info.STARTR:
             from app.center.widget_tabs.eye_tracker.startR import StartR
             widget = StartR(widget_id=widget_id)
-        elif widget_type == Info.CLOSE:
-            from app.center.widget_tabs.eye_tracker.close import Close
+        elif widget_type == Info.Log:
+            from app.center.widget_tabs.eye_tracker.log import Close
             widget = Close(widget_id=widget_id)
         elif widget_type == Info.QUEST_INIT:
             from app.center.widget_tabs.quest.start import QuestInit
@@ -330,6 +349,13 @@ class Func(object):
         :return:
         """
         attributes = {"subName": 0, "subNum": 0, "sessionNum": 0, "subSex": 0, "subHandness": 0, "subAge": 0}
+
+        # 添加quest设备全局参数
+        for k, v in Info.QUEST_INFO.items():
+            v: dict
+            quest_name = v.get("Quest Name")
+            attributes[f"{quest_name}.cValue"] = ""
+
         node = Info.WID_NODE[widget_id]
         node_parent = node.parent()
         # 得到到第0层一共多少层
@@ -465,8 +491,7 @@ class Func(object):
             print(f"error {e} happens in rename timeline in cycle. [func.py]")
 
     @staticmethod
-    def checkDragValidityFromStructure(target_timeline_wid: str, widget_id: str) -> bool:
-        # todo：timeline可以引用，那这个需求就是错的了。
+    def checkReferValidity(target_timeline_wid: str, widget_id: str) -> bool:
         """
         当从structure中拖拽至timeline时，
         对于cycle的拖拽，因其下面挂着timeline，如果不进行处理，会导致类似死锁。
@@ -475,19 +500,28 @@ class Func(object):
         :return: 合法性
         """
         try:
-            # 只需检测cycle
-            if Func.isWidgetType(widget_id, Info.CYCLE):
-                # 检测目标的timeline的自身包括引用节点上面有没有父节点name是cycle的name
-                cycle_name = Info.WID_NODE[widget_id].text(0)
-                timeline_name = Info.WID_NODE[target_timeline_wid].text(0)
-                for timeline_wid in Info.NAME_WID[timeline_name]:
-                    node = Info.WID_NODE[timeline_wid].parent()
-                    while node:
-                        if node.text(0) == cycle_name:
-                            return False
-                        node = node.parent()
+            # 如果目标timeline下已经存在该wid或者引用，即存在name相同的widget，返回可以引用
+            timeline_node = Info.WID_NODE[target_timeline_wid]
+            name = Info.WID_NODE[widget_id].text(0)
+            for index in range(timeline_node.childCount()):
+                if timeline_node.child(index).text(0) == name:
+                    return True
+            # 先确定被拖拽的widget所属的cycle是否与target的timeline所属的cycle是否为同一个
+            # target_timeline不能是第一层timeline，因为它没有父cycle
+            if target_timeline_wid == f"{Info.TIMELINE}.0":
+                return False
+            cycle_1_wid = timeline_node.parent().widget_id
+            # 根据widget得到父timeline
+            node = Info.WID_NODE[widget_id]
+            parent_timeline = node.parent()
+            # 如果是父亲为第一层timeline，其没有父cycle
+            if parent_timeline.widget_id == f"{Info.TIMELINE}.0":
+                return False
+            cycle_2_wid = parent_timeline.parent().widget_id
+            # 父cycle是否相同
+            if cycle_1_wid == cycle_2_wid:
                 return True
-            return True
+            return False
         except Exception as e:
             print(f"error {e} happens in check validity of drag from structure. [func.py]")
 
@@ -607,6 +641,22 @@ class Func(object):
         return screens
 
     @staticmethod
+    def getScreenInfo() -> dict:
+        info: dict = {}
+        for k, v in Info.OUTPUT_DEVICE_INFO.items():
+            if k.startswith("screen"):
+                info[k] = v["Device Name"]
+        return info
+
+    @staticmethod
+    def getSoundInfo() -> dict:
+        info: dict = {}
+        for k, v in Info.OUTPUT_DEVICE_INFO.items():
+            if k.startswith("sound"):
+                info[k] = v["Device Name"]
+        return info
+
+    @staticmethod
     def getSound() -> list:
         sounds = []
         for k, v in Info.OUTPUT_DEVICE_INFO.items():
@@ -642,7 +692,52 @@ class Func(object):
                 return k
         return ""
 
+    @staticmethod
+    def getQuestInfo():
+        info: dict = {}
+        for k, v in Info.QUEST_INFO.items():
+            info[k] = v.get("Quest Name")
+        return info
+
+    @staticmethod
+    def getTrackerInfo():
+        info: dict = {}
+        for k, v in Info.TRACKER_INFO.items():
+            info[k] = v.get("Tracker Name")
+        return info
+
     # 控制台输出信息
     @staticmethod
     def log(text, error=False, timer=True):
         pass
+
+    @staticmethod
+    def getParentWid(wid: str) -> str:
+        """
+        根据输入的wid参数，得到他的父节点的wid
+        :param wid: 输入的参数
+        :return: 父节点的wid， 如果没有父节点返回“”
+        """
+        try:
+            return Info.WID_NODE[wid].parent().widget_id
+        except:
+            return ""
+
+    @staticmethod
+    def getWidLevel(wid: str) -> int:
+        """
+        通过输入的wid得到该widget所在层级，从0开始累加，即最初始的timeline为0，往后递增
+        :param wid: 输入的wid
+        :return: 如果wid不存在，返回-1
+        """
+        try:
+            node = Info.WID_NODE[wid]
+        except:
+            return -1
+        # 不断迭代，直至父结点为空
+        level = 0
+        node = node.parent()
+        while node:
+            node = node.parent()
+            level += 1
+        return level

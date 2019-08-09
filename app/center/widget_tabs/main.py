@@ -18,7 +18,7 @@ class WidgetTabs(QTabWidget):
         self.setMovable(True)
         self.tabBar().setShape(QTabBar.TriangularNorth)
         self.tabBar().setUsesScrollButtons(True)
-        self.tabBar().setIconSize(QSize(12, 12))
+        self.tabBar().setIconSize(QSize(16, 16))
 
         # 初始化, 首页是一个timeline
         self.timeline = Timeline(widget_id=f"{Info.TIMELINE}.0")
@@ -45,7 +45,7 @@ class WidgetTabs(QTabWidget):
         elif widget_type == Info.CYCLE:
             self.linkCycleSignals(widget_id)
         elif widget_type in (
-                Info.ACTION, Info.CALIBRATION, Info.CLOSE, Info.DC, Info.ENDR, Info.OPEN, Info.STARTR,
+                Info.ACTION, Info.CALIBRATION, Info.Log, Info.DC, Info.ENDR, Info.OPEN, Info.STARTR,
                 Info.QUEST_GET_VALUE,
                 Info.QUEST_INIT, Info.QUEST_UPDATE, Info.IF, Info.SWITCH):
             widget = Info.WID_WIDGET[widget_id]
@@ -103,6 +103,10 @@ class WidgetTabs(QTabWidget):
                     self.setCurrentIndex(
                         self.addTab(widget, Func.getWidgetImage(widget_id.split('.')[0], 'icon'),
                                     Func.getWidgetName(widget_id)))
+                # 双击timeline icon打开某个widget，refresh用于更新screen\quest\tracker\attributes等信息
+                # 2019-07-31
+                if hasattr(self.currentWidget(), "refresh"):
+                    self.currentWidget().refresh()
             else:
                 raise Exception("fail to open tab, because widget can't be found. [widget_tabs/main.py]")
         except Exception as e:

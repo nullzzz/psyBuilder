@@ -1,11 +1,10 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, \
-    QMessageBox, \
-    QCompleter
+from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QCompleter
 
 from app.func import Func
-from app.lib import PigLineEdit
+from app.lib import PigLineEdit, PigComboBox
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class EndR(QWidget):
@@ -22,13 +21,20 @@ class EndR(QWidget):
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
         self.attributes = []
-        self.default_properties = {"Statue message": ""}
+        self.default_properties = {"Statue message": "",
+                                   "EyeTracker Name": "", }
 
         self.status_message = PigLineEdit()
         self.status_message.textChanged.connect(self.findVar)
         self.status_message.returnPressed.connect(self.finalCheck)
 
         self.msg = ""
+
+        self.using_tracker_id = ""
+        self.tracker_info = Func.getTrackerInfo()
+        self.tracker_name = PigComboBox()
+        self.tracker_name.addItems(self.tracker_info.values())
+        self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
@@ -58,6 +64,8 @@ class EndR(QWidget):
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
         layout1.addWidget(QLabel("Statue Message:"), 2, 0, 1, 1)
         layout1.addWidget(self.status_message, 2, 1, 1, 1)
+        layout1.addWidget(QLabel("EyeTracker Name:"), 3, 0, 1, 1)
+        layout1.addWidget(self.tracker_name, 3, 1, 1, 1)
 
         layout2 = QHBoxLayout()
         layout2.addStretch(10)
@@ -71,6 +79,28 @@ class EndR(QWidget):
         layout.addLayout(layout2)
         self.setLayout(layout)
 
+    def changeTrackerId(self, tracker_name):
+        for k, v in self.tracker_info.items():
+            if v == tracker_name:
+                self.using_tracker_id = k
+                break
+
+    def refresh(self):
+        self.tracker_info = Func.getTrackerInfo()
+        tracker_id = self.using_tracker_id
+        self.tracker_name.clear()
+        self.tracker_name.addItems(self.tracker_info.values())
+        tracker_name = self.tracker_info.get(tracker_id)
+        if tracker_name:
+            self.tracker_name.setCurrentText(tracker_name)
+            self.using_tracker_id = tracker_id
+
+        # 更新attributes
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+
+        self.getInfo()
+
     def ok(self):
         self.apply()
         self.close()
@@ -82,8 +112,6 @@ class EndR(QWidget):
     def apply(self):
         self.msg = self.status_message.text()
         self.propertiesChange.emit(self.getInfo())
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
 
     # 检查变量
     def findVar(self, text):
@@ -122,6 +150,7 @@ class EndR(QWidget):
 
     def getInfo(self):
         self.default_properties["Statue message"] = self.status_message.text()
+        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
         return self.default_properties
 
     def getProperties(self):
@@ -141,6 +170,7 @@ class EndR(QWidget):
 
     def loadSetting(self):
         self.status_message.setText(self.default_properties["Statue message"])
+        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
 
     def clone(self, new_id: str):
         clone_widget = EndR(widget_id=new_id)
@@ -159,6 +189,9 @@ class EndR(QWidget):
 
     def getStatusMessage(self) -> str:
         return self.status_message.text()
+
+    def getTrackerName(self) -> str:
+        return self.tracker_name.currentText()
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)

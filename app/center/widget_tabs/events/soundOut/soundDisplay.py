@@ -1,11 +1,12 @@
 from PyQt5.QtCore import pyqtSignal, QUrl, Qt, QFileInfo
 from PyQt5.QtGui import QIcon
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaPlaylist
-from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QToolBar, QPushButton, QMessageBox, QSlider, QWidget, \
+from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QToolBar, QPushButton, QSlider, QWidget, \
     QGridLayout, QLabel, QVBoxLayout
 
 from app.center.widget_tabs.events.soundOut.soundProperty import SoundProperty
 from app.func import Func
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
 class SoundDisplay(QMainWindow):
@@ -89,14 +90,17 @@ class SoundDisplay(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, tool)
 
     def openPro(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
-        sound_devices = Func.getSound()
-        self.pro_window.general.setSound(sound_devices)
+        self.refresh()
         # 阻塞原窗口
         # self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
+
+    def refresh(self):
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.pro_window.general.refresh()
+        self.getInfo()
 
     def ok(self):
         self.apply()
@@ -143,7 +147,7 @@ class SoundDisplay(QMainWindow):
         self.propertiesChange.emit(self.getInfo())
 
     def parseProperties(self):
-        if self.pro_window.general.loop.currentText() == "Yes":
+        if self.pro_window.general.repetitions.text() != "0":
             self.is_loop = True
         else:
             self.is_loop = False
@@ -238,8 +242,11 @@ class SoundDisplay(QMainWindow):
     def getUsingAttributes(self):
         using_attributes: list = []
         self.findAttributes(self.default_properties, using_attributes)
-        print(using_attributes)
+        # print(using_attributes)
         return using_attributes
+
+    def getSelectedWhileUnreachableAttributesAfterMovingOrQuote(self) -> list:
+        return []
 
     def findAttributes(self, properties: dict, using_attributes: list):
         for v in properties.values():
@@ -282,12 +289,12 @@ class SoundDisplay(QMainWindow):
         """
         return self.pro_window.general.buffer_size.text()
 
-    def getBufferMode(self) -> str:
+    def getRefillMode(self) -> str:
         """
-        返回Buffer Mode
+        返回Refill Mode
         :return:
         """
-        return self.pro_window.general.buffer_mode.currentText()
+        return self.pro_window.general.refill_mode.currentText()
 
     def getStartOffset(self) -> str:
         """
@@ -303,12 +310,12 @@ class SoundDisplay(QMainWindow):
         """
         return self.pro_window.general.stop_offset.text()
 
-    def getLoop(self) -> str:
+    def getRepetitions(self) -> str:
         """
         返回Loop
         :return:
         """
-        return self.pro_window.general.loop.currentText()
+        return self.pro_window.general.repetitions.currentText()
 
     def getIsVolumeControl(self) -> bool:
         """
@@ -324,19 +331,19 @@ class SoundDisplay(QMainWindow):
         """
         return self.pro_window.general.volume.text()
 
-    def getIsPanControl(self) -> bool:
+    def getIsLatencyBias(self) -> bool:
         """
         返回Pan控制
         :return:
         """
-        return bool(self.pro_window.general.pan_control.checkState())
+        return bool(self.pro_window.general.latency_bias.checkState())
 
-    def getPan(self) -> str:
+    def getBiasTime(self) -> str:
         """
         返回pan
         :return:
         """
-        return self.pro_window.general.pan.text()
+        return self.pro_window.general.bias_time.text()
 
     def getDuration(self) -> str:
         """
