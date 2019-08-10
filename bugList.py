@@ -10,28 +10,7 @@
 #
 # 所有控件中涉及的File Name用相对路径（图片，声音等），即相对于程序保存目录的路径
 #
-# Sound:
-# 	Gernral:
-# 		4) Volume control 下面的volume，可以输入的范围是-1 - 1，既可以是1个数字(num1)，也可以是两个数字（中间逗号，num1,num2）
 
-#
-# EYETRACKER
-# 1）在主界面的Eye Tracker Table下：
-#
-# 去除（注释掉）open的widget，（因为我们已经移动到devices下面了）
-#
-# 其余所有widget，需要有一个eyetracker name的下拉选项框，用来选择对应的eyetracker设备（风格啥的同text 里面的screen name：）
-#
-# 2）eyetracker table下面的，DC 和calibration两个widget，需要额外再加一个Screen name：的下拉选择框用来选择相应的刺激呈现的显示设备（风格、功能等的完全同text里面的screen name：）
-#
-# 3）eyetracker table下面的DC 和Calibration中的，targetColor选项框修改为同我们其他地方一样的颜色选项框，默认值设为192,192,192吧
-#
-# QUEST：
-#  4）QUEST Table下，去除questinit（我们已经移动到了device下面了），和 questGetValue(因为我们在设备中增加了对应的隐藏属性)
-
-# 	QUESTUpdate中增加一个下拉菜单，QuestName: 从多个可能的 Quest中选择
-#
-# 	block掉QUESTGETVALUE得widget
 
 
 # TODOLIST
@@ -67,23 +46,11 @@ Cycle：
 
 
 # slide：
-#
-#have done  0）slider 属性框里面增加 + frame table （内容同单独的image 里面的frame）
-#have done  1）Basic Flowchart 名称修改为 Basic Geometry
-#
-#have done 2）下面三个合并为一个 polygon，在polygon里面的gemetry里面可以自定义顶点（默认3个，添加一个增加和一个减少按钮，最少需要有3个顶点，最多20个），默认添加后的图形是正N边形状
-#
-# conditional:
-# process:
-# input/output:
 
 # 3）在cycle里面增加两个参数，也就是start 和end angle：（默认分别是0,360）,0 度对应是正上垂直线（+Y）。另外需要注意的默认是在不是全圆的扇形中，缺口的边框没有（也就是只有弧线）。
 # 当然fill color的时候还是需要填充出一个扇形的。
 
 # 4）另外在特征中，增加一个选项来决定是否呈现缺口的边框。
-
-
-# 5）另外是线条的时候选中貌似很困难，优化一下
 
 # 6）另外，最好是选中后增加一个快捷键，按del 删除
 

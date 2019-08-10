@@ -47,13 +47,6 @@ class ImageProperty(QWidget):
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
 
-    # 设置界面居中显示
-    def center(self):
-        screen = QDesktopWidget().screenGeometry()
-        size = self.geometry()
-        self.move((screen.width() - size.width()) / 2,
-                  (screen.height() - size.height()) / 2)
-
     def getInfo(self):
         self.default_properties.clear()
         self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}

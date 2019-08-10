@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout)
 
 from app.center.widget_tabs.events.durationPage import DurationPage
-from app.center.widget_tabs.events.slider.general import SliderTab1
 from app.center.widget_tabs.events.framePage import FramePage
+from app.center.widget_tabs.events.newSlider.general import SliderTab1
 
 
 class SliderProperty(QWidget):
@@ -19,7 +19,8 @@ class SliderProperty(QWidget):
         self.tab.addTab(self.frame, "Frame")
         self.tab.addTab(self.duration, "Duration")
 
-        self.default_properties = {**self.general.getProperties(), **self.duration.default_properties, **self.frame.default_properties}
+        self.default_properties = {**self.general.getProperties(), **self.duration.default_properties,
+                                   **self.frame.default_properties}
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
@@ -32,10 +33,8 @@ class SliderProperty(QWidget):
     def setUI(self):
         self.setWindowTitle("Slider property")
         self.resize(600, 800)
-        # self.setFixedSize(600, 800)
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.tab, 6)
-        # main_layout.addStretch(2)
         main_layout.addWidget(self.below, 1)
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
@@ -52,7 +51,7 @@ class SliderProperty(QWidget):
 
     def getInfo(self):
         # 无frame
-        self.default_properties = {**self.duration.getInfo(),**self.frame.getInfo(),**self.general.getInfo()}
+        self.default_properties = {**self.duration.getInfo(), **self.frame.getInfo(), **self.general.getInfo()}
         return self.default_properties
 
     def setAttributes(self, attributes):
@@ -60,10 +59,10 @@ class SliderProperty(QWidget):
         self.duration.setAttributes(attributes)
         self.frame.setAttributes(attributes)
 
-
     def setProperties(self, properties: dict):
-        self.default_properties = properties
-        self.loadSetting()
+        if isinstance(properties, dict):
+            self.default_properties = properties
+            self.loadSetting()
 
     def loadSetting(self):
         self.general.setProperties(self.default_properties)

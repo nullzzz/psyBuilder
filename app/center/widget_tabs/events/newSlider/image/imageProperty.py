@@ -1,25 +1,17 @@
-from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout)
+from PyQt5.QtWidgets import QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout
 
-from app.center.widget_tabs.events.durationPage import DurationPage
-from app.center.widget_tabs.events.slider.general import SliderTab1
-from app.center.widget_tabs.events.framePage import FramePage
+from app.center.widget_tabs.events.newSlider.image.general import ImageGeneral
 
 
-class SliderProperty(QWidget):
+class ImageProperty(QWidget):
     def __init__(self, parent=None):
-        super(SliderProperty, self).__init__(parent)
+        super(ImageProperty, self).__init__(parent)
         self.tab = QTabWidget()
         self.below = QWidget()
 
-        self.general = SliderTab1()
-        self.frame = FramePage()
-        self.duration = DurationPage()
-
-        self.tab.addTab(self.general, "General")
-        self.tab.addTab(self.frame, "Frame")
-        self.tab.addTab(self.duration, "Duration")
-
-        self.default_properties = {**self.general.getProperties(), **self.duration.default_properties, **self.frame.default_properties}
+        self.general = ImageGeneral()
+        self.tab.addTab(self.general, "general")
+        self.default_properties = self.general.default_properties
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
@@ -30,7 +22,7 @@ class SliderProperty(QWidget):
 
     # 生成主界面
     def setUI(self):
-        self.setWindowTitle("Slider property")
+        self.setWindowTitle("Image property")
         self.resize(600, 800)
         # self.setFixedSize(600, 800)
         main_layout = QVBoxLayout()
@@ -51,15 +43,11 @@ class SliderProperty(QWidget):
         self.below.setLayout(below_layout)
 
     def getInfo(self):
-        # 无frame
-        self.default_properties = {**self.duration.getInfo(),**self.frame.getInfo(),**self.general.getInfo()}
+        self.default_properties = self.general.getInfo()
         return self.default_properties
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
-        self.duration.setAttributes(attributes)
-        self.frame.setAttributes(attributes)
-
 
     def setProperties(self, properties: dict):
         self.default_properties = properties
@@ -67,11 +55,9 @@ class SliderProperty(QWidget):
 
     def loadSetting(self):
         self.general.setProperties(self.default_properties)
-        self.duration.setProperties(self.default_properties)
-        self.frame.setProperties(self.default_properties)
 
     def clone(self):
         properties = self.getInfo()
-        clone_page = SliderProperty()
+        clone_page = ImageProperty()
         clone_page.setProperties(properties)
         return clone_page
