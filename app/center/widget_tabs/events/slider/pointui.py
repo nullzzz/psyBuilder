@@ -2,6 +2,8 @@ from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QFormLayout, QGroupBox, QGridLayout, QSpinBox, QLabel
 from PyQt5.QtWidgets import (QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
+
+from app.info import Info
 from app.lib import PigComboBox
 
 
@@ -26,8 +28,6 @@ class PointWidget(QWidget):
             layout1.addWidget(x_pos, i, 1)
             layout1.addWidget(labely, i, 2)
             layout1.addWidget(y_pos, i, 3)
-
-
 
 
     def changeItem(self, item):

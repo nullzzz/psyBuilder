@@ -411,10 +411,10 @@ class DiagramItem(QGraphicsPolygonItem):
             "P4 X": "0",
             "P4 Y": "0",
             "Point": [['0', '0'], ['0', '0'], ['0', '0']],# added by yang
-            "start": "0",
-            "end angle": "0",
-            "Long axis": "0",
-            "Short axis": "0",
+            "Start angle": "0",
+            "End angle": "0",
+            "Width": "0",
+            "Height": "0",
             "Border color": "black",
             "Border width": 1,
             "Fill color": "white",
@@ -469,10 +469,8 @@ class DiagramItem(QGraphicsPolygonItem):
             self.pro_window.ok_bt.clicked.connect(self.ok)
             self.pro_window.cancel_bt.clicked.connect(self.cancel)
             self.pro_window.apply_bt.clicked.connect(self.apply)
+
         elif self.diagramType == self.Line:
-            # center = QPointF((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2)
-            # print(center.x())
-            # print(self.scenePos())
             path.moveTo(p1.x(), p1.y())
             path.lineTo(p2.x(), p2.y())
             self.myPolygon = path.toFillPolygon()
@@ -496,7 +494,7 @@ class DiagramItem(QGraphicsPolygonItem):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.resizing = False
-        self.sresizing = False
+        self.keepRatioResizing = False
         self.flag = False
         # self.flag1 = False
         self.center = QPointF(0, 0)
@@ -526,7 +524,7 @@ class DiagramItem(QGraphicsPolygonItem):
         if self.resizing and self.diagramType < 4:
             self.flag = True
         # 等比例
-        if self.sresizing and self.diagramType < 4:
+        if self.keepRatioResizing and self.diagramType < 4:
             self.flag = True
             a = rect0.height()
             if a < 5:
@@ -544,27 +542,27 @@ class DiagramItem(QGraphicsPolygonItem):
                 path = QPainterPath()
                 rect = QRectF(rect0.left(), rect0.top(), x - rect0.left(), y - rect0.top())
                 path.addEllipse(rect)
-                self.mpolygon = path.toFillPolygon()
+                self.mPolygon = path.toFillPolygon()
             elif self.diagramType == self.Conditional:
                 path = QPainterPath()
-                mpolygon = QPolygonF([QPointF(-100, (y + rect0.top()) / 2), QPointF((x + rect0.left()) / 2, y),
+                mPolygon = QPolygonF([QPointF(-100, (y + rect0.top()) / 2), QPointF((x + rect0.left()) / 2, y),
                                       QPointF(x, (y + rect0.top()) / 2), QPointF((x + rect0.left()) / 2, -100),
                                       QPointF(-100, (y + rect0.top()) / 2)])
-                path.addPolygon(mpolygon)
-                self.mpolygon = path.toFillPolygon()
+                path.addPolygon(mPolygon)
+                self.mPolygon = path.toFillPolygon()
             elif self.diagramType == self.Step:
                 path = QPainterPath()
                 rect = QRectF(rect0.left(), rect0.top(), x - rect0.left(), y - rect0.top())
                 path.addRect(rect)
-                self.mpolygon = path.toFillPolygon()
+                self.mPolygon = path.toFillPolygon()
             else:
                 path = QPainterPath()
-                mpolygon = QPolygonF([QPointF(-120, -80), QPointF(-120 + (5 * y + 400) / 16, y),
+                mPolygon = QPolygonF([QPointF(-120, -80), QPointF(-120 + (5 * y + 400) / 16, y),
                                       QPointF(x, y), QPointF(x - (5 * y + 400) / 16, -80),
                                       QPointF(-120, -80)])
-                path.addPolygon(mpolygon)
-                self.mpolygon = path.toFillPolygon()
-            self.setPolygon(self.mpolygon)
+                path.addPolygon(mPolygon)
+                self.mPolygon = path.toFillPolygon()
+            self.setPolygon(self.mPolygon)
             self.update()
             self.center = self.polygon().boundingRect().center()
         else:
@@ -575,16 +573,16 @@ class DiagramItem(QGraphicsPolygonItem):
             self.resizing = True
             self.setCursor(Qt.SizeAllCursor)
         elif mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.ShiftModifier:
-            self.sresizing = True
+            self.keepRatioResizing = True
             self.setCursor(Qt.SizeAllCursor)
         else:
             super(DiagramItem, self).mousePressEvent(mouseEvent)
 
     def mouseReleaseEvent(self, mouseEvent):
         self.unsetCursor()
-        self.flag1 = False
-        self.resizing = False
-        self.sresizing = False
+        self.flag1     = False
+        self.resizing  = False
+        self.keepRatioResizing = False
         self.flag = False
         super(DiagramItem, self).mouseReleaseEvent(mouseEvent)
 
@@ -652,12 +650,12 @@ class DiagramItem(QGraphicsPolygonItem):
 
         if self.diagramType == self.Circle:
             path = QPainterPath()
-            rect = QRectF(-int(self.pro_window.frame.default_properties["Long axis"]) / 2,
-                          -int(self.pro_window.frame.default_properties["Short axis"]) / 2,
-                          int(self.pro_window.frame.default_properties["Long axis"]),
-                          int(self.pro_window.frame.default_properties["Short axis"]))
+            rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
+                          -int(self.pro_window.frame.default_properties["Height"]) / 2,
+                          int(self.pro_window.frame.default_properties["Width"]),
+                          int(self.pro_window.frame.default_properties["Height"]))
             path.addEllipse(rect)
-            self.mpolygon = path.toFillPolygon()
+            self.mPolygon = path.toFillPolygon()
             self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
                                int(self.pro_window.frame.default_properties["Center Y"])))
 
@@ -669,10 +667,9 @@ class DiagramItem(QGraphicsPolygonItem):
                         int(self.pro_window.frame.default_properties["P2 Y"]) - cy)
             self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
                                int(self.pro_window.frame.default_properties["Center Y"])))
-            self.mpolygon = path.toFillPolygon()
+            self.mPolygon = path.toFillPolygon()
         else:
             path = QPainterPath()
-            # print(f"{self.pro_window.frame.default_properties}")
 
             verticesXY = self.pro_window.frame.default_properties["Point"]
 
@@ -693,11 +690,11 @@ class DiagramItem(QGraphicsPolygonItem):
             # y3 = int(self.pro_window.frame.default_properties["P3 Y"]) - cy
             # x4 = int(self.pro_window.frame.default_properties["P4 X"]) - cx
             # y4 = int(self.pro_window.frame.default_properties["P4 Y"]) - cy
-            # # mpolygon = QPolygonF([
+            # # mPolygon = QPolygonF([
             # #     QPointF(x1, y1), QPointF(x2, y2),
             # #     QPointF(x3, y3), QPointF(x4, y4),
             # #     QPointF(x1, y1)])
-            # # path.addPolygon(mpolygon)
+            # # path.addPolygon(mPolygon)
             # path.moveTo(x1 + dx, y1 + dy)
             # path.lineTo(x2 + dx, y2 + dy)
             # path.lineTo(x3 + dx, y3 + dy)
@@ -708,8 +705,8 @@ class DiagramItem(QGraphicsPolygonItem):
             self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
                                int(self.pro_window.frame.default_properties["Center Y"])))
 
-            self.mpolygon = path.toFillPolygon()
-        self.setPolygon(self.mpolygon)
+            self.mPolygon = path.toFillPolygon()
+        self.setPolygon(self.mPolygon)
         self.update()
 
     def setProperties(self):
@@ -726,35 +723,27 @@ class DiagramItem(QGraphicsPolygonItem):
             if self.diagramType == self.Circle:
                 self.default_properties["Center X"] = str(int(self.scenePos().x()))
                 self.default_properties["Center Y"] = str(int(self.scenePos().y()))
-                self.default_properties["Long axis"] = str(int(self.polygon().boundingRect().height()))
-                self.default_properties["Short axis"] = str(int(self.polygon().boundingRect().width()))
+                self.default_properties["Height"] = str(int(self.polygon().boundingRect().height()))
+                self.default_properties["Width"] = str(int(self.polygon().boundingRect().width()))
+
+                self.default_properties["Start angle"] = '0'
+                self.default_properties["End angle"] = '360'
             else:
                 x = int(self.scenePos().x())
                 y = int(self.scenePos().y())
-                #"Point": [["0", "0"], ["0", "0"], ["0", "0"]]
-                print(f"slider Line 704: {len(self.polygon())}")
-                print(f"slider Line 704: {self.polygon()[0].x()}")
+
                 self.default_properties["Center X"] = str(int(self.scenePos().x()))
                 self.default_properties["Center Y"] = str(int(self.scenePos().y()))
 
                 verticesXY = []
                 for iVertex in range(len(self.polygon())-1):
                     verticesXY.append([str(int(self.polygon()[iVertex].x()) + x),str(int(self.polygon()[iVertex].y()) + y)])
-                    # self.default_properties["Point"] = [[str(int(self.polygon()[0].x()) + x),str(int(self.polygon()[0].y()) + y)],
-                    #                                     [str(int(self.polygon()[1].x()) + x),str(int(self.polygon()[1].y()) + y)],
-                    #                                     [str(int(self.polygon()[2].x()) + x),str(int(self.polygon()[2].y()) + y)]]
-                print(f"line 746 : {verticesXY}")
+
                 self.default_properties["Point"] = verticesXY
-                self.default_properties["start"] = '0'
-                self.default_properties["end angle"] = '360'
-                # self.default_properties["P1 X"] = str(int(self.polygon()[0].x()) + x)
-                # self.default_properties["P1 Y"] =
-                # self.default_properties["P2 X"] = str(int(self.polygon()[1].x()) + x)
-                # self.default_properties["P2 Y"] = str(int(self.polygon()[1].y()) + y)
-                # self.default_properties["P3 X"] = str(int(self.polygon()[2].x()) + x)
-                # self.default_properties["P3 Y"] = str(int(self.polygon()[2].y()) + y)
-                # self.default_properties["P4 X"] = str(int(self.polygon()[3].x()) + x)
-                # self.default_properties["P4 Y"] = str(int(self.polygon()[3].y()) + y)
+                self.default_properties["Start angle"] = '0'
+                self.default_properties["End angle"] = '360'
+
+
         self.default_properties["Border color"] = self.LineColor
         self.default_properties["Border width"] = str(self.LineWidth)
         self.default_properties["Fill color"] = self.ItemColor
@@ -849,7 +838,7 @@ class DiagramScene(QGraphicsScene):
                 textItem.setFont(self.myFont)
                 textItem.setPlainText('Text')
                 textItem.setTextInteractionFlags(Qt.TextEditorInteraction)
-                textItem.setZValue(1000.0)
+                textItem.setZValue(1000.0)# a possible reason why text is always on the front
                 textItem.lostFocus.connect(self.editorLostFocus)
                 textItem.selectedChange.connect(self.itemSelected)
                 self.addItem(textItem)
@@ -1319,7 +1308,7 @@ class Slider(QMainWindow):
         self.toolBox.setSizePolicy(QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Ignored))
         self.toolBox.setMinimumWidth(itemWidget.sizeHint().width())
         self.toolBox.addItem(itemWidget, "Basic Geometries")
-        self.toolBox.addItem(backgroundWidget, "Backgrounds")
+        self.toolBox.addItem(backgroundWidget, "Stimuli")
 
     def createActions(self):
         self.toFrontAction = QAction(QIcon(Func.getImage("sendtoback.png")), "Bringto & Front", self, shortcut="Ctrl+F",
@@ -1376,17 +1365,20 @@ class Slider(QMainWindow):
         # 字体大小
         self.fontSizeCombo = QComboBox()
         self.fontSizeCombo.setEditable(True)
-        for i in range(8, 30, 2):
-            self.fontSizeCombo.addItem(str(i))
+        for iFontSize in range(8, 30, 2):
+            self.fontSizeCombo.addItem(str(iFontSize))
+
         validator = QIntValidator(2, 64, self)
+
         self.fontSizeCombo.setValidator(validator)
         self.fontSizeCombo.currentIndexChanged.connect(self.fontSizeChanged)
 
         # 边框宽度
         self.lineWidthCombo = QComboBox()
         self.lineWidthCombo.setEditable(True)
-        for i in range(2, 20, 2):
-            self.lineWidthCombo.addItem(str(i))
+        for iLineWidth in range(2, 20, 2):
+            self.lineWidthCombo.addItem(str(iLineWidth))
+
         validator = QIntValidator(0, 20, self)
         self.lineWidthCombo.setValidator(validator)
         self.lineWidthCombo.currentIndexChanged.connect(self.lineWidthChanged)
@@ -1412,8 +1404,7 @@ class Slider(QMainWindow):
             self.createColorMenu(self.itemColorChanged, Qt.white))
         self.fillAction = self.fillColorToolButton.menu().defaultAction()
         self.fillColorToolButton.setIcon(
-            self.createColorToolButtonIcon(Func.getImage("floodfill.png"),
-                                           Qt.white))
+            self.createColorToolButtonIcon(Func.getImage("floodfill.png"), Qt.white))
         self.fillColorToolButton.clicked.connect(self.fillButtonTriggered)
 
         self.lineColorToolButton = QToolButton()
@@ -1422,8 +1413,7 @@ class Slider(QMainWindow):
             self.createColorMenu(self.lineColorChanged, Qt.black))
         self.lineAction = self.lineColorToolButton.menu().defaultAction()
         self.lineColorToolButton.setIcon(
-            self.createColorToolButtonIcon(Func.getImage("linecolor.png"),
-                                           Qt.black))
+            self.createColorToolButtonIcon(Func.getImage("linecolor.png"), Qt.black))
         self.lineColorToolButton.clicked.connect(self.lineButtonTriggered)
 
         # ?

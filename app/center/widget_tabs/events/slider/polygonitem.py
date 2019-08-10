@@ -11,42 +11,45 @@ class FramePage(QWidget):
     def __init__(self, type, parent=None):
         super(FramePage, self).__init__(parent)
         self.attributes = []
-        self.plabels    = [] # added by yang
+        self.pLabels    = [] # added by yang
         self.type = type
         self.default_properties = {
             "Center X": "0",
             "Center Y": "0",
             "Point": [["0", "0"], ["0", "0"], ["0", "0"]],
-            "start": "0",
-            "end angle": "360",
+            "Width": "200",
+            "Height": "200",
+            "Start angle": "0",
+            "End angle": "360",
             "Border color": "black",
             "Border width": '1',
             "Fill color": "white"
         }
-        # print(f"{self.default_properties}")
         # up
-        self.cx_pos = PigComboBox()
-        self.cy_pos = PigComboBox()
+        self.cx_pos  = PigComboBox()
+        self.cy_pos  = PigComboBox()
         self.p1x_pos = PigComboBox()
         self.p1y_pos = PigComboBox()
         self.p2x_pos = PigComboBox()
         self.p2y_pos = PigComboBox()
         self.p3x_pos = PigComboBox()
         self.p3y_pos = PigComboBox()
-        self.p4x_pos = PigComboBox()
-        self.p4y_pos = PigComboBox()
+        # self.p4x_pos = PigComboBox()
+        # self.p4y_pos = PigComboBox()
 
-        self.La = PigComboBox()
-        self.Sa = PigComboBox()
+        self.width = PigComboBox()
+        self.height = PigComboBox()
 
+        self.start_angle = PigComboBox()
+        self.end_angle = PigComboBox()
 
         #各个顶点位置的类
-        self.pinfo = [[self.p1x_pos, self.p1y_pos], [self.p2x_pos, self.p2y_pos], [self.p3x_pos, self.p3y_pos]]
+        self.pInfo = [[self.p1x_pos, self.p1y_pos], [self.p2x_pos, self.p2y_pos], [self.p3x_pos, self.p3y_pos]]
         #各点坐标的布局
-        self.playout = QGridLayout()
+        self.pLayout = QGridLayout()
 
         #group1的布局
-        self.glayout = QVBoxLayout()
+        self.gLayout = QVBoxLayout()
 
         # down
         self.border_color = ColorListEditor()
@@ -58,7 +61,7 @@ class FramePage(QWidget):
 
 
     #点位置的布局
-    def setplayout(self):
+    def setPointsLayout(self):
         l1 = QLabel("Center X:")
         l2 = QLabel(" Y:")
         l3 = QLabel("P1 X:")
@@ -72,16 +75,15 @@ class FramePage(QWidget):
         self.cy_pos.addItems(["0", "25", "50", "75", "100"])
         self.cy_pos.setEditable(True)
 
-
-        self.playout.addWidget(l1, 0, 0)
-        self.playout.addWidget(self.cx_pos, 0, 1)
-        self.playout.addWidget(l2, 0, 2)
-        self.playout.addWidget(self.cy_pos, 0, 3)
+        self.pLayout.addWidget(l1, 0, 0)
+        self.pLayout.addWidget(self.cx_pos, 0, 1)
+        self.pLayout.addWidget(l2, 0, 2)
+        self.pLayout.addWidget(self.cy_pos, 0, 3)
 
         self.add_bt = QPushButton("+")
-        self.add_bt.clicked.connect(self.addpoint)
+        self.add_bt.clicked.connect(self.addPoint)
         self.del_bt = QPushButton("-")
-        self.del_bt.clicked.connect(self.delpoint)
+        self.del_bt.clicked.connect(self.delPoint)
         self.del_bt.setEnabled(False)
 
         below = QWidget()
@@ -93,36 +95,37 @@ class FramePage(QWidget):
         below.setLayout(below_layout)
 
 
-        self.pinfo=[]
-        for i in range(len(self.default_properties["Point"])):
+        self.pInfo=[]
+        for iVertex in range(len(self.default_properties["Point"])):
             #顶点位置
-            labelx = QLabel("P{} X:".format(i+1))
-            labely = QLabel("P{} Y:".format(i+1))
+            labelX = QLabel("P{} X:".format(iVertex+1))
+            labelY = QLabel("P{} Y:".format(iVertex+1))
             x_pos = PigComboBox()
             y_pos = PigComboBox()
             x_pos.addItems(["0", "25", "50", "75", "100"])
             x_pos.setEditable(True)
             y_pos.addItems(["0", "25", "50", "75", "100"])
             y_pos.setEditable(True)
-            labelx.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            labely.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            labelX.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            labelY.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-            self.playout.addWidget(labelx, i+1, 0)
-            self.playout.addWidget(x_pos, i+1, 1)
-            self.playout.addWidget(labely, i+1, 2)
-            self.playout.addWidget(y_pos, i+1, 3)
+            self.pLayout.addWidget(labelX, iVertex + 1, 0)
+            self.pLayout.addWidget(x_pos, iVertex + 1, 1)
+            self.pLayout.addWidget(labelY, iVertex + 1, 2)
+            self.pLayout.addWidget(y_pos, iVertex + 1, 3)
+
             p = [x_pos, y_pos]
-            self.pinfo.append(p)
+            self.pInfo.append(p)
 
         top = QWidget()
-        top.setLayout(self.playout)
-        self.glayout.addWidget(top, 6)
-        self.glayout.addWidget(below, 1)
-        self.glayout.setSpacing(0)
+        top.setLayout(self.pLayout)
+        self.gLayout.addWidget(top, 6)
+        self.gLayout.addWidget(below, 1)
+        self.gLayout.setSpacing(0)
 
-    def addpoint(self):
+    def addPoint(self):
 
-        if len(self.pinfo) == 20:
+        if len(self.pInfo) == 20:
             self.add_bt.setEnabled(False)
             return
         #顶点位置改变
@@ -135,48 +138,50 @@ class FramePage(QWidget):
         y_pos.addItems(["0", "25", "50", "75", "100"])
         y_pos.setEditable(True)
         p = [x_pos, y_pos]
-        self.pinfo.append(p)
+        self.pInfo.append(p)
 
         #给顶点赋值
         #圆心
         x = int(self.default_properties["Center X"])
         y = int(self.default_properties["Center Y"])
 
-        n = len(self.default_properties["Point"])
-        for i in range(n):
+        nVertices = len(self.default_properties["Point"])
+
+        for iVertex in range(nVertices):
             try:
-                self.default_properties["Point"][i][0] = str(x + int(100 * np.cos(np.pi/2 - i*2*np.pi/n)))
-                self.default_properties["Point"][i][1] = str(y + int(100 * np.sin(i * 2 * np.pi / n - np.pi / 2)))
+                self.default_properties["Point"][iVertex][0] = str(x + int(100 * np.cos(np.pi/2 - iVertex*2*np.pi/nVertices)))
+                self.default_properties["Point"][iVertex][1] = str(y + int(100 * np.sin(iVertex * 2 * np.pi / nVertices - np.pi / 2)))
             except Exception as e:
                 print(e)
 
-        for i in range(len(self.pinfo)):
-            self.pinfo[i][0].setCurrentText(self.default_properties["Point"][i][0])
-            self.pinfo[i][1].setCurrentText(self.default_properties["Point"][i][1])
+        for iVertex in range(len(self.pInfo)):
+            self.pInfo[iVertex][0].setCurrentText(self.default_properties["Point"][iVertex][0])
+            self.pInfo[iVertex][1].setCurrentText(self.default_properties["Point"][iVertex][1])
 
-        labelx = QLabel("P{} X:".format(len(self.pinfo)))
-        labely = QLabel("P{} Y:".format(len(self.pinfo)))
-        labelx.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        labely.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        labelX = QLabel("P{} X:".format(len(self.pInfo)))
+        labelY = QLabel("P{} Y:".format(len(self.pInfo)))
 
-        self.playout.addWidget(labelx, len(self.pinfo)+1, 0)
-        self.playout.addWidget(self.pinfo[-1][0], len(self.pinfo)+1, 1)
-        self.playout.addWidget(labely, len(self.pinfo)+1, 2)
-        self.playout.addWidget(self.pinfo[-1][1], len(self.pinfo)+1, 3)
+        labelX.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        labelY.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        self.pLayout.addWidget(labelX, len(self.pInfo) + 1, 0)
+        self.pLayout.addWidget(self.pInfo[-1][0], len(self.pInfo) + 1, 1)
+        self.pLayout.addWidget(labelY, len(self.pInfo) + 1, 2)
+        self.pLayout.addWidget(self.pInfo[-1][1], len(self.pInfo) + 1, 3)
 
         # self.plabels = [] # a bug here
-        self.plabels.append([labelx, labely])
+        self.pLabels.append([labelX, labelY])
         self.del_bt.setEnabled(True)
 
 
-    def delpoint(self):
+    def delPoint(self):
         self.default_properties["Point"].pop(-1)
-        x1 = self.pinfo[-1][0]
-        x2 = self.pinfo[-1][1]
-        y1 = self.plabels[-1][0]
-        y2 = self.plabels[-1][1]
-        self.pinfo.pop(-1)
-        self.plabels.pop(-1)
+        x1 = self.pInfo[-1][0]
+        x2 = self.pInfo[-1][1]
+        y1 = self.pLabels[-1][0]
+        y2 = self.pLabels[-1][1]
+        self.pInfo.pop(-1)
+        self.pLabels.pop(-1)
         x1.deleteLater()
         x2.deleteLater()
         y1.deleteLater()
@@ -187,18 +192,19 @@ class FramePage(QWidget):
         x = int(self.default_properties["Center X"])
         y = int(self.default_properties["Center Y"])
         n = len(self.default_properties["Point"])
-        for i in range(len(self.default_properties["Point"])):
+
+        for iVertex in range(n):
             try:
-                self.default_properties["Point"][i][0] = str(x + int(100 * np.cos(np.pi / 2 - i * 2 * np.pi / n)))
-                self.default_properties["Point"][i][1] = str(y + int(100 * np.sin(i * 2 * np.pi / n - np.pi / 2)))
+                self.default_properties["Point"][iVertex][0] = str(x + int(100 * np.cos(np.pi / 2 - iVertex * 2 * np.pi / n)))
+                self.default_properties["Point"][iVertex][1] = str(y + int(100 * np.sin(iVertex * 2 * np.pi / n - np.pi / 2)))
             except Exception as e:
                 print(e)
 
-        for i in range(len(self.pinfo)):
-            self.pinfo[i][0].setCurrentText(self.default_properties["Point"][i][0])
-            self.pinfo[i][1].setCurrentText(self.default_properties["Point"][i][1])
+        for iVertex in range(len(self.pInfo)):
+            self.pInfo[iVertex][0].setCurrentText(self.default_properties["Point"][iVertex][0])
+            self.pInfo[iVertex][1].setCurrentText(self.default_properties["Point"][iVertex][1])
 
-        if len(self.pinfo) == 3:
+        if len(self.pInfo) == 3:
             self.del_bt.setEnabled(False)
 
     # 生成frame页面
@@ -208,37 +214,37 @@ class FramePage(QWidget):
         self.cy_pos.addItems(["0", "25", "50", "75", "100"])
         self.cy_pos.setEditable(True)
 
+        self.width.addItems(["200", "300", "400","500", "600"])
+        self.width.setEditable(True)
+        self.height.addItems(["200", "300", "400","500", "600"])
+        self.height.setEditable(True)
 
+        self.start_angle.addItems(["0", "90", "180","270", "360"])
+        self.start_angle.setEditable(True)
+        self.end_angle.addItems(["0", "90", "180","270", "360"])
+        self.end_angle.setEditable(True)
 
-        self.La.addItems(["0", "25", "50", "75", "100"])
-        self.La.setEditable(True)
-        self.Sa.addItems(["0", "25", "50", "75", "100"])
-        self.Sa.setEditable(True)
         valid_num = QRegExp("\d+")
         self.cx_pos.setValidator(QRegExpValidator(valid_num))
         self.cy_pos.setValidator(QRegExpValidator(valid_num))
-        # self.p1x_pos.setValidator(QRegExpValidator(valid_num))
-        # self.p1y_pos.setValidator(QRegExpValidator(valid_num))
-        # self.p2x_pos.setValidator(QRegExpValidator(valid_num))
-        # self.p2y_pos.setValidator(QRegExpValidator(valid_num))
-        # self.p3x_pos.setValidator(QRegExpValidator(valid_num))
-        # self.p3y_pos.setValidator(QRegExpValidator(valid_num))
-        # self.p4x_pos.setValidator(QRegExpValidator(valid_num))
-        # self.p4y_pos.setValidator(QRegExpValidator(valid_num))
-        self.La.setValidator(QRegExpValidator(valid_num))
-        self.Sa.setValidator(QRegExpValidator(valid_num))
 
-        for i in self.pinfo:
-            i[0].addItems(["0", "25", "50", "75", "100"])
-            i[0].setEditable(True)
-            i[1].addItems(["0", "25", "50", "75", "100"])
-            i[1].setEditable(True)
-            i[0].setValidator(QRegExpValidator(valid_num))
-            i[1].setValidator(QRegExpValidator(valid_num))
+        self.width.setValidator(QRegExpValidator(valid_num))
+        self.height.setValidator(QRegExpValidator(valid_num))
+
+        self.start_angle.setValidator(QRegExpValidator(valid_num))
+        self.end_angle.setValidator(QRegExpValidator(valid_num))
+
+        for vertex in self.pInfo:
+            vertex[0].addItems(["0", "25", "50", "75", "100"])
+            vertex[0].setEditable(True)
+            vertex[1].addItems(["0", "25", "50", "75", "100"])
+            vertex[1].setEditable(True)
+            vertex[0].setValidator(QRegExpValidator(valid_num))
+            vertex[1].setValidator(QRegExpValidator(valid_num))
 
 
         l1 = QLabel("Center X:")
-        l2 = QLabel(" Y:")
+        l2 = QLabel("Center Y:")
         l3 = QLabel("P1 X:")
         l4 = QLabel(" Y:")
         l5 = QLabel("P2 X:")
@@ -246,12 +252,18 @@ class FramePage(QWidget):
         l7 = QLabel("P3 X:")
         l8 = QLabel(" Y:")
         l9 = QLabel("P4 X:")
-        _21 = QLabel(" Y:")
-        _22 = QLabel("start:")
-        _23 = QLabel("angle:")
-        _24 = QLabel("Border Color:")
-        _25 = QLabel("Border Width:")
-        _26 = QLabel("Fill Color")
+        l10 = QLabel(" Y:")
+
+        l_width = QLabel("Width:")
+        l_height = QLabel("Height:")
+
+        l_start_angle = QLabel("Start Angle°:")
+        l_end_angle = QLabel("End Angle°:")
+
+        l_borderColor = QLabel("Border Color:")
+        l_borderWidth = QLabel("Border Width:")
+        l_fillColor = QLabel("Fill Color")
+
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -261,46 +273,27 @@ class FramePage(QWidget):
         l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l8.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l9.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        _21.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        _22.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        _23.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        _24.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        _25.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        _26.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l10.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        l_width.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_height.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        l_start_angle.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_end_angle.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        l_borderColor.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_borderWidth.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_fillColor.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
 
         group1 = QGroupBox("Geometry")
         layout1 = QGridLayout()
         #多边形
         if self.type == 'four':
-            # layout1.addWidget(l1, 0, 0)
-            # layout1.addWidget(self.cx_pos, 0, 1)
-            # layout1.addWidget(l2, 0, 2)
-            # layout1.addWidget(self.cy_pos, 0, 3)
-            # layout1.addWidget(l3, 1, 0)
-            # layout1.addWidget(self.p1x_pos, 1, 1)
-            # layout1.addWidget(l4, 1, 2)
-            # layout1.addWidget(self.p1y_pos, 1, 3)
-            # layout1.addWidget(l5, 2, 0)
-            # layout1.addWidget(self.p2x_pos, 2, 1)
-            # layout1.addWidget(l6, 2, 2)
-            # layout1.addWidget(self.p2y_pos, 2, 3)
-            # layout1.addWidget(l7, 3, 0)
-            # layout1.addWidget(self.p3x_pos, 3, 1)
-            # layout1.addWidget(l8, 3, 2)
-            # layout1.addWidget(self.p3y_pos, 3, 3)
-            # layout1.addWidget(l9, 4, 0)
-            # layout1.addWidget(self.p4x_pos, 4, 1)
-            # layout1.addWidget(_21, 4, 2)
-            # layout1.addWidget(self.p4y_pos, 4, 3)
         #直线
-            self.setplayout()
-            layout1 = self.glayout
+            self.setPointsLayout()
+            layout1 = self.gLayout
         elif self.type == 'two':
-            # layout1.addWidget(l1, 0, 0)
-            # layout1.addWidget(self.cx_pos, 0, 1)
-            # layout1.addWidget(l2, 0, 2)
-            # layout1.addWidget(self.cy_pos, 0, 3)
             layout1.addWidget(l3, 0, 0)
             layout1.addWidget(self.p1x_pos, 0, 1)
             layout1.addWidget(l4, 0, 2)
@@ -314,19 +307,25 @@ class FramePage(QWidget):
             layout1.addWidget(self.cx_pos, 0, 1)
             layout1.addWidget(l2, 0, 2)
             layout1.addWidget(self.cy_pos, 0, 3)
-            layout1.addWidget(_22, 1, 0)
-            layout1.addWidget(self.La, 1, 1)
-            layout1.addWidget(_23, 1, 2)
-            layout1.addWidget(self.Sa, 1, 3)
+
+            layout1.addWidget(l_width, 1, 0)
+            layout1.addWidget(self.width, 1, 1)
+            layout1.addWidget(l_height, 1, 2)
+            layout1.addWidget(self.height, 1, 3)
+
+            layout1.addWidget(l_start_angle, 2, 0)
+            layout1.addWidget(self.start_angle, 2, 1)
+            layout1.addWidget(l_end_angle, 2, 2)
+            layout1.addWidget(self.end_angle, 2, 3)
 
         group1.setLayout(layout1)
 
         group2 = QGroupBox("")
         layout2 = QFormLayout()
-        layout2.addRow(_24, self.border_color)
-        layout2.addRow(_25, self.border_width)
+        layout2.addRow(l_borderColor, self.border_color)
+        layout2.addRow(l_borderWidth, self.border_width)
         if self.type != 'two':
-            layout2.addRow(_26, self.item_color)
+            layout2.addRow(l_fillColor, self.item_color)
         layout2.setVerticalSpacing(20)
         group2.setLayout(layout2)
 
@@ -339,32 +338,20 @@ class FramePage(QWidget):
     # 设置可选属性
     def setAttributes(self, attributes):
         self.attributes = attributes
-        # self.x_pos.setCompleter(QCompleter(self.attributes))
-        # self.y_pos.setCompleter(QCompleter(self.attributes))
-        # self.width.setCompleter(QCompleter(self.attributes))
-        # self.height.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         self.default_properties['Center X'] = self.cx_pos.currentText()
         self.default_properties['Center Y'] = self.cy_pos.currentText()
-        # self.default_properties['P1 X'] = self.p1x_pos.currentText()
-        # self.default_properties['P1 Y'] = self.p1y_pos.currentText()
-        # self.default_properties['P2 X'] = self.p2x_pos.currentText()
-        # self.default_properties['P2 Y'] = self.p2y_pos.currentText()
-        # self.default_properties['P3 X'] = self.p3x_pos.currentText()
-        # self.default_properties['P3 Y'] = self.p3y_pos.currentText()
-        # self.default_properties['P4 X'] = self.p4x_pos.currentText()
-        # self.default_properties['P4 Y'] = self.p4y_pos.currentText()
-        # print(f"pinfo:{len(self.pinfo)}")
-        # print(f"depro:{self.default_properties['Point']}")
-        for iVertex in range(len(self.pinfo)):
-            # print(f"{iVertex}:{self.pinfo[iVertex][0].currentText()}")
-            # print(f"{self.default_properties['Point'][iVertex][0]}")
-            self.default_properties["Point"][iVertex][0] = self.pinfo[iVertex][0].currentText()
-            self.default_properties["Point"][iVertex][1] = self.pinfo[iVertex][1].currentText()
 
-        self.default_properties['start']        = self.La.currentText()
-        self.default_properties['end angle']    = self.Sa.currentText()
+        for iVertex in range(len(self.pInfo)):
+
+            self.default_properties["Point"][iVertex][0] = self.pInfo[iVertex][0].currentText()
+            self.default_properties["Point"][iVertex][1] = self.pInfo[iVertex][1].currentText()
+
+        self.default_properties['Width']        = self.width.currentText()
+        self.default_properties['Height']       = self.height.currentText()
+        self.default_properties['Start angle']  = self.start_angle.currentText()
+        self.default_properties['End angle']    = self.end_angle.currentText()
         self.default_properties['Border width'] = str(self.border_width.value())
         self.default_properties['Border color'] = self.border_color.currentText()
         self.default_properties['Fill color']   = self.item_color.currentText()
@@ -383,23 +370,17 @@ class FramePage(QWidget):
     def loadSetting(self):
         self.cx_pos.setCurrentText(self.default_properties["Center X"])
         self.cy_pos.setCurrentText(self.default_properties["Center Y"])
-        # self.p1x_pos.setCurrentText(self.default_properties["P1 X"])
-        # self.p1y_pos.setCurrentText(self.default_properties["P1 Y"])
-        # self.p2x_pos.setCurrentText(self.default_properties["P2 X"])
-        # self.p2y_pos.setCurrentText(self.default_properties["P2 Y"])
-        # self.p3x_pos.setCurrentText(self.default_properties["P3 X"])
-        # self.p3y_pos.setCurrentText(self.default_properties["P3 Y"])
-        # self.p4x_pos.setCurrentText(self.default_properties["P4 X"])
-        # self.p4y_pos.setCurrentText(self.default_properties["P4 Y"])
-        # print(f"{self.pinfo}")
-        # print(f"slider 389: {self.default_properties['Point']}")
-        for i in range(len(self.pinfo)):
-            self.pinfo[i][0].setCurrentText(self.default_properties["Point"][i][0])
-            self.pinfo[i][1].setCurrentText(self.default_properties["Point"][i][1])
 
+        for i in range(len(self.pInfo)):
+            self.pInfo[i][0].setCurrentText(self.default_properties["Point"][i][0])
+            self.pInfo[i][1].setCurrentText(self.default_properties["Point"][i][1])
 
-        self.La.setCurrentText(self.default_properties["start"])
-        self.Sa.setCurrentText(self.default_properties["end angle"])
+        self.width.setCurrentText(self.default_properties["Width"])
+        self.height.setCurrentText(self.default_properties["Height"])
+
+        self.start_angle.setCurrentText(self.default_properties["Start angle"])
+        self.end_angle.setCurrentText(self.default_properties["End angle"])
+
         self.border_color.setCurrentText(self.default_properties["Border color"])
         self.border_width.setValue(int(self.default_properties["Border width"]))
         self.item_color.setCurrentText(self.default_properties['Fill color'])
@@ -432,7 +413,7 @@ class polygonProperty(QWidget):
 
         self.frame = FramePage(type)
         self.default_properties = {**self.frame.default_properties}
-        # print(f"line 429 {self.default_properties}")
+
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
