@@ -20,7 +20,7 @@ class FramePage(QWidget):
             "Width": "200",
             "Height": "200",
             "Start angle": "0",
-            "End angle": "360",
+            "Angle length": "270",
             "Border color": "black",
             "Border width": '1',
             "Fill color": "white"
@@ -41,7 +41,7 @@ class FramePage(QWidget):
         self.height = PigComboBox()
 
         self.start_angle = PigComboBox()
-        self.end_angle = PigComboBox()
+        self.end_angle   = PigComboBox()
 
         #各个顶点位置的类
         self.pInfo = [[self.p1x_pos, self.p1y_pos], [self.p2x_pos, self.p2y_pos], [self.p3x_pos, self.p3y_pos]]
@@ -258,17 +258,18 @@ class FramePage(QWidget):
         l_p1Y = QLabel(" Y:")
         l_p2X = QLabel("P2 X:")
         l_p2Y = QLabel(" Y:")
-        l_p3X = QLabel("P3 X:")
-        l_p3Y = QLabel(" Y:")
 
-        l_p4X = QLabel("P4 X:")
-        l_p4Y = QLabel(" Y:")
+        # l_p3X = QLabel("P3 X:")
+        # l_p3Y = QLabel(" Y:")
+        #
+        # l_p4X = QLabel("P4 X:")
+        # l_p4Y = QLabel(" Y:")
 
         l_width = QLabel("Width:")
         l_height = QLabel("Height:")
 
         l_start_angle = QLabel("Start Angle°:")
-        l_end_angle = QLabel("End Angle°:")
+        l_end_angle = QLabel("Angle Length°:")
 
         l_borderColor = QLabel("Border Color:")
         l_borderWidth = QLabel("Border Width:")
@@ -280,11 +281,11 @@ class FramePage(QWidget):
         l_p1Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_p2X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_p2Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l_p3X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l_p3Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-
-        l_p4X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l_p4Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l_p3X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l_p3Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        #
+        # l_p4X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l_p4Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         l_width.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_height.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -329,7 +330,7 @@ class FramePage(QWidget):
             layout1.addWidget(self.start_angle, 2, 1)
             layout1.addWidget(l_end_angle, 2, 2)
             layout1.addWidget(self.end_angle, 2, 3)
-        else:
+        else: # rectangle, circle, polygon
             layout1.addWidget(l_cX, 0, 0)
             layout1.addWidget(self.cx_pos, 0, 1)
             layout1.addWidget(l_cY, 0, 2)
@@ -374,7 +375,7 @@ class FramePage(QWidget):
         self.default_properties['Width']        = self.width.currentText()
         self.default_properties['Height']       = self.height.currentText()
         self.default_properties['Start angle']  = self.start_angle.currentText()
-        self.default_properties['End angle']    = self.end_angle.currentText()
+        self.default_properties['Angle length'] = self.end_angle.currentText()
         self.default_properties['Border width'] = str(self.border_width.value())
         self.default_properties['Border color'] = self.border_color.currentText()
         self.default_properties['Fill color']   = self.item_color.currentText()
@@ -402,7 +403,7 @@ class FramePage(QWidget):
         self.height.setCurrentText(self.default_properties["Height"])
 
         self.start_angle.setCurrentText(self.default_properties["Start angle"])
-        self.end_angle.setCurrentText(self.default_properties["End angle"])
+        self.end_angle.setCurrentText(self.default_properties["Angle length"])
 
         self.border_color.setCurrentText(self.default_properties["Border color"])
         self.border_width.setValue(int(self.default_properties["Border width"]))

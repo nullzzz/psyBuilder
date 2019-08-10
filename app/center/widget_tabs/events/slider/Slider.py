@@ -391,11 +391,11 @@ class DiagramItem(QGraphicsPolygonItem):
             "P2 Y": "0",
             "P3 X": "0",
             "P3 Y": "0",
-            "P4 X": "0",
-            "P4 Y": "0",
+            # "P4 X": "0",
+            # "P4 Y": "0",
             "Point": [['0', '0'], ['0', '0'], ['0', '0']],# added by yang
             "Start angle": "0",
-            "End angle": "0",
+            "Angle length": "270",
             "Width": "200",
             "Height": "200",
             "Border color": "black",
@@ -417,7 +417,7 @@ class DiagramItem(QGraphicsPolygonItem):
         elif self.diagramType == self.Rectangle:
             path.addRect(QRectF(-100, -100, 200, 200))
             self.myPolygon  = path.toFillPolygon()
-            self.pro_window = polygonProperty('arc')
+            self.pro_window = polygonProperty('rectangle')
 
         # arc
         elif self.diagramType == self.Arc:
@@ -450,15 +450,7 @@ class DiagramItem(QGraphicsPolygonItem):
             self.pro_window = polygonProperty('line')
 
         else:
-            pass
-            # myPolygon = QPolygonF([
-            #     QPointF(-120, -80), QPointF(-70, 80),
-            #     QPointF(120, 80), QPointF(70, -80),
-            #     QPointF(-120, -80)])
-            #
-            # path.addPolygon(myPolygon)
-            # self.myPolygon = path.toFillPolygon()
-            # self.pro_window = polygonProperty('arc')
+            raise Exception("diagramType should be of 'Arc','Line','rectangle', or 'circle' !!")
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
@@ -485,15 +477,23 @@ class DiagramItem(QGraphicsPolygonItem):
 
     def setLineWidth(self, width):
         self.LineWidth = width
+        self.polygon
 
     def boundingRect(self):
-        return self.polygon().boundingRect().adjusted(-self.pen().width(), -self.pen().width(), self.pen().width(),
+        return self.polygon().boundingRect().adjusted(-self.pen().width(),
+                                                      -self.pen().width(),
+                                                      self.pen().width(),
                                                       self.pen().width())
+
 
     def mouseMoveEvent(self, mouseEvent):
         x = mouseEvent.pos().x()
         y = mouseEvent.pos().y()
+        test = self.polygon()
+        print(f"line 493: {test.toList()}")
+        print(f"line 493: {test.takeLast()}")
         rect0 = self.polygon().boundingRect()
+
         self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
         # 非等比例
         if self.resizing and self.diagramType < 4:
@@ -507,47 +507,43 @@ class DiagramItem(QGraphicsPolygonItem):
             cWidth = rect0.width()
             if cWidth < 5:
                 cWidth = 5
-                
+
+            # make sure the zoom in/out ratio equal for h and w
             ratio = cHeight / cWidth
+
             if (y - cHeight) / (x - cWidth) > ratio:
                 y = ratio * (x - cWidth) + cHeight
             else:
                 x = (y - cHeight) / ratio + cWidth
                 
         if self.resizingFlag:
+            path  = QPainterPath()
+            cRect = QRectF(rect0.left(), rect0.top(), x - rect0.left(), y - rect0.top())
+
             if self.diagramType == self.Circle:
-                path = QPainterPath()
-                rect = QRectF(rect0.left(), rect0.top(), x - rect0.left(), y - rect0.top())
-                path.addEllipse(rect)
-                self.mPolygon = path.toFillPolygon()
+                path.addEllipse(cRect)
 
             elif self.diagramType == self.Arc:
-                path = QPainterPath()
-                mPolygon = QPolygonF([QPointF(-100, (y + rect0.top()) / 2), QPointF((x + rect0.left()) / 2, y),
-                                      QPointF(x, (y + rect0.top()) / 2), QPointF((x + rect0.left()) / 2, -100),
-                                      QPointF(-100, (y + rect0.top()) / 2)])
-                path.addPolygon(mPolygon)
-                self.mPolygon = path.toFillPolygon()
+                path.moveTo(cRect.center())
+                path.arcTo(cRect, 0, 270)
+
+            elif self.diagramType == self.Rectangle:
+                path.addRect(cRect)
 
             elif self.diagramType == self.PolygonStim:
-                path = QPainterPath()
-                rect = QRectF(rect0.left(), rect0.top(), x - rect0.left(), y - rect0.top())
-                path.addRect(rect)
-                self.mPolygon = path.toFillPolygon()
+                path.addRect(cRect)
 
             else:
-                path = QPainterPath()
-                mPolygon = QPolygonF([QPointF(-120, -80), QPointF(-120 + (5 * y + 400) / 16, y),
-                                      QPointF(x, y), QPointF(x - (5 * y + 400) / 16, -80),
-                                      QPointF(-120, -80)])
-                path.addPolygon(mPolygon)
-                self.mPolygon = path.toFillPolygon()
+                raise Exception("diagramType should be of 'Arc','rectangle', or 'circle' !!")
 
+            self.mPolygon = path.toFillPolygon()
             self.setPolygon(self.mPolygon)
             self.update()
+
             self.center = self.polygon().boundingRect().center()
         else:
             super(DiagramItem, self).mouseMoveEvent(mouseEvent)
+
 
     def mousePressEvent(self, mouseEvent):
         if mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.AltModifier:
@@ -625,35 +621,50 @@ class DiagramItem(QGraphicsPolygonItem):
         cy = int(self.pro_window.frame.default_properties["Center Y"])
         dx = cx - cx0
         dy = cy - cy0
+
         self.ItemColor = self.pro_window.frame.default_properties["Fill color"]
         self.LineColor = self.pro_window.frame.default_properties["Border color"]
         self.LineWidth = int(self.pro_window.frame.default_properties["Border width"])
-        self.setBrush(QColor(self.ItemColor))
+
+        self.setBrush(QColor(self.ItemColor)) # item Color == Fill color
         pen = self.pen()
         pen.setWidth(self.LineWidth)
         pen.setColor(QColor(self.LineColor))
         self.setPen(pen)
 
+        path = QPainterPath()
+
         if self.diagramType == self.Circle:
-            path = QPainterPath()
             rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
                           -int(self.pro_window.frame.default_properties["Height"]) / 2,
                           int(self.pro_window.frame.default_properties["Width"]),
                           int(self.pro_window.frame.default_properties["Height"]))
             path.addEllipse(rect)
 
+        elif self.diagramType == self.Arc:
+            rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
+                          -int(self.pro_window.frame.default_properties["Height"]) / 2,
+                          int(self.pro_window.frame.default_properties["Width"]),
+                          int(self.pro_window.frame.default_properties["Height"]))
+
+            path.arcTo(rect,int(self.pro_window.frame.default_properties["Start angle"]),
+                            int(self.pro_window.frame.default_properties["Angle length"]) )
+
+        elif self.diagramType == self.Rectangle:
+            rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
+                          -int(self.pro_window.frame.default_properties["Height"]) / 2,
+                          int(self.pro_window.frame.default_properties["Width"]),
+                          int(self.pro_window.frame.default_properties["Height"]))
+            path.addRect(rect)
+
         elif self.diagramType == self.Line:
-            path = QPainterPath()
             path.moveTo(int(self.pro_window.frame.default_properties["P1 X"]) - cx,
                         int(self.pro_window.frame.default_properties["P1 Y"]) - cy)
             path.lineTo(int(self.pro_window.frame.default_properties["P2 X"]) - cx,
                         int(self.pro_window.frame.default_properties["P2 Y"]) - cy)
 
-        else:
-            path = QPainterPath()
-
+        elif self.diagramType == self.PolygonStim:
             verticesXY = self.pro_window.frame.default_properties["Point"]
-
             # added by yang to plot the m-polygon
             for iVertex in range(len(verticesXY)):
                 if iVertex == 0:
@@ -684,12 +695,19 @@ class DiagramItem(QGraphicsPolygonItem):
             self.default_properties["P2 X"] = str(int(self.polygon()[1].x()) + x)
             self.default_properties["P2 Y"] = str(int(self.polygon()[1].y()) + y)
 
-        elif self.diagramType == self.Circle:
+        elif self.diagramType == self.Rectangle:
+            self.default_properties["Height"]   = str(int(self.polygon().boundingRect().height()))
+            self.default_properties["Width"]    = str(int(self.polygon().boundingRect().width()))
+        elif self.diagramType == self.Arc:
             self.default_properties["Height"]   = str(int(self.polygon().boundingRect().height()))
             self.default_properties["Width"]    = str(int(self.polygon().boundingRect().width()))
 
             self.default_properties["Start angle"] = '0'
-            self.default_properties["End angle"]   = '360'
+            self.default_properties["Angle length"]   = '360'
+
+        elif self.diagramType == self.Circle:
+            self.default_properties["Height"]   = str(int(self.polygon().boundingRect().height()))
+            self.default_properties["Width"]    = str(int(self.polygon().boundingRect().width()))
 
         elif self.diagramType == self.PolygonStim:
             verticesXY = []
@@ -697,14 +715,13 @@ class DiagramItem(QGraphicsPolygonItem):
                 verticesXY.append([str(int(self.polygon()[iVertex].x()) + x),str(int(self.polygon()[iVertex].y()) + y)])
 
             self.default_properties["Point"] = verticesXY
-            # self.default_properties["Start angle"] = '0'
-            # self.default_properties["End angle"] = '360'
 
 
         self.default_properties["Border color"] = self.LineColor
         self.default_properties["Border width"] = str(self.LineWidth)
         self.default_properties["Fill color"]   = self.ItemColor
         self.default_properties["z"]            = self.zValue()
+
 
     def restore(self, properties: dict):
         if properties:
