@@ -12,7 +12,7 @@ class FramePage(QWidget):
         super(FramePage, self).__init__(parent)
         self.attributes = []
         self.pLabels    = [] # added by yang
-        self.type = type
+        self.type       = type
         self.default_properties = {
             "Center X": "0",
             "Center Y": "0",
@@ -62,22 +62,24 @@ class FramePage(QWidget):
 
     #点位置的布局
     def setPointsLayout(self):
-        l1 = QLabel("Center X:")
-        l2 = QLabel(" Y:")
-        l3 = QLabel("P1 X:")
-        l4 = QLabel(" Y:")
-        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_cX = QLabel("Center X:")
+        l_cY = QLabel("Center Y:")
+        l_p1X = QLabel("P1 X:")
+        l_p1Y = QLabel("P1 Y:")
+
+        l_cX.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_cY.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_p1X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_p1Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
         self.cx_pos.addItems(["0", "25", "50", "75", "100"])
         self.cx_pos.setEditable(True)
         self.cy_pos.addItems(["0", "25", "50", "75", "100"])
         self.cy_pos.setEditable(True)
 
-        self.pLayout.addWidget(l1, 0, 0)
+        self.pLayout.addWidget(l_cX, 0, 0)
         self.pLayout.addWidget(self.cx_pos, 0, 1)
-        self.pLayout.addWidget(l2, 0, 2)
+        self.pLayout.addWidget(l_cY, 0, 2)
         self.pLayout.addWidget(self.cy_pos, 0, 3)
 
         self.add_bt = QPushButton("+")
@@ -95,17 +97,21 @@ class FramePage(QWidget):
         below.setLayout(below_layout)
 
 
-        self.pInfo=[]
+        self.pInfo = []
+
         for iVertex in range(len(self.default_properties["Point"])):
             #顶点位置
             labelX = QLabel("P{} X:".format(iVertex+1))
             labelY = QLabel("P{} Y:".format(iVertex+1))
+
             x_pos = PigComboBox()
             y_pos = PigComboBox()
+
             x_pos.addItems(["0", "25", "50", "75", "100"])
             x_pos.setEditable(True)
             y_pos.addItems(["0", "25", "50", "75", "100"])
             y_pos.setEditable(True)
+
             labelX.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             labelY.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
@@ -119,6 +125,7 @@ class FramePage(QWidget):
 
         top = QWidget()
         top.setLayout(self.pLayout)
+
         self.gLayout.addWidget(top, 6)
         self.gLayout.addWidget(below, 1)
         self.gLayout.setSpacing(0)
@@ -133,20 +140,21 @@ class FramePage(QWidget):
 
         x_pos = PigComboBox()
         y_pos = PigComboBox()
+
         x_pos.addItems(["0", "25", "50", "75", "100"])
         x_pos.setEditable(True)
         y_pos.addItems(["0", "25", "50", "75", "100"])
         y_pos.setEditable(True)
         p = [x_pos, y_pos]
+
         self.pInfo.append(p)
 
         #给顶点赋值
-        #圆心
+        # get center axis of the stimulus
         x = int(self.default_properties["Center X"])
         y = int(self.default_properties["Center Y"])
 
         nVertices = len(self.default_properties["Point"])
-
         for iVertex in range(nVertices):
             try:
                 self.default_properties["Point"][iVertex][0] = str(x + int(100 * np.cos(np.pi/2 - iVertex*2*np.pi/nVertices)))
@@ -178,15 +186,17 @@ class FramePage(QWidget):
         self.default_properties["Point"].pop(-1)
         x1 = self.pInfo[-1][0]
         x2 = self.pInfo[-1][1]
+
         y1 = self.pLabels[-1][0]
         y2 = self.pLabels[-1][1]
+
         self.pInfo.pop(-1)
         self.pLabels.pop(-1)
+
         x1.deleteLater()
         x2.deleteLater()
         y1.deleteLater()
         y2.deleteLater()
-
 
         #给其他顶点赋值
         x = int(self.default_properties["Center X"])
@@ -242,17 +252,17 @@ class FramePage(QWidget):
             vertex[0].setValidator(QRegExpValidator(valid_num))
             vertex[1].setValidator(QRegExpValidator(valid_num))
 
+        l_cX = QLabel("Center X:")
+        l_cY = QLabel("Center Y:")
+        l_p1X = QLabel("P1 X:")
+        l_p1Y = QLabel(" Y:")
+        l_p2X = QLabel("P2 X:")
+        l_p2Y = QLabel(" Y:")
+        l_p3X = QLabel("P3 X:")
+        l_p3Y = QLabel(" Y:")
 
-        l1 = QLabel("Center X:")
-        l2 = QLabel("Center Y:")
-        l3 = QLabel("P1 X:")
-        l4 = QLabel(" Y:")
-        l5 = QLabel("P2 X:")
-        l6 = QLabel(" Y:")
-        l7 = QLabel("P3 X:")
-        l8 = QLabel(" Y:")
-        l9 = QLabel("P4 X:")
-        l10 = QLabel(" Y:")
+        l_p4X = QLabel("P4 X:")
+        l_p4Y = QLabel(" Y:")
 
         l_width = QLabel("Width:")
         l_height = QLabel("Height:")
@@ -264,16 +274,17 @@ class FramePage(QWidget):
         l_borderWidth = QLabel("Border Width:")
         l_fillColor = QLabel("Fill Color")
 
-        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l8.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l9.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l10.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_cX.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_cY.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_p1X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_p1Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_p2X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_p2Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_p3X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_p3Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        l_p4X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l_p4Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         l_width.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_height.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -286,26 +297,27 @@ class FramePage(QWidget):
         l_fillColor.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
 
-        group1 = QGroupBox("Geometry")
+        group1  = QGroupBox("Geometry")
         layout1 = QGridLayout()
-        #多边形
-        if self.type == 'four':
-        #直线
+        #polygons
+        if self.type == 'polygonStim':
             self.setPointsLayout()
             layout1 = self.gLayout
-        elif self.type == 'two':
-            layout1.addWidget(l3, 0, 0)
+
+        # lines
+        elif self.type == 'line':
+            layout1.addWidget(l_p1X, 0, 0)
             layout1.addWidget(self.p1x_pos, 0, 1)
-            layout1.addWidget(l4, 0, 2)
+            layout1.addWidget(l_p1Y, 0, 2)
             layout1.addWidget(self.p1y_pos, 0, 3)
-            layout1.addWidget(l5, 1, 0)
+            layout1.addWidget(l_p2X, 1, 0)
             layout1.addWidget(self.p2x_pos, 1, 1)
-            layout1.addWidget(l6, 1, 2)
+            layout1.addWidget(l_p2Y, 1, 2)
             layout1.addWidget(self.p2y_pos, 1, 3)
-        else:
-            layout1.addWidget(l1, 0, 0)
+        elif self.type == 'arc':
+            layout1.addWidget(l_cX, 0, 0)
             layout1.addWidget(self.cx_pos, 0, 1)
-            layout1.addWidget(l2, 0, 2)
+            layout1.addWidget(l_cY, 0, 2)
             layout1.addWidget(self.cy_pos, 0, 3)
 
             layout1.addWidget(l_width, 1, 0)
@@ -317,6 +329,16 @@ class FramePage(QWidget):
             layout1.addWidget(self.start_angle, 2, 1)
             layout1.addWidget(l_end_angle, 2, 2)
             layout1.addWidget(self.end_angle, 2, 3)
+        else:
+            layout1.addWidget(l_cX, 0, 0)
+            layout1.addWidget(self.cx_pos, 0, 1)
+            layout1.addWidget(l_cY, 0, 2)
+            layout1.addWidget(self.cy_pos, 0, 3)
+
+            layout1.addWidget(l_width, 1, 0)
+            layout1.addWidget(self.width, 1, 1)
+            layout1.addWidget(l_height, 1, 2)
+            layout1.addWidget(self.height, 1, 3)
 
         group1.setLayout(layout1)
 
@@ -324,8 +346,10 @@ class FramePage(QWidget):
         layout2 = QFormLayout()
         layout2.addRow(l_borderColor, self.border_color)
         layout2.addRow(l_borderWidth, self.border_width)
-        if self.type != 'two':
+
+        if self.type != 'line':
             layout2.addRow(l_fillColor, self.item_color)
+
         layout2.setVerticalSpacing(20)
         group2.setLayout(layout2)
 
@@ -344,7 +368,6 @@ class FramePage(QWidget):
         self.default_properties['Center Y'] = self.cy_pos.currentText()
 
         for iVertex in range(len(self.pInfo)):
-
             self.default_properties["Point"][iVertex][0] = self.pInfo[iVertex][0].currentText()
             self.default_properties["Point"][iVertex][1] = self.pInfo[iVertex][1].currentText()
 
@@ -415,9 +438,9 @@ class polygonProperty(QWidget):
         self.default_properties = {**self.frame.default_properties}
 
         # bottom
-        self.ok_bt = QPushButton("OK")
+        self.ok_bt     = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
-        self.apply_bt = QPushButton("Apply")
+        self.apply_bt  = QPushButton("Apply")
         self.setButtons()
 
         self.setUI()

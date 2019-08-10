@@ -44,8 +44,7 @@ class Button(QPushButton):
 
 
 class DiagramTextItem(QGraphicsTextItem):
-    lostFocus = pyqtSignal(QGraphicsTextItem)
-
+    lostFocus      = pyqtSignal(QGraphicsTextItem)
     selectedChange = pyqtSignal(QGraphicsItem)
 
     def __init__(self, parent=None, scene=None):
@@ -84,15 +83,15 @@ class DiagramTextItem(QGraphicsTextItem):
 
     def setProperties(self):
         self.default_properties['family'] = self.font().family()
-        self.default_properties['size'] = self.font().pointSize()
-        self.default_properties['B'] = self.font().bold()
-        self.default_properties['I'] = self.font().italic()
-        self.default_properties['U'] = self.font().underline()
-        self.default_properties['color'] = self.defaultTextColor().name()
-        self.default_properties['text'] = self.toPlainText()
-        self.default_properties['z'] = self.zValue()
-        self.default_properties['x_pos'] = self.scenePos().x()
-        self.default_properties['y_pos'] = self.scenePos().y()
+        self.default_properties['size']   = self.font().pointSize()
+        self.default_properties['B']      = self.font().bold()
+        self.default_properties['I']      = self.font().italic()
+        self.default_properties['U']      = self.font().underline()
+        self.default_properties['color']  = self.defaultTextColor().name()
+        self.default_properties['text']   = self.toPlainText()
+        self.default_properties['z']      = self.zValue()
+        self.default_properties['x_pos']  = self.scenePos().x()
+        self.default_properties['y_pos']  = self.scenePos().y()
 
     def restore(self, properties: dict):
         if properties:
@@ -106,6 +105,7 @@ class DiagramTextItem(QGraphicsTextItem):
         font.setBold(self.default_properties['B'])
         font.setItalic(self.default_properties['I'])
         font.setUnderline(self.default_properties['U'])
+
         self.setFont(font)
         self.setDefaultTextColor(QColor(self.default_properties['color']))
         self.setPlainText(self.default_properties['text'])
@@ -127,58 +127,38 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
 
         self.diagramType = diagramType
         self.contextMenu = contextMenu
-        self.attributes = attributes
+        self.attributes  = attributes
 
         if self.diagramType == self.Video:
             self.pro_window = VideoProperty()
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
             self.setPixmap(QPixmap(Func.getImage("video.png")).scaled(100, 100))
+
         elif self.diagramType == self.Sound:
             self.pro_window = SoundProperty()
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
             self.setPixmap(QPixmap(Func.getImage("music.png")).scaled(100, 100))
+
         elif self.diagramType == self.Snow:
-            try:
-                self.pro_window = snowProperty()
-            except Exception as e:
-                print(e)
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
-            try:
-                pix = QPixmap(Func.getImage("snow.png"))
-                self.setPixmap(pix)
-            except Exception as e:
-                print(e)
+            self.pro_window = snowProperty()
+            self.setPixmap(QPixmap(Func.getImage("snow.png")))
+
         elif self.diagramType == self.Gabor:
-            try:
-                self.pro_window = gaborProperty()
-            except Exception as e:
-                print(e)
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
-            try:
-                pix = QPixmap(Func.getImage("Gabor.png"))
-                self.setPixmap(pix)
-            except Exception as e:
-                print(e)
+            self.pro_window = gaborProperty()
+            self.setPixmap(QPixmap(Func.getImage("Gabor.png")))
+
         else:
             self.pro_window = ImageProperty()
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
             self.setPixmap(QPixmap(Func.getImage("Picture.png")).scaled(100, 100))
+
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        self.flag = False
-        self.resizing = False
-        self.sresizing = False
+
+        self.resizingFlag      = False
+        self.resizing          = False
+        self.keepRatioResizing = False
 
         self.default_properties = {
             'name': self.diagramType,
@@ -194,7 +174,7 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
                 self.resizing = True
                 self.setCursor(Qt.SizeAllCursor)
             elif mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.ShiftModifier:
-                self.sresizing = True
+                self.keepRatioResizing = True
                 self.setCursor(Qt.SizeAllCursor)
             else:
                 super(DiagramPixmapItem, self).mousePressEvent(mouseEvent)
@@ -207,14 +187,14 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
         if self.diagramType > 7:
             self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
         if self.resizing:
-            self.flag = True
-        if self.sresizing:
-            self.flag = True
+            self.resizingFlag = True
+        if self.keepRatioResizing:
+            self.resizingFlag = True
             if x > y:
                 x = y
             else:
                 y = x
-        if self.flag:
+        if self.resizingFlag:
             if self.diagramType == self.Video:
                 self.setPixmap(QPixmap(Func.getImage("video.png")).scaled(x, y))
             elif self.diagramType == self.Sound:
@@ -228,8 +208,8 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
     def mouseReleaseEvent(self, mouseEvent):
         self.unsetCursor()
         self.resizing = False
-        self.sresizing = False
-        self.flag = False
+        self.keepRatioResizing = False
+        self.resizingFlag = False
         super(DiagramPixmapItem, self).mouseReleaseEvent(mouseEvent)
 
     def mouseDoubleClickEvent(self, mouseEvent):
@@ -263,7 +243,7 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
         self.pro_window.close()
 
     def cancel(self):
-        # 加载之前的deafult_properties
+        # load previous default_properties
         self.pro_window.loadSetting()
 
     def apply(self):
@@ -278,9 +258,9 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
         }
         if self.diagramType == self.Snow:
             try:
-                s = int(self.default_properties["Scale"])
-                snow = Snow(int(int(self.default_properties["Height"]) / s),
-                            int(int(self.default_properties["Width"]) / s))
+                rgbValue = int(self.default_properties["Scale"])
+                snow = Snow(int(int(self.default_properties["Height"]) / rgbValue),
+                            int(int(self.default_properties["Width"]) / rgbValue))
                 pix = QPixmap(Func.getImage("snow1.png"))
                 pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
                 self.setPos(QPoint(float(self.pro_window.frame.default_properties["Center X"]),
@@ -298,31 +278,34 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
                 print(e)
         if self.diagramType == self.Gabor:
             try:
-                spFreq = float(self.default_properties['spatialFreq(cycles/pixel)'])
-                Contrast = float(self.default_properties['Contrast'])
-                phase = float(self.default_properties['phase'])
+                spFreq      = float(self.default_properties['spatialFreq(cycles/pixel)'])
+                Contrast    = float(self.default_properties['Contrast'])
+                phase       = float(self.default_properties['phase'])
                 orientation = float(self.default_properties['orientation'])
-                s = self.default_properties['bkColor']
-                s = s.split(',')
-                sdx = float(self.default_properties['SDx(pixels)'])
-                sdy = float(self.default_properties['SDy(pixels)'])
-                width = int(self.default_properties["Width"])
-                height = int(self.default_properties["Height"])
-                bkColor = (float(s[0]), float(s[1]), float(s[2]))
-                g = makeGabor_bcl(spFreq, Contrast, phase, orientation,
+
+                rgbValue       = self.default_properties['bkColor'].split(',')
+                sdx     = float(self.default_properties['SDx(pixels)'])
+                sdy     = float(self.default_properties['SDy(pixels)'])
+                width   = int(self.default_properties["Width"])
+                height  = int(self.default_properties["Height"])
+                bkColor = (float(rgbValue[0]), float(rgbValue[1]), float(rgbValue[2]))
+                g       = makeGabor_bcl(spFreq, Contrast, phase, orientation,
                                   bkColor, width, height, sdx, sdy)
                 pix = QPixmap(Func.getImage("gabor1.png"))
                 pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
                 self.setPos(QPoint(float(self.pro_window.frame.default_properties["Center X"]),
                                    float(self.pro_window.frame.default_properties["Center Y"])))
                 self.setPixmap(pix)
+
                 x = self.boundingRect().center().x()
                 y = self.boundingRect().center().y()
+
                 self.setTransformOriginPoint(x, y)
                 self.setRotation(int(self.default_properties["rotation"]))
                 self.update()
             except Exception as e:
                 print(e)
+
         self.default_properties = {
             'name': self.diagramType,
             'z': self.zValue(),
@@ -341,11 +324,13 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
             if self.diagramType == self.Snow:
                 try:
                     snow = Snow(int(properties["Width"]), int(properties["Height"]))
-                    pix = QPixmap(Func.getImage("snow.png"))
-                    pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
+                    pix  = QPixmap(Func.getImage("snow.png"))
+                    pix  = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
                     self.setPixmap(pix)
+                    
                     x = self.boundingRect().center().x()
                     y = self.boundingRect().center().y()
+
                     self.setTransformOriginPoint(x, y)
                     self.setRotation(int(properties["Rotation"]))
                     self.update()
@@ -353,17 +338,16 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
                     print(e)
             if self.diagramType == self.Gabor:
                 try:
-                    spFreq = float(self.default_properties['spatialFreq(cycles/pixel)'])
-                    Contrast = float(self.default_properties['Contrast'])
-                    phase = float(self.default_properties['phase'])
+                    spFreq      = float(self.default_properties['spatialFreq(cycles/pixel)'])
+                    Contrast    = float(self.default_properties['Contrast'])
+                    phase       = float(self.default_properties['phase'])
                     orientation = float(self.default_properties['orientation'])
-                    s = self.default_properties['bkColor']
-                    s = s.split(',')
-                    sdx = float(self.default_properties['SDx(pixels)'])
-                    sdy = float(self.default_properties['SDy(pixels)'])
-                    width = int(self.default_properties["Width"])
-                    height = int(self.default_properties["Height"])
-                    bkColor = (float(s[0]), float(s[1]), float(s[2]))
+                    rgbValue    = self.default_properties['bkColor'].split(',')
+                    sdx         = float(self.default_properties['SDx(pixels)'])
+                    sdy         = float(self.default_properties['SDy(pixels)'])
+                    width       = int(self.default_properties["Width"])
+                    height      = int(self.default_properties["Height"])
+                    bkColor     = (float(rgbValue[0]), float(rgbValue[1]), float(rgbValue[2]))
                     g = makeGabor_bcl(spFreq, Contrast, phase, orientation,
                                       bkColor, width, height, sdx, sdy)
                     pix = QPixmap(Func.getImage("gabor1.png"))
@@ -388,15 +372,14 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
 
 
 class DiagramItem(QGraphicsPolygonItem):
-    Step, Conditional, Circle, Io = range(4)
-    Line = 4
+    PolygonStim, Arc, Circle, Rectangle, Line = range(5)
 
     def __init__(self, diagramType, contextMenu, attributes=None, p1=None, p2=None, parent=None, scene=None):
         super(DiagramItem, self).__init__()
 
         self.diagramType = diagramType
         self.contextMenu = contextMenu
-        self.attributes = attributes
+        self.attributes  = attributes
 
         self.default_properties = {
             "name": self.diagramType,
@@ -413,8 +396,8 @@ class DiagramItem(QGraphicsPolygonItem):
             "Point": [['0', '0'], ['0', '0'], ['0', '0']],# added by yang
             "Start angle": "0",
             "End angle": "0",
-            "Width": "0",
-            "Height": "0",
+            "Width": "200",
+            "Height": "200",
             "Border color": "black",
             "Border width": 1,
             "Fill color": "white",
@@ -424,35 +407,28 @@ class DiagramItem(QGraphicsPolygonItem):
         self.p2 = p2
 
         path = QPainterPath()
+        # circle
         if self.diagramType == self.Circle:
             path.addEllipse(QRectF(-100, -100, 200, 200))
-            self.myPolygon = path.toFillPolygon()
-            self.pro_window = polygonProperty('one')
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
+            self.myPolygon  = path.toFillPolygon()
+            self.pro_window = polygonProperty('circle')
 
-        elif self.diagramType == self.Conditional:
-            # 菱形
-            # myPolygon = QPolygonF([
-            #     QPointF(-100, 0), QPointF(0, 100),
-            #     QPointF(100, 0), QPointF(0, -100),
-            #     QPointF(-100, 0)])
-            # path.addPolygon(myPolygon)
-            path.moveTo(-100, 0)
-            path.lineTo(0, 100)
-            path.lineTo(100, 0)
-            path.lineTo(0, -100)
-            path.lineTo(-100, 0)
-            self.myPolygon = path.toFillPolygon()
-            self.pro_window = polygonProperty('four')
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
-        elif self.diagramType == self.Step:
-            # path.addRect(QRectF(-100, -100, 200, 200))
-            #------ added by yang to plot the triangle -----------------------------------------------/
-            nVertices = 3
+        #  rectange
+        elif self.diagramType == self.Rectangle:
+            path.addRect(QRectF(-100, -100, 200, 200))
+            self.myPolygon  = path.toFillPolygon()
+            self.pro_window = polygonProperty('arc')
+
+        # arc
+        elif self.diagramType == self.Arc:
+            path.arcTo(QRectF(-100, -100, 200, 200),0, 270)
+            self.myPolygon  = path.toFillPolygon()
+            self.pro_window = polygonProperty('arc')
+
+        # polygon
+        elif self.diagramType == self.PolygonStim:
+            #added by yang to plot the triangle
+            nVertices  = 3
             verticesXY = []
             for iVertex in range(nVertices):
                 verticesXY.append([int(100 * np.cos(np.pi / 2 - iVertex * 2 * np.pi / nVertices)),
@@ -463,41 +439,40 @@ class DiagramItem(QGraphicsPolygonItem):
                     path.lineTo(verticesXY[iVertex][0], verticesXY[iVertex][1])
 
             path.lineTo(verticesXY[0][0], verticesXY[0][1])
-            # -----------------------------------------------------------------------------------------\
+            #
             self.myPolygon = path.toFillPolygon()
-            self.pro_window = polygonProperty('four')
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
+            self.pro_window = polygonProperty('polygonStim')
 
         elif self.diagramType == self.Line:
             path.moveTo(p1.x(), p1.y())
             path.lineTo(p2.x(), p2.y())
             self.myPolygon = path.toFillPolygon()
-            self.pro_window = polygonProperty('two')
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
+            self.pro_window = polygonProperty('line')
+
         else:
-            myPolygon = QPolygonF([
-                QPointF(-120, -80), QPointF(-70, 80),
-                QPointF(120, 80), QPointF(70, -80),
-                QPointF(-120, -80)])
-            path.addPolygon(myPolygon)
-            self.myPolygon = path.toFillPolygon()
-            self.pro_window = polygonProperty('four')
-            self.pro_window.ok_bt.clicked.connect(self.ok)
-            self.pro_window.cancel_bt.clicked.connect(self.cancel)
-            self.pro_window.apply_bt.clicked.connect(self.apply)
+            pass
+            # myPolygon = QPolygonF([
+            #     QPointF(-120, -80), QPointF(-70, 80),
+            #     QPointF(120, 80), QPointF(70, -80),
+            #     QPointF(-120, -80)])
+            #
+            # path.addPolygon(myPolygon)
+            # self.myPolygon = path.toFillPolygon()
+            # self.pro_window = polygonProperty('arc')
+
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
         self.setPolygon(self.myPolygon)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        self.resizing = False
+
+        self.resizing          = False
         self.keepRatioResizing = False
-        self.flag = False
+        self.resizingFlag      = False
         # self.flag1 = False
-        self.center = QPointF(0, 0)
+        self.center    = QPointF(0, 0)
         self.ItemColor = 'white'
         self.LineColor = 'black'
         self.LineWidth = 1
@@ -522,39 +497,44 @@ class DiagramItem(QGraphicsPolygonItem):
         self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
         # 非等比例
         if self.resizing and self.diagramType < 4:
-            self.flag = True
+            self.resizingFlag = True
         # 等比例
         if self.keepRatioResizing and self.diagramType < 4:
-            self.flag = True
-            a = rect0.height()
-            if a < 5:
-                a = 5
-            b = rect0.width()
-            if b < 5:
-                b = 5
-            c = a / b
-            if (y - a) / (x - b) > c:
-                y = c * (x - b) + a
+            self.resizingFlag = True
+            cHeight = rect0.height()
+            if cHeight < 5:
+                cHeight = 5
+            cWidth = rect0.width()
+            if cWidth < 5:
+                cWidth = 5
+                
+            ratio = cHeight / cWidth
+            if (y - cHeight) / (x - cWidth) > ratio:
+                y = ratio * (x - cWidth) + cHeight
             else:
-                x = (y - a) / c + b
-        if self.flag:
+                x = (y - cHeight) / ratio + cWidth
+                
+        if self.resizingFlag:
             if self.diagramType == self.Circle:
                 path = QPainterPath()
                 rect = QRectF(rect0.left(), rect0.top(), x - rect0.left(), y - rect0.top())
                 path.addEllipse(rect)
                 self.mPolygon = path.toFillPolygon()
-            elif self.diagramType == self.Conditional:
+
+            elif self.diagramType == self.Arc:
                 path = QPainterPath()
                 mPolygon = QPolygonF([QPointF(-100, (y + rect0.top()) / 2), QPointF((x + rect0.left()) / 2, y),
                                       QPointF(x, (y + rect0.top()) / 2), QPointF((x + rect0.left()) / 2, -100),
                                       QPointF(-100, (y + rect0.top()) / 2)])
                 path.addPolygon(mPolygon)
                 self.mPolygon = path.toFillPolygon()
-            elif self.diagramType == self.Step:
+
+            elif self.diagramType == self.PolygonStim:
                 path = QPainterPath()
                 rect = QRectF(rect0.left(), rect0.top(), x - rect0.left(), y - rect0.top())
                 path.addRect(rect)
                 self.mPolygon = path.toFillPolygon()
+
             else:
                 path = QPainterPath()
                 mPolygon = QPolygonF([QPointF(-120, -80), QPointF(-120 + (5 * y + 400) / 16, y),
@@ -562,6 +542,7 @@ class DiagramItem(QGraphicsPolygonItem):
                                       QPointF(-120, -80)])
                 path.addPolygon(mPolygon)
                 self.mPolygon = path.toFillPolygon()
+
             self.setPolygon(self.mPolygon)
             self.update()
             self.center = self.polygon().boundingRect().center()
@@ -572,18 +553,21 @@ class DiagramItem(QGraphicsPolygonItem):
         if mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.AltModifier:
             self.resizing = True
             self.setCursor(Qt.SizeAllCursor)
+
         elif mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.ShiftModifier:
             self.keepRatioResizing = True
             self.setCursor(Qt.SizeAllCursor)
+
         else:
             super(DiagramItem, self).mousePressEvent(mouseEvent)
 
     def mouseReleaseEvent(self, mouseEvent):
         self.unsetCursor()
-        self.flag1     = False
-        self.resizing  = False
+        self.flag1        = False # what does this for ????
+        self.resizingFlag = False
+
+        self.resizing          = False
         self.keepRatioResizing = False
-        self.flag = False
         super(DiagramItem, self).mouseReleaseEvent(mouseEvent)
 
     def mouseDoubleClickEvent(self, mouseEvent):
@@ -594,12 +578,14 @@ class DiagramItem(QGraphicsPolygonItem):
             self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
             self.setAttributes(self.attributes)
             self.pro_window.show()
+
         elif self.diagramType == self.Line:
             self.setProperties()
             self.pro_window.frame.setProperties(self.default_properties)
             self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
             self.setAttributes(self.attributes)
             self.pro_window.show()
+
         else:
             return
 
@@ -655,9 +641,6 @@ class DiagramItem(QGraphicsPolygonItem):
                           int(self.pro_window.frame.default_properties["Width"]),
                           int(self.pro_window.frame.default_properties["Height"]))
             path.addEllipse(rect)
-            self.mPolygon = path.toFillPolygon()
-            self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
-                               int(self.pro_window.frame.default_properties["Center Y"])))
 
         elif self.diagramType == self.Line:
             path = QPainterPath()
@@ -665,9 +648,7 @@ class DiagramItem(QGraphicsPolygonItem):
                         int(self.pro_window.frame.default_properties["P1 Y"]) - cy)
             path.lineTo(int(self.pro_window.frame.default_properties["P2 X"]) - cx,
                         int(self.pro_window.frame.default_properties["P2 Y"]) - cy)
-            self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
-                               int(self.pro_window.frame.default_properties["Center Y"])))
-            self.mPolygon = path.toFillPolygon()
+
         else:
             path = QPainterPath()
 
@@ -682,72 +663,48 @@ class DiagramItem(QGraphicsPolygonItem):
             path.lineTo(int(verticesXY[0][0]) - cx + dx, int(verticesXY[0][1])  - cy + dy)
 
 
-            # x1 = int(self.pro_window.frame.default_properties["P1 X"]) - cx
-            # y1 = int(self.pro_window.frame.default_properties["P1 Y"]) - cy
-            # x2 = int(self.pro_window.frame.default_properties["P2 X"]) - cx
-            # y2 = int(self.pro_window.frame.default_properties["P2 Y"]) - cy
-            # x3 = int(self.pro_window.frame.default_properties["P3 X"]) - cx
-            # y3 = int(self.pro_window.frame.default_properties["P3 Y"]) - cy
-            # x4 = int(self.pro_window.frame.default_properties["P4 X"]) - cx
-            # y4 = int(self.pro_window.frame.default_properties["P4 Y"]) - cy
-            # # mPolygon = QPolygonF([
-            # #     QPointF(x1, y1), QPointF(x2, y2),
-            # #     QPointF(x3, y3), QPointF(x4, y4),
-            # #     QPointF(x1, y1)])
-            # # path.addPolygon(mPolygon)
-            # path.moveTo(x1 + dx, y1 + dy)
-            # path.lineTo(x2 + dx, y2 + dy)
-            # path.lineTo(x3 + dx, y3 + dy)
-            # path.lineTo(x4 + dx, y4 + dy)
-            # path.lineTo(x1 + dx, y1 + dy)
+        self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
+                           int(self.pro_window.frame.default_properties["Center Y"])))
 
-
-            self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
-                               int(self.pro_window.frame.default_properties["Center Y"])))
-
-            self.mPolygon = path.toFillPolygon()
+        self.mPolygon = path.toFillPolygon()
         self.setPolygon(self.mPolygon)
         self.update()
 
     def setProperties(self):
+        x = int(self.scenePos().x())
+        y = int(self.scenePos().y())
+
+        self.default_properties["Center X"] = str(int(self.scenePos().x()))
+        self.default_properties["Center Y"] = str(int(self.scenePos().y()))
+
         if self.diagramType == self.Line:
-            x = int(self.scenePos().x())
-            y = int(self.scenePos().y())
-            self.default_properties["Center X"] = str(int(self.scenePos().x()))
-            self.default_properties["Center Y"] = str(int(self.scenePos().y()))
+
             self.default_properties["P1 X"] = str(int(self.polygon()[0].x()) + x)
             self.default_properties["P1 Y"] = str(int(self.polygon()[0].y()) + y)
             self.default_properties["P2 X"] = str(int(self.polygon()[1].x()) + x)
             self.default_properties["P2 Y"] = str(int(self.polygon()[1].y()) + y)
-        else:
-            if self.diagramType == self.Circle:
-                self.default_properties["Center X"] = str(int(self.scenePos().x()))
-                self.default_properties["Center Y"] = str(int(self.scenePos().y()))
-                self.default_properties["Height"] = str(int(self.polygon().boundingRect().height()))
-                self.default_properties["Width"] = str(int(self.polygon().boundingRect().width()))
 
-                self.default_properties["Start angle"] = '0'
-                self.default_properties["End angle"] = '360'
-            else:
-                x = int(self.scenePos().x())
-                y = int(self.scenePos().y())
+        elif self.diagramType == self.Circle:
+            self.default_properties["Height"]   = str(int(self.polygon().boundingRect().height()))
+            self.default_properties["Width"]    = str(int(self.polygon().boundingRect().width()))
 
-                self.default_properties["Center X"] = str(int(self.scenePos().x()))
-                self.default_properties["Center Y"] = str(int(self.scenePos().y()))
+            self.default_properties["Start angle"] = '0'
+            self.default_properties["End angle"]   = '360'
 
-                verticesXY = []
-                for iVertex in range(len(self.polygon())-1):
-                    verticesXY.append([str(int(self.polygon()[iVertex].x()) + x),str(int(self.polygon()[iVertex].y()) + y)])
+        elif self.diagramType == self.PolygonStim:
+            verticesXY = []
+            for iVertex in range(len(self.polygon())-1):
+                verticesXY.append([str(int(self.polygon()[iVertex].x()) + x),str(int(self.polygon()[iVertex].y()) + y)])
 
-                self.default_properties["Point"] = verticesXY
-                self.default_properties["Start angle"] = '0'
-                self.default_properties["End angle"] = '360'
+            self.default_properties["Point"] = verticesXY
+            # self.default_properties["Start angle"] = '0'
+            # self.default_properties["End angle"] = '360'
 
 
         self.default_properties["Border color"] = self.LineColor
         self.default_properties["Border width"] = str(self.LineWidth)
-        self.default_properties["Fill color"] = self.ItemColor
-        self.default_properties["z"] = self.zValue()
+        self.default_properties["Fill color"]   = self.ItemColor
+        self.default_properties["z"]            = self.zValue()
 
     def restore(self, properties: dict):
         if properties:
@@ -773,22 +730,18 @@ class DiagramItem(QGraphicsPolygonItem):
 class DiagramScene(QGraphicsScene):
     InsertItem, InsertLine, InsertText, MoveItem = range(4)
 
-    itemInserted = pyqtSignal(DiagramItem)
-
-    textInserted = pyqtSignal(QGraphicsTextItem)
-
-    itemSelected = pyqtSignal(QGraphicsItem)
-
+    itemInserted    = pyqtSignal(DiagramItem)
+    textInserted    = pyqtSignal(QGraphicsTextItem)
+    itemSelected    = pyqtSignal(QGraphicsItem)
     pixitemInserted = pyqtSignal(QGraphicsPixmapItem)
-
-    DitemSelected = pyqtSignal(dict)
+    DitemSelected   = pyqtSignal(dict)
 
     def __init__(self, itemMenu, attributes, parent=None):
         super(DiagramScene, self).__init__(parent)
 
         self.myItemMenu = itemMenu
         self.myMode = self.MoveItem
-        self.myItemType = DiagramItem.Step
+        self.myItemType = DiagramItem.PolygonStim
         self.attributes = attributes
         self.line = None
         self.textItem = None
@@ -940,7 +893,7 @@ class DiagramScene(QGraphicsScene):
             p3 = QPointF((p1.x() - p2.x()) / 2, (p1.y() - p2.y()) / 2)
             p4 = QPointF(-(p1.x() - p2.x()) / 2, -(p1.y() - p2.y()) / 2)
             center = QPointF((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2)
-            item = DiagramItem(DiagramItem.Line, self.myItemMenu, self.attributes, p3, p4)
+            item   = DiagramItem(DiagramItem.Line, self.myItemMenu, self.attributes, p3, p4)
             self.addItem(item)
             item.setPos(center)
             self.update()
@@ -977,7 +930,6 @@ class Slider(QMainWindow):
         self.createToolBox()
 
         self.scene = DiagramScene(self.itemMenu, self.attributes)
-        # self.scene.setSceneRect(QRectF(100, 100, 640, 480))
 
         self.scene.itemInserted.connect(self.itemInserted)
         self.scene.pixitemInserted.connect(self.pixitemInserted)
@@ -1217,9 +1169,11 @@ class Slider(QMainWindow):
         self.buttonGroup.buttonPressed[int].connect(self.buttonGroupPressed)
 
         layout = QGridLayout()
-        layout.addWidget(self.createCellWidget("Polygon", DiagramItem.Step), 0, 0)
+        layout.addWidget(self.createCellWidget("Polygon", DiagramItem.PolygonStim), 0, 0)
         layout.addWidget(self.createCellWidget("Circle", DiagramItem.Circle), 1, 0)
-        # layout.addWidget(self.createCellWidget("Polygon", DiagramItem.Conditional), 0, 0)
+        layout.addWidget(self.createCellWidget("Arc", DiagramItem.Arc), 2, 0)
+        layout.addWidget(self.createCellWidget("Rectangle", DiagramItem.Rectangle), 3, 0)
+
         # layout.addWidget(self.createCellWidget("Conditional", DiagramItem.Conditional), 0, 0)
         # layout.addWidget(self.createCellWidget("Polygon", DiagramItem.Step), 2, 0)
         # layout.addWidget(self.createCellWidget("Circle", DiagramItem.Circle), 2, 0)
@@ -1250,12 +1204,13 @@ class Slider(QMainWindow):
         gaborButton.setIcon(QIcon(QPixmap(Func.getImage("Gabor.png")).scaled(50, 50)))
         gaborButton.setIconSize(QSize(50, 50))
 
-        textLayout = QGridLayout()
-        videoLayout = QGridLayout()
+        textLayout    = QGridLayout()
+        videoLayout   = QGridLayout()
         pictureLayout = QGridLayout()
-        soundLayout = QGridLayout()
-        snowLayout = QGridLayout()
-        gaborLayout = QGridLayout()
+        soundLayout   = QGridLayout()
+        snowLayout    = QGridLayout()
+        gaborLayout   = QGridLayout()
+
         textLayout.addWidget(textButton, 0, 0, Qt.AlignHCenter)
         textLayout.addWidget(QLabel("Text"), 1, 0, Qt.AlignCenter)
         videoLayout.addWidget(videoButton, 0, 0, Qt.AlignHCenter)
@@ -1281,7 +1236,6 @@ class Slider(QMainWindow):
         snowWidget.setLayout(snowLayout)
         gaborWidget = QWidget()
         gaborWidget.setLayout(gaborLayout)
-        # layout.addWidget(textWidget, 3, 0)
 
         layout.setRowStretch(5, 10)
 
@@ -1601,7 +1555,6 @@ class Slider(QMainWindow):
                     self.scene.addItem(item)
                     item.restore(dic)
                     item.setZValue(dic['z'])
-                    # print(QPoint(int(dic['Center X']), int(dic['Center Y'])))
                     item.setPos(QPoint(int(dic['Center X']), int(dic['Center Y'])))
                 else:
                     item = DiagramPixmapItem(dic['name'], self.itemMenu, self.attributes)

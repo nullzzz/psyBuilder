@@ -3,6 +3,8 @@ from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QFormLayout, QGroupBox, QGridLayout, QSpinBox, QLabel
 from PyQt5.QtWidgets import (QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
 
+from app.deviceSelection.IODevice.duration.InputDeviceItem import DeviceInItem
+from app.deviceSelection.IODevice.duration.OutputDeviceItem import DeviceOutItem
 from app.info import Info
 from app.lib import PigComboBox
 
@@ -18,15 +20,15 @@ class PointWidget(QWidget):
         layout1 = QGridLayout()
 
         for i in range(len(self.point)):
-            labelx = QLabel("P{} X:".format(i+1))
-            labely = QLabel("P{} Y:".format(i+1))
+            l_pX = QLabel("P{} X:".format(i+1))
+            l_pY = QLabel("P{} Y:".format(i+1))
             x_pos = PigComboBox()
             y_pos = PigComboBox()
-            labelx.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            labely.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            layout1.addWidget(labelx, i, 0)
+            l_pX.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            l_pY.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            layout1.addWidget(l_pX, i, 0)
             layout1.addWidget(x_pos, i, 1)
-            layout1.addWidget(labely, i, 2)
+            layout1.addWidget(l_pY, i, 2)
             layout1.addWidget(y_pos, i, 3)
 
 
