@@ -410,19 +410,19 @@ class DiagramItem(QGraphicsPolygonItem):
         # circle
         if self.diagramType == self.Circle:
             path.addEllipse(QRectF(-100, -100, 200, 200))
-            self.myPolygon  = path.toFillPolygon()
+            self.mPolygon  = path.toFillPolygon()
             self.pro_window = polygonProperty('circle')
 
         #  rectange
         elif self.diagramType == self.Rectangle:
             path.addRect(QRectF(-100, -100, 200, 200))
-            self.myPolygon  = path.toFillPolygon()
+            self.mPolygon  = path.toFillPolygon()
             self.pro_window = polygonProperty('rectangle')
 
         # arc
         elif self.diagramType == self.Arc:
             path.arcTo(QRectF(-100, -100, 200, 200),0, 270)
-            self.myPolygon  = path.toFillPolygon()
+            self.mPolygon  = path.toFillPolygon()
             self.pro_window = polygonProperty('arc')
 
         # polygon
@@ -440,13 +440,13 @@ class DiagramItem(QGraphicsPolygonItem):
 
             path.lineTo(verticesXY[0][0], verticesXY[0][1])
             #
-            self.myPolygon = path.toFillPolygon()
+            self.mPolygon = path.toFillPolygon()
             self.pro_window = polygonProperty('polygonStim')
 
         elif self.diagramType == self.Line:
             path.moveTo(p1.x(), p1.y())
             path.lineTo(p2.x(), p2.y())
-            self.myPolygon = path.toFillPolygon()
+            self.mPolygon = path.toFillPolygon()
             self.pro_window = polygonProperty('line')
 
         else:
@@ -456,7 +456,7 @@ class DiagramItem(QGraphicsPolygonItem):
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
-        self.setPolygon(self.myPolygon)
+        self.setPolygon(self.mPolygon)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
@@ -477,7 +477,7 @@ class DiagramItem(QGraphicsPolygonItem):
 
     def setLineWidth(self, width):
         self.LineWidth = width
-        self.polygon
+        # self.polygon
 
     def boundingRect(self):
         return self.polygon().boundingRect().adjusted(-self.pen().width(),
@@ -490,8 +490,8 @@ class DiagramItem(QGraphicsPolygonItem):
         x = mouseEvent.pos().x()
         y = mouseEvent.pos().y()
         test = self.polygon()
-        print(f"line 493: {test.toList()}")
-        print(f"line 493: {test.takeLast()}")
+        # print(f"line 493: {test.toList()}")
+        # print(f"line 493: {test.takeLast()}")
         rect0 = self.polygon().boundingRect()
 
         self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
@@ -595,7 +595,7 @@ class DiagramItem(QGraphicsPolygonItem):
         painter = QPainter(pixmap)
         painter.setPen(QPen(Qt.black, 8))
         painter.translate(125, 125)
-        painter.drawPolyline(self.myPolygon)
+        painter.drawPolyline(self.mPolygon)
         return pixmap
 
     def contextMenuEvent(self, event):
