@@ -68,10 +68,10 @@ Cycle：
 
 # slide：
 #
-# 0）slider 属性框里面增加 + frame table （内容同单独的image 里面的frame）
-# 1）Basic Flowchart 名称修改为 Basic Geometry
+#have done  0）slider 属性框里面增加 + frame table （内容同单独的image 里面的frame）
+#have done  1）Basic Flowchart 名称修改为 Basic Geometry
 #
-# 2）下面三个合并为一个 polygon，在polygon里面的gemetry里面可以自定义顶点（默认3个，添加一个增加和一个减少按钮，最少需要有3个顶点，最多20个），默认添加后的图形是正N边形状
+#have done 2）下面三个合并为一个 polygon，在polygon里面的gemetry里面可以自定义顶点（默认3个，添加一个增加和一个减少按钮，最少需要有3个顶点，最多20个），默认添加后的图形是正N边形状
 #
 # conditional:
 # process:

@@ -392,7 +392,7 @@ class FramePage(QWidget):
         # self.p4x_pos.setCurrentText(self.default_properties["P4 X"])
         # self.p4y_pos.setCurrentText(self.default_properties["P4 Y"])
         # print(f"{self.pinfo}")
-        print(f"slider 389: {self.default_properties['Point']}")
+        # print(f"slider 389: {self.default_properties['Point']}")
         for i in range(len(self.pinfo)):
             self.pinfo[i][0].setCurrentText(self.default_properties["Point"][i][0])
             self.pinfo[i][1].setCurrentText(self.default_properties["Point"][i][1])
