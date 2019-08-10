@@ -69,6 +69,8 @@ class Info(object):
     IMAGE = "Image"
     VIDEO = "Video"
     SLIDER = "Slider"
+    BUG = "Bug"
+
     OPEN = "Open"
     DC = "DC"
     CALIBRATION = "Calibration"
@@ -83,11 +85,11 @@ class Info(object):
     SWITCH = "Switch"
     TIMELINE = "Timeline"
 
-    DEV_NETWORK_PORT  = "network_port"
-    DEV_SCREEN        = "screen"
+    DEV_NETWORK_PORT = "network_port"
+    DEV_SCREEN = "screen"
     DEV_PARALLEL_PORT = "parallel_port"
-    DEV_SERIAL_PORT   = "serial_port"
-    DEV_SOUND         = "sound"
+    DEV_SERIAL_PORT = "serial_port"
+    DEV_SOUND = "sound"
 
     # 图片保存路径
     IMAGE_SOURCE_PATH = "image"
@@ -99,6 +101,7 @@ class Info(object):
         IMAGE: os.path.join(IMAGE_SOURCE_PATH, "image.png"),
         VIDEO: os.path.join(IMAGE_SOURCE_PATH, "video.png"),
         SLIDER: os.path.join(IMAGE_SOURCE_PATH, "slider.png"),
+        BUG: os.path.join(IMAGE_SOURCE_PATH, "bug.png"),
         OPEN: os.path.join(IMAGE_SOURCE_PATH, "open_eye.png"),
         DC: os.path.join(IMAGE_SOURCE_PATH, "DC_eye.png"),
         CALIBRATION: os.path.join(IMAGE_SOURCE_PATH, "calibration_eye.png"),
@@ -122,6 +125,7 @@ class Info(object):
         IMAGE: 0,
         VIDEO: 0,
         SLIDER: 0,
+        BUG: 0,
         OPEN: 0,
         DC: 0,
         CALIBRATION: 0,
@@ -145,6 +149,7 @@ class Info(object):
         IMAGE: 0,
         VIDEO: 0,
         SLIDER: 0,
+        BUG: 0,
         OPEN: 0,
         DC: 0,
         CALIBRATION: 0,

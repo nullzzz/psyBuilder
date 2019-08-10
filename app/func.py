@@ -261,6 +261,9 @@ class Func(object):
         elif widget_type == Info.SLIDER:
             from app.center.widget_tabs.events.slider.Slider import Slider
             widget = Slider(widget_id=widget_id)
+        elif widget_type == Info.BUG:
+            from app.center.widget_tabs.events.newSlider.slider import Slider
+            widget = Slider(widget_id=widget_id)
         # eye tracker
         elif widget_type == Info.ACTION:
             from app.center.widget_tabs.eye_tracker.action import EyeAction
