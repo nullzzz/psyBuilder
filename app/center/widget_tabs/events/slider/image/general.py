@@ -8,9 +8,9 @@ from app.lib import PigLineEdit, PigComboBox, ColorListEditor
 
 
 # image event专属页面
-class ImageTab1(QWidget):
+class ImageGeneral(QWidget):
     def __init__(self, parent=None):
-        super(ImageTab1, self).__init__(parent)
+        super(ImageGeneral, self).__init__(parent)
 
         # 当前可使用attribute
         self.attributes = []
@@ -186,7 +186,7 @@ class ImageTab1(QWidget):
         self.screen_name.setCurrentText(self.default_properties["Screen name"])
 
     def clone(self):
-        clone_page = ImageTab1()
+        clone_page = ImageGeneral()
         clone_page.setProperties(self.default_properties)
         return clone_page
 
@@ -196,7 +196,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    t = ImageTab1()
+    t = ImageGeneral()
 
     t.show()
 

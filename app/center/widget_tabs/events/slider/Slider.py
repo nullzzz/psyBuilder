@@ -1,7 +1,7 @@
 from PyQt5.QtCore import (pyqtSignal, QLineF, QPointF, QRect, QRectF, QSize, QPoint, Qt, QByteArray, QDataStream,
                           QIODevice, QMimeData)
 from PyQt5.QtGui import (QBrush, QColor, QFont, QIcon, QIntValidator, QPainter,
-                         QPainterPath, QPen, QPixmap, QPolygonF, QDrag)
+                         QPainterPath, QPen, QPixmap, QDrag)
 from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QGraphicsItem,
                              QGraphicsLineItem, QGraphicsPolygonItem,
                              QGraphicsScene, QGraphicsTextItem, QGraphicsView, QGridLayout, QGraphicsPixmapItem,
@@ -12,11 +12,10 @@ from app.center.widget_tabs.events.slider.SliderProperty import SliderProperty
 from app.center.widget_tabs.events.slider.gabor import gaborProperty
 from app.center.widget_tabs.events.slider.graph import Snow, makeGabor_bcl
 from app.center.widget_tabs.events.slider.image import ImageProperty
-from app.center.widget_tabs.events.slider.polygonitem import polygonProperty
+from app.center.widget_tabs.events.slider.polygon.PolygonProperty import PolygonProperty
 from app.center.widget_tabs.events.slider.snow import snowProperty
 from app.center.widget_tabs.events.slider.sound import SoundProperty
 from app.center.widget_tabs.events.slider.viedeo import VideoProperty
-from .text import TextTab2
 from app.func import Func
 from lib.psy_message_box import PsyMessageBox as QMessageBox
 import numpy as np
@@ -408,19 +407,19 @@ class DiagramItem(QGraphicsPolygonItem):
         if self.diagramType == self.Circle:
             path.addEllipse(QRectF(-100, -100, 200, 200))
             self.mPolygon  = path.toFillPolygon()
-            self.pro_window = polygonProperty('circle')
+            self.pro_window = PolygonProperty('circle')
 
         #  rectange
         elif self.diagramType == self.Rectangle:
             path.addRect(QRectF(-100, -100, 200, 200))
             self.mPolygon  = path.toFillPolygon()
-            self.pro_window = polygonProperty('rectangle')
+            self.pro_window = PolygonProperty('rectangle')
 
         # arc
         elif self.diagramType == self.Arc:
             path.arcTo(QRectF(-100, -100, 200, 200),0, 270)
             self.mPolygon  = path.toFillPolygon()
-            self.pro_window = polygonProperty('arc')
+            self.pro_window = PolygonProperty('arc')
 
         # polygon
         elif self.diagramType == self.PolygonStim:
@@ -438,13 +437,13 @@ class DiagramItem(QGraphicsPolygonItem):
             path.lineTo(verticesXY[0][0], verticesXY[0][1])
             #
             self.mPolygon = path.toFillPolygon()
-            self.pro_window = polygonProperty('polygonStim')
+            self.pro_window = PolygonProperty('polygonStim')
 
         elif self.diagramType == self.Line:
             path.moveTo(p1.x(), p1.y())
             path.lineTo(p2.x(), p2.y())
             self.mPolygon   = path.toFillPolygon()
-            self.pro_window = polygonProperty('line')
+            self.pro_window = PolygonProperty('line')
 
         else:
             raise Exception("diagramType should be of 'Arc','Line','rectangle', or 'circle' !!")

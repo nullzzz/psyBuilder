@@ -149,18 +149,17 @@ class FramePage(QWidget):
             self.pinfo[i][0].setCurrentText(self.default_properties["Point"][i][0])
             self.pinfo[i][1].setCurrentText(self.default_properties["Point"][i][1])
 
-        labelx = QLabel("P{} X:".format(len(self.pinfo)))
-        labely = QLabel("P{} Y:".format(len(self.pinfo)))
-        labelx.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        labely.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        labelX = QLabel("P{} X:".format(len(self.pinfo)))
+        labelY = QLabel("P{} Y:".format(len(self.pinfo)))
+        labelX.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        labelY.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        self.playout.addWidget(labelx, len(self.pinfo) + 1, 0)
+        self.playout.addWidget(labelX, len(self.pinfo) + 1, 0)
         self.playout.addWidget(self.pinfo[-1][0], len(self.pinfo) + 1, 1)
-        self.playout.addWidget(labely, len(self.pinfo) + 1, 2)
+        self.playout.addWidget(labelY, len(self.pinfo) + 1, 2)
         self.playout.addWidget(self.pinfo[-1][1], len(self.pinfo) + 1, 3)
 
-        # self.plabels = [] # a bug here
-        self.plabels.append([labelx, labely])
+        self.plabels.append([labelX, labelY])
         self.del_bt.setEnabled(True)
 
     def delpoint(self):

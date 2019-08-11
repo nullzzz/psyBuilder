@@ -441,9 +441,9 @@ class FramePage(QWidget):
     #     return QWidget.eventFilter(self, obj, e)
 
 
-class polygonProperty(QWidget):
+class PolygonProperty(QWidget):
     def __init__(self, type, parent=None):
-        super(polygonProperty, self).__init__(parent)
+        super(PolygonProperty, self).__init__(parent)
         self.below = QWidget()
 
         self.frame = FramePage(type)

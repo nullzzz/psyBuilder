@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QPushButton, QVBoxLayout, \
     QHBoxLayout, QDesktopWidget
 
-from .imageG import ImageTab1
+from app.center.widget_tabs.events.slider.image.general import ImageGeneral
 
 
 class ImageProperty(QWidget):
@@ -10,7 +10,7 @@ class ImageProperty(QWidget):
         self.tab = QTabWidget()
         self.below = QWidget()
 
-        self.general = ImageTab1()
+        self.general = ImageGeneral()
         self.tab.addTab(self.general, "general")
         self.default_properties = {**self.general.default_properties}
         # bottom
