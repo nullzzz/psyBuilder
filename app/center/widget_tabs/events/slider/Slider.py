@@ -490,10 +490,8 @@ class DiagramItem(QGraphicsPolygonItem):
 
         x = mouseEvent.pos().x()
         y = mouseEvent.pos().y()
-        # print(f"{x},{y}")
 
         rect0 = self.polygon().boundingRect()
-        print(f"{rect0}")
 
         self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
 
