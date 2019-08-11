@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QG
                              QHBoxLayout, QLabel, QMainWindow, QMenu, QMessageBox, QSizePolicy, QToolBox, QToolButton,
                              QWidget, QPushButton, QColorDialog)
 
-from app.center.widget_tabs.events.slider.SliderProperty import SliderProperty
+from app.center.widget_tabs.events.slider.property import SliderProperty
 from app.center.widget_tabs.events.slider.gabor import gaborProperty
 from app.center.widget_tabs.events.slider.graph import Snow, makeGabor_bcl
 from app.center.widget_tabs.events.slider.image import ImageProperty
@@ -118,11 +118,11 @@ class DiagramTextItem(QGraphicsTextItem):
         return item
 
 
-class DiagramPixmapItem(QGraphicsPixmapItem):
+class PixItem(QGraphicsPixmapItem):
     Video, Picture, Sound, Snow, Gabor = 5, 6, 7, 8, 9
 
     def __init__(self, diagramType, contextMenu, attributes=None, parent=None):
-        super(DiagramPixmapItem, self).__init__(parent)
+        super(PixItem, self).__init__(parent)
 
         self.diagramType = diagramType
         self.contextMenu = contextMenu
@@ -176,9 +176,9 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
                 self.keepRatioResizing = True
                 self.setCursor(Qt.SizeAllCursor)
             else:
-                super(DiagramPixmapItem, self).mousePressEvent(mouseEvent)
+                super(PixItem, self).mousePressEvent(mouseEvent)
         else:
-            super(DiagramPixmapItem, self).mousePressEvent(mouseEvent)
+            super(PixItem, self).mousePressEvent(mouseEvent)
 
     def mouseMoveEvent(self, mouseEvent):
         x = mouseEvent.pos().x()
@@ -202,14 +202,14 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
                 self.setPixmap(QPixmap(Func.getImage("Picture.png")).scaled(x, y))
             self.update()
         else:
-            super(DiagramPixmapItem, self).mouseMoveEvent(mouseEvent)
+            super(PixItem, self).mouseMoveEvent(mouseEvent)
 
     def mouseReleaseEvent(self, mouseEvent):
         self.unsetCursor()
         self.resizing = False
         self.keepRatioResizing = False
         self.resizingFlag = False
-        super(DiagramPixmapItem, self).mouseReleaseEvent(mouseEvent)
+        super(PixItem, self).mouseReleaseEvent(mouseEvent)
 
     def mouseDoubleClickEvent(self, mouseEvent):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
@@ -361,7 +361,7 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
                     print(e)
 
     def clone(self):
-        new = DiagramPixmapItem(self.diagramType, self.contextMenu, self.attributes)
+        new = PixItem(self.diagramType, self.contextMenu, self.attributes)
         properties = self.pro_window.getInfo()
         new.pro_window.setProperties(properties)
         new.setPixmap(self.pixmap())
@@ -370,12 +370,12 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
         return new
 
 
-class DiagramItem(QGraphicsPolygonItem):
+class DiaItem(QGraphicsPolygonItem):
     PolygonStim, Arc, Circle, Rectangle, Line = range(5)
 
     def __init__(self, diagramType, contextMenu, attributes=None, p1=None, p2=None, parent=None,
         scene = None):
-        super(DiagramItem, self).__init__()
+        super(DiaItem, self).__init__()
         self.diagramType = diagramType
         self.contextMenu = contextMenu
         self.attributes  = attributes
@@ -573,7 +573,7 @@ class DiagramItem(QGraphicsPolygonItem):
             self.pro_window.frame.setProperties(self.default_properties)
             
         else:
-            super(DiagramItem, self).mouseMoveEvent(mouseEvent)
+            super(DiaItem, self).mouseMoveEvent(mouseEvent)
 
 
     def mousePressEvent(self, mouseEvent):
@@ -586,7 +586,7 @@ class DiagramItem(QGraphicsPolygonItem):
             self.setCursor(Qt.SizeAllCursor)
 
         else:
-            super(DiagramItem, self).mousePressEvent(mouseEvent)
+            super(DiaItem, self).mousePressEvent(mouseEvent)
 
     def mouseReleaseEvent(self, mouseEvent):
         self.unsetCursor()
@@ -595,7 +595,7 @@ class DiagramItem(QGraphicsPolygonItem):
 
         self.resizing          = False
         self.keepRatioResizing = False
-        super(DiagramItem, self).mouseReleaseEvent(mouseEvent)
+        super(DiaItem, self).mouseReleaseEvent(mouseEvent)
 
     def mouseDoubleClickEvent(self, mouseEvent):
         self.setProperties()
@@ -742,7 +742,6 @@ class DiagramItem(QGraphicsPolygonItem):
         self.default_properties["Fill color"]   = self.ItemColor
         self.default_properties["z"]            = self.zValue()
 
-        # print(f"line 717 :{self.default_properties}")
 
     def restore(self, properties: dict):
         if properties:
@@ -752,9 +751,9 @@ class DiagramItem(QGraphicsPolygonItem):
 
     def clone(self):
         if self.diagramType == self.Line:
-            item = DiagramItem(self.diagramType, self.contextMenu, self.attributes, self.p1, self.p2)
+            item = DiaItem(self.diagramType, self.contextMenu, self.attributes, self.p1, self.p2)
         else:
-            item = DiagramItem(self.diagramType, self.contextMenu, self.attributes)
+            item = DiaItem(self.diagramType, self.contextMenu, self.attributes)
         item.setPolygon(self.polygon())
         item.setLineWidth(self.LineWidth)
         item.setLineColor(self.LineColor)
@@ -765,21 +764,21 @@ class DiagramItem(QGraphicsPolygonItem):
         return item
 
 
-class DiagramScene(QGraphicsScene):
+class Scene(QGraphicsScene):
     InsertItem, InsertLine, InsertText, MoveItem = range(4)
 
-    itemInserted    = pyqtSignal(DiagramItem)
+    itemInserted    = pyqtSignal(DiaItem)
     textInserted    = pyqtSignal(QGraphicsTextItem)
     itemSelected    = pyqtSignal(QGraphicsItem)
     pixitemInserted = pyqtSignal(QGraphicsPixmapItem)
     DitemSelected   = pyqtSignal(dict)
 
     def __init__(self, itemMenu, attributes, parent=None):
-        super(DiagramScene, self).__init__(parent)
+        super(Scene, self).__init__(parent)
 
         self.myItemMenu = itemMenu
         self.myMode = self.MoveItem
-        self.myItemType = DiagramItem.PolygonStim
+        self.myItemType = DiaItem.PolygonStim
         self.attributes = attributes
         self.line = None
         self.textItem = None
@@ -807,7 +806,7 @@ class DiagramScene(QGraphicsScene):
             if self.myMode == self.InsertItem:
                 if self.myItemType < 4:
                     # 参数：图形的形状，右键菜单
-                    item = DiagramItem(self.myItemType, self.myItemMenu, self.attributes)
+                    item = DiaItem(self.myItemType, self.myItemMenu, self.attributes)
                     pen = item.pen()
                     pen.setColor(self.myLineColor)
                     pen.setWidth(self.myLineWidth)
@@ -819,7 +818,7 @@ class DiagramScene(QGraphicsScene):
                     self.update()
                 # 添加图片
                 else:
-                    item = DiagramPixmapItem(self.myItemType, self.myItemMenu, self.attributes)
+                    item = PixItem(self.myItemType, self.myItemMenu, self.attributes)
                     self.addItem(item)
                     item.setPos(event.scenePos())
                     self.pixitemInserted.emit(item)
@@ -844,7 +843,7 @@ class DiagramScene(QGraphicsScene):
             event.ignore()
 
     def setLineColor(self, color):
-        if self.isItemChange(DiagramItem):
+        if self.isItemChange(DiaItem):
             item = self.selectedItems()[0]
             pen = item.pen()
             pen.setColor(color)
@@ -852,7 +851,7 @@ class DiagramScene(QGraphicsScene):
             item.setLineColor(color.name())
 
     def setLineWidth(self, size):
-        if self.isItemChange(DiagramItem):
+        if self.isItemChange(DiaItem):
             item = self.selectedItems()[0]
             pen = item.pen()
             pen.setWidth(size)
@@ -866,7 +865,7 @@ class DiagramScene(QGraphicsScene):
             item.setDefaultTextColor(color)
 
     def setItemColor(self, color):
-        if self.isItemChange(DiagramItem):
+        if self.isItemChange(DiaItem):
             item = self.selectedItems()[0]
             item.setBrush(color)
             item.setItemColor(color.name())
@@ -897,7 +896,7 @@ class DiagramScene(QGraphicsScene):
         d = {'itemcolor': 'white',
              'linecolor': 'black',
              'linewidth': 1}
-        if self.selectedItems() and self.isItemChange(DiagramItem):
+        if self.selectedItems() and self.isItemChange(DiaItem):
             it = self.selectedItems()[0]
             d = {'itemcolor': it.ItemColor,
                  'linecolor': it.LineColor,
@@ -914,7 +913,7 @@ class DiagramScene(QGraphicsScene):
             self.addItem(self.line)
 
         self.DitemSelected.emit(d)
-        super(DiagramScene, self).mousePressEvent(mouseEvent)
+        super(Scene, self).mousePressEvent(mouseEvent)
 
     def mouseMoveEvent(self, mouseEvent):
         if self.myMode == self.InsertLine and self.line:
@@ -922,7 +921,7 @@ class DiagramScene(QGraphicsScene):
             self.line.setLine(newLine)
         elif self.myMode == self.MoveItem:
             self.update()
-            super(DiagramScene, self).mouseMoveEvent(mouseEvent)
+            super(Scene, self).mouseMoveEvent(mouseEvent)
 
     def mouseReleaseEvent(self, mouseEvent):
         if self.line and self.myMode == self.InsertLine:
@@ -931,7 +930,7 @@ class DiagramScene(QGraphicsScene):
             p3 = QPointF((p1.x() - p2.x()) / 2, (p1.y() - p2.y()) / 2)
             p4 = QPointF(-(p1.x() - p2.x()) / 2, -(p1.y() - p2.y()) / 2)
             center = QPointF((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2)
-            item   = DiagramItem(DiagramItem.Line, self.myItemMenu, self.attributes, p3, p4)
+            item   = DiaItem(DiaItem.Line, self.myItemMenu, self.attributes, p3, p4)
             self.addItem(item)
             item.setPos(center)
             self.update()
@@ -939,7 +938,7 @@ class DiagramScene(QGraphicsScene):
             self.line = None
 
         self.line = None
-        super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
+        super(Scene, self).mouseReleaseEvent(mouseEvent)
 
     def isItemChange(self, type):
         for item in self.selectedItems():
@@ -967,7 +966,7 @@ class Slider(QMainWindow):
         self.createMenus()
         self.createToolBox()
 
-        self.scene = DiagramScene(self.itemMenu, self.attributes)
+        self.scene = Scene(self.itemMenu, self.attributes)
 
         self.scene.itemInserted.connect(self.itemInserted)
         self.scene.pixitemInserted.connect(self.pixitemInserted)
@@ -1024,10 +1023,10 @@ class Slider(QMainWindow):
                 button.setChecked(False)
 
         if id == self.InsertTextButton:
-            self.scene.setMode(DiagramScene.InsertText)
+            self.scene.setMode(Scene.InsertText)
         else:
             self.scene.setItemType(id)
-            self.scene.setMode(DiagramScene.InsertItem)
+            self.scene.setMode(Scene.InsertItem)
 
     def deleteItem(self):
         for item in self.scene.selectedItems():
@@ -1045,7 +1044,7 @@ class Slider(QMainWindow):
 
         zValue = 0
         for item in overlapItems:
-            if item.zValue() >= zValue and (isinstance(item, DiagramItem) or isinstance(item, DiagramPixmapItem)):
+            if item.zValue() >= zValue and (isinstance(item, DiaItem) or isinstance(item, PixItem)):
                 zValue = item.zValue() + 0.1
         selectedItem.setZValue(zValue)
 
@@ -1058,17 +1057,17 @@ class Slider(QMainWindow):
 
         zValue = 0
         for item in overlapItems:
-            if (item.zValue() <= zValue and (isinstance(item, DiagramItem) or isinstance(item, DiagramPixmapItem))):
+            if (item.zValue() <= zValue and (isinstance(item, DiaItem) or isinstance(item, PixItem))):
                 zValue = item.zValue() - 0.1
         selectedItem.setZValue(zValue)
 
     def itemInserted(self, item):
-        self.pointerTypeGroup.button(DiagramScene.MoveItem).setChecked(True)
+        self.pointerTypeGroup.button(Scene.MoveItem).setChecked(True)
         self.scene.setMode(self.pointerTypeGroup.checkedId())
         self.buttonGroup.button(item.diagramType).setChecked(False)
 
     def pixitemInserted(self, item):
-        self.pointerTypeGroup.button(DiagramScene.MoveItem).setChecked(True)
+        self.pointerTypeGroup.button(Scene.MoveItem).setChecked(True)
         self.scene.setMode(self.pointerTypeGroup.checkedId())
         self.buttonGroup.button(item.diagramType).setChecked(False)
 
@@ -1207,10 +1206,10 @@ class Slider(QMainWindow):
         self.buttonGroup.buttonPressed[int].connect(self.buttonGroupPressed)
 
         layout = QGridLayout()
-        layout.addWidget(self.createCellWidget("Polygon", DiagramItem.PolygonStim), 0, 0)
-        layout.addWidget(self.createCellWidget("Circle", DiagramItem.Circle), 1, 0)
-        layout.addWidget(self.createCellWidget("Arc", DiagramItem.Arc), 2, 0)
-        layout.addWidget(self.createCellWidget("Rectangle", DiagramItem.Rectangle), 3, 0)
+        layout.addWidget(self.createCellWidget("Polygon", DiaItem.PolygonStim), 0, 0)
+        layout.addWidget(self.createCellWidget("Circle", DiaItem.Circle), 1, 0)
+        layout.addWidget(self.createCellWidget("Arc", DiaItem.Arc), 2, 0)
+        layout.addWidget(self.createCellWidget("Rectangle", DiaItem.Rectangle), 3, 0)
 
         # layout.addWidget(self.createCellWidget("Conditional", DiagramItem.Conditional), 0, 0)
         # layout.addWidget(self.createCellWidget("Polygon", DiagramItem.Step), 2, 0)
@@ -1222,23 +1221,23 @@ class Slider(QMainWindow):
         textButton.setIcon(QIcon(QPixmap(Func.getImage("textpointer.png")).scaled(50, 50)))
         textButton.setIconSize(QSize(50, 50))
         videoButton = Button()
-        self.buttonGroup.addButton(videoButton, DiagramPixmapItem.Video)
+        self.buttonGroup.addButton(videoButton, PixItem.Video)
         videoButton.setIcon(QIcon(QPixmap(Func.getImage("video.png")).scaled(50, 50)))
         videoButton.setIconSize(QSize(50, 50))
         pictureButton = Button()
-        self.buttonGroup.addButton(pictureButton, DiagramPixmapItem.Picture)
+        self.buttonGroup.addButton(pictureButton, PixItem.Picture)
         pictureButton.setIcon(QIcon(QPixmap(Func.getImage("Picture.png")).scaled(50, 50)))
         pictureButton.setIconSize(QSize(50, 50))
         soundButton = Button()
-        self.buttonGroup.addButton(soundButton, DiagramPixmapItem.Sound)
+        self.buttonGroup.addButton(soundButton, PixItem.Sound)
         soundButton.setIcon(QIcon(QPixmap(Func.getImage("music.png")).scaled(50, 50)))
         soundButton.setIconSize(QSize(50, 50))
         snowButton = Button()
-        self.buttonGroup.addButton(snowButton, DiagramPixmapItem.Snow)
+        self.buttonGroup.addButton(snowButton, PixItem.Snow)
         snowButton.setIcon(QIcon(QPixmap(Func.getImage("snow1.png")).scaled(50, 50)))
         snowButton.setIconSize(QSize(50, 50))
         gaborButton = Button()
-        self.buttonGroup.addButton(gaborButton, DiagramPixmapItem.Gabor)
+        self.buttonGroup.addButton(gaborButton, PixItem.Gabor)
         gaborButton.setIcon(QIcon(QPixmap(Func.getImage("Gabor.png")).scaled(50, 50)))
         gaborButton.setIconSize(QSize(50, 50))
 
@@ -1431,8 +1430,8 @@ class Slider(QMainWindow):
         linePointerButton.setIcon(QIcon(Func.getImage("linepointer.png")))
 
         self.pointerTypeGroup = QButtonGroup()
-        self.pointerTypeGroup.addButton(pointerButton, DiagramScene.MoveItem)
-        self.pointerTypeGroup.addButton(linePointerButton, DiagramScene.InsertLine)
+        self.pointerTypeGroup.addButton(pointerButton, Scene.MoveItem)
+        self.pointerTypeGroup.addButton(linePointerButton, Scene.InsertLine)
         self.pointerTypeGroup.buttonClicked[int].connect(self.pointerGroupClicked)
 
         # self.pointerToolbar = self.addToolBar("Pointer type")
@@ -1452,7 +1451,7 @@ class Slider(QMainWindow):
         # 左边工具栏添加图形本文
 
     def createCellWidget(self, text, diagramType):
-        item = DiagramItem(diagramType, self.itemMenu)
+        item = DiaItem(diagramType, self.itemMenu)
         icon = QIcon(item.image())
 
         button = Button()
@@ -1579,7 +1578,7 @@ class Slider(QMainWindow):
                     self.scene.addItem(item)
                     item.setPos(QPoint(dic['x_pos'], dic['y_pos']))
                 elif dic['name'] < 4:
-                    item = DiagramItem(dic['name'], self.itemMenu, self.attributes)
+                    item = DiaItem(dic['name'], self.itemMenu, self.attributes)
                     self.scene.addItem(item)
                     item.restore(dic)
                     item.setZValue(dic['z'])
@@ -1589,13 +1588,13 @@ class Slider(QMainWindow):
                     p2 = QPointF(int(dic['P2 X']), int(dic['P2 Y']))
                     p3 = QPointF((p1.x() - p2.x()) / 2, (p1.y() - p2.y()) / 2)
                     p4 = QPointF(-(p1.x() - p2.x()) / 2, -(p1.y() - p2.y()) / 2)
-                    item = DiagramItem(dic['name'], self.itemMenu, self.attributes, p3, p4)
+                    item = DiaItem(dic['name'], self.itemMenu, self.attributes, p3, p4)
                     self.scene.addItem(item)
                     item.restore(dic)
                     item.setZValue(dic['z'])
                     item.setPos(QPoint(int(dic['Center X']), int(dic['Center Y'])))
                 else:
-                    item = DiagramPixmapItem(dic['name'], self.itemMenu, self.attributes)
+                    item = PixItem(dic['name'], self.itemMenu, self.attributes)
                     item.restore(dic)
                     self.scene.addItem(item)
                     item.setZValue(dic['z'])

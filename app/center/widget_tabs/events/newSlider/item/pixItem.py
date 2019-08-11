@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsItem
 # 画图
 from app.center.widget_tabs.events.newSlider.image.imageProperty import ImageProperty
 from app.center.widget_tabs.events.newSlider.text.textProperty import TextProperty
-from app.center.widget_tabs.events.slider.Slider import DiagramPixmapItem
+from app.center.widget_tabs.events.slider.Slider import PixItem
 from app.func import Func
 
 
@@ -242,7 +242,7 @@ class PixItem(QGraphicsPixmapItem):
             #         print(e)
 
     def clone(self):
-        new = DiagramPixmapItem(self.diagram_type, self.contextMenu, self.attributes)
+        new = PixItem(self.diagram_type, self.contextMenu, self.attributes)
         properties = self.pro_window.getInfo()
         new.pro_window.setProperties(properties)
         new.setPixmap(self.pixmap())
