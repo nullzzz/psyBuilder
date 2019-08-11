@@ -384,7 +384,7 @@ class FramePage(QWidget):
 
     def setProperties(self, properties: dict):
         self.default_properties = properties
-        print(f"line 386 setProperties: {self.default_properties}")
+        # print(f"line 386 setProperties: {self.default_properties}")
         self.loadSetting()
 
 
@@ -397,12 +397,13 @@ class FramePage(QWidget):
         self.cx_pos.setCurrentText(self.default_properties["Center X"])
         self.cy_pos.setCurrentText(self.default_properties["Center Y"])
 
-
+        # print(f"line 400 self.pInfo:{self.pInfo}")
+        # print(f"line 400 self.prope:{self.default_properties['Point']}")
         for i in range(len(self.pInfo)):
+            # print(f"line 400 index:{i}")
             self.pInfo[i][0].setCurrentText(self.default_properties["Point"][i][0])
             self.pInfo[i][1].setCurrentText(self.default_properties["Point"][i][1])
 
-        print(f"line 399: {self.default_properties['P1 X']}")
         self.p1x_pos.setCurrentText(self.default_properties["P1 X"])
         self.p1y_pos.setCurrentText(self.default_properties["P1 Y"])
 

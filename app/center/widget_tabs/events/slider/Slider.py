@@ -484,22 +484,32 @@ class DiagramItem(QGraphicsPolygonItem):
 
 
     def mouseMoveEvent(self, mouseEvent):
+        # step 1: updating the default_properties of frame
+        self.setProperties()
+        self.pro_window.frame.setProperties(self.default_properties)
+
         x = mouseEvent.pos().x()
         y = mouseEvent.pos().y()
+        # print(f"{x},{y}")
 
         rect0 = self.polygon().boundingRect()
+        print(f"{rect0}")
 
         self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
+
+        cHeight = rect0.height()
+        cWidth  = rect0.width()
+
         # 非等比例
         if self.resizing and self.diagramType < 4:
             self.resizingFlag = True
         # 等比例
         if self.keepRatioResizing and self.diagramType < 4:
             self.resizingFlag = True
-            cHeight = rect0.height()
+
             if cHeight < 5:
                 cHeight = 5
-            cWidth = rect0.width()
+
             if cWidth < 5:
                 cWidth = 5
 
@@ -510,10 +520,13 @@ class DiagramItem(QGraphicsPolygonItem):
                 y = ratio * (x - cWidth) + cHeight
             else:
                 x = (y - cHeight) / ratio + cWidth
-                
+
         if self.resizingFlag:
+            x0 = rect0.left()
+            y0 = rect0.top()
+
             path  = QPainterPath()
-            cRect = QRectF(rect0.left(), rect0.top(), x - rect0.left(), y - rect0.top())
+            cRect = QRectF(x0, y0, x - x0, y - y0)
 
             if self.diagramType == self.Circle:
                 path.addEllipse(cRect)
@@ -527,7 +540,25 @@ class DiagramItem(QGraphicsPolygonItem):
                 path.addRect(cRect)
 
             elif self.diagramType == self.PolygonStim:
-                path.addRect(cRect)
+
+                hRatio = (x - x0)/cWidth
+                vRatio = (y - y0)/cHeight
+
+                if self.keepRatioResizing:
+                    if hRatio > vRatio:
+                        vRatio = hRatio
+                    else:
+                        hRatio = vRatio
+
+                for iVertex in range(len(self.polygon())):
+                    cX = self.polygon().value(iVertex).x()*hRatio
+                    cY = self.polygon().value(iVertex).y()*vRatio
+
+                    if iVertex == 0:
+                        path.moveTo(cX, cY)
+                    else:
+                        path.lineTo(cX, cY )
+
 
             else:
                 raise Exception("diagramType should be of 'Arc','rectangle', or 'circle' !!")
@@ -541,6 +572,7 @@ class DiagramItem(QGraphicsPolygonItem):
             # after redrawing, update the default properties in the frame
             # to transform the properties back
             self.setProperties()
+            # print(f"line 555 self.prope:{self.default_properties}")
             self.pro_window.frame.setProperties(self.default_properties)
             
         else:
@@ -680,8 +712,6 @@ class DiagramItem(QGraphicsPolygonItem):
         self.default_properties["Center Y"] = str(item_center_y)
 
         if self.diagramType == self.Line:
-            # print(f"line 683: {self.p1}")
-            # print(f"line 683: {self.p2}")
             self.default_properties["P1 X"] = str(int(self.p1.x()) + item_center_x)
             self.default_properties["P1 Y"] = str(int(self.p1.y()) + item_center_y)
             self.default_properties["P2 X"] = str(int(self.p2.x()) + item_center_x)
@@ -715,7 +745,7 @@ class DiagramItem(QGraphicsPolygonItem):
         self.default_properties["Fill color"]   = self.ItemColor
         self.default_properties["z"]            = self.zValue()
 
-        print(f"line 717 :{self.default_properties}")
+        # print(f"line 717 :{self.default_properties}")
 
     def restore(self, properties: dict):
         if properties:
