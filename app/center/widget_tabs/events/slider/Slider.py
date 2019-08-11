@@ -374,25 +374,22 @@ class DiagramPixmapItem(QGraphicsPixmapItem):
 class DiagramItem(QGraphicsPolygonItem):
     PolygonStim, Arc, Circle, Rectangle, Line = range(5)
 
-    def __init__(self, diagramType, contextMenu, attributes=None, p1=None, p2=None, parent=None, scene=None):
+    def __init__(self, diagramType, contextMenu, attributes=None, p1=None, p2=None, parent=None,
+        scene = None):
         super(DiagramItem, self).__init__()
-
         self.diagramType = diagramType
         self.contextMenu = contextMenu
         self.attributes  = attributes
 
         self.default_properties = {
             "name": self.diagramType,
+            "Type": self.diagramType,
             "Center X": "0",
             "Center Y": "0",
             "P1 X": "0",
             "P1 Y": "0",
             "P2 X": "0",
             "P2 Y": "0",
-            "P3 X": "0",
-            "P3 Y": "0",
-            # "P4 X": "0",
-            # "P4 Y": "0",
             "Point": [['0', '0'], ['0', '0'], ['0', '0']],# added by yang
             "Start angle": "0",
             "Angle length": "270",
@@ -446,7 +443,7 @@ class DiagramItem(QGraphicsPolygonItem):
         elif self.diagramType == self.Line:
             path.moveTo(p1.x(), p1.y())
             path.lineTo(p2.x(), p2.y())
-            self.mPolygon = path.toFillPolygon()
+            self.mPolygon   = path.toFillPolygon()
             self.pro_window = polygonProperty('line')
 
         else:
@@ -489,9 +486,7 @@ class DiagramItem(QGraphicsPolygonItem):
     def mouseMoveEvent(self, mouseEvent):
         x = mouseEvent.pos().x()
         y = mouseEvent.pos().y()
-        test = self.polygon()
-        # print(f"line 493: {test.toList()}")
-        # print(f"line 493: {test.takeLast()}")
+
         rect0 = self.polygon().boundingRect()
 
         self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
@@ -525,7 +520,8 @@ class DiagramItem(QGraphicsPolygonItem):
 
             elif self.diagramType == self.Arc:
                 path.moveTo(cRect.center())
-                path.arcTo(cRect, 0, 270)
+                path.arcTo(cRect, float(self.pro_window.frame.default_properties["Start angle"]),
+                                  float(self.pro_window.frame.default_properties["Angle length"]))
 
             elif self.diagramType == self.Rectangle:
                 path.addRect(cRect)
@@ -541,6 +537,12 @@ class DiagramItem(QGraphicsPolygonItem):
             self.update()
 
             self.center = self.polygon().boundingRect().center()
+
+            # after redrawing, update the default properties in the frame
+            # to transform the properties back
+            self.setProperties()
+            self.pro_window.frame.setProperties(self.default_properties)
+            
         else:
             super(DiagramItem, self).mouseMoveEvent(mouseEvent)
 
@@ -567,23 +569,13 @@ class DiagramItem(QGraphicsPolygonItem):
         super(DiagramItem, self).mouseReleaseEvent(mouseEvent)
 
     def mouseDoubleClickEvent(self, mouseEvent):
-        if self.diagramType != self.Line:
-            self.setProperties()
+        self.setProperties()
 
-            self.pro_window.frame.setProperties(self.default_properties)
-            self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
-            self.setAttributes(self.attributes)
-            self.pro_window.show()
+        self.pro_window.frame.setProperties(self.default_properties)
+        self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
+        self.setAttributes(self.attributes)
+        self.pro_window.show()
 
-        elif self.diagramType == self.Line:
-            self.setProperties()
-            self.pro_window.frame.setProperties(self.default_properties)
-            self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
-            self.setAttributes(self.attributes)
-            self.pro_window.show()
-
-        else:
-            return
 
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
@@ -601,8 +593,6 @@ class DiagramItem(QGraphicsPolygonItem):
     def contextMenuEvent(self, event):
         self.scene().clearSelection()
         self.setSelected(True)
-        # Here is a bug, Fuck you!
-        # self.myContextMenu.exec_(event.screenPos())
         self.contextMenu.exec_(event.screenPos())
 
     def ok(self):
@@ -614,13 +604,13 @@ class DiagramItem(QGraphicsPolygonItem):
         self.pro_window.frame.loadSetting()
 
     def apply(self):
-        cx0 = int(self.pro_window.frame.default_properties["Center X"])
-        cy0 = int(self.pro_window.frame.default_properties["Center Y"])
+        # cx0 = int(self.pro_window.frame.default_properties["Center X"])
+        # cy0 = int(self.pro_window.frame.default_properties["Center Y"])
         self.pro_window.frame.getInfo()
         cx = int(self.pro_window.frame.default_properties["Center X"])
         cy = int(self.pro_window.frame.default_properties["Center Y"])
-        dx = cx - cx0
-        dy = cy - cy0
+        # dx = cx - cx0
+        # dy = cy - cy0
 
         self.ItemColor = self.pro_window.frame.default_properties["Fill color"]
         self.LineColor = self.pro_window.frame.default_properties["Border color"]
@@ -635,7 +625,7 @@ class DiagramItem(QGraphicsPolygonItem):
         path = QPainterPath()
 
         if self.diagramType == self.Circle:
-            rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
+            rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2 ,
                           -int(self.pro_window.frame.default_properties["Height"]) / 2,
                           int(self.pro_window.frame.default_properties["Width"]),
                           int(self.pro_window.frame.default_properties["Height"]))
@@ -647,8 +637,8 @@ class DiagramItem(QGraphicsPolygonItem):
                           int(self.pro_window.frame.default_properties["Width"]),
                           int(self.pro_window.frame.default_properties["Height"]))
 
-            path.arcTo(rect,int(self.pro_window.frame.default_properties["Start angle"]),
-                            int(self.pro_window.frame.default_properties["Angle length"]) )
+            path.arcTo(rect,float(self.pro_window.frame.default_properties["Start angle"]),
+                            float(self.pro_window.frame.default_properties["Angle length"]) )
 
         elif self.diagramType == self.Rectangle:
             rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
@@ -668,10 +658,10 @@ class DiagramItem(QGraphicsPolygonItem):
             # added by yang to plot the m-polygon
             for iVertex in range(len(verticesXY)):
                 if iVertex == 0:
-                    path.moveTo(int(verticesXY[iVertex][0]) - cx + dx, int(verticesXY[iVertex][1]) - cy + dy)
+                    path.moveTo(int(verticesXY[iVertex][0]) - cx, int(verticesXY[iVertex][1]) - cy)
                 else:
-                    path.lineTo(int(verticesXY[iVertex][0]) - cx + dx, int(verticesXY[iVertex][1])  - cy + dy)
-            path.lineTo(int(verticesXY[0][0]) - cx + dx, int(verticesXY[0][1])  - cy + dy)
+                    path.lineTo(int(verticesXY[iVertex][0]) - cx, int(verticesXY[iVertex][1])  - cy)
+            path.lineTo(int(verticesXY[0][0]) - cx, int(verticesXY[0][1])  - cy)
 
 
         self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
@@ -682,18 +672,20 @@ class DiagramItem(QGraphicsPolygonItem):
         self.update()
 
     def setProperties(self):
-        x = int(self.scenePos().x())
-        y = int(self.scenePos().y())
 
-        self.default_properties["Center X"] = str(int(self.scenePos().x()))
-        self.default_properties["Center Y"] = str(int(self.scenePos().y()))
+        item_center_x = int(self.scenePos().x())
+        item_center_y = int(self.scenePos().y())
+
+        self.default_properties["Center X"] = str(item_center_x)
+        self.default_properties["Center Y"] = str(item_center_y)
 
         if self.diagramType == self.Line:
-
-            self.default_properties["P1 X"] = str(int(self.polygon()[0].x()) + x)
-            self.default_properties["P1 Y"] = str(int(self.polygon()[0].y()) + y)
-            self.default_properties["P2 X"] = str(int(self.polygon()[1].x()) + x)
-            self.default_properties["P2 Y"] = str(int(self.polygon()[1].y()) + y)
+            # print(f"line 683: {self.p1}")
+            # print(f"line 683: {self.p2}")
+            self.default_properties["P1 X"] = str(int(self.p1.x()) + item_center_x)
+            self.default_properties["P1 Y"] = str(int(self.p1.y()) + item_center_y)
+            self.default_properties["P2 X"] = str(int(self.p2.x()) + item_center_x)
+            self.default_properties["P2 Y"] = str(int(self.p2.y()) + item_center_y)
 
         elif self.diagramType == self.Rectangle:
             self.default_properties["Height"]   = str(int(self.polygon().boundingRect().height()))
@@ -702,8 +694,8 @@ class DiagramItem(QGraphicsPolygonItem):
             self.default_properties["Height"]   = str(int(self.polygon().boundingRect().height()))
             self.default_properties["Width"]    = str(int(self.polygon().boundingRect().width()))
 
-            self.default_properties["Start angle"] = '0'
-            self.default_properties["Angle length"]   = '360'
+            self.default_properties["Start angle"]  = self.pro_window.frame.default_properties["Start angle"]
+            self.default_properties["Angle length"] = self.pro_window.frame.default_properties["Angle length"]
 
         elif self.diagramType == self.Circle:
             self.default_properties["Height"]   = str(int(self.polygon().boundingRect().height()))
@@ -712,7 +704,8 @@ class DiagramItem(QGraphicsPolygonItem):
         elif self.diagramType == self.PolygonStim:
             verticesXY = []
             for iVertex in range(len(self.polygon())-1):
-                verticesXY.append([str(int(self.polygon()[iVertex].x()) + x),str(int(self.polygon()[iVertex].y()) + y)])
+                verticesXY.append([str(int(self.polygon()[iVertex].x()) + item_center_x),
+                                   str(int(self.polygon()[iVertex].y()) + item_center_y)])
 
             self.default_properties["Point"] = verticesXY
 
@@ -722,6 +715,7 @@ class DiagramItem(QGraphicsPolygonItem):
         self.default_properties["Fill color"]   = self.ItemColor
         self.default_properties["z"]            = self.zValue()
 
+        print(f"line 717 :{self.default_properties}")
 
     def restore(self, properties: dict):
         if properties:

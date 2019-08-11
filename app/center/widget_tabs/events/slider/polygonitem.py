@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import QFormLayout, QGroupBox, QGridLayout, QSpinBox, QLabe
 from PyQt5.QtWidgets import (QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
 
 import numpy as np
+
+from app.info import Info
 from app.lib import PigComboBox, ColorListEditor
 
 
@@ -16,6 +18,10 @@ class FramePage(QWidget):
         self.default_properties = {
             "Center X": "0",
             "Center Y": "0",
+            "P1 X": "0",
+            "P1 Y": "0",
+            "P2 X": "0",
+            "P2 Y": "0",
             "Point": [["0", "0"], ["0", "0"], ["0", "0"]],
             "Width": "200",
             "Height": "200",
@@ -34,10 +40,8 @@ class FramePage(QWidget):
         self.p2y_pos = PigComboBox()
         self.p3x_pos = PigComboBox()
         self.p3y_pos = PigComboBox()
-        # self.p4x_pos = PigComboBox()
-        # self.p4y_pos = PigComboBox()
 
-        self.width = PigComboBox()
+        self.width  = PigComboBox()
         self.height = PigComboBox()
 
         self.start_angle = PigComboBox()
@@ -59,7 +63,6 @@ class FramePage(QWidget):
         self.setUI()
 
 
-
     #点位置的布局
     def setPointsLayout(self):
         l_cX = QLabel("Center X:")
@@ -72,9 +75,7 @@ class FramePage(QWidget):
         l_p1X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_p1Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        self.cx_pos.addItems(["0", "25", "50", "75", "100"])
         self.cx_pos.setEditable(True)
-        self.cy_pos.addItems(["0", "25", "50", "75", "100"])
         self.cy_pos.setEditable(True)
 
         self.pLayout.addWidget(l_cX, 0, 0)
@@ -234,23 +235,26 @@ class FramePage(QWidget):
         self.end_angle.addItems(["0", "90", "180","270", "360"])
         self.end_angle.setEditable(True)
 
-        valid_num = QRegExp("\d+")
-        self.cx_pos.setValidator(QRegExpValidator(valid_num))
-        self.cy_pos.setValidator(QRegExpValidator(valid_num))
+        # valid_int_num = QRegExp("\d+")
+        valid_float_num = QRegExp(Info.RE_FLOAT)
+        valid_int_num = QRegExp(Info.RE_NUMBER)
 
-        self.width.setValidator(QRegExpValidator(valid_num))
-        self.height.setValidator(QRegExpValidator(valid_num))
+        self.cx_pos.setValidator(QRegExpValidator(valid_int_num))
+        self.cy_pos.setValidator(QRegExpValidator(valid_int_num))
 
-        self.start_angle.setValidator(QRegExpValidator(valid_num))
-        self.end_angle.setValidator(QRegExpValidator(valid_num))
+        self.width.setValidator(QRegExpValidator(valid_int_num))
+        self.height.setValidator(QRegExpValidator(valid_int_num))
+
+        self.start_angle.setValidator(QRegExpValidator(valid_float_num))
+        self.end_angle.setValidator(QRegExpValidator(valid_float_num))
 
         for vertex in self.pInfo:
             vertex[0].addItems(["0", "25", "50", "75", "100"])
             vertex[0].setEditable(True)
             vertex[1].addItems(["0", "25", "50", "75", "100"])
             vertex[1].setEditable(True)
-            vertex[0].setValidator(QRegExpValidator(valid_num))
-            vertex[1].setValidator(QRegExpValidator(valid_num))
+            vertex[0].setValidator(QRegExpValidator(valid_int_num))
+            vertex[1].setValidator(QRegExpValidator(valid_int_num))
 
         l_cX = QLabel("Center X:")
         l_cY = QLabel("Center Y:")
@@ -259,21 +263,15 @@ class FramePage(QWidget):
         l_p2X = QLabel("P2 X:")
         l_p2Y = QLabel(" Y:")
 
-        # l_p3X = QLabel("P3 X:")
-        # l_p3Y = QLabel(" Y:")
-        #
-        # l_p4X = QLabel("P4 X:")
-        # l_p4Y = QLabel(" Y:")
-
         l_width = QLabel("Width:")
         l_height = QLabel("Height:")
 
         l_start_angle = QLabel("Start Angle°:")
-        l_end_angle = QLabel("Angle Length°:")
+        l_end_angle   = QLabel("Angle Length°:")
 
         l_borderColor = QLabel("Border Color:")
         l_borderWidth = QLabel("Border Width:")
-        l_fillColor = QLabel("Fill Color")
+        l_fillColor   = QLabel("Fill Color")
 
         l_cX.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_cY.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -281,11 +279,6 @@ class FramePage(QWidget):
         l_p1Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_p2X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_p2Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l_p3X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l_p3Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        #
-        # l_p4X.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l_p4Y.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         l_width.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_height.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -364,6 +357,7 @@ class FramePage(QWidget):
     def setAttributes(self, attributes):
         self.attributes = attributes
 
+    # a possible bug here, maybe we need to get the Info differently for different item
     def getInfo(self):
         self.default_properties['Center X'] = self.cx_pos.currentText()
         self.default_properties['Center Y'] = self.cy_pos.currentText()
@@ -371,6 +365,12 @@ class FramePage(QWidget):
         for iVertex in range(len(self.pInfo)):
             self.default_properties["Point"][iVertex][0] = self.pInfo[iVertex][0].currentText()
             self.default_properties["Point"][iVertex][1] = self.pInfo[iVertex][1].currentText()
+
+        self.default_properties['P1 X']        = self.p1x_pos.currentText()
+        self.default_properties['P1 Y']        = self.p1y_pos.currentText()
+
+        self.default_properties['P2 X']        = self.p2x_pos.currentText()
+        self.default_properties['P2 Y']        = self.p2y_pos.currentText()
 
         self.default_properties['Width']        = self.width.currentText()
         self.default_properties['Height']       = self.height.currentText()
@@ -384,7 +384,9 @@ class FramePage(QWidget):
 
     def setProperties(self, properties: dict):
         self.default_properties = properties
+        print(f"line 386 setProperties: {self.default_properties}")
         self.loadSetting()
+
 
     def setPos(self, x, y):
         self.cx_pos.setCurrentText(str(int(x)))
@@ -395,9 +397,17 @@ class FramePage(QWidget):
         self.cx_pos.setCurrentText(self.default_properties["Center X"])
         self.cy_pos.setCurrentText(self.default_properties["Center Y"])
 
+
         for i in range(len(self.pInfo)):
             self.pInfo[i][0].setCurrentText(self.default_properties["Point"][i][0])
             self.pInfo[i][1].setCurrentText(self.default_properties["Point"][i][1])
+
+        print(f"line 399: {self.default_properties['P1 X']}")
+        self.p1x_pos.setCurrentText(self.default_properties["P1 X"])
+        self.p1y_pos.setCurrentText(self.default_properties["P1 Y"])
+
+        self.p2x_pos.setCurrentText(self.default_properties["P2 X"])
+        self.p2y_pos.setCurrentText(self.default_properties["P2 Y"])
 
         self.width.setCurrentText(self.default_properties["Width"])
         self.height.setCurrentText(self.default_properties["Height"])
