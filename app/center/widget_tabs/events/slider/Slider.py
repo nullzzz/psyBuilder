@@ -1259,7 +1259,7 @@ class Slider(QMainWindow):
         soundButton.setIconSize(QSize(50, 50))
         snowButton = Button()
         self.buttonGroup.addButton(snowButton, PixItem.Snow)
-        snowButton.setIcon(QIcon(QPixmap(Func.getImage("snow1.png")).scaled(50, 50)))
+        snowButton.setIcon(QIcon(QPixmap(Func.getImage("snow.png")).scaled(50, 50)))
         snowButton.setIconSize(QSize(50, 50))
         gaborButton = Button()
         self.buttonGroup.addButton(gaborButton, PixItem.Gabor)
