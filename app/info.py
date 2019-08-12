@@ -39,6 +39,15 @@ class Info(object):
         "game pad": 0
     }
 
+    SLIDER_COUNT: dict = {
+        "image": 0,
+        "text": 0,
+        "video": 0,
+        "sound": 0,
+        "snow": 0,
+        "gabor": 0,
+    }
+
     # 当前导入导出文件名
     FILE_NAME: str = ""
 

@@ -2,26 +2,28 @@ from PyQt5.QtCore import Qt, QByteArray, QDataStream, QIODevice, QMimeData, pyqt
 from PyQt5.QtGui import QDrag, QIcon
 from PyQt5.QtWidgets import QPushButton, QWidget, QGridLayout, QLabel, QToolBox, QSizePolicy, QFormLayout
 
+from app.func import Func
+
 
 class LeftBox(QToolBox):
     Polygon, Circle, Image, Text, Video, Sound, Snow, Gabor = range(8)
-    clicked = pyqtSignal()
+    clicked = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(LeftBox, self).__init__(parent=parent)
         self.basic = QWidget()
         image = Item("image", self.Image)
-        image.itemType.connect(lambda x: self.clicked.emit())
+        image.itemType.connect(lambda x: self.clicked.emit(""))
         video = Item("video", self.Video)
-        video.itemType.connect(lambda x: self.clicked.emit())
+        video.itemType.connect(lambda x: self.clicked.emit(""))
         text = Item("text", self.Text)
-        text.itemType.connect(lambda x: self.clicked.emit())
+        text.itemType.connect(lambda x: self.clicked.emit(""))
         sound = Item("sound", self.Sound)
-        sound.itemType.connect(lambda x: self.clicked.emit())
+        sound.itemType.connect(lambda x: self.clicked.emit(""))
         snow = Item("snow", self.Snow)
-        snow.itemType.connect(lambda x: self.clicked.emit())
+        snow.itemType.connect(lambda x: self.clicked.emit(""))
         gabor = Item("gabor", self.Gabor)
-        gabor.itemType.connect(lambda x: self.clicked.emit())
+        gabor.itemType.connect(lambda x: self.clicked.emit(""))
 
         self.stimuli = QWidget()
         self.addItem(self.basic, "Basic Geometries")
@@ -33,9 +35,9 @@ class LeftBox(QToolBox):
         layout1 = QFormLayout()
         layout1.setAlignment(Qt.AlignCenter)
         layout1.addWidget(image)
-        # layout1.addWidget(video)
+        layout1.addWidget(video)
         layout1.addWidget(text)
-        # layout1.addWidget(sound)
+        layout1.addWidget(sound)
         # layout1.addWidget(snow)
         # layout1.addWidget(gabor)
         self.stimuli.setLayout(layout1)
@@ -64,7 +66,7 @@ class Button(QPushButton):
         super().__init__(parent)
         self.setMouseTracking(True)
         self.item_type = item_type
-        fp = f"D:\\PsyDemo\\image\\{text}.png"
+        fp = Func.getImage(f"{text}.png")
         self.setIcon(QIcon(fp))
 
     def mouseMoveEvent(self, e):

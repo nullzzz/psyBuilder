@@ -1,15 +1,14 @@
 import sys
 
-from PyQt5.QtCore import pyqtSignal, Qt, QSize, QRect
-from PyQt5.QtGui import QIcon, QFont, QColor, QIntValidator, QPixmap, QPainter, QBrush
+from PyQt5.QtCore import pyqtSignal, Qt, QRect
+from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMainWindow, QMenu, QAction, \
-    QGridLayout, QLabel, QComboBox, QColorDialog
+    QComboBox, QColorDialog
 from quamash import QApplication
 
 from app.center.widget_tabs.events.newSlider.button import LeftBox
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
-
 from app.center.widget_tabs.events.newSlider.property import SliderProperty
 from app.center.widget_tabs.events.newSlider.scene import Scene
 from app.func import Func
@@ -26,6 +25,7 @@ class Slider(QMainWindow):
         self.attributes: list = []
         self.scene = Scene()
         self.scene.itemAdd.connect(self.addItem)
+        self.scene.selectionChanged.connect(self.changeItemList)
 
         self.pro_window = SliderProperty()
         self.pro_window.ok_bt.clicked.connect(self.ok)
@@ -43,21 +43,37 @@ class Slider(QMainWindow):
         self.back_action.setToolTip("Send item to back")
         self.back_action.triggered.connect(self.toBack)
 
+        self.open_item_action = QAction(QIcon(Func.getImage("setting.png")), "Properties", self)
+        self.open_item_action.triggered.connect(self.openItem)
+
         self.delete_action = QAction(QIcon(Func.getImage("delete.png")), "&Delete", self)
         self.delete_action.setToolTip("Delete item from diagram")
         self.delete_action.triggered.connect(self.deleteItem)
 
-        # self.itemMenu = QMenu()
-        # self.itemMenu.addAction(self.delete_action)
-        # self.itemMenu.addSeparator()
-        # self.itemMenu.addAction(self.front_action)
-        # self.itemMenu.addAction(self.back_action)
+        self.itemMenu = QMenu()
+        self.itemMenu.addAction(self.delete_action)
+        self.itemMenu.addSeparator()
+        self.itemMenu.addAction(self.front_action)
+        self.itemMenu.addAction(self.back_action)
+        self.itemMenu.addAction(self.open_item_action)
+
+        self.item_list = QComboBox()
+        self.item_list.setMinimumWidth(100)
+        self.item_list.addItem("none")
+        self.item_list.currentTextChanged.connect(self.selectItem)
+
+        self.item_pro_windows = QAction(QIcon(Func.getImage("item.png")), "open item properties", self)
+        self.item_pro_windows.setToolTip("Open current item's properties")
+        self.item_pro_windows.triggered.connect(self.openItem)
 
         self.setting = self.addToolBar('Setting')
         self.setting.addAction(self.open_action)
         self.setting.addAction(self.delete_action)
         self.setting.addAction(self.front_action)
         self.setting.addAction(self.back_action)
+
+        self.setting.addWidget(self.item_list)
+        self.setting.addAction(self.item_pro_windows)
 
         # 边框宽度
         self.line_wid_com = QComboBox()
@@ -124,14 +140,32 @@ class Slider(QMainWindow):
 
         self.view = QGraphicsView(self.scene)
         self.scene.setSceneRect(0, 0, 2000, 2000)
+        self.scene.menu = self.itemMenu
 
         self.left_box = LeftBox()
         self.left_box.clicked.connect(self.addItem)
         self.setUI()
 
-    def addItem(self):
+    def addItem(self, item_name: str):
         self.pointer_bt.setChecked(True)
         self.scene.setMode(Scene.InsertItem)
+        if item_name:
+            self.item_list.addItem(item_name)
+
+    def changeItemList(self):
+        items = self.scene.selectedItems()
+        if items:
+            if items[0].item_name != self.item_list.currentText():
+                self.item_list.setCurrentText(items[0].item_name)
+        else:
+            self.item_list.setCurrentIndex(0)
+
+    def selectItem(self, item_name: str):
+        self.scene.selectionChanged.disconnect()
+        for item in self.scene.items():
+            if isinstance(item, PixItem):
+                item.setSelected(item_name == item.item_name)
+        self.scene.selectionChanged.connect(self.changeItemList)
 
     def setUI(self):
         self.setWindowTitle("Slider")
@@ -256,6 +290,11 @@ class Slider(QMainWindow):
     def openPro(self):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
+
+    def openItem(self):
+        items = self.scene.selectedItems()
+        if items:
+            items[0].openPro()
 
     def refresh(self):
         pass
