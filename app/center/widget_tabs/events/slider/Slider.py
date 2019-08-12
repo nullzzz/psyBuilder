@@ -364,10 +364,20 @@ class PixItem(QGraphicsPixmapItem):
                     width = int(self.default_properties["Width"])
                     height = int(self.default_properties["Height"])
                     bkColor = (float(rgbValue[0]), float(rgbValue[1]), float(rgbValue[2]))
-                    g = makeGabor_bcl(spFreq, Contrast, phase, orientation,
-                                      bkColor, width, height, sdx, sdy)
-                    pix = QPixmap(Func.getImage("gabor1.png"))
-                    pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
+
+                    stim = makeGabor_bcl(spFreq, Contrast, phase, orientation,
+                                         bkColor, width, height, sdx, sdy)
+
+                    stim = stim.astype(np.uint8)
+                    pix = QPixmap(qimage2ndarray.array2qimage(stim))
+
+                    pix = pix.scaled(int(self.default_properties['Width']),
+                                     int(self.default_properties['Height']),
+                                     Qt.KeepAspectRatio)
+                    # g = makeGabor_bcl(spFreq, Contrast, phase, orientation,
+                    #                   bkColor, width, height, sdx, sdy)
+                    # pix = QPixmap(Func.getImage("gabor1.png"))
+                    # pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
                     self.setPixmap(pix)
                     x = self.boundingRect().center().x()
                     y = self.boundingRect().center().y()
