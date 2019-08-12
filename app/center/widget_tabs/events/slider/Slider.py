@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QG
                              QGraphicsLineItem, QGraphicsPolygonItem,
                              QGraphicsScene, QGraphicsTextItem, QGraphicsView, QGridLayout, QGraphicsPixmapItem,
                              QHBoxLayout, QLabel, QMainWindow, QMenu, QMessageBox, QSizePolicy, QToolBox, QToolButton,
-                             QWidget, QPushButton, QColorDialog)
+                             QWidget, QPushButton, QColorDialog, QDesktopWidget)
 
 from app.center.widget_tabs.events.slider.gabor import gaborProperty
 from app.center.widget_tabs.events.slider.graph import Snow, makeGabor_bcl
@@ -974,7 +974,10 @@ class Slider(QMainWindow):
         layout = QHBoxLayout()
         layout.addWidget(self.toolBox)
         self.view = QGraphicsView(self.scene)
-        self.scene.setSceneRect(0, 0, 3000, 3000)
+        scr_Rect = QDesktopWidget().screenGeometry()
+
+        self.scene.setSceneRect(0, 0, scr_Rect.width(), scr_Rect.height())
+        self.view.fitInView(0,0, scr_Rect.width()/2,scr_Rect.height()/2, Qt.KeepAspectRatio)
 
         layout.addWidget(self.view)
 
