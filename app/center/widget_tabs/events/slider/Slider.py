@@ -259,10 +259,16 @@ class PixItem(QGraphicsPixmapItem):
         }
         if self.diagramType == self.Snow:
             try:
-                rgbValue = int(self.default_properties["Scale"])
-                snow = Snow(int(int(self.default_properties["Height"]) / rgbValue),
-                            int(int(self.default_properties["Width"]) / rgbValue))
-                pix = QPixmap(Func.getImage("snow1.png"))
+                # rgbValue = int(self.default_properties["Scale"])
+                # snow = Snow(int(int(self.default_properties["Height"]) / rgbValue),
+                #             int(int(self.default_properties["Width"]) / rgbValue))
+                # pix = QPixmap(Func.getImage("snow1.png"))
+                snowPixSize = int(self.default_properties["Scale"])
+                stim = Snow(int(int(self.default_properties["Width"])/snowPixSize),
+                            int(int(self.default_properties["Height"])/snowPixSize))
+                stim = stim.astype(np.uint8)
+                pix = QPixmap(qimage2ndarray.array2qimage(stim))
+
                 pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
                 self.setPos(QPoint(float(self.pro_window.frame.default_properties["Center X"]),
                                    float(self.pro_window.frame.default_properties["Center Y"])))
@@ -332,7 +338,6 @@ class PixItem(QGraphicsPixmapItem):
             if self.diagramType == self.Snow:
                 try:
                     stim = Snow(int(properties["Width"]), int(properties["Height"]))
-                    # pix = QPixmap(Func.getImage("snow.png"))
                     stim = stim.astype(np.uint8)
                     pix = QPixmap(qimage2ndarray.array2qimage(stim))
 
