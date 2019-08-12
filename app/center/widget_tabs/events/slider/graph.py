@@ -1,34 +1,20 @@
 import numpy as np
-from matplotlib import cm
-from matplotlib import pyplot as plt
 
-from app.func import Func
-
-
-def Snow(w, h):
+def Snow(w, h, isBool = False):
     stim = np.random.rand(w, h)
     stim = stim * 255
-    # stim[stim <=  0.5]  = 0
-    # stim[stim >   0.5] = 255
-    # vmax = stim[0][0]
-    # vmin = stim[0][0]
-    # for i in stim.shape():
-    #     for j in i:
-            # if j > vmax:
-            #     vmax = j
-            # if j < vmin:
-            #     vmin = j
+    if isBool:
+        stim[stim <=  0.5]  = 0
+        stim[stim >   0.5]  = 255
+
     return stim
 
 
 def makeGabor_bcl(cyclesPerPix, Contrast, phase, orientation, bkColor, width, height,
                   SDx, SDy):
-    phase = (phase % 360) * (np.pi / 180)
+    phase       = (phase % 360) * (np.pi / 180)
+
     orientation = (orientation % 360) * (np.pi / 180)
-
-    # pixelsPerPeriod = (1 / cyclesPerPix)
-
-    # gaussianSpaceConstant = periodsCoveredByOneStandardDeviation * pixelsPerPeriod
 
     radius = (int(width / 2.0), int(height / 2.0))
 
@@ -59,15 +45,5 @@ def makeGabor_bcl(cyclesPerPix, Contrast, phase, orientation, bkColor, width, he
 
     for iDim in range(0, np.size(bkColor)):
         stim[:, :, iDim] = stim[:, :, iDim] + (1 - circularGaussianMaskMatrix) * bkColor[iDim]
-
-
-    #
-    # figure = plt.figure(figsize=(width /100, height/100))
-    # ax = figure.add_subplot(1, 1, 1, position=[0, 0, 1, 1])
-    # plt.xticks(())
-    # plt.yticks(())
-    # ax.imshow(stim / 255)
-    # plt.savefig(Func.getImage("gabor1.png"))
-    # plt.close()
 
     return stim
