@@ -1,8 +1,9 @@
 import numpy as np
+import qimage2ndarray
 from PyQt5.QtCore import (pyqtSignal, QLineF, QPointF, QRect, QRectF, QSize, QPoint, Qt, QByteArray, QDataStream,
                           QIODevice, QMimeData)
 from PyQt5.QtGui import (QBrush, QColor, QFont, QIcon, QIntValidator, QPainter,
-                         QPainterPath, QPen, QPixmap, QDrag)
+                         QPainterPath, QPen, QPixmap, QDrag, QImage)
 from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QGraphicsItem,
                              QGraphicsLineItem, QGraphicsPolygonItem,
                              QGraphicsScene, QGraphicsTextItem, QGraphicsView, QGridLayout, QGraphicsPixmapItem,
@@ -289,10 +290,17 @@ class PixItem(QGraphicsPixmapItem):
                 width = int(self.default_properties["Width"])
                 height = int(self.default_properties["Height"])
                 bkColor = (float(rgbValue[0]), float(rgbValue[1]), float(rgbValue[2]))
-                g = makeGabor_bcl(spFreq, Contrast, phase, orientation,
+
+                stim = makeGabor_bcl(spFreq, Contrast, phase, orientation,
                                   bkColor, width, height, sdx, sdy)
-                pix = QPixmap(Func.getImage("gabor1.png"))
-                pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
+
+                stim = stim.astype(np.uint8)
+                pix = QPixmap(qimage2ndarray.array2qimage(stim))
+
+                pix = pix.scaled(int(self.default_properties['Width']),
+                                 int(self.default_properties['Height']),
+                                 Qt.KeepAspectRatio)
+
                 self.setPos(QPoint(float(self.pro_window.frame.default_properties["Center X"]),
                                    float(self.pro_window.frame.default_properties["Center Y"])))
                 self.setPixmap(pix)
@@ -301,7 +309,7 @@ class PixItem(QGraphicsPixmapItem):
                 y = self.boundingRect().center().y()
 
                 self.setTransformOriginPoint(x, y)
-                self.setRotation(int(self.default_properties["rotation"]))
+                # self.setRotation(int(self.default_properties["rotation"]))
                 self.update()
             except Exception as e:
                 print(e)
@@ -323,8 +331,11 @@ class PixItem(QGraphicsPixmapItem):
             self.pro_window.setProperties(properties)
             if self.diagramType == self.Snow:
                 try:
-                    snow = Snow(int(properties["Width"]), int(properties["Height"]))
-                    pix = QPixmap(Func.getImage("snow.png"))
+                    stim = Snow(int(properties["Width"]), int(properties["Height"]))
+                    # pix = QPixmap(Func.getImage("snow.png"))
+                    stim = stim.astype(np.uint8)
+                    pix = QPixmap(qimage2ndarray.array2qimage(stim))
+
                     pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
                     self.setPixmap(pix)
 

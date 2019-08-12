@@ -6,23 +6,17 @@ from app.func import Func
 
 
 def Snow(w, h):
-    data = np.random.rand(w, h)
-    cmap = cm.get_cmap('gray', 100)
-    figure = plt.figure(facecolor='w', figsize=(1, 1))
-    ax = figure.add_subplot(1, 1, 1, position=[0, 0, 1, 1])
-    vmax = data[0][0]
-    vmin = data[0][0]
-    for i in data:
+    stim = np.random.rand(w, h)
+
+    vmax = stim[0][0]
+    vmin = stim[0][0]
+    for i in stim:
         for j in i:
             if j > vmax:
                 vmax = j
             if j < vmin:
                 vmin = j
-
-    ax.imshow(data, interpolation='nearest', cmap=cmap, aspect='auto', vmin=vmin, vmax=vmax, shape=(1, 1))
-    plt.xticks(())
-    plt.yticks(())
-    plt.savefig(Func.getImage("snow1.png"))
+    return stim
 
 
 def makeGabor_bcl(cyclesPerPix, Contrast, phase, orientation, bkColor, width, height,
@@ -30,7 +24,7 @@ def makeGabor_bcl(cyclesPerPix, Contrast, phase, orientation, bkColor, width, he
     phase = (phase % 360) * (np.pi / 180)
     orientation = (orientation % 360) * (np.pi / 180)
 
-    pixelsPerPeriod = (1 / cyclesPerPix)
+    # pixelsPerPeriod = (1 / cyclesPerPix)
 
     # gaussianSpaceConstant = periodsCoveredByOneStandardDeviation * pixelsPerPeriod
 
@@ -64,10 +58,14 @@ def makeGabor_bcl(cyclesPerPix, Contrast, phase, orientation, bkColor, width, he
     for iDim in range(0, np.size(bkColor)):
         stim[:, :, iDim] = stim[:, :, iDim] + (1 - circularGaussianMaskMatrix) * bkColor[iDim]
 
-    figure = plt.figure(figsize=(width / 100, height / 100))
-    ax = figure.add_subplot(1, 1, 1, position=[0, 0, 1, 1])
-    plt.xticks(())
-    plt.yticks(())
-    ax.imshow(stim / 255)
-    plt.savefig(Func.getImage("gabor1.png"))
-    plt.close()
+
+    #
+    # figure = plt.figure(figsize=(width /100, height/100))
+    # ax = figure.add_subplot(1, 1, 1, position=[0, 0, 1, 1])
+    # plt.xticks(())
+    # plt.yticks(())
+    # ax.imshow(stim / 255)
+    # plt.savefig(Func.getImage("gabor1.png"))
+    # plt.close()
+
+    return stim
