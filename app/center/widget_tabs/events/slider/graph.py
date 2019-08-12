@@ -7,15 +7,16 @@ from app.func import Func
 
 def Snow(w, h):
     stim = np.random.rand(w, h)
-
-    vmax = stim[0][0]
-    vmin = stim[0][0]
-    for i in stim:
-        for j in i:
-            if j > vmax:
-                vmax = j
-            if j < vmin:
-                vmin = j
+    stim[stim <=  0.5]  = 0
+    stim[stim >   0.5] = 255
+    # vmax = stim[0][0]
+    # vmin = stim[0][0]
+    # for i in stim.shape():
+    #     for j in i:
+            # if j > vmax:
+            #     vmax = j
+            # if j < vmin:
+            #     vmin = j
     return stim
 
 
