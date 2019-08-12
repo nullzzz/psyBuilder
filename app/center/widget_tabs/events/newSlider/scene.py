@@ -1,8 +1,9 @@
-from PyQt5.QtCore import pyqtSignal, Qt, QByteArray, QPointF, QLineF, QRectF, QSizeF
-from PyQt5.QtGui import QPen, QTransform, QKeyEvent
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem
+from PyQt5.QtCore import pyqtSignal, Qt, QPointF, QLineF, QRectF
+from PyQt5.QtGui import QPen, QTransform, QKeyEvent, QPainterPath
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
+from app.center.widget_tabs.events.newSlider.item.lasso import Lasso
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
 
 
@@ -19,7 +20,8 @@ class Scene(QGraphicsScene):
 
         self.attributes = []
         self.line = None
-        self.rect = None
+        self.lasso = None
+        self.path = QPainterPath()
 
         self.line_color = Qt.black
         self.fill_color = Qt.transparent
@@ -107,7 +109,8 @@ class Scene(QGraphicsScene):
                 self.press_x = event.scenePos().x()
                 self.press_y = event.scenePos().y()
                 it = self.itemAt(self.press_x, self.press_y, self.t)
-                self.rect = QGraphicsRectItem(QRectF(self.press_x, self.press_y, self.press_x + 1, self.press_y + 1))
+                self.lasso = Lasso(self.press_x, self.press_y)
+                self.addItem(self.lasso)
         super(Scene, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
@@ -117,13 +120,25 @@ class Scene(QGraphicsScene):
         elif self.my_mode == self.MoveItem or self.my_mode == self.InsertItem:
             self.update()
             super(Scene, self).mouseMoveEvent(event)
+        # 套索模式
         elif self.my_mode == self.SelectItem:
-            self.rect: QGraphicsRectItem
-            self.rect.setRect(QRectF(self.press_x, self.press_y, event.scenePos().x() - self.press_x,
-                                     event.scenePos().y() - self.press_y))
-            it = self.itemAt(event.scenePos().x(), event.scenePos().y(), self.t)
-            if it:
-                it.setSelected(True)
+            self.lasso: Lasso
+            x = event.scenePos().x()
+            y = event.scenePos().y()
+
+            rect0 = self.lasso.polygon().boundingRect()
+            x0 = rect0.left()
+            y0 = rect0.top()
+
+            new_rect = QRectF(x0, y0, x - x0, y - y0)
+            path = QPainterPath()
+            path.addRect(new_rect)
+            rect = path.toFillPolygon()
+            self.lasso.setPolygon(rect)
+            self.update()
+
+            self.lasso.center = self.lasso.polygon().boundingRect().center()
+            self.setSelectionArea(path, self.t)
 
     def mouseReleaseEvent(self, mouseEvent):
         if self.line and self.my_mode == self.InsertLine:
@@ -138,8 +153,8 @@ class Scene(QGraphicsScene):
             self.update()
             self.removeItem(self.line)
             self.line = None
-        if self.rect and self.my_mode == self.SelectItem:
-            self.removeItem(self.rect)
-            self.rect = None
+        if self.lasso and self.my_mode == self.SelectItem:
+            self.removeItem(self.lasso)
+            self.lasso = None
         self.line = None
         super(Scene, self).mouseReleaseEvent(mouseEvent)
