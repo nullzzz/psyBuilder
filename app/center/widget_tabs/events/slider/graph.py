@@ -7,8 +7,9 @@ from app.func import Func
 
 def Snow(w, h):
     stim = np.random.rand(w, h)
-    stim[stim <=  0.5]  = 0
-    stim[stim >   0.5] = 255
+    stim = stim * 255
+    # stim[stim <=  0.5]  = 0
+    # stim[stim >   0.5] = 255
     # vmax = stim[0][0]
     # vmin = stim[0][0]
     # for i in stim.shape():
