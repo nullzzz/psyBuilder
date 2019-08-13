@@ -253,9 +253,9 @@ class FramePage(QWidget):
     #     return QWidget.eventFilter(self, obj, e)
 
 
-class gaborProperty(QWidget):
+class GaborProperty(QWidget):
     def __init__(self, parent=None):
-        super(gaborProperty, self).__init__(parent)
+        super(GaborProperty, self).__init__(parent)
         self.below = QWidget()
 
         self.frame = FramePage()

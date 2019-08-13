@@ -3,7 +3,7 @@ import time
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
-from app.center.widget_tabs.events.slider.Slider import Slider
+from app.center.widget_tabs.events.slider.slider import Slider
 from app.func import Func
 from app.info import Info
 from app.lib import PigComboBox, PigLineEdit

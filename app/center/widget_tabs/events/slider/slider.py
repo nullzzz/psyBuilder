@@ -10,10 +10,11 @@ from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QG
                              QHBoxLayout, QLabel, QMainWindow, QMenu, QMessageBox, QSizePolicy, QToolBox, QToolButton,
                              QWidget, QPushButton, QColorDialog, QDesktopWidget)
 
-from app.center.widget_tabs.events.slider.gabor import gaborProperty
+from app.center.widget_tabs.events.slider.gabor import GaborProperty
 from app.center.widget_tabs.events.slider.graph import Snow, makeGabor_bcl
-from app.center.widget_tabs.events.slider.image import ImageProperty
-from app.center.widget_tabs.events.slider.polygon.PolygonProperty import PolygonProperty
+from app.center.widget_tabs.events.slider.image.imageProperty import ImageProperty
+
+from app.center.widget_tabs.events.slider.polygon.polygonProperty import PolygonProperty
 from app.center.widget_tabs.events.slider.property import SliderProperty
 from app.center.widget_tabs.events.slider.snow import snowProperty
 from app.center.widget_tabs.events.slider.sound import SoundProperty
@@ -143,7 +144,7 @@ class PixItem(QGraphicsPixmapItem):
             self.setPixmap(QPixmap(Func.getImage("snow.png")))
 
         elif self.diagramType == self.Gabor:
-            self.pro_window = gaborProperty()
+            self.pro_window = GaborProperty()
             self.setPixmap(QPixmap(Func.getImage("Gabor.png")))
 
         else:
@@ -158,8 +159,8 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
         self.resizingFlag = False
-        self.resizing = False
-        self.keepRatioResizing = False
+        self.arbitrary_resize = False
+        self.keep_resize = False
 
         self.default_properties = {
             'name': self.diagramType,
@@ -172,10 +173,10 @@ class PixItem(QGraphicsPixmapItem):
     def mousePressEvent(self, mouseEvent):
         if self.diagramType < 8:
             if mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.AltModifier:
-                self.resizing = True
+                self.arbitrary_resize = True
                 self.setCursor(Qt.SizeAllCursor)
             elif mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.ShiftModifier:
-                self.keepRatioResizing = True
+                self.keep_resize = True
                 self.setCursor(Qt.SizeAllCursor)
             else:
                 super(PixItem, self).mousePressEvent(mouseEvent)
@@ -187,9 +188,9 @@ class PixItem(QGraphicsPixmapItem):
         y = mouseEvent.pos().y()
         if self.diagramType > 7:
             self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
-        if self.resizing:
+        if self.arbitrary_resize:
             self.resizingFlag = True
-        if self.keepRatioResizing:
+        if self.keep_resize:
             self.resizingFlag = True
             if x > y:
                 x = y
@@ -208,8 +209,8 @@ class PixItem(QGraphicsPixmapItem):
 
     def mouseReleaseEvent(self, mouseEvent):
         self.unsetCursor()
-        self.resizing = False
-        self.keepRatioResizing = False
+        self.arbitrary_resize = False
+        self.keep_resize = False
         self.resizingFlag = False
         super(PixItem, self).mouseReleaseEvent(mouseEvent)
 
@@ -484,8 +485,8 @@ class DiaItem(QGraphicsPolygonItem):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
-        self.resizing = False
-        self.keepRatioResizing = False
+        self.arbitrary_resize = False
+        self.keep_resize = False
         self.resizingFlag = False
         # self.flag1 = False
         self.center = QPointF(0, 0)
@@ -519,16 +520,14 @@ class DiaItem(QGraphicsPolygonItem):
 
         rect0 = self.polygon().boundingRect()
 
-        self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
-
         cHeight = rect0.height()
-        cWidth = rect0.width()
+        cWidth  = rect0.width()
 
         # 非等比例
-        if self.resizing and self.diagramType < 4:
+        if self.arbitrary_resize and self.diagramType < 4:
             self.resizingFlag = True
         # 等比例
-        if self.keepRatioResizing and self.diagramType < 4:
+        if self.keep_resize and self.diagramType < 4:
             self.resizingFlag = True
 
             if cHeight < 5:
@@ -549,8 +548,12 @@ class DiaItem(QGraphicsPolygonItem):
             x0 = rect0.left()
             y0 = rect0.top()
 
-            path = QPainterPath()
-            cRect = QRectF(x0, y0, x - x0, y - y0)
+            path  = QPainterPath()
+
+            newWidth  = x - x0
+            newHeight = y - y0
+
+            cRect = QRectF(x0 - (newWidth - cWidth)/2, y0 - (newHeight - cHeight)/2, newWidth, newHeight)
 
             if self.diagramType == self.Circle:
                 path.addEllipse(cRect)
@@ -568,7 +571,7 @@ class DiaItem(QGraphicsPolygonItem):
                 hRatio = (x - x0) / cWidth
                 vRatio = (y - y0) / cHeight
 
-                if self.keepRatioResizing:
+                if self.keep_resize:
                     if hRatio > vRatio:
                         vRatio = hRatio
                     else:
@@ -591,12 +594,12 @@ class DiaItem(QGraphicsPolygonItem):
             self.setPolygon(self.mPolygon)
             self.update()
 
-            self.center = self.polygon().boundingRect().center()
+            cBoundRect = self.polygon().boundingRect()
+            self.center = cBoundRect.center()
 
-            # after redrawing, update the default properties in the frame
-            # to transform the properties back
+            print(f"scenePos: {self.scenePos().x()},{self.scenePos().y()}")
+
             self.setProperties()
-            # print(f"line 555 self.prope:{self.default_properties}")
             self.pro_window.frame.setProperties(self.default_properties)
 
         else:
@@ -604,11 +607,11 @@ class DiaItem(QGraphicsPolygonItem):
 
     def mousePressEvent(self, mouseEvent):
         if mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.AltModifier:
-            self.resizing = True
+            self.arbitrary_resize = True
             self.setCursor(Qt.SizeAllCursor)
 
         elif mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.ShiftModifier:
-            self.keepRatioResizing = True
+            self.keep_resize = True
             self.setCursor(Qt.SizeAllCursor)
 
         else:
@@ -619,8 +622,8 @@ class DiaItem(QGraphicsPolygonItem):
         self.flag1 = False  # what does this for ????
         self.resizingFlag = False
 
-        self.resizing = False
-        self.keepRatioResizing = False
+        self.arbitrary_resize = False
+        self.keep_resize = False
         super(DiaItem, self).mouseReleaseEvent(mouseEvent)
 
     def mouseDoubleClickEvent(self, mouseEvent):
@@ -724,11 +727,12 @@ class DiaItem(QGraphicsPolygonItem):
         self.setPolygon(self.mPolygon)
         self.update()
 
+
     def setProperties(self):
 
         item_center_x = int(self.scenePos().x())
         item_center_y = int(self.scenePos().y())
-
+        # print(f"cx: {item_center_x},{item_center_y}")
         self.default_properties["Center X"] = str(item_center_x)
         self.default_properties["Center Y"] = str(item_center_y)
 
@@ -1002,6 +1006,8 @@ class Slider(QMainWindow):
         layout.addWidget(self.toolBox)
         self.view = QGraphicsView(self.scene)
         scr_Rect = QDesktopWidget().screenGeometry()
+
+        print(f"screen: {scr_Rect}")
 
         self.scene.setSceneRect(0, 0, scr_Rect.width(), scr_Rect.height())
         self.view.fitInView(0,0, scr_Rect.width()/2,scr_Rect.height()/2, Qt.KeepAspectRatio)
