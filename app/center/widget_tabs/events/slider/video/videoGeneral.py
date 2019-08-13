@@ -23,11 +23,12 @@ class VideoTab1(QWidget):
         self.file_name = PigLineEdit()
         self.file_name.textChanged.connect(self.findVar)
         self.file_name.returnPressed.connect(self.finalCheck)
+
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
         self.start_pos = PigLineEdit()
-        self.end_pos = PigLineEdit()
+        self.end_pos   = PigLineEdit()
 
         # 倍速
         self.playback_rate = PigComboBox()

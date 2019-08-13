@@ -3,7 +3,7 @@ import qimage2ndarray
 from PyQt5.QtCore import (pyqtSignal, QLineF, QPointF, QRect, QRectF, QSize, QPoint, Qt, QByteArray, QDataStream,
                           QIODevice, QMimeData)
 from PyQt5.QtGui import (QBrush, QColor, QFont, QIcon, QIntValidator, QPainter,
-                         QPainterPath, QPen, QPixmap, QDrag, QImage)
+                         QPainterPath, QPen, QPixmap, QDrag)
 from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QGraphicsItem,
                              QGraphicsLineItem, QGraphicsPolygonItem,
                              QGraphicsScene, QGraphicsTextItem, QGraphicsView, QGridLayout, QGraphicsPixmapItem,
@@ -17,8 +17,8 @@ from app.center.widget_tabs.events.slider.image.imageProperty import ImageProper
 from app.center.widget_tabs.events.slider.polygon.polygonProperty import PolygonProperty
 from app.center.widget_tabs.events.slider.property import SliderProperty
 from app.center.widget_tabs.events.slider.snow import snowProperty
-from app.center.widget_tabs.events.slider.sound import SoundProperty
-from app.center.widget_tabs.events.slider.viedeo import VideoProperty
+from app.center.widget_tabs.events.slider.sound.soundProperty import SoundProperty
+from app.center.widget_tabs.events.slider.video.videoProperty import VideoProperty
 from app.func import Func
 from lib.psy_message_box import PsyMessageBox as QMessageBox
 
@@ -197,13 +197,14 @@ class PixItem(QGraphicsPixmapItem):
             else:
                 y = x
         if self.resizingFlag:
-            if self.diagramType == self.Video:
-                self.setPixmap(QPixmap(Func.getImage("video.png")).scaled(x, y))
-            elif self.diagramType == self.Sound:
-                self.setPixmap(QPixmap(Func.getImage("music.png")).scaled(x, y))
-            else:
-                self.setPixmap(QPixmap(Func.getImage("Picture.png")).scaled(x, y))
-            self.update()
+            pass
+            # if self.diagramType == self.Video:
+            #     self.setPixmap(QPixmap(Func.getImage("video.png")).scaled(x, y))
+            # elif self.diagramType == self.Sound:
+            #     self.setPixmap(QPixmap(Func.getImage("music.png")).scaled(x, y))
+            # else:
+            #     self.setPixmap(QPixmap(Func.getImage("Picture.png")).scaled(x, y))
+            # self.update()
         else:
             super(PixItem, self).mouseMoveEvent(mouseEvent)
 
@@ -597,7 +598,7 @@ class DiaItem(QGraphicsPolygonItem):
             cBoundRect = self.polygon().boundingRect()
             self.center = cBoundRect.center()
 
-            print(f"scenePos: {self.scenePos().x()},{self.scenePos().y()}")
+            # print(f"scenePos: {self.scenePos().x()},{self.scenePos().y()}")
 
             self.setProperties()
             self.pro_window.frame.setProperties(self.default_properties)

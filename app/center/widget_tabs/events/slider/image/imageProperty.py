@@ -7,16 +7,16 @@ from app.center.widget_tabs.events.slider.image.general import ImageGeneral
 class ImageProperty(QWidget):
     def __init__(self, parent=None):
         super(ImageProperty, self).__init__(parent)
-        self.tab = QTabWidget()
+        self.tab   = QTabWidget()
         self.below = QWidget()
 
         self.general = ImageGeneral()
         self.tab.addTab(self.general, "general")
         self.default_properties = {**self.general.default_properties}
         # bottom
-        self.ok_bt = QPushButton("OK")
+        self.ok_bt     = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
-        self.apply_bt = QPushButton("Apply")
+        self.apply_bt  = QPushButton("Apply")
         self.setButtons()
 
         self.setUI()
