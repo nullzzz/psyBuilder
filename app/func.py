@@ -609,6 +609,21 @@ class Func(object):
             return []
 
     @staticmethod
+    def isCitingValue(valueStr: str) -> bool:
+        if re.fullmatch("\[[A-Za-z]+[a-zA-Z\._0-9]*\]", valueStr):
+            return True
+        return False
+
+
+    @staticmethod
+    def isRGBStr(RGBStr: str):
+        if re.fullmatch("^\d+,\d+,\d+$", RGBStr):
+            output = RGBStr.split(',')
+            return output
+
+        return False
+
+    @staticmethod
     def isWidgetType(widget_id: str, widget_type: str):
         """
         根据输入的widget_id来判断是不是输入的类型

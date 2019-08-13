@@ -101,7 +101,7 @@ class PointWidget(QWidget):
                 self.device_name.append(device_name.lower())
                 self.device_id_name[device_id] = device_name
                 device_info = self.default_properties.get(device_name)
-                item.setProperties(device_info)
+                item.getProperties(device_info)
 
         # 更新显示信息
         item = self.currentItem()

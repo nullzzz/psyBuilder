@@ -60,6 +60,7 @@ class FramePage(QWidget):
         self.border_width = QSpinBox()
         self.border_width.setRange(0, 20)
         self.item_color = ColorListEditor()
+        # self.item_color.getColor()
         self.setUI()
 
 
@@ -376,15 +377,15 @@ class FramePage(QWidget):
         self.default_properties['Height']       = self.height.currentText()
         self.default_properties['Start angle']  = self.start_angle.currentText()
         self.default_properties['Angle length'] = self.end_angle.currentText()
+
         self.default_properties['Border width'] = str(self.border_width.value())
-        self.default_properties['Border color'] = self.border_color.currentText()
-        self.default_properties['Fill color']   = self.item_color.currentText()
+        self.default_properties['Border color'] = self.border_color.getColor()
+        self.default_properties['Fill color']   = self.item_color.getColor()
 
         return self.default_properties
 
     def setProperties(self, properties: dict):
         self.default_properties = properties
-        # print(f"line 386 setProperties: {self.default_properties}")
         self.loadSetting()
 
 

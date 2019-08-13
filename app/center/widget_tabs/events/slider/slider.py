@@ -10,15 +10,12 @@ from PyQt5.QtWidgets import (QAction, QButtonGroup, QComboBox, QFontComboBox, QG
                              QHBoxLayout, QLabel, QMainWindow, QMenu, QMessageBox, QSizePolicy, QToolBox, QToolButton,
                              QWidget, QPushButton, QColorDialog, QDesktopWidget)
 
-from app.center.widget_tabs.events.slider.gabor import GaborProperty
-from app.center.widget_tabs.events.slider.graph import Snow, makeGabor_bcl
-from app.center.widget_tabs.events.slider.image.imageProperty import ImageProperty
+from app.center.widget_tabs.events.slider.item.diaItem import DiaItem
+from app.center.widget_tabs.events.slider.item.diagramTextItem import DiagramTextItem
+from app.center.widget_tabs.events.slider.item.pixItem import PixItem
 
-from app.center.widget_tabs.events.slider.polygon.polygonProperty import PolygonProperty
 from app.center.widget_tabs.events.slider.property import SliderProperty
-from app.center.widget_tabs.events.slider.snow import snowProperty
-from app.center.widget_tabs.events.slider.sound.soundProperty import SoundProperty
-from app.center.widget_tabs.events.slider.video.videoProperty import VideoProperty
+from app.center.widget_tabs.events.slider.scene import Scene
 from app.func import Func
 from lib.psy_message_box import PsyMessageBox as QMessageBox
 
@@ -44,7 +41,7 @@ class Button(QPushButton):
         drag.setHotSpot(e.pos() - self.rect().topLeft())
         drag.exec_()
 
-
+"""
 class DiagramTextItem(QGraphicsTextItem):
     lostFocus = pyqtSignal(QGraphicsTextItem)
     selectedChange = pyqtSignal(QGraphicsItem)
@@ -119,7 +116,6 @@ class DiagramTextItem(QGraphicsTextItem):
         item.setZValue(self.zValue())
 
         return item
-
 
 class PixItem(QGraphicsPixmapItem):
     Video, Picture, Sound, Snow, Gabor = 5, 6, 7, 8, 9
@@ -257,20 +253,16 @@ class PixItem(QGraphicsPixmapItem):
             'z': self.zValue(),
             'x_pos': 1,
             'y_pos': 1,
-            **self.pro_window.default_properties
-        }
+            **self.pro_window.default_properties}
+
         if self.diagramType == self.Snow:
             try:
-                # rgbValue = int(self.default_properties["Scale"])
-                # snow = Snow(int(int(self.default_properties["Height"]) / rgbValue),
-                #             int(int(self.default_properties["Width"]) / rgbValue))
-                # pix = QPixmap(Func.getImage("snow1.png"))
                 snowPixSize = int(self.default_properties["Scale"])
-                snowStim = Snow(int(int(self.default_properties["Width"])/snowPixSize),
-                            int(int(self.default_properties["Height"])/snowPixSize))
-                snowStim = snowStim.astype(np.uint8)
-                pix = QPixmap(qimage2ndarray.array2qimage(snowStim))
+                snowStim    = Snow(int(int(self.default_properties["Width"])/snowPixSize),
+                                   int(int(self.default_properties["Height"])/snowPixSize))
+                snowStim    = snowStim.astype(np.uint8)
 
+                pix = QPixmap(qimage2ndarray.array2qimage(snowStim))
                 pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
 
                 self.setPos(QPoint(float(self.pro_window.frame.default_properties["Center X"]),
@@ -279,34 +271,33 @@ class PixItem(QGraphicsPixmapItem):
                 self.setPixmap(pix)
                 x = self.boundingRect().center().x()
                 y = self.boundingRect().center().y()
+
                 self.setTransformOriginPoint(x, y)
                 self.setRotation(int(self.default_properties["Rotation"]))
-
                 # self.setScale(float(self.default_properties["Scale"]))
                 self.update()
             except Exception as e:
                 print(e)
+                
         if self.diagramType == self.Gabor:
             try:
-                spFreq = float(self.default_properties['spatialFreq(cycles/pixel)'])
-                Contrast = float(self.default_properties['Contrast'])
-                phase = float(self.default_properties['phase'])
+                spFreq      = float(self.default_properties['spatialFreq(cycles/pixel)'])
+                Contrast    = float(self.default_properties['Contrast'])
+                phase       = float(self.default_properties['phase'])
                 orientation = float(self.default_properties['orientation'])
 
                 rgbValue = self.default_properties['bkColor'].split(',')
-                sdx = float(self.default_properties['SDx(pixels)'])
-                sdy = float(self.default_properties['SDy(pixels)'])
-                width = int(self.default_properties["Width"])
-                height = int(self.default_properties["Height"])
-                bkColor = (float(rgbValue[0]), float(rgbValue[1]), float(rgbValue[2]))
+                sdx      = float(self.default_properties['SDx(pixels)'])
+                sdy      = float(self.default_properties['SDy(pixels)'])
+                width    = int(self.default_properties["Width"])
+                height   = int(self.default_properties["Height"])
+                bkColor  = (float(rgbValue[0]), float(rgbValue[1]), float(rgbValue[2]))
 
-                stim = makeGabor_bcl(spFreq, Contrast, phase, orientation,
+                stim  = makeGabor_bcl(spFreq, Contrast, phase, orientation,
                                   bkColor, width, height, sdx, sdy)
-
-                stim = stim.astype(np.uint8)
-                pix = QPixmap(qimage2ndarray.array2qimage(stim))
-
-                pix = pix.scaled(int(self.default_properties['Width']),
+                stim  = stim.astype(np.uint8)
+                pix   = QPixmap(qimage2ndarray.array2qimage(stim))
+                pix  = pix.scaled(int(self.default_properties['Width']),
                                  int(self.default_properties['Height']),
                                  Qt.KeepAspectRatio)
 
@@ -318,7 +309,7 @@ class PixItem(QGraphicsPixmapItem):
                 y = self.boundingRect().center().y()
 
                 self.setTransformOriginPoint(x, y)
-                # self.setRotation(int(self.default_properties["rotation"]))
+                self.setRotation(int(self.default_properties["rotation"]))
                 self.update()
             except Exception as e:
                 print(e)
@@ -328,8 +319,7 @@ class PixItem(QGraphicsPixmapItem):
             'z': self.zValue(),
             'x_pos': 1,
             'y_pos': 1,
-            **self.pro_window.default_properties
-        }
+            **self.pro_window.default_properties}
 
     def setProperties(self):
         self.default_properties['x_pos'] = self.scenePos().x()
@@ -355,32 +345,31 @@ class PixItem(QGraphicsPixmapItem):
                     self.update()
                 except Exception as e:
                     print(e)
+
+
             if self.diagramType == self.Gabor:
                 try:
-                    spFreq = float(self.default_properties['spatialFreq(cycles/pixel)'])
-                    Contrast = float(self.default_properties['Contrast'])
-                    phase = float(self.default_properties['phase'])
+                    spFreq      = float(self.default_properties['spatialFreq(cycles/pixel)'])
+                    Contrast    = float(self.default_properties['Contrast'])
+                    phase       = float(self.default_properties['phase'])
                     orientation = float(self.default_properties['orientation'])
-                    rgbValue = self.default_properties['bkColor'].split(',')
-                    sdx = float(self.default_properties['SDx(pixels)'])
-                    sdy = float(self.default_properties['SDy(pixels)'])
-                    width = int(self.default_properties["Width"])
-                    height = int(self.default_properties["Height"])
+                    rgbValue    = self.default_properties['bkColor'].split(',')
+                    sdx     = float(self.default_properties['SDx(pixels)'])
+                    sdy     = float(self.default_properties['SDy(pixels)'])
+                    width   = int(self.default_properties["Width"])
+                    height  = int(self.default_properties["Height"])
                     bkColor = (float(rgbValue[0]), float(rgbValue[1]), float(rgbValue[2]))
 
                     stim = makeGabor_bcl(spFreq, Contrast, phase, orientation,
                                          bkColor, width, height, sdx, sdy)
 
                     stim = stim.astype(np.uint8)
-                    pix = QPixmap(qimage2ndarray.array2qimage(stim))
+                    pix  = QPixmap(qimage2ndarray.array2qimage(stim))
 
-                    pix = pix.scaled(int(self.default_properties['Width']),
+                    pix  = pix.scaled(int(self.default_properties['Width']),
                                      int(self.default_properties['Height']),
                                      Qt.KeepAspectRatio)
-                    # g = makeGabor_bcl(spFreq, Contrast, phase, orientation,
-                    #                   bkColor, width, height, sdx, sdy)
-                    # pix = QPixmap(Func.getImage("gabor1.png"))
-                    # pix = pix.scaled(int(self.default_properties["Width"]), int(self.default_properties["Height"]))
+
                     self.setPixmap(pix)
                     x = self.boundingRect().center().x()
                     y = self.boundingRect().center().y()
@@ -398,7 +387,6 @@ class PixItem(QGraphicsPixmapItem):
         new.setZValue(self.zValue())
 
         return new
-
 
 class DiaItem(QGraphicsPolygonItem):
     PolygonStim, Arc, Circle, Rectangle, Line = range(5)
@@ -513,7 +501,7 @@ class DiaItem(QGraphicsPolygonItem):
 
     def mouseMoveEvent(self, mouseEvent):
         # step 1: updating the default_properties of frame
-        self.setProperties()
+        self.getProperties()
         self.pro_window.frame.setProperties(self.default_properties)
 
         x = mouseEvent.pos().x()
@@ -600,7 +588,7 @@ class DiaItem(QGraphicsPolygonItem):
 
             # print(f"scenePos: {self.scenePos().x()},{self.scenePos().y()}")
 
-            self.setProperties()
+            self.getProperties()
             self.pro_window.frame.setProperties(self.default_properties)
 
         else:
@@ -628,7 +616,7 @@ class DiaItem(QGraphicsPolygonItem):
         super(DiaItem, self).mouseReleaseEvent(mouseEvent)
 
     def mouseDoubleClickEvent(self, mouseEvent):
-        self.setProperties()
+        self.getProperties()
 
         self.pro_window.frame.setProperties(self.default_properties)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
@@ -653,6 +641,27 @@ class DiaItem(QGraphicsPolygonItem):
         self.setSelected(True)
         self.contextMenu.exec_(event.screenPos())
 
+    def setPolygonFillColor(self):
+        rgbValue = Func.isRGBStr(self.ItemColor)
+        if rgbValue:
+            self.setBrush(QColor(int(rgbValue[0]), int(rgbValue[1]), int(rgbValue[2]) ))
+        else:
+            self.setBrush(QColor(self.ItemColor))
+
+    def setOutlineColorAndWidth(self):
+        rgbValue = Func.isRGBStr(self.LineColor)
+
+        pen = self.pen()
+        pen.setWidth(self.LineWidth)
+
+        if rgbValue:
+            pen.setColor(QColor(int(rgbValue[0]), int(rgbValue[1]), int(rgbValue[2]) ))
+        else:
+            pen.setColor(QColor(self.LineColor))
+
+        self.setPen(pen)
+
+
     def ok(self):
         self.apply()
         self.pro_window.close()
@@ -662,23 +671,17 @@ class DiaItem(QGraphicsPolygonItem):
         self.pro_window.frame.loadSetting()
 
     def apply(self):
-        # cx0 = int(self.pro_window.frame.default_properties["Center X"])
-        # cy0 = int(self.pro_window.frame.default_properties["Center Y"])
+
         self.pro_window.frame.getInfo()
         cx = int(self.pro_window.frame.default_properties["Center X"])
         cy = int(self.pro_window.frame.default_properties["Center Y"])
-        # dx = cx - cx0
-        # dy = cy - cy0
 
         self.ItemColor = self.pro_window.frame.default_properties["Fill color"]
         self.LineColor = self.pro_window.frame.default_properties["Border color"]
         self.LineWidth = int(self.pro_window.frame.default_properties["Border width"])
 
-        self.setBrush(QColor(self.ItemColor))  # item Color == Fill color
-        pen = self.pen()
-        pen.setWidth(self.LineWidth)
-        pen.setColor(QColor(self.LineColor))
-        self.setPen(pen)
+        self.setPolygonFillColor()
+        self.setOutlineColorAndWidth()
 
         path = QPainterPath()
 
@@ -729,8 +732,7 @@ class DiaItem(QGraphicsPolygonItem):
         self.update()
 
 
-    def setProperties(self):
-
+    def getProperties(self):
         item_center_x = int(self.scenePos().x())
         item_center_y = int(self.scenePos().y())
         # print(f"cx: {item_center_x},{item_center_y}")
@@ -767,8 +769,11 @@ class DiaItem(QGraphicsPolygonItem):
 
         self.default_properties["Border color"] = self.LineColor
         self.default_properties["Border width"] = str(self.LineWidth)
-        self.default_properties["Fill color"] = self.ItemColor
-        self.default_properties["z"] = self.zValue()
+        self.default_properties["Fill color"]   = self.ItemColor
+        self.default_properties["z"]            = self.zValue()
+
+        return self.default_properties
+
 
     def restore(self, properties: dict):
         if properties:
@@ -789,7 +794,6 @@ class DiaItem(QGraphicsPolygonItem):
         item.setPen(self.pen())
 
         return item
-
 
 class Scene(QGraphicsScene):
     InsertItem, InsertLine, InsertText, MoveItem = range(4)
@@ -972,7 +976,7 @@ class Scene(QGraphicsScene):
             if isinstance(item, type):
                 return True
         return False
-
+"""
 
 class Slider(QMainWindow):
     propertiesChange = pyqtSignal(str)
@@ -996,7 +1000,7 @@ class Slider(QMainWindow):
         self.scene = Scene(self.itemMenu, self.attributes)
 
         self.scene.itemInserted.connect(self.itemInserted)
-        self.scene.pixitemInserted.connect(self.pixitemInserted)
+        self.scene.pixItemInserted.connect(self.pixitemInserted)
         self.scene.textInserted.connect(self.textInserted)
         self.scene.itemSelected.connect(self.itemSelected)
         self.scene.DitemSelected.connect(self.DitemSelected)

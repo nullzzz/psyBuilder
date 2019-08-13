@@ -210,13 +210,13 @@ class DiaItem(QGraphicsPolygonItem):
     def mouseDoubleClickEvent(self, event):
         if self.diagram_type != self.Line:
             self.setProperties()
-            self.pro_window.frame.setProperties(self.default_properties)
+            self.pro_window.frame.getProperties(self.default_properties)
             self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
             self.setAttributes(self.attributes)
             self.pro_window.show()
         else:
             self.setProperties()
-            self.pro_window.frame.setProperties(self.default_properties)
+            self.pro_window.frame.getProperties(self.default_properties)
             self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
             self.setAttributes(self.attributes)
             self.pro_window.show()
@@ -378,7 +378,7 @@ class DiaItem(QGraphicsPolygonItem):
     def restore(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
-            self.pro_window.frame.setProperties(self.default_properties)
+            self.pro_window.frame.getProperties(self.default_properties)
             self.apply()
 
     def clone(self):

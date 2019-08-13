@@ -56,29 +56,33 @@ class Info(object):
     IS_REGISTER: str = CONFIG.value("register")
 
     # 限制输入的正则表达式
-    RE_NUMBER = r"\[\w+\]|\d+"
-    RE_FLOAT = r"\[\w+\]|\d+\.\d+"
+    RE_NUMBER      = r"\[\w+\]|\d+"
+    RE_FLOAT       = r"\[\w+\]|\d+\.\d+"
+    RE_NUM_PERCENT = r"\[\w+\]|\d+%?|\d+"
+
+    # possible useful in the future
+    REF_VALUE_SEPERATOR = "@"
 
     # 区分不同的添加情况
-    WidgetAdd = 0
-    WidgetCopy = 1
+    WidgetAdd   = 0
+    WidgetCopy  = 1
     WidgetRefer = 2
-    WidgetMove = 3
+    WidgetMove  = 3
     # Timeline name
-    TimelineNameError = 0
-    TimelineTypeError = 1
+    TimelineNameError   = 0
+    TimelineTypeError   = 1
     TimelineParentError = 2
-    TimelineNameRight = 3
-    TimelineNameExist = 4
+    TimelineNameRight   = 3
+    TimelineNameExist   = 4
 
     # widget type
-    CYCLE = "Cycle"
-    SOUND = "Sound"
-    TEXT = "Text"
-    IMAGE = "Image"
-    VIDEO = "Video"
+    CYCLE  = "Cycle"
+    SOUND  = "Sound"
+    TEXT   = "Text"
+    IMAGE  = "Image"
+    VIDEO  = "Video"
     SLIDER = "Slider"
-    BUG = "Bug"
+    BUG    = "Bug"
 
     OPEN = "Open"
     DC = "DC"
