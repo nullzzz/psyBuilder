@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBo
 
 from app.center.widget_tabs.events.durationPage import DurationPage
 from app.center.widget_tabs.events.framePage import FramePage
-from app.center.widget_tabs.events.newSlider.general import SliderTab1
+from app.center.widget_tabs.events.newSlider.general import SliderGeneral
 
 
 class SliderProperty(QWidget):
@@ -11,7 +11,7 @@ class SliderProperty(QWidget):
         self.tab = QTabWidget()
         self.below = QWidget()
 
-        self.general = SliderTab1()
+        self.general = SliderGeneral()
         self.frame = FramePage()
         self.duration = DurationPage()
 
@@ -49,8 +49,9 @@ class SliderProperty(QWidget):
         below_layout.setContentsMargins(0, 0, 0, 0)
         self.below.setLayout(below_layout)
 
+
     def getInfo(self):
-        # 无frame
+        self.default_properties.clear()
         self.default_properties = {**self.duration.getInfo(), **self.frame.getInfo(), **self.general.getInfo()}
         return self.default_properties
 

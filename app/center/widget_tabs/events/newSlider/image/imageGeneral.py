@@ -119,10 +119,7 @@ class ImageGeneral(QWidget):
         self.default_properties["Rotate"] = self.rotate.text()
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
-        # self.default_properties["Back color"] = self.back_color.getColor()
-        # self.default_properties["Transparent"] = self.transparent.value()
         self.default_properties["Transparent"] = self.transparent.text()
-        self.default_properties["Clear after"] = self.clear_after.currentText()
         return self.default_properties
 
     def getProperties(self):
@@ -135,7 +132,6 @@ class ImageGeneral(QWidget):
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
         self.default_properties["Transparent"] = self.transparent.text()
-        self.default_properties["Clear after"] = self.clear_after.currentText()
         return self.default_properties
 
     def setProperties(self, properties: dict):

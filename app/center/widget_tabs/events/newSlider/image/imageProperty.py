@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout
 
-from app.center.widget_tabs.events.newSlider.image.general import ImageGeneral
+from app.center.widget_tabs.events.newSlider.image.imageGeneral import ImageGeneral
 
 
 class ImageProperty(QWidget):

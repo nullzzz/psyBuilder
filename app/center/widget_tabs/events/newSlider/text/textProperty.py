@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
 
-from app.center.widget_tabs.events.newSlider.text.textGeneral import TextTab1
+from app.center.widget_tabs.events.newSlider.text.textGeneral import TextGeneral
 
 
 class TextProperty(QWidget):
@@ -9,7 +9,7 @@ class TextProperty(QWidget):
         self.tab = QTabWidget()
         self.below = QWidget()
 
-        self.general = TextTab1()
+        self.general = TextGeneral()
 
         self.html = self.general.html
 
@@ -59,7 +59,7 @@ class TextProperty(QWidget):
         self.html = html
 
     def setProperties(self, properties: dict):
-        if properties:
+        if isinstance(properties, dict):
             self.default_properties = properties.copy()
             self.loadSetting()
 

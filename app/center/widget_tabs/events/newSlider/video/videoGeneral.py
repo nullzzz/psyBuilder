@@ -2,13 +2,12 @@ from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QPushButton, QSpinBox, QGridLayout, QLabel, QFileDialog, QCompleter, QWidget
 
-from app.func import Func
 from app.lib import PigComboBox, PigLineEdit
 
 
-class VideoTab1(QWidget):
+class VideoGeneral(QWidget):
     def __init__(self, parent=None):
-        super(VideoTab1, self).__init__(parent)
+        super(VideoGeneral, self).__init__(parent)
         self.attributes = []
         self.default_properties = {
             "File name": "",
@@ -33,8 +32,6 @@ class VideoTab1(QWidget):
         self.transparent = QSpinBox()
         self.aspect_ratio = PigComboBox()
 
-        self.clear_after = PigComboBox()
-
         self.setUI()
 
     def setUI(self):
@@ -49,23 +46,16 @@ class VideoTab1(QWidget):
         self.playback_rate.currentTextChanged.connect(self.pbTip)
         self.aspect_ratio.addItems(["Default", "Ignore", "Keep", "KeepByExpanding"])
 
-        # self.screen.addItems(["screen.0"])
-        self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
-
         l0 = QLabel("File Name:")
         l1 = QLabel("Start Position:")
         l2 = QLabel("End Position:")
         l3 = QLabel("Playback Rate:")
         l4 = QLabel("Aspect Ratio:")
-        # l5 = QLabel("Screen Name:")
-        l6 = QLabel("Dont Clear After:")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout = QGridLayout()
         layout.addWidget(l0, 0, 0, 1, 1)
@@ -85,11 +75,6 @@ class VideoTab1(QWidget):
 
         layout.addWidget(l4, 4, 0, 1, 1)
         layout.addWidget(self.aspect_ratio, 4, 1, 1, 1)
-        # layout.addWidget(l5, 5, 0, 1, 1)
-        # layout.addWidget(self.screen, 5, 1, 1, 1)
-        layout.addWidget(l6, 6, 0, 1, 1)
-        layout.addWidget(self.clear_after, 6, 1, 1, 1)
-        layout.setContentsMargins(40, 0, 40, 0)
         self.setLayout(layout)
 
     def pbTip(self, text):
@@ -125,12 +110,12 @@ class VideoTab1(QWidget):
         self.end_pos.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
+        self.default_properties.clear()
         self.default_properties["File name"] = self.file_name.text()
         self.default_properties["Start position"] = self.start_pos.text()
         self.default_properties["End position"] = self.end_pos.text()
         self.default_properties["Aspect ratio"] = self.aspect_ratio.currentText()
         self.default_properties["Playback rate"] = self.playback_rate.currentText()
-        self.default_properties["Clear after"] = self.clear_after.currentText()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -143,4 +128,3 @@ class VideoTab1(QWidget):
         self.end_pos.setText(self.default_properties["End position"])
         self.aspect_ratio.setCurrentText(self.default_properties["Aspect ratio"])
         self.playback_rate.setCurrentText(self.default_properties["Playback rate"])
-        self.clear_after.setCurrentText(self.default_properties["Clear after"])

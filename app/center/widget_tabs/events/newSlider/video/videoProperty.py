@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
-from .videoGeneral import VideoTab1
+from .videoGeneral import VideoGeneral
 
 
 class VideoProperty(QWidget):
@@ -11,7 +11,7 @@ class VideoProperty(QWidget):
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
         self.apply_bt = QPushButton("Apply")
-        self.general = VideoTab1()
+        self.general = VideoGeneral()
 
         self.default_properties = self.general.default_properties
 

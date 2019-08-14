@@ -57,8 +57,8 @@ class PixItem(QGraphicsPixmapItem):
         self.default_properties = {
             'name': self.item_type,
             'z': self.zValue(),
-            'x_pos': 1,
-            'y_pos': 1,
+            'x': 1,
+            'y': 1,
             **self.pro_window.default_properties
         }
 
@@ -70,6 +70,9 @@ class PixItem(QGraphicsPixmapItem):
         item_name = f"{name}_{cnt}"
         Info.SLIDER_COUNT[name] += 1
         return item_name
+
+    def getName(self):
+        return self.item_name
 
     def mousePressEvent(self, event):
         if self.item_type < 8:
@@ -123,7 +126,6 @@ class PixItem(QGraphicsPixmapItem):
         self.scene().clearSelection()
         self.setSelected(True)
         self.menu.exec_(event.screenPos())
-        # self.contextMenu.exec_(event.screenPos())
 
     def ok(self):
         self.apply()
@@ -134,17 +136,19 @@ class PixItem(QGraphicsPixmapItem):
         self.pro_window.loadSetting()
 
     def apply(self):
-        self.pro_window.getInfo()
+        self.getInfo()
+
+    def getInfo(self):
         self.default_properties = {
             'name': self.item_type,
             'z': self.zValue(),
-            'x_pos': 1,
-            'y_pos': 1,
-            **self.pro_window.default_properties
+            'x': self.scenePos().x(),
+            'y': self.scenePos().y(),
+            **self.pro_window.getInfo(),
         }
 
-    def restore(self, properties: dict):
-        if properties:
+    def setProperties(self, properties: dict):
+        if isinstance(properties, dict):
             self.pro_window.setProperties(properties)
 
     def clone(self):

@@ -123,7 +123,7 @@ class CaseArea(QScrollArea):
             for i in range(new_cnt - old_cnt):
                 self.delCase(old_cnt - 1)
         for case in self.case_list:
-            case.getProperties(self.default_properties.get(case.title(), {}))
+            case.setProperties(self.default_properties.get(case.title(), {}))
 
     def setAttributes(self, attributes: list):
         self.attributes = attributes

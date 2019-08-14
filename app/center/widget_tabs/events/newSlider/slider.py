@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QB
     QComboBox, QColorDialog
 from quamash import QApplication
 
-from app.center.widget_tabs.events.newSlider.button import LeftBox
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
+from app.center.widget_tabs.events.newSlider.leftBox import LeftBox
 from app.center.widget_tabs.events.newSlider.property import SliderProperty
 from app.center.widget_tabs.events.newSlider.scene import Scene
 from app.func import Func
@@ -176,6 +176,19 @@ class Slider(QMainWindow):
         self.widget.setLayout(layout)
         self.setCentralWidget(self.widget)
 
+    def refresh(self):
+        self.attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
+        self.pro_window.general.refresh()
+        self.getInfo()
+
+    def getInfo(self):
+        item_info: dict = {}
+        for item in self.scene.items():
+            item_info[item.getName()] = item.getInfo()
+        self.default_properties = {**item_info, **self.pro_window.getInfo()}
+        return self.default_properties
+
     def getProperties(self):
         return {'none': 'none'}
 
@@ -198,6 +211,10 @@ class Slider(QMainWindow):
     def deleteItem(self):
         for item in self.scene.selectedItems():
             self.scene.removeItem(item)
+            item_name = item.getName()
+            index = self.item_list.findText(item_name, Qt.MatchExactly)
+            if index != -1:
+                self.item_list.removeItem(index)
 
     def pointerGroupClicked(self, i):
         self.scene.setMode(self.pointer_group.checkedId())

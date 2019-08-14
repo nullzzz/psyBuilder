@@ -153,7 +153,7 @@ class IconChoose(QWidget):
             if isinstance(self.pro_window, Slider):
                 self.pro_window.restore(self.default_properties.get("pro window", {}))
             else:
-                self.pro_window.getProperties(self.default_properties.get("pro window", {}))
+                self.pro_window.setProperties(self.default_properties.get("pro window", {}))
 
     def setProWindow(self, pro):
         del self.pro_window

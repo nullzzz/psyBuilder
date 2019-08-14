@@ -55,15 +55,15 @@ class Scene(QGraphicsScene):
     def dropEvent(self, event):
         if event.mimeData().hasFormat("application/x-icon-and-text"):
             # 添加图形
-            if self.my_mode == self.InsertItem:
-                item_type, ok = event.mimeData().data("item-type").toUInt()
-                if PixItem.Image <= item_type <= PixItem.Sound:
-                    item = PixItem(item_type)
-                    self.addItem(item)
-                    item.setPos(event.scenePos())
-                    self.update()
+            # if self.my_mode == self.InsertItem:
+            item_type, ok = event.mimeData().data("item-type").toUInt()
+            if PixItem.Image <= item_type <= PixItem.Sound:
+                item = PixItem(item_type)
+                self.addItem(item)
+                item.setPos(event.scenePos())
+                self.update()
 
-                    self.itemAdd.emit(item.item_name)
+                self.itemAdd.emit(item.item_name)
 
             action = Qt.MoveAction
             event.setDropAction(action)

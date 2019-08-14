@@ -3,13 +3,12 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QTextEdit, \
     QFontComboBox, QCompleter
 
-from app.func import Func
 from app.lib import PigComboBox, PigLineEdit, ColorListEditor
 
 
-class TextTab1(QWidget):
+class TextGeneral(QWidget):
     def __init__(self, parent=None):
-        super(TextTab1, self).__init__(parent)
+        super(TextGeneral, self).__init__(parent)
 
         self.attributes: list = []
 
@@ -20,7 +19,6 @@ class TextTab1(QWidget):
             "Back color": "255,255,255",
             "Transparent": "100%",
             "Word wrap": 0,
-            "Clear after": "Yes"
         }
 
         self.text_edit = QTextEdit()
@@ -74,12 +72,6 @@ class TextTab1(QWidget):
         self.right_to_left = PigComboBox()
         self.right_to_left.addItems(("no", "yes"))
 
-        self.using_screen_id: str = "screen.0"
-        # self.screen = PigComboBox()
-        # self.screen_info = Func.getScreenInfo()
-        # self.screen.addItems(self.screen_info.values())
-        # self.screen.currentTextChanged.connect(self.changeScreen)
-
         self.setUI()
 
     def setUI(self):
@@ -90,9 +82,6 @@ class TextTab1(QWidget):
 
         l02 = QLabel("Fore Color:")
         l12 = QLabel("Back Color:")
-
-        l20 = QLabel("Dont Clear After:")
-        l22 = QLabel("Screen Name:")
 
         l30 = QLabel("Transparent:")
         l32 = QLabel("Wrapat Chars:")
@@ -110,8 +99,7 @@ class TextTab1(QWidget):
         l02.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l10.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l12.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l20.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l22.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
         l30.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l32.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l40.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -123,10 +111,6 @@ class TextTab1(QWidget):
 
         self.align_x.addItems(["center", "left", "right", "wrapat", "justifytomax"])
         self.align_y.addItem("center")
-
-        self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
-
-        # self.screen.addItems(["screen.0"])
 
         group1 = QGroupBox("Text")
         layout1 = QGridLayout()
@@ -145,29 +129,24 @@ class TextTab1(QWidget):
         layout2.addWidget(l12, 1, 2)
         layout2.addWidget(self.back_color, 1, 3)
 
-        layout2.addWidget(l20, 2, 0)
-        layout2.addWidget(self.clear_after, 2, 1)
-        # layout2.addWidget(l22, 2, 2)
-        # layout2.addWidget(self.screen, 2, 3)
+        layout2.addWidget(l30, 2, 0)
+        layout2.addWidget(self.transparent, 2, 1)
+        layout2.addWidget(l32, 2, 2)
+        layout2.addWidget(self.word_wrap, 2, 3)
 
-        layout2.addWidget(l30, 3, 0)
-        layout2.addWidget(self.transparent, 3, 1)
-        layout2.addWidget(l32, 3, 2)
-        layout2.addWidget(self.word_wrap, 3, 3)
+        layout2.addWidget(l40, 3, 0)
+        layout2.addWidget(self.flip_horizontal, 3, 1)
+        layout2.addWidget(l42, 3, 2)
+        layout2.addWidget(self.flip_vertical, 3, 3)
 
-        layout2.addWidget(l40, 4, 0)
-        layout2.addWidget(self.flip_horizontal, 4, 1)
-        layout2.addWidget(l42, 4, 2)
-        layout2.addWidget(self.flip_vertical, 4, 3)
-
-        layout2.addWidget(l50, 5, 0)
-        layout2.addWidget(self.font_box, 5, 1, 1, 3)
-        layout2.addWidget(l52, 6, 2)
-        layout2.addWidget(self.style_box, 6, 3)
-        layout2.addWidget(l60, 6, 0)
-        layout2.addWidget(self.font_size_box, 6, 1)
-        layout2.addWidget(l70, 7, 0)
-        layout2.addWidget(self.right_to_left, 7, 1)
+        layout2.addWidget(l50, 4, 0)
+        layout2.addWidget(self.font_box, 4, 1, 1, 3)
+        layout2.addWidget(l52, 5, 2)
+        layout2.addWidget(self.style_box, 5, 3)
+        layout2.addWidget(l60, 5, 0)
+        layout2.addWidget(self.font_size_box, 5, 1)
+        layout2.addWidget(l70, 6, 0)
+        layout2.addWidget(self.right_to_left, 6, 1)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
@@ -177,14 +156,6 @@ class TextTab1(QWidget):
 
     def refresh(self):
         pass
-        # self.screen_info = Func.getScreenInfo()
-        # screen_id = self.using_screen_id
-        # self.screen.clear()
-        # self.screen.addItems(self.screen_info.values())
-        # screen_name = self.screen_info.get(screen_id)
-        # if screen_name:
-        #     self.screen.setCurrentText(screen_name)
-        #     self.using_screen_id = screen_id
 
     def colorChange(self, color: str):
         r, g, b = 255, 255, 255
@@ -217,7 +188,6 @@ class TextTab1(QWidget):
 
     def fontChange(self):
         f = self.font_box.currentFont().family()
-
         size = self.font_size_box.currentText()
         size = int(size) if size.isdigit() else 8
         font = self.text_edit.currentFont()
@@ -257,27 +227,10 @@ class TextTab1(QWidget):
         self.align_y.setCompleter(QCompleter(self.attributes))
         self.fore_color.setCompleter(QCompleter(self.attributes))
         self.back_color.setCompleter(QCompleter(self.attributes))
-        # self.clear_after.setCompleter(QCompleter(self.attributes))
-        # self.screen_name.setCompleter(QCompleter(self.attributes))
         self.transparent.setCompleter(QCompleter(self.attributes))
         self.word_wrap.setCompleter(QCompleter(self.attributes))
-        # self.flip_vertical.setCompleter(QCompleter(self.attributes))
-        # self.flip_horizontal.setCompleter(QCompleter(self.attributes))
-        # self.font_box.setCompleter(QCompleter(self.attributes))
         self.font_size_box.setCompleter(QCompleter(self.attributes))
         self.style_box.setCompleter(QCompleter(self.attributes))
-        # self.right_to_left.setCompleter(QCompleter(self.attributes))
-
-    # def setScreen(self, screen: list):
-    #     selected = self.screen.currentText()
-    #     self.screen.clear()
-    #     self.screen.addItems(screen)
-    #     if selected in screen:
-    #         self.screen.setCurrentText(selected)
-    #     else:
-    #         new_name = Func.getDeviceNameById(self.using_device_id)
-    #         if new_name:
-    #             self.screen.setCurrentText(new_name)
 
     def apply(self):
         self.html = self.text_edit.toHtml()
@@ -290,9 +243,7 @@ class TextTab1(QWidget):
         self.default_properties["Alignment Y"] = self.align_y.currentText()
         self.default_properties["Fore color"] = self.fore_color.getColor()
         self.default_properties["Back color"] = self.back_color.getColor()
-        # self.default_properties["Screen name"] = self.screen.currentText()
         self.default_properties["Transparent"] = self.transparent.text()
-        self.default_properties["Clear after"] = self.clear_after.currentText()
         self.default_properties["Font family"] = self.font_box.currentText()
         self.default_properties["Font size"] = self.font_size_box.currentText()
         self.default_properties["Wrapat chars"] = self.word_wrap.text()
@@ -310,24 +261,20 @@ class TextTab1(QWidget):
 
     def loadSetting(self):
         self.text_edit.setHtml(self.html)
-
         self.align_x.setCurrentText(self.default_properties["Alignment X"])
         self.align_y.setCurrentText(self.default_properties["Alignment Y"])
         self.fore_color.setCurrentText(self.default_properties["Fore color"])
         self.back_color.setCurrentText(self.default_properties["Back color"])
-        # self.screen.setCurrentText(self.default_properties["Screen name"])
         self.transparent.setText(self.default_properties["Transparent"])
         self.word_wrap.setText(self.default_properties["Wrapat chars"])
-        self.clear_after.setCurrentText(self.default_properties["Clear after"])
         self.font_box.setCurrentText(self.default_properties["Font family"])
         self.font_size_box.setCurrentText(self.default_properties["Font size"])
         self.style_box.setCurrentText(self.default_properties["Style"])
-
         self.flip_horizontal.setCurrentText(self.default_properties["Flip horizontal"])
         self.flip_vertical.setCurrentText(self.default_properties["Flip vertical"])
         self.right_to_left.setCurrentText(self.default_properties["Right to left"])
 
     def clone(self):
-        clone_page = TextTab1()
+        clone_page = TextGeneral()
         clone_page.setProperties(self.default_properties, self.html)
         return clone_page

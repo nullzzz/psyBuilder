@@ -7,9 +7,9 @@ from app.lib import PigLineEdit, PigComboBox
 
 
 # soundOut event专属页面
-class general(QWidget):
+class SoundGeneral(QWidget):
     def __init__(self, parent=None):
-        super(general, self).__init__(parent)
+        super(SoundGeneral, self).__init__(parent)
         self.attributes = []
 
         self.default_properties = {
@@ -66,18 +66,12 @@ class general(QWidget):
         self.wait_for_start = PigComboBox()
         self.wait_for_start.addItems(("No", "Yes"))
 
-        self.setGeneral()
+        self.setUI()
 
-    def setGeneral(self):
-        # valid_input = QRegExp(r"(\d+)|(\[[_\d\w]+\]")
-        # self.start_offset.setValidator(QRegExpValidator(valid_input, self))
-        # self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
+    def setUI(self):
         self.stream_refill.addItems(["0", "1", "2"])
-        # self.repetitions.addItems(["Yes", "No"])
         self.repetitions.setText("0")
         self.buffer_size.setText("5000")
-        # self.start_offset.setText("0")
-        # self.stop_offset.setText("0")
         self.volume.setEnabled(False)
         self.bias_time.setEnabled(False)
 
@@ -124,13 +118,11 @@ class general(QWidget):
         group2 = QGroupBox()
         layout2 = QGridLayout()
 
-        # layout2.addWidget(l6, 0, 0, 1, 1)
         layout2.addWidget(self.volume_control, 0, 0, )
         layout2.addWidget(self.volume, 0, 1, )
         layout2.addWidget(l6, 0, 2)
         layout2.addWidget(self.sound, 0, 3)
 
-        # layout2.addWidget(l7, 1, 0, 1, 1)
         layout2.addWidget(self.latency_bias, 1, 0)
         layout2.addWidget(self.bias_time, 1, 1)
         layout2.addWidget(l7, 1, 2)
@@ -139,7 +131,6 @@ class general(QWidget):
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
-
         layout.addWidget(group1, 2)
         layout.addWidget(group2, 1)
 
@@ -203,8 +194,6 @@ class general(QWidget):
         self.stop_offset.setCompleter(QCompleter(self.attributes))
         self.volume.setCompleter(QCompleter(self.attributes))
         self.bias_time.setCompleter(QCompleter(self.attributes))
-        # self.sound_device.setCompleter(QCompleter(self.attributes))
-        # self.wait_for_start.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         self.default_properties.clear()
@@ -224,8 +213,9 @@ class general(QWidget):
         return self.default_properties
 
     def setProperties(self, properties: dict):
-        self.default_properties = properties
-        self.loadSetting()
+        if isinstance(properties, dict):
+            self.default_properties = properties
+            self.loadSetting()
 
     def loadSetting(self):
         self.file_name.setText(self.default_properties["File name"])
@@ -242,6 +232,6 @@ class general(QWidget):
         self.wait_for_start.setCurrentText(self.default_properties["Wait for start"])
 
     def clone(self):
-        clone_page = general()
+        clone_page = SoundGeneral()
         clone_page.setProperties(self.default_properties)
         return clone_page

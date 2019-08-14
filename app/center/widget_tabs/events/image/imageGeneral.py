@@ -134,19 +134,6 @@ class ImageTab1(QWidget):
         self.file_name.setCompleter(QCompleter(self.attributes))
         self.rotate.setCompleter(QCompleter(self.attributes))
         self.transparent.setCompleter(QCompleter(self.attributes))
-        # self.clear_after.setCompleter(QCompleter(self.attributes))
-        # self.screen_name.setCompleter(QCompleter(self.attributes))
-
-    def setScreen(self, screen: list):
-        selected = self.screen.currentText()
-        self.screen.clear()
-        self.screen.addItems(screen)
-        if selected in screen:
-            self.screen.setCurrentText(selected)
-        else:
-            new_name = Func.getDeviceNameById(self.using_screen_id)
-            if new_name:
-                self.screen.setCurrentText(new_name)
 
     def getInfo(self):
         """

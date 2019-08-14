@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget, QApplication)
 
-from app.center.widget_tabs.events.newSlider.sound.soundGeneral import general
+from app.center.widget_tabs.events.newSlider.sound.soundGeneral import SoundGeneral
 
 
 class SoundProperty(QWidget):
@@ -9,7 +9,7 @@ class SoundProperty(QWidget):
         self.tab = QTabWidget()
         self.below = QWidget()
 
-        self.general = general()
+        self.general = SoundGeneral()
         self.tab.addTab(self.general, "general")
 
         self.default_properties = self.general.default_properties
@@ -25,10 +25,8 @@ class SoundProperty(QWidget):
     def setUI(self):
         self.setWindowTitle("Sound property")
         self.resize(600, 800)
-        # self.setFixedSize(600, 800)
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.tab, 6)
-        # main_layout.addStretch(2)
         main_layout.addWidget(self.below, 1)
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
