@@ -300,10 +300,10 @@ class Slider(QMainWindow):
         self.buttonGroup.buttonPressed[int].connect(self.buttonGroupPressed)
 
         layout = QGridLayout()
-        layout.addWidget(self.createCellWidget("Polygon", DiaItem.PolygonStim), 0, 0)
+        layout.addWidget(self.createCellWidget("Polygon", DiaItem.Polygon), 0, 0)
         layout.addWidget(self.createCellWidget("Circle", DiaItem.Circle), 1, 0)
         layout.addWidget(self.createCellWidget("Arc", DiaItem.Arc), 2, 0)
-        layout.addWidget(self.createCellWidget("Rectangle", DiaItem.Rectangle), 3, 0)
+        layout.addWidget(self.createCellWidget("Rectangle", DiaItem.Rect), 3, 0)
 
         # layout.addWidget(self.createCellWidget("Conditional", DiagramItem.Conditional), 0, 0)
         # layout.addWidget(self.createCellWidget("Polygon", DiagramItem.Step), 2, 0)
@@ -319,7 +319,7 @@ class Slider(QMainWindow):
         videoButton.setIcon(QIcon(QPixmap(Func.getImage("video.png")).scaled(50, 50)))
         videoButton.setIconSize(QSize(50, 50))
         pictureButton = Button()
-        self.buttonGroup.addButton(pictureButton, PixItem.Picture)
+        self.buttonGroup.addButton(pictureButton, PixItem.Image)
         pictureButton.setIcon(QIcon(QPixmap(Func.getImage("Picture.png")).scaled(50, 50)))
         pictureButton.setIconSize(QSize(50, 50))
         soundButton = Button()

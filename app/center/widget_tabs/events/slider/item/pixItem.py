@@ -10,11 +10,17 @@ from app.center.widget_tabs.events.slider.snow import snowProperty
 from app.center.widget_tabs.events.slider.sound.soundProperty import SoundProperty
 from app.center.widget_tabs.events.slider.video.videoProperty import VideoProperty
 from app.func import Func
-
+from app.info import Info
 
 
 class PixItem(QGraphicsPixmapItem):
-    Video, Picture, Sound, Snow, Gabor = 5, 6, 7, 8, 9
+    # Video, Picture, Sound, Snow, Gabor = 5, 6, 7, 8, 9
+    Image = Info.ITEM_IMAGE
+    Text = Info.ITEM_TEXT
+    Video = Info.ITEM_VIDEO
+    Sound = Info.ITEM_SOUND
+    Snow = Info.ITEM_SNOW
+    Gabor = Info.ITEM_GABOR
 
     def __init__(self, diagramType, contextMenu, attributes=None, parent=None):
         super(PixItem, self).__init__(parent)

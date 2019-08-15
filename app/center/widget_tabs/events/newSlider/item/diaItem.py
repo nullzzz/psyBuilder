@@ -89,11 +89,11 @@ class DiaItem(QGraphicsPolygonItem):
             path.lineTo(verticesXY[0][0], verticesXY[0][1])
             #
             self.mPolygon = path.toFillPolygon()
-            self.pro_window = PolygonProperty('polygonStim')
+            self.pro_window = PolygonProperty('polygon')
 
 
         else:
-            raise Exception("diagramType should be of 'Arc','Line','rectangle', or 'circle' !!")
+            raise Exception("diagramType should be of 'Arc','Line','Rect', or 'Circle' !!")
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)

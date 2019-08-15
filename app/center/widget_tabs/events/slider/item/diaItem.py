@@ -4,10 +4,16 @@ from PyQt5.QtGui import QColor, QPainter, QPainterPath, QPen, QPixmap
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPolygonItem
 from app.center.widget_tabs.events.slider.polygon.polygonProperty import PolygonProperty
 from app.func import Func
+from app.info import Info
 
 
 class DiaItem(QGraphicsPolygonItem):
-    PolygonStim, Arc, Circle, Rectangle, Line = range(5)
+    # Polygon, Arc, Circle, Rect, Line = range(5)
+    Line = Info.ITEM_LINE
+    Polygon = Info.ITEM_POLYGON
+    Circle = Info.ITEM_CIRCLE
+    Arc = Info.ITEM_ARC
+    Rect = Info.ITEM_RECT
 
     def __init__(self, diagramType, contextMenu, attributes=None, p1=None, p2=None, parent=None,
                  scene=None):
@@ -46,10 +52,10 @@ class DiaItem(QGraphicsPolygonItem):
             self.pro_window = PolygonProperty('circle')
 
         #  rectangle
-        elif self.diagramType == self.Rectangle:
+        elif self.diagramType == self.Rect:
             path.addRect(QRectF(-100, -100, 200, 200))
             self.mPolygon = path.toFillPolygon()
-            self.pro_window = PolygonProperty('rectangle')
+            self.pro_window = PolygonProperty('rect')
 
         # arc
         elif self.diagramType == self.Arc:
@@ -58,7 +64,7 @@ class DiaItem(QGraphicsPolygonItem):
             self.pro_window = PolygonProperty('arc')
 
         # polygon
-        elif self.diagramType == self.PolygonStim:
+        elif self.diagramType == self.Polygon:
             # added by yang to plot the triangle
             nVertices = 3
             verticesXY = []
@@ -73,7 +79,7 @@ class DiaItem(QGraphicsPolygonItem):
             path.lineTo(verticesXY[0][0], verticesXY[0][1])
             #
             self.mPolygon = path.toFillPolygon()
-            self.pro_window = PolygonProperty('polygonStim')
+            self.pro_window = PolygonProperty('polygon')
 
         elif self.diagramType == self.Line:
             path.moveTo(p1.x(), p1.y())
@@ -131,10 +137,10 @@ class DiaItem(QGraphicsPolygonItem):
         cWidth  = rect0.width()
 
         # 非等比例
-        if self.arbitrary_resize and self.diagramType < 4:
+        if self.arbitrary_resize and self.diagramType in [self.Polygon , self.Circle , self.Arc , self.Rect ]:
             self.resizingFlag = True
         # 等比例
-        if self.keep_resize and self.diagramType < 4:
+        if self.keep_resize and self.diagramType in [self.Polygon , self.Circle , self.Arc , self.Rect ]:
             self.resizingFlag = True
 
             if cHeight < 5:
@@ -170,10 +176,10 @@ class DiaItem(QGraphicsPolygonItem):
                 path.arcTo(cRect, float(self.pro_window.frame.default_properties["Start angle"]),
                            float(self.pro_window.frame.default_properties["Angle length"]))
 
-            elif self.diagramType == self.Rectangle:
+            elif self.diagramType == self.Rect:
                 path.addRect(cRect)
 
-            elif self.diagramType == self.PolygonStim:
+            elif self.diagramType == self.Polygon:
 
                 hRatio = (x - x0) / cWidth
                 vRatio = (y - y0) / cHeight
@@ -319,7 +325,7 @@ class DiaItem(QGraphicsPolygonItem):
             path.arcTo(rect, float(self.pro_window.frame.default_properties["Start angle"]),
                        float(self.pro_window.frame.default_properties["Angle length"]))
 
-        elif self.diagramType == self.Rectangle:
+        elif self.diagramType == self.Rect:
             rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
                           -int(self.pro_window.frame.default_properties["Height"]) / 2,
                           int(self.pro_window.frame.default_properties["Width"]),
@@ -332,7 +338,7 @@ class DiaItem(QGraphicsPolygonItem):
             path.lineTo(int(self.pro_window.frame.default_properties["P2 X"]) - cx,
                         int(self.pro_window.frame.default_properties["P2 Y"]) - cy)
 
-        elif self.diagramType == self.PolygonStim:
+        elif self.diagramType == self.Polygon:
             verticesXY = self.pro_window.frame.default_properties["Point"]
             # added by yang to plot the m-polygon
             for iVertex in range(len(verticesXY)):
@@ -363,7 +369,7 @@ class DiaItem(QGraphicsPolygonItem):
             self.default_properties["P2 X"] = str(int(self.p2.x()) + item_center_x)
             self.default_properties["P2 Y"] = str(int(self.p2.y()) + item_center_y)
 
-        elif self.diagramType == self.Rectangle:
+        elif self.diagramType == self.Rect:
             self.default_properties["Height"] = str(int(self.polygon().boundingRect().height()))
             self.default_properties["Width"] = str(int(self.polygon().boundingRect().width()))
         elif self.diagramType == self.Arc:
@@ -377,7 +383,7 @@ class DiaItem(QGraphicsPolygonItem):
             self.default_properties["Height"] = str(int(self.polygon().boundingRect().height()))
             self.default_properties["Width"] = str(int(self.polygon().boundingRect().width()))
 
-        elif self.diagramType == self.PolygonStim:
+        elif self.diagramType == self.Polygon:
             verticesXY = []
             for iVertex in range(len(self.polygon()) - 1):
                 verticesXY.append([str(int(self.polygon()[iVertex].x()) + item_center_x),

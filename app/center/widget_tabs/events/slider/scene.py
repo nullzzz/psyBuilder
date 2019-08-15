@@ -20,7 +20,7 @@ class Scene(QGraphicsScene):
 
         self.myItemMenu = itemMenu
         self.myMode = self.MoveItem
-        self.myItemType = DiaItem.PolygonStim
+        self.myItemType = DiaItem.Polygon
         self.attributes = attributes
         self.line = None
         self.textItem = None

@@ -295,7 +295,7 @@ class FramePage(QWidget):
         group1  = QGroupBox("Geometry")
         layout1 = QGridLayout()
         #polygons
-        if self.type == 'polygonStim':
+        if self.type == 'polygon':
             self.setPointsLayout()
             layout1 = self.gLayout
 
