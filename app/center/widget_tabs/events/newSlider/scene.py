@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
 from app.center.widget_tabs.events.newSlider.item.lasso import Lasso
 from app.center.widget_tabs.events.newSlider.item.linItem import LineItem
-from app.center.widget_tabs.events.newSlider.item.othItem import OthItem
+from app.center.widget_tabs.events.newSlider.item.otherItem import OtherItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
 
 
@@ -61,8 +61,8 @@ class Scene(QGraphicsScene):
             item_type, ok = event.mimeData().data("item-type").toUInt()
             if PixItem.Image <= item_type <= PixItem.Sound:
                 item = PixItem(item_type)
-            elif OthItem.Snow <= item_type <= OthItem.Gabor:
-                item = OthItem(item_type)
+            elif OtherItem.Snow <= item_type <= OtherItem.Gabor:
+                item = OtherItem(item_type)
                 item.getInfo()
             else:
                 return
@@ -169,9 +169,9 @@ class Scene(QGraphicsScene):
                 elif k.startswith("sound"):
                     item = PixItem(PixItem.Sound, k)
                 elif k.startswith("snow"):
-                    item = OthItem(OthItem.Snow, k)
+                    item = OtherItem(OtherItem.Snow, k)
                 elif k.startswith("gabor"):
-                    item = OthItem(OthItem.Gabor, k)
+                    item = OtherItem(OtherItem.Gabor, k)
                 self.addItem(item)
                 item.setProperties(v)
 

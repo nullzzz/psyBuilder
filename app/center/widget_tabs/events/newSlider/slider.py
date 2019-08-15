@@ -8,6 +8,8 @@ from quamash import QApplication
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
 from app.center.widget_tabs.events.newSlider.item.lasso import Lasso
+from app.center.widget_tabs.events.newSlider.item.linItem import LineItem
+from app.center.widget_tabs.events.newSlider.item.otherItem import OtherItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
 from app.center.widget_tabs.events.newSlider.leftBox import LeftBox
 from app.center.widget_tabs.events.newSlider.property import SliderProperty
@@ -166,7 +168,7 @@ class Slider(QMainWindow):
     def selectItem(self, item_name: str):
         self.scene.selectionChanged.disconnect()
         for item in self.scene.items():
-            if not isinstance(item, Lasso):
+            if isinstance(item, PixItem) or isinstance(item, LineItem) or isinstance(item, OtherItem):
                 item.setSelected(item_name == item.getName())
                 if item_name == item.getName():
                     self.changeTool(item)
@@ -189,9 +191,9 @@ class Slider(QMainWindow):
         layout = QHBoxLayout()
         layout.addWidget(self.left_box, 1)
         layout.addWidget(self.view, 2)
-        self.widget = QWidget()
-        self.widget.setLayout(layout)
-        self.setCentralWidget(self.widget)
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
 
     def refresh(self):
         self.attributes = Func.getAttributes(self.widget_id)
@@ -246,10 +248,8 @@ class Slider(QMainWindow):
     def toFront(self):
         if not self.scene.selectedItems():
             return
-
         selected_item = self.scene.selectedItems()[0]
         overlap_items = selected_item.collidingItems()
-
         z_value = 0
         for item in overlap_items:
             if item.zValue() >= z_value and (isinstance(item, DiaItem) or isinstance(item, PixItem)):
@@ -259,10 +259,8 @@ class Slider(QMainWindow):
     def toBack(self):
         if not self.scene.selectedItems():
             return
-
         selected_item = self.scene.selectedItems()[0]
         overlap_items = selected_item.collidingItems()
-
         z_value = 0
         for item in overlap_items:
             if item.zValue() <= z_value and (isinstance(item, DiaItem) or isinstance(item, PixItem)):
@@ -420,20 +418,20 @@ class Slider(QMainWindow):
             self.item_list.addItems(items.keys())
             self.item_list.insertItem(0, "none")
 
-    # def clone(self, widget_id: str):
-    #     """
-    #     根据传入的widget_id，复制一个widget
-    #     :param widget_id:
-    #     :return:
-    #     """
-    #     slider = Slider(widget_id=widget_id)
-    #     slider.pro_window.setProperties(self.pro_window.getInfo())
-    #     for item in self.scene.items():
-    #         item1 = item.clone()
-    #         slider.scene.addItem(item1)
-    #         item1.setPos(item.scenePos())
-    #         slider.scene.update()
-    #     return slider
+    def clone(self, widget_id: str):
+        """
+        根据传入的widget_id，复制一个widget
+        :param widget_id:
+        :return:
+        """
+        slider = Slider(widget_id=widget_id)
+        slider.pro_window.setProperties(self.pro_window.getInfo())
+        for item in self.scene.items():
+            item1 = item.clone()
+            slider.scene.addItem(item1)
+            item1.setPos(item.scenePos())
+            slider.scene.update()
+        return slider
 
     def changeWidgetId(self, new_widget_id: str):
         """
@@ -442,10 +440,3 @@ class Slider(QMainWindow):
         :return:
         """
         self.widget_id = new_widget_id
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    t = Slider("11")
-    t.show()
-    sys.exit(app.exec_())

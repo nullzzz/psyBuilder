@@ -57,33 +57,33 @@ class Info(object):
     IS_REGISTER: str = CONFIG.value("register")
 
     # 限制输入的正则表达式
-    RE_NUMBER      = r"\[\w+\]|\d+"
-    RE_FLOAT       = r"\[\w+\]|\d+\.\d+"
+    RE_NUMBER = r"\[\w+\]|\d+"
+    RE_FLOAT = r"\[\w+\]|\d+\.\d+"
     RE_NUM_PERCENT = r"\[\w+\]|\d+%?|\d+"
 
     # possible useful in the future
     REF_VALUE_SEPERATOR = "@"
 
     # 区分不同的添加情况
-    WidgetAdd   = 0
-    WidgetCopy  = 1
+    WidgetAdd = 0
+    WidgetCopy = 1
     WidgetRefer = 2
-    WidgetMove  = 3
+    WidgetMove = 3
     # Timeline name
-    TimelineNameError   = 0
-    TimelineTypeError   = 1
+    TimelineNameError = 0
+    TimelineTypeError = 1
     TimelineParentError = 2
-    TimelineNameRight   = 3
-    TimelineNameExist   = 4
+    TimelineNameRight = 3
+    TimelineNameExist = 4
 
     # widget type
-    CYCLE  = "Cycle"
-    SOUND  = "Sound"
-    TEXT   = "Text"
-    IMAGE  = "Image"
-    VIDEO  = "Video"
+    CYCLE = "Cycle"
+    SOUND = "Sound"
+    TEXT = "Text"
+    IMAGE = "Image"
+    VIDEO = "Video"
     SLIDER = "Slider"
-    BUG    = "Bug"
+    BUG = "Bug"
 
     OPEN = "Open"
     DC = "DC"
@@ -105,18 +105,6 @@ class Info(object):
     DEV_SERIAL_PORT = "serial_port"
     DEV_SOUND = "sound"
 
-    #  slider item num
-    ITEM_LINE = 0
-    ITEM_POLYGON = 1
-    ITEM_CIRCLE = 2
-    ITEM_ARC = 3
-    ITEM_RECT = 4
-    ITEM_IMAGE = 5
-    ITEM_TEXT = 6
-    ITEM_VIDEO = 7
-    ITEM_SOUND = 8
-    ITEM_SNOW = 9
-    ITEM_GABOR = 10
     # 图片保存路径
     IMAGE_SOURCE_PATH = "image"
     # widget不同类型对应图片

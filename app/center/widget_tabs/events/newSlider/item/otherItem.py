@@ -10,17 +10,15 @@ from app.func import Func
 from app.info import Info
 
 
-class OthItem(QGraphicsPixmapItem):
-    Snow = Info.ITEM_SNOW
-    Gabor = Info.ITEM_GABOR
-
+class OtherItem(QGraphicsPixmapItem):
+    Snow, Gabor = 9, 10
     name = {
         Snow: "snow",
         Gabor: "gabor",
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):
-        super(OthItem, self).__init__(parent=parent)
+        super(OtherItem, self).__init__(parent=parent)
 
         self.item_type = item_type
         self.item_name = item_name if item_name else self.generateItemName()
@@ -210,7 +208,7 @@ class OthItem(QGraphicsPixmapItem):
         self.setZValue(z)
 
     def clone(self):
-        clone_page = OthItem(self.item_type)
+        clone_page = OtherItem(self.item_type)
         properties = self.getInfo()
         clone_page.pro_window.setProperties(properties)
         return clone_page

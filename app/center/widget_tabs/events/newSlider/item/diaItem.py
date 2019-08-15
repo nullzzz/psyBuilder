@@ -5,19 +5,12 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPolygonItem
 
 from app.center.widget_tabs.events.slider.polygon.polygonProperty import PolygonProperty
 from app.func import Func
-from app.info import Info
 
 
 class DiaItem(QGraphicsPolygonItem):
-    # Line, Polygon, Arc, Circle, Rect = range(5)
-    Line = Info.ITEM_LINE
-    Polygon = Info.ITEM_POLYGON
-    Circle = Info.ITEM_CIRCLE
-    Arc = Info.ITEM_ARC
-    Rect = Info.ITEM_RECT
+    Polygon, Arc, Circle, Rect = range(1, 5)
 
     name: dict = {
-        Line: "line",
         Polygon: "polygon",
         Arc: "arc",
         Circle: "circle",
@@ -50,13 +43,8 @@ class DiaItem(QGraphicsPolygonItem):
         }
 
         path = QPainterPath()
-        if self.item_type == self.Line:
-            path.moveTo(p1.x(), p1.y())
-            path.lineTo(p2.x(), p2.y())
-            self.mPolygon = path.toFillPolygon()
-            self.pro_window = PolygonProperty('line')
         # circle
-        elif self.item_type == self.Circle:
+        if self.item_type == self.Circle:
             path.addEllipse(QRectF(-100, -100, 200, 200))
             self.mPolygon = path.toFillPolygon()
             self.pro_window = PolygonProperty('circle')
@@ -90,10 +78,6 @@ class DiaItem(QGraphicsPolygonItem):
             #
             self.mPolygon = path.toFillPolygon()
             self.pro_window = PolygonProperty('polygon')
-
-
-        else:
-            raise Exception("diagramType should be of 'Arc','Line','Rect', or 'Circle' !!")
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
