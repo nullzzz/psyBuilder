@@ -35,6 +35,7 @@ class Button(QPushButton):
         drag.setHotSpot(e.pos() - self.rect().topLeft())
         drag.exec_()
 
+
 class Slider(QMainWindow):
     propertiesChange = pyqtSignal(str)
     InsertTextButton = 10
@@ -69,10 +70,10 @@ class Slider(QMainWindow):
         self.view = QGraphicsView(self.scene)
         scr_Rect = QDesktopWidget().screenGeometry()
 
-        print(f"screen: {scr_Rect}")
+        # print(f"screen: {scr_Rect}")
 
         self.scene.setSceneRect(0, 0, scr_Rect.width(), scr_Rect.height())
-        self.view.fitInView(0,0, scr_Rect.width()/2,scr_Rect.height()/2, Qt.KeepAspectRatio)
+        self.view.fitInView(0, 0, scr_Rect.width() / 2, scr_Rect.height() / 2, Qt.KeepAspectRatio)
 
         layout.addWidget(self.view)
 
@@ -438,7 +439,7 @@ class Slider(QMainWindow):
         self.about_action.setToolTip("underline")
         self.about_action.triggered.connect(self.about)
 
-        self.open_pro = QAction(QIcon(Func.getImage("setting.png")),"setting", self)
+        self.open_pro = QAction(QIcon(Func.getImage("setting.png")), "setting", self)
         # self.open_pro.setShortcut("Ctrl+O")
         self.open_pro.setToolTip("setting")
         self.open_pro.triggered.connect(self.openPro)
@@ -591,8 +592,7 @@ class Slider(QMainWindow):
         action1 = QAction('More..', self, triggered=slot)
         action1.setData('More..')
         for color, name in zip(colors, names):
-            action = QAction(self.createColorIcon(color), name, self,
-                             triggered=slot)
+            action = QAction(self.createColorIcon(color), name, self, triggered=slot)
             action.setData(QColor(color))
             colorMenu.addAction(action)
             if color == defaultColor:
