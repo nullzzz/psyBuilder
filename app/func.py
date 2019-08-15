@@ -4,7 +4,7 @@ import re
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QPainter, QColor
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QDesktopWidget
 
 from app.info import Info
 
@@ -613,6 +613,24 @@ class Func(object):
         if re.fullmatch("\[[A-Za-z]+[a-zA-Z\._0-9]*\]", valueStr):
             return True
         return False
+
+    @staticmethod
+    def getCurrentScreenRes(screen_id: str) -> list:
+        print(f"{screen_id}")
+        print(f"{Info.OUTPUT_DEVICE_INFO}")
+        resolution = Info.OUTPUT_DEVICE_INFO[screen_id]['Resolution']
+
+        wAndHStr = resolution.lower().split('x')
+
+        if len(wAndHStr)>1:
+            width  = int(wAndHStr[0])
+            height = int(wAndHStr[1])
+        else:
+            scr_Rect = QDesktopWidget().screenGeometry()
+            width  = scr_Rect.width()
+            height = scr_Rect.height()
+        print(f"{resolution}:{width},{height}")
+        return [width,height]
 
 
     @staticmethod

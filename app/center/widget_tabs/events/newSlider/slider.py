@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtCore import pyqtSignal, Qt, QRect
 from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMainWindow, QMenu, QAction, \
-    QComboBox, QColorDialog
+    QComboBox, QColorDialog, QDesktopWidget
 from quamash import QApplication
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
@@ -134,8 +134,16 @@ class Slider(QMainWindow):
         self.background_bt.setIcon(QIcon(Func.getImage("background4.png")))
         self.background_bt.clicked.connect(self.fillButtonTriggered)
         self.setting.addWidget(self.background_bt)
+
         self.view = QGraphicsView(self.scene)
-        self.scene.setSceneRect(0, 0, 2000, 2000)
+
+        width, height = Func.getCurrentScreenRes(self.pro_window.getInfo()['Screen name'])
+        # width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
+        # to match the specific resolution of the current screen
+        scr_Rect = QDesktopWidget().screenGeometry()
+        self.scene.setSceneRect(0, 0, width, height)
+        self.view.fitInView(0, 0, width / 2, height/ 2, Qt.KeepAspectRatio)
+
         self.scene.menu = self.itemMenu
 
         self.left_box = LeftBox()
@@ -143,6 +151,10 @@ class Slider(QMainWindow):
             "items": {},
             "pro": self.pro_window.getInfo()
         }
+        # print(f"{self.pro_window.getInfo()}")
+
+
+
         self.setUI()
 
     def addItem(self, item_name: str):
