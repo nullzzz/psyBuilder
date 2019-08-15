@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QB
 from quamash import QApplication
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
-from app.center.widget_tabs.events.newSlider.item.othItem import OthItem
+from app.center.widget_tabs.events.newSlider.item.lasso import Lasso
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
 from app.center.widget_tabs.events.newSlider.leftBox import LeftBox
 from app.center.widget_tabs.events.newSlider.property import SliderProperty
@@ -90,8 +90,8 @@ class Slider(QMainWindow):
             self.createColorMenu(self.itemColorChanged, Qt.white))
         self.fillAction = self.fill_color_bt.menu().defaultAction()
         self.fill_color_bt.setIcon(
-            self.createColorToolButtonIcon(Func.getImage("floodfill.png"),
-                                           Qt.white))
+            self.createColorButtonIcon(Func.getImage("floodfill.png"),
+                                       Qt.white))
 
         self.line_color_bt = QToolButton()
         self.line_color_bt.setPopupMode(QToolButton.MenuButtonPopup)
@@ -99,8 +99,8 @@ class Slider(QMainWindow):
             self.createColorMenu(self.lineColorChanged, Qt.black))
         self.lineAction = self.line_color_bt.menu().defaultAction()
         self.line_color_bt.setIcon(
-            self.createColorToolButtonIcon(Func.getImage("linecolor.png"),
-                                           Qt.black))
+            self.createColorButtonIcon(Func.getImage("linecolor.png"),
+                                       Qt.black))
         self.line_color_bt.clicked.connect(self.lineButtonTriggered)
 
         self.setting.addWidget(self.fill_color_bt)
@@ -137,12 +137,9 @@ class Slider(QMainWindow):
 
         self.view = QGraphicsView(self.scene)
 
-        width, height = Func.getCurrentScreenRes(self.pro_window.getInfo()['Screen name'])
-        # width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
-        # to match the specific resolution of the current screen
-        scr_Rect = QDesktopWidget().screenGeometry()
+        width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
         self.scene.setSceneRect(0, 0, width, height)
-        self.view.fitInView(0, 0, width / 2, height/ 2, Qt.KeepAspectRatio)
+        self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
         self.scene.menu = self.itemMenu
 
@@ -151,10 +148,6 @@ class Slider(QMainWindow):
             "items": {},
             "pro": self.pro_window.getInfo()
         }
-        # print(f"{self.pro_window.getInfo()}")
-
-
-
         self.setUI()
 
     def addItem(self, item_name: str):
@@ -166,17 +159,31 @@ class Slider(QMainWindow):
     def changeItemList(self):
         items = self.scene.selectedItems()
         if items:
-            if items[0].item_name != self.item_list.currentText():
-                self.item_list.setCurrentText(items[0].item_name)
+            if items[0].getName() != self.item_list.currentText():
+                self.item_list.setCurrentText(items[0].getName())
         else:
             self.item_list.setCurrentIndex(0)
 
     def selectItem(self, item_name: str):
         self.scene.selectionChanged.disconnect()
         for item in self.scene.items():
-            if isinstance(item, PixItem) or isinstance(item, OthItem):
+            if not isinstance(item, Lasso):
                 item.setSelected(item_name == item.getName())
+                if item_name == item.getName():
+                    self.changeTool(item)
         self.scene.selectionChanged.connect(self.changeItemList)
+
+    def changeTool(self, item):
+        border_width = item.default_properties.get("Border width", "2")
+        self.line_wid_com.setCurrentText(border_width)
+
+        border_color: str = item.default_properties.get("Border color", "0,0,0")
+        if border_color.startswith("["):
+            r, g, b = 0, 0, 0
+        else:
+            r, g, b = [int(x) for x in border_color.split(",")]
+        color = QColor(r, g, b)
+        self.line_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("linecolor.png"), color))
 
     def setUI(self):
         self.setWindowTitle("Slider")
@@ -193,12 +200,18 @@ class Slider(QMainWindow):
         self.pro_window.general.refresh()
         self.getInfo()
 
+        width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
+        self.scene.setSceneRect(0, 0, width, height)
+        self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
+
     def getInfo(self):
         item_info: dict = {}
         for item in self.scene.items():
             item_info[item.getName()] = item.getInfo()
         self.default_properties = {
-            "items": item_info, "pro": self.pro_window.getInfo()}
+            "items": item_info,
+            "pro": self.pro_window.getInfo()
+        }
         return self.default_properties
 
     def getProperties(self):
@@ -215,9 +228,9 @@ class Slider(QMainWindow):
 
     def selectDiaItem(self, d):
         self.fill_color_bt.setIcon(
-            self.createColorToolButtonIcon(Func.getImage("floodfill.png"), QColor(d['itemcolor'])))
+            self.createColorButtonIcon(Func.getImage("floodfill.png"), QColor(d['itemcolor'])))
         self.line_color_bt.setIcon(
-            self.createColorToolButtonIcon(Func.getImage("linecolor.png"), QColor(d['linecolor'])))
+            self.createColorButtonIcon(Func.getImage("linecolor.png"), QColor(d['linecolor'])))
         self.line_wid_com.setCurrentText(str(d['linewidth']))
 
     def deleteItem(self):
@@ -263,12 +276,12 @@ class Slider(QMainWindow):
             color = QColorDialog.getColor()
             if color.isValid():
                 self.fill_color_bt.setIcon(
-                    self.createColorToolButtonIcon(Func.getImage("floodfill.png"), color))
+                    self.createColorButtonIcon(Func.getImage("floodfill.png"), color))
                 self.scene.setItemColor(color)
         else:
             self.fill_color_bt.setIcon(
-                self.createColorToolButtonIcon(Func.getImage("floodfill.png"),
-                                               QColor(self.fillAction.data())))
+                self.createColorButtonIcon(Func.getImage("floodfill.png"),
+                                           QColor(self.fillAction.data())))
             self.fillButtonTriggered()
 
     def lineColorChanged(self):
@@ -276,12 +289,12 @@ class Slider(QMainWindow):
         if self.lineAction.data() == 'More..':
             color = QColorDialog.getColor()
             self.line_color_bt.setIcon(
-                self.createColorToolButtonIcon(Func.getImage("linecolor.png"), color))
+                self.createColorButtonIcon(Func.getImage("linecolor.png"), color))
             self.scene.setLineColor(color)
         else:
             self.line_color_bt.setIcon(
-                self.createColorToolButtonIcon(Func.getImage('linecolor.png'),
-                                               QColor(self.lineAction.data())))
+                self.createColorButtonIcon(Func.getImage('linecolor.png'),
+                                           QColor(self.lineAction.data())))
             self.lineButtonTriggered()
 
     def changeLineWidth(self):
@@ -300,10 +313,6 @@ class Slider(QMainWindow):
 
     def lineButtonTriggered(self):
         self.scene.setLineColor(QColor(self.lineAction.data()))
-
-    # def about(self):
-    #     QMessageBox.about(self, "About Diagram Scene",
-    #                       "The <b>Diagram Scene</b> example shows use of the graphics framework.")
 
     def openPro(self):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
@@ -348,8 +357,8 @@ class Slider(QMainWindow):
         return back_menu
 
     def createColorMenu(self, slot, default_color):
-        colors = [Qt.black, Qt.white, Qt.red, Qt.blue, Qt.yellow]
-        names = ["black", "white", "red", "blue", "yellow"]
+        colors = (Qt.black, Qt.white, Qt.red, Qt.blue, Qt.yellow)
+        names = ("black", "white", "red", "blue", "yellow")
 
         color_menu = QMenu(self)
         more_action = QAction('More..', self)
@@ -365,27 +374,27 @@ class Slider(QMainWindow):
         color_menu.addAction(more_action)
         return color_menu
 
-    def createColorToolButtonIcon(self, imageFile, color):
-        pixmap = QPixmap(50, 80)
-        pixmap.fill(Qt.transparent)
-        painter = QPainter(pixmap)
-        image = QPixmap(imageFile)
+    @staticmethod
+    def createColorButtonIcon(file_path, color):
+        pix = QPixmap(50, 80)
+        pix.fill(Qt.transparent)
+        painter = QPainter(pix)
+        image = QPixmap(file_path)
         target = QRect(0, 0, 50, 60)
         source = QRect(0, 0, 42, 42)
         painter.fillRect(QRect(0, 60, 50, 80), color)
         painter.drawPixmap(target, image, source)
         painter.end()
+        return QIcon(pix)
 
-        return QIcon(pixmap)
-
-    #
-    def createColorIcon(self, color):
-        pixmap = QPixmap(20, 20)
-        painter = QPainter(pixmap)
+    @staticmethod
+    def createColorIcon(color):
+        pix = QPixmap(20, 20)
+        painter = QPainter(pix)
         painter.setPen(Qt.NoPen)
         painter.fillRect(QRect(0, 0, 20, 20), color)
         painter.end()
-        return QIcon(pixmap)
+        return QIcon(pix)
 
     def ok(self):
         self.apply()

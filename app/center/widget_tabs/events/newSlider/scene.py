@@ -1,9 +1,10 @@
-from PyQt5.QtCore import pyqtSignal, Qt, QPointF, QLineF
+from PyQt5.QtCore import pyqtSignal, Qt, QLineF
 from PyQt5.QtGui import QPen, QTransform, QKeyEvent, QPainterPath
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
 from app.center.widget_tabs.events.newSlider.item.lasso import Lasso
+from app.center.widget_tabs.events.newSlider.item.linItem import LineItem
 from app.center.widget_tabs.events.newSlider.item.othItem import OthItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
 
@@ -13,6 +14,7 @@ class Scene(QGraphicsScene):
 
     itemAdd = pyqtSignal(str)
     itemSelected = pyqtSignal()
+    propertyChanged = pyqtSignal(dict)
 
     def __init__(self, parent=None):
         super(Scene, self).__init__(parent)
@@ -84,11 +86,8 @@ class Scene(QGraphicsScene):
 
     def setLineColor(self, color):
         for item in self.selectedItems():
-            if isinstance(item, DiaItem):
-                pen = item.pen()
-                pen.setColor(color)
-                item.setPen(pen)
-                item.setLineColor(color.name())
+            if isinstance(item, LineItem):
+                item.setColor(color)
 
     def setItemColor(self, color):
         for item in self.selectedItems():
@@ -96,21 +95,16 @@ class Scene(QGraphicsScene):
                 item.setBrush(color)
                 item.setItemColor(color.name())
 
-    def setLineWidth(self, size):
+    def setLineWidth(self, width):
         for item in self.selectedItems():
-            if isinstance(item, DiaItem):
-                pen = item.pen()
-                pen.setWidth(size)
-                item.setPen(pen)
-                item.setLineWidth(size)
-                self.update()
+            if isinstance(item, LineItem):
+                item.setWidth(width)
 
     def setMode(self, mode: int):
         self.my_mode = mode
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-
             if self.my_mode == self.InsertLine:
                 self.line = QGraphicsLineItem(QLineF(event.scenePos(),
                                                      event.scenePos()))
@@ -147,21 +141,16 @@ class Scene(QGraphicsScene):
 
     def mouseReleaseEvent(self, mouseEvent):
         if self.line and self.my_mode == self.InsertLine:
-            p1 = self.line.line().p1()
-            p2 = self.line.line().p2()
-            p3 = QPointF((p1.x() - p2.x()) / 2, (p1.y() - p2.y()) / 2)
-            p4 = QPointF(-(p1.x() - p2.x()) / 2, -(p1.y() - p2.y()) / 2)
-            center = QPointF((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2)
-            item = DiaItem(DiaItem.Line, p3, p4)
+            item = LineItem(self.line.line())
             self.addItem(item)
-            item.setPos(center)
+            self.itemAdd.emit(item.getName())
             self.update()
             self.removeItem(self.line)
             self.line = None
         if self.lasso and self.my_mode == self.SelectItem:
             self.removeItem(self.lasso)
             self.lasso = None
-        self.line = None
+
         super(Scene, self).mouseReleaseEvent(mouseEvent)
 
     def setProperties(self, properties: dict):
@@ -186,7 +175,7 @@ class Scene(QGraphicsScene):
                 self.addItem(item)
                 item.setProperties(v)
 
-    def setAttributes(self, attributes:list):
+    def setAttributes(self, attributes: list):
         self.attributes = attributes
         for item in self.items():
             item.setAttributes(attributes)

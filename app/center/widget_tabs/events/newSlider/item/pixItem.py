@@ -16,7 +16,7 @@ class PixItem(QGraphicsPixmapItem):
     """
     Image、Text、Video、Sound
     """
-    Image, Text, Video, Sound = 4, 5, 6, 7
+    Image, Text, Video, Sound = range(5, 9)
     name = {
         Image: "image",
         Text: "text",
@@ -28,10 +28,8 @@ class PixItem(QGraphicsPixmapItem):
         super(PixItem, self).__init__(parent)
 
         self.item_type = item_type
-        if item_name:
-            self.item_name = item_name
-        else:
-            self.item_name = self.generateItemName()
+
+        self.item_name = item_name if item_name else self.generateItemName()
 
         self.attributes: list = []
         if self.item_type == self.Image:

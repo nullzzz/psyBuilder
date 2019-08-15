@@ -609,29 +609,25 @@ class Func(object):
             return []
 
     @staticmethod
-    def isCitingValue(valueStr: str) -> bool:
-        if re.fullmatch("\[[A-Za-z]+[a-zA-Z\._0-9]*\]", valueStr):
+    def isCitingValue(value: str) -> bool:
+        if re.fullmatch(r"\[[A-Za-z]+[a-zA-Z\._0-9]*\]", value):
             return True
         return False
 
     @staticmethod
-    def getCurrentScreenRes(screen_id: str) -> list:
-        print(f"{screen_id}")
-        print(f"{Info.OUTPUT_DEVICE_INFO}")
-        resolution = Info.OUTPUT_DEVICE_INFO[screen_id]['Resolution']
+    def getCurrentScreenRes(screen_id: str) -> tuple:
+        resolution = Info.OUTPUT_DEVICE_INFO[screen_id].get('Resolution', "auto")
 
-        wAndHStr = resolution.lower().split('x')
+        wh = resolution.lower().split('x')
 
-        if len(wAndHStr)>1:
-            width  = int(wAndHStr[0])
-            height = int(wAndHStr[1])
+        if len(wh) > 1:
+            width = int(wh[0])
+            height = int(wh[1])
         else:
-            scr_Rect = QDesktopWidget().screenGeometry()
-            width  = scr_Rect.width()
-            height = scr_Rect.height()
-        print(f"{resolution}:{width},{height}")
-        return [width,height]
-
+            scr_rect = QDesktopWidget().screenGeometry()
+            width = scr_rect.width()
+            height = scr_rect.height()
+        return width, height
 
     @staticmethod
     def isRGBStr(RGBStr: str):

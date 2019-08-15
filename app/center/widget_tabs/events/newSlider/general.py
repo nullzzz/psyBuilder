@@ -20,7 +20,7 @@ class SliderGeneral(QWidget):
         self.clear_after = PigComboBox()
         self.clear_after.addItems(("Yes", "No"))
 
-        self.using_screen_id: str = ""
+        self.using_screen_id: str = "screen.0"
         self.screen = PigComboBox()
         self.screen_info = Func.getScreenInfo()
         self.screen.addItems(self.screen_info.values())

@@ -47,7 +47,7 @@ class OthItem(QGraphicsPixmapItem):
             **self.pro_window.getInfo(),
         }
 
-    def mouseDoubleClickEvent(self, mouseEvent):
+    def mouseDoubleClickEvent(self, event):
         self.openPro()
 
     def setAttributes(self, attributes):
@@ -149,7 +149,6 @@ class OthItem(QGraphicsPixmapItem):
 
         radius = (int(width / 2.0), int(height / 2.0))
         [x, y] = np.meshgrid(range(-radius[0], radius[0] + 1), range(-radius[1], radius[1] + 1))
-
 
         circle_mask = (x / radius[0]) ** 2 + (y / radius[1]) ** 2
 

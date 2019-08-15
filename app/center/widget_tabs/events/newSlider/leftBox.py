@@ -6,7 +6,7 @@ from app.func import Func
 
 
 class LeftBox(QToolBox):
-    Polygon, Circle, Arc, Rect, Image, Text, Video, Sound, Snow, Gabor = range(10)
+    Line, Polygon, Circle, Arc, Rect, Image, Text, Video, Sound, Snow, Gabor = range(11)
 
     def __init__(self, parent=None):
         super(LeftBox, self).__init__(parent=parent)

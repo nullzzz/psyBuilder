@@ -46,6 +46,7 @@ class Info(object):
         "sound": 0,
         "snow": 0,
         "gabor": 0,
+        "line": 0,
     }
 
     # 当前导入导出文件名

@@ -75,3 +75,43 @@ Cycle：
 # 直线里面不需要Center X Y的选项，直接由 P1和P2计算得到；
 
 # 【done】12) slide 中，slider property 里面增加Frame table，内容同image widget
+
+
+# k = int(input())
+# s = input()
+#
+# mp: dict = {}
+# for i in "qwertyuiopasdfghjklzxcvbnm1234567890_":
+#     if i in s:
+#         temp = s.replace(i*k, "")
+#         if i not in temp:
+#             mp[i] = True
+#
+# for i in s:
+#     if mp.get(i):
+#         mp[i] = False
+#         print(i, end="")
+#         s = s.replace(i * k, i)
+# print()
+# print(s)
+#
+
+mp: dict = {}
+
+n = int(input())
+
+for i in range(n):
+    a, b = input().split()
+    mp[a] = b
+    mp[b] = a
+
+m = int(input())
+
+guest = [x for x in input().split()]
+single = []
+for i in guest:
+    if mp.get(i) is None or mp[i] not in guest:
+        single.append(i)
+
+print(len(single))
+print(*sorted(single), sep=" ")
