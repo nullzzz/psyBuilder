@@ -140,7 +140,6 @@ class Slider(QMainWindow):
         width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
         self.scene.setSceneRect(0, 0, width, height)
         self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
-
         self.scene.menu = self.itemMenu
 
         self.left_box = LeftBox()

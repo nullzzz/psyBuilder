@@ -11,7 +11,9 @@ from app.info import Info
 
 
 class OthItem(QGraphicsPixmapItem):
-    Snow, Gabor = 8, 9
+    Snow = Info.ITEM_SNOW
+    Gabor = Info.ITEM_GABOR
+
     name = {
         Snow: "snow",
         Gabor: "gabor",

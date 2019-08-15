@@ -3,10 +3,21 @@ from PyQt5.QtGui import QDrag, QIcon
 from PyQt5.QtWidgets import QPushButton, QWidget, QGridLayout, QLabel, QToolBox, QSizePolicy, QFormLayout
 
 from app.func import Func
+from app.info import Info
 
 
 class LeftBox(QToolBox):
-    Line, Polygon, Circle, Arc, Rect, Image, Text, Video, Sound, Snow, Gabor = range(11)
+    Line = Info.ITEM_LINE
+    Polygon = Info.ITEM_POLYGON
+    Circle = Info.ITEM_CIRCLE
+    Arc = Info.ITEM_ARC
+    Rect = Info.ITEM_RECT
+    Image = Info.ITEM_IMAGE
+    Text = Info.ITEM_TEXT
+    Video = Info.ITEM_VIDEO
+    Sound = Info.ITEM_SOUND
+    Snow = Info.ITEM_SNOW
+    Gabor = Info.ITEM_GABOR
 
     def __init__(self, parent=None):
         super(LeftBox, self).__init__(parent=parent)

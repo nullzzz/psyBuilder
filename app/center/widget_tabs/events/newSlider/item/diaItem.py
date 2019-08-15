@@ -5,16 +5,23 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPolygonItem
 
 from app.center.widget_tabs.events.slider.polygon.polygonProperty import PolygonProperty
 from app.func import Func
+from app.info import Info
 
 
 class DiaItem(QGraphicsPolygonItem):
-    Line, Polygon, Arc, Circle, Rectangle = range(5)
+    # Line, Polygon, Arc, Circle, Rect = range(5)
+    Line = Info.ITEM_LINE
+    Polygon = Info.ITEM_POLYGON
+    Circle = Info.ITEM_CIRCLE
+    Arc = Info.ITEM_ARC
+    Rect = Info.ITEM_RECT
+
     name: dict = {
         Line: "line",
         Polygon: "polygon",
         Arc: "arc",
         Circle: "circle",
-        Rectangle: "rectangle",
+        Rect: "rect",
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):
@@ -55,7 +62,7 @@ class DiaItem(QGraphicsPolygonItem):
             self.pro_window = PolygonProperty('circle')
 
         #  rectangle
-        elif self.item_type == self.Rectangle:
+        elif self.item_type == self.Rect:
             path.addRect(QRectF(-100, -100, 200, 200))
             self.mPolygon = path.toFillPolygon()
             self.pro_window = PolygonProperty('rectangle')
@@ -135,10 +142,10 @@ class DiaItem(QGraphicsPolygonItem):
         cWidth = rect0.width()
 
         # 非等比例
-        if self.arbitrary_resize and self.item_type < 4:
+        if self.arbitrary_resize and self.item_type in [self.Polygon , self.Circle , self.Arc , self.Rect]:
             self.resizingFlag = True
         # 等比例
-        if self.keep_resize and self.item_type < 4:
+        if self.keep_resize and self.item_type in [self.Polygon , self.Circle , self.Arc , self.Rect]:
             self.resizingFlag = True
 
             if cHeight < 5:
@@ -174,7 +181,7 @@ class DiaItem(QGraphicsPolygonItem):
                 path.arcTo(cRect, float(self.pro_window.frame.default_properties["Start angle"]),
                            float(self.pro_window.frame.default_properties["Angle length"]))
 
-            elif self.item_type == self.Rectangle:
+            elif self.item_type == self.Rect:
                 path.addRect(cRect)
 
             elif self.item_type == self.Polygon:
@@ -322,7 +329,7 @@ class DiaItem(QGraphicsPolygonItem):
             path.arcTo(rect, float(self.pro_window.frame.default_properties["Start angle"]),
                        float(self.pro_window.frame.default_properties["Angle length"]))
 
-        elif self.item_type == self.Rectangle:
+        elif self.item_type == self.Rect:
             rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
                           -int(self.pro_window.frame.default_properties["Height"]) / 2,
                           int(self.pro_window.frame.default_properties["Width"]),
@@ -365,7 +372,7 @@ class DiaItem(QGraphicsPolygonItem):
             self.default_properties["P2 X"] = str(int(self.p2.x()) + item_center_x)
             self.default_properties["P2 Y"] = str(int(self.p2.y()) + item_center_y)
 
-        elif self.item_type == self.Rectangle:
+        elif self.item_type == self.Rect:
             self.default_properties["Height"] = str(int(self.polygon().boundingRect().height()))
             self.default_properties["Width"] = str(int(self.polygon().boundingRect().width()))
         elif self.item_type == self.Arc:

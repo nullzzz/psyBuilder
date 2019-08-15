@@ -16,7 +16,12 @@ class PixItem(QGraphicsPixmapItem):
     """
     Image、Text、Video、Sound
     """
-    Image, Text, Video, Sound = range(5, 9)
+    # Image, Text, Video, Sound = range(5, 9)
+    Image = Info.ITEM_IMAGE
+    Text = Info.ITEM_TEXT
+    Video = Info.ITEM_VIDEO
+    Sound = Info.ITEM_SOUND
+
     name = {
         Image: "image",
         Text: "text",

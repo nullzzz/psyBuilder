@@ -105,6 +105,18 @@ class Info(object):
     DEV_SERIAL_PORT = "serial_port"
     DEV_SOUND = "sound"
 
+    #  slider item num
+    ITEM_LINE = 0
+    ITEM_POLYGON = 1
+    ITEM_CIRCLE = 2
+    ITEM_ARC = 3
+    ITEM_RECT = 4
+    ITEM_IMAGE = 5
+    ITEM_TEXT = 6
+    ITEM_VIDEO = 7
+    ITEM_SOUND = 8
+    ITEM_SNOW = 9
+    ITEM_GABOR = 10
     # 图片保存路径
     IMAGE_SOURCE_PATH = "image"
     # widget不同类型对应图片
