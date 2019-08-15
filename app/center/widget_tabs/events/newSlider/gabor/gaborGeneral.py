@@ -132,8 +132,8 @@ class GaborGeneral(QWidget):
     # 设置可选属性
     def setAttributes(self, attributes):
         self.attributes = attributes
-        self.x_pos.setCompleter(QCompleter(self.attributes))
-        self.y_pos.setCompleter(QCompleter(self.attributes))
+        self.cx_pos.setCompleter(QCompleter(self.attributes))
+        self.cy_pos.setCompleter(QCompleter(self.attributes))
         self._width.setCompleter(QCompleter(self.attributes))
         self._height.setCompleter(QCompleter(self.attributes))
         self.spatial.setCompleter(QCompleter(self.attributes))
