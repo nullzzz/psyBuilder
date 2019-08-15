@@ -11,6 +11,7 @@ from app.center.widget_tabs.events.slider.item.pixItem import PixItem
 from app.center.widget_tabs.events.slider.property import SliderProperty
 from app.center.widget_tabs.events.slider.scene import Scene
 from app.func import Func
+from app.info import Info
 from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 
@@ -38,7 +39,7 @@ class Button(QPushButton):
 
 class Slider(QMainWindow):
     propertiesChange = pyqtSignal(str)
-    InsertTextButton = 10
+    InsertTextButton = Info.ITEM_TEXT
 
     def __init__(self, widget_id):
         super(Slider, self).__init__()
@@ -115,7 +116,7 @@ class Slider(QMainWindow):
         for button in buttons:
             if self.buttonGroup.button(id) != button:
                 button.setChecked(False)
-
+        print(f"line 119: {id}")
         if id == self.InsertTextButton:
             self.scene.setMode(Scene.InsertText)
         else:
@@ -303,12 +304,7 @@ class Slider(QMainWindow):
         layout.addWidget(self.createCellWidget("Polygon", DiaItem.Polygon), 0, 0)
         layout.addWidget(self.createCellWidget("Circle", DiaItem.Circle), 1, 0)
         layout.addWidget(self.createCellWidget("Arc", DiaItem.Arc), 2, 0)
-        layout.addWidget(self.createCellWidget("Rectangle", DiaItem.Rect), 3, 0)
-
-        # layout.addWidget(self.createCellWidget("Conditional", DiagramItem.Conditional), 0, 0)
-        # layout.addWidget(self.createCellWidget("Polygon", DiagramItem.Step), 2, 0)
-        # layout.addWidget(self.createCellWidget("Circle", DiagramItem.Circle), 2, 0)
-        # layout.addWidget(self.createCellWidget("Input/Output", DiagramItem.Io), 3, 0)
+        layout.addWidget(self.createCellWidget("Rect", DiaItem.Rect), 3, 0)
 
         textButton = Button()
         self.buttonGroup.addButton(textButton, self.InsertTextButton)

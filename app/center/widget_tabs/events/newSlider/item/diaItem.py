@@ -65,7 +65,7 @@ class DiaItem(QGraphicsPolygonItem):
         elif self.item_type == self.Rect:
             path.addRect(QRectF(-100, -100, 200, 200))
             self.mPolygon = path.toFillPolygon()
-            self.pro_window = PolygonProperty('rectangle')
+            self.pro_window = PolygonProperty('rect')
 
         # arc
         elif self.item_type == self.Arc:
@@ -206,7 +206,7 @@ class DiaItem(QGraphicsPolygonItem):
 
 
             else:
-                raise Exception("diagramType should be of 'Arc','rectangle', or 'circle' !!")
+                raise Exception("diagramType should be of 'Arc','rect', or 'circle' !!")
 
             self.mPolygon = path.toFillPolygon()
             self.setPolygon(self.mPolygon)

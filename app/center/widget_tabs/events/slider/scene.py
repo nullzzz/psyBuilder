@@ -46,7 +46,7 @@ class Scene(QGraphicsScene):
         if event.mimeData().hasFormat("application/x-icon-and-text"):
             # 添加图形
             if self.myMode == self.InsertItem:
-                if self.myItemType < 4:
+                if self.myItemType in [DiaItem.Polygon , DiaItem.Circle , DiaItem.Arc , DiaItem.Rect]:
                     # 参数：图形的形状，右键菜单
                     item = DiaItem(self.myItemType, self.myItemMenu, self.attributes)
                     pen = item.pen()
