@@ -54,7 +54,7 @@ class GaborGeneral(QWidget):
         self._height.setCurrentText("100")
         self.spatial.addItems(["0.01", "0.02", "0.04", "0.06", "0.08"])
         self.spatial.setEditable(True)
-        self.spatial.setCurrentText("0.33")
+        self.spatial.setCurrentText("0.033")
         self.contrast.addItems(["0", "1", "0.2", "0.4", "0.6", "0.8"])
         self.contrast.setEditable(True)
         self.contrast.setCurrentText("1")
