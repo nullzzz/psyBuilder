@@ -143,8 +143,13 @@ class OthItem(QGraphicsPixmapItem):
     def getGabor(cycles_per_pix, contrast, phase, orientation, back_color, width, height, sdx, sdy):
         phase = (phase % 360) * (np.pi / 180)
         orientation = (orientation % 360) * (np.pi / 180)
+        # to force the width and height to be even
+        width = int(width / 2.0) * 2
+        height = int(height / 2.0) * 2
+
         radius = (int(width / 2.0), int(height / 2.0))
         [x, y] = np.meshgrid(range(-radius[0], radius[0] + 1), range(-radius[1], radius[1] + 1))
+
 
         circle_mask = (x / radius[0]) ** 2 + (y / radius[1]) ** 2
 

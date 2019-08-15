@@ -15,9 +15,11 @@ def makeGabor_bcl(cyclesPerPix, Contrast, phase, orientation, bkColor, width, he
     phase       = (phase % 360) * (np.pi / 180)
 
     orientation = (orientation % 360) * (np.pi / 180)
+    width = int(width / 2.0) * 2
+    height = int(height / 2.0) * 2
 
     radius = (int(width / 2.0), int(height / 2.0))
-
+    print(f"{radius}")
     [x, y] = np.meshgrid(range(-radius[0], radius[0] + 1), range(-radius[1], radius[1] + 1))
 
     cicleMask = (x / radius[0]) ** 2 + (y / radius[1]) ** 2
