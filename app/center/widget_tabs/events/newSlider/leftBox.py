@@ -6,31 +6,23 @@ from app.func import Func
 
 
 class LeftBox(QToolBox):
-    Polygon, Circle, Image, Text, Video, Sound, Snow, Gabor = range(8)
-    clicked = pyqtSignal(str)
+    Polygon, Circle, Arc, Rect, Image, Text, Video, Sound, Snow, Gabor = range(10)
 
     def __init__(self, parent=None):
         super(LeftBox, self).__init__(parent=parent)
         self.basic = QWidget()
         image = Item("image", self.Image)
-        image.itemType.connect(lambda x: self.clicked.emit(""))
         video = Item("video", self.Video)
-        video.itemType.connect(lambda x: self.clicked.emit(""))
         text = Item("text", self.Text)
-        text.itemType.connect(lambda x: self.clicked.emit(""))
         sound = Item("sound", self.Sound)
-        sound.itemType.connect(lambda x: self.clicked.emit(""))
         snow = Item("snow", self.Snow)
-        snow.itemType.connect(lambda x: self.clicked.emit(""))
         gabor = Item("gabor", self.Gabor)
-        gabor.itemType.connect(lambda x: self.clicked.emit(""))
 
         self.stimuli = QWidget()
         self.addItem(self.basic, "Basic Geometries")
         self.addItem(self.stimuli, "Stimuli")
 
         self.setSizePolicy(QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Ignored))
-        # self.setMinimumWidth(self.basic.sizeHint().width())
 
         layout1 = QFormLayout()
         layout1.setAlignment(Qt.AlignCenter)
@@ -38,8 +30,8 @@ class LeftBox(QToolBox):
         layout1.addWidget(video)
         layout1.addWidget(text)
         layout1.addWidget(sound)
-        # layout1.addWidget(snow)
-        # layout1.addWidget(gabor)
+        layout1.addWidget(snow)
+        layout1.addWidget(gabor)
         self.stimuli.setLayout(layout1)
 
 

@@ -390,6 +390,10 @@ class PsyApplication(QMainWindow):
             dock_layout = setting.value("DOCK_LAYOUT")
             if dock_layout:
                 self.restoreState(dock_layout)
+            # 恢复slider命名计数
+            slider_count = setting.value("SLIDER_COUNT")
+            if slider_count:
+                Info.SLIDER_COUNT = slider_count
 
             platform = setting.value("PLATFORM")
             Info.PLATFORM = platform
@@ -423,13 +427,15 @@ class PsyApplication(QMainWindow):
         # 当前布局信息
         current_dock_layout = self.saveState()
         name_wid = Info.NAME_WID.copy()
-
+        # slider命名计数
+        slider_count = Info.SLIDER_COUNT.copy()
         setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
         setting.setValue("INPUT_DEVICE_INFO", input_device_info)
         setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
         setting.setValue("QUEST_INFO", quest_info)
         setting.setValue("TRACKER_INFO", tracker_info)
         setting.setValue("DOCK_LAYOUT", current_dock_layout)
+        setting.setValue("SLIDER_COUNT", slider_count)
         setting.setValue("NAME_WID", name_wid)
         setting.setValue("WIDGET_TYPE_NAME_COUNT", Info.WIDGET_TYPE_NAME_COUNT.copy())
         setting.setValue("WIDGET_TYPE_ID_COUNT", Info.WIDGET_TYPE_ID_COUNT.copy())

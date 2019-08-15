@@ -1,26 +1,17 @@
-from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout)
+from PyQt5.QtWidgets import QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout
 
-from app.center.widget_tabs.events.durationPage import DurationPage
-from app.center.widget_tabs.events.framePage import FramePage
-from app.center.widget_tabs.events.newSlider.general import SliderGeneral
+from app.center.widget_tabs.events.newSlider.gabor.gaborGeneral import GaborGeneral
 
 
-class SliderProperty(QWidget):
+class GaborProperty(QWidget):
     def __init__(self, parent=None):
-        super(SliderProperty, self).__init__(parent)
+        super(GaborProperty, self).__init__(parent)
         self.tab = QTabWidget()
         self.below = QWidget()
 
-        self.general = SliderGeneral()
-        self.frame = FramePage()
-        self.duration = DurationPage()
-
+        self.general = GaborGeneral()
+        self.default_properties = self.general.getInfo()
         self.tab.addTab(self.general, "general")
-        self.tab.addTab(self.frame, "frame")
-        self.tab.addTab(self.duration, "duration")
-
-        self.default_properties = {**self.general.getProperties(), **self.duration.default_properties,
-                                   **self.frame.default_properties}
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
@@ -31,7 +22,7 @@ class SliderProperty(QWidget):
 
     # 生成主界面
     def setUI(self):
-        self.setWindowTitle("Slider property")
+        self.setWindowTitle("Property")
         self.resize(600, 800)
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.tab, 6)
@@ -51,13 +42,14 @@ class SliderProperty(QWidget):
 
     def getInfo(self):
         self.default_properties.clear()
-        self.default_properties = {**self.duration.getInfo(), **self.frame.getInfo(), **self.general.getInfo()}
+        self.default_properties = self.general.getInfo()
         return self.default_properties
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
-        self.frame.setAttributes(attributes)
-        self.duration.setAttributes(attributes)
+
+    def setPosition(self, x, y):
+        self.general.setPosition(x, y)
 
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
@@ -66,11 +58,3 @@ class SliderProperty(QWidget):
 
     def loadSetting(self):
         self.general.setProperties(self.default_properties)
-        self.frame.setProperties(self.default_properties)
-        self.duration.setProperties(self.default_properties)
-
-    def clone(self):
-        properties = self.getInfo()
-        clone_page = SliderProperty()
-        clone_page.setProperties(properties)
-        return clone_page

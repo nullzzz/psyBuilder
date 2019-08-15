@@ -2,7 +2,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
     QFileDialog, QCompleter, QFormLayout
 
-from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
 
 
@@ -43,17 +42,13 @@ class ImageGeneral(QWidget):
         self.stretch = QCheckBox("Stretch")
         self.stretch_mode = PigComboBox()
 
-        # 背景色、透明度、Clear&Screen
-        # self.back_color = ColorListEditor()
+        # 背景色、透明度
         self.transparent = PigLineEdit()
-        self.clear_after = PigComboBox()
-        self.using_device_id = "screen.0"
         self.setGeneral()
 
     def setGeneral(self):
         self.stretch_mode.addItems(("Both", "LeftRight", "UpDown"))
         self.transparent.setText("100")
-        self.clear_after.addItems(("Yes", "No"))
 
         # 打开文件按钮布局
         group1 = QGroupBox("")
@@ -107,6 +102,7 @@ class ImageGeneral(QWidget):
         self.attributes = attributes
         self.file_name.setCompleter(QCompleter(self.attributes))
         self.rotate.setCompleter(QCompleter(self.attributes))
+        self.transparent.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
         """

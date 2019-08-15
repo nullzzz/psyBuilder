@@ -3,8 +3,8 @@ from PyQt5.QtGui import QPen, QTransform, QKeyEvent, QPainterPath
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
-from app.center.widget_tabs.events.newSlider.item.itemMenu import ItemMenu
 from app.center.widget_tabs.events.newSlider.item.lasso import Lasso
+from app.center.widget_tabs.events.newSlider.item.othItem import OthItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
 
 
@@ -59,12 +59,16 @@ class Scene(QGraphicsScene):
             item_type, ok = event.mimeData().data("item-type").toUInt()
             if PixItem.Image <= item_type <= PixItem.Sound:
                 item = PixItem(item_type)
-                self.addItem(item)
-                item.setPos(event.scenePos())
-                self.update()
-
-                self.itemAdd.emit(item.item_name)
-
+            elif OthItem.Snow <= item_type <= OthItem.Gabor:
+                item = OthItem(item_type)
+                item.getInfo()
+            else:
+                return
+            self.addItem(item)
+            item.setPos(event.scenePos())
+            item.setAttributes(self.attributes)
+            self.update()
+            self.itemAdd.emit(item.item_name)
             action = Qt.MoveAction
             event.setDropAction(action)
             event.accept()
@@ -135,15 +139,6 @@ class Scene(QGraphicsScene):
             if self.lasso is None:
                 self.lasso = Lasso(x, y)
                 self.addItem(self.lasso)
-            # rect0 = self.lasso.polygon().boundingRect()
-            #             # x0 = rect0.left()
-            #             # y0 = rect0.top()
-            #             #
-            #             # new_rect = QRectF(x0, y0, x - x0, y - y0)
-            #             # path = QPainterPath()
-            #             # path.addRect(new_rect)
-            #             # rect = path.toFillPolygon()
-            #             # self.lasso.setPolygon(rect)
             self.lasso.draw(x, y)
             self.update()
 
@@ -169,32 +164,29 @@ class Scene(QGraphicsScene):
         self.line = None
         super(Scene, self).mouseReleaseEvent(mouseEvent)
 
-    def toFront(self):
-        if not self.selectedItems():
-            return
+    def setProperties(self, properties: dict):
+        if isinstance(properties, dict):
+            self.clear()
+            for k, v in properties.items():
+                print("add", k)
+                print(v)
+                k: str
+                if k.startswith("image"):
+                    item = PixItem(PixItem.Image, k)
+                elif k.startswith("text"):
+                    item = PixItem(PixItem.Text, k)
+                elif k.startswith("video"):
+                    item = PixItem(PixItem.Video, k)
+                elif k.startswith("sound"):
+                    item = PixItem(PixItem.Sound, k)
+                elif k.startswith("snow"):
+                    item = OthItem(OthItem.Snow, k)
+                elif k.startswith("gabor"):
+                    item = OthItem(OthItem.Gabor, k)
+                self.addItem(item)
+                item.setProperties(v)
 
-        selected_item = self.selectedItems()[0]
-        overlap_items = selected_item.collidingItems()
-
-        z_value = 0
-        for item in overlap_items:
-            if item.zValue() >= z_value and (isinstance(item, DiaItem) or isinstance(item, PixItem)):
-                z_value = item.zValue() + 0.1
-        selected_item.setZValue(z_value)
-
-    def toBack(self):
-        if not self.selectedItems():
-            return
-
-        selected_item = self.selectedItems()[0]
-        overlap_items = selected_item.collidingItems()
-
-        z_value = 0
-        for item in overlap_items:
-            if item.zValue() <= z_value and (isinstance(item, DiaItem) or isinstance(item, PixItem)):
-                z_value = item.zValue() - 0.1
-        selected_item.setZValue(z_value)
-
-    def deleteItem(self):
-        for item in self.selectedItems():
-            self.scene.removeItem(item)
+    def setAttributes(self, attributes:list):
+        self.attributes = attributes
+        for item in self.items():
+            item.setAttributes(attributes)

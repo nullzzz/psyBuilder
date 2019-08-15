@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QB
 from quamash import QApplication
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
+from app.center.widget_tabs.events.newSlider.item.othItem import OthItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
 from app.center.widget_tabs.events.newSlider.leftBox import LeftBox
 from app.center.widget_tabs.events.newSlider.property import SliderProperty
@@ -15,8 +16,7 @@ from app.func import Func
 
 
 class Slider(QMainWindow):
-    propertiesChange = pyqtSignal(str)
-    InsertTextButton = 10
+    propertiesChange = pyqtSignal(dict)
 
     def __init__(self, widget_id):
         super(Slider, self).__init__()
@@ -124,26 +124,25 @@ class Slider(QMainWindow):
         self.pointer_group.addButton(lasso_bt, Scene.SelectItem)
         self.pointer_group.buttonClicked[int].connect(self.pointerGroupClicked)
 
-        # self.pointerToolbar = self.addToolBar("Pointer type")
         self.setting.addWidget(self.pointer_bt)
         self.setting.addWidget(line_bt)
         self.setting.addWidget(lasso_bt)
-
         self.background_bt = QToolButton()
         self.background_bt.setPopupMode(QToolButton.MenuButtonPopup)
         self.background_bt.setMenu(
             self.createBackgroundMenu(self.changeBackground))
         self.background_bt.setIcon(QIcon(Func.getImage("background4.png")))
         self.background_bt.clicked.connect(self.fillButtonTriggered)
-
         self.setting.addWidget(self.background_bt)
-
         self.view = QGraphicsView(self.scene)
         self.scene.setSceneRect(0, 0, 2000, 2000)
         self.scene.menu = self.itemMenu
 
         self.left_box = LeftBox()
-        self.left_box.clicked.connect(self.addItem)
+        self.default_properties: dict = {
+            "items": {},
+            "pro": self.pro_window.getInfo()
+        }
         self.setUI()
 
     def addItem(self, item_name: str):
@@ -163,8 +162,8 @@ class Slider(QMainWindow):
     def selectItem(self, item_name: str):
         self.scene.selectionChanged.disconnect()
         for item in self.scene.items():
-            if isinstance(item, PixItem):
-                item.setSelected(item_name == item.item_name)
+            if isinstance(item, PixItem) or isinstance(item, OthItem):
+                item.setSelected(item_name == item.getName())
         self.scene.selectionChanged.connect(self.changeItemList)
 
     def setUI(self):
@@ -186,11 +185,12 @@ class Slider(QMainWindow):
         item_info: dict = {}
         for item in self.scene.items():
             item_info[item.getName()] = item.getInfo()
-        self.default_properties = {**item_info, **self.pro_window.getInfo()}
+        self.default_properties = {
+            "items": item_info, "pro": self.pro_window.getInfo()}
         return self.default_properties
 
     def getProperties(self):
-        return {'none': 'none'}
+        return self.pro_window.default_properties
 
     def getHiddenAttribute(self):
         hidden_attr = {
@@ -244,17 +244,6 @@ class Slider(QMainWindow):
             if item.zValue() <= z_value and (isinstance(item, DiaItem) or isinstance(item, PixItem)):
                 z_value = item.zValue() - 0.1
         selected_item.setZValue(z_value)
-
-    #
-    # def itemInserted(self, item):
-    #     self.pointer_group.button(DiagramScene.MoveItem).setChecked(True)
-    #     self.scene.setMode(self.pointer_group.checkedId())
-    #     self.buttonGroup.button(item.diagram_type).setChecked(False)
-    #
-    # def pixitemInserted(self, item):
-    #     self.pointer_group.button(DiagramScene.MoveItem).setChecked(True)
-    #     self.scene.setMode(self.pointer_group.checkedId())
-    #     self.buttonGroup.button(item.diagram_type).setChecked(False)
 
     def itemColorChanged(self):
         self.fillAction = self.sender()
@@ -313,12 +302,10 @@ class Slider(QMainWindow):
         if items:
             items[0].openPro()
 
-    def refresh(self):
-        pass
-
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
+        self.scene.setAttributes(format_attributes)
 
     def createMenus(self):
         self.itemMenu = QMenu()
@@ -396,45 +383,22 @@ class Slider(QMainWindow):
         self.pro_window.loadSetting()
 
     def apply(self):
-        self.getinfo()
+        self.getInfo()
         # 发送信号
-        # self.propertiesChange.emit(self.default_properties)
+        self.propertiesChange.emit(self.pro_window.default_properties)
 
-    # def restore(self, properties: dict):
-    #     for d in properties:
-    #         if d == 'default_properties':
-    #             self.pro_window.setProperties(properties[d])
-    #         else:
-    #             dic = properties[d]
-    #             if dic['name'] == 'text':
-    #                 item = DiagramTextItem()
-    #                 item.restore(dic)
-    #                 item.setZValue(dic['z'])
-    #                 self.scene.addItem(item)
-    #                 item.setPos(QPoint(dic['x_pos'], dic['y_pos']))
-    #             elif dic['name'] < 4:
-    #                 item = DiagramItem(dic['name'], self.itemMenu, self.attributes)
-    #                 self.scene.addItem(item)
-    #                 item.restore(dic)
-    #                 item.setZValue(dic['z'])
-    #                 item.setPos(QPoint(int(dic['Center X']), int(dic['Center Y'])))
-    #             elif dic['name'] == 4:
-    #                 p1 = QPointF(int(dic['P1 X']), int(dic['P1 Y']))
-    #                 p2 = QPointF(int(dic['P2 X']), int(dic['P2 Y']))
-    #                 p3 = QPointF((p1.x() - p2.x()) / 2, (p1.y() - p2.y()) / 2)
-    #                 p4 = QPointF(-(p1.x() - p2.x()) / 2, -(p1.y() - p2.y()) / 2)
-    #                 item = DiagramItem(dic['name'], self.itemMenu, self.attributes, p3, p4)
-    #                 self.scene.addItem(item)
-    #                 item.restore(dic)
-    #                 item.setZValue(dic['z'])
-    #                 # print(QPoint(int(dic['Center X']), int(dic['Center Y'])))
-    #                 item.setPos(QPoint(int(dic['Center X']), int(dic['Center Y'])))
-    #             else:
-    #                 item = DiagramPixmapItem(dic['name'], self.itemMenu, self.attributes)
-    #                 item.restore(dic)
-    #                 self.scene.addItem(item)
-    #                 item.setZValue(dic['z'])
-    #                 item.setPos(QPoint(dic['x_pos'], dic['y_pos']))
+    def restore(self, properties: dict):
+        if isinstance(properties, dict):
+            self.default_properties = properties
+            pro: dict = self.default_properties.get("pro")
+            self.pro_window.setProperties(pro)
+
+            items: dict = self.default_properties.get("items")
+            self.scene.setProperties(items)
+
+            self.item_list.clear()
+            self.item_list.addItems(items.keys())
+            self.item_list.insertItem(0, "none")
 
     # def clone(self, widget_id: str):
     #     """

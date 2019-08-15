@@ -16,7 +16,7 @@ class PixItem(QGraphicsPixmapItem):
     """
     Image、Text、Video、Sound
     """
-    Image, Text, Video, Sound = 2, 3, 4, 5
+    Image, Text, Video, Sound = 4, 5, 6, 7
     name = {
         Image: "image",
         Text: "text",
@@ -24,11 +24,14 @@ class PixItem(QGraphicsPixmapItem):
         Sound: "sound",
     }
 
-    def __init__(self, pix_type, parent=None):
+    def __init__(self, item_type, item_name: str = "", parent=None):
         super(PixItem, self).__init__(parent)
 
-        self.item_type = pix_type
-        self.item_name = self.generateItemName()
+        self.item_type = item_type
+        if item_name:
+            self.item_name = item_name
+        else:
+            self.item_name = self.generateItemName()
 
         self.attributes: list = []
         if self.item_type == self.Image:
@@ -55,7 +58,7 @@ class PixItem(QGraphicsPixmapItem):
         self.keep_resize = False
 
         self.default_properties = {
-            'name': self.item_type,
+            'name': self.item_name,
             'z': self.zValue(),
             'x': 1,
             'y': 1,
@@ -116,16 +119,11 @@ class PixItem(QGraphicsPixmapItem):
 
     def openPro(self):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
-        self.setAttributes(self.attributes)
         self.pro_window.show()
 
     def setAttributes(self, attributes):
+        self.attributes = attributes
         self.pro_window.setAttributes(attributes)
-
-    def contextMenuEvent(self, event):
-        self.scene().clearSelection()
-        self.setSelected(True)
-        self.menu.exec_(event.screenPos())
 
     def ok(self):
         self.apply()
@@ -140,16 +138,26 @@ class PixItem(QGraphicsPixmapItem):
 
     def getInfo(self):
         self.default_properties = {
-            'name': self.item_type,
+            'name': self.item_name,
             'z': self.zValue(),
             'x': self.scenePos().x(),
             'y': self.scenePos().y(),
             **self.pro_window.getInfo(),
         }
+        return self.default_properties
 
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
+            self.default_properties = properties
             self.pro_window.setProperties(properties)
+            self.loadSetting()
+
+    def loadSetting(self):
+        x = self.default_properties.get("x", 0)
+        y = self.default_properties.get("y", 0)
+        z = self.default_properties.get("z", 0)
+        self.setPos(x, y)
+        self.setZValue(z)
 
     def clone(self):
         new = PixItem(self.item_type)
