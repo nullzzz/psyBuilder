@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget
 
-# soundOut event专属页面
-from app.center.widget_tabs.events.soundOut.soundGeneral import SoundTab1
+# sound event专属页面
+from app.center.widget_tabs.events.sound.soundGeneral import SoundTab1
 
 
 class SoundProperty(QWidget):

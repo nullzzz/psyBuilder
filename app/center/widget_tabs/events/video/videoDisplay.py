@@ -3,8 +3,9 @@ from PyQt5.QtGui import QIcon, QPalette, QKeyEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QLabel, QSizePolicy
-from lib.psy_message_box import PsyMessageBox as QMessageBox
+
 from app.func import Func
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from .videoProperty import VideoProperty
 
 
@@ -173,6 +174,12 @@ class VideoDisplay(QMainWindow):
 
     def bufferLoad(self, percentage: int):
         print(percentage)
+
+    def getShowProperties(self):
+        info = self.default_properties.copy()
+        info.pop("Input devices")
+        info.pop("Output devices")
+        return info
 
     @staticmethod
     def getStartTime(str_time):

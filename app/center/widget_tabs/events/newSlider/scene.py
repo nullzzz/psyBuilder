@@ -154,6 +154,11 @@ class Scene(QGraphicsScene):
 
         super(Scene, self).mouseReleaseEvent(mouseEvent)
 
+    def getInfo(self):
+        item_info: dict = {}
+        for item in self.items():
+            item_info[item.getName()] = item.getInfo()
+
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
             self.clear()

@@ -82,15 +82,18 @@ class Func(object):
             print("No such widget")
 
     @staticmethod
-    def getProperties(widget_id) -> dict:
+    def getProperties(widget_id, is_show: bool = False) -> dict:
         """
         按widget_id得到对应widget的属性
         :param widget_id:
+        :param is_show: 是否呈现在properties界面
         :return:
         """
         widget = Info.WID_WIDGET[widget_id]
         if hasattr(widget, "refresh"):
             widget.refresh()
+        if is_show and hasattr(widget, "getShowProperties"):
+            return widget.getShowProperties()
         return widget.getProperties()
 
     @staticmethod
@@ -256,7 +259,7 @@ class Func(object):
             from app.center.widget_tabs.events.text.textDisplay import TextDisplay
             widget = TextDisplay(widget_id=widget_id)
         elif widget_type == Info.SOUND:
-            from app.center.widget_tabs.events.soundOut.soundDisplay import SoundDisplay
+            from app.center.widget_tabs.events.sound.soundDisplay import SoundDisplay
             widget = SoundDisplay(widget_id=widget_id)
         elif widget_type == Info.SLIDER:
             from app.center.widget_tabs.events.slider.slider import Slider

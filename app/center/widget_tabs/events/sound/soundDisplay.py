@@ -4,7 +4,7 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaPlaylist
 from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QToolBar, QPushButton, QSlider, QWidget, \
     QGridLayout, QLabel, QVBoxLayout
 
-from app.center.widget_tabs.events.soundOut.soundProperty import SoundProperty
+from app.center.widget_tabs.events.sound.soundProperty import SoundProperty
 from app.func import Func
 from lib.psy_message_box import PsyMessageBox as QMessageBox
 
@@ -210,6 +210,12 @@ class SoundDisplay(QMainWindow):
 
     def getProperties(self):
         return self.getInfo()
+
+    def getShowProperties(self):
+        info = self.default_properties.copy()
+        info.pop("Input devices")
+        info.pop("Output devices")
+        return info
 
     def restore(self, properties: dict):
         if properties:

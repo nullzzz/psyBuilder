@@ -23,7 +23,7 @@ class Properties(QDockWidget):
         :return: 
         """
         if isinstance(wid_or_data, str):
-            properties = Func.getProperties(wid_or_data)
+            properties = Func.getProperties(wid_or_data, True)
         elif isinstance(wid_or_data, dict):
             properties = wid_or_data
         else:
