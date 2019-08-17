@@ -6,7 +6,7 @@ from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
 
 
-# soundOut event专属页面
+# sound event专属页面
 class SoundGeneral(QWidget):
     def __init__(self, parent=None):
         super(SoundGeneral, self).__init__(parent)

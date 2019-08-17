@@ -142,6 +142,13 @@ class TextDisplay(QMainWindow):
         self.default_properties = self.pro_window.getInfo()
         return self.default_properties
 
+    def getShowProperties(self):
+        info = self.default_properties.copy()
+        info.pop("Html")
+        info.pop("Input devices")
+        info.pop("Output devices")
+        return info
+
     def restore(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()

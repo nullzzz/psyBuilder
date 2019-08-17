@@ -2,9 +2,9 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QFileInfo, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QImage
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction, QLabel
-from lib.psy_message_box import PsyMessageBox as QMessageBox
 
 from app.func import Func
+from lib.psy_message_box import PsyMessageBox as QMessageBox
 from .imageProperty import ImageProperty
 from .view import Preview
 
@@ -173,6 +173,12 @@ class ImageDisplay(QMainWindow):
 
     def getProperties(self):
         return self.getInfo()
+
+    def getShowProperties(self):
+        info = self.default_properties.copy()
+        info.pop("Input devices")
+        info.pop("Output devices")
+        return info
 
     def restore(self, properties: dict):
         if properties:

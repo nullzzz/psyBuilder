@@ -200,7 +200,7 @@ class GaborGeneral(QWidget):
         self.rotation.setCurrentText(self.default_properties["Rotation"])
         self.transparency.setCurrentText(self.default_properties["Transparency"])
 
-    # def clone(self):
-    #     clone_page = FramePage()
-    #     clone_page.setProperties(self.default_properties)
-    #     return clone_page
+    def clone(self):
+        clone_page = GaborGeneral()
+        clone_page.setProperties(self.default_properties)
+        return clone_page

@@ -110,7 +110,7 @@ class Info(object):
     # widget不同类型对应图片
     WIDGET_TYPE_IMAGE_PATH = {
         CYCLE: os.path.join(IMAGE_SOURCE_PATH, "cycle.png"),
-        SOUND: os.path.join(IMAGE_SOURCE_PATH, "soundOut.png"),
+        SOUND: os.path.join(IMAGE_SOURCE_PATH, "sound.png"),
         TEXT: os.path.join(IMAGE_SOURCE_PATH, "text.png"),
         IMAGE: os.path.join(IMAGE_SOURCE_PATH, "image.png"),
         VIDEO: os.path.join(IMAGE_SOURCE_PATH, "video.png"),

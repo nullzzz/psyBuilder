@@ -1,13 +1,9 @@
-import sys
-
 from PyQt5.QtCore import pyqtSignal, Qt, QRect
 from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMainWindow, QMenu, QAction, \
-    QComboBox, QColorDialog, QDesktopWidget, QGraphicsTextItem
-from quamash import QApplication
+    QComboBox, QColorDialog
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
-from app.center.widget_tabs.events.newSlider.item.lasso import Lasso
 from app.center.widget_tabs.events.newSlider.item.linItem import LineItem
 from app.center.widget_tabs.events.newSlider.item.otherItem import OtherItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
@@ -64,9 +60,10 @@ class Slider(QMainWindow):
         self.item_list.addItem("none")
         self.item_list.currentTextChanged.connect(self.selectItem)
 
-        self.item_pro_windows = QAction(QIcon(Func.getImage("item_pro.png")), "open item properties", self)
+        self.item_pro_windows = QAction(QIcon(Func.getImage("item.png")), "open item properties", self)
         self.item_pro_windows.setToolTip("Open current item's properties")
         self.item_pro_windows.triggered.connect(self.openItem)
+        self.item_pro_windows.setEnabled(False)
 
         self.setting = self.addToolBar('Setting')
         self.setting.addAction(self.open_action)
@@ -137,12 +134,10 @@ class Slider(QMainWindow):
         self.background_bt.clicked.connect(self.fillButtonTriggered)
         self.setting.addWidget(self.background_bt)
 
-        # text3 = QGraphicsTextItem()
+        self.view = QGraphicsView(self.scene)
 
         width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
         self.scene.setSceneRect(0, 0, width, height)
-        self.view = QGraphicsView(self.scene)
-        # print(f"{self.view.x()},{self.view.y()},{self.view.width()},{self.view.height()}")
         self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
         self.scene.menu = self.itemMenu
 
@@ -169,6 +164,7 @@ class Slider(QMainWindow):
 
     def selectItem(self, item_name: str):
         self.scene.selectionChanged.disconnect()
+        self.item_pro_windows.setEnabled(item_name != "none")
         for item in self.scene.items():
             if isinstance(item, PixItem) or isinstance(item, LineItem) or isinstance(item, OtherItem):
                 item.setSelected(item_name == item.getName())
@@ -208,17 +204,20 @@ class Slider(QMainWindow):
         self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
     def getInfo(self):
-        item_info: dict = {}
-        for item in self.scene.items():
-            item_info[item.getName()] = item.getInfo()
         self.default_properties = {
-            "items": item_info,
+            "items": self.scene.getInfo(),
             "pro": self.pro_window.getInfo()
         }
         return self.default_properties
 
     def getProperties(self):
-        return self.pro_window.default_properties
+        return self.default_properties
+
+    def getShowProperties(self):
+        info = self.pro_window.default_properties.copy()
+        info.pop("Input devices")
+        info.pop("Output devices")
+        return info
 
     def getHiddenAttribute(self):
         hidden_attr = {
@@ -405,7 +404,6 @@ class Slider(QMainWindow):
     def apply(self):
         self.getInfo()
         # 发送信号
-        self.refresh()
         self.propertiesChange.emit(self.pro_window.default_properties)
 
     def restore(self, properties: dict):
@@ -427,14 +425,10 @@ class Slider(QMainWindow):
         :param widget_id:
         :return:
         """
-        slider = Slider(widget_id=widget_id)
-        slider.pro_window.setProperties(self.pro_window.getInfo())
-        for item in self.scene.items():
-            item1 = item.clone()
-            slider.scene.addItem(item1)
-            item1.setPos(item.scenePos())
-            slider.scene.update()
-        return slider
+        clone_page = Slider(widget_id=widget_id)
+        clone_page.pro_window.setProperties(self.pro_window.getInfo())
+        clone_page.scene.setProperties(self.scene.getInfo())
+        return clone_page
 
     def changeWidgetId(self, new_widget_id: str):
         """
