@@ -13,41 +13,31 @@ class TextGeneral(QWidget):
         self.attributes: list = []
 
         self.default_properties = {
-            "Text": "",
-            "Alignment": "center",
+            "Text": "Hello World",
+            "Center X": "0",
+            "Center Y": "0",
             "Fore color": "0,0,0",
             "Back color": "255,255,255",
             "Transparent": "100%",
-            "Word wrap": 0,
         }
 
-        self.text_edit = QTextEdit()
-        self.text_edit.setLineWrapMode(QTextEdit.FixedColumnWidth)
-        self.html = ""
-        self.align_mode = "center"
 
-        self.align_x = PigComboBox()
-        self.align_x.setEditable(True)
-        self.align_x.currentTextChanged.connect(self.alignChange)
-        self.align_y = PigComboBox()
-        self.align_y.setEditable(True)
-        self.align_y.currentTextChanged.connect(self.alignChange)
+        self.x_pos = PigComboBox()
+        self.x_pos.setEditable(True)
+
+        self.y_pos = PigComboBox()
+        self.y_pos.setEditable(True)
+
 
         self.fore_color = ColorListEditor()
         self.back_color = ColorListEditor()
         self.fore_color.setCurrentText("black")
-        self.fore_color_name = "black"
-        self.back_color_name = "white"
-        self.fore_color.colorChanged.connect(self.colorChange)
-        self.back_color.colorChanged.connect(self.colorChange)
 
-        self.clear_after = PigComboBox()
+        # self.fore_color_name = "black"
+        # self.back_color_name = "white"
+
         self.transparent = PigLineEdit("100%")
         self.transparent.setReg(r"0%|[1-9]\d%|100%")
-        self.word_wrap = PigLineEdit("80")
-        self.word_wrap.setReg(r"\d+")
-        self.word_wrap.textChanged.connect(self.wrapChange)
-        self.text_edit.setLineWrapColumnOrWidth(80)
 
         self.flip_horizontal = PigComboBox()
         self.flip_horizontal.addItems(("False", "True"))
@@ -55,19 +45,17 @@ class TextGeneral(QWidget):
         self.flip_vertical.addItems(("False", "True"))
 
         self.font_box = QFontComboBox()
-        self.font_box.currentFontChanged.connect(self.fontChange)
+
         self.style_box = PigComboBox()
         self.style_box.setEditable(True)
         self.style_box.addItems(
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
-        self.style_box.currentTextChanged.connect(self.fontChange)
+        # self.style_box.currentTextChanged.connect(self.fontChange)
         self.font_size_box = PigComboBox()
         self.font_size_box.setReg(r"\d+")
         self.font_size_box.setEditable(True)
         for i in range(12, 72, 2):
             self.font_size_box.addItem(str(i))
-
-        self.font_size_box.currentIndexChanged.connect(self.fontChange)
 
         self.right_to_left = PigComboBox()
         self.right_to_left.addItems(("no", "yes"))
@@ -75,88 +63,82 @@ class TextGeneral(QWidget):
         self.setUI()
 
     def setUI(self):
-        l0 = QLabel("Text:")
+        # l0 = QLabel("Text:")
 
-        l00 = QLabel("Alignment X:")
-        l10 = QLabel("Alignment Y:")
+        l00 = QLabel("Center X:")
+        l10 = QLabel("Center Y:")
 
         l02 = QLabel("Fore Color:")
         l12 = QLabel("Back Color:")
 
         l30 = QLabel("Transparent:")
-        l32 = QLabel("Wrapat Chars:")
+        # l32 = QLabel("Wrapat Chars:")
 
-        l40 = QLabel("flip Horizontal:")
-        l42 = QLabel("flip Vertical:")
+        # l40 = QLabel("flip Horizontal:")
+        # l42 = QLabel("flip Vertical:")
 
         l50 = QLabel("Font Family:")
         l52 = QLabel("Style:")
         l60 = QLabel("Font Size:")
         l70 = QLabel("Right to Left:")
 
-        l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l00.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l02.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l10.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l12.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         l30.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l32.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l40.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l42.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l32.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l40.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l42.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l50.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l52.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l60.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l70.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        self.align_x.addItems(["center", "left", "right", "wrapat", "justifytomax"])
-        self.align_y.addItem("center")
-
-        group1 = QGroupBox("Text")
-        layout1 = QGridLayout()
-        layout1.addWidget(self.text_edit, 0, 0)
-        group1.setLayout(layout1)
+        # self.x_pos.addItems("0")
+        # self.y_pos.addItem("0")
 
         group2 = QGroupBox("")
         layout2 = QGridLayout()
+
         layout2.addWidget(l00, 0, 0)
-        layout2.addWidget(self.align_x, 0, 1)
+        layout2.addWidget(self.x_pos, 0, 1)
         layout2.addWidget(l10, 1, 0)
-        layout2.addWidget(self.align_y, 1, 1)
+        layout2.addWidget(self.y_pos, 1, 1)
 
-        layout2.addWidget(l02, 0, 2)
-        layout2.addWidget(self.fore_color, 0, 3)
-        layout2.addWidget(l12, 1, 2)
-        layout2.addWidget(self.back_color, 1, 3)
-
+        layout2.addWidget(l02, 0, 2, 1, 2)
+        layout2.addWidget(self.fore_color, 0, 4)
+        layout2.addWidget(l12, 1, 2, 1, 2)
+        layout2.addWidget(self.back_color, 1, 4)
         layout2.addWidget(l30, 2, 0)
+
         layout2.addWidget(self.transparent, 2, 1)
-        layout2.addWidget(l32, 2, 2)
-        layout2.addWidget(self.word_wrap, 2, 3)
-
-        layout2.addWidget(l40, 3, 0)
-        layout2.addWidget(self.flip_horizontal, 3, 1)
-        layout2.addWidget(l42, 3, 2)
-        layout2.addWidget(self.flip_vertical, 3, 3)
-
+        layout2.addWidget(l70, 2, 2, 1, 2)
+        layout2.addWidget(self.right_to_left, 2, 4)
+        # layout2.addWidget(l40, 3, 0)
+        # layout2.addWidget(self.flip_horizontal, 3, 1)
+        # layout2.addWidget(l42, 3, 2)
+        # layout2.addWidget(self.flip_vertical, 3, 3)
         layout2.addWidget(l50, 4, 0)
         layout2.addWidget(self.font_box, 4, 1, 1, 3)
-        layout2.addWidget(l52, 5, 2)
-        layout2.addWidget(self.style_box, 5, 3)
+
         layout2.addWidget(l60, 5, 0)
         layout2.addWidget(self.font_size_box, 5, 1)
-        layout2.addWidget(l70, 6, 0)
-        layout2.addWidget(self.right_to_left, 6, 1)
+        layout2.addWidget(l52, 5, 2, 1, 2)
+        layout2.addWidget(self.style_box, 5, 4)
+        # layout2.addWidget(l70, 6, 0)
+        # layout2.addWidget(self.right_to_left, 6, 1)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
-        layout.addWidget(group1, 1)
-        layout.addWidget(group2, 2)
+        # layout.addWidget(group1, 1)
+        layout.addWidget(group2, 1)
+
         self.setLayout(layout)
 
-    def refresh(self):
-        pass
-
+    """
     def colorChange(self, color: str):
         r, g, b = 255, 255, 255
         if "," in color:
@@ -220,59 +202,61 @@ class TextGeneral(QWidget):
         font.setOverline(bool(style & 16))
 
         self.text_edit.setFont(font)
-
+    
+    def refresh(self):
+        pass
+    """
     def setAttributes(self, attributes):
         self.attributes = attributes
-        self.align_x.setCompleter(QCompleter(self.attributes))
-        self.align_y.setCompleter(QCompleter(self.attributes))
+        self.x_pos.setCompleter(QCompleter(self.attributes))
+        self.y_pos.setCompleter(QCompleter(self.attributes))
         self.fore_color.setCompleter(QCompleter(self.attributes))
         self.back_color.setCompleter(QCompleter(self.attributes))
         self.transparent.setCompleter(QCompleter(self.attributes))
-        self.word_wrap.setCompleter(QCompleter(self.attributes))
+        self.right_to_left.setCompleter(QCompleter(self.attributes))
         self.font_size_box.setCompleter(QCompleter(self.attributes))
         self.style_box.setCompleter(QCompleter(self.attributes))
 
-    def apply(self):
-        self.html = self.text_edit.toHtml()
+    # def apply(self):
+    #     self.html = self.text_edit.toHtml()
 
     def getInfo(self):
         self.default_properties.clear()
-        self.default_properties["Html"] = self.html
-        self.default_properties["Text"] = self.text_edit.toPlainText()
-        self.default_properties["Alignment X"] = self.align_x.currentText()
-        self.default_properties["Alignment Y"] = self.align_y.currentText()
+        # self.default_properties["Html"] = self.html
+        # self.default_properties["Text"] = self.text_edit.toPlainText()
+        self.default_properties["Center X"] = self.x_pos.currentText()
+        self.default_properties["Center Y"] = self.y_pos.currentText()
         self.default_properties["Fore color"] = self.fore_color.getColor()
         self.default_properties["Back color"] = self.back_color.getColor()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Font family"] = self.font_box.currentText()
         self.default_properties["Font size"] = self.font_size_box.currentText()
-        self.default_properties["Wrapat chars"] = self.word_wrap.text()
         self.default_properties["Style"] = self.style_box.currentText()
-        self.default_properties["Flip horizontal"] = self.flip_horizontal.currentText()
-        self.default_properties["Flip vertical"] = self.flip_vertical.currentText()
+        # self.default_properties["Flip horizontal"] = self.flip_horizontal.currentText()
+        # self.default_properties["Flip vertical"] = self.flip_vertical.currentText()
         self.default_properties["Right to left"] = self.right_to_left.currentText()
 
         return self.default_properties
 
     def setProperties(self, properties: dict, html: str):
         self.default_properties = properties.copy()
-        self.html = html
+        # self.html = html
         self.loadSetting()
 
     def loadSetting(self):
-        self.text_edit.setHtml(self.html)
-        self.align_x.setCurrentText(self.default_properties["Alignment X"])
-        self.align_y.setCurrentText(self.default_properties["Alignment Y"])
+        # self.text_edit.setHtml(self.html)
+        self.x_pos.setCurrentText(self.default_properties["Center X"])
+        self.y_pos.setCurrentText(self.default_properties["Center Y"])
         self.fore_color.setCurrentText(self.default_properties["Fore color"])
         self.back_color.setCurrentText(self.default_properties["Back color"])
         self.transparent.setText(self.default_properties["Transparent"])
-        self.word_wrap.setText(self.default_properties["Wrapat chars"])
+        self.right_to_left.setCurrentText(self.default_properties["Right to left"])
+        # self.word_wrap.setText(self.default_properties["Wrapat chars"])
         self.font_box.setCurrentText(self.default_properties["Font family"])
         self.font_size_box.setCurrentText(self.default_properties["Font size"])
         self.style_box.setCurrentText(self.default_properties["Style"])
-        self.flip_horizontal.setCurrentText(self.default_properties["Flip horizontal"])
-        self.flip_vertical.setCurrentText(self.default_properties["Flip vertical"])
-        self.right_to_left.setCurrentText(self.default_properties["Right to left"])
+        # self.flip_horizontal.setCurrentText(self.default_properties["Flip horizontal"])
+        # self.flip_vertical.setCurrentText(self.default_properties["Flip vertical"])
 
     def clone(self):
         clone_page = TextGeneral()

@@ -8,10 +8,9 @@ class TextProperty(QWidget):
         super(TextProperty, self).__init__(parent)
         self.tab = QTabWidget()
         self.below = QWidget()
-
         self.general = TextGeneral()
 
-        self.html = self.general.html
+        # self.html = self.general.html
 
         self.default_properties = self.general.getInfo()
 
@@ -48,7 +47,7 @@ class TextProperty(QWidget):
 
     def getInfo(self):
         self.general.apply()
-        self.html = self.general.html
+        # self.html = self.general.html
         self.default_properties = self.general.getInfo()
         return self.default_properties
 
@@ -68,6 +67,6 @@ class TextProperty(QWidget):
 
     def clone(self):
         clone_page = TextProperty()
-        clone_page.setOther(self.html)
+        # clone_page.setOther(self.html)
         clone_page.setProperties(self.default_properties)
         return clone_page

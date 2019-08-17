@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtCore import pyqtSignal, Qt, QRect
 from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMainWindow, QMenu, QAction, \
-    QComboBox, QColorDialog, QDesktopWidget
+    QComboBox, QColorDialog, QDesktopWidget, QGraphicsTextItem
 from quamash import QApplication
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
@@ -64,7 +64,7 @@ class Slider(QMainWindow):
         self.item_list.addItem("none")
         self.item_list.currentTextChanged.connect(self.selectItem)
 
-        self.item_pro_windows = QAction(QIcon(Func.getImage("item.png")), "open item properties", self)
+        self.item_pro_windows = QAction(QIcon(Func.getImage("item_pro.png")), "open item properties", self)
         self.item_pro_windows.setToolTip("Open current item's properties")
         self.item_pro_windows.triggered.connect(self.openItem)
 
@@ -137,10 +137,12 @@ class Slider(QMainWindow):
         self.background_bt.clicked.connect(self.fillButtonTriggered)
         self.setting.addWidget(self.background_bt)
 
-        self.view = QGraphicsView(self.scene)
+        # text3 = QGraphicsTextItem()
 
         width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
         self.scene.setSceneRect(0, 0, width, height)
+        self.view = QGraphicsView(self.scene)
+        # print(f"{self.view.x()},{self.view.y()},{self.view.width()},{self.view.height()}")
         self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
         self.scene.menu = self.itemMenu
 
@@ -403,6 +405,7 @@ class Slider(QMainWindow):
     def apply(self):
         self.getInfo()
         # 发送信号
+        self.refresh()
         self.propertiesChange.emit(self.pro_window.default_properties)
 
     def restore(self, properties: dict):

@@ -14,13 +14,13 @@ from app.info import Info
 
 
 class PixItem(QGraphicsPixmapItem):
-    # Video, Picture, Sound, Snow, Gabor = 5, 6, 7, 8, 9
-    Image = Info.ITEM_IMAGE
-    Text = Info.ITEM_TEXT
-    Video = Info.ITEM_VIDEO
-    Sound = Info.ITEM_SOUND
-    Snow = Info.ITEM_SNOW
-    Gabor = Info.ITEM_GABOR
+    Image,Text, Video, Sound, Snow, Gabor = range(5,11)
+    # Image = Info.ITEM_IMAGE
+    # Text = Info.ITEM_TEXT
+    # Video = Info.ITEM_VIDEO
+    # Sound = Info.ITEM_SOUND
+    # Snow = Info.ITEM_SNOW
+    # Gabor = Info.ITEM_GABOR
 
     def __init__(self, diagramType, contextMenu, attributes=None, parent=None):
         super(PixItem, self).__init__(parent)
@@ -84,7 +84,7 @@ class PixItem(QGraphicsPixmapItem):
     def mouseMoveEvent(self, mouseEvent):
         x = mouseEvent.pos().x()
         y = mouseEvent.pos().y()
-        if self.diagramType > 7:
+        if self.diagramType in [5,6]:
             self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
         if self.arbitrary_resize:
             self.resizingFlag = True

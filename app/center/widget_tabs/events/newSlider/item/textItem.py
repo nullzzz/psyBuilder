@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsItem
 
 # 画图
 from app.center.widget_tabs.events.newSlider.image.imageProperty import ImageProperty
@@ -12,59 +12,58 @@ from app.func import Func
 from app.info import Info
 
 
-class PixItem(QGraphicsPixmapItem):
+class TextItem(QGraphicsTextItem):
     """
-    Image、Text、Video、Sound
+    Text
     """
-    Image, Text, Video, Sound = range(5, 9)
+    # Image, Text, Video, Sound = range(5, 9)
+    Text = 6
 
     name = {
-        Image: "image",
+        # Image: "image",
         Text: "text",
-        Video: "video",
-        Sound: "sound",
+        # Video: "video",
+        # Sound: "sound",
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):
-        super(PixItem, self).__init__(parent)
+        super(TextItem, self).__init__(parent)
 
         self.item_type = item_type
 
         self.item_name = item_name if item_name else self.generateItemName()
 
         self.attributes: list = []
-        if self.item_type == self.Image:
-            self.pro_window = ImageProperty()
-            self.setPixmap(QPixmap(Func.getImage("image.png")).scaled(100, 100))
-        elif self.item_type == self.Text:
+
+        if self.item_type == self.Text:
             self.pro_window = TextProperty()
-            # insert new text item here
-            self.setPixmap(QPixmap(Func.getImage("text.png")).scaled(100, 100))
-        elif self.item_type == self.Video:
-            self.pro_window = VideoProperty()
-            self.setPixmap(QPixmap(Func.getImage("video.png")).scaled(100, 100))
-        elif self.item_type == self.Sound:
-            self.pro_window = SoundProperty()
-            self.setPixmap(QPixmap(Func.getImage("sound.png")).scaled(100, 100))
+
+            self.setPlainText('Hello World')
+            # print(f"line 42 {self.toPlainText()}")
+            self.setTextInteractionFlags(Qt.TextEditorInteraction)
+
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
+        self.setFlag(QGraphicsItem.ItemIsFocusable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        # self.flag = False
-        # self.arbitrary_resize = False
-        # self.keep_resize = False
 
         self.default_properties = {
-            'name': self.item_name,
+            'name': 'text',
+            'family': 'SimSun',
+            'size': 1,
+            # 'B': False,
+            # 'I': False,
+            # 'U': False,
+            'color': self.defaultTextColor(),
+            'text': 'Hello World',
             'z': self.zValue(),
-            'x': 1,
-            'y': 1,
-            **self.pro_window.default_properties
+            'x_pos': 1,
+            'y_pos': 1
         }
-
         self.menu = ItemMenu()
 
     def generateItemName(self) -> str:
@@ -114,8 +113,8 @@ class PixItem(QGraphicsPixmapItem):
     #     self.flag = False
     #     super(PixItem, self).mouseReleaseEvent(event)
 
-    def mouseDoubleClickEvent(self, event):
-        self.openPro()
+    # def mouseDoubleClickEvent(self, event):
+    #     self.openPro()
 
     def openPro(self):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
@@ -146,6 +145,9 @@ class PixItem(QGraphicsPixmapItem):
         }
         return self.default_properties
 
+    def getText(self) -> str:
+        return self.toPlainText()
+
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
             self.default_properties = properties
@@ -160,10 +162,12 @@ class PixItem(QGraphicsPixmapItem):
         self.setZValue(z)
 
     def clone(self):
-        new = PixItem(self.item_type)
+        new = TextItem(self.item_type)
         properties = self.pro_window.getInfo()
         new.pro_window.setProperties(properties)
-        new.setPixmap(self.pixmap())
+
+        new.setPlainText(self.toPlainText()) # a bug here
+        new.setTextInteractionFlags(Qt.TextEditorInteraction)
         new.setZValue(self.zValue())
 
         return new

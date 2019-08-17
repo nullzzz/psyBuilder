@@ -617,16 +617,22 @@ class Func(object):
     @staticmethod
     def getCurrentScreenRes(screen_id: str) -> tuple:
         resolution = Info.OUTPUT_DEVICE_INFO[screen_id].get('Resolution', "auto")
+        print(f"------------/")
+
+        print(f"{screen_id}")
 
         wh = resolution.lower().split('x')
 
         if len(wh) > 1:
             width = int(wh[0])
             height = int(wh[1])
+            print(f"{width},{height}")
         else:
             scr_rect = QDesktopWidget().screenGeometry()
             width = scr_rect.width()
             height = scr_rect.height()
+            print(f"{scr_rect}")
+        print(f"------------\\")
         return width, height
 
     @staticmethod

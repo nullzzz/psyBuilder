@@ -39,7 +39,7 @@ class Button(QPushButton):
 
 class Slider(QMainWindow):
     propertiesChange = pyqtSignal(str)
-    InsertTextButton = Info.ITEM_TEXT
+    InsertTextButton = 6
 
     def __init__(self, widget_id):
         super(Slider, self).__init__()
@@ -116,7 +116,7 @@ class Slider(QMainWindow):
         for button in buttons:
             if self.buttonGroup.button(id) != button:
                 button.setChecked(False)
-        print(f"line 119: {id}")
+        # print(f"line 119: {id}")
         if id == self.InsertTextButton:
             self.scene.setMode(Scene.InsertText)
         else:

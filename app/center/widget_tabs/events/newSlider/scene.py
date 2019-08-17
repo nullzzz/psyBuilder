@@ -7,6 +7,7 @@ from app.center.widget_tabs.events.newSlider.item.lasso import Lasso
 from app.center.widget_tabs.events.newSlider.item.linItem import LineItem
 from app.center.widget_tabs.events.newSlider.item.otherItem import OtherItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
+from app.center.widget_tabs.events.newSlider.item.textItem import TextItem
 
 
 class Scene(QGraphicsScene):
@@ -59,7 +60,9 @@ class Scene(QGraphicsScene):
             # 添加图形
             # if self.my_mode == self.InsertItem:
             item_type, ok = event.mimeData().data("item-type").toUInt()
-            if PixItem.Image <= item_type <= PixItem.Sound:
+            if TextItem.Text == item_type:
+                item = TextItem(item_type)
+            elif PixItem.Image <= item_type <= PixItem.Sound:
                 item = PixItem(item_type)
             elif OtherItem.Snow <= item_type <= OtherItem.Gabor:
                 item = OtherItem(item_type)
@@ -151,6 +154,7 @@ class Scene(QGraphicsScene):
             self.removeItem(self.lasso)
             self.lasso = None
 
+
         super(Scene, self).mouseReleaseEvent(mouseEvent)
 
     def setProperties(self, properties: dict):
@@ -163,7 +167,7 @@ class Scene(QGraphicsScene):
                 if k.startswith("image"):
                     item = PixItem(PixItem.Image, k)
                 elif k.startswith("text"):
-                    item = PixItem(PixItem.Text, k)
+                    item = TextItem(TextItem.Text, k)
                 elif k.startswith("video"):
                     item = PixItem(PixItem.Video, k)
                 elif k.startswith("sound"):
