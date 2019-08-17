@@ -39,7 +39,7 @@ class Button(QPushButton):
 
 class Slider(QMainWindow):
     propertiesChange = pyqtSignal(str)
-    InsertTextButton = Info.ITEM_TEXT
+    InsertTextButton = 10
 
     def __init__(self, widget_id):
         super(Slider, self).__init__()

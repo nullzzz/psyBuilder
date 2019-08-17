@@ -8,12 +8,12 @@ from app.info import Info
 
 
 class DiaItem(QGraphicsPolygonItem):
-    # Polygon, Arc, Circle, Rect, Line = range(5)
-    Line = Info.ITEM_LINE
-    Polygon = Info.ITEM_POLYGON
-    Circle = Info.ITEM_CIRCLE
-    Arc = Info.ITEM_ARC
-    Rect = Info.ITEM_RECT
+    Polygon, Arc, Circle, Rect, Line = range(5)
+    # Line = Info.ITEM_LINE
+    # Polygon = Info.ITEM_POLYGON
+    # Circle = Info.ITEM_CIRCLE
+    # Arc = Info.ITEM_ARC
+    # Rect = Info.ITEM_RECT
 
     def __init__(self, diagramType, contextMenu, attributes=None, p1=None, p2=None, parent=None,
                  scene=None):

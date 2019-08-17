@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QByteArray, QDataStream, QIODevice, QMimeData, pyqtSignal
+from PyQt5.QtCore import Qt, QByteArray, QDataStream, QIODevice, QMimeData, pyqtSignal, QSize
 from PyQt5.QtGui import QDrag, QIcon
 from PyQt5.QtWidgets import QPushButton, QWidget, QGridLayout, QLabel, QToolBox, QSizePolicy, QFormLayout
 
@@ -60,6 +60,8 @@ class Button(QPushButton):
         self.item_type = item_type
         fp = Func.getImage(f"{text}.png")
         self.setIcon(QIcon(fp))
+        # self.setIconSize(QSize(62, 100))
+        self.setMouseTracking(True)
 
     def mouseMoveEvent(self, e):
         if e.buttons() != Qt.LeftButton:

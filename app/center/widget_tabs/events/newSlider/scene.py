@@ -24,7 +24,6 @@ class Scene(QGraphicsScene):
         self.attributes = []
         self.line = None
         self.lasso = None
-        self.path = QPainterPath()
 
         self.line_color = Qt.black
         self.fill_color = Qt.transparent
@@ -70,7 +69,7 @@ class Scene(QGraphicsScene):
             item.setPos(event.scenePos())
             item.setAttributes(self.attributes)
             self.update()
-            self.itemAdd.emit(item.item_name)
+            self.itemAdd.emit(item.getName())
             action = Qt.MoveAction
             event.setDropAction(action)
             event.accept()
@@ -104,6 +103,9 @@ class Scene(QGraphicsScene):
         self.my_mode = mode
 
     def mousePressEvent(self, event):
+        if self.lasso:
+            self.removeItem(self.lasso)
+            self.lasso = None
         if event.button() == Qt.LeftButton:
             if self.my_mode == self.InsertLine:
                 self.line = QGraphicsLineItem(QLineF(event.scenePos(),
@@ -111,10 +113,9 @@ class Scene(QGraphicsScene):
                 self.line.setPen(QPen(self.line_color, 2))
                 self.addItem(self.line)
             elif self.my_mode == self.SelectItem:
-                self.press_x = event.scenePos().x()
-                self.press_y = event.scenePos().y()
-                it = self.itemAt(self.press_x, self.press_y, self.t)
-                self.lasso = Lasso(self.press_x, self.press_y)
+                x = event.scenePos().x()
+                y = event.scenePos().y()
+                self.lasso = Lasso(x, y)
                 self.addItem(self.lasso)
         super(Scene, self).mousePressEvent(event)
 
@@ -157,8 +158,6 @@ class Scene(QGraphicsScene):
         if isinstance(properties, dict):
             self.clear()
             for k, v in properties.items():
-                print("add", k)
-                print(v)
                 k: str
                 if k.startswith("image"):
                     item = PixItem(PixItem.Image, k)

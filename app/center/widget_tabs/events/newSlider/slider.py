@@ -67,6 +67,7 @@ class Slider(QMainWindow):
         self.item_pro_windows = QAction(QIcon(Func.getImage("item.png")), "open item properties", self)
         self.item_pro_windows.setToolTip("Open current item's properties")
         self.item_pro_windows.triggered.connect(self.openItem)
+        self.item_pro_windows.setEnabled(False)
 
         self.setting = self.addToolBar('Setting')
         self.setting.addAction(self.open_action)
@@ -167,6 +168,7 @@ class Slider(QMainWindow):
 
     def selectItem(self, item_name: str):
         self.scene.selectionChanged.disconnect()
+        self.item_pro_windows.setEnabled(item_name != "none")
         for item in self.scene.items():
             if isinstance(item, PixItem) or isinstance(item, LineItem) or isinstance(item, OtherItem):
                 item.setSelected(item_name == item.getName())

@@ -58,3 +58,6 @@ class GaborProperty(QWidget):
 
     def loadSetting(self):
         self.general.setProperties(self.default_properties)
+
+    def clone(self):
+        pass
