@@ -224,9 +224,10 @@ class TextGeneral(QWidget):
         self.default_properties.clear()
         # self.default_properties["Html"] = self.html
         # self.default_properties["Text"] = self.text_edit.toPlainText()
-        self.default_properties["Center X"] = self.x_pos.currentText()
-        self.default_properties["Center Y"] = self.y_pos.currentText()
+        self.default_properties["Center x"] = self.x_pos.currentText()
+        self.default_properties["Center y"] = self.y_pos.currentText()
         self.default_properties["Fore color"] = self.fore_color.getColor()
+        # print(f"line 230 getColor:{self.fore_color.getColor()}")
         self.default_properties["Back color"] = self.back_color.getColor()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Font family"] = self.font_box.currentText()
@@ -245,8 +246,8 @@ class TextGeneral(QWidget):
 
     def loadSetting(self):
         # self.text_edit.setHtml(self.html)
-        self.x_pos.setCurrentText(self.default_properties["Center X"])
-        self.y_pos.setCurrentText(self.default_properties["Center Y"])
+        self.x_pos.setCurrentText(self.default_properties["Center x"])
+        self.y_pos.setCurrentText(self.default_properties["Center y"])
         self.fore_color.setCurrentText(self.default_properties["Fore color"])
         self.back_color.setCurrentText(self.default_properties["Back color"])
         self.transparent.setText(self.default_properties["Transparent"])

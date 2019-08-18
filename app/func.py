@@ -613,6 +613,7 @@ class Func(object):
 
     @staticmethod
     def isCitingValue(value: str) -> bool:
+        print(f"line 616: {value}")
         if re.fullmatch(r"\[[A-Za-z]+[a-zA-Z\._0-9]*\]", value):
             return True
         return False

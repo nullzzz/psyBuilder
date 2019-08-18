@@ -46,7 +46,7 @@ class TextProperty(QWidget):
         self.below.setLayout(below_layout)
 
     def getInfo(self):
-        self.general.apply()
+        # self.apply()
         # self.html = self.general.html
         self.default_properties = self.general.getInfo()
         return self.default_properties

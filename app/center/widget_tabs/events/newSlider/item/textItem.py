@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsItem
 
 # 画图
@@ -10,7 +10,7 @@ from app.center.widget_tabs.events.newSlider.text.textProperty import TextProper
 from app.center.widget_tabs.events.newSlider.video.videoProperty import VideoProperty
 from app.func import Func
 from app.info import Info
-
+from bitarray import bitarray
 
 class TextItem(QGraphicsTextItem):
     """
@@ -53,16 +53,16 @@ class TextItem(QGraphicsTextItem):
 
         self.default_properties = {
             'name': 'text',
-            'family': 'SimSun',
-            'size': 1,
+            'Font family': 'SimSun',
+            'Font size': '12',
             # 'B': False,
             # 'I': False,
             # 'U': False,
-            'color': self.defaultTextColor(),
-            'text': 'Hello World',
-            'z': self.zValue(),
-            'x_pos': 1,
-            'y_pos': 1
+            # 'color': self.defaultTextColor(),
+            'Text': 'Hello World',
+            'Z': self.zValue(),
+            'Center x': '1',
+            'Center y': '1'
         }
         self.menu = ItemMenu()
 
@@ -117,6 +117,8 @@ class TextItem(QGraphicsTextItem):
     #     self.openPro()
 
     def openPro(self):
+        cProperties = self.getInfo()
+        self.setProperties(cProperties)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
 
@@ -133,16 +135,119 @@ class TextItem(QGraphicsTextItem):
         self.pro_window.loadSetting()
 
     def apply(self):
+        # get input parameters from GUI
         self.getInfo()
+        # take effect
+
+
+        text = self.toPlainText()
+
+        x = self.default_properties.get("Center x")
+        y = self.default_properties.get("Center y")
+        z = self.zValue()
+
+        style = self.default_properties.get("Style")
+        foreColor = self.default_properties.get("Fore color")
+        backColor = self.default_properties.get("Back color")
+        family = self.default_properties.get("Font family")
+        size = self.default_properties.get("Font size")
+        transparent = self.default_properties.get("Transparent")
+
+        #  handle the ref values
+        if Func.isCitingValue(x):
+            x = 0
+        else:
+            x = int(x)
+
+        if Func.isCitingValue(y):
+            y = 0
+        else:
+            y = int(y)
+
+        if Func.isCitingValue(style):
+            style = "0"
+
+        if Func.isCitingValue(foreColor):
+            foreColor = "0,0,0"
+
+        if Func.isCitingValue(backColor):
+            backColor = "255,255,255"
+
+        if Func.isCitingValue(family):
+            family = "Times"
+
+        if Func.isCitingValue(size):
+            size = 18
+
+        if Func.isCitingValue(transparent):
+            transparent = "100%"
+
+        # create html
+        html = f'<body style = "font-size: {size}pt; "font-family: {family}">\
+                <p style = "background-color: rgb({backColor})">\
+                <font style = "color: rgb({foreColor})">\
+                 {text}</font></p></body>'
+        print(f"line 192 old html:{self.toHtml()}")
+        print(f"line 193 new html:{html}")
+        # font = self.font()
+        font = QFont()
+
+        if style == "normal_0":
+            style = 0
+        elif style == "bold_1":
+            style = 1
+        elif style == "italic_2":
+            style = 2
+        elif style == "underline_4":
+            style = 4
+        elif style == "outline_8":
+            style = 8
+        elif style == "overline_16":
+            style = 16
+        elif style == "condense_32":
+            style = 32
+        elif style == "extend_64":
+            style = 64
+        else:
+            style = int(style) if style.isdigit() else 0
+        font.setBold(bool(style & 1))
+        font.setItalic(bool(style & 2))
+        font.setUnderline(bool(style & 4))
+        font.setStrikeOut(bool(style & 8))
+        font.setOverline(bool(style & 16))
+
+        if bool(style & 32):
+            font.setStretch(QFont.Condensed)
+
+        if bool(style & 64):
+            font.setStretch(QFont.Expanded)
+
+        self.setFont(font)
+
+        self.setHtml(html)
+        self.setPos(x, y)
+        self.setZValue(z)
 
     def getInfo(self):
+        font = self.font()
+        styleBool = bitarray([True, font.bold(),font.italic(),font.underline(),font.strikeOut(),font.overline()])
+
+        print(f" font stretch: {font.stretch()}")
+
+
         self.default_properties = {
+            **self.pro_window.getInfo(), # maybe useless
             'name': self.item_name,
-            'z': self.zValue(),
-            'x': self.scenePos().x(),
-            'y': self.scenePos().y(),
-            **self.pro_window.getInfo(),
+            'Text': self.toPlainText(),
+            'Z': str(self.zValue()),
+            'Center x': str(self.scenePos().x()),
+            'Center y': str(self.scenePos().y()),
+            'Fore color': str(self.defaultTextColor()),
+            'Font family': str(self.font().family()),
+            'Style': str(int(styleBool.to01(),2)),
+            'Font size': str(self.font().pointSize()),
         }
+
         return self.default_properties
 
     def getText(self) -> str:
@@ -155,9 +260,12 @@ class TextItem(QGraphicsTextItem):
             self.loadSetting()
 
     def loadSetting(self):
-        x = self.default_properties.get("x", 0)
-        y = self.default_properties.get("y", 0)
+        x = self.default_properties.get("Center x", 0)
+        y = self.default_properties.get("Center y", 0)
         z = self.default_properties.get("z", 0)
+        text = self.default_properties.get("text", "Hello World")
+
+        self.setPlainText(text)
         self.setPos(x, y)
         self.setZValue(z)
 
@@ -166,7 +274,7 @@ class TextItem(QGraphicsTextItem):
         properties = self.pro_window.getInfo()
         new.pro_window.setProperties(properties)
 
-        new.setPlainText(self.toPlainText()) # a bug here
+        new.setPlainText(self.toPlainText()) # maybe a bug here
         new.setTextInteractionFlags(Qt.TextEditorInteraction)
         new.setZValue(self.zValue())
 
