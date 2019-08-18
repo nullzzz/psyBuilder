@@ -63,7 +63,7 @@ class TextProperty(QWidget):
             self.loadSetting()
 
     def loadSetting(self):
-        self.general.setProperties(self.default_properties, self.html)
+        self.general.setProperties(self.default_properties)
 
     def clone(self):
         clone_page = TextProperty()

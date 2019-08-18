@@ -239,7 +239,7 @@ class TextGeneral(QWidget):
 
         return self.default_properties
 
-    def setProperties(self, properties: dict, html: str):
+    def setProperties(self, properties: dict):
         self.default_properties = properties.copy()
         # self.html = html
         self.loadSetting()
@@ -261,5 +261,5 @@ class TextGeneral(QWidget):
 
     def clone(self):
         clone_page = TextGeneral()
-        clone_page.setProperties(self.default_properties, self.html)
+        clone_page.setProperties(self.default_properties)
         return clone_page

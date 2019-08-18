@@ -10,7 +10,7 @@ from app.center.widget_tabs.events.newSlider.text.textProperty import TextProper
 from app.center.widget_tabs.events.newSlider.video.videoProperty import VideoProperty
 from app.func import Func
 from app.info import Info
-from bitarray import bitarray
+
 
 class TextItem(QGraphicsTextItem):
     """
@@ -187,8 +187,8 @@ class TextItem(QGraphicsTextItem):
                 <p style = "background-color: rgb({backColor})">\
                 <font style = "color: rgb({foreColor})">\
                  {text}</font></p></body>'
-        print(f"line 192 old html:{self.toHtml()}")
-        print(f"line 193 new html:{html}")
+        # print(f"line 192 old html:{self.toHtml()}")
+        # print(f"line 193 new html:{html}")
         # font = self.font()
         font = QFont()
 
@@ -230,21 +230,25 @@ class TextItem(QGraphicsTextItem):
 
     def getInfo(self):
         font = self.font()
-        styleBool = bitarray([True, font.bold(),font.italic(),font.underline(),font.strikeOut(),font.overline()])
+        styleBool = [font.overline(),font.strikeOut(),font.underline(),font.italic(),font.bold(),True]
+
+        styleBool = int("".join('1' if x else '0' for x in styleBool),2)
 
         print(f" font stretch: {font.stretch()}")
+        color_name = self.defaultTextColor().toRgb().getRgb()
 
+        print(f"line 239 color name: {color_name}")
 
         self.default_properties = {
             **self.pro_window.getInfo(), # maybe useless
             'name': self.item_name,
             'Text': self.toPlainText(),
             'Z': str(self.zValue()),
-            'Center x': str(self.scenePos().x()),
-            'Center y': str(self.scenePos().y()),
-            'Fore color': str(self.defaultTextColor()),
+            'Center x': str(int(self.scenePos().x())),
+            'Center y': str(int(self.scenePos().y())),
+            # 'Fore color': str(self.defaultTextColor()),
             'Font family': str(self.font().family()),
-            'Style': str(int(styleBool.to01(),2)),
+            'Style': str(styleBool),
             'Font size': str(self.font().pointSize()),
         }
 
@@ -266,8 +270,8 @@ class TextItem(QGraphicsTextItem):
         text = self.default_properties.get("text", "Hello World")
 
         self.setPlainText(text)
-        self.setPos(x, y)
-        self.setZValue(z)
+        self.setPos(int(x), int(y))
+        self.setZValue(int(z))
 
     def clone(self):
         new = TextItem(self.item_type)
