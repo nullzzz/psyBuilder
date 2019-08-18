@@ -48,6 +48,7 @@ class TextProperty(QWidget):
     def getInfo(self):
         # self.apply()
         # self.html = self.general.html
+        self.default_properties.clear()
         self.default_properties = self.general.getInfo()
         return self.default_properties
 
@@ -61,6 +62,9 @@ class TextProperty(QWidget):
         if isinstance(properties, dict):
             self.default_properties = properties.copy()
             self.loadSetting()
+
+    def setPosition(self, x, y):
+        self.general.setPosition(x, y)
 
     def loadSetting(self):
         self.general.setProperties(self.default_properties)

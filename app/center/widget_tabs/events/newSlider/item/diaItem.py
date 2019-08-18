@@ -285,6 +285,7 @@ class DiaItem(QGraphicsPolygonItem):
     def apply(self):
 
         self.pro_window.frame.getInfo()
+
         cx = int(self.pro_window.frame.default_properties["Center X"])
         cy = int(self.pro_window.frame.default_properties["Center Y"])
 

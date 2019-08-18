@@ -7,6 +7,7 @@ from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
 from app.center.widget_tabs.events.newSlider.item.linItem import LineItem
 from app.center.widget_tabs.events.newSlider.item.otherItem import OtherItem
 from app.center.widget_tabs.events.newSlider.item.pixItem import PixItem
+from app.center.widget_tabs.events.newSlider.item.textItem import TextItem
 from app.center.widget_tabs.events.newSlider.leftBox import LeftBox
 from app.center.widget_tabs.events.newSlider.property import SliderProperty
 from app.center.widget_tabs.events.newSlider.scene import Scene
@@ -166,7 +167,7 @@ class Slider(QMainWindow):
         self.scene.selectionChanged.disconnect()
         self.item_pro_windows.setEnabled(item_name != "none")
         for item in self.scene.items():
-            if isinstance(item, PixItem) or isinstance(item, LineItem) or isinstance(item, OtherItem):
+            if isinstance(item, TextItem) or isinstance(item, PixItem) or isinstance(item, LineItem) or isinstance(item, OtherItem):
                 item.setSelected(item_name == item.getName())
                 if item_name == item.getName():
                     self.changeTool(item)
@@ -253,7 +254,7 @@ class Slider(QMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            if item.zValue() >= z_value and (isinstance(item, DiaItem) or isinstance(item, PixItem)):
+            if item.zValue() >= z_value and (isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
                 z_value = item.zValue() + 0.1
         selected_item.setZValue(z_value)
 
@@ -264,7 +265,7 @@ class Slider(QMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            if item.zValue() <= z_value and (isinstance(item, DiaItem) or isinstance(item, PixItem)):
+            if item.zValue() <= z_value and (isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
                 z_value = item.zValue() - 0.1
         selected_item.setZValue(z_value)
 

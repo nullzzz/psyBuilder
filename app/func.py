@@ -13,7 +13,6 @@ class Func(object):
     """
     存放一些通用函数
     """
-
     @staticmethod
     def getWidgetImage(widget_type: str, type: str = 'icon') -> QPixmap or QIcon:
         """
@@ -94,7 +93,7 @@ class Func(object):
             widget.refresh()
         if is_show and hasattr(widget, "getShowProperties"):
             return widget.getShowProperties()
-        return widget.getProperties()
+        return widget.getInfo()
 
     @staticmethod
     def getWidgetName(widget_id: str) -> str:
@@ -613,7 +612,7 @@ class Func(object):
 
     @staticmethod
     def isCitingValue(value: str) -> bool:
-        print(f"line 616: {value}")
+        # print(f"line 616: {value}")
         if re.fullmatch(r"\[[A-Za-z]+[a-zA-Z\._0-9]*\]", value):
             return True
         return False
@@ -621,22 +620,21 @@ class Func(object):
     @staticmethod
     def getCurrentScreenRes(screen_id: str) -> tuple:
         resolution = Info.OUTPUT_DEVICE_INFO[screen_id].get('Resolution', "auto")
-        print(f"------------/")
-
-        print(f"{screen_id}")
+        # print(f"------------/")
+        # print(f"{screen_id}")
 
         wh = resolution.lower().split('x')
 
         if len(wh) > 1:
             width = int(wh[0])
             height = int(wh[1])
-            print(f"{width},{height}")
+            # print(f"{width},{height}")
         else:
             scr_rect = QDesktopWidget().screenGeometry()
             width = scr_rect.width()
             height = scr_rect.height()
-            print(f"{scr_rect}")
-        print(f"------------\\")
+        #     print(f"{scr_rect}")
+        # print(f"------------\\")
         return width, height
 
     @staticmethod

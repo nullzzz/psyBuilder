@@ -55,14 +55,10 @@ class TextItem(QGraphicsTextItem):
             'name': 'text',
             'Font family': 'SimSun',
             'Font size': '12',
-            # 'B': False,
-            # 'I': False,
-            # 'U': False,
-            # 'color': self.defaultTextColor(),
             'Text': 'Hello World',
-            'Z': self.zValue(),
-            'Center x': '1',
-            'Center y': '1'
+            'z': self.zValue(),
+            'x': 1,
+            'y': 1,
         }
         self.menu = ItemMenu()
 
@@ -117,9 +113,8 @@ class TextItem(QGraphicsTextItem):
     #     self.openPro()
 
     def openPro(self):
-        cProperties = self.getInfo()
-        self.setProperties(cProperties)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
+        self.setPosition()
         self.pro_window.show()
 
     def setAttributes(self, attributes):
@@ -138,7 +133,6 @@ class TextItem(QGraphicsTextItem):
         # get input parameters from GUI
         self.getInfo()
         # take effect
-
 
         text = self.toPlainText()
 
@@ -165,7 +159,7 @@ class TextItem(QGraphicsTextItem):
             y = int(y)
 
         if Func.isCitingValue(style):
-            style = "0"
+            style = 0
 
         if Func.isCitingValue(foreColor):
             foreColor = "0,0,0"
@@ -208,19 +202,20 @@ class TextItem(QGraphicsTextItem):
             style = 32
         elif style == "extend_64":
             style = 64
-        else:
-            style = int(style) if style.isdigit() else 0
-        font.setBold(bool(style & 1))
+
+        style = int(style)
+
+        font.setBold(bool(style & 1 ))
         font.setItalic(bool(style & 2))
         font.setUnderline(bool(style & 4))
         font.setStrikeOut(bool(style & 8))
         font.setOverline(bool(style & 16))
 
-        if bool(style & 32):
-            font.setStretch(QFont.Condensed)
-
-        if bool(style & 64):
-            font.setStretch(QFont.Expanded)
+        # if bool(int(styleBin[6])):
+        #     font.setStretch(QFont.Condensed)
+        #
+        # if bool(int(styleBin[7])):
+        #     font.setStretch(QFont.Expanded)
 
         self.setFont(font)
 
@@ -229,29 +224,25 @@ class TextItem(QGraphicsTextItem):
         self.setZValue(z)
 
     def getInfo(self):
-        font = self.font()
-        styleBool = [font.overline(),font.strikeOut(),font.underline(),font.italic(),font.bold(),True]
+        # font = self.font()
+        # styleBool = [font.overline(),font.strikeOut(),font.underline(),font.italic(),font.bold(),False]
+        # styleStr = "".join('1' if x else '0' for x in styleBool)
+        # print(f"{styleBool}")
+        # print(f'{styleStr}: {int(styleStr,2)}')
+        # styleBool = int("".join('1' if x else '0' for x in styleBool),2)
+        #
+        # print(f" font stretch: {font.stretch()}")
+        # color_name = self.defaultTextColor().toRgb().getRgb()
 
-        styleBool = int("".join('1' if x else '0' for x in styleBool),2)
-
-        print(f" font stretch: {font.stretch()}")
-        color_name = self.defaultTextColor().toRgb().getRgb()
-
-        print(f"line 239 color name: {color_name}")
 
         self.default_properties = {
-            **self.pro_window.getInfo(), # maybe useless
             'name': self.item_name,
             'Text': self.toPlainText(),
-            'Z': str(self.zValue()),
-            'Center x': str(int(self.scenePos().x())),
-            'Center y': str(int(self.scenePos().y())),
-            # 'Fore color': str(self.defaultTextColor()),
-            'Font family': str(self.font().family()),
-            'Style': str(styleBool),
-            'Font size': str(self.font().pointSize()),
+            'z': str(self.zValue()),
+            'x': self.scenePos().x(),
+            'y': self.scenePos().y(),
+            **self.pro_window.getInfo(),
         }
-
         return self.default_properties
 
     def getText(self) -> str:
@@ -262,6 +253,9 @@ class TextItem(QGraphicsTextItem):
             self.default_properties = properties
             self.pro_window.setProperties(properties)
             self.loadSetting()
+
+    def setPosition(self):
+        self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def loadSetting(self):
         x = self.default_properties.get("Center x", 0)

@@ -22,11 +22,13 @@ class TextGeneral(QWidget):
         }
 
 
-        self.x_pos = PigComboBox()
-        self.x_pos.setEditable(True)
+        self.cx_pos = PigComboBox()
+        self.cx_pos.setEditable(True)
+        self.cx_pos.addItem('100')
 
-        self.y_pos = PigComboBox()
-        self.y_pos.setEditable(True)
+        self.cy_pos = PigComboBox()
+        self.cy_pos.setEditable(True)
+        self.cy_pos.addItem('100')
 
 
         self.fore_color = ColorListEditor()
@@ -104,9 +106,9 @@ class TextGeneral(QWidget):
         layout2 = QGridLayout()
 
         layout2.addWidget(l00, 0, 0)
-        layout2.addWidget(self.x_pos, 0, 1)
+        layout2.addWidget(self.cx_pos, 0, 1)
         layout2.addWidget(l10, 1, 0)
-        layout2.addWidget(self.y_pos, 1, 1)
+        layout2.addWidget(self.cy_pos, 1, 1)
 
         layout2.addWidget(l02, 0, 2, 1, 2)
         layout2.addWidget(self.fore_color, 0, 4)
@@ -208,8 +210,8 @@ class TextGeneral(QWidget):
     """
     def setAttributes(self, attributes):
         self.attributes = attributes
-        self.x_pos.setCompleter(QCompleter(self.attributes))
-        self.y_pos.setCompleter(QCompleter(self.attributes))
+        self.cx_pos.setCompleter(QCompleter(self.attributes))
+        self.cy_pos.setCompleter(QCompleter(self.attributes))
         self.fore_color.setCompleter(QCompleter(self.attributes))
         self.back_color.setCompleter(QCompleter(self.attributes))
         self.transparent.setCompleter(QCompleter(self.attributes))
@@ -224,8 +226,8 @@ class TextGeneral(QWidget):
         self.default_properties.clear()
         # self.default_properties["Html"] = self.html
         # self.default_properties["Text"] = self.text_edit.toPlainText()
-        self.default_properties["Center x"] = self.x_pos.currentText()
-        self.default_properties["Center y"] = self.y_pos.currentText()
+        self.default_properties["Center x"] = self.cx_pos.currentText()
+        self.default_properties["Center y"] = self.cy_pos.currentText()
         self.default_properties["Fore color"] = self.fore_color.getColor()
         # print(f"line 230 getColor:{self.fore_color.getColor()}")
         self.default_properties["Back color"] = self.back_color.getColor()
@@ -244,10 +246,14 @@ class TextGeneral(QWidget):
         # self.html = html
         self.loadSetting()
 
+    def setPosition(self, x, y):
+        self.cx_pos.setCurrentText(str(int(x)))
+        self.cy_pos.setCurrentText(str(int(y)))
+
     def loadSetting(self):
         # self.text_edit.setHtml(self.html)
-        self.x_pos.setCurrentText(self.default_properties["Center x"])
-        self.y_pos.setCurrentText(self.default_properties["Center y"])
+        self.cx_pos.setCurrentText(self.default_properties["Center x"])
+        self.cy_pos.setCurrentText(self.default_properties["Center y"])
         self.fore_color.setCurrentText(self.default_properties["Fore color"])
         self.back_color.setCurrentText(self.default_properties["Back color"])
         self.transparent.setText(self.default_properties["Transparent"])
@@ -255,6 +261,8 @@ class TextGeneral(QWidget):
         # self.word_wrap.setText(self.default_properties["Wrapat chars"])
         self.font_box.setCurrentText(self.default_properties["Font family"])
         self.font_size_box.setCurrentText(self.default_properties["Font size"])
+
+
         self.style_box.setCurrentText(self.default_properties["Style"])
         # self.flip_horizontal.setCurrentText(self.default_properties["Flip horizontal"])
         # self.flip_vertical.setCurrentText(self.default_properties["Flip vertical"])
