@@ -81,23 +81,55 @@ class OtherItem(QGraphicsPixmapItem):
 
     def changeSomething(self):
         if self.item_type == self.Snow:
-            scale = int(self.default_properties["Scale"])
-            w = int(int(self.default_properties["Width"]))
-            h = int(self.default_properties["Height"])
+            scale = self.default_properties["Scale"]
+
+            w = self.default_properties["Width"]
+            h = self.default_properties["Height"]
+
+            cx = self.default_properties["Center X"]
+            cy = self.default_properties["Center Y"]
+
+            rotate = self.default_properties["Rotation"]
+
+            if Func.isCitingValue(scale):
+                scale = '8'
+
+            if Func.isCitingValue(w):
+                w = '100'
+
+            if Func.isCitingValue(h):
+                h = '100'
+
+            if Func.isCitingValue(cx):
+                cx = self.scenePos().x()
+
+            if Func.isCitingValue(cx):
+                cy = self.scenePos().y()
+
+            if Func.isCitingValue(rotate):
+                rotate = '0'
+
+                scale = int(scale)
+                w = int(w)
+                h = int(h)
+
+                cx = int(cx)
+                cy = int(cy)
+
+                rotate = float(rotate)
+
             snow_stimulate = self.getSnow(w // scale, h // scale)
 
             pix = QPixmap(qimage2ndarray.array2qimage(snow_stimulate))
             self.setPixmap(pix.scaled(w, h))
 
-            cx = float(self.default_properties["Center X"])
-            cy = float(self.default_properties["Center Y"])
             self.setPos(QPoint(cx, cy))
 
             x = self.boundingRect().center().x()
             y = self.boundingRect().center().y()
 
             self.setTransformOriginPoint(x, y)
-            self.setRotation(int(self.default_properties["Rotation"]))
+            self.setRotation(rotate)
             self.update()
 
         elif self.item_type == self.Gabor:
@@ -106,11 +138,53 @@ class OtherItem(QGraphicsPixmapItem):
             phase = float(self.default_properties['Phase'])
             orientation = float(self.default_properties['Orientation'])
 
-            rgb_value = self.default_properties['Back Color'].split(',')
+            backColor = self.default_properties['Back Color']
             sdx = float(self.default_properties['SDx'])
             sdy = float(self.default_properties['SDy'])
             w = int(self.default_properties["Width"])
             h = int(self.default_properties["Height"])
+
+            cx = float(self.default_properties["Center X"])
+            cy = float(self.default_properties["Center Y"])
+            rotate = self.default_properties["Rotation"]
+
+
+            if Func.isCitingValue(spatial):
+                spatial = '0.033'
+            if Func.isCitingValue(contrast):
+                contrast = '1'
+            if Func.isCitingValue(phase):
+                phase = '0'
+            if Func.isCitingValue(orientation):
+                orientation = '0'
+            if Func.isCitingValue(backColor):
+                backColor = '128,128,128'
+            if Func.isCitingValue(sdx):
+                sdx = '30'
+            if Func.isCitingValue(sdy):
+                sdy = '30'
+            if Func.isCitingValue(w):
+                w = '100'
+            if Func.isCitingValue(h):
+                h = '100'
+            if Func.isCitingValue(cx):
+                cx = self.scenePos().x()
+            if Func.isCitingValue(cy):
+                cx = self.scenePos().y()
+
+            spatial = float(spatial)
+            contrast = float(contrast)
+            phase = float(phase)
+            orientation = float(orientation)
+            sdx = float(sdx)
+            sdy = float(sdy)
+            w = int(w)
+            h = int(h)
+            cx = int(cx)
+            cy = int(cy)
+            rotate = float(rotate)
+
+            rgb_value = backColor.split(',')
             back_color = (float(rgb_value[0]), float(rgb_value[1]), float(rgb_value[2]))
 
             gabor_stimulate = self.getGabor(spatial, contrast, phase, orientation,
@@ -118,15 +192,13 @@ class OtherItem(QGraphicsPixmapItem):
             pix = QPixmap(qimage2ndarray.array2qimage(gabor_stimulate))
             self.setPixmap(pix.scaled(w, h, Qt.KeepAspectRatio))
 
-            cx = float(self.default_properties["Center X"])
-            cy = float(self.default_properties["Center Y"])
             self.setPos(QPoint(cx, cy))
 
             x = self.boundingRect().center().x()
             y = self.boundingRect().center().y()
 
             self.setTransformOriginPoint(x, y)
-            self.setRotation(int(self.default_properties["Rotation"]))
+            self.setRotation(rotate)
             self.update()
 
     @staticmethod

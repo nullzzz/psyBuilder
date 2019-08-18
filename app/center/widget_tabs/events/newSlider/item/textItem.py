@@ -181,9 +181,7 @@ class TextItem(QGraphicsTextItem):
                 <p style = "background-color: rgb({backColor})">\
                 <font style = "color: rgb({foreColor})">\
                  {text}</font></p></body>'
-        # print(f"line 192 old html:{self.toHtml()}")
-        # print(f"line 193 new html:{html}")
-        # font = self.font()
+
         font = QFont()
 
         if style == "normal_0":
@@ -211,12 +209,6 @@ class TextItem(QGraphicsTextItem):
         font.setStrikeOut(bool(style & 8))
         font.setOverline(bool(style & 16))
 
-        # if bool(int(styleBin[6])):
-        #     font.setStretch(QFont.Condensed)
-        #
-        # if bool(int(styleBin[7])):
-        #     font.setStretch(QFont.Expanded)
-
         self.setFont(font)
 
         self.setHtml(html)
@@ -224,17 +216,6 @@ class TextItem(QGraphicsTextItem):
         self.setZValue(z)
 
     def getInfo(self):
-        # font = self.font()
-        # styleBool = [font.overline(),font.strikeOut(),font.underline(),font.italic(),font.bold(),False]
-        # styleStr = "".join('1' if x else '0' for x in styleBool)
-        # print(f"{styleBool}")
-        # print(f'{styleStr}: {int(styleStr,2)}')
-        # styleBool = int("".join('1' if x else '0' for x in styleBool),2)
-        #
-        # print(f" font stretch: {font.stretch()}")
-        # color_name = self.defaultTextColor().toRgb().getRgb()
-
-
         self.default_properties = {
             'name': self.item_name,
             'Text': self.toPlainText(),
