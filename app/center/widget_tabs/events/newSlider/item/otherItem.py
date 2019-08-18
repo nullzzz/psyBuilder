@@ -109,14 +109,15 @@ class OtherItem(QGraphicsPixmapItem):
             if Func.isCitingValue(rotate):
                 rotate = '0'
 
-                scale = int(scale)
-                w = int(w)
-                h = int(h)
+            scale = int(scale)
 
-                cx = int(cx)
-                cy = int(cy)
+            w = int(w)
+            h = int(h)
 
-                rotate = float(rotate)
+            cx = int(cx)
+            cy = int(cy)
+
+            rotate = float(rotate)
 
             snow_stimulate = self.getSnow(w // scale, h // scale)
 
@@ -147,7 +148,6 @@ class OtherItem(QGraphicsPixmapItem):
             cx = float(self.default_properties["Center X"])
             cy = float(self.default_properties["Center Y"])
             rotate = self.default_properties["Rotation"]
-
 
             if Func.isCitingValue(spatial):
                 spatial = '0.033'
