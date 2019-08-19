@@ -89,7 +89,9 @@ class TextItem(QGraphicsTextItem):
         # get input parameters from GUI
         self.getInfo()
         # take effect
+        self.changeSomething()
 
+    def changeSomething(self):
         text = self.toPlainText()
 
         x = self.default_properties.get("Center x")
@@ -105,39 +107,21 @@ class TextItem(QGraphicsTextItem):
 
         z = float(z)
         #  handle the ref values
-        if Func.isCitingValue(x):
-            x = 0
-        else:
-            x = int(x)
+        x = 0 if Func.isCitingValue(x) else int(x)
+        y = 0 if Func.isCitingValue(y) else int(y)
+        style = 0 if Func.isCitingValue(style) else int(style)
+        foreColor = "0,0,0" if Func.isCitingValue(foreColor) else foreColor
+        backColor = "255,255,255" if Func.isCitingValue(backColor) else backColor
+        family = "Times" if Func.isCitingValue(family) else family
+        size = 18 if Func.isCitingValue(size) else int(size)
+        transparent = "100%" if Func.isCitingValue(transparent) else transparent
 
-        if Func.isCitingValue(y):
-            y = 0
-        else:
-            y = int(y)
-
-        if Func.isCitingValue(style):
-            style = 0
-
-        if Func.isCitingValue(foreColor):
-            foreColor = "0,0,0"
-
-        if Func.isCitingValue(backColor):
-            backColor = "255,255,255"
-
-        if Func.isCitingValue(family):
-            family = "Times"
-
-        if Func.isCitingValue(size):
-            size = 18
-
-        if Func.isCitingValue(transparent):
-            transparent = "100%"
 
         # create html
         html = f'<body style = "font-size: {size}pt; "font-family: {family}">\
-                <p style = "background-color: rgb({backColor})">\
-                <font style = "color: rgb({foreColor})">\
-                 {text}</font></p></body>'
+                        <p style = "background-color: rgb({backColor})">\
+                        <font style = "color: rgb({foreColor})">\
+                         {text}</font></p></body>'
 
         font = QFont()
 
@@ -158,7 +142,7 @@ class TextItem(QGraphicsTextItem):
         elif style == "extend_64":
             style = 64
 
-        style = int(style)
+        # style = int(style)
 
         font.setBold(bool(style & 1))
         font.setItalic(bool(style & 2))
@@ -196,11 +180,13 @@ class TextItem(QGraphicsTextItem):
         self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def loadSetting(self):
-        x = self.default_properties.get("x", 0)
-        y = self.default_properties.get("y", 0)
-        z = self.default_properties.get("z", 0)
-        self.setPos(x, y)
-        self.setZValue(z)
+        # x = self.default_properties.get("x", 0)
+        # y = self.default_properties.get("y", 0)
+        # z = self.default_properties.get("z", 0)
+        # self.setPos(x, y)
+        # self.setZValue(z)
+
+        self.changeSomething()
 
     def clone(self):
         new = TextItem(self.item_type)
