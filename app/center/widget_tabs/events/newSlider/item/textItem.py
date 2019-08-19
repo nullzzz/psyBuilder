@@ -68,46 +68,6 @@ class TextItem(QGraphicsTextItem):
     def getName(self):
         return self.item_name
 
-    # def mousePressEvent(self, event):
-    #     if self.item_type < 8:
-    #         if event.button() == Qt.LeftButton and event.modifiers() == Qt.AltModifier:
-    #             self.arbitrary_resize = True
-    #             self.setCursor(Qt.SizeAllCursor)
-    #         elif event.button() == Qt.LeftButton and event.modifiers() == Qt.ShiftModifier:
-    #             self.keep_resize = True
-    #             self.setCursor(Qt.SizeAllCursor)
-    #         else:
-    #             super(PixItem, self).mousePressEvent(event)
-    #     else:
-    #         super(PixItem, self).mousePressEvent(event)
-    #
-    # def mouseMoveEvent(self, event):
-    #     x = event.pos().x()
-    #     y = event.pos().y()
-    #     if self.arbitrary_resize:
-    #         self.flag = True
-    #     if self.keep_resize:
-    #         self.flag = True
-    #         if x > y:
-    #             x = y
-    #         else:
-    #             y = x
-    #     if self.flag:
-    #         self.setPixmap(QPixmap(Func.getImage(f"{self.name[self.item_type]}.png")).scaled(x, y))
-    #         self.update()
-    #     else:
-    #         super(PixItem, self).mouseMoveEvent(event)
-    #
-    # def mouseReleaseEvent(self, event):
-    #     self.unsetCursor()
-    #     self.arbitrary_resize = False
-    #     self.keep_resize = False
-    #     self.flag = False
-    #     super(PixItem, self).mouseReleaseEvent(event)
-
-    # def mouseDoubleClickEvent(self, event):
-    #     self.openPro()
-
     def openPro(self):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setPosition()
