@@ -134,7 +134,7 @@ class TextItem(QGraphicsTextItem):
 
         x = self.default_properties.get("Center x")
         y = self.default_properties.get("Center y")
-        z = self.zValue()
+        z = self.default_properties.get("z")
 
         style = self.default_properties.get("Style")
         foreColor = self.default_properties.get("Fore color")
@@ -143,6 +143,7 @@ class TextItem(QGraphicsTextItem):
         size = self.default_properties.get("Font size")
         transparent = self.default_properties.get("Transparent")
 
+        z = float(z)
         #  handle the ref values
         if Func.isCitingValue(x):
             x = 0
@@ -215,7 +216,7 @@ class TextItem(QGraphicsTextItem):
         self.default_properties = {
             'Name': self.item_name,
             'Text': self.toPlainText(),
-            'z': str(self.zValue()),
+            'z': self.zValue(),
             'x': self.scenePos().x(),
             'y': self.scenePos().y(),
             **self.pro_window.getInfo(),
@@ -238,11 +239,11 @@ class TextItem(QGraphicsTextItem):
         x = self.default_properties.get("Center x", 0)
         y = self.default_properties.get("Center y", 0)
         z = self.default_properties.get("z", 0)
-        text = self.default_properties.get("text", "Hello World")
+        text = self.default_properties.get("Text", "Hello World")
 
         self.setPlainText(text)
         self.setPos(int(x), int(y))
-        self.setZValue(int(z))
+        self.setZValue(z)
 
     def clone(self):
         new = TextItem(self.item_type)
