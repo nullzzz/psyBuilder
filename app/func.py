@@ -14,17 +14,17 @@ class Func(object):
     存放一些通用函数
     """
     @staticmethod
-    def getWidgetImage(widget_type: str, type: str = 'icon') -> QPixmap or QIcon:
+    def getWidgetImage(widget_type: str, image_type: str = 'icon') -> QPixmap or QIcon:
         """
         返回widget_type对应的图片
         :param widget_type: widget类型
-        :param type: 返回图片类型
+        :param image_type: 返回图片类型
         :return: 
         """
         # 得到图片路径
         if widget_type in Info.WIDGET_TYPE_IMAGE_PATH:
             path = Info.WIDGET_TYPE_IMAGE_PATH[widget_type]
-            if type == "icon":
+            if image_type == "icon":
                 return QIcon(path)
             else:
                 return QPixmap(path)

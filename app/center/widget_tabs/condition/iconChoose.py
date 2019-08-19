@@ -31,7 +31,7 @@ class IconChoose(QWidget):
         self.event_types.addItem(Info.VIDEO)
         self.event_types.addItem(Info.TEXT)
         self.event_types.addItem(Info.SOUND)
-        self.event_types.addItem(Info.SLIDER)
+        self.event_types.addItem(Info.BUG)
         self.event_types.currentTextChanged.connect(self.changeIcon)
         self.name_line = PigLineEdit()
         self.name_line.setEnabled(False)
@@ -43,9 +43,9 @@ class IconChoose(QWidget):
         self.widget_id = ""
 
         self.default_properties: dict = {
-            "stim type": "None",
-            "event name": "",
-            "pro window": None
+            "Stim type": "None",
+            "Event name": "",
+            "Pro window": None
         }
 
         self.event_type = "None"
@@ -67,20 +67,19 @@ class IconChoose(QWidget):
         self.setLayout(grid_layout)
 
     def changeIcon(self, current_type):
-        if current_type not in (Info.IMAGE, Info.TEXT, Info.VIDEO, Info.SOUND, "None"):
-            return
         self.event_type = current_type
-        pix_map = Func.getWidgetImage(self.event_type, "pixmap")
-        self.icon_label.setPixmap(pix_map)
-
         # 删除原来的widget
         Func.delWidget(self.widget_id)
         # 空
         if current_type == "None":
+            self.icon_label.clear()
             self.name_line.clear()
             self.name_line.setEnabled(False)
             self.widget = None
             return
+
+        pix_map = Func.getWidgetImage(self.event_type, "pixmap")
+        self.icon_label.setPixmap(pix_map.scaled(100, 100))
 
         # 创建widget
         self.widget_id = Func.generateWidgetId(current_type)
@@ -88,7 +87,7 @@ class IconChoose(QWidget):
         assert self.widget is not None
 
         # slider
-        if self.event_type == Info.SLIDER:
+        if self.event_type == Info.BUG:
             self.pro_window = self.widget
         else:
             self.pro_window = self.widget.pro_window
@@ -116,23 +115,22 @@ class IconChoose(QWidget):
         self.pro_window.close()
 
     def openProWindow(self):
-        if self.pro_window:
-            # 设置screen
-            if hasattr(self.pro_window, "general"):
-                if hasattr(self.pro_window.general, "setScreen"):
-                    screen_devices = Func.getScreen()
-                    self.pro_window.general.setScreen(screen_devices)
-            # self.pro_window.setWindowModality(Qt.ApplicationModal)
+        if self.widget:
+            if self.event_type == Info.BUG:
+                self.pro_window.pro_window.refresh()
+            else:
+                self.pro_window.refresh()
             self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
             self.pro_window.show()
 
     def getInfo(self):
+        self.default_properties.clear()
         if self.pro_window:
             self.default_properties["pro window"] = self.pro_window.getInfo().copy()
         else:
             self.default_properties["pro window"] = {}
-        self.default_properties["stim type"] = self.event_type
-        self.default_properties["event name"] = self.event_name
+        self.default_properties["Stim type"] = self.event_type
+        self.default_properties["Event name"] = self.event_name
         return self.default_properties
 
     def getProperties(self):
@@ -146,14 +144,14 @@ class IconChoose(QWidget):
 
     # 加载当前属性
     def loadSetting(self):
-        self.event_types.setCurrentText(self.default_properties.get("stim type", "None"))
-        self.name_line.setText(self.default_properties.get("event name", ""))
+        self.event_types.setCurrentText(self.default_properties.get("Stim type", "None"))
+        self.name_line.setText(self.default_properties.get("Event name", ""))
 
         if self.default_properties.get("pro window", None):
             if isinstance(self.pro_window, Slider):
-                self.pro_window.restore(self.default_properties.get("pro window", {}))
+                self.pro_window.restore(self.default_properties.get("Pro window", {}))
             else:
-                self.pro_window.setProperties(self.default_properties.get("pro window", {}))
+                self.pro_window.setProperties(self.default_properties.get("Pro window", {}))
 
     def setProWindow(self, pro):
         del self.pro_window

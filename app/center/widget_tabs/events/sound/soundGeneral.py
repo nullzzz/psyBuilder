@@ -48,9 +48,9 @@ class SoundTab1(QWidget):
         self.stream_refill = PigComboBox()
 
         self.start_offset = PigLineEdit("00:00:00.000")
-        self.start_offset.setInputMask("00:00:00.000")
+        # self.start_offset.setInputMask("00:00:00.000")
         self.stop_offset = PigLineEdit("00:00:00.000")
-        self.stop_offset.setInputMask("00:00:00.000")
+        # self.stop_offset.setInputMask("00:00:00.000")
         self.repetitions = PigLineEdit()
 
         self.sound = PigComboBox()

@@ -30,8 +30,8 @@ class CaseArea(QScrollArea):
 
         self.default_properties: dict = {
             "Default": self.case_0.getProperties(),
-            "Case 1": self.case_list[0].getInfo(),
-            "Case 2": self.case_list[1].getInfo()
+            "Case 1": self.case_list[0].getProperties(),
+            "Case 2": self.case_list[1].getProperties()
         }
 
         self.setUI()
@@ -105,7 +105,7 @@ class CaseArea(QScrollArea):
     def getProperties(self):
         self.default_properties.clear()
         for case in self.case_list:
-            self.default_properties[case.title()] = case.getInfo()
+            self.default_properties[case.title()] = case.getProperties()
         return self.default_properties
 
     def setProperties(self, properties: dict):

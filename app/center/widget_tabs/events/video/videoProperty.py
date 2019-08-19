@@ -46,6 +46,9 @@ class VideoProperty(QWidget):
         below_layout.setContentsMargins(0, 0, 0, 0)
         self.below.setLayout(below_layout)
 
+    def refresh(self):
+        self.general.refresh()
+
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
         self.frame.setAttributes(attributes)

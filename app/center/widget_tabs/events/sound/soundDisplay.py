@@ -99,7 +99,7 @@ class SoundDisplay(QMainWindow):
     def refresh(self):
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
-        self.pro_window.general.refresh()
+        self.pro_window.refresh()
         self.getInfo()
 
     def ok(self):

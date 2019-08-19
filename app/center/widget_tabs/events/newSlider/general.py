@@ -44,7 +44,6 @@ class SliderGeneral(QWidget):
         if screen_name:
             self.screen.setCurrentText(screen_name)
             self.using_screen_id = screen_id
-        print(f"general refresh: {self.using_screen_id}")
 
     def setAttributes(self, attributes):
         self.attributes = attributes

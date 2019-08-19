@@ -40,13 +40,11 @@ class Case(QGroupBox):
         self.values.setEditable(True)
         self.values.setInsertPolicy(QComboBox.NoInsert)
         self.values.currentTextChanged.connect(self.changeValue)
-        self.values.lineEdit().textChanged.connect(self.findVar)
-        self.values.lineEdit().returnPressed.connect(self.finalCheck)
         # icon choose
         self.icon_choose = IconChoose(self)
 
         self.default_properties: dict = self.icon_choose.getInfo().copy()
-        self.default_properties["case value"] = self.value
+        self.default_properties["Case value"] = self.value
 
         self.add_bt = AddDeleteButton(self, "add")
         self.add_bt.clicked.connect(lambda: self.addCase.emit(self.index))
@@ -78,7 +76,7 @@ class Case(QGroupBox):
     def getProperties(self):
         self.default_properties.clear()
         self.default_properties = self.icon_choose.getProperties().copy()
-        self.default_properties["case value"] = self.value
+        self.default_properties["Case value"] = self.value
         return self.default_properties
 
     def changeValue(self, new_value):

@@ -45,7 +45,7 @@ class Slider(QMainWindow):
         self.open_item_action = QAction(QIcon(Func.getImage("setting.png")), "Properties", self)
         self.open_item_action.triggered.connect(self.openItem)
 
-        self.delete_action = QAction(QIcon(Func.getImage("delete.png")), "&Delete", self)
+        self.delete_action = QAction(QIcon(Func.getImage("trash.png")), "&Delete", self)
         self.delete_action.setToolTip("Delete item from diagram")
         self.delete_action.triggered.connect(self.deleteItem)
 
@@ -61,7 +61,7 @@ class Slider(QMainWindow):
         self.item_list.addItem("none")
         self.item_list.currentTextChanged.connect(self.selectItem)
 
-        self.item_pro_windows = QAction(QIcon(Func.getImage("item.png")), "open item properties", self)
+        self.item_pro_windows = QAction(QIcon(Func.getImage("item_pro.png")), "open item properties", self)
         self.item_pro_windows.setToolTip("Open current item's properties")
         self.item_pro_windows.triggered.connect(self.openItem)
         self.item_pro_windows.setEnabled(False)
@@ -197,7 +197,7 @@ class Slider(QMainWindow):
     def refresh(self):
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
-        self.pro_window.general.refresh()
+        self.pro_window.refresh()
         self.getInfo()
 
         width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)

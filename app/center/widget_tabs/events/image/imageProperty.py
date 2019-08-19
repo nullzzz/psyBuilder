@@ -47,6 +47,9 @@ class ImageProperty(QWidget):
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
 
+    def refresh(self):
+        self.general.refresh()
+
     def getInfo(self):
         self.default_properties.clear()
         self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}

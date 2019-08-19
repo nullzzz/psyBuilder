@@ -1,13 +1,10 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QFont, QColor
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsItem
 
 # 画图
-from app.center.widget_tabs.events.newSlider.image.imageProperty import ImageProperty
 from app.center.widget_tabs.events.newSlider.item.itemMenu import ItemMenu
-from app.center.widget_tabs.events.newSlider.sound.soundProperty import SoundProperty
 from app.center.widget_tabs.events.newSlider.text.textProperty import TextProperty
-from app.center.widget_tabs.events.newSlider.video.videoProperty import VideoProperty
 from app.func import Func
 from app.info import Info
 
@@ -42,7 +39,6 @@ class TextItem(QGraphicsTextItem):
             # print(f"line 42 {self.toPlainText()}")
             self.setTextInteractionFlags(Qt.TextEditorInteraction)
 
-
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
@@ -52,7 +48,7 @@ class TextItem(QGraphicsTextItem):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
         self.default_properties = {
-            'name': 'text',
+            'Name': 'text',
             'Font family': 'SimSun',
             'Font size': '12',
             'Text': 'Hello World',
@@ -203,7 +199,7 @@ class TextItem(QGraphicsTextItem):
 
         style = int(style)
 
-        font.setBold(bool(style & 1 ))
+        font.setBold(bool(style & 1))
         font.setItalic(bool(style & 2))
         font.setUnderline(bool(style & 4))
         font.setStrikeOut(bool(style & 8))
@@ -217,7 +213,7 @@ class TextItem(QGraphicsTextItem):
 
     def getInfo(self):
         self.default_properties = {
-            'name': self.item_name,
+            'Name': self.item_name,
             'Text': self.toPlainText(),
             'z': str(self.zValue()),
             'x': self.scenePos().x(),
@@ -253,7 +249,7 @@ class TextItem(QGraphicsTextItem):
         properties = self.pro_window.getInfo()
         new.pro_window.setProperties(properties)
 
-        new.setPlainText(self.toPlainText()) # maybe a bug here
+        new.setPlainText(self.toPlainText())  # maybe a bug here
         new.setTextInteractionFlags(Qt.TextEditorInteraction)
         new.setZValue(self.zValue())
 

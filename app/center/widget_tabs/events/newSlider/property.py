@@ -39,6 +39,9 @@ class SliderProperty(QWidget):
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
 
+    def refresh(self):
+        self.general.refresh()
+
     # 生成下方三个按钮
     def setButtons(self):
         below_layout = QHBoxLayout()

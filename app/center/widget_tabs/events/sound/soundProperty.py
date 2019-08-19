@@ -46,12 +46,8 @@ class SoundProperty(QWidget):
         below_layout.setContentsMargins(0, 0, 0, 0)
         self.below.setLayout(below_layout)
 
-    # 设置界面居中显示
-    def center(self):
-        screen = QDesktopWidget().screenGeometry()
-        size = self.geometry()
-        self.move((screen.width() - size.width()) / 2,
-                  (screen.height() - size.height()) / 2)
+    def refresh(self):
+        self.general.refresh()
 
     def getInfo(self):
         self.default_properties.clear()
