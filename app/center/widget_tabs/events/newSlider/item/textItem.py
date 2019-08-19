@@ -236,13 +236,10 @@ class TextItem(QGraphicsTextItem):
         self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def loadSetting(self):
-        x = self.default_properties.get("Center x", 0)
-        y = self.default_properties.get("Center y", 0)
+        x = self.default_properties.get("x", 0)
+        y = self.default_properties.get("y", 0)
         z = self.default_properties.get("z", 0)
-        text = self.default_properties.get("Text", "Hello World")
-
-        self.setPlainText(text)
-        self.setPos(int(x), int(y))
+        self.setPos(x, y)
         self.setZValue(z)
 
     def clone(self):
