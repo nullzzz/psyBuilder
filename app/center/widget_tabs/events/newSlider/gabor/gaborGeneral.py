@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QCompleter
 from PyQt5.QtWidgets import (QWidget)
 
-from app.lib import PigComboBox
+from app.lib import PigComboBox, PigLineEdit
 
 
 class GaborGeneral(QWidget):
@@ -25,8 +25,8 @@ class GaborGeneral(QWidget):
             "Transparency": "0"
         }
         # up
-        self.cx_pos = PigComboBox()
-        self.cy_pos = PigComboBox()
+        self.cx_pos = PigLineEdit()
+        self.cy_pos = PigLineEdit()
         self._width = PigComboBox()
         self._height = PigComboBox()
         self.spatial = PigComboBox()
@@ -42,10 +42,6 @@ class GaborGeneral(QWidget):
 
     # 生成frame页面
     def setUI(self):
-        self.cx_pos.addItems(["0", "25", "50", "75", "100"])
-        self.cx_pos.setEditable(True)
-        self.cy_pos.addItems(["0", "25", "50", "75", "100"])
-        self.cy_pos.setEditable(True)
         self._width.addItems(["0", "25", "50", "75", "100"])
         self._width.setEditable(True)
         self._width.setCurrentText("100")
@@ -152,24 +148,22 @@ class GaborGeneral(QWidget):
         self.transparency.setCompleter(QCompleter(self.attributes))
 
     def setPosition(self, x, y):
-        self.cx_pos.setCurrentText(str(int(x)))
-        self.cy_pos.setCurrentText(str(int(y)))
-
-    def setPos(self, x, y):
-        self.cx_pos.setCurrentText(str(int(x)))
-        self.cy_pos.setCurrentText(str(int(y)))
+        if not self.cx_pos.text().startswith("["):
+            self.cx_pos.setText(str(int(x)))
+        if not self.cy_pos.text().startswith("["):
+            self.cy_pos.setText(str(int(y)))
 
     def getInfo(self):
         self.default_properties.clear()
-        self.default_properties['Center X'] = self.cx_pos.currentText()
-        self.default_properties['Center Y'] = self.cy_pos.currentText()
+        self.default_properties['Center X'] = self.cx_pos.text()
+        self.default_properties['Center Y'] = self.cy_pos.text()
         self.default_properties['Width'] = self._width.currentText()
         self.default_properties['Height'] = self._height.currentText()
         self.default_properties['Spatial'] = self.spatial.currentText()
         self.default_properties['Contrast'] = self.contrast.currentText()
         self.default_properties['Phase'] = self.phase.currentText()
         self.default_properties['Orientation'] = self.orientation.currentText()
-        self.default_properties['Back Color'] = self.back_color.currentText()
+        self.default_properties['Back color'] = self.back_color.currentText()
         self.default_properties['SDx'] = self.sdx.currentText()
         self.default_properties['SDy'] = self.sdy.currentText()
         self.default_properties['Rotation'] = self.rotation.currentText()
@@ -184,8 +178,8 @@ class GaborGeneral(QWidget):
 
     # 加载参数设置
     def loadSetting(self):
-        self.cx_pos.setCurrentText(self.default_properties["Center X"])
-        self.cy_pos.setCurrentText(self.default_properties["Center Y"])
+        self.cx_pos.setText(self.default_properties["Center X"])
+        self.cy_pos.setText(self.default_properties["Center Y"])
         self._width.setCurrentText(self.default_properties["Width"])
         self._height.setCurrentText(self.default_properties["Height"])
 
@@ -194,7 +188,7 @@ class GaborGeneral(QWidget):
         self.phase.setCurrentText(self.default_properties["Phase"])
         self.orientation.setCurrentText(self.default_properties["Orientation"])
 
-        self.back_color.setCurrentText(self.default_properties["Back Color"])
+        self.back_color.setCurrentText(self.default_properties["Back color"])
         self.sdx.setCurrentText(self.default_properties['SDx'])
         self.sdy.setCurrentText(self.default_properties['SDy'])
         self.rotation.setCurrentText(self.default_properties["Rotation"])

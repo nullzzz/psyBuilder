@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QLineF
-from PyQt5.QtGui import QPen, QTransform, QKeyEvent, QPainterPath
+from PyQt5.QtGui import QPen, QTransform, QKeyEvent
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
@@ -130,13 +130,10 @@ class Scene(QGraphicsScene):
             self.update()
             super(Scene, self).mouseMoveEvent(event)
         # 套索模式
-        elif self.my_mode == self.SelectItem:
+        elif self.my_mode == self.SelectItem and self.lasso:
             self.lasso: Lasso
             x = event.scenePos().x()
             y = event.scenePos().y()
-            if self.lasso is None:
-                self.lasso = Lasso(x, y)
-                self.addItem(self.lasso)
             self.lasso.draw(x, y)
             self.update()
 
@@ -155,14 +152,13 @@ class Scene(QGraphicsScene):
             self.removeItem(self.lasso)
             self.lasso = None
 
-
         super(Scene, self).mouseReleaseEvent(mouseEvent)
 
     def getInfo(self):
         item_info: dict = {}
         for item in self.items():
             item_info[item.getName()] = item.getInfo()
-        return  item_info
+        return item_info
 
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
@@ -183,6 +179,7 @@ class Scene(QGraphicsScene):
                     item = OtherItem(OtherItem.Gabor, k)
                 self.addItem(item)
                 item.setProperties(v)
+                item.apply()
 
     def setAttributes(self, attributes: list):
         self.attributes = attributes

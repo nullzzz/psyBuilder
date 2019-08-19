@@ -163,8 +163,10 @@ class TextGeneral(QWidget):
         self.loadSetting()
 
     def setPosition(self, x, y):
-        self.cx_pos.setCurrentText(str(int(x)))
-        self.cy_pos.setCurrentText(str(int(y)))
+        if not self.cx_pos.currentText().startswith("["):
+            self.cx_pos.setCurrentText(str(int(x)))
+        if not self.cy_pos.currentText().startswith("["):
+            self.cy_pos.setCurrentText(str(int(y)))
 
     def loadSetting(self):
 

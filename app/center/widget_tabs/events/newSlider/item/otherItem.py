@@ -80,126 +80,62 @@ class OtherItem(QGraphicsPixmapItem):
         self.changeSomething()
 
     def changeSomething(self):
+        __w = self.default_properties["Width"]
+        w = int(__w) if __w.isdigit() else 100
+        __h = self.default_properties["Height"]
+        h = int(__h) if __h.isdigit() else 100
+
+        __cx = self.default_properties["Center X"]
+        cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
+        __cy = self.default_properties["Center Y"]
+        cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
+
+        __rotate = self.default_properties["Rotation"]
+        rotate = int(__rotate) if __rotate.isdigit() else 0
+
         if self.item_type == self.Snow:
-            scale = self.default_properties["Scale"]
-
-            w = self.default_properties["Width"]
-            h = self.default_properties["Height"]
-
-            cx = self.default_properties["Center X"]
-            cy = self.default_properties["Center Y"]
-
-            rotate = self.default_properties["Rotation"]
-
-            if Func.isCitingValue(scale):
-                scale = '8'
-
-            if Func.isCitingValue(w):
-                w = '100'
-
-            if Func.isCitingValue(h):
-                h = '100'
-
-            if Func.isCitingValue(cx):
-                cx = self.scenePos().x()
-
-            if Func.isCitingValue(cx):
-                cy = self.scenePos().y()
-
-            if Func.isCitingValue(rotate):
-                rotate = '0'
-
-            scale = int(scale)
-
-            w = int(w)
-            h = int(h)
-
-            cx = int(cx)
-            cy = int(cy)
-
-            rotate = float(rotate)
+            __scale = self.default_properties["Scale"]
+            scale = int(__scale) if __scale.isdigit() else 8
 
             snow_stimulate = self.getSnow(w // scale, h // scale)
 
             pix = QPixmap(qimage2ndarray.array2qimage(snow_stimulate))
             self.setPixmap(pix.scaled(w, h))
 
-            self.setPos(QPoint(cx, cy))
-
-            x = self.boundingRect().center().x()
-            y = self.boundingRect().center().y()
-
-            self.setTransformOriginPoint(x, y)
-            self.setRotation(rotate)
-            self.update()
-
         elif self.item_type == self.Gabor:
-            spatial = float(self.default_properties['Spatial'])
-            contrast = float(self.default_properties['Contrast'])
-            phase = float(self.default_properties['Phase'])
-            orientation = float(self.default_properties['Orientation'])
+            __spatial = self.default_properties['Spatial']
+            spatial = 0.033 if __spatial.startswith("[") else float(__spatial)
 
-            backColor = self.default_properties['Back Color']
-            sdx = float(self.default_properties['SDx'])
-            sdy = float(self.default_properties['SDy'])
-            w = int(self.default_properties["Width"])
-            h = int(self.default_properties["Height"])
+            __contrast = self.default_properties['Contrast']
+            contrast = 1 if __contrast.startswith("[") else float(__contrast)
 
-            cx = float(self.default_properties["Center X"])
-            cy = float(self.default_properties["Center Y"])
-            rotate = self.default_properties["Rotation"]
+            __phase = self.default_properties['Phase']
+            phase = 0 if __phase.startswith("[") else float(__phase)
 
-            if Func.isCitingValue(spatial):
-                spatial = '0.033'
-            if Func.isCitingValue(contrast):
-                contrast = '1'
-            if Func.isCitingValue(phase):
-                phase = '0'
-            if Func.isCitingValue(orientation):
-                orientation = '0'
-            if Func.isCitingValue(backColor):
-                backColor = '128,128,128'
-            if Func.isCitingValue(sdx):
-                sdx = '30'
-            if Func.isCitingValue(sdy):
-                sdy = '30'
-            if Func.isCitingValue(w):
-                w = '100'
-            if Func.isCitingValue(h):
-                h = '100'
-            if Func.isCitingValue(cx):
-                cx = self.scenePos().x()
-            if Func.isCitingValue(cy):
-                cx = self.scenePos().y()
+            __orientation = self.default_properties['Orientation']
+            orientation = 0 if __rotate.startswith("[") else float(__rotate)
 
-            spatial = float(spatial)
-            contrast = float(contrast)
-            phase = float(phase)
-            orientation = float(orientation)
-            sdx = float(sdx)
-            sdy = float(sdy)
-            w = int(w)
-            h = int(h)
-            cx = int(cx)
-            cy = int(cy)
-            rotate = float(rotate)
+            __back_color = self.default_properties['Back color']
+            back_color = (128.0, 128.0, 128.0) if __back_color.startswith("[") else tuple(float(x) for x in __back_color.split(","))
 
-            rgb_value = backColor.split(',')
-            back_color = (float(rgb_value[0]), float(rgb_value[1]), float(rgb_value[2]))
+            __sdx = self.default_properties['SDx']
+            sdx = 30 if __sdx.startswith("[") else int(__sdx)
+
+            __sdy = self.default_properties['SDy']
+            sdy = 30 if __sdy.startswith("[") else int(__sdy)
 
             gabor_stimulate = self.getGabor(spatial, contrast, phase, orientation,
                                             back_color, w, h, sdx, sdy)
             pix = QPixmap(qimage2ndarray.array2qimage(gabor_stimulate))
             self.setPixmap(pix.scaled(w, h, Qt.KeepAspectRatio))
 
-            self.setPos(QPoint(cx, cy))
+        self.setPos(QPoint(cx, cy))
+        x = self.boundingRect().center().x()
+        y = self.boundingRect().center().y()
 
-            x = self.boundingRect().center().x()
-            y = self.boundingRect().center().y()
-
-            self.setTransformOriginPoint(x, y)
-            self.setRotation(rotate)
-            self.update()
+        self.setTransformOriginPoint(x, y)
+        self.setRotation(rotate)
+        self.update()
 
     @staticmethod
     def getSnow(w, h, is_binary=False):
@@ -212,7 +148,7 @@ class OtherItem(QGraphicsPixmapItem):
         return snow
 
     @staticmethod
-    def getGabor(cycles_per_pix, contrast, phase, orientation, back_color, width, height, sdx, sdy):
+    def getGabor(cycles_per_pix, contrast, phase, orientation, back_color:tuple, width, height, sdx, sdy):
         phase = (phase % 360) * (np.pi / 180)
         orientation = (orientation % 360) * (np.pi / 180)
         # to force the width and height to be even

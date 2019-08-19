@@ -721,7 +721,7 @@ class Slider(QMainWindow):
         for item in self.scene.items():
             item1 = item.clone()
             slider.scene.addItem(item1)
-            item1.setPos(item.scenePos())
+            item1.setPoso(item.scenePos())
             slider.scene.update()
         return slider
 

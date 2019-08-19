@@ -167,7 +167,9 @@ class Slider(QMainWindow):
         self.scene.selectionChanged.disconnect()
         self.item_pro_windows.setEnabled(item_name != "none")
         for item in self.scene.items():
-            if isinstance(item, TextItem) or isinstance(item, PixItem) or isinstance(item, LineItem) or isinstance(item, OtherItem):
+            if isinstance(item, TextItem) or isinstance(item, PixItem) \
+                    or isinstance(item, LineItem) \
+                    or isinstance(item, OtherItem):
                 item.setSelected(item_name == item.getName())
                 if item_name == item.getName():
                     self.changeTool(item)

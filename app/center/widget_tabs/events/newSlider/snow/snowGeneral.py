@@ -1,8 +1,8 @@
-from PyQt5.QtCore import QRegExp, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QCompleter
-from PyQt5.QtWidgets import (QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
+from PyQt5.QtWidgets import QWidget
 
-from app.lib import PigComboBox
+from app.lib import PigComboBox, PigLineEdit
 
 
 class SnowGeneral(QWidget):
@@ -20,8 +20,8 @@ class SnowGeneral(QWidget):
             "Transparency": "0"
         }
         # up
-        self.cx_pos = PigComboBox()
-        self.cy_pos = PigComboBox()
+        self.cx_pos = PigLineEdit()
+        self.cy_pos = PigLineEdit()
         self._width = PigComboBox()
         self._height = PigComboBox()
         self.scale = PigComboBox()
@@ -31,10 +31,6 @@ class SnowGeneral(QWidget):
 
     # 生成frame页面
     def setUI(self):
-        self.cx_pos.addItems(["0", "25", "50", "75", "100"])
-        self.cx_pos.setEditable(True)
-        self.cy_pos.addItems(["0", "25", "50", "75", "100"])
-        self.cy_pos.setEditable(True)
         self._width.addItems(["0", "25", "50", "75", "100"])
         self._width.setEditable(True)
         self._width.setCurrentText("100")
@@ -95,13 +91,15 @@ class SnowGeneral(QWidget):
         self.transparency.setCompleter(QCompleter(self.attributes))
 
     def setPosition(self, x, y):
-        self.cx_pos.setCurrentText(str(int(x)))
-        self.cy_pos.setCurrentText(str(int(y)))
+        if not self.cx_pos.text().startswith("["):
+            self.cx_pos.setText(str(int(x)))
+        if not self.cy_pos.text().startswith("["):
+            self.cy_pos.setText(str(int(y)))
 
     def getInfo(self):
         self.default_properties.clear()
-        self.default_properties['Center X'] = self.cx_pos.currentText()
-        self.default_properties['Center Y'] = self.cy_pos.currentText()
+        self.default_properties['Center X'] = self.cx_pos.text()
+        self.default_properties['Center Y'] = self.cy_pos.text()
         self.default_properties['Width'] = self._width.currentText()
         self.default_properties['Height'] = self._height.currentText()
         self.default_properties['Scale'] = self.scale.currentText()
@@ -117,74 +115,10 @@ class SnowGeneral(QWidget):
 
     # 加载参数设置
     def loadSetting(self):
-        self.cx_pos.setCurrentText(self.default_properties["Center X"])
-        self.cy_pos.setCurrentText(self.default_properties["Center Y"])
+        self.cx_pos.setText(self.default_properties["Center X"])
+        self.cy_pos.setText(self.default_properties["Center Y"])
         self._width.setCurrentText(self.default_properties["Width"])
         self._height.setCurrentText(self.default_properties["Height"])
         self.scale.setCurrentText(self.default_properties["Scale"])
         self.rotation.setCurrentText(self.default_properties["Rotation"])
         self.transparency.setCurrentText(self.default_properties["Transparency"])
-
-    # def clone(self):
-    #     clone_page = FramePage()
-    #     clone_page.setProperties(self.default_properties)
-    #     return clone_page
-
-
-class snowProperty(QWidget):
-    def __init__(self, parent=None):
-        super(snowProperty, self).__init__(parent)
-        self.below = QWidget()
-
-        self.frame = SnowGeneral()
-        self.default_properties = {**self.frame.default_properties}
-        # bottom
-        self.ok_bt = QPushButton("OK")
-        self.cancel_bt = QPushButton("Cancel")
-        self.apply_bt = QPushButton("Apply")
-        self.setButtons()
-
-        self.setUI()
-
-    # 生成主界面
-    def setUI(self):
-        self.setWindowTitle("Property")
-        self.resize(600, 800)
-        # self.setFixedSize(600, 800)
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(self.frame, 6)
-        # main_layout.addStretch(2)
-        main_layout.addWidget(self.below, 1)
-        main_layout.setSpacing(0)
-        self.setLayout(main_layout)
-
-    # 生成下方三个按钮
-    def setButtons(self):
-        below_layout = QHBoxLayout()
-        below_layout.addStretch(10)
-        below_layout.addWidget(self.ok_bt, 1)
-        below_layout.addWidget(self.cancel_bt, 1)
-        below_layout.addWidget(self.apply_bt, 1)
-        below_layout.setContentsMargins(0, 0, 0, 0)
-        self.below.setLayout(below_layout)
-
-    # 设置界面居中显示
-    def center(self):
-        screen = QDesktopWidget().screenGeometry()
-        size = self.geometry()
-        self.move((screen.width() - size.width()) / 2,
-                  (screen.height() - size.height()) / 2)
-
-    def getInfo(self):
-        self.default_properties = {**self.frame.getInfo()}
-        return self.default_properties
-
-    def setAttributes(self, attributes):
-        self.frame.setAttributes(attributes)
-
-    def setProperties(self, properties: dict):
-        self.default_properties = properties
-        self.loadSetting()
-
-    def loadSetting(self):
-        self.frame.setProperties(self.default_properties)
