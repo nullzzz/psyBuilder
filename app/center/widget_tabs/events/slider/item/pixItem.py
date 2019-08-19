@@ -85,7 +85,8 @@ class PixItem(QGraphicsPixmapItem):
         x = mouseEvent.pos().x()
         y = mouseEvent.pos().y()
         if self.diagramType in [5,6]:
-            self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
+            pass
+        # self.pro_window.frame.setPos(self.scenePos().x(), self.scenePos().y())
         if self.arbitrary_resize:
             self.resizingFlag = True
         if self.keep_resize:

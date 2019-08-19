@@ -134,19 +134,19 @@ class OtherItem(QGraphicsPixmapItem):
             self.update()
 
         elif self.item_type == self.Gabor:
-            spatial = float(self.default_properties['Spatial'])
-            contrast = float(self.default_properties['Contrast'])
-            phase = float(self.default_properties['Phase'])
-            orientation = float(self.default_properties['Orientation'])
+            spatial = self.default_properties['Spatial']
+            contrast = self.default_properties['Contrast']
+            phase = self.default_properties['Phase']
+            orientation = self.default_properties['Orientation']
 
             backColor = self.default_properties['Back Color']
-            sdx = float(self.default_properties['SDx'])
-            sdy = float(self.default_properties['SDy'])
-            w = int(self.default_properties["Width"])
-            h = int(self.default_properties["Height"])
+            sdx = self.default_properties['SDx']
+            sdy = self.default_properties['SDy']
+            w = self.default_properties["Width"]
+            h = self.default_properties["Height"]
 
-            cx = float(self.default_properties["Center X"])
-            cy = float(self.default_properties["Center Y"])
+            cx = self.default_properties["Center X"]
+            cy = self.default_properties["Center Y"]
             rotate = self.default_properties["Rotation"]
 
             if Func.isCitingValue(spatial):
@@ -180,8 +180,8 @@ class OtherItem(QGraphicsPixmapItem):
             sdy = float(sdy)
             w = int(w)
             h = int(h)
-            cx = int(cx)
-            cy = int(cy)
+            cx = int(float(cx))
+            cy = int(float(cy))
             rotate = float(rotate)
 
             rgb_value = backColor.split(',')
