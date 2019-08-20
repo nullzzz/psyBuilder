@@ -1,14 +1,17 @@
 import numpy as np
 from PyQt5.QtCore import QPointF, QRectF, QPoint, Qt
-from PyQt5.QtGui import QColor, QPainter, QPainterPath, QPen, QPixmap
+from PyQt5.QtGui import QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPolygonItem
 
-from app.center.widget_tabs.events.slider.polygon.polygonProperty import PolygonProperty
-from app.func import Func
+from app.center.widget_tabs.events.newSlider.item.arc import ArcProperty
+from app.center.widget_tabs.events.newSlider.item.circle import CircleProperty
+from app.center.widget_tabs.events.newSlider.item.polygon import PolygonProperty
+from app.center.widget_tabs.events.newSlider.item.rect import RectProperty
+from app.info import Info
 
 
 class DiaItem(QGraphicsPolygonItem):
-    Polygon, Arc, Circle, Rect = range(1, 5)
+    Polygon, Circle, Arc, Rect = range(1, 5)
 
     name: dict = {
         Polygon: "polygon",
@@ -19,65 +22,43 @@ class DiaItem(QGraphicsPolygonItem):
 
     def __init__(self, item_type, item_name: str = "", parent=None):
         super(DiaItem, self).__init__(parent=parent)
-        self.item_type = item_name
+        self.item_type = item_type
         self.item_name = item_name if item_name else self.generateItemName()
         self.attributes = []
-
-        self.default_properties = {
-            "name": self.item_type,
-            "Center X": "0",
-            "Center Y": "0",
-            "P1 X": "0",
-            "P1 Y": "0",
-            "P2 X": "0",
-            "P2 Y": "0",
-            "Point": [['0', '0'], ['0', '0'], ['0', '0']],
-            "Start angle": "0",
-            "Angle length": "270",
-            "Width": "200",
-            "Height": "200",
-            "Border color": "black",
-            "Border width": 1,
-            "Fill color": "white",
-            'z': self.zValue()
-        }
 
         path = QPainterPath()
         # circle
         if self.item_type == self.Circle:
             path.addEllipse(QRectF(-100, -100, 200, 200))
-            self.mPolygon = path.toFillPolygon()
-            self.pro_window = PolygonProperty('circle')
+            self.pro_window = CircleProperty()
 
         #  rectangle
         elif self.item_type == self.Rect:
             path.addRect(QRectF(-100, -100, 200, 200))
-            self.mPolygon = path.toFillPolygon()
-            self.pro_window = PolygonProperty('rect')
+            self.pro_window = RectProperty()
 
         # arc
         elif self.item_type == self.Arc:
             path.arcTo(QRectF(-100, -100, 200, 200), 0, 270)
-            self.mPolygon = path.toFillPolygon()
-            self.pro_window = PolygonProperty('arc')
+            self.pro_window = ArcProperty()
 
         # polygon
         elif self.item_type == self.Polygon:
             # added by yang to plot the triangle
-            nVertices = 3
-            verticesXY = []
-            for iVertex in range(nVertices):
-                verticesXY.append([int(100 * np.cos(np.pi / 2 - iVertex * 2 * np.pi / nVertices)),
-                                   int(100 * np.sin(iVertex * 2 * np.pi / nVertices - np.pi / 2))])
-                if iVertex == 0:
-                    path.moveTo(verticesXY[iVertex][0], verticesXY[iVertex][1])
+            self.pro_window = PolygonProperty()
+            n = 3
+            points = []
+            for p in range(n):
+                x = int(100 * np.cos(np.pi / 2 - p * 2 * np.pi / n))
+                y = int(100 * np.sin(p * 2 * np.pi / n - np.pi / 2))
+                points.append((x, y))
+                if p == 0:
+                    path.moveTo(points[p][0], points[p][1])
                 else:
-                    path.lineTo(verticesXY[iVertex][0], verticesXY[iVertex][1])
+                    path.lineTo(points[p][0], points[p][1])
+            path.lineTo(points[0][0], points[0][1])
 
-            path.lineTo(verticesXY[0][0], verticesXY[0][1])
-            #
-            self.mPolygon = path.toFillPolygon()
-            self.pro_window = PolygonProperty('polygon')
+        self.mPolygon = path.toFillPolygon()
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
@@ -90,20 +71,38 @@ class DiaItem(QGraphicsPolygonItem):
         self.arbitrary_resize = False
         self.keep_resize = False
         self.resizingFlag = False
-        # self.flag1 = False
+
         self.center = QPointF(0, 0)
-        self.ItemColor = 'white'
-        self.LineColor = 'black'
-        self.LineWidth = 1
+        self.fill_color = '0,0,0'
+        self.border_color = '255,255,255'
+        self.border_width = 1
+
+        self.default_properties = {
+            'name': self.item_name,
+            'z': self.zValue(),
+            'x': 1,
+            'y': 1,
+            **self.pro_window.getInfo(),
+        }
+
+    def generateItemName(self) -> str:
+        name = self.name[self.item_type]
+        cnt = Info.SLIDER_COUNT.get(name)
+        item_name = f"{name}_{cnt}"
+        Info.SLIDER_COUNT[name] += 1
+        return item_name
+
+    def getName(self):
+        return self.item_name
 
     def setItemColor(self, color):
-        self.ItemColor = color
+        self.fill_color = color
 
     def setLineColor(self, color):
-        self.LineColor = color
+        self.border_color = color
 
     def setLineWidth(self, width):
-        self.LineWidth = width
+        self.border_width = width
         # self.polygon
 
     def boundingRect(self):
@@ -113,75 +112,71 @@ class DiaItem(QGraphicsPolygonItem):
                                                       self.pen().width())
 
     def mouseMoveEvent(self, mouseEvent):
-        # step 1: updating the default_properties of frame
-        self.getProperties()
-        self.pro_window.frame.setProperties(self.default_properties)
-
         x = mouseEvent.pos().x()
         y = mouseEvent.pos().y()
 
-        rect0 = self.polygon().boundingRect()
+        bounding_rect = self.polygon().boundingRect()
 
-        cHeight = rect0.height()
-        cWidth = rect0.width()
+        height = bounding_rect.height()
+        width = bounding_rect.width()
 
         # 非等比例
-        if self.arbitrary_resize and self.item_type in [self.Polygon , self.Circle , self.Arc , self.Rect]:
+        if self.arbitrary_resize:
             self.resizingFlag = True
         # 等比例
-        if self.keep_resize and self.item_type in [self.Polygon , self.Circle , self.Arc , self.Rect]:
+        if self.keep_resize:
             self.resizingFlag = True
 
-            if cHeight < 5:
-                cHeight = 5
+            if height < 5:
+                height = 5
 
-            if cWidth < 5:
-                cWidth = 5
+            if width < 5:
+                width = 5
 
             # make sure the zoom in/out ratio equal for h and w
-            ratio = cHeight / cWidth
+            ratio = height / width
 
-            if (y - cHeight) / (x - cWidth) > ratio:
-                y = ratio * (x - cWidth) + cHeight
+            if (y - height) / (x - width) > ratio:
+                y = ratio * (x - width) + height
             else:
-                x = (y - cHeight) / ratio + cWidth
+                x = (y - height) / ratio + width
 
         if self.resizingFlag:
-            x0 = rect0.left()
-            y0 = rect0.top()
+            x0 = bounding_rect.left()
+            y0 = bounding_rect.top()
 
             path = QPainterPath()
 
-            newWidth = x - x0
-            newHeight = y - y0
+            new_width = x - x0
+            new_height = y - y0
 
-            cRect = QRectF(x0 - (newWidth - cWidth) / 2, y0 - (newHeight - cHeight) / 2, newWidth, newHeight)
+            new_rect = QRectF(x0 - (new_width - width) / 2, y0 - (new_height - height) / 2, new_width, new_height)
 
             if self.item_type == self.Circle:
-                path.addEllipse(cRect)
+                path.addEllipse(new_rect)
 
             elif self.item_type == self.Arc:
-                path.moveTo(cRect.center())
-                path.arcTo(cRect, float(self.pro_window.frame.default_properties["Start angle"]),
+                path.moveTo(new_rect.center())
+                path.arcTo(new_rect, float(self.pro_window.frame.default_properties["Start angle"]),
                            float(self.pro_window.frame.default_properties["Angle length"]))
 
             elif self.item_type == self.Rect:
-                path.addRect(cRect)
+                path.addRect(new_rect)
 
             elif self.item_type == self.Polygon:
 
-                hRatio = (x - x0) / cWidth
-                vRatio = (y - y0) / cHeight
+                h_ratio = (x - x0) / width
+                v_ratio = (y - y0) / height
 
                 if self.keep_resize:
-                    if hRatio > vRatio:
-                        vRatio = hRatio
+                    if h_ratio > v_ratio:
+                        v_ratio = h_ratio
                     else:
-                        hRatio = vRatio
+                        h_ratio = v_ratio
 
                 for iVertex in range(len(self.polygon())):
-                    cX = self.polygon().value(iVertex).x() * hRatio
-                    cY = self.polygon().value(iVertex).y() * vRatio
+                    cX = self.polygon().value(iVertex).x() * h_ratio
+                    cY = self.polygon().value(iVertex).y() * v_ratio
 
                     if iVertex == 0:
                         path.moveTo(cX, cY)
@@ -190,218 +185,205 @@ class DiaItem(QGraphicsPolygonItem):
 
 
             else:
-                raise Exception("diagramType should be of 'Arc','rect', or 'circle' !!")
+                raise Exception("item_type should be of 'Arc','rectangle', or 'circle' !!")
 
             self.mPolygon = path.toFillPolygon()
             self.setPolygon(self.mPolygon)
             self.update()
 
-            cBoundRect = self.polygon().boundingRect()
-            self.center = cBoundRect.center()
-
-            # print(f"scenePos: {self.scenePos().x()},{self.scenePos().y()}")
-
-            self.getProperties()
-            self.pro_window.frame.setProperties(self.default_properties)
+            bound_rect = self.polygon().boundingRect()
+            self.center = bound_rect.center()
 
         else:
             super(DiaItem, self).mouseMoveEvent(mouseEvent)
 
     def mousePressEvent(self, mouseEvent):
-        if mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.AltModifier:
+        if mouseEvent.button() != Qt.LeftButton:
+            return
+        if mouseEvent.modifiers() == Qt.AltModifier:
             self.arbitrary_resize = True
             self.setCursor(Qt.SizeAllCursor)
 
-        elif mouseEvent.button() == Qt.LeftButton and mouseEvent.modifiers() == Qt.ShiftModifier:
+        elif mouseEvent.modifiers() == Qt.ShiftModifier:
             self.keep_resize = True
             self.setCursor(Qt.SizeAllCursor)
 
-        else:
-            super(DiaItem, self).mousePressEvent(mouseEvent)
+        super(DiaItem, self).mousePressEvent(mouseEvent)
 
     def mouseReleaseEvent(self, mouseEvent):
         self.unsetCursor()
-        self.flag1 = False  # what does this for ????
         self.resizingFlag = False
-
         self.arbitrary_resize = False
         self.keep_resize = False
         super(DiaItem, self).mouseReleaseEvent(mouseEvent)
 
     def mouseDoubleClickEvent(self, mouseEvent):
-        self.getProperties()
+        self.openPro()
 
-        self.pro_window.frame.setProperties(self.default_properties)
+    def openPro(self):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
-        self.setAttributes(self.attributes)
+        self.setPosition()
+        self.setWh()
+        self.setPoint()
         self.pro_window.show()
 
+    def setPosition(self):
+        self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
+
+    def setWh(self):
+        self.pro_window.setWh(self.boundingRect().width(), self.boundingRect().height())
+
+    def setPoint(self):
+        # todo: 设置polygon顶点
+        pass
+
     def setAttributes(self, attributes):
-        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
-        self.pro_window.setAttributes(format_attributes)
-
-    def image(self):
-        pixmap = QPixmap(250, 250)
-        pixmap.fill(Qt.transparent)
-        painter = QPainter(pixmap)
-        painter.setPen(QPen(Qt.black, 8))
-        painter.translate(125, 125)
-        painter.drawPolyline(self.mPolygon)
-        return pixmap
-
-    def contextMenuEvent(self, event):
-        self.scene().clearSelection()
-        self.setSelected(True)
-        self.contextMenu.exec_(event.screenPos())
-
-    def setPolygonFillColor(self):
-        rgbValue = Func.isRGBStr(self.ItemColor)
-        if rgbValue:
-            self.setBrush(QColor(int(rgbValue[0]), int(rgbValue[1]), int(rgbValue[2])))
-        else:
-            self.setBrush(QColor(self.ItemColor))
-
-    def setOutlineColorAndWidth(self):
-        rgbValue = Func.isRGBStr(self.LineColor)
-
-        pen = self.pen()
-        pen.setWidth(self.LineWidth)
-
-        if rgbValue:
-            pen.setColor(QColor(int(rgbValue[0]), int(rgbValue[1]), int(rgbValue[2])))
-        else:
-            pen.setColor(QColor(self.LineColor))
-
-        self.setPen(pen)
+        self.attributes = attributes
+        self.pro_window.setAttributes(attributes)
 
     def ok(self):
         self.apply()
         self.pro_window.close()
 
     def cancel(self):
-        # 加载之前的deafult_properties
-        self.pro_window.frame.loadSetting()
+        # 加载之前的default_properties
+        self.pro_window.loadSetting()
 
     def apply(self):
+        self.getInfo()
+        self.changeSomething()
 
-        self.pro_window.frame.getInfo()
+    def getInfo(self):
+        self.default_properties = {
+            'name': self.item_name,
+            'z': self.zValue(),
+            'x': self.scenePos().x(),
+            'y': self.scenePos().y(),
+            **self.pro_window.getInfo(),
+        }
+        return self.default_properties
 
-        cx = int(self.pro_window.frame.default_properties["Center X"])
-        cy = int(self.pro_window.frame.default_properties["Center Y"])
+    def setProperties(self, properties: dict):
+        if isinstance(properties, dict):
+            self.default_properties = properties
+            self.pro_window.setProperties(properties)
+            self.loadSetting()
 
-        self.ItemColor = self.pro_window.frame.default_properties["Fill color"]
-        self.LineColor = self.pro_window.frame.default_properties["Border color"]
-        self.LineWidth = int(self.pro_window.frame.default_properties["Border width"])
+    def loadSetting(self):
+        x = self.default_properties.get("x", 0)
+        y = self.default_properties.get("y", 0)
+        z = self.default_properties.get("z", 0)
+        self.setPos(x, y)
+        self.setZValue(z)
 
-        self.setPolygonFillColor()
-        self.setOutlineColorAndWidth()
+    def clone(self):
+        new = DiaItem(self.item_type)
+        properties = self.pro_window.getInfo()
+        new.pro_window.setProperties(properties)
+        new.setZValue(self.zValue())
+
+        return new
+
+    def changeSomething(self):
+        __cx = self.default_properties["Center X"]
+        cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
+        __cy = self.default_properties["Center Y"]
+        cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
+
+        self.setPos(QPoint(cx, cy))
+
+        fill_color = self.default_properties["Fill color"]
+        if not fill_color.startswith("["):
+            self.fill_color = fill_color
+        # todo
+        r, g, b = [int(x) for x in self.fill_color.split(",")]
+        self.setBrush(QColor(r, g, b))
+
+        border_color = self.default_properties["Border color"]
+        if not border_color.startswith("["):
+            self.border_color = border_color
+        border_width = self.default_properties["Border width"]
+        if not border_width.startswith("["):
+            self.border_width = int(border_width)
+        pen = self.pen()
+        pen.setWidth(self.border_width)
+        r, g, b = [int(x) for x in self.border_color.split(",")]
+        pen.setColor(QColor(r, g, b))
+        self.setPen(pen)
 
         path = QPainterPath()
 
-        if self.item_type == self.Circle:
-            rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
-                          -int(self.pro_window.frame.default_properties["Height"]) / 2,
-                          int(self.pro_window.frame.default_properties["Width"]),
-                          int(self.pro_window.frame.default_properties["Height"]))
-            path.addEllipse(rect)
+        if self.item_type == self.Polygon:
+            points = self.default_properties["Points"]
+            flag = True
+            for p in points:
+                x, y = p
+                if x.startswith("[") or y.startswith("["):
+                    flag = False
+                    break
+            if flag:
+                for i, p in enumerate(points):
+                    x = int(p[0])
+                    y = int(p[1])
+                    if i == 0:
+                        path.moveTo(x - cx, y - cy)
+                    else:
+                        path.lineTo(x - cx, y - cy)
+                path.lineTo(int(points[0][0]) - cx, int(points[0][1]) - cy)
+                self.mPolygon = path.toFillPolygon()
+                self.setPolygon(self.mPolygon)
+                self.update()
+        else:
+            __w = self.default_properties["Width"]
+            w = int(__w) if __w.isdigit() else 100
+            __h = self.default_properties["Height"]
+            h = int(__h) if __h.isdigit() else 100
+            if self.item_type == self.Circle:
+                rect = QRectF(-w / 2, -h / 2, w, h)
+                path.addEllipse(rect)
 
-        elif self.item_type == self.Arc:
-            rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
-                          -int(self.pro_window.frame.default_properties["Height"]) / 2,
-                          int(self.pro_window.frame.default_properties["Width"]),
-                          int(self.pro_window.frame.default_properties["Height"]))
+            elif self.item_type == self.Arc:
+                rect = QRectF(-w / 2, -h / 2, w, h)
+                __start = self.default_properties["Angle start"]
+                start = 0 if __start.startswith("[") else float(__start)
 
-            path.arcTo(rect, float(self.pro_window.frame.default_properties["Start angle"]),
-                       float(self.pro_window.frame.default_properties["Angle length"]))
+                __length = self.default_properties["Angle length"]
+                length = 360 if __length.startswith("[") else float(__length)
 
-        elif self.item_type == self.Rect:
-            rect = QRectF(-int(self.pro_window.frame.default_properties["Width"]) / 2,
-                          -int(self.pro_window.frame.default_properties["Height"]) / 2,
-                          int(self.pro_window.frame.default_properties["Width"]),
-                          int(self.pro_window.frame.default_properties["Height"]))
-            path.addRect(rect)
+                path.arcTo(rect, start, length)
 
-        elif self.item_type == self.Line:
-            path.moveTo(int(self.pro_window.frame.default_properties["P1 X"]) - cx,
-                        int(self.pro_window.frame.default_properties["P1 Y"]) - cy)
-            path.lineTo(int(self.pro_window.frame.default_properties["P2 X"]) - cx,
-                        int(self.pro_window.frame.default_properties["P2 Y"]) - cy)
+            elif self.item_type == self.Rect:
+                rect = QRectF(-w / 2, -h / 2, w, h)
+                path.addRect(rect)
+            self.mPolygon = path.toFillPolygon()
+            self.setPolygon(self.mPolygon)
+            self.update()
 
-        elif self.item_type == self.Polygon:
-            verticesXY = self.pro_window.frame.default_properties["Point"]
-            # added by yang to plot the m-polygon
-            for iVertex in range(len(verticesXY)):
-                if iVertex == 0:
-                    path.moveTo(int(verticesXY[iVertex][0]) - cx, int(verticesXY[iVertex][1]) - cy)
-                else:
-                    path.lineTo(int(verticesXY[iVertex][0]) - cx, int(verticesXY[iVertex][1]) - cy)
-            path.lineTo(int(verticesXY[0][0]) - cx, int(verticesXY[0][1]) - cy)
-
-        self.setPos(QPoint(int(self.pro_window.frame.default_properties["Center X"]),
-                           int(self.pro_window.frame.default_properties["Center Y"])))
-
-        self.mPolygon = path.toFillPolygon()
-        self.setPolygon(self.mPolygon)
+    def setWidth(self, width):
+        if isinstance(width, str) and width.isdigit():
+            width = int(width)
+        pen = self.pen()
+        pen.setWidth(width)
+        self.setPen(pen)
         self.update()
 
-    def getProperties(self):
-        item_center_x = int(self.scenePos().x())
-        item_center_y = int(self.scenePos().y())
-        # print(f"cx: {item_center_x},{item_center_y}")
-        self.default_properties["Center X"] = str(item_center_x)
-        self.default_properties["Center Y"] = str(item_center_y)
+        old_width = self.default_properties["Border width"]
+        if not old_width.startswith("["):
+            self.pro_window.default_properties["Border width"] = str(width)
+            self.pro_window.general.default_properties["Border width"] = str(width)
+            self.default_properties["Border width"] = str(width)
+            self.pro_window.general.border_width.setText(str(width))
 
-        if self.item_type == self.Line:
-            self.default_properties["P1 X"] = str(int(self.p1.x()) + item_center_x)
-            self.default_properties["P1 Y"] = str(int(self.p1.y()) + item_center_y)
-            self.default_properties["P2 X"] = str(int(self.p2.x()) + item_center_x)
-            self.default_properties["P2 Y"] = str(int(self.p2.y()) + item_center_y)
+    def setColor(self, color: QColor):
+        pen = self.pen()
+        pen.setColor(color)
+        self.setPen(pen)
+        self.update()
 
-        elif self.item_type == self.Rect:
-            self.default_properties["Height"] = str(int(self.polygon().boundingRect().height()))
-            self.default_properties["Width"] = str(int(self.polygon().boundingRect().width()))
-        elif self.item_type == self.Arc:
-            self.default_properties["Height"] = str(int(self.polygon().boundingRect().height()))
-            self.default_properties["Width"] = str(int(self.polygon().boundingRect().width()))
-
-            self.default_properties["Start angle"] = self.pro_window.frame.default_properties["Start angle"]
-            self.default_properties["Angle length"] = self.pro_window.frame.default_properties["Angle length"]
-
-        elif self.item_type == self.Circle:
-            self.default_properties["Height"] = str(int(self.polygon().boundingRect().height()))
-            self.default_properties["Width"] = str(int(self.polygon().boundingRect().width()))
-
-        elif self.item_type == self.Polygon:
-            verticesXY = []
-            for iVertex in range(len(self.polygon()) - 1):
-                verticesXY.append([str(int(self.polygon()[iVertex].x()) + item_center_x),
-                                   str(int(self.polygon()[iVertex].y()) + item_center_y)])
-
-            self.default_properties["Point"] = verticesXY
-
-        self.default_properties["Border color"] = self.LineColor
-        self.default_properties["Border width"] = str(self.LineWidth)
-        self.default_properties["Fill color"] = self.ItemColor
-        self.default_properties["z"] = self.zValue()
-
-        return self.default_properties
-
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.pro_window.frame.setProperties(self.default_properties)
-            self.apply()
-
-    def clone(self):
-        if self.item_type == self.Line:
-            item = DiaItem(self.item_type, self.contextMenu, self.attributes, self.p1, self.p2)
-        else:
-            item = DiaItem(self.item_type, self.contextMenu, self.attributes)
-        item.setPolygon(self.polygon())
-        item.setLineWidth(self.LineWidth)
-        item.setLineColor(self.LineColor)
-        item.setItemColor(self.ItemColor)
-        item.setBrush(QColor(self.ItemColor))
-        item.setPen(self.pen())
-
-        return item
+        old_rgb = self.default_properties["Border color"]
+        if not old_rgb.startswith("["):
+            rgb = f"{color.red()},{color.green()},{color.blue()}"
+            self.pro_window.default_properties["Border color"] = rgb
+            self.pro_window.general.default_properties["Border color"] = rgb
+            self.default_properties["Border color"] = rgb
+            self.pro_window.general.border_color.setCurrentText(rgb)

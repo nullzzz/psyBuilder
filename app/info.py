@@ -40,6 +40,10 @@ class Info(object):
     }
 
     SLIDER_COUNT: dict = {
+        "polygon": 0,
+        "arc": 0,
+        "rect": 0,
+        "circle": 0,
         "image": 0,
         "text": 0,
         "video": 0,

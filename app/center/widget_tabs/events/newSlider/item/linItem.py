@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QLineF, pyqtSignal
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsItem
 
-from app.center.widget_tabs.events.newSlider.line.lineProperty import LineProperty
+from app.center.widget_tabs.events.newSlider.item.line.lineProperty import LineProperty
 from app.info import Info
 
 
@@ -65,21 +65,23 @@ class LineItem(QGraphicsLineItem):
         pen.setWidth(width)
         self.setPen(pen)
         self.update()
-
-        self.pro_window.default_properties["Border width"] = str(width)
-        self.default_properties["Border width"] = str(width)
-        self.pro_window.general.border_width.setText(str(width))
+        old_width = self.default_properties["Border width"]
+        if not old_width.startswith("["):
+            self.pro_window.default_properties["Border width"] = str(width)
+            self.default_properties["Border width"] = str(width)
+            self.pro_window.general.border_width.setText(str(width))
 
     def setColor(self, color: QColor):
         pen = self.pen()
         pen.setColor(color)
         self.setPen(pen)
         self.update()
-
-        rgb = f"{color.red()},{color.green()},{color.blue()}"
-        self.pro_window.default_properties["Border color"] = rgb
-        self.default_properties["Border color"] = rgb
-        self.pro_window.general.border_color.setCurrentText(rgb)
+        old_rgb = self.default_properties["Border color"]
+        if not old_rgb.startswith("["):
+            rgb = f"{color.red()},{color.green()},{color.blue()}"
+            self.pro_window.default_properties["Border color"] = rgb
+            self.default_properties["Border color"] = rgb
+            self.pro_window.general.border_color.setCurrentText(rgb)
 
     def setAttributes(self, attributes):
         self.attributes = attributes

@@ -169,7 +169,8 @@ class Slider(QMainWindow):
         for item in self.scene.items():
             if isinstance(item, TextItem) or isinstance(item, PixItem) \
                     or isinstance(item, LineItem) \
-                    or isinstance(item, OtherItem):
+                    or isinstance(item, OtherItem) \
+                    or isinstance(item, DiaItem):
                 item.setSelected(item_name == item.getName())
                 if item_name == item.getName():
                     self.changeTool(item)
@@ -177,7 +178,8 @@ class Slider(QMainWindow):
 
     def changeTool(self, item):
         border_width = item.default_properties.get("Border width", "2")
-        self.line_wid_com.setCurrentText(border_width)
+        if not border_width.startswith("["):
+            self.line_wid_com.setCurrentText(border_width)
 
         border_color: str = item.default_properties.get("Border color", "0,0,0")
         if border_color.startswith("["):
@@ -186,6 +188,14 @@ class Slider(QMainWindow):
             r, g, b = [int(x) for x in border_color.split(",")]
         color = QColor(r, g, b)
         self.line_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("linecolor.png"), color))
+
+        fill_color: str = item.default_properties.get("Fill color", "0,0,0")
+        if fill_color.startswith("["):
+            r, g, b = 0, 0, 0
+        else:
+            r, g, b = [int(x) for x in fill_color.split(",")]
+        color = QColor(r, g, b)
+        self.fill_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("floodfill.png"), color))
 
     def setUI(self):
         self.setWindowTitle("Slider")
@@ -256,7 +266,8 @@ class Slider(QMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            if item.zValue() >= z_value and (isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
+            if item.zValue() >= z_value and (
+                    isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
                 z_value = item.zValue() + 0.1
         selected_item.setZValue(z_value)
 
@@ -267,7 +278,8 @@ class Slider(QMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            if item.zValue() <= z_value and (isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
+            if item.zValue() <= z_value and (
+                    isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
                 z_value = item.zValue() - 0.1
         selected_item.setZValue(z_value)
 

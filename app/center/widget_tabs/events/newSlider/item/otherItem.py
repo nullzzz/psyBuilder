@@ -4,8 +4,8 @@ from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPixmapItem
 
-from app.center.widget_tabs.events.newSlider.gabor.garborProperty import GaborProperty
-from app.center.widget_tabs.events.newSlider.snow.snowProperties import SnowProperty
+from app.center.widget_tabs.events.newSlider.item.gabor import GaborProperty
+from app.center.widget_tabs.events.newSlider.item.snow import SnowProperty
 from app.func import Func
 from app.info import Info
 
@@ -206,7 +206,6 @@ class OtherItem(QGraphicsPixmapItem):
             self.pro_window.setProperties(properties)
             self.loadSetting()
             self.getInfo()
-            print(self.default_properties)
 
     def loadSetting(self):
         x = self.default_properties.get("x", 0)

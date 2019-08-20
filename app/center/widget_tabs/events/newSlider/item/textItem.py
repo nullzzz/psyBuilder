@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsItem
 
 # 画图
 from app.center.widget_tabs.events.newSlider.item.itemMenu import ItemMenu
-from app.center.widget_tabs.events.newSlider.text.textProperty import TextProperty
+from app.center.widget_tabs.events.newSlider.item.text import TextProperty
 from app.func import Func
 from app.info import Info
 

@@ -3,11 +3,11 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsItem
 
 # 画图
-from app.center.widget_tabs.events.newSlider.image.imageProperty import ImageProperty
+from app.center.widget_tabs.events.newSlider.item.image import ImageProperty
 from app.center.widget_tabs.events.newSlider.item.itemMenu import ItemMenu
-from app.center.widget_tabs.events.newSlider.sound.soundProperty import SoundProperty
-from app.center.widget_tabs.events.newSlider.text.textProperty import TextProperty
-from app.center.widget_tabs.events.newSlider.video.videoProperty import VideoProperty
+from app.center.widget_tabs.events.newSlider.item.sound import SoundProperty
+from app.center.widget_tabs.events.newSlider.item.text import TextProperty
+from app.center.widget_tabs.events.newSlider.item.video import VideoProperty
 from app.func import Func
 from app.info import Info
 

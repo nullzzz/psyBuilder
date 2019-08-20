@@ -66,10 +66,17 @@ class Scene(QGraphicsScene):
             elif OtherItem.Snow <= item_type <= OtherItem.Gabor:
                 item = OtherItem(item_type)
                 item.getInfo()
+            elif DiaItem.Polygon <= item_type <= DiaItem.Rect:
+                item = DiaItem(item_type)
             else:
                 return
             self.addItem(item)
             item.setPos(event.scenePos())
+            # todo 苟且一下
+            if item_type == DiaItem.Polygon:
+                item.setPosition()
+                item.pro_window.general.add_bt.click()
+                item.pro_window.general.del_bt.click()
             item.setAttributes(self.attributes)
             self.update()
             self.itemAdd.emit(item.getName())
@@ -88,7 +95,7 @@ class Scene(QGraphicsScene):
 
     def setLineColor(self, color):
         for item in self.selectedItems():
-            if isinstance(item, LineItem):
+            if isinstance(item, LineItem) or isinstance(item, DiaItem):
                 item.setColor(color)
 
     def setItemColor(self, color):
@@ -99,7 +106,7 @@ class Scene(QGraphicsScene):
 
     def setLineWidth(self, width):
         for item in self.selectedItems():
-            if isinstance(item, LineItem):
+            if isinstance(item, LineItem) or isinstance(item, DiaItem):
                 item.setWidth(width)
 
     def setMode(self, mode: int):
@@ -177,6 +184,14 @@ class Scene(QGraphicsScene):
                     item = OtherItem(OtherItem.Snow, k)
                 elif k.startswith("gabor"):
                     item = OtherItem(OtherItem.Gabor, k)
+                elif k.startswith("polygon"):
+                    item = DiaItem(DiaItem.Polygon, k)
+                elif k.startswith("arc"):
+                    item = DiaItem(DiaItem.Arc, k)
+                elif k.startswith("rect"):
+                    item = DiaItem(DiaItem.Rect, k)
+                elif k.startswith("circle"):
+                    item = DiaItem(DiaItem.Circle, k)
                 self.addItem(item)
                 item.setProperties(v)
                 item.apply()

@@ -1,7 +1,6 @@
 from PyQt5.QtCore import Qt, QByteArray, QDataStream, QIODevice, QMimeData, pyqtSignal, QSize
-from PyQt5.QtGui import QDrag, QIcon, QPixmap
-from PyQt5.QtCore import Qt, QByteArray, QDataStream, QIODevice, QMimeData, pyqtSignal, QSize
 from PyQt5.QtGui import QDrag, QIcon
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QPushButton, QWidget, QGridLayout, QLabel, QToolBox, QSizePolicy, QFormLayout
 
 from app.func import Func
@@ -14,6 +13,10 @@ class LeftBox(QToolBox):
         super(LeftBox, self).__init__(parent=parent)
         # here to create geometries items
         self.basic = QWidget()
+        polygon = Item("Polygon", self.Polygon)
+        circle = Item("Circle", self.Circle)
+        arc = Item("Arc", self.Arc)
+        rect = Item("Rect", self.Rect)
 
         self.stimuli = QWidget()
         image = Item("image", self.Image)
@@ -28,6 +31,13 @@ class LeftBox(QToolBox):
 
         self.setSizePolicy(QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Ignored))
 
+        basic_layout = QFormLayout()
+        basic_layout.setAlignment(Qt.AlignCenter)
+        basic_layout.addWidget(polygon)
+        basic_layout.addWidget(circle)
+        basic_layout.addWidget(arc)
+        basic_layout.addWidget(rect)
+
         stim_Layout = QFormLayout()
         stim_Layout.setAlignment(Qt.AlignCenter)
 
@@ -38,11 +48,13 @@ class LeftBox(QToolBox):
         stim_Layout.addWidget(snow)
         stim_Layout.addWidget(gabor)
 
+        self.basic.setLayout(basic_layout)
         self.stimuli.setLayout(stim_Layout)
 
         # here to insert geometries layout
         geom_layout = QFormLayout()
         geom_layout.setAlignment(Qt.AlignCenter)
+
 
 class Item(QWidget):
     itemType = pyqtSignal(int)

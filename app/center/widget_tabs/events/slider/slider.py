@@ -564,6 +564,7 @@ class Slider(QMainWindow):
     def createCellWidget(self, text, diagramType):
         item = DiaItem(diagramType, self.itemMenu)
         icon = QIcon(item.image())
+        item.image
 
         button = Button()
         button.setIcon(icon)
