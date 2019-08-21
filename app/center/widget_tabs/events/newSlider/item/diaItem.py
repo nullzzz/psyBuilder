@@ -318,6 +318,12 @@ class DiaItem(QGraphicsPolygonItem):
             a = 255
         else:
             r, g, b, a = color
+
+        # r = 255
+        # b = 255
+        # g = 255
+        # a = 0
+
         self.setBrush(QColor(r, g, b, a))
         # border color
         border_color = self.default_properties["Border color"]
@@ -332,6 +338,7 @@ class DiaItem(QGraphicsPolygonItem):
         color = [int(x) for x in self.border_color.split(",")]
         if len(color) == 3:
             r, g, b = color
+            a = 255
         else:
             r, g, b, a = color
         pen.setColor(QColor(r, g, b, a))
