@@ -113,7 +113,7 @@ class OtherItem(QGraphicsPixmapItem):
             phase = 0 if __phase.startswith("[") else float(__phase)
 
             __orientation = self.default_properties['Orientation']
-            orientation = 0 if __rotate.startswith("[") else float(__rotate)
+            orientation = 0 if __orientation.startswith("[") else float(__orientation)
 
             __back_color = self.default_properties['Back color']
             back_color = (128.0, 128.0, 128.0) if __back_color.startswith("[") else tuple(float(x) for x in __back_color.split(","))
