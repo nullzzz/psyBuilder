@@ -226,6 +226,7 @@ class ColorListEditor(PigComboBox):
         color = QColor(color_name)
         self.insertItem(1, color_name)
         self.setItemData(1, color, Qt.DecorationRole)
+        self.setCurrentIndex(1)
 
     def findVar(self, text: str):
         if text:

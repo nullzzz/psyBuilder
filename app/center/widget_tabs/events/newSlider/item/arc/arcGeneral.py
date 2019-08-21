@@ -15,7 +15,7 @@ class ArcGeneral(QWidget):
             "Height": "200",
             "Border color": "black",
             "Border width": '1',
-            "Fill color": "white"
+            "Fill color": "0,0,0,0"
         }
 
         self.cx_pos = PigLineEdit("0")
@@ -37,6 +37,7 @@ class ArcGeneral(QWidget):
         self.border_color.setCurrentText("0,0,0")
         self.border_width = PigLineEdit("1")
         self.fill_color = ColorListEditor()
+        self.fill_color.addTransparent()
         self.setUI()
 
     def setUI(self):
