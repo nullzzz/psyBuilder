@@ -47,6 +47,9 @@ class PolygonProperty(QWidget):
     def setWh(self, w, h):
         pass
 
+    def setVertex(self, points:list):
+        self.general.setVertex(points)
+
     def getInfo(self):
         self.default_properties = self.general.getInfo()
         return self.default_properties

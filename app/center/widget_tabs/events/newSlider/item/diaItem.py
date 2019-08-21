@@ -157,8 +157,12 @@ class DiaItem(QGraphicsPolygonItem):
 
             elif self.item_type == self.Arc:
                 path.moveTo(new_rect.center())
-                path.arcTo(new_rect, float(self.pro_window.frame.default_properties["Start angle"]),
-                           float(self.pro_window.frame.default_properties["Angle length"]))
+                __start_angle = self.default_properties["Angle start"]
+                start_angle = 0 if __start_angle.startswith("[") else float(__start_angle)
+                __angle_length = self.default_properties["Angle length"]
+                angle_length = 0 if __angle_length.startswith("[") else float(__angle_length)
+
+                path.arcTo(new_rect, start_angle, angle_length)
 
             elif self.item_type == self.Rect:
                 path.addRect(new_rect)
@@ -224,6 +228,8 @@ class DiaItem(QGraphicsPolygonItem):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setPosition()
         self.setWh()
+        if self.item_type == self.Polygon:
+            self.setVertex()
         self.setPoint()
         self.pro_window.show()
 
@@ -232,6 +238,15 @@ class DiaItem(QGraphicsPolygonItem):
 
     def setWh(self):
         self.pro_window.setWh(self.boundingRect().width(), self.boundingRect().height())
+
+    def setVertex(self):
+        points = []
+        for p in range(len(self.polygon()) - 1):
+            points.append(
+                (self.polygon()[p].x() + self.scenePos().x(),
+                 self.polygon()[p].y() + self.scenePos().y()))
+
+        self.pro_window.setVertex(points)
 
     def setPoint(self):
         # todo: 设置polygon顶点
@@ -292,13 +307,19 @@ class DiaItem(QGraphicsPolygonItem):
 
         self.setPos(QPoint(cx, cy))
 
+        # fill color
         fill_color = self.default_properties["Fill color"]
         if not fill_color.startswith("["):
             self.fill_color = fill_color
         # todo
-        r, g, b = [int(x) for x in self.fill_color.split(",")]
-        self.setBrush(QColor(r, g, b))
-
+        color = [int(x) for x in self.fill_color.split(",")]
+        if len(color) == 3:
+            r, g, b = color
+            a = 255
+        else:
+            r, g, b, a = color
+        self.setBrush(QColor(r, g, b, a))
+        # border color
         border_color = self.default_properties["Border color"]
         if not border_color.startswith("["):
             self.border_color = border_color
@@ -307,12 +328,16 @@ class DiaItem(QGraphicsPolygonItem):
             self.border_width = int(border_width)
         pen = self.pen()
         pen.setWidth(self.border_width)
-        r, g, b = [int(x) for x in self.border_color.split(",")]
-        pen.setColor(QColor(r, g, b))
+
+        color = [int(x) for x in self.border_color.split(",")]
+        if len(color) == 3:
+            r, g, b = color
+        else:
+            r, g, b, a = color
+        pen.setColor(QColor(r, g, b, a))
         self.setPen(pen)
 
         path = QPainterPath()
-
         if self.item_type == self.Polygon:
             points = self.default_properties["Points"]
             flag = True

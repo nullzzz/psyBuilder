@@ -195,8 +195,17 @@ class PolygonGeneral(QWidget):
         self.loadSetting()
 
     def setPosition(self, x, y):
-        self.cx_pos.setText(str(int(x)))
-        self.cy_pos.setText(str(int(y)))
+        if not self.cx_pos.text().startswith("["):
+            self.cx_pos.setText(str(int(x)))
+        if not self.cy_pos.text().startswith("["):
+            self.cy_pos.setText(str(int(y)))
+
+    def setVertex(self, points: list):
+        for i, j in zip(self.points, points):
+            if not i.x.text().startswith("["):
+                i.x.setText(str(int(j[0])))
+            if not i.y.text().startswith("["):
+                i.y.setText(str(int(j[1])))
 
     # 加载参数设置
     def loadSetting(self):

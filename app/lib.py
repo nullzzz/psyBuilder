@@ -191,6 +191,7 @@ class ColorListEditor(PigComboBox):
         "green": "0,255,0",
         "blue": "0,0,255",
         "purple": "128,0,128",
+        "transparent": "0,0,0,0"
     }
 
     def __init__(self, widget=None):
@@ -213,12 +214,18 @@ class ColorListEditor(PigComboBox):
 
     # 添加默认颜色，白灰黑、红橙黄绿蓝紫
     def init(self):
-        for i, colorName in enumerate(self.default_color):
-            color = QColor(colorName)
-            self.insertItem(i, colorName)
+        for i, color_name in enumerate(self.default_color):
+            color = QColor(color_name)
+            self.insertItem(i, color_name)
             self.setItemData(i, color, Qt.DecorationRole)
         self.insertItem(0, "More...", Qt.DecorationRole)
         self.setItemIcon(0, QIcon("image/more_color.png"))
+
+    def addTransparent(self):
+        color_name = "transparent"
+        color = QColor(color_name)
+        self.insertItem(1, color_name)
+        self.setItemData(1, color, Qt.DecorationRole)
 
     def findVar(self, text: str):
         if text:
@@ -253,7 +260,7 @@ class ColorListEditor(PigComboBox):
                 # 255,255,255格式rgb
                 elif text[0].isdigit():
                     color_rgb = text.split(",")
-                    if len(color_rgb) == 3 and color_rgb[2] != "":
+                    if len(color_rgb) >= 3 and color_rgb[2] != "":
                         self.setStyleSheet("background-color: rgb({});".format(text))
                         # 添加到下拉菜单
                         if self.findText(text, Qt.MatchExactly) == -1:
@@ -277,9 +284,10 @@ class ColorListEditor(PigComboBox):
                     self.is_valid = 1
                 elif text in self.default_color:
                     self.is_valid = 1
-                    # index = self.findText(text, Qt.MatchExactly)
-                    # self.setCurrentIndex(index)
                     self.setStyleSheet("background: rgb({})".format(self.color_map.get(text)))
+                elif text == "transparent":
+                    self.is_valid = 1
+                    self.setStyleSheet("background: white")
                 else:
                     self.is_valid = 0
                     self.setStyleSheet("background: white")
@@ -341,6 +349,16 @@ class ColorListEditor(PigComboBox):
         color_name = self.currentText()
         if color_name.startswith("["):
             color_name = '255,255,255'
+        elif color_name.startswith("#"):
+            color_name = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
+        elif color_name == "transparent":
+            color_name = '255,255,255'
+        return self.color_map.get(color_name, color_name)
+
+    def getRGBA(self):
+        color_name = self.currentText()
+        if color_name.startswith("["):
+            return color_name
         elif color_name.startswith("#"):
             color_name = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
         return self.color_map.get(color_name, color_name)

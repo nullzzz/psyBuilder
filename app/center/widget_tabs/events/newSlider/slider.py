@@ -183,18 +183,28 @@ class Slider(QMainWindow):
 
         border_color: str = item.default_properties.get("Border color", "0,0,0")
         if border_color.startswith("["):
-            r, g, b = 0, 0, 0
+            r, g, b, a = 0, 0, 0, 255
         else:
-            r, g, b = [int(x) for x in border_color.split(",")]
-        color = QColor(r, g, b)
+            color = [int(x) for x in border_color.split(",")]
+            if len(color) == 3:
+                r, g, b = color
+                a = 255
+            else:
+                r, g, b, a = color
+        color = QColor(r, g, b, a)
         self.line_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("linecolor.png"), color))
 
         fill_color: str = item.default_properties.get("Fill color", "0,0,0")
         if fill_color.startswith("["):
-            r, g, b = 0, 0, 0
+            r, g, b, a = 0, 0, 0, 255
         else:
-            r, g, b = [int(x) for x in fill_color.split(",")]
-        color = QColor(r, g, b)
+            color = [int(x) for x in fill_color.split(",")]
+            if len(color) == 3:
+                r, g, b = color
+                a = 255
+            else:
+                r, g, b, a = color
+        color = QColor(r, g, b, a)
         self.fill_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("floodfill.png"), color))
 
     def setUI(self):
