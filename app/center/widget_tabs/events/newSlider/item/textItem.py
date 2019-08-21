@@ -109,7 +109,10 @@ class TextItem(QGraphicsTextItem):
         #  handle the ref values
         x = 0 if Func.isCitingValue(x) else int(x)
         y = 0 if Func.isCitingValue(y) else int(y)
-        style = 0 if Func.isCitingValue(style) else int(style)
+
+        if Func.isCitingValue(style):
+            style = 0
+
         foreColor = "0,0,0" if Func.isCitingValue(foreColor) else foreColor
         backColor = "255,255,255" if Func.isCitingValue(backColor) else backColor
         family = "Times" if Func.isCitingValue(family) else family
@@ -142,7 +145,7 @@ class TextItem(QGraphicsTextItem):
         elif style == "extend_64":
             style = 64
 
-        # style = int(style)
+        style = int(style)
 
         font.setBold(bool(style & 1))
         font.setItalic(bool(style & 2))
