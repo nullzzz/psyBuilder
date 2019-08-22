@@ -138,9 +138,9 @@ class OtherItem(QGraphicsPixmapItem):
         self.update()
 
     @staticmethod
-    def getSnow(w, h, is_binary=False):
+    def getSnow(h, w, is_binary=False):
 
-        snow = np.random.rand(w, h)
+        snow = np.random.rand(h, w)
         if is_binary:
             snow[snow <= 0.5] = 0
             snow[snow > 0.5] = 255
