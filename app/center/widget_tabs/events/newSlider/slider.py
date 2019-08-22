@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QRect
 from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMainWindow, QMenu, QAction, \
-    QComboBox, QColorDialog
+    QComboBox, QColorDialog, QFrame
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
 from app.center.widget_tabs.events.newSlider.item.linItem import LineItem
@@ -136,13 +136,18 @@ class Slider(QMainWindow):
         self.setting.addWidget(self.background_bt)
 
         self.view = QGraphicsView(self.scene)
+        self.view.setRenderHint(QPainter.Antialiasing)
 
         width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
+
+        self.view.setMaximumSize(width/2, height/2)
         self.scene.setSceneRect(0, 0, width, height)
         self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
+
         self.scene.menu = self.itemMenu
 
         self.left_box = LeftBox()
+
         self.default_properties: dict = {
             "items": {},
             "pro": self.pro_window.getInfo()
@@ -210,8 +215,8 @@ class Slider(QMainWindow):
     def setUI(self):
         self.setWindowTitle("Slider")
         layout = QHBoxLayout()
-        layout.addWidget(self.left_box, 1)
-        layout.addWidget(self.view, 2)
+        layout.addWidget(self.left_box, 0, Qt.AlignLeft)
+        layout.addWidget(self.view, 1, Qt.AlignHCenter | Qt.AlignVCenter)
         widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
@@ -222,7 +227,10 @@ class Slider(QMainWindow):
         self.pro_window.refresh()
         self.getInfo()
 
+        self.view = QGraphicsView(self.scene)
+        self.view.setRenderHint(QPainter.Antialiasing)
         width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
+        self.view.setMaximumSize(width / 2, height / 2)
         self.scene.setSceneRect(0, 0, width, height)
         self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 

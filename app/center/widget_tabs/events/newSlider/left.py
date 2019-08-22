@@ -42,6 +42,7 @@ class LeftList(QListWidget):
         self.setWrapping(False)
         self.setSpacing(10)
         self.setFrameStyle(QFrame.NoFrame)
+
         # self.setIconSize(QSize(40, 40))
         # self.setLayoutDirection(Qt.)
 
@@ -56,7 +57,7 @@ class Item(QListWidgetItem):
         self.setText(text)
         # fp = Func.getImage(f"{text}.png")
         fp = f"D:\\PsyDemo\\image\\{text}.png"
-        print(fp)
+        # print(fp)
         self.setIcon(QIcon(fp))
         # self.setMouseTracking(True)
 
