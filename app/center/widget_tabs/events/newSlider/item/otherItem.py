@@ -97,7 +97,7 @@ class OtherItem(QGraphicsPixmapItem):
             __scale = self.default_properties["Scale"]
             scale = int(__scale) if __scale.isdigit() else 8
 
-            snow_stimulate = self.getSnow(w // scale, h // scale)
+            snow_stimulate = self.getSnow(h // scale, w // scale)
 
             pix = QPixmap(qimage2ndarray.array2qimage(snow_stimulate))
             self.setPixmap(pix.scaled(w, h))
@@ -139,11 +139,14 @@ class OtherItem(QGraphicsPixmapItem):
 
     @staticmethod
     def getSnow(w, h, is_binary=False):
+
         snow = np.random.rand(w, h)
-        snow = snow * 255
         if is_binary:
             snow[snow <= 0.5] = 0
             snow[snow > 0.5] = 255
+        else:
+            snow = snow * 255
+
         snow.astype(np.uint8)
         return snow
 

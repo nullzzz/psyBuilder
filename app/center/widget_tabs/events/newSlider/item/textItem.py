@@ -17,10 +17,7 @@ class TextItem(QGraphicsTextItem):
     Text = 6
 
     name = {
-        # Image: "image",
         Text: "text",
-        # Video: "video",
-        # Sound: "sound",
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):
@@ -36,7 +33,7 @@ class TextItem(QGraphicsTextItem):
             self.pro_window = TextProperty()
 
             self.setPlainText('Hello World')
-            # print(f"line 42 {self.toPlainText()}")
+
             self.setTextInteractionFlags(Qt.TextEditorInteraction)
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
