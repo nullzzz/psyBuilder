@@ -29,7 +29,6 @@ class TextItem(QGraphicsTextItem):
 
         self.attributes: list = []
 
-        # if self.item_type == self.Text:
         self.pro_window = TextProperty()
 
         self.setPlainText('Hello World')

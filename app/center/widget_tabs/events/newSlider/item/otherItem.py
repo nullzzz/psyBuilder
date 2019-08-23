@@ -86,9 +86,9 @@ class OtherItem(QGraphicsPixmapItem):
         h = int(__h) if __h.isdigit() else 100
 
         __cx = self.default_properties["Center X"]
-        cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
+        cx = int(__cx) if __cx.isdigit() else self.getUnRotatedScenePos().x()
         __cy = self.default_properties["Center Y"]
-        cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
+        cy = int(__cy) if __cy.isdigit() else self.getUnRotatedScenePos().x()
 
         __rotate = self.default_properties["Rotation"]
         rotate = int(__rotate) if __rotate.isdigit() else 0
@@ -129,7 +129,8 @@ class OtherItem(QGraphicsPixmapItem):
             pix = QPixmap(qimage2ndarray.array2qimage(gabor_stimulate))
             self.setPixmap(pix.scaled(w, h, Qt.KeepAspectRatio))
 
-        self.setPos(QPoint(cx, cy))
+        self.setPos(QPoint(cx - (w /2), cy - (h /2)))
+
         x = self.boundingRect().center().x()
         y = self.boundingRect().center().y()
 
@@ -190,7 +191,23 @@ class OtherItem(QGraphicsPixmapItem):
         return gabor
 
     def setPosition(self):
-        self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
+        unRotatedScenePos = self.getUnRotatedScenePos()
+
+        width = self.boundingRect().width()
+        height = self.boundingRect().height()
+
+        self.pro_window.setPosition(unRotatedScenePos.x() + (width / 2), unRotatedScenePos.y() + (height / 2))
+
+    def getUnRotatedScenePos(self):
+        rotate = self.rotation()
+
+        if rotate != 0:
+            self.setRotation(0)
+            unRotatedScenePos = self.scenePos()
+            self.setRotation(rotate)
+        else:
+            unRotatedScenePos = self.scenePos()
+        return unRotatedScenePos
 
     def getInfo(self):
         self.default_properties.clear()
