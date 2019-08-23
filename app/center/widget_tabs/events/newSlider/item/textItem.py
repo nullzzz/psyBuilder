@@ -29,12 +29,16 @@ class TextItem(QGraphicsTextItem):
 
         self.attributes: list = []
 
-        if self.item_type == self.Text:
-            self.pro_window = TextProperty()
+        # if self.item_type == self.Text:
+        self.pro_window = TextProperty()
 
-            self.setPlainText('Hello World')
+        self.setPlainText('Hello World')
 
-            self.setTextInteractionFlags(Qt.TextEditorInteraction)
+        font = QFont()
+        font.setPointSize(20) #set the inital font size to 20 pt (point)
+        self.setFont(font)
+
+        self.setTextInteractionFlags(Qt.TextEditorInteraction)
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
@@ -47,7 +51,7 @@ class TextItem(QGraphicsTextItem):
         self.default_properties = {
             'Name': 'text',
             'Font family': 'SimSun',
-            'Font size': '12',
+            'Font size': '20',
             'Text': 'Hello World',
             'z': self.zValue(),
             'x': 1,
@@ -89,6 +93,7 @@ class TextItem(QGraphicsTextItem):
         self.changeSomething()
 
     def changeSomething(self):
+
         text = self.toPlainText()
 
         x = self.default_properties.get("Center x")
@@ -113,7 +118,7 @@ class TextItem(QGraphicsTextItem):
         foreColor = "0,0,0" if Func.isCitingValue(foreColor) else foreColor
         backColor = "255,255,255" if Func.isCitingValue(backColor) else backColor
         family = "Times" if Func.isCitingValue(family) else family
-        size = 18 if Func.isCitingValue(size) else int(size)
+        size = 20 if Func.isCitingValue(size) else int(size)
         transparent = "100%" if Func.isCitingValue(transparent) else transparent
 
 
@@ -149,6 +154,14 @@ class TextItem(QGraphicsTextItem):
         font.setUnderline(bool(style & 4))
         font.setStrikeOut(bool(style & 8))
         font.setOverline(bool(style & 16))
+        if bool(style & 32):
+            font.setStretch(75) # condensed 75
+
+        if bool(style & 64):
+            font.setStretch(125) # expanded 125
+        # see detail in below site:
+        # https://doc.qt.io/qtforpython/PySide2/QtGui/QFont.html
+
 
         self.setFont(font)
 
@@ -156,13 +169,19 @@ class TextItem(QGraphicsTextItem):
         self.setPos(x, y)
         self.setZValue(z)
 
+
     def getInfo(self):
+        boundRect = self.boundingRect()
+
+
         self.default_properties = {
             'Name': self.item_name,
             'Text': self.toPlainText(),
             'z': self.zValue(),
             'x': self.scenePos().x(),
             'y': self.scenePos().y(),
+            'Text Width':str(boundRect.width()),
+            'Text Height':str(boundRect.height()),
             **self.pro_window.getInfo(),
         }
         return self.default_properties

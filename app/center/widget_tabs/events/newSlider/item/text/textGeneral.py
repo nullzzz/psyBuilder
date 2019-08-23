@@ -54,6 +54,7 @@ class TextGeneral(QWidget):
         self.font_size_box.setEditable(True)
         for i in range(12, 72, 2):
             self.font_size_box.addItem(str(i))
+            self.font_size_box.setCurrentText('20')
 
         self.right_to_left = PigComboBox()
         self.right_to_left.addItems(("no", "yes"))
@@ -61,8 +62,10 @@ class TextGeneral(QWidget):
         self.setUI()
 
     def setUI(self):
-        l00 = QLabel("Center X:")
-        l10 = QLabel("Center Y:")
+        # l00 = QLabel("Center X:")
+        # l10 = QLabel("Center Y:")
+        l00 = QLabel("Left X:")
+        l10 = QLabel("Top  Y:")
 
         l02 = QLabel("Fore Color:")
         l12 = QLabel("Back Color:")
