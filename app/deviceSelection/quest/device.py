@@ -20,7 +20,7 @@ class Quest(QListWidgetItem):
         self.method = "quantile"
         self.minimum = "0"
         self.maximum = "1"
-        self.is_log10_transform = "yes"
+        self.is_log10_transform = "Yes"
 
         # 设置图标
         self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.quest_type))))

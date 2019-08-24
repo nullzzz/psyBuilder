@@ -35,7 +35,7 @@ class Device(QListWidgetItem):
         self.resolution = "auto"
         self.refresh_rate = "auto"
         # parallel
-        self.is_client: str = "yes"
+        self.is_client: str = "Yes"
         # net
         self.ip_port: str = "25576"
         # serial

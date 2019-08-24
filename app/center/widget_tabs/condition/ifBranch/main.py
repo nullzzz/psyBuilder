@@ -10,8 +10,8 @@ class IfBranch(QWidget):
     """
     {
         "Condition": "",
-        "True": "",
-        "False": ""
+        "Yes": "",
+        "No": ""
     }
 
     """
@@ -35,8 +35,8 @@ class IfBranch(QWidget):
 
         self.default_properties = {
             "Condition": self.condition_area.getInfo(),
-            "True": self.true_icon_choose.getInfo(),
-            "False": self.false_icon_choose.getInfo()
+            "Yes": self.true_icon_choose.getInfo(),
+            "No": self.false_icon_choose.getInfo()
         }
 
         self.ok_button = QPushButton("OK")
@@ -56,12 +56,12 @@ class IfBranch(QWidget):
         layout1.addWidget(self.condition_area)
         condition_group.setLayout(layout1)
 
-        true_group = QGroupBox("True")
+        true_group = QGroupBox("Yes")
         layout2 = QVBoxLayout()
         layout2.addWidget(self.true_icon_choose)
         true_group.setLayout(layout2)
 
-        false_group = QGroupBox("False")
+        false_group = QGroupBox("No")
         layout3 = QVBoxLayout()
         layout3.addWidget(self.false_icon_choose)
         false_group.setLayout(layout3)
@@ -85,8 +85,8 @@ class IfBranch(QWidget):
 
     def getInfo(self):
         self.default_properties["Condition"] = self.condition_area.getInfo()
-        self.default_properties["True"] = self.true_icon_choose.getInfo()
-        self.default_properties["False"] = self.false_icon_choose.getInfo()
+        self.default_properties["Yes"] = self.true_icon_choose.getInfo()
+        self.default_properties["No"] = self.false_icon_choose.getInfo()
         return self.default_properties
 
     def getProperties(self):
@@ -123,8 +123,8 @@ class IfBranch(QWidget):
 
     def loadSetting(self):
         self.condition_area.setProperties(self.default_properties.get("Condition", {}))
-        self.true_icon_choose.setProperties(self.default_properties.get("True", {}))
-        self.false_icon_choose.setProperties(self.default_properties.get("False", {}))
+        self.true_icon_choose.setProperties(self.default_properties.get("Yes", {}))
+        self.false_icon_choose.setProperties(self.default_properties.get("No", {}))
 
     def clone(self, new_id: str):
         clone_widget = IfBranch(widget_id=new_id)

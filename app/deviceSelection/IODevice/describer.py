@@ -147,13 +147,13 @@ class Net(Shower):
     def describe(self, device_type, device_name, device_address, others):
         super().describe(device_type, device_name, device_address, others)
         self.device_ip_port.setText(others.get("IP Port", "25576"))
-        self.is_client.setChecked(others.get("Is Client", "yes") == "yes")
+        self.is_client.setChecked(others.get("Is Client", "Yes") == "Yes")
 
     def changeClient(self, state):
         if state:
-            self.clientChanged.emit("yes")
+            self.clientChanged.emit("Yes")
         else:
-            self.clientChanged.emit("no")
+            self.clientChanged.emit("No")
 
 
 class Serial(Shower):

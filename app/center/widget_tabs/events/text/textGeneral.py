@@ -53,9 +53,9 @@ class TextTab1(QWidget):
         self.text_edit.setLineWrapColumnOrWidth(80)
 
         self.flip_horizontal = PigComboBox()
-        self.flip_horizontal.addItems(("False", "True"))
+        self.flip_horizontal.addItems(("No", "Yes"))
         self.flip_vertical = PigComboBox()
-        self.flip_vertical.addItems(("False", "True"))
+        self.flip_vertical.addItems(("No", "Yes"))
 
         self.font_box = QFontComboBox()
         self.font_box.currentFontChanged.connect(self.fontChange)
@@ -73,7 +73,7 @@ class TextTab1(QWidget):
         self.font_size_box.currentIndexChanged.connect(self.fontChange)
 
         self.right_to_left = PigComboBox()
-        self.right_to_left.addItems(("no", "yes"))
+        self.right_to_left.addItems(("No", "Yes"))
 
         self.using_screen_id: str = "screen.0"
         self.screen = PigComboBox()
