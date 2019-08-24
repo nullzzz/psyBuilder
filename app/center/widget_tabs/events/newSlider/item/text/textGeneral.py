@@ -134,7 +134,7 @@ class TextGeneral(QWidget):
         self.fore_color.setCompleter(QCompleter(self.attributes))
         self.back_color.setCompleter(QCompleter(self.attributes))
         self.transparent.setCompleter(QCompleter(self.attributes))
-        self.right_to_left.setCompleter(QCompleter(self.attributes))
+        # self.right_to_left.setCompleter(QCompleter(self.attributes))
         self.font_size_box.setCompleter(QCompleter(self.attributes))
         self.style_box.setCompleter(QCompleter(self.attributes))
 
@@ -169,7 +169,6 @@ class TextGeneral(QWidget):
             self.cy_pos.setCurrentText(str(int(y)))
 
     def loadSetting(self):
-
         self.cx_pos.setCurrentText(self.default_properties["Center x"])
         self.cy_pos.setCurrentText(self.default_properties["Center y"])
         self.fore_color.setCurrentText(self.default_properties["Fore color"])

@@ -261,7 +261,7 @@ class Func(object):
             from app.center.widget_tabs.events.sound.soundDisplay import SoundDisplay
             widget = SoundDisplay(widget_id=widget_id)
         elif widget_type == Info.SLIDER:
-            from app.center.widget_tabs.events.slider.slider import Slider
+            from app.center.widget_tabs.events.newSlider.slider import Slider
             widget = Slider(widget_id=widget_id)
         elif widget_type == Info.BUG:
             from app.center.widget_tabs.events.newSlider.slider import Slider

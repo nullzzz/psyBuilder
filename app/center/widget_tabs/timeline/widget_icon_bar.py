@@ -72,7 +72,7 @@ class WidgetIconBar(QTabWidget):
         self.events.addItem(QListWidgetItem(Func.getWidgetImage(Info.IMAGE, 'icon'), Info.IMAGE))
         self.events.addItem(QListWidgetItem(Func.getWidgetImage(Info.VIDEO, 'icon'), Info.VIDEO))
         self.events.addItem(QListWidgetItem(Func.getWidgetImage(Info.SLIDER, 'icon'), Info.SLIDER))
-        self.events.addItem(QListWidgetItem(Func.getWidgetImage(Info.BUG, 'icon'), Info.BUG))
+        # self.events.addItem(QListWidgetItem(Func.getWidgetImage(Info.BUG, 'icon'), Info.BUG))
         # eye_tracker
         # self.eye_tracker.addItem(QListWidgetItem(Func.getWidgetImage(Info.OPEN, 'icon'), Info.OPEN))
         self.eye_tracker.addItem(QListWidgetItem(Func.getWidgetImage(Info.DC, 'icon'), Info.DC))
