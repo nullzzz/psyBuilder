@@ -45,7 +45,7 @@ class ImageGeneral(QWidget):
         self.stretch_mode = PigComboBox()
 
         # 背景色、透明度
-        self.transparent = PigLineEdit()
+        self.transparent = PigComboBox()
 
         self.x_pos = PigComboBox()
         self.y_pos = PigComboBox()
@@ -61,6 +61,9 @@ class ImageGeneral(QWidget):
         self.rotate.setEditable(True)
         self.rotate.setReg(r"\d+|\d+\.\d+")
 
+        self.transparent.addItems(("0%","25%", "50%", "75%", "100%"))
+        self.transparent.setCurrentText("100%")
+        self.transparent.setEditable(True)
         self.transparent.setReg(r"\d+%?|\d+\.\d+%?")
 
         self.x_pos.addItems(("25%", "50%", "75%", "100%"))
@@ -103,7 +106,7 @@ class ImageGeneral(QWidget):
         layout1.addWidget(l0, 1, 2)
         layout1.addWidget(self.rotate, 1, 3)
 
-        l_tra = QLabel("Transparent:")
+        l_tra = QLabel("Transparent(%):")
         l_tra.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1.addWidget(l_tra, 2, 2)
@@ -121,8 +124,8 @@ class ImageGeneral(QWidget):
 
         l_x_pos = QLabel("X Position:")
         l_y_pos = QLabel("Y Position:")
-        l_width = QLabel("Width:")
-        l_height = QLabel("Height:")
+        l_width = QLabel("Maximum Width:")
+        l_height = QLabel("Maximum Height:")
 
         l_x_pos.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_y_pos.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -185,7 +188,7 @@ class ImageGeneral(QWidget):
         self.default_properties["Rotate"] = self.rotate.currentText()
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
-        self.default_properties["Transparent"] = self.transparent.text()
+        self.default_properties["Transparent"] = self.transparent.currentText()
         self.default_properties["X position"] = self.x_pos.currentText()
         self.default_properties["Y position"] = self.y_pos.currentText()
         self.default_properties["Width"] = self._width.currentText()
@@ -201,7 +204,7 @@ class ImageGeneral(QWidget):
         self.default_properties["Rotate"] = self.rotate.currentText()
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
-        self.default_properties["Transparent"] = self.transparent.text()
+        self.default_properties["Transparent"] = self.transparent.currentText()
         self.default_properties["X position"] = self.x_pos.currentText()
         self.default_properties["Y position"] = self.y_pos.currentText()
         self.default_properties["Width"] = self._width.currentText()
@@ -220,7 +223,7 @@ class ImageGeneral(QWidget):
         self.rotate.setCurrentText(self.default_properties["Rotate"])
         self.stretch.setChecked(self.default_properties["Stretch"])
         self.stretch_mode.setCurrentText(self.default_properties["Stretch mode"])
-        self.transparent.setText(self.default_properties["Transparent"])
+        self.transparent.setCurrentText(self.default_properties["Transparent"])
         self.x_pos.setCurrentText(self.default_properties["X position"])
         self.y_pos.setCurrentText(self.default_properties["Y position"])
         self._width.setCurrentText(self.default_properties["Width"])
