@@ -102,7 +102,7 @@ class PigComboBox(QComboBox):
             self.setFont(QFont("宋体", 9, QFont.Normal))
 
     def setReg(self, reg_exp: str):
-        self.reg_exp = reg_exp + r"|\[[\w\d_]+\]"
+        self.reg_exp = reg_exp + r"|\[[\w\d_\.]+\]"
         self.setValidator(QRegExpValidator(QRegExp(self.reg_exp), self))
 
     def focusOutEvent(self, e):

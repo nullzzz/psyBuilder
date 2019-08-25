@@ -31,7 +31,7 @@ class IconChoose(QWidget):
         self.event_types.addItem(Info.VIDEO)
         self.event_types.addItem(Info.TEXT)
         self.event_types.addItem(Info.SOUND)
-        self.event_types.addItem(Info.BUG)
+        self.event_types.addItem(Info.SLIDER)
         self.event_types.currentTextChanged.connect(self.changeIcon)
         self.name_line = PigLineEdit()
         self.name_line.setEnabled(False)
@@ -87,17 +87,14 @@ class IconChoose(QWidget):
         assert self.widget is not None
 
         # slider
-        if self.event_type == Info.BUG:
+        if self.event_type == Info.SLIDER:
             self.pro_window = self.widget
         else:
             self.pro_window = self.widget.pro_window
-
-            # 设置attributes
-            self.pro_window.setAttributes(self.attributes)
             self.pro_window.ok_bt.clicked.connect(self.ok)
             self.pro_window.cancel_bt.clicked.connect(self.cancel)
             self.pro_window.apply_bt.clicked.connect(self.apply)
-
+        self.setAttributes(self.attributes)
         self.name_line.setText(f"Untitled_{self.event_type}{int(time.time() % 10000)}")
         self.name_line.setEnabled(True)
 
@@ -116,7 +113,7 @@ class IconChoose(QWidget):
 
     def openProWindow(self):
         if self.widget:
-            if self.event_type == Info.BUG:
+            if self.event_type == Info.SLIDER:
                 self.pro_window.pro_window.refresh()
             else:
                 self.pro_window.refresh()
