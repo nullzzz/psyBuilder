@@ -53,7 +53,7 @@ class Describer(QWidget):
         self.maximum = QLineEdit()
         self.maximum.textChanged.connect(lambda x: self.maximumChanged.emit(x))
         self.is_log10_transform = QComboBox()
-        self.is_log10_transform.addItems(("yes", "no"))
+        self.is_log10_transform.addItems(("Yes", "No"))
         self.is_log10_transform.currentTextChanged.connect(lambda x: self.isTransformChanged.emit(x))
 
         self.setUI()

@@ -38,9 +38,9 @@ class TextGeneral(QWidget):
         self.transparent.setReg(r"0%|[1-9]\d%|100%")
 
         self.flip_horizontal = PigComboBox()
-        self.flip_horizontal.addItems(("False", "True"))
+        self.flip_horizontal.addItems(("No", "Yes"))
         self.flip_vertical = PigComboBox()
-        self.flip_vertical.addItems(("False", "True"))
+        self.flip_vertical.addItems(("No", "Yes"))
 
         self.font_box = QFontComboBox()
 
@@ -57,7 +57,7 @@ class TextGeneral(QWidget):
             self.font_size_box.setCurrentText('20')
 
         self.right_to_left = PigComboBox()
-        self.right_to_left.addItems(("no", "yes"))
+        self.right_to_left.addItems(("No", "Yes"))
 
         self.setUI()
 

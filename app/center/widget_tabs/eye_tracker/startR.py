@@ -24,12 +24,12 @@ class StartR(QWidget):
 
         self.default_properties = {
             "Status message": "",
-            "Sync to next event flip": "no",
+            "Sync to next event flip": "No",
             "EyeTracker Name": "",
         }
         self.status_message = PigLineEdit()
         self.sync_to_next_event_flip = PigComboBox()
-        self.sync_to_next_event_flip.addItems(("no", "yes"))
+        self.sync_to_next_event_flip.addItems(("No", "Yes"))
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()

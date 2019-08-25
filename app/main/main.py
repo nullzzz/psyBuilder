@@ -561,14 +561,14 @@ class PsyApplication(QMainWindow):
             traceback.print_exc()
 
     def registry(self):
-        if Info.IS_REGISTER == "yes":
+        if Info.IS_REGISTER == "Yes":
             QMessageBox.about(self, "Registry", "Already registry")
         else:
             try:
                 writeToRegistry(Func.getPsyIconPath())
-                Info.CONFIG.setValue("register", "yes")
+                Info.CONFIG.setValue("register", "Yes")
                 QMessageBox.about(self, "Registry", "Registry Successful!")
-                Info.IS_REGISTER = "yes"
+                Info.IS_REGISTER = "Yes"
             except Exception:
                 QMessageBox.about(self, "Registry", "Registry Failed!")
     def aboutWidget_ok(self):

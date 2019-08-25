@@ -15,7 +15,7 @@ class FramePage(QWidget):
             "Y position": "0",
             "Width": "100%",
             "Height": "100%",
-            "Enable": "yes",
+            "Enable": "Yes",
             "Border color": "255,255,255",
             "Border width": "0",
             "Frame fill color": "255,255,255",
@@ -39,14 +39,14 @@ class FramePage(QWidget):
         self.back_color = ColorListEditor()
         self.transparent = PigLineEdit("100%")
         self.transparent.setReg(r"[0-9]%|[1-9]\d%|100%")
-        self.enable.addItems(("no", "yes"))
+        self.enable.addItems(("No", "Yes"))
         self.setUI()
 
     def operationAble(self, signal):
-        self.border_color.setEnabled(signal == "yes")
-        self.border_width.setEnabled(signal == "yes")
-        self.back_color.setEnabled(signal == "yes")
-        self.transparent.setEnabled(signal == "yes")
+        self.border_color.setEnabled(signal == "Yes")
+        self.border_width.setEnabled(signal == "Yes")
+        self.back_color.setEnabled(signal == "Yes")
+        self.transparent.setEnabled(signal == "Yes")
 
     # 生成frame页面
     def setUI(self):
