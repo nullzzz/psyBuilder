@@ -45,7 +45,7 @@ class PixItem(QGraphicsPixmapItem):
             self.setPixmap(QPixmap(Func.getImage("video.png")).scaled(100, 100))
         elif self.item_type == self.Sound:
             self.pro_window = SoundProperty()
-            self.setPixmap(QPixmap(Func.getImage("sound.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImage("sound_item.png")).scaled(100, 100))
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)

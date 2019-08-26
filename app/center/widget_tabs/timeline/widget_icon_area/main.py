@@ -57,18 +57,35 @@ class WidgetIconArea(QFrame):
                     if widget_type in ['widget_type_1', 'widget_type_2', '...']:
                         e.ignore()
                         return None
-                # 如果是从structure中拖拽过来，需要进行一个有效性的判断，根据不同类型读取id
-                # 引用的拖拽只局限于同一cycle中所属的timeline
-                # 引用时需要检测widget_id是否违法，即是否在同一层的cycle所挂timeline
-                # 其他地方：timeline和cycle被禁止一切了，直接无法从structure中拖出
-                # 所以其他的复制等等，不需要判断
+
+                # Now, we need to check its validity.
+                # every widget should check using attributes, those attributes should be full-name.
                 accept = True
+                # different type, different way.
                 if e.mimeData().hasFormat("structure_tree/refer-wid"):
+                    # refer widget, we should assure attributes totally same.
+                    # get wid first.
                     data = e.mimeData().data("structure_tree/refer-wid")
                     stream = QDataStream(data, QIODevice.ReadOnly)
                     widget_id = stream.readQString()
-                    # 检查合法性
+                    #
                     accept = Func.checkReferValidity(self.widget_id, widget_id)
+                    if not accept:
+                        QMessageBox.information(self, 'Warning', 'Incompatible attributes.')
+                else:
+                    # we just need assure using attributes same.
+                    data = None
+                    if e.mimeData().hasFormat("structure_tree/copy-wid"):
+                        data = e.mimeData().data("structure_tree/copy-wid")
+                    if e.mimeData().hasFormat("structure_tree/move-wid"):
+                        data = e.mimeData().data("structure_tree/move-wid")
+                    if data:
+                        # get wid first.
+                        stream = QDataStream(data, QIODevice.ReadOnly)
+                        widget_id = stream.readQString()
+                        accept = Func.checkMoveOrCopyValidity(self.widget_id, widget_id)
+                        if not accept:
+                            QMessageBox.information(self, 'Warning', 'Incompatible using attributes.')
                 # end
                 if accept:
                     # sign显示
@@ -76,7 +93,6 @@ class WidgetIconArea(QFrame):
                     e.setDropAction(Qt.CopyAction)
                     e.accept()
                 else:
-                    QMessageBox.information(self, 'Warning', 'Invalid drag!')
                     e.ignore()
             else:
                 e.ignore()

@@ -244,6 +244,7 @@ class Slider(QMainWindow):
     def getProperties(self):
         return self.default_properties
 
+
     def getShowProperties(self):
         info = self.pro_window.default_properties.copy()
         info.pop("Input devices")
@@ -470,3 +471,29 @@ class Slider(QMainWindow):
         :return:
         """
         self.widget_id = new_widget_id
+
+
+
+    def getDuration(self) -> str:
+        """
+        返回duration
+        :return:
+        """
+        return self.pro_window.duration.duration.currentText()
+
+    def getOutputDevice(self) -> dict:
+        """
+        返回输出设备
+        :return:
+        """
+        return self.pro_window.duration.default_properties.get("Output devices", {})
+
+    def getInputDevice(self) -> dict:
+        """
+        返回输入设备
+        :return: 输入设备字典
+        """
+        return self.pro_window.duration.default_properties.get("Input devices", {})
+
+    def getPropertyByKey(self, key: str):
+        return self.default_properties.get(key)
