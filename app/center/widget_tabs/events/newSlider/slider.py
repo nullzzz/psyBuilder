@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QRect
-from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
+from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush, QKeySequence
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMainWindow, QMenu, QAction, \
     QComboBox, QColorDialog, QFrame
 
@@ -45,7 +45,8 @@ class Slider(QMainWindow):
         self.open_item_action = QAction(QIcon(Func.getImage("setting.png")), "Properties", self)
         self.open_item_action.triggered.connect(self.openItem)
 
-        self.delete_action = QAction(QIcon(Func.getImage("trash.png")), "&Delete", self)
+        self.delete_action = QAction(QIcon(Func.getImage("trash.png")), "Delete", self)
+        self.delete_action.setShortcut("Ctrl+D")
         self.delete_action.setToolTip("Delete item from diagram")
         self.delete_action.triggered.connect(self.deleteItem)
 
@@ -342,6 +343,8 @@ class Slider(QMainWindow):
 
     def fillButtonTriggered(self):
         self.scene.setItemColor(QColor(self.fillAction.data()))
+        print(f"line 346: fillButtonTriggered")
+        # self.apply()
 
     def lineButtonTriggered(self):
         self.scene.setLineColor(QColor(self.lineAction.data()))

@@ -97,6 +97,7 @@ class DiaItem(QGraphicsPolygonItem):
 
     def setItemColor(self, color):
         self.fill_color = color
+        self.pro_window.setItemColor(color)
 
     def setLineColor(self, color):
         self.border_color = color

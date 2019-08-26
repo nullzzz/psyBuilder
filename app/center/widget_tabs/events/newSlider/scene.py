@@ -102,7 +102,9 @@ class Scene(QGraphicsScene):
         for item in self.selectedItems():
             if isinstance(item, DiaItem):
                 item.setBrush(color)
-                item.setItemColor(color.name())
+
+                item.setItemColor(color)
+                # item.setItemColor(color.name())
 
     def setLineWidth(self, width):
         for item in self.selectedItems():

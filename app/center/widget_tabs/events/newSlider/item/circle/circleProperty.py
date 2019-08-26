@@ -53,6 +53,9 @@ class CircleProperty(QWidget):
     def setWh(self, w, h):
         self.general.setWh(w, h)
 
+    def setItemColor(self, color):
+        self.general.setItemColor(color)
+
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
             self.default_properties = properties

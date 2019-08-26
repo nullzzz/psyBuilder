@@ -110,6 +110,11 @@ class CircleGeneral(QWidget):
         if not self._height.text().startswith("["):
             self._height.setText(str(int(h)))
 
+    def setItemColor(self,color):
+        if not self.fill_color.currentText().startswith("["):
+            cRGBA = color.getRgb()
+            self.fill_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
+
     # 加载参数设置
     def loadSetting(self):
         self.cx_pos.setText(self.default_properties["Center X"])
