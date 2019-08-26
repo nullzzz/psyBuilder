@@ -44,6 +44,12 @@ class LineProperty(QWidget):
     def setPosition(self, x1, y1, x2, y2):
         self.general.setPosition(x1, y1, x2, y2)
 
+    def setItemColor(self, color):
+        pass
+
+    def setLineColor(self, color):
+        self.general.setLineColor(color)
+
     def getInfo(self):
         self.default_properties.clear()
         self.default_properties = self.general.getInfo()

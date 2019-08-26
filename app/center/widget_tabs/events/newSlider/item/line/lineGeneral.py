@@ -113,6 +113,11 @@ class LineGeneral(QWidget):
         self.cx_pos.setCurrentText(str(int(x)))
         self.cy_pos.setCurrentText(str(int(y)))
 
+    def setLineColor(self,color):
+        if not self.border_color.currentText().startswith("["):
+            cRGBA = color.getRgb()
+            self.border_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
+
     # 加载参数设置
     def loadSetting(self):
         self.x_pos1.setText(self.default_properties["X1"])

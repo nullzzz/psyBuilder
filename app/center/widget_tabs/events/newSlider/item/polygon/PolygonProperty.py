@@ -47,6 +47,12 @@ class PolygonProperty(QWidget):
     def setWh(self, w, h):
         pass
 
+    def setItemColor(self, color):
+        self.general.setItemColor(color)
+
+    def setLineColor(self, color):
+        self.general.setLineColor(color)
+
     def setVertex(self, points:list):
         self.general.setVertex(points)
 
