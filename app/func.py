@@ -13,6 +13,7 @@ class Func(object):
     """
     存放一些通用函数
     """
+
     @staticmethod
     def getWidgetImage(widget_type: str, image_type: str = 'icon') -> QPixmap or QIcon:
         """
@@ -499,7 +500,6 @@ class Func(object):
     def checkReferValidity(target_timeline_wid: str, widget_id: str) -> bool:
         """
         当从structure中拖拽至timeline时，
-        对于cycle的拖拽，因其下面挂着timeline，如果不进行处理，会导致类似死锁。
         :param target_timeline_wid: 目标的timeline的wid
         :param widget_id: 被拖拽的wid
         :return: 合法性
@@ -529,6 +529,27 @@ class Func(object):
             return False
         except Exception as e:
             print(f"error {e} happens in check validity of drag from structure. [func.py]")
+
+    @staticmethod
+    def checkMoveOrCopyValidity(target_timeline_wid: str, widget_id: str) -> bool:
+        """
+        check using attributes.
+        :param target_timeline_wid:
+        :param widget_id:
+        :return: its validity
+        """
+        # get attributes above target timeline wid.
+        target_attributes = Func.getAttributes(target_timeline_wid, need_detail=True)
+        # check using attributes.
+        try:
+            using_attributes = Info.WID_WIDGET[widget_id].getUsingAttributes()
+            for using_attribute in using_attributes:
+                if using_attribute not in target_attributes:
+                    return False
+            return True
+        except Exception as e:
+            print(e)
+            return False
 
     @staticmethod
     def getWidgetPosition(widget_id: str) -> int:
@@ -781,3 +802,17 @@ class Func(object):
             node = node.parent()
             level += 1
         return level
+
+    @staticmethod
+    def getWidgetsTotalLayer(wid: str = f"{Info.TIMELINE}.0") -> int:
+        """
+        返回最大level，深度优先遍历
+        :return:
+        """
+        node = Info.WID_NODE[wid]
+        max_child_count = 0
+        for i in range(node.childCount()):
+            temp_count = Func.getWidgetsTotalLayer(node.widget_id)
+            if temp_count > max_child_count:
+                max_child_count = temp_count
+        return 1 + max_child_count
