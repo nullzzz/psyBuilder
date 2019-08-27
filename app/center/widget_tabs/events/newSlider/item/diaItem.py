@@ -95,9 +95,10 @@ class DiaItem(QGraphicsPolygonItem):
     def getName(self):
         return self.item_name
 
-    def setItemColor(self, color):
-        self.fill_color = color
-        self.pro_window.setItemColor(color)
+
+
+
+
 
     def setLineColor(self, color):
         self.border_color = color
@@ -105,7 +106,8 @@ class DiaItem(QGraphicsPolygonItem):
 
     def setLineWidth(self, width):
         self.border_width = width
-        # self.polygon
+        self.pro_window.setLineWidth(width)
+
 
     def boundingRect(self):
         return self.polygon().boundingRect().adjusted(-self.pen().width(),
@@ -331,6 +333,7 @@ class DiaItem(QGraphicsPolygonItem):
         border_color = self.default_properties["Border color"]
         if not border_color.startswith("["):
             self.border_color = border_color
+
         border_width = self.default_properties["Border width"]
         if not border_width.startswith("["):
             self.border_width = int(border_width)
@@ -421,3 +424,16 @@ class DiaItem(QGraphicsPolygonItem):
             self.pro_window.general.default_properties["Border color"] = rgb
             self.default_properties["Border color"] = rgb
             self.pro_window.general.border_color.setCurrentText(rgb)
+
+    def setItemColor(self, color):
+        self.fill_color = color
+
+        old_rgb = self.default_properties["Fill color"]
+        if not old_rgb.startswith("["):
+            rgb = f"{color.red()},{color.green()},{color.blue()}"
+            self.pro_window.default_properties["Fill color"] = rgb
+            self.pro_window.general.default_properties["Fill color"] = rgb
+            self.default_properties["Fill color"] = rgb
+            self.pro_window.general.fill_color.setCurrentText(rgb)
+
+        # self.pro_window.setItemColor(color)

@@ -95,8 +95,8 @@ class TextItem(QGraphicsTextItem):
 
         text = self.toPlainText()
 
-        x = self.default_properties.get("Center x")
-        y = self.default_properties.get("Center y")
+        x = self.default_properties.get("Center X")
+        y = self.default_properties.get("Center Y")
         z = self.default_properties.get("z")
 
         style = self.default_properties.get("Style")

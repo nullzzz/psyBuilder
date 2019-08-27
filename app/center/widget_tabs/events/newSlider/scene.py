@@ -65,19 +65,26 @@ class Scene(QGraphicsScene):
                 item = PixItem(item_type)
             elif OtherItem.Snow <= item_type <= OtherItem.Gabor:
                 item = OtherItem(item_type)
-                item.getInfo()
+                # item.getInfo()
             elif DiaItem.Polygon <= item_type <= DiaItem.Rect:
                 item = DiaItem(item_type)
             else:
                 return
             self.addItem(item)
-            item.setPos(event.scenePos())
+            item.setPos(event.scenePos()) # move the item in the scene
+
+            # item.setPosition() # update the general tab
+            # item.getInfo()     # get default_property from general tab
+
+
             # todo 苟且一下
             if item_type == DiaItem.Polygon:
-                item.setPosition()
+                # item.setPosition()
                 item.pro_window.general.add_bt.click()
                 item.pro_window.general.del_bt.click()
+
             item.setAttributes(self.attributes)
+
             self.update()
             self.itemAdd.emit(item.getName())
             action = Qt.MoveAction
@@ -102,9 +109,8 @@ class Scene(QGraphicsScene):
         for item in self.selectedItems():
             if isinstance(item, DiaItem):
                 item.setBrush(color)
+                item.setItemColor(color)# update the default properties in GeneralTab
 
-                item.setItemColor(color)
-                # item.setItemColor(color.name())
 
     def setLineWidth(self, width):
         for item in self.selectedItems():

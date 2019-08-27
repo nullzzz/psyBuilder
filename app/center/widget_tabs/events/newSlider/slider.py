@@ -243,7 +243,7 @@ class Slider(QMainWindow):
         return self.default_properties
 
     def getProperties(self):
-        return self.default_properties
+        return self.getInfo()
 
 
     def getShowProperties(self):
@@ -343,11 +343,11 @@ class Slider(QMainWindow):
 
     def fillButtonTriggered(self):
         self.scene.setItemColor(QColor(self.fillAction.data()))
-        print(f"line 346: fillButtonTriggered")
-        # self.apply()
+        # self.getInfo()# after changed the color, updating the default_properties
 
     def lineButtonTriggered(self):
         self.scene.setLineColor(QColor(self.lineAction.data()))
+        # self.getInfo()  # after changed the color, updating the default_properties
 
     def openPro(self):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
@@ -445,6 +445,7 @@ class Slider(QMainWindow):
 
     def restore(self, properties: dict):
         if isinstance(properties, dict):
+            # print(f"line 446 slider: {properties}")
             self.default_properties = properties
             pro: dict = self.default_properties.get("pro")
             self.pro_window.setProperties(pro)

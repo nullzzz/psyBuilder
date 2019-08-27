@@ -59,6 +59,9 @@ class CircleProperty(QWidget):
     def setLineColor(self, color):
         self.general.setLineColor(color)
 
+    def setLineWidth(self, width):
+        self.general.setLineWidth(width)
+
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
             self.default_properties = properties

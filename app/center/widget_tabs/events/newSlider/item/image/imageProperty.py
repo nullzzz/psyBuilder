@@ -53,6 +53,9 @@ class ImageProperty(QWidget):
         self.default_properties = properties
         self.loadSetting()
 
+    def setPosition(self, x, y):
+        self.general.setPosition(x, y)
+
     def loadSetting(self):
         self.general.setProperties(self.default_properties)
 

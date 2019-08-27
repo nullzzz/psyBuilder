@@ -180,11 +180,13 @@ class PolygonGeneral(QWidget):
     def getInfo(self):
         self.default_properties['Center X'] = self.cx_pos.text()
         self.default_properties['Center Y'] = self.cy_pos.text()
+
         points: list = []
         for p in self.points:
             points.append((p.getX(), p.getY()))
 
         self.default_properties["Points"] = points
+
         self.default_properties['Border width'] = self.border_width.text()
         self.default_properties['Border color'] = self.border_color.getColor()
         self.default_properties['Fill color'] = self.fill_color.getColor()

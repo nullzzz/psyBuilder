@@ -144,8 +144,8 @@ class TextGeneral(QWidget):
     def getInfo(self):
         self.default_properties.clear()
 
-        self.default_properties["Center x"] = self.cx_pos.currentText()
-        self.default_properties["Center y"] = self.cy_pos.currentText()
+        self.default_properties["Center X"] = self.cx_pos.currentText()
+        self.default_properties["Center Y"] = self.cy_pos.currentText()
         self.default_properties["Fore color"] = self.fore_color.getColor()
 
         self.default_properties["Back color"] = self.back_color.getColor()
@@ -169,8 +169,8 @@ class TextGeneral(QWidget):
             self.cy_pos.setCurrentText(str(int(y)))
 
     def loadSetting(self):
-        self.cx_pos.setCurrentText(self.default_properties["Center x"])
-        self.cy_pos.setCurrentText(self.default_properties["Center y"])
+        self.cx_pos.setCurrentText(self.default_properties["Center X"])
+        self.cy_pos.setCurrentText(self.default_properties["Center Y"])
         self.fore_color.setCurrentText(self.default_properties["Fore color"])
         self.back_color.setCurrentText(self.default_properties["Back color"])
         self.transparent.setText(self.default_properties["Transparent"])

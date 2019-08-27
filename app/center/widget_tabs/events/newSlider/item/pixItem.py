@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsItem
 
@@ -119,6 +119,7 @@ class PixItem(QGraphicsPixmapItem):
 
     def openPro(self):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
+        self.setPosition()
         self.pro_window.show()
 
     def setAttributes(self, attributes):
@@ -135,6 +136,7 @@ class PixItem(QGraphicsPixmapItem):
 
     def apply(self):
         self.getInfo()
+        self.changeSomething()
 
     def getInfo(self):
         self.default_properties = {
@@ -152,6 +154,9 @@ class PixItem(QGraphicsPixmapItem):
             self.pro_window.setProperties(properties)
             self.loadSetting()
 
+    def setPosition(self):
+        self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
+
     def loadSetting(self):
         x = self.default_properties.get("x", 0)
         y = self.default_properties.get("y", 0)
@@ -167,3 +172,11 @@ class PixItem(QGraphicsPixmapItem):
         new.setZValue(self.zValue())
 
         return new
+
+    def changeSomething(self):
+        __cx = self.default_properties["Center X"]
+        cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
+        __cy = self.default_properties["Center Y"]
+        cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
+
+        self.setPos(QPoint(cx, cy))

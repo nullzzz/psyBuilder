@@ -21,9 +21,9 @@ class ImageGeneral(QWidget):
             "Stretch": False,
             "Stretch mode": "Both",
             "Back color": "white",
-            "Transparent": "100",
-            "X position": "50%",
-            "Y position": "50%",
+            "Transparent": "100%",
+            "Center X": "50%",
+            "Center Y": "50%",
             "Width": "100%",
             "Height": "100%",
         }
@@ -122,8 +122,8 @@ class ImageGeneral(QWidget):
         layout2 = QGridLayout()
         layout2.setVerticalSpacing(10)
 
-        l_x_pos = QLabel("X Position:")
-        l_y_pos = QLabel("Y Position:")
+        l_x_pos = QLabel("Center X:")
+        l_y_pos = QLabel("Center Y:")
         l_width = QLabel("Maximum Width:")
         l_height = QLabel("Maximum Height:")
 
@@ -189,8 +189,8 @@ class ImageGeneral(QWidget):
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
         self.default_properties["Transparent"] = self.transparent.currentText()
-        self.default_properties["X position"] = self.x_pos.currentText()
-        self.default_properties["Y position"] = self.y_pos.currentText()
+        self.default_properties["Center X"] = self.x_pos.currentText()
+        self.default_properties["Center Y"] = self.y_pos.currentText()
         self.default_properties["Width"] = self._width.currentText()
         self.default_properties["Height"] = self._height.currentText()
 
@@ -205,8 +205,8 @@ class ImageGeneral(QWidget):
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
         self.default_properties["Transparent"] = self.transparent.currentText()
-        self.default_properties["X position"] = self.x_pos.currentText()
-        self.default_properties["Y position"] = self.y_pos.currentText()
+        self.default_properties["Center X"] = self.x_pos.currentText()
+        self.default_properties["Center Y"] = self.y_pos.currentText()
         self.default_properties["Width"] = self._width.currentText()
         self.default_properties["Height"] = self._height.currentText()
         return self.default_properties
@@ -216,6 +216,12 @@ class ImageGeneral(QWidget):
             self.default_properties = properties.copy()
             self.loadSetting()
 
+    def setPosition(self, x, y):
+        if not self.x_pos.currentText().startswith("["):
+            self.x_pos.setCurrentText(str(int(x)))
+        if not self.y_pos.currentText().startswith("["):
+            self.y_pos.setCurrentText(str(int(y)))
+
     def loadSetting(self):
         self.file_name.setText(self.default_properties["File name"])
         self.mirrorUD.setChecked(self.default_properties["Mirror up/down"])
@@ -224,8 +230,8 @@ class ImageGeneral(QWidget):
         self.stretch.setChecked(self.default_properties["Stretch"])
         self.stretch_mode.setCurrentText(self.default_properties["Stretch mode"])
         self.transparent.setCurrentText(self.default_properties["Transparent"])
-        self.x_pos.setCurrentText(self.default_properties["X position"])
-        self.y_pos.setCurrentText(self.default_properties["Y position"])
+        self.x_pos.setCurrentText(self.default_properties["Center X"])
+        self.y_pos.setCurrentText(self.default_properties["Center Y"])
         self._width.setCurrentText(self.default_properties["Width"])
         self._height.setCurrentText(self.default_properties["Height"])
 
