@@ -259,7 +259,7 @@ push_button = """
 
 table_view = """
 QTableView {
-    selection-background-color: rgba(204,232,255);
+    selection-background-color: rgb(204,232,255);
 }
 QTableView::Item:selected {
         background-color:white;
