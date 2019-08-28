@@ -88,10 +88,6 @@ class Button(QPushButton):
         fp = QPixmap(Func.getImage(f"{text}.png")).scaled(50, 50)
         self.setIcon(QIcon(fp))
         self.setIconSize(QSize(50, 50))
-        # self.setFixedHeight(50)
-        # self.setMinimumHeight(50)
-        # self.setSizePolicy()
-        # self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.setMouseTracking(True)
 
     def mouseMoveEvent(self, e):
