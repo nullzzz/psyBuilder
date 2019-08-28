@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QFileDialog, QCompleter, QFormLayout, QSpacerItem
+    QFileDialog, QCompleter
 
 from app.lib import PigLineEdit, PigComboBox
 
