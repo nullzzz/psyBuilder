@@ -47,8 +47,8 @@ class SoundGeneral(QWidget):
         self.buffer_size = PigLineEdit()
         self.stream_refill = PigComboBox()
 
-        self.start_offset = PigLineEdit("00:00:00.000")
-        self.stop_offset = PigLineEdit("00:00:00.000")
+        self.start_offset = PigLineEdit("0")
+        self.stop_offset = PigLineEdit("0")
         self.repetitions = PigLineEdit()
 
         self.sound = PigComboBox()
@@ -121,6 +121,8 @@ class SoundGeneral(QWidget):
 
         layout2.addWidget(self.latency_bias, 1, 0)
         layout2.addWidget(self.bias_time, 1, 1)
+        self.bias_time.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
+        self.volume.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
         layout2.addWidget(l7, 1, 2)
         layout2.addWidget(self.wait_for_start, 1, 3)
 

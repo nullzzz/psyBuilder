@@ -61,7 +61,7 @@ class CircleGeneral(QWidget):
 
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("")
+        group2 = QGroupBox("Fill && Borderline")
         layout2 = QFormLayout()
 
         layout2.setRowWrapPolicy(QFormLayout.DontWrapRows)

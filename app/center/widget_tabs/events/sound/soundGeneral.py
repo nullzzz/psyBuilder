@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QFileDialog, QCompleter
+    QFileDialog, QCompleter, QSizePolicy
 
 from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
@@ -47,9 +47,9 @@ class SoundTab1(QWidget):
         self.buffer_size = PigLineEdit()
         self.stream_refill = PigComboBox()
 
-        self.start_offset = PigLineEdit("00:00:00.000")
+        self.start_offset = PigLineEdit("0")
         # self.start_offset.setInputMask("00:00:00.000")
-        self.stop_offset = PigLineEdit("00:00:00.000")
+        self.stop_offset = PigLineEdit("0")
         # self.stop_offset.setInputMask("00:00:00.000")
         self.repetitions = PigLineEdit()
 
@@ -124,6 +124,8 @@ class SoundTab1(QWidget):
         group2 = QGroupBox()
         layout2 = QGridLayout()
 
+        self.bias_time.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
+        self.volume.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
         # layout2.addWidget(l6, 0, 0, 1, 1)
         layout2.addWidget(self.volume_control, 0, 0, )
         layout2.addWidget(self.volume, 0, 1, )

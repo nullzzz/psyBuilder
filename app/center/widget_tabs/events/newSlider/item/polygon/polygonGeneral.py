@@ -136,10 +136,18 @@ class PolygonGeneral(QWidget):
         group1 = QGroupBox("Geometry")
 
         self.point_layout = QGridLayout()
+        # self.point_layout.setAlignment(Qt.AlignVCenter)
         # self.point_layout.addWidget(l00, 0, 0)
         # self.point_layout.addWidget(self.cx_pos, 0, 1)
         # self.point_layout.addWidget(l01, 0, 2)
         # self.point_layout.addWidget(self.cy_pos, 0, 3)
+        # self.p1.x.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
+        # self.p2.x.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
+        # self.p3.x.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
+        #
+        # self.p1.y.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
+        # self.p2.y.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
+        # self.p3.y.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
         self.point_layout.addWidget(self.p1.x_label, 1, 0)
         self.point_layout.addWidget(self.p1.x, 1, 1)
         self.point_layout.addWidget(self.p1.y_label, 1, 2)
@@ -157,15 +165,17 @@ class PolygonGeneral(QWidget):
         bt_layout.addStretch(5)
         bt_layout.addWidget(self.add_bt)
         bt_layout.addWidget(self.del_bt)
+        bt_layout.setAlignment(Qt.AlignBottom)
 
         up_layout = QVBoxLayout()
         up_layout.addLayout(self.point_layout, 10)
         up_layout.addLayout(bt_layout, 11)
 
 
+
         group1.setLayout(up_layout)
 
-        group2 = QGroupBox("")
+        group2 = QGroupBox("Fill && Borderline")
 
         layout2 = QFormLayout()
         layout2.setRowWrapPolicy(QFormLayout.DontWrapRows)

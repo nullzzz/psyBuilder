@@ -62,7 +62,7 @@ class LineGeneral(QWidget):
 
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("")
+        group2 = QGroupBox("Borderline")
         layout2 = QFormLayout()
         layout2.addRow("Border Color:", self.border_color)
         layout2.addRow("Border Width:", self.border_width)
