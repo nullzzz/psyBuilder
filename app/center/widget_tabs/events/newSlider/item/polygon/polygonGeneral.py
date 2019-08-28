@@ -125,9 +125,13 @@ class PolygonGeneral(QWidget):
 
         l1 = QLabel("Border Color:")
         l2 = QLabel("Border Width:")
-        l3 = QLabel("Fill Color")
+        l3 = QLabel("Fill Color:")
         l00.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l01.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         group1 = QGroupBox("Geometry")
 
@@ -163,25 +167,10 @@ class PolygonGeneral(QWidget):
 
         group2 = QGroupBox("")
 
-        layout2 = QGridLayout()
-
-        spacerItem = QSpacerItem(20,40,QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
-        layout2.addItem(spacerItem,0,0,1,1)
-
-        layout2.addWidget(l1,0,1)
-        layout2.addItem(spacerItem,1,0,1,1)
-        layout2.addWidget(l2,1,1)
-        layout2.addItem(spacerItem,1,0,1,1)
-        layout2.addWidget(l3,2,1)
-
-        layout2.addWidget(self.border_color,0,2)
-        layout2.addItem(spacerItem,0,3,1,1)
-
-        layout2.addWidget(self.border_width,1,2)
-        layout2.addItem(spacerItem, 1, 3, 1, 1)
-        layout2.addWidget(self.fill_color,2,2)
-        layout2.addItem(spacerItem, 2, 3, 1, 1)
-
+        layout2 = QFormLayout()
+        layout2.addRow(l1, self.border_color)
+        layout2.addRow(l2, self.border_width)
+        layout2.addRow(l3, self.fill_color)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()

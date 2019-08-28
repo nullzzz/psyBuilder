@@ -304,12 +304,7 @@ class DiaItem(QGraphicsPolygonItem):
         __cy = self.default_properties["Center Y"]
         cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
 
-        # if self.item_type != self.polygon:
         self.setPos(QPoint(cx, cy))
-        # print(f"line 302: {cx},{cy}")
-
-        # self.setPos(QPoint(cx, cy))
-        # self.update()
 
         # fill color
         fill_color = self.default_properties["Fill color"]

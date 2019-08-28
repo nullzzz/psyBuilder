@@ -113,19 +113,16 @@ class SoundGeneral(QWidget):
 
         group2 = QGroupBox()
         layout2 = QGridLayout()
-        spacerItem = QSpacerItem(20, 40, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
-        layout2.addWidget(self.volume_control, 0, 0)
-        layout2.addWidget(self.volume, 0, 1)
-        layout2.addItem(spacerItem,0,2,1,1)
-        layout2.addWidget(l6, 0, 3)
-        layout2.addWidget(self.sound, 0, 4)
+        layout2.addWidget(self.volume_control, 0, 0, )
+        layout2.addWidget(self.volume, 0, 1, )
+        layout2.addWidget(l6, 0, 2)
+        layout2.addWidget(self.sound, 0, 3)
 
         layout2.addWidget(self.latency_bias, 1, 0)
         layout2.addWidget(self.bias_time, 1, 1)
-        layout2.addItem(spacerItem, 1, 2, 1, 1)
-        layout2.addWidget(l7, 1, 3)
-        layout2.addWidget(self.wait_for_start, 1, 4)
+        layout2.addWidget(l7, 1, 2)
+        layout2.addWidget(self.wait_for_start, 1, 3)
 
         group2.setLayout(layout2)
 
