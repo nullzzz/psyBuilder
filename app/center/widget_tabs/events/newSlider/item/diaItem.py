@@ -95,11 +95,6 @@ class DiaItem(QGraphicsPolygonItem):
     def getName(self):
         return self.item_name
 
-
-
-
-
-
     def setLineColor(self, color):
         self.border_color = color
         self.pro_window.setLineColor(color)
@@ -309,7 +304,12 @@ class DiaItem(QGraphicsPolygonItem):
         __cy = self.default_properties["Center Y"]
         cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
 
+        # if self.item_type != self.polygon:
         self.setPos(QPoint(cx, cy))
+        # print(f"line 302: {cx},{cy}")
+
+        # self.setPos(QPoint(cx, cy))
+        # self.update()
 
         # fill color
         fill_color = self.default_properties["Fill color"]
@@ -323,10 +323,6 @@ class DiaItem(QGraphicsPolygonItem):
         else:
             r, g, b, a = color
 
-        # r = 255
-        # b = 255
-        # g = 255
-        # a = 0
 
         self.setBrush(QColor(r, g, b, a))
         # border color
@@ -367,9 +363,7 @@ class DiaItem(QGraphicsPolygonItem):
                     else:
                         path.lineTo(x - cx, y - cy)
                 path.lineTo(int(points[0][0]) - cx, int(points[0][1]) - cy)
-                self.mPolygon = path.toFillPolygon()
-                self.setPolygon(self.mPolygon)
-                self.update()
+
         else:
             __w = self.default_properties["Width"]
             w = int(__w) if __w.isdigit() else 100
@@ -392,9 +386,10 @@ class DiaItem(QGraphicsPolygonItem):
             elif self.item_type == self.Rect:
                 rect = QRectF(-w / 2, -h / 2, w, h)
                 path.addRect(rect)
-            self.mPolygon = path.toFillPolygon()
-            self.setPolygon(self.mPolygon)
-            self.update()
+
+        self.mPolygon = path.toFillPolygon()
+        self.setPolygon(self.mPolygon)
+        self.update()
 
     def setWidth(self, width):
         if isinstance(width, str) and width.isdigit():

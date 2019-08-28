@@ -73,8 +73,8 @@ class Scene(QGraphicsScene):
             self.addItem(item)
             item.setPos(event.scenePos()) # move the item in the scene
 
-            # item.setPosition() # update the general tab
-            # item.getInfo()     # get default_property from general tab
+            item.setPosition() # update the general tab
+            item.getInfo()     # get default_property from general tab
 
 
             # todo 苟且一下

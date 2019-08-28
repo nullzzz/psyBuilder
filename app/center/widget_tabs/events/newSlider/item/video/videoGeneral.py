@@ -66,13 +66,13 @@ class VideoGeneral(QWidget):
         self.transparent.setEditable(True)
         self.transparent.setReg(r"\d+%?|\d+\.\d+%?")
 
-        self.x_pos.addItems(("25%", "50%", "75%", "100%"))
+        self.x_pos.addItems(("100", "200", "300", "400"))
         self.x_pos.setCurrentText("50%")
         self.x_pos.setEditable(True)
         self.x_pos.setReg(r"\d+%?")
 
-        self.y_pos.addItems(("25%", "50%", "75%", "100%"))
-        self.y_pos.setCurrentText("50%")
+        self.y_pos.addItems(("100", "200", "300", "400"))
+        self.y_pos.setCurrentText("100")
         self.y_pos.setEditable(True)
         self.y_pos.setReg(r"\d+%?")
 

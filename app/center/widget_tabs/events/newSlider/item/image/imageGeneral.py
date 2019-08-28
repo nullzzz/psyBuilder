@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QFileDialog, QCompleter, QFormLayout
+    QFileDialog, QCompleter, QFormLayout, QSpacerItem
 
 from app.lib import PigLineEdit, PigComboBox
 
@@ -99,18 +99,20 @@ class ImageGeneral(QWidget):
         self.stretch_mode.setEnabled(False)
 
         layout1.addWidget(self.mirrorUD, 1, 0)
+        layout1.setColumnMinimumWidth(1, 40)
+
         layout1.addWidget(self.mirrorLR, 2, 0)
-        l0 = QLabel("Rotate (0-360):")
+        l0 = QLabel("Rotate (0~360):")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1.addWidget(l0, 1, 2)
-        layout1.addWidget(self.rotate, 1, 3)
+        layout1.addWidget(self.rotate, 1, 3, 1, 2)
 
         l_tra = QLabel("Transparent(%):")
         l_tra.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1.addWidget(l_tra, 2, 2)
-        layout1.addWidget(self.transparent, 2, 3)
+        layout1.addWidget(self.transparent, 2, 3, 1, 2)
 
         layout1.addWidget(self.stretch, 3, 0)
         layout1.addWidget(self.stretch_mode, 3, 2)

@@ -130,6 +130,11 @@ class PigLineEdit(QLineEdit):
         self.focusLost.connect(self.checkValidity)
         self.valid_data: str = self.text()
 
+        # font = self.font()  # lineedit current font
+        # font.setPointSize(12)  # change it's size
+        # font.setFamily("Times")
+        # self.setFont(font)  # set font
+
         self.suffix: str = ""
         self.reg_exp: str = ""
 

@@ -71,6 +71,9 @@ class Item(QWidget):
         layout = QGridLayout()
         layout.addWidget(self.bt, 0, 0, Qt.AlignHCenter)
         layout.addWidget(QLabel(self.text), 1, 0, Qt.AlignCenter)
+        # layout.setRowStretch(0, 2)
+        # layout.setRowStretch(1, 0.2)
+        # layout.setRowMinimumHeight(1,20)
         self.setLayout(layout)
 
 
@@ -85,6 +88,10 @@ class Button(QPushButton):
         fp = QPixmap(Func.getImage(f"{text}.png")).scaled(50, 50)
         self.setIcon(QIcon(fp))
         self.setIconSize(QSize(50, 50))
+        # self.setFixedHeight(50)
+        # self.setMinimumHeight(50)
+        # self.setSizePolicy()
+        # self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.setMouseTracking(True)
 
     def mouseMoveEvent(self, e):
