@@ -66,6 +66,14 @@ class RectGeneral(QWidget):
 
         group2 = QGroupBox("")
         layout2 = QFormLayout()
+
+        layout2.setRowWrapPolicy(QFormLayout.DontWrapRows)
+        layout2.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
+        layout2.setLabelAlignment(Qt.AlignLeft)
+
+        self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
+        self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
+
         layout2.addRow(l2, self.border_color)
         layout2.addRow(l3, self.border_width)
         layout2.addRow(l4, self.fill_color)

@@ -11,11 +11,9 @@ QTabBar::tab {
     background: rgb(246,246,246);
     border: 1px solid rgb(201,201,201);
     border-left: 0.5px solid rgb(201,201,201);
-    margin-top: 6px;
     min-height: 26px;
     min-width: 100px;
     text-align: center;
-    font-size:11px;
 }
 
 QTabBar::tab:selected{
