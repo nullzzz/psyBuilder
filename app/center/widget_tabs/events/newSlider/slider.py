@@ -46,7 +46,7 @@ class Slider(QMainWindow):
         self.open_item_action.triggered.connect(self.openItem)
 
         self.delete_action = QAction(QIcon(Func.getImage("trash.png")), "Delete", self)
-        self.delete_action.setShortcut("Ctrl+D")
+        # self.delete_action.setShortcut("Ctrl+D")
         self.delete_action.setToolTip("Delete item from diagram")
         self.delete_action.triggered.connect(self.deleteItem)
 
