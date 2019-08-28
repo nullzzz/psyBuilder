@@ -104,11 +104,15 @@ class DiaItem(QGraphicsPolygonItem):
         self.pro_window.setLineWidth(width)
 
 
-    def boundingRect(self):
-        return self.polygon().boundingRect().adjusted(-self.pen().width(),
-                                                      -self.pen().width(),
-                                                      self.pen().width(),
-                                                      self.pen().width())
+    def noOutLineBoundingRect(self):
+        cBoundRect =  self.polygon().boundingRect()
+        # print(f"line 109: {cBoundRect}")
+        # cBoundRect = cBoundRect.adjusted(self.pen().width()/2,
+        #                                               self.pen().width()/2,
+        #                                               -self.pen().width(),
+        #                                             -self.pen().width())
+        # print(f"line 114: {cBoundRect}")
+        return cBoundRect
 
     def mouseMoveEvent(self, mouseEvent):
         x = mouseEvent.pos().x()
@@ -236,7 +240,8 @@ class DiaItem(QGraphicsPolygonItem):
         self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def setWh(self):
-        self.pro_window.setWh(self.boundingRect().width(), self.boundingRect().height())
+
+        self.pro_window.setWh(self.noOutLineBoundingRect().width(), self.noOutLineBoundingRect().height())
 
     def setVertex(self):
         points = []
