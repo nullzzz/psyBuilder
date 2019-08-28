@@ -1,7 +1,7 @@
 import numpy as np
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGroupBox, QGridLayout, QVBoxLayout, QFormLayout, QHBoxLayout, \
-    QCompleter
+    QCompleter, QSpacerItem, QSizePolicy
 
 from app.lib import PigLineEdit, ColorListEditor
 
@@ -45,6 +45,9 @@ class PolygonGeneral(QWidget):
 
         self.cx_pos = PigLineEdit("0")
         self.cy_pos = PigLineEdit("0")
+        self.cx_pos.setEnabled(False)
+        self.cy_pos.setEnabled(False)
+
         self.p1 = Point("X1:", "Y1:")
         self.p2 = Point("X2:", "Y2:")
         self.p3 = Point("X3:", "Y3:")
@@ -60,8 +63,10 @@ class PolygonGeneral(QWidget):
         self.border_color = ColorListEditor()
         self.border_color.setCurrentText("0,0,0")
         self.border_width = PigLineEdit("1")
+
         self.fill_color = ColorListEditor()
         self.fill_color.addTransparent()
+
         self.setUI()
 
     def addPoint(self):
@@ -153,13 +158,30 @@ class PolygonGeneral(QWidget):
         up_layout.addLayout(self.point_layout, 10)
         up_layout.addLayout(bt_layout, 11)
 
+
         group1.setLayout(up_layout)
 
         group2 = QGroupBox("")
-        layout2 = QFormLayout()
-        layout2.addRow(l1, self.border_color)
-        layout2.addRow(l2, self.border_width)
-        layout2.addRow(l3, self.fill_color)
+
+        layout2 = QGridLayout()
+
+        spacerItem = QSpacerItem(20,40,QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
+        layout2.addItem(spacerItem,0,0,1,1)
+
+        layout2.addWidget(l1,0,1)
+        layout2.addItem(spacerItem,1,0,1,1)
+        layout2.addWidget(l2,1,1)
+        layout2.addItem(spacerItem,1,0,1,1)
+        layout2.addWidget(l3,2,1)
+
+        layout2.addWidget(self.border_color,0,2)
+        layout2.addItem(spacerItem,0,3,1,1)
+
+        layout2.addWidget(self.border_width,1,2)
+        layout2.addItem(spacerItem, 1, 3, 1, 1)
+        layout2.addWidget(self.fill_color,2,2)
+        layout2.addItem(spacerItem, 2, 3, 1, 1)
+
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()

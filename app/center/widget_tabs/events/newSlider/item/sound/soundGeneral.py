@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QFileDialog, QCompleter
+    QFileDialog, QCompleter, QSpacerItem, QSizePolicy
 
 from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
@@ -113,16 +113,19 @@ class SoundGeneral(QWidget):
 
         group2 = QGroupBox()
         layout2 = QGridLayout()
+        spacerItem = QSpacerItem(20, 40, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
-        layout2.addWidget(self.volume_control, 0, 0, )
-        layout2.addWidget(self.volume, 0, 1, )
-        layout2.addWidget(l6, 0, 2)
-        layout2.addWidget(self.sound, 0, 3)
+        layout2.addWidget(self.volume_control, 0, 0)
+        layout2.addWidget(self.volume, 0, 1)
+        layout2.addItem(spacerItem,0,2,1,1)
+        layout2.addWidget(l6, 0, 3)
+        layout2.addWidget(self.sound, 0, 4)
 
         layout2.addWidget(self.latency_bias, 1, 0)
         layout2.addWidget(self.bias_time, 1, 1)
-        layout2.addWidget(l7, 1, 2)
-        layout2.addWidget(self.wait_for_start, 1, 3)
+        layout2.addItem(spacerItem, 1, 2, 1, 1)
+        layout2.addWidget(l7, 1, 3)
+        layout2.addWidget(self.wait_for_start, 1, 4)
 
         group2.setLayout(layout2)
 
@@ -198,6 +201,9 @@ class SoundGeneral(QWidget):
         if isinstance(properties, dict):
             self.default_properties = properties
             self.loadSetting()
+
+    def setPosition(self, x, y):
+        pass # do nothing here
 
     def loadSetting(self):
         self.file_name.setText(self.default_properties["File name"])

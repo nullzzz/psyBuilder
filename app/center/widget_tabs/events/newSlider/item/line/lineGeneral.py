@@ -86,10 +86,17 @@ class LineGeneral(QWidget):
         self.border_width.setCompleter(QCompleter(self.attributes))
 
     def setPosition(self, x1, y1, x2, y2):
-        self.x_pos1.setText(str(int(x1)))
-        self.y_pos1.setText(str(int(y1)))
-        self.x_pos2.setText(str(int(x2)))
-        self.y_pos2.setText(str(int(y2)))
+        if not self.x_pos1.text().startswith("["):
+            self.x_pos1.setText(str(int(x1)))
+
+        if not self.y_pos1.text().startswith("["):
+            self.y_pos1.setText(str(int(y1)))
+
+        if not self.x_pos2.text().startswith("["):
+            self.x_pos2.setText(str(int(x2)))
+
+        if not self.y_pos2.text().startswith("["):
+            self.y_pos2.setText(str(int(y2)))
 
     def getInfo(self):
         self.default_properties.clear()

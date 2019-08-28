@@ -55,11 +55,11 @@ class Item(QListWidgetItem):
     def __init__(self, text: str = "", parent=None):
         super(Item, self).__init__(parent=parent)
         self.setText(text)
-        # fp = Func.getImage(f"{text}.png")
-        fp = f"D:\\PsyDemo\\image\\{text}.png"
-        # print(fp)
+        fp = Func.getImage(f"{text}.png")
+        # fp = f"D:\\PsyDemo\\image\\{text}.png"
+        print(f"{fp}")
         self.setIcon(QIcon(fp))
-        # self.setMouseTracking(True)
+        self.setMouseTracking(True)
 
     def mouseMoveEvent(self, e):
         if e.buttons() != Qt.LeftButton:

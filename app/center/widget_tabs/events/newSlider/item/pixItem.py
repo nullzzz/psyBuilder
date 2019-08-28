@@ -16,11 +16,10 @@ class PixItem(QGraphicsPixmapItem):
     """
     Image、Text、Video、Sound
     """
-    Image, Text, Video, Sound = range(5, 9)
+    Image, Video, Sound = [5,7,8]
 
     name = {
         Image: "image",
-        Text: "text",
         Video: "video",
         Sound: "sound",
     }
@@ -36,10 +35,10 @@ class PixItem(QGraphicsPixmapItem):
         if self.item_type == self.Image:
             self.pro_window = ImageProperty()
             self.setPixmap(QPixmap(Func.getImage("image.png")).scaled(100, 100))
-        elif self.item_type == self.Text:
-            self.pro_window = TextProperty()
-            # insert new text item here
-            self.setPixmap(QPixmap(Func.getImage("text.png")).scaled(100, 100))
+        # elif self.item_type == self.Text:
+        #     self.pro_window = TextProperty()
+        #     # insert new text item here
+        #     self.setPixmap(QPixmap(Func.getImage("text.png")).scaled(100, 100))
         elif self.item_type == self.Video:
             self.pro_window = VideoProperty()
             self.setPixmap(QPixmap(Func.getImage("video.png")).scaled(100, 100))
@@ -155,7 +154,13 @@ class PixItem(QGraphicsPixmapItem):
             self.loadSetting()
 
     def setPosition(self):
-        self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
+        """
+        :get icon properties in scene and send it to default_properties :
+        """
+        width = self.boundingRect().width()
+        height = self.boundingRect().height()
+
+        self.pro_window.setPosition(self.scenePos().x() + (width / 2), self.scenePos().y() + (height / 2))
 
     def loadSetting(self):
         x = self.default_properties.get("x", 0)
@@ -174,9 +179,15 @@ class PixItem(QGraphicsPixmapItem):
         return new
 
     def changeSomething(self):
-        __cx = self.default_properties["Center X"]
-        cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
-        __cy = self.default_properties["Center Y"]
-        cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
+        if self.item_type != self.Sound:
+            __w = self.default_properties["Width"]
+            w = int(__w) if __w.isdigit() else 100
+            __h = self.default_properties["Height"]
+            h = int(__h) if __h.isdigit() else 100
 
-        self.setPos(QPoint(cx, cy))
+            __cx = self.default_properties["Center X"]
+            cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
+            __cy = self.default_properties["Center Y"]
+            cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
+
+            self.setPos(QPoint(cx - (w / 2), cy - (h / 2)))

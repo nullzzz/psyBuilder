@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QGridLayout, QFormLayout, QVBoxLayout, QCompleter
+from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QGridLayout, QFormLayout, QVBoxLayout, QCompleter, QSpacerItem, \
+    QSizePolicy
 
 from app.lib import ColorListEditor, PigLineEdit, PigComboBox
 
@@ -77,10 +78,31 @@ class ArcGeneral(QWidget):
         group1.setLayout(layout1)
 
         group2 = QGroupBox("")
-        layout2 = QFormLayout()
-        layout2.addRow(l2, self.border_color)
-        layout2.addRow(l3, self.border_width)
-        layout2.addRow(l4, self.fill_color)
+
+        layout2 = QGridLayout()
+
+        spacerItem = QSpacerItem(20,40,QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
+        layout2.addItem(spacerItem,0,0,1,1)
+
+        layout2.addWidget(l2,0,1)
+        layout2.addItem(spacerItem,1,0,1,1)
+        layout2.addWidget(l3,1,1)
+        layout2.addItem(spacerItem,1,0,1,1)
+        layout2.addWidget(l4,2,1)
+
+        layout2.addWidget(self.border_color,0,2)
+        layout2.addItem(spacerItem,0,3,1,1)
+
+        layout2.addWidget(self.border_width,1,2)
+        layout2.addItem(spacerItem, 1, 3, 1, 1)
+        layout2.addWidget(self.fill_color,2,2)
+        layout2.addItem(spacerItem, 2, 3, 1, 1)
+
+
+        # layout2 = QFormLayout()
+        # layout2.addRow(l2, self.border_color)
+        # layout2.addRow(l3, self.border_width)
+        # layout2.addRow(l4, self.fill_color)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
