@@ -330,6 +330,9 @@ class PsyApplication(QMainWindow):
         else:
             self.loadOut()
 
+        Info.CONFIG.setValue("directory",Info.FILE_DIRECTORY)
+        # print(f"{Info.FILE_DIRECTORY}")
+
     def getFileName(self) -> bool:
         """
         获取文件名
@@ -349,6 +352,7 @@ class PsyApplication(QMainWindow):
         self.getFileName()
         if Info.FILE_NAME:
             self.loadOut()
+            Info.CONFIG.setValue("directory", Info.FILE_DIRECTORY)
 
     def loadIn(self):
         """
