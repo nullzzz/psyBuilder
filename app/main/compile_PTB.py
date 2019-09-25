@@ -1011,6 +1011,15 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     return delayedPrintCodes
 
 
+
+
+
+
+
+
+
+
+
 def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
     global spFormatVarDict
     # start from 1 to compatible with MATLAB
