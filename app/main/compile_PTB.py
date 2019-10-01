@@ -287,7 +287,7 @@ def getRefValue(cWidget, inputStr, attributesSetDict):
 
 def getRefValueSet(cWidget, inputStr, attributesSetDict):
     isRefValue = False
-    valueSet   = set()
+    valueSet = set()
 
     if isinstance(inputStr, str):
 
@@ -489,23 +489,24 @@ def isContainCycleTL(widgetId) -> bool:
 
 
 def outPutTriggerCheck(cWidget) -> dict:
-    cOutPutDevices  = cWidget.getOutputDevice()
-    cInputDevices  = cWidget.getInputDevice()
+    cOutPutDevices = cWidget.getOutputDevice()
+    cInputDevices = cWidget.getInputDevice()
 
     respTriggerDevNames = set()
     for cInputDevInfo in cInputDevices.key():
         cRespTriggerDevName = cInputDevInfo['Output Device']
         if isRefStr(cRespTriggerDevName):
-            throwCompileErrorInfo(f"'{cRespTriggerDevName}':The response trigger Device should NOT be a variable citation!")
+            throwCompileErrorInfo(
+                f"'{cRespTriggerDevName}':The response trigger Device should NOT be a variable citation!")
         respTriggerDevNames.update(cRespTriggerDevName)
 
     shortPulseDurParallelsDict = dict()
     for cOpDevInfo in cOutPutDevices.key():
         if cOpDevInfo['Device Type'] == 'parallel_port':
             if cOpDevInfo['Device Name'] in respTriggerDevNames:
-                shortPulseDurParallelsDict.update({cOpDevInfo['Device Id']:10})
+                shortPulseDurParallelsDict.update({cOpDevInfo['Device Id']: 10})
 
-    return shortPulseDurParallelsDict # temp
+    return shortPulseDurParallelsDict  # temp
 
 
 def parseAllowKeys(allowKeyStr):
@@ -542,7 +543,7 @@ def parseDurationStr(inputStr):
             inputStr = "0"
         elif re.fullmatch("\d+~\d+", inputStr):
             cDurRange = inputStr.split('~')
-            inputStr  = f"{cDurRange[0]},{cDurRange[1]}"
+            inputStr = f"{cDurRange[0]},{cDurRange[1]}"
 
     return inputStr
 
@@ -734,11 +735,135 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintC
     # to be continue ...
 
 
+def printRespCodes(f, delayedPrintCodes):
+    # -------------------------------------------------------------
+    # Step 1: print out previous widget's resp related codes
+    # -------------------------------------------------------------
+    for cRowStr in delayedPrintCodes['respCodes']:
+        printAutoInd(f, cRowStr)
+    # clear out the print buffer
+    delayedPrintCodes.update({'respCodes': []})
+
+    return delayedPrintCodes
+
+
+
+
 def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+
+    # print comments to indicate the current frame order
+    # Step 1: draw the content of current frame
+    delayedPrintCodes = drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+
+    # step 2: print delayed resp codes or none if the widget is the first one
+    #         print comments to indicate the current frame order if it is not the first one
+    delayedPrintCodes = printRespCodes(f, delayedPrintCodes)
+
+    # STEP 3: flip screen
+    flipScreen(cWidget, f, cLoopLevel)
+
+    # step 4: send trigger
+
+
+    # step 5: make the delayed resp codes for the current frame
+
+
+def flipScreen(cWidget, f, cLoopLevel):
+    global historyPropDict, isDummyPrint
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+
+    cWinIdx = historyPropDict['cWinIdx']
+    cWinStr = historyPropDict['cWinStr']
+
+    cScreenName = historyPropDict['cScreenName']
+    clearAfter = historyPropDict['clearAfter']
+
+
+    if Func.getWidgetPosition(cWidget.widget_id) > 0:
+        # Step 2: print out help info for the current widget
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, Func.getWidgetPosition(cWidget.widget_id) + 1,
+                     Func.getWidgetName(cWidget.widget_id))
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    # Flip the Screen
+    if Func.getWidgetPosition(cWidget.widget_id) == 0:
+        printAutoInd(f, "% for first event, flip immediately.. ")
+        f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n", Func.getWidgetName(cWidget.widget_id),
+                     cOpRowIdxStr, cWinStr, 0, clearAfter)
+    else:
+
+        preCScreenFlipTimeStr = historyPropDict[f"{cScreenName}_lastFlipTimeVar"]
+
+        printAutoInd(f, f"if cDur > 0")
+        printAutoInd(f, f"cScrFlipTime = cDur + {preCScreenFlipTimeStr};")
+        printAutoInd(f, "else ")
+        printAutoInd(f, "cScrFlipTime = 0;")
+        printAutoInd(f, "end ")
+
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3});\n",
+                     Func.getWidgetName(cWidget.widget_id),
+                     cOpRowIdxStr, cWinStr, clearAfter)
+
+    historyPropDict.update(
+        {f"{cScreenName}_lastFlipTimeVar": f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
+
+
+def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
+    global outputDevNameIdxDict, historyPropDict
+
+    # ---------------------------------------------------------------------------------------
+    # Step 1: print out previous widget's codes that suppose to be print just after the Flip
+    # ----------------------------------------------------------------------------------------
+    for cRowStr in delayedPrintCodes['codesAfFip']:
+        printAutoInd(f, cRowStr)
+    # clear out the print buffer
+    delayedPrintCodes.update({'codesAfFip': []})
+
+    # ------------------------------------------------------------
+    # Step 2: send output messages
+    # ------------------------------------------------------------
+
+    debugPrint(f"------------------------\\")
+
+    output_device = cWidget.getOutputDevice()
+    if len(output_device) > 0:
+        printAutoInd(f, "% send output trigger and msg:")
+
+    debugPrint(f"{cWidget.widget_id}: outputDevice:\n a = {output_device}")
+    debugPrint(f"b = {cWidget.getInputDevice()}")
+
+    for device, properties in output_device.items():
+        msgValue = dataStrConvert(*getRefValue(cWidget, properties['Value or Msg'], attributesSetDict), True)
+        pulseDur = dataStrConvert(*getRefValue(cWidget, properties['Pulse Duration'], attributesSetDict), False)
+
+        cDevName = properties.get("Device Name", "")
+        devType = properties.get("Device Type", "")
+
+        if devType == 'parallel_port':
+
+            if Info.PLATFORM == 'linux':
+                printAutoInd(f, "lptoutMex({0},{1});", outputDevNameIdxDict.get(cDevName), msgValue)
+            elif Info.PLATFORM == 'windows':
+                printAutoInd(f, "io64(io64Obj,{0},{1});", outputDevNameIdxDict.get(cDevName), msgValue)
+            elif Info.PLATFORM == 'mac':
+                printAutoInd(f, "% currently, under Mac OX we just do nothing for parallel ports")
+
+        elif devType == 'network_port':
+            printAutoInd(f, "pnet({0},'write',{1});", outputDevNameIdxDict.get(cDevName), msgValue)
+
+        elif devType == 'serial_port':
+            printAutoInd(f, "[ign, when] = IOPort('Write', {0}, {1});", outputDevNameIdxDict.get(cDevName), msgValue)
+
+    return delayedPrintCodes
+
+
+
+def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
     global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
-    cRespCodes   = []
+    cRespCodes = []
     cAfFlipCodes = []
 
     if Func.getWidgetPosition(cWidget.widget_id) == 0:
@@ -767,6 +892,11 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
     cWinIdx = outputDevNameIdxDict.get(cScreenName)
     cWinStr = f"winIds({cWinIdx})"
+
+    historyPropDict.update({"cScreenName": cScreenName})
+    historyPropDict.update({"cWinIdx": cWinIdx})
+    historyPropDict.update({"cWinStr": cWinStr})
+
 
     # 2) handle the text content
     cProperties['Text'], ign = getRefValue(cWidget, cProperties['Text'], attributesSetDict)
@@ -799,30 +929,21 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     rightToLeft = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
 
     # 11) check the parameter winRect
-    sx      = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
-    sy      = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
-    cWidth  = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
+    sx = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
+    sy = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
+    cWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
     cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
 
     frameRectStr = f"makeFrameRect({sx}, {sy}, {cWidth}, {cHeight}, fullRects({cWinIdx},:))"
 
     # set the font name size color style:
-    fontName  = dataStrConvert(*getRefValue(cWidget, cProperties['Font family'], attributesSetDict))
-    fontSize  = dataStrConvert(*getRefValue(cWidget, cProperties['Font size'], attributesSetDict))
+    fontName = dataStrConvert(*getRefValue(cWidget, cProperties['Font family'], attributesSetDict))
+    fontSize = dataStrConvert(*getRefValue(cWidget, cProperties['Font size'], attributesSetDict))
     fontStyle = dataStrConvert(*getRefValue(cWidget, cProperties['Style'], attributesSetDict))
     fontStyle = parseFontStyleStr(fontStyle)
 
     fontBkColor = dataStrConvert(*getRefValue(cWidget, cProperties['Back color'], attributesSetDict))
 
-    # debugPrint('------------------------------------/')
-    # debugPrint(fontName)
-    # debugPrint(fontSize)
-    # debugPrint(fontStyle)
-    # debugPrint(fontBkColor)
-    #
-    # debugPrint('previous saved color font info:')
-    # debugPrint(historyPropDict)
-    # debugPrint('------------------------------------\\')
     isChangeFontPars = False
     #  font name
     if historyPropDict['fontName'] != fontName:
@@ -852,8 +973,8 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         printAutoInd(f, "")
 
     # before we draw the formattedtext， we draw the frame rect first:
-    borderColor    = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
-    borderWidth    = dataStrConvert(*getRefValue(cWidget, cProperties['Border width'], attributesSetDict))
+    borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
+    borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border width'], attributesSetDict))
     frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame fill color'], attributesSetDict))
     # if f"preFrameFillColor" not in historyPropDict:
     frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
@@ -891,11 +1012,16 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
     clearAfter = parseDontClearAfterStr(clearAfter)
 
+    historyPropDict.update({"clearAfter": clearAfter})
+
     printAutoInd(f, "Screen('DrawingFinished',{0},{1});\n", cWinStr, clearAfter)
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event")
+
+    '''
     # -------------------------------------------------------------
     # Step 2: print out previous widget's resp related codes
     # -------------------------------------------------------------
+
     for cRowStr in delayedPrintCodes['respCodes']:
         printAutoInd(f, cRowStr)
     # clear out the print buffer
@@ -925,10 +1051,12 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         printAutoInd(f, "cScrFlipTime = 0;")
         printAutoInd(f, "end ")
 
-        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3});\n", Func.getWidgetName(cWidget.widget_id),
+        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3});\n",
+                     Func.getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr, cWinStr, clearAfter)
 
-    historyPropDict.update({f"{cScreenName}_lastFlipTimeVar":f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
+    historyPropDict.update(
+        {f"{cScreenName}_lastFlipTimeVar": f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
 
     # ---------------------------------------------------------------------------------------
     # Step 4: print out previous widget's codes that suppose to be print just after the Flip
@@ -972,10 +1100,7 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
         elif devType == 'serial_port':
             printAutoInd(f, "[ign, when] = IOPort('Write', {0}, {1});", outputDevNameIdxDict.get(cDevName), msgValue)
-
-
-
-
+'''
     # -------------------------------------------------------------
     #  we need to dummy draw stim for the next widget
     # so here after we will print any code into delayedPrintCodes
@@ -988,33 +1113,26 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
     durStr = parseDurationStr(durStr)
 
-    cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+    # cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+    cRespCodes.append(f"cDur = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+
 
     shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
-
-
-
 
     # to be continue ...
 
     # if the current widget is the last one in the timeline, just print response codes here
     if Func.getNextWidgetId(cWidget.widget_id) is None:
         for cValue in cRespCodes:
-            printAutoInd(f,cValue)
+            printAutoInd(f, cValue)
         cRespCodes = []
-    #------------------------------------------
+    # ------------------------------------------
     # the last step: upload the delayed codes
-    #------------------------------------------
+    # ------------------------------------------
     delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
     delayedPrintCodes.update({'respCodes': cRespCodes})
 
     return delayedPrintCodes
-
-
-
-
-
-
 
 
 
@@ -1268,8 +1386,10 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
         printAutoInd(f, "function {0}()", cFilenameOnly)
         printAutoInd(f, "% function generated by PTB Builder 0.1")
-        printAutoInd(f, "% If you use PTB Builder for your research, then we would appreciate your citing our work in your paper:")
-        printAutoInd(f, "% , (2019) PTB builder: a free GUI to generate experimental codes for Psychoolbox. Behavior Research Methods\n%")
+        printAutoInd(f,
+                     "% If you use PTB Builder for your research, then we would appreciate your citing our work in your paper:")
+        printAutoInd(f,
+                     "% , (2019) PTB builder: a free GUI to generate experimental codes for Psychoolbox. Behavior Research Methods\n%")
         printAutoInd(f, "% To report possible bugs and any suggestions please send us e-mail:")
         printAutoInd(f, "% Yang Zhang")
         printAutoInd(f, "% Ph.D, Prof.")
@@ -1310,10 +1430,10 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         # get output devices, such as global output devices.
         # you can get each widget's device you selected
-        output_devices     = Info.OUTPUT_DEVICE_INFO
-        input_devices      = Info.INPUT_DEVICE_INFO
+        output_devices = Info.OUTPUT_DEVICE_INFO
+        input_devices = Info.INPUT_DEVICE_INFO
         eyetracker_devices = Info.TRACKER_INFO
-        quest_devices      = Info.QUEST_INFO
+        quest_devices = Info.QUEST_INFO
 
         print(f"eyetracker: {eyetracker_devices}")
         print(f"quest: {quest_devices}")
@@ -1346,30 +1466,30 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
                 printAutoInd(f, "quest({0}).maxStimIntensity = {1};", iQuest, quest['Maximum'])
                 printAutoInd(f, "quest({0}).minStimIntensity = {1};\n", iQuest, quest['Minimum'])
 
-                printAutoInd(f,"% get the first stimulus intensity")
-                if   quest['Method'] == 'quantile':
-                    printAutoInd(f,"quest({0}).cValue = QuestQuantile(quest({1}));",iQuest,iQuest)
+                printAutoInd(f, "% get the first stimulus intensity")
+                if quest['Method'] == 'quantile':
+                    printAutoInd(f, "quest({0}).cValue = QuestQuantile(quest({1}));", iQuest, iQuest)
                 elif quest['Method'] == 'mean':
-                    printAutoInd(f,"quest({0}).cValue = QuestMean(quest({1}));",iQuest,iQuest)
+                    printAutoInd(f, "quest({0}).cValue = QuestMean(quest({1}));", iQuest, iQuest)
                 elif quest['Method'] == 'mode':
-                    printAutoInd(f,"quest({0}).cValue = QuestMode(quest({1}));",iQuest,iQuest)
+                    printAutoInd(f, "quest({0}).cValue = QuestMode(quest({1}));", iQuest, iQuest)
                 else:
                     throwCompileErrorInfo("quest method should be of {'quantile', 'mean', or 'mode'}!!")
 
                 #  intensity transform:
                 printAutoInd(f, "quest({0}) = questValueTrans(quest({1}));\n", iQuest, iQuest)
 
-                attributesSetDict.update({f"{quest['Quest Name']}.cValue":[0,f"quest({iQuest}).cValue",{f"quest({iQuest}).cValue"}]})
+                attributesSetDict.update(
+                    {f"{quest['Quest Name']}.cValue": [0, f"quest({iQuest}).cValue", {f"quest({iQuest}).cValue"}]})
 
                 iQuest += 1
             printAutoInd(f, "%------------------------------------\\")
 
-
         printAutoInd(f, "%------ define input devices --------/")
         iKeyboard = 1
-        iGamepad  = 1
-        iRespBox  = 1
-        iMouse    = 1
+        iGamepad = 1
+        iRespBox = 1
+        iMouse = 1
 
         for inputDevId, cDevice in input_devices.items():
 
@@ -1381,11 +1501,11 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
                 printAutoInd(f, "KBoards({0}).name     = '{1}';\n", iKeyboard, cDevice['Device Name'])
                 iKeyboard += 1
             elif cDevice['Device Type'] == 'mouse':
-                iMouse    += 1
+                iMouse += 1
             elif cDevice['Device Type'] == 'game pad':
-                iGamepad  += 1
+                iGamepad += 1
             elif cDevice['Device Type'] == 'response box':
-                iRespBox  += 1
+                iRespBox += 1
 
         # if u'\u4e00' <= char <= u'\u9fa5':  # 判断是否是汉字
 
@@ -1394,10 +1514,10 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "%----- define output devices --------/")
 
         iMonitor = 1
-        iParal   = 1
+        iParal = 1
         iNetPort = 1
-        iSerial  = 1
-        iSound   = 1
+        iSerial = 1
+        iSound = 1
 
         # debugPrint(output_devices)
 
@@ -1407,7 +1527,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
                 outputDevNameIdxDict.update({cDevice['Device Name']: f"{iMonitor}"})
 
                 historyPropDict.update({f"{cDevice['Device Name']}_bkColor": addSquBrackets(cDevice['Back Color'])})
-                historyPropDict.update({f"{cDevice['Device Name']}_lastFlipTimeVar":[]})
+                historyPropDict.update({f"{cDevice['Device Name']}_lastFlipTimeVar": []})
 
                 printAutoInd(f, "monitors({0}).port        =  {1};", iMonitor, cDevice['Device Port'])
                 printAutoInd(f, "monitors({0}).name        = '{1}';", iMonitor, cDevice['Device Name'])
@@ -1705,7 +1825,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "cShuffledIdx = 1:nRows;")
         printAutoInd(f, "switch orderStr")
         printAutoInd(f, "case 'Sequential'")
-        printAutoInd(f,"% do nothing")
+        printAutoInd(f, "% do nothing")
 
         printAutoInd(f, "case 'Random'")
         printAutoInd(f, "cShuffledIdx = Shuffle(cShuffledIdx);")
@@ -1743,7 +1863,8 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "end%switch")
 
         printAutoInd(f, "otherwise")
-        printAutoInd(f, "error('order methods should be of {{''Sequential'',''Random'',''Random with Replacement'',''CounterBalance''}}');")
+        printAutoInd(f,
+                     "error('order methods should be of {{''Sequential'',''Random'',''Random with Replacement'',''CounterBalance''}}');")
         printAutoInd(f, "end%switch")
 
         printAutoInd(f, "end %  end of subfun4")
@@ -1766,7 +1887,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
         if iQuest > 1:
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            printAutoInd(f, "% subfun {0}: questValueTrans",iSubFunNum)
+            printAutoInd(f, "% subfun {0}: questValueTrans", iSubFunNum)
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             printAutoInd(f, "function quest = questValueTrans(quest)")
             printAutoInd(f, "if quest.isLog10Trans")
@@ -1774,13 +1895,9 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
             printAutoInd(f, "end ")
             printAutoInd(f, "quest.cValue = max(quest.cValue,quest.minValue);")
             printAutoInd(f, "quest.cValue = min(quest.cValue,quest.maxValue);")
-            printAutoInd(f, "end %  end of subfun{0}",iSubFunNum)
+            printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
 
         iSubFunNum += 1
-
-
-
-
 
     if not isDummyPrint:
         Func.log(f"Compile successful!:{compile_file_name}")  # print info to the output panel
