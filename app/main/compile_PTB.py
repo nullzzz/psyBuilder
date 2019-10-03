@@ -763,6 +763,7 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     flipScreen(cWidget, f, cLoopLevel)
 
     # step 4: send trigger
+    printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes)
 
 
     # step 5: make the delayed resp codes for the current frame
@@ -795,8 +796,8 @@ def flipScreen(cWidget, f, cLoopLevel):
 
         preCScreenFlipTimeStr = historyPropDict[f"{cScreenName}_lastFlipTimeVar"]
 
-        printAutoInd(f, f"if cDur > 0")
-        printAutoInd(f, f"cScrFlipTime = cDur + {preCScreenFlipTimeStr};")
+        printAutoInd(f, f"if cDurs({cWinIdx}) > 0")
+        printAutoInd(f, f"cScrFlipTime = cDurs({cWinIdx}) + {preCScreenFlipTimeStr};")
         printAutoInd(f, "else ")
         printAutoInd(f, "cScrFlipTime = 0;")
         printAutoInd(f, "end ")
@@ -1113,8 +1114,8 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
     durStr = parseDurationStr(durStr)
 
-    # cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
-    cRespCodes.append(f"cDur = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+    cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+    # cRespCodes.append(f"cDur = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
 
 
     shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
