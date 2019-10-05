@@ -49,7 +49,7 @@ def throwCompileErrorInfo(inputStr):
 
 
 def debugPrint(input):
-    isDebug = True
+    isDebug = False
 
     if isDebug:
         print(input)
@@ -317,7 +317,7 @@ def getSepcialFormatAtts():
     for widgetId, cWidget in Info.WID_WIDGET.items():
         # print(f"line 74 {widgetId}")
         cProperties = Func.getProperties(widgetId)
-        # print(f"line 76: {cProperties}")
+        print(f"line 76: {cProperties}")
         if Func.isWidgetType(widgetId, Info.CYCLE):
             pass
         elif Func.isWidgetType(widgetId, Info.TEXT):
@@ -352,7 +352,7 @@ def getSepcialFormatAtts():
 
         elif Func.isWidgetType(widgetId, Info.SLIDER):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
-            updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['pro']['Clear after'], 'clearAfter', spFormatVarDict)
 
     return spFormatVarDict
 
@@ -488,23 +488,42 @@ def isContainCycleTL(widgetId) -> bool:
     return False
 
 
+def replaceDot(screenNameStr, newSplitStr = "_") -> str:
+
+    return newSplitStr.join(screenNameStr.split('.'))
+
+
+def shouldNotBeCitationCheck(keyStr,value):
+    if isRefStr(value):
+        throwCompileErrorInfo(f"'{keyStr}': the value should NOT be a citation!")
+
+
+
 def outPutTriggerCheck(cWidget) -> dict:
+    '''
+    : force the pulse dur to be 10 ms if the ppl device will be used to send responses triggers
+    '''
     cOutPutDevices = cWidget.getOutputDevice()
     cInputDevices = cWidget.getInputDevice()
 
+    print(f"cOutPutDevices = {cOutPutDevices}")
+    print(f"cInputDevices = {cInputDevices}")
+
     respTriggerDevNames = set()
-    for cInputDevInfo in cInputDevices.key():
+    for cInputDevInfo in cInputDevices.values():
         cRespTriggerDevName = cInputDevInfo['Output Device']
-        if isRefStr(cRespTriggerDevName):
-            throwCompileErrorInfo(
-                f"'{cRespTriggerDevName}':The response trigger Device should NOT be a variable citation!")
+
+        shouldNotBeCitationCheck('Resp Trigger Device', cRespTriggerDevName)
+
         respTriggerDevNames.update(cRespTriggerDevName)
 
     shortPulseDurParallelsDict = dict()
-    for cOpDevInfo in cOutPutDevices.key():
+
+    for cOpDevInfo in cOutPutDevices.values():
         if cOpDevInfo['Device Type'] == 'parallel_port':
             if cOpDevInfo['Device Name'] in respTriggerDevNames:
                 shortPulseDurParallelsDict.update({cOpDevInfo['Device Id']: 10})
+                Func.log('Currently we will force the pulse duration to be 10 ms', False)
 
     return shortPulseDurParallelsDict  # temp
 
@@ -776,7 +795,7 @@ def flipScreen(cWidget, f, cLoopLevel):
     cWinIdx = historyPropDict['cWinIdx']
     cWinStr = historyPropDict['cWinStr']
 
-    cScreenName = historyPropDict['cScreenName']
+    transedScrName = replaceDot(historyPropDict['cScreenName'])
     clearAfter = historyPropDict['clearAfter']
 
 
@@ -794,12 +813,12 @@ def flipScreen(cWidget, f, cLoopLevel):
                      cOpRowIdxStr, cWinStr, 0, clearAfter)
     else:
 
-        preCScreenFlipTimeStr = historyPropDict[f"{cScreenName}_lastFlipTimeVar"]
+        preCScreenFlipTimeStr = historyPropDict[f"{transedScrName}_lastFlipTimeVar"]
 
-        printAutoInd(f, f"if cDurs({cWinIdx}) > 0")
-        printAutoInd(f, f"cScrFlipTime = cDurs({cWinIdx}) + {preCScreenFlipTimeStr};")
+        printAutoInd(f, f"if {transedScrName}_cDur > 0")
+        printAutoInd(f, f"cScrFlipTime = {transedScrName}_cDur + {preCScreenFlipTimeStr};")
         printAutoInd(f, "else ")
-        printAutoInd(f, "cScrFlipTime = 0;")
+        printAutoInd(f, "cScrFlipTime = 0; % flip immediately")
         printAutoInd(f, "end ")
 
         printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3});\n",
@@ -807,7 +826,7 @@ def flipScreen(cWidget, f, cLoopLevel):
                      cOpRowIdxStr, cWinStr, clearAfter)
 
     historyPropDict.update(
-        {f"{cScreenName}_lastFlipTimeVar": f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
+        {f"{transedScrName}_lastFlipTimeVar": f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
 
 
 def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
@@ -822,7 +841,7 @@ def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
     delayedPrintCodes.update({'codesAfFip': []})
 
     # ------------------------------------------------------------
-    # Step 2: send output messages
+    # Step 2: send output triggers and messages
     # ------------------------------------------------------------
 
     debugPrint(f"------------------------\\")
@@ -834,6 +853,9 @@ def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
     debugPrint(f"{cWidget.widget_id}: outputDevice:\n a = {output_device}")
     debugPrint(f"b = {cWidget.getInputDevice()}")
 
+    # initializing the outDevices that could be used to store the outDev info
+    cOutDeviceDict = dict()
+
     for device, properties in output_device.items():
         msgValue = dataStrConvert(*getRefValue(cWidget, properties['Value or Msg'], attributesSetDict), True)
         pulseDur = dataStrConvert(*getRefValue(cWidget, properties['Pulse Duration'], attributesSetDict), False)
@@ -841,7 +863,10 @@ def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
         cDevName = properties.get("Device Name", "")
         devType = properties.get("Device Type", "")
 
+
         if devType == 'parallel_port':
+            # currently only ppl need to be reset to zero
+            cOutDeviceDict[cDevName] = [devType,pulseDur]
 
             if Info.PLATFORM == 'linux':
                 printAutoInd(f, "lptoutMex({0},{1});", outputDevNameIdxDict.get(cDevName), msgValue)
@@ -856,7 +881,61 @@ def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
         elif devType == 'serial_port':
             printAutoInd(f, "[ign, when] = IOPort('Write', {0}, {1});", outputDevNameIdxDict.get(cDevName), msgValue)
 
+    historyPropDict.update({'cOutDevices':cOutDeviceDict})
+
     return delayedPrintCodes
+
+
+def checkResponse(cWidget,f , attributesSetDict, delayedPrintCodes):
+    global outputDevNameIdxDict, historyPropDict
+
+    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip',[])
+    cRespCodes = delayedPrintCodes.get('respCodes',[])
+
+    cWinIdx = historyPropDict['cWinIdx']
+    transedScrName = replaceDot(historyPropDict['cScreenName'])
+
+    cInputDevices = cWidget.getInputDevice()
+    # -------------------------------------------------------------------------------
+    # Step 1: check parameters that should be a citation value
+    # -------------------------------------------------------------------------------
+    for cInputDev in cInputDevices.values():
+        shouldNotBeCitationCheck('RT Window',cInputDev['RT Window'])
+        shouldNotBeCitationCheck('End Action',cInputDev['End Action'])
+    # -------------------------------------------------------------------------------
+    # Step 2: get the current screen duration that determined by the next flip
+    # -------------------------------------------------------------------------------
+    # after drawing the next widget's stimuli, get the duration first
+    durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
+    durStr = parseDurationStr(durStr)
+    cRespCodes.append(f"{transedScrName}_cDur = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+
+    if len(cInputDevices) > 0:
+        preCScreenFlipTimeStr = historyPropDict.get(f"{transedScrName}_lastFlipTimeVar")
+        # if preCScreenFlipTimeStr is None:
+        #     cRespCodes.append('')
+        cRespCodes.append(f"while GetSecs < {transedScrName}_cDur +  {preCScreenFlipTimeStr} ")
+        cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
+        cRespCodes.append(f"end % while")
+
+
+
+
+
+    shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
+
+    # to be continue ...
+
+    # if the current widget is the last one in the timeline, just print response codes here
+    if Func.getNextWidgetId(cWidget.widget_id) is None:
+        for cValue in cRespCodes:
+            printAutoInd(f, cValue)
+        cRespCodes = []
+    # ------------------------------------------
+    # the last step: upload the delayed codes
+    # ------------------------------------------
+    delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
+    delayedPrintCodes.update({'respCodes': cRespCodes})
 
 
 
@@ -1115,7 +1194,7 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     durStr = parseDurationStr(durStr)
 
     cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
-    # cRespCodes.append(f"cDur = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+
 
 
     shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
@@ -1874,7 +1953,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "% subfun 5: getDurValue")
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "function cDur = getDurValue(cDur,cIFI)")
-        printAutoInd(f, "if cDur == 0")
+        printAutoInd(f, "if numel(cDur) == 1 & cDur == 0")
         printAutoInd(f, "return;")
         printAutoInd(f, "end")
         printAutoInd(f, "cDur = cDur./1000; % transform the unit from ms to sec")
