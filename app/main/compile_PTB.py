@@ -786,6 +786,7 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
 
     # step 5: make the delayed resp codes for the current frame
+    checkResponse(cWidget, f, attributesSetDict, delayedPrintCodes)
 
 
 def flipScreen(cWidget, f, cLoopLevel):
@@ -795,7 +796,7 @@ def flipScreen(cWidget, f, cLoopLevel):
     cWinIdx = historyPropDict['cWinIdx']
     cWinStr = historyPropDict['cWinStr']
 
-    transedScrName = replaceDot(historyPropDict['cScreenName'])
+    # transedScrName = replaceDot(historyPropDict['cScreenName'])
     clearAfter = historyPropDict['clearAfter']
 
 
@@ -812,21 +813,24 @@ def flipScreen(cWidget, f, cLoopLevel):
         printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n", Func.getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr, cWinStr, 0, clearAfter)
     else:
-
-        preCScreenFlipTimeStr = historyPropDict[f"{transedScrName}_lastFlipTimeVar"]
-
-        printAutoInd(f, f"if {transedScrName}_cDur > 0")
-        printAutoInd(f, f"cScrFlipTime = {transedScrName}_cDur + {preCScreenFlipTimeStr};")
+        printAutoInd(f, f"if cDurs({cWinIdx}) > 0")
+        printAutoInd(f, f"cScrFlipTime = cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx});")
         printAutoInd(f, "else ")
-        printAutoInd(f, "cScrFlipTime = 0; % flip immediately")
+        printAutoInd(f, "cScrFlipTime = 0;  % flip immediately")
         printAutoInd(f, "end ")
 
         printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3});\n",
                      Func.getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr, cWinStr, clearAfter)
 
-    historyPropDict.update(
-        {f"{transedScrName}_lastFlipTimeVar": f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
+        # updated the screen flip times in matlab
+        printAutoInd(f, "lastScrOnsettime({0}) = {1}_onsettime({2});\n",
+                      cWinIdx,
+                     Func.getWidgetName(cWidget.widget_id),
+                     cOpRowIdxStr)
+    #
+    # historyPropDict.update(
+    #     {f"{transedScrName}_lastFlipTimeVar": f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
 
 
 def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
@@ -886,35 +890,64 @@ def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
     return delayedPrintCodes
 
 
-def checkResponse(cWidget,f , attributesSetDict, delayedPrintCodes):
+def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
     global outputDevNameIdxDict, historyPropDict
+
+    cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
     cAfFlipCodes = delayedPrintCodes.get('codesAfFlip',[])
     cRespCodes = delayedPrintCodes.get('respCodes',[])
 
+    allInputDevs = historyPropDict.get('allInputDevs',{})
+
     cWinIdx = historyPropDict['cWinIdx']
-    transedScrName = replaceDot(historyPropDict['cScreenName'])
+    transedScrName = replaceDot(historyPropDict['cScreenName']) # there is a bug when screen is a citation
 
     cInputDevices = cWidget.getInputDevice()
+
     # -------------------------------------------------------------------------------
-    # Step 1: check parameters that should be a citation value
+    # Step 1: check parameters that should not be a citation value
     # -------------------------------------------------------------------------------
-    for cInputDev in cInputDevices.values():
-        shouldNotBeCitationCheck('RT Window',cInputDev['RT Window'])
-        shouldNotBeCitationCheck('End Action',cInputDev['End Action'])
+    nKbs = 0
+    nMouses = 0
+
+    for key, value in cInputDevices.items():
+        shouldNotBeCitationCheck('RT Window',value['RT Window'])
+        shouldNotBeCitationCheck('End Action',value['End Action'])
+
+        if value['Device Type'] == 'keyboard':
+            nKbs += 1
+
+        if value['Device Type'] == 'mouse':
+            nMouses += 1
+
+        value.update({'Widget Name':cWidgetName})
+        cInputDevices.update({key:value})
+
+    # under windows: all keyboards and mouses will be tried as a single device
+    if Info.PLATFORM == 'windows':
+        if nKbs > 1 or nMouses > 1:
+            tobeShowStr = 'Input devices: \n For windows, specify multiple kbs or mice separately are not allowed!\n you can specify only one keyboard and/or one mouse here!'
+            throwCompileErrorInfo(f"{cWidgetName}: {tobeShowStr}")
+
+
     # -------------------------------------------------------------------------------
+
+    allInputDevs.update(cInputDevices)
+
     # Step 2: get the current screen duration that determined by the next flip
     # -------------------------------------------------------------------------------
     # after drawing the next widget's stimuli, get the duration first
     durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
     durStr = parseDurationStr(durStr)
-    cRespCodes.append(f"{transedScrName}_cDur = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+    cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
 
-    if len(cInputDevices) > 0:
+
+
+    if len(allInputDevs) > 0:
         preCScreenFlipTimeStr = historyPropDict.get(f"{transedScrName}_lastFlipTimeVar")
-        # if preCScreenFlipTimeStr is None:
-        #     cRespCodes.append('')
-        cRespCodes.append(f"while GetSecs < {transedScrName}_cDur +  {preCScreenFlipTimeStr} ")
+
+        cRespCodes.append(f"while GetSecs < cDurs({cWinIdx})  +  {preCScreenFlipTimeStr} ")
         cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
         cRespCodes.append(f"end % while")
 
@@ -968,6 +1001,8 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
+    shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
+
     cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
 
     cWinIdx = outputDevNameIdxDict.get(cScreenName)
@@ -1577,8 +1612,8 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
             inputDevNameIdxDict.update({cDevice['Device Name']: inputDevId})
             # debugPrint(input_device)
             if cDevice['Device Type'] == 'keyboard':
-                printAutoInd(f, "KBoards({0}).port     = '{1}';", iKeyboard, cDevice['Device Port'])
-                printAutoInd(f, "KBoards({0}).name     = '{1}';\n", iKeyboard, cDevice['Device Name'])
+                # printAutoInd(f, "KBoards({0}).port     = '{1}';", iKeyboard, cDevice['Device Port'])
+                # printAutoInd(f, "KBoards({0}).name     = '{1}';\n", iKeyboard, cDevice['Device Name'])
                 iKeyboard += 1
             elif cDevice['Device Type'] == 'mouse':
                 iMouse += 1
@@ -1588,6 +1623,20 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
                 iRespBox += 1
 
         # if u'\u4e00' <= char <= u'\u9fa5':  # 判断是否是汉字
+
+        printAutoInd(f, "% get input device indices")
+        printAutoInd(f, "kbIndices = unique(GetKeyboardIndices());")
+
+        if iGamepad > 1:
+            if Info.PLATFORM == 'windows':
+                printAutoInd(f, "gamepadIndices = 1:{0}; % getGamepadIndices does not work on windows ",iGamepad - 1)
+            else:
+                printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices());")
+
+        if Info.PLATFORM == "linux":
+            printAutoInd(f, "miceIndices = unique(GetMouseIndices('slavePointer'));")
+        else:
+            printAutoInd(f, "miceIndices = unique(GetMouseIndices());")
 
         printAutoInd(f, "%------------------------------------\\\n\n")
 
@@ -1607,7 +1656,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
                 outputDevNameIdxDict.update({cDevice['Device Name']: f"{iMonitor}"})
 
                 historyPropDict.update({f"{cDevice['Device Name']}_bkColor": addSquBrackets(cDevice['Back Color'])})
-                historyPropDict.update({f"{cDevice['Device Name']}_lastFlipTimeVar": []})
+                # historyPropDict.update({f"{cDevice['Device Name']}_lastFlipTimeVar": []})
 
                 printAutoInd(f, "monitors({0}).port        =  {1};", iMonitor, cDevice['Device Port'])
                 printAutoInd(f, "monitors({0}).name        = '{1}';", iMonitor, cDevice['Device Name'])
@@ -1656,10 +1705,11 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
         printAutoInd(f, "%----- initialize output devices --------/")
         printAutoInd(f, "%--- open windows ---/")
-        printAutoInd(f, "winIds    = zeros({0},1);", iMonitor - 1)
-        printAutoInd(f, "cDurs     = zeros({0},1);", iMonitor - 1)
-        printAutoInd(f, "winIFIs   = zeros({0},1);", iMonitor - 1)
-        printAutoInd(f, "fullRects = zeros({0},4);", iMonitor - 1)
+        printAutoInd(f, "winIds           = zeros({0},1);", iMonitor - 1)
+        printAutoInd(f, "lastScrOnsettime = zeros({0},1);", iMonitor - 1)
+        printAutoInd(f, "cDurs            = zeros({0},1);", iMonitor - 1)
+        printAutoInd(f, "winIFIs          = zeros({0},1);", iMonitor - 1)
+        printAutoInd(f, "fullRects        = zeros({0},4);", iMonitor - 1)
 
         printAutoInd(f, "for iWin = 1:numel(monitors)")
         printAutoInd(f,

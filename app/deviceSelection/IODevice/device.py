@@ -26,6 +26,8 @@ class Device(QListWidgetItem):
             self.port = "0"
         elif device_type == "sound":
             self.port = "1"
+        elif device_type in ("keyboard","mouse","game pad"):
+            self.port = "0"
         else:
             self.port = "null"
 
@@ -96,6 +98,8 @@ class Device(QListWidgetItem):
             self.port = port.split(".")[-1]
         elif port.startswith("serial_port"):
             self.port = f"com{port.split('.')[-1]}"
+        elif port.startswith("keyboard") or port.startswith("mouse") or port.startswith("game pad"):
+            self.port = port.split(".")[-1]
         elif port.startswith(self.device_type):
             pass
         else:

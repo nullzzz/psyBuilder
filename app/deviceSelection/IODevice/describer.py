@@ -27,16 +27,17 @@ class Shower(QWidget):
     def setUI(self):
         layout = QFormLayout()
         layout.setLabelAlignment(Qt.AlignRight)
-        layout.addRow("Device Type:", self.device_type)
-        layout.addRow("Device Name:", self.device_name)
-        layout.addRow("Device Port:", self.device_port)
+        layout.addRow("Input Device Type:", self.device_type)
+        layout.addRow("Input Device Name:", self.device_name)
+        layout.addRow("Device Port/index:", self.device_port)
         layout.addRow("", self.port_tip)
         self.setLayout(layout)
 
     def describe(self, device_type, device_name, device_port, other):
         self.device_type.setText(device_type)
         self.device_name.setText(device_name)
-        if device_type in ("mouse", "keyboard", "game pad"):
+        # if device_type in ("mouse", "keyboard", "game pad"):
+        if device_type in ("currently none "):
             self.device_port.setText("Invalid")
             self.device_port.setEnabled(False)
         else:
