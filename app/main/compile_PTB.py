@@ -49,7 +49,7 @@ def throwCompileErrorInfo(inputStr):
 
 
 def debugPrint(input):
-    isDebug = False
+    isDebug = True
 
     if isDebug:
         print(input)
@@ -531,15 +531,17 @@ def outPutTriggerCheck(cWidget) -> dict:
 def parseAllowKeys(allowKeyStr):
     global enabledKBKeysList
 
-    splittedStrs = re.split('({\w*})', allowKeyStr)
 
-    for item in splittedStrs:
-        if item[0] == '{':
-            item = re.sub('[\{\}]', '', item)
-            enabledKBKeysList.append(item)
-        else:
-            for char in item:
-                enabledKBKeysList.append(char)
+    if len(allowKeyStr) > 0:
+        splittedStrs = re.split('({\w*})', allowKeyStr)
+
+        for item in splittedStrs:
+            if item[0] == '{':
+                item = re.sub('[\{\}]', '', item)
+                enabledKBKeysList.append(item)
+            else:
+                for char in item:
+                    enabledKBKeysList.append(char)
 
 
 def parseBooleanStr(inputStr, isRef=False):
@@ -782,11 +784,13 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     flipScreen(cWidget, f, cLoopLevel)
 
     # step 4: send trigger
-    printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes)
+    delayedPrintCodes = printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
 
 
     # step 5: make the delayed resp codes for the current frame
-    checkResponse(cWidget, f, attributesSetDict, delayedPrintCodes)
+    delayedPrintCodes = checkResponse(cWidget, f, attributesSetDict, delayedPrintCodes)
+
+    return delayedPrintCodes
 
 
 def flipScreen(cWidget, f, cLoopLevel):
@@ -823,18 +827,19 @@ def flipScreen(cWidget, f, cLoopLevel):
                      Func.getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr, cWinStr, clearAfter)
 
-        # updated the screen flip times in matlab
-        printAutoInd(f, "lastScrOnsettime({0}) = {1}_onsettime({2});\n",
-                      cWinIdx,
-                     Func.getWidgetName(cWidget.widget_id),
-                     cOpRowIdxStr)
-    #
-    # historyPropDict.update(
-    #     {f"{transedScrName}_lastFlipTimeVar": f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
+    # updated the screen flip times in matlab
+    printAutoInd(f, "lastScrOnsettime({0}) = {1}_onsettime({2});\n",
+                  cWinIdx,
+                 Func.getWidgetName(cWidget.widget_id),
+                 cOpRowIdxStr)
 
 
-def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
+
+def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     global outputDevNameIdxDict, historyPropDict
+
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"
+    cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
     # ---------------------------------------------------------------------------------------
     # Step 1: print out previous widget's codes that suppose to be print just after the Flip
@@ -852,7 +857,7 @@ def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
 
     output_device = cWidget.getOutputDevice()
     if len(output_device) > 0:
-        printAutoInd(f, "% send output trigger and msg:")
+        printAutoInd(f, "% -- send output trigger and msg: --/")
 
     debugPrint(f"{cWidget.widget_id}: outputDevice:\n a = {output_device}")
     debugPrint(f"b = {cWidget.getInputDevice()}")
@@ -887,6 +892,10 @@ def printStimTriggers(cWidget, f, attributesSetDict, delayedPrintCodes):
 
     historyPropDict.update({'cOutDevices':cOutDeviceDict})
 
+    if len(output_device) > 0:
+        printAutoInd(f, "{0}_msgEndTime({1}) = GetSecs;", cWidgetName, cOpRowIdxStr)
+        printAutoInd(f, "% ----------------------------------\\\n")
+
     return delayedPrintCodes
 
 
@@ -901,7 +910,6 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
     allInputDevs = historyPropDict.get('allInputDevs',{})
 
     cWinIdx = historyPropDict['cWinIdx']
-    # transedScrName = replaceDot(historyPropDict['cScreenName']) # there is a bug when screen is a citation
 
     cInputDevices = cWidget.getInputDevice()
 
@@ -915,6 +923,11 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
         shouldNotBeCitationCheck('RT Window',value['RT Window'])
         shouldNotBeCitationCheck('End Action',value['End Action'])
 
+        # check if the end action and rt window parameters are compatible
+        if value.get('End Action') == 'Terminate':
+            if value.get('RT Window') != '(Same as duration)':
+                throwCompileErrorInfo(f"{cWidgetName}:{value.get('Device Name')} when 'End Action' == 'Terminate', 'RT Window' should be '(Same as duration)'")
+
         if value['Device Type'] == 'keyboard':
             nKbs += 1
 
@@ -924,13 +937,22 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
         value.update({'Widget Name':cWidgetName})
         cInputDevices.update({key:value})
 
+        # update the allowable keys
+        if  value['Device Type'] != 'response box':
+            allowableKeysStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, value.get('Allowable'), attributesSetDict)
+
+            if isRefValue:
+                for allowableKey in cRefValueSet:
+                    parseAllowKeys(allowableKey)
+            else:
+                parseAllowKeys(allowableKeysStr)
+
+
     # under windows: all keyboards and mouses will be treated as a single device
     if Info.PLATFORM == 'windows':
         if nKbs > 1 or nMouses > 1:
             tobeShowStr = 'Input devices: \n For windows, specify multiple kbs or mice separately are not allowed!\n you can specify only one keyboard and/or one mouse here!'
             throwCompileErrorInfo(f"{cWidgetName}: {tobeShowStr}")
-
-
     # -------------------------------------------------------------------------------
 
     allInputDevs.update(cInputDevices)
@@ -940,15 +962,34 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
     # after drawing the next widget's stimuli, get the duration first
     durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
     durStr = parseDurationStr(durStr)
-    cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+
+    if re.fullmatch("\d+,\d+", durStr):
+        cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}));")
+    else:
+        cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue({durStr},winIFIs({cWinIdx}));")
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
     if len(allInputDevs) > 0:
 
-        cRespCodes.append(f"while GetSecs < cDurs({cWinIdx})  +  lastScrOnsettime({cWinIdx}) ")
+        cRespCodes.append("%-- acquire responses --/")
+        cRespCodes.append(f"while GetSecs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) ")
         cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
         cRespCodes.append(f"end % while")
+        cRespCodes.append("%-----------------------\\")
 
 
 
@@ -969,6 +1010,8 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
     delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
     delayedPrintCodes.update({'respCodes': cRespCodes})
 
+    return delayedPrintCodes
+
 
 
 def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
@@ -977,6 +1020,9 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
     cRespCodes = []
     cAfFlipCodes = []
+
+    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip',[])
+    cRespCodes = delayedPrintCodes.get('respCodes',[])
 
     if Func.getWidgetPosition(cWidget.widget_id) == 0:
         # Step 2: print out help info for the current widget
@@ -1128,93 +1174,10 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
     historyPropDict.update({"clearAfter": clearAfter})
 
-    printAutoInd(f, "Screen('DrawingFinished',{0},{1});\n", cWinStr, clearAfter)
-    printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event")
+    printAutoInd(f, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
+    printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
 
-    '''
-    # -------------------------------------------------------------
-    # Step 2: print out previous widget's resp related codes
-    # -------------------------------------------------------------
 
-    for cRowStr in delayedPrintCodes['respCodes']:
-        printAutoInd(f, cRowStr)
-    # clear out the print buffer
-    delayedPrintCodes.update({'respCodes': []})
-
-    # -------------------------------------------------------------
-    # Step 3: print out title of the current widget
-    # -------------------------------------------------------------
-    if Func.getWidgetPosition(cWidget.widget_id) > 0:
-        # Step 2: print out help info for the current widget
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, Func.getWidgetPosition(cWidget.widget_id) + 1,
-                     Func.getWidgetName(cWidget.widget_id))
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    # Flip the Screen
-    if Func.getWidgetPosition(cWidget.widget_id) == 0:
-        printAutoInd(f, "% for first event, flip immediately.. ")
-        f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
-        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},{3},{4});\n", Func.getWidgetName(cWidget.widget_id),
-                     cOpRowIdxStr, cWinStr, 0, clearAfter)
-    else:
-
-        preCScreenFlipTimeStr = historyPropDict[f"{cScreenName}_lastFlipTimeVar"]
-        printAutoInd(f, f"if cDurs({cWinIdx}) > 0")
-        printAutoInd(f, f"cScrFlipTime = cDurs({cWinIdx}) + {preCScreenFlipTimeStr};")
-        printAutoInd(f, "else ")
-        printAutoInd(f, "cScrFlipTime = 0;")
-        printAutoInd(f, "end ")
-
-        printAutoInd(f, "{0}_onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3});\n",
-                     Func.getWidgetName(cWidget.widget_id),
-                     cOpRowIdxStr, cWinStr, clearAfter)
-
-    historyPropDict.update(
-        {f"{cScreenName}_lastFlipTimeVar": f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"})
-
-    # ---------------------------------------------------------------------------------------
-    # Step 4: print out previous widget's codes that suppose to be print just after the Flip
-    # ----------------------------------------------------------------------------------------
-    for cRowStr in delayedPrintCodes['codesAfFip']:
-        printAutoInd(f, cRowStr)
-    # clear out the print buffer
-    delayedPrintCodes.update({'codesAfFip': []})
-
-    # ------------------------------------------------------------
-    # Step 5: send output messages
-    # ------------------------------------------------------------
-
-    debugPrint(f"------------------------\\")
-
-    output_device = cWidget.getOutputDevice()
-    if len(output_device) > 0:
-        printAutoInd(f, "% send output trigger and msg:")
-
-    debugPrint(f"{cWidget.widget_id}: outputDevice:\n a = {output_device}")
-    debugPrint(f"b = {cWidget.getInputDevice()}")
-
-    for device, properties in output_device.items():
-        msgValue = dataStrConvert(*getRefValue(cWidget, properties['Value or Msg'], attributesSetDict), True)
-        pulseDur = dataStrConvert(*getRefValue(cWidget, properties['Pulse Duration'], attributesSetDict), False)
-
-        cDevName = properties.get("Device Name", "")
-        devType = properties.get("Device Type", "")
-
-        if devType == 'parallel_port':
-
-            if Info.PLATFORM == 'linux':
-                printAutoInd(f, "lptoutMex({0},{1});", outputDevNameIdxDict.get(cDevName), msgValue)
-            elif Info.PLATFORM == 'windows':
-                printAutoInd(f, "io64(io64Obj,{0},{1});", outputDevNameIdxDict.get(cDevName), msgValue)
-            elif Info.PLATFORM == 'mac':
-                printAutoInd(f, "% currently, under Mac OX we just do nothing for parallel ports")
-
-        elif devType == 'network_port':
-            printAutoInd(f, "pnet({0},'write',{1});", outputDevNameIdxDict.get(cDevName), msgValue)
-
-        elif devType == 'serial_port':
-            printAutoInd(f, "[ign, when] = IOPort('Write', {0}, {1});", outputDevNameIdxDict.get(cDevName), msgValue)
-'''
     # -------------------------------------------------------------
     #  we need to dummy draw stim for the next widget
     # so here after we will print any code into delayedPrintCodes
@@ -1224,10 +1187,10 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     # Step 6: acquire responses
     # ------------------------------------------------------------------
     # after drawing the next widget's stimuli, get the duration first
-    durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
-    durStr = parseDurationStr(durStr)
+    # durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
+    # durStr = parseDurationStr(durStr)
 
-    cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+    # cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
 
 
 
@@ -1791,6 +1754,9 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         # start to handle all the widgets
         printTimelineWidget(Info.WID_WIDGET[f"{Info.TIMELINE}.0"], f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f, "% end of the main exp procedure")
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "expEndTime = datestr(now,'dd-mmm-YYYY:HH:MM:SS'); % record the end time \n")
         printAutoInd(f, "sca;                        % Close opened windows")
         printAutoInd(f, "ShowCursor;                 % Show the hided mouse cursor")
@@ -1927,19 +1893,19 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
         printAutoInd(f, "function outRect = makeFrameRect(x, y, frameWidth, frameHeight, fullRect)")
         printAutoInd(f, "if x <= 0")
-        printAutoInd(f, "x = x*fullRect(3);")
+        printAutoInd(f, "x = -x*fullRect(3);")
         printAutoInd(f, "end % if")
 
         printAutoInd(f, "if y <= 0")
-        printAutoInd(f, "y = y*fullRect(4);")
+        printAutoInd(f, "y = -y*fullRect(4);")
         printAutoInd(f, "end % if")
 
         printAutoInd(f, "if frameWidth <= 0")
-        printAutoInd(f, "frameWidth = frameWidth*fullRect(3);")
+        printAutoInd(f, "frameWidth = -frameWidth*fullRect(3);")
         printAutoInd(f, "end % if")
 
         printAutoInd(f, "if frameHeight <= 0")
-        printAutoInd(f, "frameHeight = frameHigh*fullRect(4);")
+        printAutoInd(f, "frameHeight = -frameHigh*fullRect(4);")
         printAutoInd(f, "end % if")
 
         printAutoInd(f, "outRect = CenterRectOnPointd([0, 0, frameWidth, frameHeight], x, y);")
@@ -2002,7 +1968,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "% subfun 5: getDurValue")
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "function cDur = getDurValue(cDur,cIFI)")
-        printAutoInd(f, "if numel(cDur) == 1 & cDur == 0")
+        printAutoInd(f, "if numel(cDur) == 1 && cDur == 0")
         printAutoInd(f, "return;")
         printAutoInd(f, "end")
         printAutoInd(f, "cDur = cDur./1000; % transform the unit from ms to sec")

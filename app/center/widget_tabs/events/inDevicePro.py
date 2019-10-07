@@ -97,6 +97,7 @@ class InDeviceInfoAtDuration(QWidget):
         self.correct.textChanged.connect(lambda x: self.correctChanged.emit(x))
 
         self.RT_window = PigComboBox()
+        self.RT_window.setEditable(True)
         self.RT_window.addItems(["(Same as duration)", "(End of timeline)", "1000", "2000", "3000", "4000", "5000"])
         self.RT_window.currentTextChanged.connect(lambda x: self.rtWindowChanged.emit(x))
 
