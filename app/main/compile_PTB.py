@@ -901,7 +901,7 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
     allInputDevs = historyPropDict.get('allInputDevs',{})
 
     cWinIdx = historyPropDict['cWinIdx']
-    transedScrName = replaceDot(historyPropDict['cScreenName']) # there is a bug when screen is a citation
+    # transedScrName = replaceDot(historyPropDict['cScreenName']) # there is a bug when screen is a citation
 
     cInputDevices = cWidget.getInputDevice()
 
@@ -924,7 +924,7 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
         value.update({'Widget Name':cWidgetName})
         cInputDevices.update({key:value})
 
-    # under windows: all keyboards and mouses will be tried as a single device
+    # under windows: all keyboards and mouses will be treated as a single device
     if Info.PLATFORM == 'windows':
         if nKbs > 1 or nMouses > 1:
             tobeShowStr = 'Input devices: \n For windows, specify multiple kbs or mice separately are not allowed!\n you can specify only one keyboard and/or one mouse here!'
@@ -945,9 +945,8 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
 
 
     if len(allInputDevs) > 0:
-        preCScreenFlipTimeStr = historyPropDict.get(f"{transedScrName}_lastFlipTimeVar")
 
-        cRespCodes.append(f"while GetSecs < cDurs({cWinIdx})  +  {preCScreenFlipTimeStr} ")
+        cRespCodes.append(f"while GetSecs < cDurs({cWinIdx})  +  lastScrOnsettime({cWinIdx}) ")
         cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
         cRespCodes.append(f"end % while")
 
@@ -1509,7 +1508,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "% Yang Zhang")
         printAutoInd(f, "% Ph.D, Prof.")
         printAutoInd(f, "% Department of Psychology, \n% SooChow University")
-        printAutoInd(f, "% zhangyang873@gmail.com \n% Or yzhangpsy@suda.edu.cn")
+        printAutoInd(f, "% zhangyang873@gmail.com \n% Or\n% yzhangpsy@suda.edu.cn")
         printAutoInd(f, "% {0}", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         # begin of the function
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
