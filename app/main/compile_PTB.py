@@ -332,6 +332,11 @@ def getSepcialFormatAtts():
             updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
 
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+
         elif Func.isWidgetType(widgetId, Info.VIDEO):
             updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
@@ -339,9 +344,19 @@ def getSepcialFormatAtts():
             updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
 
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+
         elif Func.isWidgetType(widgetId, Info.SOUND):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Wait for start'], 'waitForStart', spFormatVarDict)
+
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
 
         elif Info.IMAGE == widgetId.split('.')[0]:
             updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
@@ -350,9 +365,19 @@ def getSepcialFormatAtts():
             updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
 
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+
         elif Func.isWidgetType(widgetId, Info.SLIDER):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
             updateSpFormatVarDict(cProperties['pro']['Clear after'], 'clearAfter', spFormatVarDict)
+
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
 
     return spFormatVarDict
 
@@ -556,6 +581,13 @@ def parseBooleanStr(inputStr, isRef=False):
     return inputStr
 
 
+def parseKbCorRespStr(kbCorRespStr):
+    if kbCorRespStr.startswith('{') and kbCorRespStr.endswith('}'):
+        kbCorRespStr = kbCorRespStr[1:-1]
+    return kbCorRespStr
+
+
+
 def parseDurationStr(inputStr):
     if isinstance(inputStr, str):
         inputStr = removeSingleQuotes(inputStr)
@@ -568,6 +600,14 @@ def parseDurationStr(inputStr):
 
     return inputStr
 
+
+def parseEndActionStr(endActionStr):
+    if endActionStr == 'Terminate':
+        endActionStr = '1'
+    else:
+        endActionStr = '0'
+
+    return endActionStr
 
 def parsePercentStr(inputStr):
     if isinstance(inputStr, str):
@@ -615,6 +655,19 @@ def parseDontClearAfterStr(inputStr):
             inputStr = '1'
         elif inputStr == "noNothing_2":
             inputStr = '2'
+    return inputStr
+
+
+def parseRTWindowStr(inputStr):
+    if isinstance(inputStr, str):
+        if inputStr == "(Same as duration)":
+            inputStr = '-1'
+        elif inputStr == "(End of timeline)":
+            inputStr = '-2'
+        # elif isIntStr(inputStr):
+        #     pass
+        # else:
+        #
     return inputStr
 
 
@@ -986,6 +1039,47 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
     if len(allInputDevs) > 0:
 
         cRespCodes.append("%-- acquire responses --/")
+
+        iRespDevice = 1
+        for cInputDev, cProperties in cInputDevices.items():
+            # construct corRespCode
+            corRespStr, isRefValue = getRefValue(cWidget, cProperties['Correct'], attributesSetDict)
+            if cProperties['Device Type'] == 'keyboard':
+                if isRefValue:
+                    cRespCodes.append(f"cFrameRespDevs({iRespDevice}).corRespCode = KbName({corRespStr}); ")# a bug here
+                else:
+                    cRespCodes.append(f"cFrameRespDevs({iRespDevice}).corRespCode = KbName('{parseKbCorRespStr(corRespStr)}'); ")
+            else:
+                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).corRespCode = {corRespStr}; ")
+
+            rtWindowStr = parseRTWindowStr(cProperties['RT Window'])
+            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).rtWindow = {rtWindowStr}; ")
+
+            endActionStr = parseEndActionStr(cProperties['End Action'])
+            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).endAction = {endActionStr}; % 0 and 1 for none and terminate respectively")
+
+            if cProperties['Device Type'] == 'keyboard':
+                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = kbIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
+                cDevType = 1
+
+            elif cProperties['Device Type'] == 'mouse':
+                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = miceIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
+                cDevType = 2
+
+            elif cProperties['Device Type'] == 'game pad':
+                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = gamepadIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
+                cDevType = 3
+            elif cProperties['Device Type'] == 'response box':
+                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = rbIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
+                cDevType = 4
+
+            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).type = {cDevType}; % 1,2,3,4 for kb, mouse, gamepad, and Cedrus RB respectively")
+
+
+
+
+            iRespDevice += 1
+
         cRespCodes.append(f"while GetSecs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) ")
         cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
         cRespCodes.append(f"end % while")
@@ -1284,6 +1378,10 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                     cValue = parseBooleanStr(cValue)
                     cRowDict[key] = cValue
 
+                elif spFormatVarDict[cKeyAttrName] == 'kbCorrectResp':
+                    cValue = parseKbCorRespStr(cValue)
+                    cRowDict[key] = cValue
+
             #     TO BE CONTINUING... FOR ALL OTHER Special Types
             # --------------------------------------\
 
@@ -1568,20 +1666,27 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         iRespBox = 1
         iMouse = 1
 
+        debugPrint(f"line 1581 a = {input_devices}")
+
         for inputDevId, cDevice in input_devices.items():
 
             # create a map dict to map device name (key) to device ID (value)
-            inputDevNameIdxDict.update({cDevice['Device Name']: inputDevId})
-            # debugPrint(input_device)
+            if cDevice['Device Type'] == 'response box':
+                # for response box (port address)
+                inputDevNameIdxDict.update({cDevice['Device Name']: cDevice['Device Port']})
+            else:
+                # for keyboards, game-pads, mice (indices)
+                inputDevNameIdxDict.update({cDevice['Device Name']: str(int(cDevice['Device Port'])+1)})
+
+
             if cDevice['Device Type'] == 'keyboard':
-                # printAutoInd(f, "KBoards({0}).port     = '{1}';", iKeyboard, cDevice['Device Port'])
-                # printAutoInd(f, "KBoards({0}).name     = '{1}';\n", iKeyboard, cDevice['Device Name'])
                 iKeyboard += 1
             elif cDevice['Device Type'] == 'mouse':
                 iMouse += 1
             elif cDevice['Device Type'] == 'game pad':
                 iGamepad += 1
             elif cDevice['Device Type'] == 'response box':
+                printAutoInd(f, "rbIndices{0} = CedrusResponseBox('Open', {1});", iRespBox, cDevice['Device Port'])
                 iRespBox += 1
 
         # if u'\u4e00' <= char <= u'\u9fa5':  # 判断是否是汉字
@@ -1591,7 +1696,10 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
         if iGamepad > 1:
             if Info.PLATFORM == 'windows':
-                printAutoInd(f, "gamepadIndices = 1:{0}; % getGamepadIndices does not work on windows ",iGamepad - 1)
+                if iGamepad == 2:
+                    printAutoInd(f, "gamepadIndices = 1; % getGamepadIndices does not work on windows ")
+                else:
+                    printAutoInd(f, "gamepadIndices = 1:{0}; % getGamepadIndices does not work on windows ",iGamepad - 1)
             else:
                 printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices());")
 
@@ -1792,11 +1900,15 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
         # close parallel ports
         if iParal > 1:
-
             if Info.PLATFORM == 'windows':
                 printAutoInd(f, "%--- close parallel ports ---/")
                 printAutoInd(f, "clear io64;")
                 printAutoInd(f, "%----------------------------\\\n")
+
+        # close Cedrus response box
+        if iRespBox > 1:
+            printAutoInd(f, "%close Cedrus response boxes:")
+            printAutoInd(f, "CedrusResponseBox('CloseAll');\n")
 
         # close psychPortAudio device
         if iSound > 1:
@@ -1841,7 +1953,6 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
         # close parallel ports
         if iParal > 1:
-
             if Info.PLATFORM == 'windows':
                 printAutoInd(f, "%close parallel ports")
                 printAutoInd(f, "clear io64;% Under windows io64 need to be closed")
@@ -1853,7 +1964,10 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
             printAutoInd(f, "for iCount = 1:numel(serialCons)")
             printAutoInd(f, "PsychPortAudio('Close', audioDevs(iCount));")
             printAutoInd(f, "end % iCount")
-            # printAutoInd(f, "%----------------------------\\\n")
+            # close Cedrus response box
+            if iRespBox > 1:
+                printAutoInd(f, "%close Cedrus response boxes:")
+                printAutoInd(f, "CedrusResponseBox('CloseAll');\n")
 
         printAutoInd(f, "save('{0}_debug');", cFilenameOnly)
         printAutoInd(f, "rethrow({0}_error);", cFilenameOnly)
