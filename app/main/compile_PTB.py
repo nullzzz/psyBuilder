@@ -23,7 +23,7 @@ from lib.wait_dialog import WaitDialog
 
 cIndents = 0
 isPreLineSwitch = 0
-enabledKBKeysList = []
+enabledKBKeysList = set()
 isDummyPrint = False
 spFormatVarDict = dict()
 inputDevNameIdxDict = {}
@@ -49,7 +49,7 @@ def throwCompileErrorInfo(inputStr):
 
 
 def debugPrint(input):
-    isDebug = True
+    isDebug = False
 
     if isDebug:
         print(input)
@@ -317,7 +317,7 @@ def getSepcialFormatAtts():
     for widgetId, cWidget in Info.WID_WIDGET.items():
         # print(f"line 74 {widgetId}")
         cProperties = Func.getProperties(widgetId)
-        print(f"line 76: {cProperties}")
+        debugPrint(f"line 76: {cProperties}")
         if Func.isWidgetType(widgetId, Info.CYCLE):
             pass
         elif Func.isWidgetType(widgetId, Info.TEXT):
@@ -336,8 +336,10 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
                 else:
                     updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
 
         elif Func.isWidgetType(widgetId, Info.VIDEO):
@@ -351,8 +353,10 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
                 else:
                     updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
         elif Func.isWidgetType(widgetId, Info.SOUND):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
@@ -362,8 +366,10 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
                 else:
                     updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
         elif Info.IMAGE == widgetId.split('.')[0]:
             updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
@@ -376,8 +382,10 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
                 else:
                     updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
         elif Func.isWidgetType(widgetId, Info.SLIDER):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
@@ -387,8 +395,10 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
                 else:
                     updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
     return spFormatVarDict
 
@@ -561,7 +571,9 @@ def shouldNotBeCitationCheck(keyStr,value):
     if isRefStr(value):
         throwCompileErrorInfo(f"'{keyStr}': the value should NOT be a citation!")
 
-
+def shouldNotBeEmptyCheck(keyStr,value):
+    if value == '':
+        throwCompileErrorInfo(f"'{keyStr}'should NOT be empty!")
 
 def outPutTriggerCheck(cWidget) -> dict:
     '''
@@ -570,8 +582,8 @@ def outPutTriggerCheck(cWidget) -> dict:
     cOutPutDevices = cWidget.getOutputDevice()
     cInputDevices = cWidget.getInputDevice()
 
-    print(f"cOutPutDevices = {cOutPutDevices}")
-    print(f"cInputDevices = {cInputDevices}")
+    # print(f"cOutPutDevices = {cOutPutDevices}")
+    # print(f"cInputDevices = {cInputDevices}")
 
     respTriggerDevNames = set()
     for cInputDevInfo in cInputDevices.values():
@@ -592,19 +604,23 @@ def outPutTriggerCheck(cWidget) -> dict:
     return shortPulseDurParallelsDict  # temp
 
 
-def parseAllowKeys(allowKeyStr):
+def updateEnableKbKeysList(allowKeyStr):
     global enabledKBKeysList
 
     if len(allowKeyStr) > 0:
-        splittedStrs = re.split('({\w*})', allowKeyStr)
-
-        for item in splittedStrs:
-            if item[0] == '{':
-                item = re.sub('[\{\}]', '', item)
-                enabledKBKeysList.append(item)
-            else:
-                for char in item:
-                    enabledKBKeysList.append(char)
+        if allowKeyStr.startswith('[') and allowKeyStr.endswith(']'):
+            enabledKBKeysList.add(allowKeyStr[1:-1])
+        else:
+            enabledKBKeysList.add(allowKeyStr)
+# splittedStrs = re.split('({\w*})', allowKeyStr)
+        #
+        # for item in splittedStrs:
+        #     if item[0] == '{':
+        #         item = re.sub('[\{\}]', '', item)
+        #         enabledKBKeysList.add(item)
+        #     else:
+        #         for char in item:
+        #             enabledKBKeysList.add(char)
 
 
 def parseBooleanStr(inputStr, isRef=False):
@@ -640,10 +656,10 @@ def parseKbCorRespStr(kbCorRespStr, isRefValue, devType) -> str:
                 kbCorRespCodes = kbCorRespStr
 
             kbCorRespCodesStr = "".join(f"{value}, " for value in kbCorRespCodes[0:-1])
-            kbCorRespCodesStr = "["+kbCorRespCodesStr+f"{kbCorRespCodes[-1]}"+"]"
+            kbCorRespCodesStr = "[" + kbCorRespCodesStr+f"{kbCorRespCodes[-1]}" + "]"
 
         else:
-            kbCorRespCodesStr = "[]"
+            kbCorRespCodesStr = "[0]"
 
     return kbCorRespCodesStr
 
@@ -901,7 +917,7 @@ def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
 
     # step 5: make the delayed resp codes for the current frame
-    delayedPrintCodes = checkResponse(cWidget, f, attributesSetDict, delayedPrintCodes)
+    checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
 
     return delayedPrintCodes
 
@@ -1012,8 +1028,10 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
     return delayedPrintCodes
 
 
-def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
+def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     global outputDevNameIdxDict, historyPropDict
+
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"
 
     cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
@@ -1036,6 +1054,9 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
         shouldNotBeCitationCheck('RT Window',value['RT Window'])
         shouldNotBeCitationCheck('End Action',value['End Action'])
 
+        shouldNotBeEmptyCheck(f"the allow able keys in {cWidgetName}:{value['Device Name']}", value['Allowable'])
+
+
         # check if the end action and rt window parameters are compatible
         if value.get('End Action') == 'Terminate':
             if value.get('RT Window') != '(Same as duration)':
@@ -1050,15 +1071,7 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
         value.update({'Widget Name':cWidgetName})
         cInputDevices.update({key:value})
 
-        # update the allowable keys
-        if  value['Device Type'] != 'response box':
-            allowableKeysStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, value.get('Allowable'), attributesSetDict)
 
-            if isRefValue:
-                for allowableKey in cRefValueSet:
-                    parseAllowKeys(allowableKey)
-            else:
-                parseAllowKeys(allowableKeysStr)
 
 
     # under windows: all keyboards and mouses will be treated as a single device
@@ -1076,75 +1089,105 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
     durStr = parseDurationStr(durStr)
 
     if re.fullmatch("\d+,\d+", durStr):
-        cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}));")
+        cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}));\n")
     else:
-        cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue({durStr},winIFIs({cWinIdx}));")
+        cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue({durStr},winIFIs({cWinIdx}));\n")
+
+    cRespCodes.append(f"%-- initializing results vars --/")
+    cRespCodes.append(f"{cWidgetName}_resp({cOpRowIdxStr}) = 0;")
+    cRespCodes.append(f"{cWidgetName}_acc({cOpRowIdxStr})  = 0;")
+    cRespCodes.append(f"{cWidgetName}_rt({cOpRowIdxStr})   = [];")
+    cRespCodes.append(f"%-------------------------------\\")
     # -------------------------------------------------------------------------------
 
 
     # Step 3:
-    if len(allInputDevs) > 0:
+    cRespCodes.append("%---------- acquire responses ----------/")
 
-        cRespCodes.append("%---------- acquire responses ----------/")
+    if len(cInputDevices) > 0:
+        cRespCodes.append("%-- make respDev struct --/")
 
-        if len(cInputDevices) > 0:
-            cRespCodes.append("%-- make respDev struct --/")
+        iRespDevice = 1
+        for cInputDev, cProperties in cInputDevices.items():
+            # get allowable keys
+            allowableKeysStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cProperties.get('Allowable'),attributesSetDict)
+            allowableKeysStr = parseKbCorRespStr(allowableKeysStr, isRefValue, cProperties['Device Type'])
 
-            iRespDevice = 1
-            for cInputDev, cProperties in cInputDevices.items():
+            # update the allowableKeysList
+            if cProperties['Device Type'] != 'response box':
 
-                # get corRespCode
-                corRespStr, isRefValue = getRefValue(cWidget, cProperties['Correct'], attributesSetDict)
-                parseKbCorRespStr(corRespStr, isRefValue, cProperties['Device Type'])
+                if isRefValue:
+                    for allowableKey in cRefValueSet:
+                        updateEnableKbKeysList(allowableKey)
+                else:
+                    updateEnableKbKeysList(allowableKeysStr)
 
-                # get response time window
-                rtWindowStr = parseRTWindowStr(cProperties['RT Window'])
+            # get corRespCode
+            corRespStr, isRefValue = getRefValue(cWidget, cProperties['Correct'], attributesSetDict)
+            # print(f"{corRespStr}")
+            corRespStr = parseKbCorRespStr(corRespStr, isRefValue, cProperties['Device Type'])
+            # print(f"{corRespStr}")
+            # get response time window
+            rtWindowStr = parseRTWindowStr(cProperties['RT Window'])
 
-                # get end action
-                endActionStr = parseEndActionStr(cProperties['End Action'])
+            # get end action
+            endActionStr = parseEndActionStr(cProperties['End Action'])
 
-                # get dev type and devIndexesVarName
-                if cProperties['Device Type'] == 'keyboard':
-                    devIndexesVarName = "kbIndices"
-                    cDevType = 1
+            # get dev type and devIndexesVarName
+            if cProperties['Device Type'] == 'keyboard':
+                devIndexesVarName = "kbIndices"
+                cDevType = 1
 
-                elif cProperties['Device Type'] == 'mouse':
-                    devIndexesVarName = "miceIndices"
-                    cDevType = 2
+            elif cProperties['Device Type'] == 'mouse':
+                devIndexesVarName = "miceIndices"
+                cDevType = 2
 
-                elif cProperties['Device Type'] == 'game pad':
-                    devIndexesVarName = "gamepadIndices"
-                    cDevType = 3
+            elif cProperties['Device Type'] == 'game pad':
+                devIndexesVarName = "gamepadIndices"
+                cDevType = 3
 
-                elif cProperties['Device Type'] == 'response box':
-                    devIndexesVarName = "rbIndices"
-                    cDevType = 4
+            elif cProperties['Device Type'] == 'response box':
+                devIndexesVarName = "rbIndices"
+                cDevType = 4
 
-                # get device type
-                # get the start time of the response window
-                # get the isOn
+            # get device type
+            # get the start time of the response window
+            # get the isOn
+            if corRespStr.find(',') == -1:
+                corRespStr = corRespStr[1:-1]
 
-                iRespDevice += 1
+            cRespCodes.append(f"cFrameRespDevs({iRespDevice}) = makeRespDevStruct('{cWidgetName}_({cOpRowIdxStr})',{allowableKeysStr},{corRespStr},{rtWindowStr},{endActionStr},{cDevType},{inputDevNameIdxDict[cProperties['Device Name']]},{devIndexesVarName},lastScrOnsettime({cWinIdx}),true); ")
+            iRespDevice += 1
 
-                cRespCodes.append(f"cFrameRespDevs({iRespDevice}) = makeRespDevStruct({corRespStr},{rtWindowStr},{endActionStr},{cDevType},{inputDevNameIdxDict[cProperties['Device Name']]},{devIndexesVarName},lastScrOnsettime({cWinIdx}),true); ")
 
-            cRespCodes.append(f"beCheckedRespDevs = [beCheckedRespDevs, cFrameRespDevs];")
-            # cRespCodes.append(f"beCheckedRespDevs = beCheckedRespDevs([beCheckedRespDevs(:).isOn]);")
-            cRespCodes.append("%-------------------------\\")
+        cRespCodes.append(f"beCheckedRespDevs = [beCheckedRespDevs, cFrameRespDevs];")
+        # cRespCodes.append(f"beCheckedRespDevs = beCheckedRespDevs([beCheckedRespDevs(:).isOn]);")
+        cRespCodes.append("%-------------------------\\")
 
     cRespCodes.append(f"while GetSecs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) ")
     cRespCodes.append(f"for iRespDev = 1:numel(beCheckedRespDevs) ")
-    cRespCodes.append(f"[keyIsDown,secs,keyCode] = responseCheck(beCheckedRespDevs(iRespDev).type,beCheckedRespDevs(iRespDev).index) ")
+    cRespCodes.append(f"if beCheckedRespDevs(iRespDev).isOn")
+    cRespCodes.append(f"[keyIsDown,secs,keyCode] = responseCheck(beCheckedRespDevs(iRespDev).type,beCheckedRespDevs(iRespDev).index);")
+    cRespCodes.append(f"if beCheckedRespDevs(iRespDev).rtWindow > 0")
+    cRespCodes.append(f"if secs - beCheckedRespDevs(iRespDev).startTime > beCheckedRespDevs(iRespDev).rtWindow")
+    cRespCodes.append(f"beCheckedRespDevs(iRespDev).isOn = false;")
+    cRespCodes.append(f"end % if out of RT Window")
+    cRespCodes.append(f"end % if RT window is not negative")
 
     cRespCodes.append(f"if any(keyCodes(beCheckedRespDevs(iRespDev).allowAble))")
+    cRespCodes.append(f"eval([beCheckedRespDevs(iRespDev).beUpatedVar,'.rt   = secs - beCheckedRespDevs(iRespDev).startTime);']);")
+    cRespCodes.append(f"eval([beCheckedRespDevs(iRespDev).beUpatedVar,'.resp = find(keyCode);']);")
+    cRespCodes.append(f"eval([beCheckedRespDevs(iRespDev).beUpatedVar,'.acc  = all(ismember(beCheckedRespDevs(iRespDev).resp, beCheckedRespDevs(iRespDev).corResp));']);\n")
+    cRespCodes.append(f"beCheckedRespDevs(iRespDev).isOn = false;")
     cRespCodes.append(f"if beCheckedRespDevs(iRespDev).endAction")
     cRespCodes.append(f"break; % break out while")
     cRespCodes.append(f"end % end action")
-    cRespCodes.append(f"beCheckedRespDevs(iRespDev).isOn = false;")
     cRespCodes.append(f"end % if there was a response")
+    cRespCodes.append(f"end % if the check switch is on")
     cRespCodes.append(f"end % for iRespDev")
     cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
     cRespCodes.append(f"end % while")
+    cRespCodes.append(f"beCheckedRespDevs = beCheckedRespDevs([beCheckedRespDevs(:).isOn]);")
     cRespCodes.append("%---------------------------------------\\")
 
 
@@ -1448,6 +1491,14 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                     cValue = parseKbCorRespStr(cValue,isRefValue,'noneKbDevs')
                     cRowDict[key] = cValue
 
+                elif spFormatVarDict[cKeyAttrName] == 'kbAllowKeys':
+                    cValue = parseKbCorRespStr(cValue,isRefValue,'keyboard')
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'noKbAllowKeys':
+                    cValue = parseKbCorRespStr(cValue,isRefValue,'noneKbDevs')
+                    cRowDict[key] = cValue
+
             #     TO BE CONTINUING... FOR ALL OTHER Special Types
             # --------------------------------------\
 
@@ -1594,8 +1645,9 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
     inputDevNameIdxDict = dict()
     outputDevNameIdxDict = dict()
 
-    enabledKBKeysList = list()
-    enabledKBKeysList.append('escape')
+    enabledKBKeysList.clear()
+
+    enabledKBKeysList.add(parseKbCorRespStr('{escape}', False, 'keyboard')[1:-1])
 
     attributesSetDict = {'sessionNum': [0, 'SubInfo.session', {'SubInfo.session'}],
                          'subAge': [0, 'SubInfo.age', {'SubInfo.age'}],
@@ -1739,10 +1791,10 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
             # create a map dict to map device name (key) to device ID (value)
             if cDevice['Device Type'] == 'response box':
                 # for response box (port address)
-                inputDevNameIdxDict.update({cDevice['Device Name']: cDevice['Device Port']})
+                inputDevNameIdxDict.update({cDevice['Device Name']: f"{iRespBox}"})
             else:
                 # for keyboards, game-pads, mice (indices)
-                inputDevNameIdxDict.update({cDevice['Device Name']: str(int(cDevice['Device Port'])+1)})
+                inputDevNameIdxDict.update({cDevice['Device Name']: f"{int(cDevice['Device Port'])+1}"})
 
 
             if cDevice['Device Type'] == 'keyboard':
@@ -1752,7 +1804,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
             elif cDevice['Device Type'] == 'game pad':
                 iGamepad += 1
             elif cDevice['Device Type'] == 'response box':
-                printAutoInd(f, "rbIndices{0} = CedrusResponseBox('Open', {1});", iRespBox, cDevice['Device Port'])
+                printAutoInd(f, "rbIndices({0}) = CedrusResponseBox('Open', '{1}');", iRespBox, cDevice['Device Port'])
                 iRespBox += 1
 
         # if u'\u4e00' <= char <= u'\u9fa5':  # 判断是否是汉字
@@ -1763,16 +1815,16 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         if iGamepad > 1:
             if Info.PLATFORM == 'windows':
                 if iGamepad == 2:
-                    printAutoInd(f, "gamepadIndices = 1; % getGamepadIndices does not work on windows ")
+                    printAutoInd(f, "gamepadIndices = 0; % joystickMex starts from 0 ")
                 else:
-                    printAutoInd(f, "gamepadIndices = 1:{0}; % getGamepadIndices does not work on windows ",iGamepad - 1)
+                    printAutoInd(f, "gamepadIndices = 0:{0}; % getGamepadIndices does not work on windows ",iGamepad - 2)
             else:
-                printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices());")
+                printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices);")
 
         if Info.PLATFORM == "linux":
             printAutoInd(f, "miceIndices = unique(GetMouseIndices('slavePointer'));")
         else:
-            printAutoInd(f, "miceIndices = unique(GetMouseIndices());")
+            printAutoInd(f, "miceIndices = unique(GetMouseIndices);")
 
         printAutoInd(f, "%------------------------------------\\\n\n")
 
@@ -1841,11 +1893,12 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
         printAutoInd(f, "%----- initialize output devices --------/")
         printAutoInd(f, "%--- open windows ---/")
-        printAutoInd(f, "winIds           = zeros({0},1);", iMonitor - 1)
-        printAutoInd(f, "lastScrOnsettime = zeros({0},1);", iMonitor - 1)
-        printAutoInd(f, "cDurs            = zeros({0},1);", iMonitor - 1)
-        printAutoInd(f, "winIFIs          = zeros({0},1);", iMonitor - 1)
-        printAutoInd(f, "fullRects        = zeros({0},4);", iMonitor - 1)
+        printAutoInd(f, "winIds            = zeros({0},1);", iMonitor - 1)
+        printAutoInd(f, "lastScrOnsettime  = zeros({0},1);", iMonitor - 1)
+        printAutoInd(f, "cDurs             = zeros({0},1);", iMonitor - 1)
+        printAutoInd(f, "winIFIs           = zeros({0},1);", iMonitor - 1)
+        printAutoInd(f, "fullRects         = zeros({0},4);", iMonitor - 1)
+        printAutoInd(f, "beCheckedRespDevs = [];")
 
         printAutoInd(f, "for iWin = 1:numel(monitors)")
         printAutoInd(f,
@@ -2063,8 +2116,12 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
         printAutoInd(f, "function disableSomeKbKeys()")
-        printAutoInd(f, "{0}{1}{2}\n", "RestrictKeysForKbCheck(KbName({",
-                     ''.join("'" + cItem + "'," for cItem in enabledKBKeysList)[:-1], "}));")
+        # printAutoInd(f, "{0}{1}{2}\n", "RestrictKeysForKbCheck(KbName({",
+        #              ''.join("'" + cItem + "'," for cItem in enabledKBKeysList)[:-1], "}));")
+        debugPrint(enabledKBKeysList)
+        enabledKBKeysList = enabledKBKeysList.difference({'','0'})
+        printAutoInd(f, "{0}{1}{2}\n", "RestrictKeysForKbCheck(unique([",
+                     ''.join(cItem + ", " for cItem in enabledKBKeysList)[:-2], "]));")
         printAutoInd(f, "end %  end of subfun2\n")
 
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
@@ -2177,17 +2234,47 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "% subfun {0}: makeRespDevStruct", iSubFunNum)
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        printAutoInd(f, "cRespDev = makeRespDevStruct(corResp,rtWindow,endAction,devType,devIndex,respDevIndexes,startTime,isOn)")
-        printAutoInd(f, "cRespDev.corResp    = corResp;")
-        printAutoInd(f, "cRespDev.rtWindow   = rtWindow;")
-        printAutoInd(f, "cRespDev.endAction  = endAction;")
-        printAutoInd(f, "cRespDev.type       = devType;")
-        printAutoInd(f, "cRespDev.index      = respDevIndexes(devIndex);")
-        printAutoInd(f, "cRespDev.startTime  = startTime;")
-        printAutoInd(f, "cRespDev.isOn       = isOn;")
+        printAutoInd(f, "function  cRespDev = makeRespDevStruct(beUpatedVar, allowAble,corResp,rtWindow,endAction,devType,devIndex,respDevIndexes,startTime,isOn)")
+        printAutoInd(f, "cRespDev.beUpatedVar = beUpatedVar;")
+        printAutoInd(f, "cRespDev.allowAble   = allowAble;")
+        printAutoInd(f, "cRespDev.corResp     = corResp;")
+        printAutoInd(f, "cRespDev.rtWindow    = rtWindow;")
+        printAutoInd(f, "cRespDev.endAction   = endAction;")
+        printAutoInd(f, "cRespDev.type        = devType;")
+        printAutoInd(f, "cRespDev.index       = respDevIndexes(devIndex);")
+        printAutoInd(f, "cRespDev.startTime   = startTime;")
+        printAutoInd(f, "cRespDev.isOn        = isOn;")
         printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
 
         iSubFunNum += 1
+
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f, "% subfun {0}: makeRespDevStruct", iSubFunNum)
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f,"function [keyIsDown,secs,keyCode]= responseCheck(respDevType,respDevIndex)")
+        printAutoInd(f,"% respDevType 1,2,3,4 for keyboard, mouse, gamepad, and response box respectively")
+        printAutoInd(f,"switch respDevType")
+
+        if Info.PLATFORM == 'windows':
+            printAutoInd(f,"case 3 % under windows, check it via joystickMex")
+            printAutoInd(f,"status    = joystickMex(respDevIndex); % index starts from 0")
+            printAutoInd(f,"keyCode   = bitget(status(5),1:8);")
+            printAutoInd(f,"secs      = GetSecs;")
+            printAutoInd(f,"keyIsDown = any(keyCode);")
+
+        printAutoInd(f,"case 4 % for Cedrus''s response boxes")
+        printAutoInd(f,"status    = CedrusResponseBox('FlushEvents', respDeviceIndices);")
+        printAutoInd(f,"keyCode   = status(1,:);")
+        printAutoInd(f,"secs      = GetSecs;")
+        printAutoInd(f,"keyIsDown = any(keyCode);")
+        printAutoInd(f,"otherwise")
+        printAutoInd(f,"[keyIsDown, secs, keyCode] = KbCheck(respDevIndex);")
+        printAutoInd(f,"end%switch")
+        printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
+        iSubFunNum += 1
+
+
+
 
     if not isDummyPrint:
         Func.log(f"Compile successful!:{compile_file_name}")  # print info to the output panel
