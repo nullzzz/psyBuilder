@@ -1187,7 +1187,8 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     cRespCodes.append(f"end % for iRespDev")
     cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
     cRespCodes.append(f"end % while")
-    cRespCodes.append(f"beCheckedRespDevs = beCheckedRespDevs([beCheckedRespDevs(:).isOn]);")
+    cRespCodes.append(f"beCheckedRespDevs(~[beCheckedRespDevs(:).isOn])          = [];")
+    cRespCodes.append(f"beCheckedRespDevs([beCheckedRespDevs(:).rtWindow] ~= -1) = [];")
     cRespCodes.append("%---------------------------------------\\")
 
 
@@ -1200,6 +1201,9 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
     # if the current widget is the last one in the timeline, just print response codes here
     if Func.getNextWidgetId(cWidget.widget_id) is None:
+
+        cRespCodes.append(f"beCheckedRespDevs = []; % empty be checked response devices")
+
         for cValue in cRespCodes:
             printAutoInd(f, cValue)
         cRespCodes = []
@@ -1778,7 +1782,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
                 iQuest += 1
             printAutoInd(f, "%------------------------------------\\")
 
-        printAutoInd(f, "%------ define input devices --------/")
+        printAutoInd(f, "%====== define input devices ========/")
         iKeyboard = 1
         iGamepad = 1
         iRespBox = 1
@@ -1804,13 +1808,13 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
             elif cDevice['Device Type'] == 'game pad':
                 iGamepad += 1
             elif cDevice['Device Type'] == 'response box':
-                printAutoInd(f, "rbIndices({0}) = CedrusResponseBox('Open', '{1}');", iRespBox, cDevice['Device Port'])
+                printAutoInd(f, "rbIndices({0})   = CedrusResponseBox('Open', '{1}');", iRespBox, cDevice['Device Port'])
                 iRespBox += 1
 
         # if u'\u4e00' <= char <= u'\u9fa5':  # 判断是否是汉字
 
-        printAutoInd(f, "% get input device indices")
-        printAutoInd(f, "kbIndices = unique(GetKeyboardIndices());")
+        # printAutoInd(f, "% get input device indices")
+        printAutoInd(f, "kbIndices      = unique(GetKeyboardIndices());")
 
         if iGamepad > 1:
             if Info.PLATFORM == 'windows':
@@ -1822,13 +1826,13 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
                 printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices);")
 
         if Info.PLATFORM == "linux":
-            printAutoInd(f, "miceIndices = unique(GetMouseIndices('slavePointer'));")
+            printAutoInd(f, "miceIndices    = unique(GetMouseIndices('slavePointer'));")
         else:
-            printAutoInd(f, "miceIndices = unique(GetMouseIndices);")
+            printAutoInd(f, "miceIndices    = unique(GetMouseIndices);")
 
-        printAutoInd(f, "%------------------------------------\\\n\n")
+        printAutoInd(f, "%====================================\\\n\n")
 
-        printAutoInd(f, "%----- define output devices --------/")
+        printAutoInd(f, "%===== define output devices ========/")
 
         iMonitor = 1
         iParal = 1
@@ -1887,12 +1891,11 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
                 iSound += 1
 
-        printAutoInd(f, "%------------------------------------\\\n")
+        printAutoInd(f, "%====================================\\\n")
 
         printAutoInd(f, "disableSomeKbKeys; % restrictKeysForKbCheck")
 
-        printAutoInd(f, "%----- initialize output devices --------/")
-        printAutoInd(f, "%--- open windows ---/")
+        printAutoInd(f, "%===== initialize output devices ========/")
         printAutoInd(f, "winIds            = zeros({0},1);", iMonitor - 1)
         printAutoInd(f, "lastScrOnsettime  = zeros({0},1);", iMonitor - 1)
         printAutoInd(f, "cDurs             = zeros({0},1);", iMonitor - 1)
@@ -1900,6 +1903,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "fullRects         = zeros({0},4);", iMonitor - 1)
         printAutoInd(f, "beCheckedRespDevs = [];")
 
+        printAutoInd(f, "%--- open windows ---/")
         printAutoInd(f, "for iWin = 1:numel(monitors)")
         printAutoInd(f,
                      "[winIds(iWin),fullRects(iWin,:)] = Screen('OpenWindow',monitors(iWin).port,monitors(iWin).bkColor,[],[],[],[],monitors(iWin).multiSample);")
@@ -1972,10 +1976,10 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
             printAutoInd(f, "end % iCount")
             printAutoInd(f, "%----------------------------\\\n")
 
-        printAutoInd(f, "%----------------------------------------\\\n")
+        printAutoInd(f, "%========================================\\\n")
 
         printAutoInd(f, "Priority(1);      % Turn the priority to high priority")
-        printAutoInd(f, "opRowIdx = 1; % set the output variables row num")
+        printAutoInd(f, "opRowIdx     = 1; % set the output variables row num")
         printAutoInd(f, "iLoop_0_cOpR = opRowIdx;")
 
         # start to handle all the widgets
