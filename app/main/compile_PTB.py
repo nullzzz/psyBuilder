@@ -336,6 +336,9 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+
 
         elif Func.isWidgetType(widgetId, Info.VIDEO):
             updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
@@ -348,6 +351,8 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
 
         elif Func.isWidgetType(widgetId, Info.SOUND):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
@@ -357,6 +362,8 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
 
         elif Info.IMAGE == widgetId.split('.')[0]:
             updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
@@ -369,6 +376,8 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
 
         elif Func.isWidgetType(widgetId, Info.SLIDER):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
@@ -378,6 +387,8 @@ def getSepcialFormatAtts():
             for cRespProperties in cInputDevices.values():
                 if cRespProperties['Device Type'] == 'keyboard':
                     updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
 
     return spFormatVarDict
 
@@ -513,6 +524,34 @@ def isContainCycleTL(widgetId) -> bool:
     return False
 
 
+def keyNameToCodes(keyNameList) -> dict:
+    keyCodesDict = {'left_mouse': 1, 'right_mouse': 2, 'middle_mouse': 4, 'backspace': 8,
+                    'tab': 9, 'clear': 12, 'return': 13, 'shift': 16, 'control': 17,
+                    'alt': 18, 'pause': 19, 'capslock': 20, 'escape': 27, 'space': 32,
+                    'pageup': 33, 'pagedown': 34, 'end': 35, 'home': 36, 'leftarrow': 37,
+                    'uparrow': 38, 'rightarrow': 39, 'downarrow': 40, 'printscreen': 44,
+                    'insert': 45, 'delete': 46, 'help': 47, '0)': 48, '1!': 49, '2@': 50,
+                    '3#': 51, '4$': 52, '5%': 53, '6^': 54, '7&': 55, '8*': 56, '9(': 57, 'a': 65,
+                    'b': 66, 'c': 67, 'd': 68, 'e': 69, 'f': 70, 'g': 71, 'h': 72, 'i': 73, 'j': 74,
+                    'k': 75, 'l': 76, 'm': 77, 'n': 78, 'o': 79, 'p': 80, 'q': 81, 'r': 82, 's': 83,
+                    't': 84, 'u': 85, 'v': 86, 'w': 87, 'x': 88, 'y': 89, 'z': 90, 'leftgui': 91,
+                    'rightgui': 92, 'application': 93, '0': 96, '1': 97, '2': 98, '3': 99, '4': 100,
+                    '5': 101, '6': 102, '7': 103, '8': 104, '9': 105, '*': 106, '+': 107, 'seperator': 108,
+                    '-': 109, '.': 110, '/': 111, 'f1': 112, 'f2': 113, 'f3': 114, 'f4': 115, 'f5': 116, 'f6': 117,
+                    'f7': 118, 'f8': 119, 'f9': 120, 'f10': 121, 'f11': 122, 'f12': 123, 'f13': 124, 'f14': 125, 'f15': 126,
+                    'f16': 127, 'f17': 128, 'f18': 129, 'f19': 130, 'f20': 131, 'f21': 132, 'f22': 133, 'f23': 134,
+                    'f24': 135, 'numlock': 144, 'scrolllock': 145, 'leftshift': 160, 'rightshift': 161,
+                    'leftcontrol': 162, 'rightcontrol': 163, 'leftalt': 164, 'rightalt': 165, ';': 186,
+                    '=+': 187, ',<': 188, '-_': 189, '.>': 190, '/?': 191, '`~': 192, '[{': 219, '\\\\': 220,
+                    ']}': 221, "'": 222, 'attn': 246, 'crsel': 247, 'exsel': 248, 'play': 251, 'zoom': 252, 'pa1': 254}
+    keyCodes = []
+    for keyName in keyNameList:
+        cKeyCode = keyCodesDict[keyName.lower()]
+        if cKeyCode:
+            keyCodes.append(cKeyCode)
+
+    return keyCodes
+
 def replaceDot(screenNameStr, newSplitStr = "_") -> str:
 
     return newSplitStr.join(screenNameStr.split('.'))
@@ -556,7 +595,6 @@ def outPutTriggerCheck(cWidget) -> dict:
 def parseAllowKeys(allowKeyStr):
     global enabledKBKeysList
 
-
     if len(allowKeyStr) > 0:
         splittedStrs = re.split('({\w*})', allowKeyStr)
 
@@ -581,11 +619,33 @@ def parseBooleanStr(inputStr, isRef=False):
     return inputStr
 
 
-def parseKbCorRespStr(kbCorRespStr):
-    if kbCorRespStr.startswith('{') and kbCorRespStr.endswith('}'):
-        kbCorRespStr = kbCorRespStr[1:-1]
-    return kbCorRespStr
+def parseKbCorRespStr(kbCorRespStr, isRefValue, devType) -> str:
+    if isRefValue:
+        kbCorRespCodesStr = kbCorRespStr
+    else:
+        if len(kbCorRespStr) > 0:
+            if devType == 'keyboard':
+                splittedStrs = re.split('({\w*})', kbCorRespStr)
+                kbNameList = []
+                for item in splittedStrs:
+                    if item.startswith('{') and item.endswith('}'):
+                        item = item[1:-1]
+                        kbNameList.append(item)
+                    else:
+                        for char in item:
+                            kbNameList.append(char)
 
+                kbCorRespCodes = keyNameToCodes(kbNameList)
+            else:
+                kbCorRespCodes = kbCorRespStr
+
+            kbCorRespCodesStr = "".join(f"{value}, " for value in kbCorRespCodes[0:-1])
+            kbCorRespCodesStr = "["+kbCorRespCodesStr+f"{kbCorRespCodes[-1]}"+"]"
+
+        else:
+            kbCorRespCodesStr = "[]"
+
+    return kbCorRespCodesStr
 
 
 def parseDurationStr(inputStr):
@@ -1044,22 +1104,22 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
         for cInputDev, cProperties in cInputDevices.items():
             # construct corRespCode
             corRespStr, isRefValue = getRefValue(cWidget, cProperties['Correct'], attributesSetDict)
-            if cProperties['Device Type'] == 'keyboard':
-                if isRefValue:
-                    cRespCodes.append(f"cFrameRespDevs({iRespDevice}).corRespCode = KbName({corRespStr}); ")# a bug here
-                else:
-                    cRespCodes.append(f"cFrameRespDevs({iRespDevice}).corRespCode = KbName('{parseKbCorRespStr(corRespStr)}'); ")
-            else:
-                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).corRespCode = {corRespStr}; ")
+            parseKbCorRespStr(corRespStr, isRefValue, cProperties['Device Type'])
 
+            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).corRespCode = {corRespStr}; ")
+            cRespCodes.append(f"cFrameRespDevs({iRespDevice}) = makecRespDevStruct({corRespStr},{rtWindowStr},{cDevType},{}); ")
+
+            # construct response time window
             rtWindowStr = parseRTWindowStr(cProperties['RT Window'])
             cRespCodes.append(f"cFrameRespDevs({iRespDevice}).rtWindow = {rtWindowStr}; ")
 
+            # construct end action
             endActionStr = parseEndActionStr(cProperties['End Action'])
             cRespCodes.append(f"cFrameRespDevs({iRespDevice}).endAction = {endActionStr}; % 0 and 1 for none and terminate respectively")
 
+            # construct device index
             if cProperties['Device Type'] == 'keyboard':
-                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = kbIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
+                devIndexesVarName = "kbIndices"
                 cDevType = 1
 
             elif cProperties['Device Type'] == 'mouse':
@@ -1069,14 +1129,19 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
             elif cProperties['Device Type'] == 'game pad':
                 cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = gamepadIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
                 cDevType = 3
+
             elif cProperties['Device Type'] == 'response box':
                 cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = rbIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
                 cDevType = 4
 
+            # construct device type
             cRespCodes.append(f"cFrameRespDevs({iRespDevice}).type = {cDevType}; % 1,2,3,4 for kb, mouse, gamepad, and Cedrus RB respectively")
 
+            # construct the start time of the response window
+            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).startTime = lastScrOnsettime({cWinIdx});")
 
-
+            # construct the isOn
+            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).isOn = true;")
 
             iRespDevice += 1
 
@@ -1359,27 +1424,31 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                     cRowDict[key] = cValue
 
                 elif spFormatVarDict[cKeyAttrName] == 'flipHorizontal':
-                    cValue = parseBooleanStr(cValue)
+                    cValue = parseBooleanStr(cValue, isRefValue)
                     cRowDict[key] = cValue
 
                 elif spFormatVarDict[cKeyAttrName] == 'flipVertical':
-                    cValue = parseBooleanStr(cValue)
+                    cValue = parseBooleanStr(cValue, isRefValue)
                     cRowDict[key] = cValue
 
                 elif spFormatVarDict[cKeyAttrName] == 'rightToLeft':
-                    cValue = parseBooleanStr(cValue)
+                    cValue = parseBooleanStr(cValue, isRefValue)
                     cRowDict[key] = cValue
 
                 elif spFormatVarDict[cKeyAttrName] == 'enableFrame':
-                    cValue = parseBooleanStr(cValue)
+                    cValue = parseBooleanStr(cValue, isRefValue)
                     cRowDict[key] = cValue
 
                 elif spFormatVarDict[cKeyAttrName] == 'waitForStart':
-                    cValue = parseBooleanStr(cValue)
+                    cValue = parseBooleanStr(cValue, isRefValue)
                     cRowDict[key] = cValue
 
                 elif spFormatVarDict[cKeyAttrName] == 'kbCorrectResp':
-                    cValue = parseKbCorRespStr(cValue)
+                    cValue = parseKbCorRespStr(cValue,isRefValue,'keyboard')
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'noKbDevCorrectResp':
+                    cValue = parseKbCorRespStr(cValue,isRefValue,'noneKbDevs')
                     cRowDict[key] = cValue
 
             #     TO BE CONTINUING... FOR ALL OTHER Special Types
@@ -2105,6 +2174,21 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
             printAutoInd(f, "quest.cValue = max(quest.cValue,quest.minValue);")
             printAutoInd(f, "quest.cValue = min(quest.cValue,quest.maxValue);")
             printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
+
+            iSubFunNum += 1
+
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f, "% subfun {0}: makeRespDevStruct", iSubFunNum)
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f, "cRespDev = makeRespDevStruct(corResp,rtWindow,endAction,devType,devIndex,respDevIndexes,startTime,isOn)")
+        printAutoInd(f, "cRespDev.corResp    = corResp;")
+        printAutoInd(f, "cRespDev.rtWindow   = rtWindow;")
+        printAutoInd(f, "cRespDev.endAction  = endAction;")
+        printAutoInd(f, "cRespDev.type       = devType;")
+        printAutoInd(f, "cRespDev.index      = respDevIndexes(devIndex);")
+        printAutoInd(f, "cRespDev.startTime  = startTime;")
+        printAutoInd(f, "cRespDev.isOn       = isOn;")
+        printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
 
         iSubFunNum += 1
 
