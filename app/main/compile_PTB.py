@@ -653,7 +653,7 @@ def parseDurationStr(inputStr):
         inputStr = removeSingleQuotes(inputStr)
 
         if inputStr == "(Infinite)":
-            inputStr = "0"
+            inputStr = "6000" # an extramely impossible value
         elif re.fullmatch("\d+~\d+", inputStr):
             cDurRange = inputStr.split('~')
             inputStr = f"{cDurRange[0]},{cDurRange[1]}"
@@ -1071,7 +1071,6 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
     allInputDevs.update(cInputDevices)
 
     # Step 2: get the current screen duration that determined by the next flip
-    # -------------------------------------------------------------------------------
     # after drawing the next widget's stimuli, get the duration first
     durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
     durStr = parseDurationStr(durStr)
@@ -1080,75 +1079,73 @@ def checkResponse(cWidget, f , attributesSetDict, delayedPrintCodes):
         cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}));")
     else:
         cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue({durStr},winIFIs({cWinIdx}));")
+    # -------------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # Step 3:
     if len(allInputDevs) > 0:
 
-        cRespCodes.append("%-- acquire responses --/")
+        cRespCodes.append("%---------- acquire responses ----------/")
 
-        iRespDevice = 1
-        for cInputDev, cProperties in cInputDevices.items():
-            # construct corRespCode
-            corRespStr, isRefValue = getRefValue(cWidget, cProperties['Correct'], attributesSetDict)
-            parseKbCorRespStr(corRespStr, isRefValue, cProperties['Device Type'])
+        if len(cInputDevices) > 0:
+            cRespCodes.append("%-- make respDev struct --/")
 
-            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).corRespCode = {corRespStr}; ")
-            cRespCodes.append(f"cFrameRespDevs({iRespDevice}) = makecRespDevStruct({corRespStr},{rtWindowStr},{cDevType},{}); ")
+            iRespDevice = 1
+            for cInputDev, cProperties in cInputDevices.items():
 
-            # construct response time window
-            rtWindowStr = parseRTWindowStr(cProperties['RT Window'])
-            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).rtWindow = {rtWindowStr}; ")
+                # get corRespCode
+                corRespStr, isRefValue = getRefValue(cWidget, cProperties['Correct'], attributesSetDict)
+                parseKbCorRespStr(corRespStr, isRefValue, cProperties['Device Type'])
 
-            # construct end action
-            endActionStr = parseEndActionStr(cProperties['End Action'])
-            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).endAction = {endActionStr}; % 0 and 1 for none and terminate respectively")
+                # get response time window
+                rtWindowStr = parseRTWindowStr(cProperties['RT Window'])
 
-            # construct device index
-            if cProperties['Device Type'] == 'keyboard':
-                devIndexesVarName = "kbIndices"
-                cDevType = 1
+                # get end action
+                endActionStr = parseEndActionStr(cProperties['End Action'])
 
-            elif cProperties['Device Type'] == 'mouse':
-                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = miceIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
-                cDevType = 2
+                # get dev type and devIndexesVarName
+                if cProperties['Device Type'] == 'keyboard':
+                    devIndexesVarName = "kbIndices"
+                    cDevType = 1
 
-            elif cProperties['Device Type'] == 'game pad':
-                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = gamepadIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
-                cDevType = 3
+                elif cProperties['Device Type'] == 'mouse':
+                    devIndexesVarName = "miceIndices"
+                    cDevType = 2
 
-            elif cProperties['Device Type'] == 'response box':
-                cRespCodes.append(f"cFrameRespDevs({iRespDevice}).index = rbIndices({inputDevNameIdxDict[cProperties['Device Name']]});")
-                cDevType = 4
+                elif cProperties['Device Type'] == 'game pad':
+                    devIndexesVarName = "gamepadIndices"
+                    cDevType = 3
 
-            # construct device type
-            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).type = {cDevType}; % 1,2,3,4 for kb, mouse, gamepad, and Cedrus RB respectively")
+                elif cProperties['Device Type'] == 'response box':
+                    devIndexesVarName = "rbIndices"
+                    cDevType = 4
 
-            # construct the start time of the response window
-            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).startTime = lastScrOnsettime({cWinIdx});")
+                # get device type
+                # get the start time of the response window
+                # get the isOn
 
-            # construct the isOn
-            cRespCodes.append(f"cFrameRespDevs({iRespDevice}).isOn = true;")
+                iRespDevice += 1
 
-            iRespDevice += 1
+                cRespCodes.append(f"cFrameRespDevs({iRespDevice}) = makeRespDevStruct({corRespStr},{rtWindowStr},{endActionStr},{cDevType},{inputDevNameIdxDict[cProperties['Device Name']]},{devIndexesVarName},lastScrOnsettime({cWinIdx}),true); ")
 
-        cRespCodes.append(f"while GetSecs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) ")
-        cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
-        cRespCodes.append(f"end % while")
-        cRespCodes.append("%-----------------------\\")
+            cRespCodes.append(f"beCheckedRespDevs = [beCheckedRespDevs, cFrameRespDevs];")
+            # cRespCodes.append(f"beCheckedRespDevs = beCheckedRespDevs([beCheckedRespDevs(:).isOn]);")
+            cRespCodes.append("%-------------------------\\")
+
+    cRespCodes.append(f"while GetSecs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) ")
+    cRespCodes.append(f"for iRespDev = 1:numel(beCheckedRespDevs) ")
+    cRespCodes.append(f"[keyIsDown,secs,keyCode] = responseCheck(beCheckedRespDevs(iRespDev).type,beCheckedRespDevs(iRespDev).index) ")
+
+    cRespCodes.append(f"if any(keyCodes(beCheckedRespDevs(iRespDev).allowAble))")
+    cRespCodes.append(f"if beCheckedRespDevs(iRespDev).endAction")
+    cRespCodes.append(f"break; % break out while")
+    cRespCodes.append(f"end % end action")
+    cRespCodes.append(f"beCheckedRespDevs(iRespDev).isOn = false;")
+    cRespCodes.append(f"end % if there was a response")
+    cRespCodes.append(f"end % for iRespDev")
+    cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
+    cRespCodes.append(f"end % while")
+    cRespCodes.append("%---------------------------------------\\")
 
 
 
