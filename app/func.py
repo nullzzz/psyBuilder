@@ -228,10 +228,11 @@ class Func(object):
             pass
 
     @staticmethod
-    def createWidget(widget_id: str) -> QWidget:
+    def createWidget(widget_id: str, visible: bool = True) -> QWidget:
         """
         根据widget_id创建对应类型的widget
         :param widget_id:
+        :param visible: 是否添加到wid widget, condition
         :return:
         """
         widget_type = widget_id.split('.')[0]
@@ -304,7 +305,8 @@ class Func(object):
         if not widget:
             raise Exception("fail to create widget, because unknown widget type. [func.py]")
         # 将新生成的widget存储到wid_widget中
-        Info.WID_WIDGET[widget_id] = widget
+        if visible:
+            Info.WID_WIDGET[widget_id] = widget
         return widget
 
     @staticmethod
