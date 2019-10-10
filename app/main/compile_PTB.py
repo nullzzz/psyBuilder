@@ -316,98 +316,107 @@ def getSepcialFormatAtts():
     # print(f"{Info.WID_WIDGET}")
     # for widgetId, cWidget in Info.WID_WIDGET.items():
     #     print({widgetId})
-    notInCondWidgetIds = Info.WID_NODE.keys()
+    # notInCondWidgetIds = Info.WID_NODE.keys()
     # print(f"{notInCondWidgetIds}")
     for widgetId, cWidget in Info.WID_WIDGET.items():
 
-        if widgetId in notInCondWidgetIds:
+        # if widgetId in notInCondWidgetIds:
             # print(f"line 74 {widgetId}")
-            cProperties = Func.getProperties(widgetId)
-            print(f"line 76 {widgetId}: {cProperties}\n\n")
+        cProperties = Func.getProperties(widgetId)
+        print(f"line 76 {widgetId}: {cProperties}\n\n")
 
-            if Func.isWidgetType(widgetId, Info.CYCLE):
-                pass
-            elif Func.isWidgetType(widgetId, Info.SWITCH):
-                print(f"{cWidget.getSwitch()}")
-            elif Func.isWidgetType(widgetId, Info.TEXT):
-                updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
-                updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Width'], 'percent', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Style'], 'fontStyle', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Flip horizontal'], 'flipHorizontal', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Flip vertical'], 'flipVertical', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Right to left'], 'rightToLeft', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', spFormatVarDict)
-                updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
+        if Func.isWidgetType(widgetId, Info.CYCLE):
+            pass
+        elif Func.isWidgetType(widgetId, Info.SWITCH):
+            # print(f"{cWidget.getSwitch()}")
+            pass
+        elif Func.isWidgetType(widgetId, Info.IF):
+            cWidgetDict = cWidget.getTrueWidget()
+            cTrueWidget = cWidgetDict['widget']
 
-                cInputDevices = cWidget.getInputDevice()
-                for cRespProperties in cInputDevices.values():
-                    if cRespProperties['Device Type'] == 'keyboard':
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                    else:
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            print(f"{cTrueWidget.getInfo()}")
+            print(f"{cTrueWidget.getInputDevice()}")
+            print(f"test")
+
+        elif Func.isWidgetType(widgetId, Info.TEXT):
+            updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Width'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Style'], 'fontStyle', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Flip horizontal'], 'flipHorizontal', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Flip vertical'], 'flipVertical', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Right to left'], 'rightToLeft', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
+
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
 
-            elif Func.isWidgetType(widgetId, Info.VIDEO):
-                updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
-                updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Width'], 'percent', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
-                updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
+        elif Func.isWidgetType(widgetId, Info.VIDEO):
+            # updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Width'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
 
-                cInputDevices = cWidget.getInputDevice()
-                for cRespProperties in cInputDevices.values():
-                    if cRespProperties['Device Type'] == 'keyboard':
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                    else:
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
-            elif Func.isWidgetType(widgetId, Info.SOUND):
-                updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Wait for start'], 'waitForStart', spFormatVarDict)
+        elif Func.isWidgetType(widgetId, Info.SOUND):
+            updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Wait for start'], 'waitForStart', spFormatVarDict)
 
-                cInputDevices = cWidget.getInputDevice()
-                for cRespProperties in cInputDevices.values():
-                    if cRespProperties['Device Type'] == 'keyboard':
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                    else:
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
-            elif Info.IMAGE == widgetId.split('.')[0]:
-                updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
-                updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Width'], 'percent', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
-                updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
+        elif Info.IMAGE == widgetId.split('.')[0]:
+            updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Width'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
+            updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
 
-                cInputDevices = cWidget.getInputDevice()
-                for cRespProperties in cInputDevices.values():
-                    if cRespProperties['Device Type'] == 'keyboard':
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                    else:
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
-            elif Func.isWidgetType(widgetId, Info.SLIDER):
-                updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
-                updateSpFormatVarDict(cProperties['pro']['Clear after'], 'clearAfter', spFormatVarDict)
+        elif Func.isWidgetType(widgetId, Info.SLIDER):
+            updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['pro']['Clear after'], 'clearAfter', spFormatVarDict)
 
-                cInputDevices = cWidget.getInputDevice()
-                for cRespProperties in cInputDevices.values():
-                    if cRespProperties['Device Type'] == 'keyboard':
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                    else:
-                        updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                        updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            cInputDevices = cWidget.getInputDevice()
+            for cRespProperties in cInputDevices.values():
+                if cRespProperties['Device Type'] == 'keyboard':
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
+                else:
+                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
     return spFormatVarDict
 

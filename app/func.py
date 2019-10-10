@@ -90,6 +90,8 @@ class Func(object):
         :return:
         """
         widget = Info.WID_WIDGET[widget_id]
+        if widget_id not in Info.WID_NODE.keys():
+            return widget.getInfo()
         if hasattr(widget, "refresh"):
             widget.refresh()
         if is_show and hasattr(widget, "getShowProperties"):

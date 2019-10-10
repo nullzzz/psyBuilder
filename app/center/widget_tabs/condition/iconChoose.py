@@ -83,7 +83,7 @@ class IconChoose(QWidget):
 
         # 创建widget
         self.widget_id = Func.generateWidgetId(current_type)
-        self.widget = Func.createWidget(self.widget_id, visible=False)
+        self.widget = Func.createWidget(self.widget_id, visible=True)
         assert self.widget is not None
 
         # slider
