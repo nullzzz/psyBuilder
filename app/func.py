@@ -361,7 +361,7 @@ class Func(object):
             v: dict
             quest_name = v.get("Quest Name")
             attributes[f"{quest_name}.cValue"] = ""
-
+        # print(f"{Info.WID_NODE}")
         node = Info.WID_NODE[widget_id]
         node_parent = node.parent()
         # 得到到第0层一共多少层
