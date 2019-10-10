@@ -1,69 +1,68 @@
 class Fraction:
-    def __init__(self, n, d, i=0, error=None):
-        if n < 0:
-            self.i = -(-n // d) + i
-            self.n = -(-n % d)
-        else:
-            self.i = n // d + i
-            self.n = n % d
-        self.d = d if self.n else 1
-        self.error = error
+    def __init__(self, up, down):
+        self.up = up
+        self.down = down
 
     def __add__(self, other):
-        __n = self.n * other.d + self.d * other.n
-        d = self.d * other.d
-        i = self.i + other.i
-        return Fraction(__n, d, i)
+        up = self.up * other.down + self.down * other.up
+        down = self.down * other.down
+        return Fraction(up, down)
 
     def __sub__(self, other):
-        __n = self.n * other.d - self.d * other.n
-        d = self.d * other.d
-        i = self.i - other.i
-        return Fraction(__n, d, i)
+        up = self.up * other.down - self.down * other.up
+        down = self.down * other.down
+        return Fraction(up, down)
 
     def __neg__(self):
-        return Fraction(-self.n, self.d, -self.i)
+        return Fraction(-self.up, self.down)
 
     def __mul__(self, other):
-        __n = (self.i * self.d + self.n) * (other.i * other.d + other.n)
-        __d = self.d * other.d
-        return Fraction(__n, __d)
+        up = self.up * other.up
+        down = self.down * other.down
+        return Fraction(up, down)
 
     def __truediv__(self, other):
-        if other.i == 0 and other.n == 0:
-            return Fraction(0, 1, 0, True)
-        __n = (self.i * self.d + self.n) * other.d
-        __d = self.d * (other.i * other.d + other.n)
-        if __d < 0:
-            __d = -__d
-            __n = -__n
-        return Fraction(__n, __d)
+        up = self.up * other.down
+        down = self.down * other.up
+        return Fraction(up, down)
 
     def __repr__(self):
-        if self.error:
+        # 分母为0
+        if self.down == 0:
             return "Inf"
-        __i = f"{self.i} " if self.i else ""
-        __f = f"{self.n}/{self.d}" if self.n else ""
-        __s = __i + __f
-        res = __s.strip() if __s else "0"
-        if self.is_negative():
-            return f"({res})"
-        return res
 
-    def simple(self, __prime=None):
-        if __prime is None:
-            __prime = range(2, self.d)
-        for i in __prime:
-            if i > self.d:
-                break
-            while self.n % i == 0 and self.d % i == 0:
-                self.n //= i
-                self.d //= i
+        # 整数
+        if self.down == 1:
+            if self.up < 0:
+                return f"({self.up})"
+            return f"{self.up}"
 
-    def is_negative(self):
-        if self.i < 0:
-            return True
-        return self.n < 0
+        # 假分数
+        if abs(self.up) > self.down:
+            integer = self.up // self.down
+            if integer < -1:
+                integer += 1
+            molecule = abs(self.up) % self.down
+            denominator = self.down
+            if integer > 0:
+                return f"{integer} {molecule}/{denominator}"
+            return f"({integer} {molecule}/{denominator})"
+        else:
+            if self.up > 0:
+                return f"{self.up}/{self.down}"
+            return f"({self.up}/{self.down})"
+
+    def simple(self):
+        gcd = self.__gcd(self.up, self.down)
+        self.up //= gcd
+        self.down //= gcd
+        if self.down < 0:
+            self.down = -self.down
+            self.up = -self.up
+
+    def __gcd(self, __int1__: int, __int2__: int):
+        return __int1__ if __int2__ == 0 else self.__gcd(__int2__, __int1__ % __int2__)
+
 
 a, b = [Fraction(*[int(x) for x in i.split("/")]) for i in input().split()]
 a: Fraction
@@ -153,20 +152,3 @@ prime = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67,
          9629, 9631, 9643, 9649, 9661, 9677, 9679, 9689, 9697, 9719, 9721, 9733, 9739, 9743, 9749, 9767, 9769, 9781,
          9787, 9791, 9803, 9811, 9817, 9829, 9833, 9839, 9851, 9857, 9859, 9871, 9883, 9887, 9901, 9907, 9923, 9929,
          9931, 9941, 9949, 9967, 9973, 10007, 10009, 10037, 10039, 10061, 10067, 10069, 10079, 10091, 10093, 10099, ]
-
-
-
-#
-# maxn = 100001
-# prime = [1] * maxn
-#
-# all_ = []
-# for i in range(2, maxn):
-#     if prime[i] == 1:
-#         all_.append(i)
-#         j = 2
-#         while i*j < maxn:
-#             prime[i*j] = 0
-#             j += 1
-#
-# print(all_)

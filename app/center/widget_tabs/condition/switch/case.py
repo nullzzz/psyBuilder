@@ -84,14 +84,14 @@ class Case(QGroupBox):
 
     def loadSetting(self):
         self.icon_choose.loadSetting()
-        self.values.setCurrentText(self.default_properties.get("case value", ""))
+        self.values.setCurrentText(self.default_properties.get("Case value", ""))
 
     # 导入参数
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
             self.icon_choose.setProperties(self.default_properties)
-            self.values.setCurrentText(self.default_properties.get("case value", ""))
+            self.values.setCurrentText(self.default_properties.get("Case value", ""))
         else:
             print("No properties")
 
@@ -112,23 +112,6 @@ class Case(QGroupBox):
         self.index += step
         self.setTitle(f"Case {self.index}")
 
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color:black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
-                temp.clear()
-
     def setAttributes(self, attributes: list):
         self.attributes = attributes
         self.values.addItems(attributes)
@@ -136,9 +119,9 @@ class Case(QGroupBox):
 
     def getCase(self) -> dict:
         return {
-            "case value": self.default_properties.get("case value", ""),
-            "stim type": self.default_properties.get("stim type", "None"),
-            "event name": self.default_properties.get("event name", ""),
-            "widget": self.icon_choose.getWidget(),
-            "widget_id": self.icon_choose.getWidgetId()
+            "Case value": self.default_properties.get("Case value", ""),
+            "Stim type": self.default_properties.get("Stim type", "None"),
+            "Event name": self.default_properties.get("Event name", ""),
+            "Widget": self.icon_choose.getWidget(),
+            "Widget id": self.icon_choose.getWidgetId()
         }

@@ -169,21 +169,21 @@ class IfBranch(QWidget):
         """
         return self.condition_area.getCondition()
 
-    def getTrueWidget(self) -> dict:
-        return {
-            "stim type": self.true_icon_choose.getInfo().get("stim type", "None"),
-            "event name": self.true_icon_choose.getInfo().get("event name", ""),
-            "widget": self.true_icon_choose.getWidget(),
-            "widget_id": self.true_icon_choose.getWidgetId()
-        }
+    def getTrueWidgetInfo(self) -> dict:
+        """
+        获取信息，包括Event name等
+        :return:
+        """
+        return self.true_icon_choose.getInfo()
 
-    def getFalseWidget(self) -> dict:
-        return {
-            "stim type": self.false_icon_choose.getInfo().get("stim type", "None"),
-            "event name": self.false_icon_choose.getInfo().get("event name", ""),
-            "widget": self.false_icon_choose.getWidget(),
-            "widget id": self.false_icon_choose.getWidgetId()
-        }
+    def getTrueWidget(self):
+        return self.true_icon_choose.getWidget()
+
+    def getFalseWidgetInfo(self) -> dict:
+        return self.false_icon_choose.getInfo()
+
+    def getFalseWidget(self):
+        return self.false_icon_choose.getWidget()
 
 
 if __name__ == "__main__":
