@@ -1,4 +1,26 @@
 # todo list
+### format of conditions' info
+## if
+    {
+        "Condition": "",
+        "Yes": "",
+        "No": ""
+    }
+## switch
+    """
+    {
+        "switch": ""
+        "case": {
+            "case 1": {},
+            "case 2": {},
+            ...
+        }
+    }
+    """
++ if中"yes"获取的内容及子控件getProperties
++ switch中case同理
++ 上述部分不仅是单纯控件的信息，还有object name\ switch 中的value等
++ 综上，删除wid_widget中子控件的wid，info由condition按上述格式获取。
 ### 2019-6-12
 * 啥也不想做
 ---
