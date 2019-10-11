@@ -965,7 +965,7 @@ def flipScreen(cWidget, f, cLoopLevel):
                      cOpRowIdxStr, cWinStr, 0, clearAfter)
     else:
         printAutoInd(f, f"if cDurs({cWinIdx}) > 0")
-        printAutoInd(f, f"cScrFlipTime = cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx});")
+        printAutoInd(f, f"cScrFlipTime = cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) - 0.003; % maybe 0.5*winIFIs({cWinIdx})")
         printAutoInd(f, "else ")
         printAutoInd(f, "cScrFlipTime = 0;  % flip immediately")
         printAutoInd(f, "end ")
@@ -1030,6 +1030,8 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
                 printAutoInd(f, "io64(io64Obj,{0},{1});", outputDevNameIdxDict.get(cDevName), msgValue)
             elif Info.PLATFORM == 'mac':
                 printAutoInd(f, "% currently, under Mac OX we just do nothing for parallel ports")
+
+            printAutoInd(f, "isParallelOn = true; ")
 
         elif devType == 'network_port':
             printAutoInd(f, "pnet({0},'write',{1});", outputDevNameIdxDict.get(cDevName), msgValue)
@@ -1120,7 +1122,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
 
     # Step 3:
-    cRespCodes.append("%---------- acquire responses ----------/")
+    cRespCodes.append("%============ acquire responses ==================/")
 
     if len(cInputDevices) > 0:
         cRespCodes.append("%-- make respDev struct --/")
@@ -1182,7 +1184,28 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
         # cRespCodes.append(f"beCheckedRespDevs = beCheckedRespDevs([beCheckedRespDevs(:).isOn]);")
         cRespCodes.append("%-------------------------\\")
 
-    cRespCodes.append(f"while GetSecs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) ")
+
+
+    cOutDeviceDict = historyPropDict.get('cOutDevices',{})
+    historyPropDict.update({'cOutDevices':{}})
+    print(f"{cOutDeviceDict}")
+
+    cRespCodes.append(f"secs = GetSecs; ")
+    cRespCodes.append(f"while secs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) - 0.003")
+
+    if len(cOutDeviceDict) > 0:
+        cRespCodes.append(f"if secs - lastScrOnsettime({cWinIdx}) > 0.01")
+        for cDevName in cOutDeviceDict.keys():
+            if Info.PLATFORM == 'linux':
+                cRespCodes.append(f"lptoutMex({outputDevNameIdxDict.get(cDevName)}, 0);")
+            elif Info.PLATFORM == 'windows':
+                cRespCodes.append(f"io64(io64Obj, {outputDevNameIdxDict.get(cDevName)}, 0);")
+            elif Info.PLATFORM == 'mac':
+                cRespCodes.append("% currently, under Mac OX we just do nothing for parallel ports")
+
+        cRespCodes.append(f"isParallelOn = false; ")
+        cRespCodes.append(f"end % reset parallel port to zero")
+
     cRespCodes.append(f"for iRespDev = 1:numel(beCheckedRespDevs) ")
     cRespCodes.append(f"if beCheckedRespDevs(iRespDev).isOn")
     cRespCodes.append(f"[keyIsDown,secs,keyCode] = responseCheck(beCheckedRespDevs(iRespDev).type,beCheckedRespDevs(iRespDev).index);")
@@ -1205,15 +1228,25 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     cRespCodes.append(f"end % for iRespDev")
     cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
     cRespCodes.append(f"end % while")
+    cRespCodes.append(f"if ~isempty(beCheckedRespDevs)")
     cRespCodes.append(f"beCheckedRespDevs(~[beCheckedRespDevs(:).isOn])          = [];")
-    cRespCodes.append(f"beCheckedRespDevs([beCheckedRespDevs(:).rtWindow] ~= -1) = [];")
-    cRespCodes.append("%---------------------------------------\\")
+    cRespCodes.append(f"beCheckedRespDevs([beCheckedRespDevs(:).rtWindow] == -1) = []; % excluded '(Same as duration)' ")
+    cRespCodes.append(f"end ")
 
+    if len(cOutDeviceDict) > 0:
+        cRespCodes.append(f"if isParallelOn ")
+        for cDevName in cOutDeviceDict.keys():
+            if Info.PLATFORM == 'linux':
+                cRespCodes.append(f"lptoutMex({outputDevNameIdxDict.get(cDevName)}, 0);")
+            elif Info.PLATFORM == 'windows':
+                cRespCodes.append(f"io64(io64Obj, {outputDevNameIdxDict.get(cDevName)}, 0);")
+            elif Info.PLATFORM == 'mac':
+                cRespCodes.append("% currently, under Mac OX we just do nothing for parallel ports")
+        cRespCodes.append(f"end ")
 
+    cRespCodes.append("%=================================================\\n")
 
-
-
-    shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
+    # shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
 
     # to be continue ...
 
@@ -2231,9 +2264,9 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "end")
         printAutoInd(f, "cDur = cDur./1000; % transform the unit from ms to sec")
         printAutoInd(f, "if numel(cDur) > 1")
-        printAutoInd(f, "cDur = Randi(cDur(2) - cDur(1)) + cDur(1);")
+        printAutoInd(f, "cDur = rand*(cDur(2) - cDur(1)) + cDur(1);")
         printAutoInd(f, "end ")
-        printAutoInd(f, "cDur = (round(cDur/cIFI) -0.5)*cIFI;")
+        printAutoInd(f, "cDur = round(cDur/cIFI);")
         printAutoInd(f, "end %  end of subfun5")
 
         iSubFunNum = 6
