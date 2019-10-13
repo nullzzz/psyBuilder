@@ -129,11 +129,15 @@ class PsyApplication(QMainWindow):
         build_menu.addSection("what")
 
         platform_menu = build_menu.addMenu("&Platform")
+
         self.linux_action = QAction("&Linux", self)
         self.linux_action.setChecked(True)
+
         self.windows_action = QAction("&Windows", self)
         self.mac_action = QAction("&Mac", self)
+
         icon = QIcon(Func.getImage("dock_visible.png"))
+
         self.linux_action.setIcon(icon)
         self.windows_action.setIcon(icon)
         self.windows_action.setIconVisibleInMenu(False)
@@ -143,10 +147,40 @@ class PsyApplication(QMainWindow):
         self.linux_action.triggered.connect(self.changePlatform)
         self.windows_action.triggered.connect(self.changePlatform)
         self.mac_action.triggered.connect(self.changePlatform)
+
         platform_menu.addAction(self.linux_action)
         platform_menu.addAction(self.windows_action)
         platform_menu.addAction(self.mac_action)
 
+
+
+        # load image mode
+        image_load_menu = build_menu.addMenu("&image Load Mode")
+
+        self.before_event_action = QAction("&before_event", self)
+        self.before_event_action.setChecked(True)
+
+        self.before_trial_action = QAction("&before_trial", self)
+        self.before_exp_action = QAction("&before_exp", self)
+
+        # icon = QIcon(Func.getImage("dock_visible.png"))
+
+        self.before_event_action.setIcon(icon)
+        self.before_trial_action.setIcon(icon)
+        self.before_trial_action.setIconVisibleInMenu(False)
+        self.before_exp_action.setIcon(icon)
+        self.before_exp_action.setIconVisibleInMenu(False)
+
+        self.before_event_action.triggered.connect(self.changeImageLoadMode)
+        self.before_trial_action.triggered.connect(self.changeImageLoadMode)
+        self.before_exp_action.triggered.connect(self.changeImageLoadMode)
+
+        image_load_menu.addAction(self.before_event_action)
+        image_load_menu.addAction(self.before_trial_action)
+        image_load_menu.addAction(self.before_exp_action)
+
+
+        # compile
         compile_action = QAction("&Compile", self)
         compile_action.setShortcut("Ctrl+F5")
         compile_action.triggered.connect(self.compile)
@@ -368,7 +402,6 @@ class PsyApplication(QMainWindow):
             Info.FILE_DIRECTORY = os.path.dirname(open_file_name)
             # 从文件中读取配置
             setting = QSettings(open_file_name, QSettings.IniFormat)
-
             # 计数恢复
             Info.WIDGET_TYPE_ID_COUNT = setting.value("WIDGET_TYPE_ID_COUNT")
             Info.WIDGET_TYPE_NAME_COUNT = setting.value("WIDGET_TYPE_NAME_COUNT")
@@ -403,6 +436,10 @@ class PsyApplication(QMainWindow):
             Info.PLATFORM = platform
             self.changePlatform(platform)
 
+            image_load_mode = setting.value("IMAGE_LOAD_MODE")
+            # print(f"load setting: {image_load_mode}")
+            Info.IMAGE_LOAD_MODE = image_load_mode
+            self.changeImageLoadMode(image_load_mode)
             # 恢复widgets
             # 复原初始的Timeline
             root_timeline: Timeline = Info.WID_WIDGET[f"{Info.TIMELINE}.0"]
@@ -450,6 +487,9 @@ class PsyApplication(QMainWindow):
 
         # 当前输出平台
         setting.setValue("PLATFORM", Info.PLATFORM)
+        setting.setValue("IMAGE_LOAD_MODE", Info.IMAGE_LOAD_MODE)
+        # print(f"save setting: {Info.IMAGE_LOAD_MODE}")
+
         Func.log(f"{Info.FILE_NAME} saved successful!")
 
     def loadOutTree(self, tree):
@@ -550,11 +590,24 @@ class PsyApplication(QMainWindow):
             self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
             Info.PLATFORM = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
-            print(c)
             platform = c if c else "linux"
             self.linux_action.setIconVisibleInMenu(platform == "linux")
             self.windows_action.setIconVisibleInMenu(platform == "windows")
             self.mac_action.setIconVisibleInMenu(platform == "mac")
+
+
+    def changeImageLoadMode(self, c):
+        if isinstance(c, bool):
+            self.before_event_action.setIconVisibleInMenu(self.sender() is self.before_event_action)
+            self.before_trial_action.setIconVisibleInMenu(self.sender() is self.before_trial_action)
+            self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
+            Info.IMAGE_LOAD_MODE = self.sender().text().lstrip("&").lower()
+        elif isinstance(c, str):
+            # print(c)
+            imageLoadMode = c if c else "before_event"
+            self.before_event_action.setIconVisibleInMenu(imageLoadMode == "before_event")
+            self.before_trial_action.setIconVisibleInMenu(imageLoadMode == "before_trial")
+            self.before_exp_action.setIconVisibleInMenu(imageLoadMode == "before_exp")
 
     def compile(self):
         try:

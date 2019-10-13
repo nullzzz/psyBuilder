@@ -338,8 +338,8 @@ def getSepcialFormatAtts():
             # print(f"{cWidget.getSwitch()}")
             pass
         elif Func.isWidgetType(widgetId, Info.IF):
-            cWidgetDict = cWidget.getTrueWidget()
-            cTrueWidget = cWidgetDict['widget']
+            cTrueWidget = cWidget.getTrueWidget()
+            # cTrueWidget = cWidgetDict['widget']
 
             print(f"{cTrueWidget.getInfo()}")
             print(f"{cTrueWidget.getInputDevice()}")
@@ -649,13 +649,19 @@ def updateEnableKbKeysList(allowKeyStr):
 
 
 def parseBooleanStr(inputStr, isRef=False):
-    if inputStr.lower() in ["'yes'", "'true'", 'yes', 'true']:
-        inputStr = "1"
-    elif inputStr.lower() in ["'no'", "'false'", 'no', 'false']:
-        inputStr = "0"
-    else:
+    if isinstance(inputStr,str):
         if not isRef:
-            throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False','True','Yes','No','1', or '0'] ")
+            if inputStr.lower() in ["'yes'", "'true'", 'yes', 'true']:
+                inputStr = "1"
+            elif inputStr.lower() in ["'no'", "'false'", 'no', 'false']:
+                inputStr = "0"
+            else:
+                throwCompileErrorInfo(f"the value of '{inputStr}' should be of ['False','True','Yes','No','1', or '0'] ")
+    elif isinstance(inputStr,bool):
+        if inputStr:
+            inputStr = "1"
+        else:
+            inputStr = "0"
 
     return inputStr
 
@@ -759,16 +765,46 @@ def parseDontClearAfterStr(inputStr):
     return inputStr
 
 
+def parseFilenameStr(inputStr, isRef = False) -> str:
+
+    if not isRef:
+        toBeSavedDir = os.path.dirname(Info.FILE_NAME)
+
+        if  len(toBeSavedDir) <= len(inputStr):
+            if inputStr[:len(toBeSavedDir)] == toBeSavedDir:
+                inputStr = inputStr[len(toBeSavedDir)-1:]
+
+    return inputStr
+
+
+
+    return inputStr
+
+
 def parseRTWindowStr(inputStr):
     if isinstance(inputStr, str):
         if inputStr == "(Same as duration)":
             inputStr = '-1'
         elif inputStr == "(End of timeline)":
             inputStr = '-2'
-        # elif isIntStr(inputStr):
-        #     pass
         # else:
         #
+    return inputStr
+
+
+def parseStretchModeStr(inputStr, isRef = False):
+    # ""、Both、LeftRight、UpDown、[attr]
+    if not isRef:
+        if isinstance(inputStr, str):
+            if inputStr == "Both":
+                inputStr = "3"
+            elif inputStr == "LeftRight":
+                inputStr = "1"
+            elif inputStr == "UpDown":
+                inputStr = "2"
+            else:
+                inputStr = "0"
+
     return inputStr
 
 
@@ -1332,89 +1368,45 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     historyPropDict.update({"cWinStr": cWinStr})
 
 
-    # 2) handle the text content
-    cProperties['Text'], ign = getRefValue(cWidget, cProperties['Text'], attributesSetDict)
+    # 2) handle file name:
+    cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
+    cFilenameStr = parseFilenameStr(cFilenameStr,isRef)
 
-    if isContainChStr(cProperties['Text']):
-        cProperties['Text'] = "[" + "".join(f"{ord(value)} " for value in cProperties['Text']) + "]"
+    # 3) check the mirror up/down parameter:
+    isMirrorUpDownStr = parseBooleanStr(cWidget.getIsMirrorUpAndDown())
+
+    # 3) check the mirror left/right parameter:
+    isMirrorLeftRightStr = parseBooleanStr(cWidget.getIsMirrorLeftAndRight())
+
+    # 4) check the rotate parameter:
+    rotateStr, isRef = getRefValue(cWidget, cWidget.getRotate(), attributesSetDict)
+
+    # 5) check the stretch mode parameter:
+    if cProperties['Stretch']:
+        # ""、Both、LeftRight、UpDown、[attr]
+        stretchModeStr = parseStretchModeStr(*getRefValue(cWidget, cProperties['Stretch mode'], attributesSetDict))
     else:
-        cProperties['Text'] = addSingleQuotes(pyStr2MatlabStr(cProperties['Text']))
+        stretchModeStr = "0"
 
-    # 3) check the alignment X parameter:
-    alignmentX = dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
+    # 6) check the Transparent parameter:
+    imageTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Transparent'], attributesSetDict))
 
-    # 4) check the alignment X parameter:
-    alignmentY = dataStrConvert(*getRefValue(cWidget, cProperties['Alignment Y'], attributesSetDict))
 
-    # 5) check the color parameter:
-    fontColorStr = dataStrConvert(*getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
-    fontTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Transparent'], attributesSetDict))
-
-    # 7) check the flip hor parameter:
-    cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
-    flipHorStr = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
-
-    # 8) check the flip ver parameter:
-    cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip vertical'], attributesSetDict)
-    flipVerStr = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
-
-    # 10) check the right to left parameter:
-    cRefedValue, isRef = getRefValue(cWidget, cProperties['Right to left'], attributesSetDict)
-    rightToLeft = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
-
-    # 11) check the parameter winRect
+    # 7) check the parameter winRect
     sx = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
     sy = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
     cWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
     cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
 
-    frameRectStr = f"makeFrameRect({sx}, {sy}, {cWidth}, {cHeight}, fullRects({cWinIdx},:))"
+    printAutoInd(f, "cFrameRect = makeFrameRect({0}, {1}, {2}, {3}, fullRects({4},:));",sx,sy,cWidth,cHeight,cWinIdx)
 
-    # set the font name size color style:
-    fontName = dataStrConvert(*getRefValue(cWidget, cProperties['Font family'], attributesSetDict))
-    fontSize = dataStrConvert(*getRefValue(cWidget, cProperties['Font size'], attributesSetDict))
-    fontStyle = dataStrConvert(*getRefValue(cWidget, cProperties['Style'], attributesSetDict))
-    fontStyle = parseFontStyleStr(fontStyle)
-
-    fontBkColor = dataStrConvert(*getRefValue(cWidget, cProperties['Back color'], attributesSetDict))
-
-    isChangeFontPars = False
-    #  font name
-    if historyPropDict['fontName'] != fontName:
-        printAutoInd(f, "Screen('TextFont',{0},{1});", cWinStr, fontName)
-        historyPropDict.update({'fontName': fontName})
-        isChangeFontPars = True
-
-    # font size
-    if historyPropDict['fontSize'] != fontSize:
-        printAutoInd(f, "Screen('TextSize',{0},{1});", cWinStr, fontSize)
-        historyPropDict.update({'fontSize': fontSize})
-        isChangeFontPars = True
-
-    # font style
-    if historyPropDict['fontStyle'] != fontStyle:
-        printAutoInd(f, "Screen('TextStyle',{0},{1});", cWinStr, fontStyle)
-        historyPropDict.update({'fontStyle': fontStyle})
-        isChangeFontPars = True
-
-    # font background color
-    if historyPropDict['fontBkColor'] != fontBkColor:
-        printAutoInd(f, "Screen('TextBackgroundColor',{0},{1});", cWinStr, fontBkColor)
-        historyPropDict.update({'fontBkColor': fontBkColor})
-        isChangeFontPars = True
-
-    if isChangeFontPars:
-        printAutoInd(f, "")
-
-    # before we draw the formattedtext， we draw the frame rect first:
+    # before we draw the image， we draw the frame rect first:
     borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
     borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border width'], attributesSetDict))
     frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame fill color'], attributesSetDict))
-    # if f"preFrameFillColor" not in historyPropDict:
     frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
 
-    debugPrint(f"frameTransparent: {frameTransparent}")
-
+    # get enable parameter
     cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
     isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
 
@@ -1422,26 +1414,46 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
         # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
         if (frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]):
-            printAutoInd(f, "Screen('FillRect',{0},{1},{2});", cWinStr,
-                         addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr)
+            printAutoInd(f, "Screen('FillRect',{0},{1}, cFrameRect);", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent))
 
         # draw the frame only when the frame color is different from the frame fill color
         if borderColor != frameFillColor:
-            printAutoInd(f, "Screen('frameRect',{0},{1},{2},{3});", cWinStr,
-                         addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr, borderWidth)
+            printAutoInd(f, "Screen('frameRect',{0},{1},cFrameRect,{2});", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent), borderWidth)
 
+    # make texture
+    printAutoInd(f, "cImData   = imread(fullfile({0})));",cFilenameStr)
+    printAutoInd(f, "cImIndex  = MakeTexture({0}, cImData);",cWinStr)
+
+    printAutoInd(f, "cDestRect = makeImDestRect(cFrameRect, size(cImData), {0});", stretchModeStr)
     #  print out the text
-    printAutoInd(f, "DrawFormattedText({0},{1},{2},{3},{4},{5},{6},{7},[],{8},{9});",
+
+    if isMirrorUpDownStr == '1' or isMirrorLeftRightStr == '1':
+        printAutoInd(f, "[xc, yc] = RectCenter(cDestRect);        % get the center of the destRect")
+        printAutoInd(f, "Screen('glPushMatrix', {0});             % enter into mirror mode",cWinStr)
+        printAutoInd(f, "Screen('glTranslate', {0}, xc, yc, 0);   % translate origin into the center of destRect",cWinStr)
+        if isMirrorLeftRightStr == '1':
+            leftRightStr = '-1'
+        else:
+            leftRightStr = '1'
+
+        if isMirrorUpDownStr == '1':
+            upDownStr = '-1'
+        else:
+            upDownStr = '1'
+
+        printAutoInd(f, "Screen('glScale', {0}, {1}, {2}, 1);     % mirror the drawn image",cWinStr,leftRightStr,upDownStr)
+        printAutoInd(f, "Screen('glTranslate', {0}, -xc, -yc, 0); % undo the translations",cWinStr)
+
+    printAutoInd(f, "DrawTexture({0}, cImIndex ,[] ,cDestRect ,{1} ,[] , abs({2}));",
                  cWinStr,
-                 cProperties['Text'],
-                 alignmentX,
-                 alignmentY,
-                 addedTransparentToRGBStr(fontColorStr, fontTransparent),
-                 dataStrConvert(*getRefValue(cWidget, cProperties['Wrapat chars'], attributesSetDict)),
-                 flipHorStr,
-                 flipVerStr,
-                 rightToLeft,
-                 frameRectStr)
+                 rotateStr,
+                 imageTransparent)
+
+    if isMirrorUpDownStr == '1' or isMirrorLeftRightStr == '1':
+        printAutoInd(f, "Screen('glPopMatrix', {0}); % restore to non mirror mode", cWinStr)
+
 
     clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
     clearAfter = parseDontClearAfterStr(clearAfter)
@@ -1452,34 +1464,13 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
 
 
-    # -------------------------------------------------------------
-    #  we need to dummy draw stim for the next widget
-    # so here after we will print any code into delayedPrintCodes
-    # -------------------------------------------------------------
-
-    # ------------------------------------------------------------------
-    # Step 6: acquire responses
-    # ------------------------------------------------------------------
-    # after drawing the next widget's stimuli, get the duration first
-    # durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
-    # durStr = parseDurationStr(durStr)
-
-    # cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
-
-
-
-    # shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
-
-    # to be continue ...
-
-    # if the current widget is the last one in the timeline, just print response codes here
-    # if Func.getNextWidgetId(cWidget.widget_id) is None:
-    #     for cValue in cRespCodes:
-    #         printAutoInd(f, cValue)
-    #     cRespCodes = []
     # ------------------------------------------
     # the last step: upload the delayed codes
     # ------------------------------------------
+
+    cRespCodes.append(f"% close the texture corresponding to {cFilenameStr}")
+    cRespCodes.append(f"Screen('Close', cImIndex);\n")
+
     delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
     delayedPrintCodes.update({'respCodes': cRespCodes})
 
@@ -1970,7 +1961,8 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
         # get subject information
         printAutoInd(f, "%----- get subject information -------/", )
-        printAutoInd(f, "subInfo = OpenExp_BCL('{0}',fileparts(mfilename('fullpath')));", cFilenameOnly)
+        printAutoInd(f, "cFolder = fileparts(mfilename('fullpath'));")
+        printAutoInd(f, "subInfo = OpenExp_BCL('{0}', cFolder);", cFilenameOnly)
         printAutoInd(f, "close(gcf);")
         printAutoInd(f, "%-------------------------------------\\\n")
 
@@ -2547,8 +2539,28 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
         iSubFunNum += 1
 
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f, "% subfun {0}: makeImDestRect", iSubFunNum)
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f,"function destRect = makeImDestRect(cFrameRect,imDataSize,stretchMode)")
+        printAutoInd(f,"destRect = centerRect([0 0 imDataSize(1) imDataSize(2)], cFrameRect);")
+
+        printAutoInd(f,"% caculate the width:")
+        printAutoInd(f,"if ismember(stretchMode,[1 3])")
+        printAutoInd(f,"destRect([1,3]) = cFrameRect([1,3]);")
+        printAutoInd(f,"end ")
+
+        printAutoInd(f,"% caculate the height")
+        printAutoInd(f,"if ismember(stretchMode,[2 3])")
+        printAutoInd(f,"destRect([2,4]) = cFrameRect([2,4]);")
+        printAutoInd(f,"end")
+        printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
+        iSubFunNum += 1
 
 
+
+        # print(Info.WIDGET_TYPE_NAME_COUNT)
+        print(Info.IMAGE_LOAD_MODE)
 
     if not isDummyPrint:
         Func.log(f"Compile successful!:{compile_file_name}")  # print info to the output panel

@@ -10,6 +10,8 @@ class Info(object):
     # 编译平台：linux\windows\mac
     PLATFORM: str = "linux"
 
+    IMAGE_LOAD_MODE: str = "before_event"
+
     # 保存widget_tabs的 (widget_id -> widget)
     WID_WIDGET = {}
 
