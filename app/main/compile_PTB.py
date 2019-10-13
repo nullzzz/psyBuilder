@@ -853,39 +853,34 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintC
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
 
-        if Info.CYCLE == cWidget.widget_id.split('.')[0]:
+        cWidgetType = cWidget.widget_id.split('.')[0]
+
+
+        if Info.CYCLE == cWidgetType:
             delayedPrintCodes = printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
-        elif Info.TEXT == cWidget.widget_id.split('.')[0]:
-            delayedPrintCodes = printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+        elif cWidgetType in [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO]:
+            delayedPrintCodes = printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
-        elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
+        elif Info.OPEN == cWidgetType:
             pass
-        elif Info.SOUND == cWidget.widget_id.split('.')[0]:
+        elif Info.DC == cWidgetType:
             pass
-        elif Info.IMAGE == cWidget.widget_id.split('.')[0]:
+        elif Info.CALIBRATION == cWidgetType:
             pass
-        elif Info.SLIDER == cWidget.widget_id.split('.')[0]:
+        elif Info.ACTION == cWidgetType:
             pass
-        elif Info.OPEN == cWidget.widget_id.split('.')[0]:
+        elif Info.STARTR == cWidgetType:
             pass
-        elif Info.DC == cWidget.widget_id.split('.')[0]:
+        elif Info.ENDR == cWidgetType:
             pass
-        elif Info.CALIBRATION == cWidget.widget_id.split('.')[0]:
+        elif Info.Log == cWidgetType:
             pass
-        elif Info.ACTION == cWidget.widget_id.split('.')[0]:
+        elif Info.QUEST_INIT == cWidgetType:
             pass
-        elif Info.STARTR == cWidget.widget_id.split('.')[0]:
+        elif Info.QUEST_GET_VALUE == cWidgetType:
             pass
-        elif Info.ENDR == cWidget.widget_id.split('.')[0]:
-            pass
-        elif Info.Log == cWidget.widget_id.split('.')[0]:
-            pass
-        elif Info.QUEST_INIT == cWidget.widget_id.split('.')[0]:
-            pass
-        elif Info.QUEST_GET_VALUE == cWidget.widget_id.split('.')[0]:
-            pass
-        elif Info.QUEST_UPDATE == cWidget.widget_id.split('.')[0]:
+        elif Info.QUEST_UPDATE == cWidgetType:
             pass
             # delayedPrintCodes = printImageWdiget(cWidget, f, delayedPrintCodes)
 
@@ -933,34 +928,20 @@ def printRespCodes(f, delayedPrintCodes):
 
 
 
-def printImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+
+
+
+def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
 
     # print comments to indicate the current frame order
     # Step 1: draw the content of current frame
-    delayedPrintCodes = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+    cWidgetType = cWidget.widget_id.split('.')[0]
 
-    # step 2: print delayed resp codes or none if the widget is the first one
-    #         print comments to indicate the current frame order if it is not the first one
-    delayedPrintCodes = printRespCodes(f, delayedPrintCodes)
+    if Info.TEXT == cWidgetType:
+        delayedPrintCodes = drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+    elif Info.IMAGE == cWidgetType:
+        delayedPrintCodes = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
-    # STEP 3: flip screen
-    flipScreen(cWidget, f, cLoopLevel)
-
-    # step 4: send trigger
-    delayedPrintCodes = printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
-
-
-    # step 5: make the delayed resp codes for the current frame
-    checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
-
-    return delayedPrintCodes
-
-
-def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-
-    # print comments to indicate the current frame order
-    # Step 1: draw the content of current frame
-    delayedPrintCodes = drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
     # step 2: print delayed resp codes or none if the widget is the first one
     #         print comments to indicate the current frame order if it is not the first one

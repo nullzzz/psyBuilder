@@ -11,8 +11,8 @@ class FramePage(QWidget):
         super(FramePage, self).__init__(parent)
         self.attributes = []
         self.default_properties = {
-            "X position": "0",
-            "Y position": "0",
+            "X position": "50%",
+            "Y position": "50%",
             "Width": "100%",
             "Height": "100%",
             "Enable": "Yes",
@@ -50,11 +50,11 @@ class FramePage(QWidget):
 
     # 生成frame页面
     def setUI(self):
-        self.x_pos.addItems(["0", "25", "50", "75", "100"])
+        self.x_pos.addItems(["50%", "0%", "25%", "75%", "100%"])
         self.x_pos.setEditable(True)
         self.x_pos.setReg(r"\d+%?")
 
-        self.y_pos.addItems(["0", "25", "50", "75", "100"])
+        self.y_pos.addItems(["50%", "0%", "25%", "75%", "100%"])
         self.y_pos.setEditable(True)
         self.y_pos.setReg(r"\d+%?")
 
@@ -126,7 +126,6 @@ class FramePage(QWidget):
 
     def getInfo(self):
         """
-        写的这是什么shit
         :return:
         """
         self.default_properties.clear()
@@ -137,13 +136,13 @@ class FramePage(QWidget):
         if x_pos:
             self.default_properties["X position"] = x_pos
         else:
-            self.default_properties["X position"] = "0"
-            self.x_pos.setCurrentText("0")
+            self.default_properties["X position"] = "50%"
+            self.x_pos.setCurrentText("50%")
         if y_pos:
             self.default_properties["Y position"] = y_pos
         else:
-            self.default_properties["Y position"] = "0"
-            self.y_pos.setCurrentText("0")
+            self.default_properties["Y position"] = "50%"
+            self.y_pos.setCurrentText("50%")
         if width:
             self.default_properties["Width"] = self.width.currentText()
         else:
@@ -154,6 +153,7 @@ class FramePage(QWidget):
         else:
             self.default_properties["Height"] = "100%"
             self.height.setCurrentText("100%")
+
         self.default_properties["Enable"] = self.enable.currentText()
         self.default_properties["Border color"] = self.border_color.getColor()
         self.default_properties["Border width"] = self.border_width.text()

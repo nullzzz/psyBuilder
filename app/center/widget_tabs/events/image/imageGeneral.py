@@ -52,10 +52,10 @@ class ImageTab1(QWidget):
         self.clear_after = PigComboBox()
 
         self.using_screen_id: str = ""
-        self.screen = PigComboBox()
+        self.screen_name = PigComboBox()
         self.screen_info = Func.getScreenInfo()
-        self.screen.addItems(self.screen_info.values())
-        self.screen.currentTextChanged.connect(self.changeScreen)
+        self.screen_name.addItems(self.screen_info.values())
+        self.screen_name.currentTextChanged.connect(self.changeScreen)
 
         self.setGeneral()
 
@@ -75,7 +75,7 @@ class ImageTab1(QWidget):
 
         layout1.addWidget(self.mirrorUD, 1, 0)
         layout1.addWidget(self.mirrorLR, 2, 0)
-        l0 = QLabel("Rotate:")
+        l0 = QLabel("Rotate:0-360°")
         l0.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         layout1.addWidget(l0, 1, 2)
         layout1.addWidget(self.rotate, 1, 3)
@@ -90,7 +90,7 @@ class ImageTab1(QWidget):
         layout2.setLabelAlignment(Qt.AlignRight)
         layout2.addRow("Transparent:", self.transparent)
         layout2.addRow("Dont Clear After:", self.clear_after)
-        layout2.addRow("Screen Name:", self.screen)
+        layout2.addRow("Screen Name:", self.screen_name)
 
         group2.setLayout(layout2)
 
@@ -102,11 +102,11 @@ class ImageTab1(QWidget):
     def refresh(self):
         self.screen_info = Func.getScreenInfo()
         screen_id = self.using_screen_id
-        self.screen.clear()
-        self.screen.addItems(self.screen_info.values())
+        self.screen_name.clear()
+        self.screen_name.addItems(self.screen_info.values())
         screen_name = self.screen_info.get(screen_id)
         if screen_name:
-            self.screen.setCurrentText(screen_name)
+            self.screen_name.setCurrentText(screen_name)
             self.using_screen_id = screen_id
 
     def changeScreen(self, screen):
@@ -119,7 +119,7 @@ class ImageTab1(QWidget):
     def openFile(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Find the image file", self.file_name.text(),
-                                                   "Image File (*.bmp;*.jpeg;*.jpg;*.png;*.gif)", options=options)
+                                                   "Image File (*.bmp;*.jpeg;*.jpg;*.png)", options=options)
         if file_name:
             self.file_name.setText(file_name)
 
@@ -151,7 +151,7 @@ class ImageTab1(QWidget):
         if Func.getDeviceNameById(self.using_screen_id):
             self.default_properties["Screen name"] = Func.getDeviceNameById(self.using_screen_id)
         else:
-            self.default_properties["Screen name"] = self.screen.currentText()
+            self.default_properties["Screen name"] = self.screen_name.currentText()
         return self.default_properties
 
     def getProperties(self):
@@ -169,7 +169,7 @@ class ImageTab1(QWidget):
         if Func.getDeviceNameById(self.using_screen_id):
             self.default_properties["Screen name"] = Func.getDeviceNameById(self.using_screen_id)
         else:
-            self.default_properties["Screen name"] = self.screen.currentText()
+            self.default_properties["Screen name"] = self.screen_name.currentText()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -188,7 +188,7 @@ class ImageTab1(QWidget):
         # self.transparent.setValue(self.default_properties["Transparent"])
         self.transparent.setText(self.default_properties["Transparent"])
         self.clear_after.setCurrentText(self.default_properties["Clear after"])
-        self.screen.setCurrentText(self.default_properties["Screen name"])
+        self.screen_name.setCurrentText(self.default_properties["Screen name"])
 
     def clone(self):
         clone_page = ImageTab1()

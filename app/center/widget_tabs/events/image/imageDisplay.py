@@ -42,10 +42,10 @@ class ImageDisplay(QMainWindow):
         self.frame_fill_color = "255,255,255"
         self.transparent_value = "0"
 
-        self.x_pos = "0"
-        self.y_pos = "0"
-        self.w_size = "100"
-        self.h_size = "100"
+        self.x_pos = "50%"
+        self.y_pos = "50%"
+        self.w_size = "100%"
+        self.h_size = "100%"
         self.setUI()
 
     def setUI(self):
@@ -132,14 +132,14 @@ class ImageDisplay(QMainWindow):
         self.stretch_mode = self.pro_window.general.stretch_mode.currentText()
         self.frame_fill_color = self.pro_window.frame.back_color.getColor()
         self.transparent_value = self.pro_window.general.transparent.text()
-        self.x_pos = self.default_properties.get("X position", "0")
-        self.y_pos = self.default_properties.get("Y position", "0")
+        self.x_pos = self.default_properties.get("X position", "50%")
+        self.y_pos = self.default_properties.get("Y position", "50%")
         self.w_size = self.default_properties.get("Width", "100%")
         self.h_size = self.default_properties.get("Height", "100%")
         if self.x_pos.startswith("[") and self.x_pos.endswith("]"):
-            self.x_pos = "0"
+            self.x_pos = "50%"
         if self.y_pos.startswith("[") and self.y_pos.endswith("]"):
-            self.y_pos = "0"
+            self.y_pos = "50%"
         if self.w_size.startswith("[") and self.w_size.endswith("]"):
             self.w_size = "100%"
         if self.h_size.startswith("[") and self.h_size.endswith("]"):
