@@ -229,6 +229,13 @@ def removeSingleQuotes(inputStr):
     return inputStr
 
 
+def removeSquBrackets(inputStr):
+    if isinstance(inputStr, str):
+        if re.fullmatch("\[.+\]", inputStr):  # any character except a new line
+            inputStr = inputStr[1:-1]
+    return inputStr
+
+
 def getAllNestedVars(inputStr, opVars=[]) -> set:
     if isRefStr(inputStr):
         inputStr = inputStr[1:-1]
@@ -828,6 +835,7 @@ def printAutoInd(f, inputStr, *argins):
         tabStrs = '\t' * cIndents
 
         if not isDummyPrint:
+            # print(f"{tabStrs}{inputStr}".format(*argins))
             print(f"{tabStrs}{inputStr}".format(*argins), file=f)
 
     if 'switch' == inputStr.split(' ')[0]:
@@ -907,14 +915,45 @@ def printRespCodes(f, delayedPrintCodes):
     # -------------------------------------------------------------
     # Step 1: print out previous widget's resp related codes
     # -------------------------------------------------------------
-    for cRowStr in delayedPrintCodes['respCodes']:
-        printAutoInd(f, cRowStr)
-    # clear out the print buffer
-    delayedPrintCodes.update({'respCodes': []})
+    if isinstance(delayedPrintCodes,dict):
+        for cRowStr in delayedPrintCodes['respCodes']:
+            cRowStr = "{{".join(cRowStr.split('{'))
+            cRowStr = "}}".join(cRowStr.split('}'))
+            printAutoInd(f,cRowStr)
+        # clear out the print buffer
+        delayedPrintCodes.update({'respCodes': []})
+    elif isinstance(delayedPrintCodes, list):
+        for cRowStr in delayedPrintCodes:
+            cRowStr = "{{".join(cRowStr.split('{'))
+            cRowStr = "}}".join(cRowStr.split('}'))
+            printAutoInd(f,cRowStr)
+        delayedPrintCodes = []
 
     return delayedPrintCodes
 
 
+
+def printImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+
+    # print comments to indicate the current frame order
+    # Step 1: draw the content of current frame
+    delayedPrintCodes = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+
+    # step 2: print delayed resp codes or none if the widget is the first one
+    #         print comments to indicate the current frame order if it is not the first one
+    delayedPrintCodes = printRespCodes(f, delayedPrintCodes)
+
+    # STEP 3: flip screen
+    flipScreen(cWidget, f, cLoopLevel)
+
+    # step 4: send trigger
+    delayedPrintCodes = printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
+
+
+    # step 5: make the delayed resp codes for the current frame
+    checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
+
+    return delayedPrintCodes
 
 
 def printTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
@@ -1146,6 +1185,10 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
             corRespStr, isRefValue = getRefValue(cWidget, cProperties['Correct'], attributesSetDict)
             # print(f"{corRespStr}")
             corRespStr = parseKbCorRespStr(corRespStr, isRefValue, cProperties['Device Type'])
+
+            if corRespStr.find(',') == -1:
+                corRespStr = removeSquBrackets(corRespStr)
+
             # print(f"{corRespStr}")
             # get response time window
             rtWindowStr = parseRTWindowStr(cProperties['RT Window'])
@@ -1173,8 +1216,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
             # get device type
             # get the start time of the response window
             # get the isOn
-            if corRespStr.find(',') == -1:
-                corRespStr = corRespStr[1:-1]
+
 
             cRespCodes.append(f"cFrameRespDevs({iRespDevice}) = makeRespDevStruct('{cWidgetName}_({cOpRowIdxStr})',{allowableKeysStr},{corRespStr},{rtWindowStr},{endActionStr},{cDevType},{inputDevNameIdxDict[cProperties['Device Name']]},{devIndexesVarName},lastScrOnsettime({cWinIdx}),true); ")
             iRespDevice += 1
@@ -1255,9 +1297,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
         cRespCodes.append(f"beCheckedRespDevs = []; % empty be checked response devices")
 
-        for cValue in cRespCodes:
-            printAutoInd(f, cValue)
-        cRespCodes = []
+        cRespCodes = printRespCodes(f, cRespCodes)
     # ------------------------------------------
     # the last step: upload the delayed codes
     # ------------------------------------------
@@ -1265,6 +1305,205 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     delayedPrintCodes.update({'respCodes': cRespCodes})
 
     return delayedPrintCodes
+
+
+def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
+
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+    cRespCodes = []
+    cAfFlipCodes = []
+
+    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip',[])
+    cRespCodes = delayedPrintCodes.get('respCodes',[])
+
+    if Func.getWidgetPosition(cWidget.widget_id) == 0:
+        # Step 2: print out help info for the current widget
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, Func.getWidgetPosition(cWidget.widget_id) + 1,
+                     Func.getWidgetName(cWidget.widget_id))
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
+    debugPrint("-- dev name id map---/")
+    debugPrint(inputDevNameIdxDict)
+    debugPrint(outputDevNameIdxDict)
+    debugPrint("----------------------\\")
+
+    cProperties = Func.getProperties(cWidget.widget_id)
+    debugPrint(f"{cWidget.widget_id} properties:")
+    debugPrint(f"{cProperties}")
+    debugPrint("-------------------------------\\")
+
+    debugPrint(f"line 714: {attributesSetDict}")
+    # ------------------------------------------------
+    # Step 1: draw the stimuli for the current widget
+    # -------------------------------------------------
+    # 1) get the win id info in matlab format winIds(idNum)
+    shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
+
+    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
+
+    cWinIdx = outputDevNameIdxDict.get(cScreenName)
+    cWinStr = f"winIds({cWinIdx})"
+
+    historyPropDict.update({"cScreenName": cScreenName})
+    historyPropDict.update({"cWinIdx": cWinIdx})
+    historyPropDict.update({"cWinStr": cWinStr})
+
+
+    # 2) handle the text content
+    cProperties['Text'], ign = getRefValue(cWidget, cProperties['Text'], attributesSetDict)
+
+    if isContainChStr(cProperties['Text']):
+        cProperties['Text'] = "[" + "".join(f"{ord(value)} " for value in cProperties['Text']) + "]"
+    else:
+        cProperties['Text'] = addSingleQuotes(pyStr2MatlabStr(cProperties['Text']))
+
+    # 3) check the alignment X parameter:
+    alignmentX = dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
+
+    # 4) check the alignment X parameter:
+    alignmentY = dataStrConvert(*getRefValue(cWidget, cProperties['Alignment Y'], attributesSetDict))
+
+    # 5) check the color parameter:
+    fontColorStr = dataStrConvert(*getRefValue(cWidget, cProperties['Fore color'], attributesSetDict))
+    fontTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Transparent'], attributesSetDict))
+
+    # 7) check the flip hor parameter:
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip horizontal'], attributesSetDict)
+    flipHorStr = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+
+    # 8) check the flip ver parameter:
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Flip vertical'], attributesSetDict)
+    flipVerStr = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+
+    # 10) check the right to left parameter:
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Right to left'], attributesSetDict)
+    rightToLeft = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+
+    # 11) check the parameter winRect
+    sx = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
+    sy = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
+    cWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
+    cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
+
+    frameRectStr = f"makeFrameRect({sx}, {sy}, {cWidth}, {cHeight}, fullRects({cWinIdx},:))"
+
+    # set the font name size color style:
+    fontName = dataStrConvert(*getRefValue(cWidget, cProperties['Font family'], attributesSetDict))
+    fontSize = dataStrConvert(*getRefValue(cWidget, cProperties['Font size'], attributesSetDict))
+    fontStyle = dataStrConvert(*getRefValue(cWidget, cProperties['Style'], attributesSetDict))
+    fontStyle = parseFontStyleStr(fontStyle)
+
+    fontBkColor = dataStrConvert(*getRefValue(cWidget, cProperties['Back color'], attributesSetDict))
+
+    isChangeFontPars = False
+    #  font name
+    if historyPropDict['fontName'] != fontName:
+        printAutoInd(f, "Screen('TextFont',{0},{1});", cWinStr, fontName)
+        historyPropDict.update({'fontName': fontName})
+        isChangeFontPars = True
+
+    # font size
+    if historyPropDict['fontSize'] != fontSize:
+        printAutoInd(f, "Screen('TextSize',{0},{1});", cWinStr, fontSize)
+        historyPropDict.update({'fontSize': fontSize})
+        isChangeFontPars = True
+
+    # font style
+    if historyPropDict['fontStyle'] != fontStyle:
+        printAutoInd(f, "Screen('TextStyle',{0},{1});", cWinStr, fontStyle)
+        historyPropDict.update({'fontStyle': fontStyle})
+        isChangeFontPars = True
+
+    # font background color
+    if historyPropDict['fontBkColor'] != fontBkColor:
+        printAutoInd(f, "Screen('TextBackgroundColor',{0},{1});", cWinStr, fontBkColor)
+        historyPropDict.update({'fontBkColor': fontBkColor})
+        isChangeFontPars = True
+
+    if isChangeFontPars:
+        printAutoInd(f, "")
+
+    # before we draw the formattedtext， we draw the frame rect first:
+    borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
+    borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border width'], attributesSetDict))
+    frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame fill color'], attributesSetDict))
+    # if f"preFrameFillColor" not in historyPropDict:
+    frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
+
+    debugPrint(f"frameTransparent: {frameTransparent}")
+
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
+    isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+
+    if isBkFrameEnable == '1':
+
+        # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
+        if (frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]):
+            printAutoInd(f, "Screen('FillRect',{0},{1},{2});", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr)
+
+        # draw the frame only when the frame color is different from the frame fill color
+        if borderColor != frameFillColor:
+            printAutoInd(f, "Screen('frameRect',{0},{1},{2},{3});", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr, borderWidth)
+
+    #  print out the text
+    printAutoInd(f, "DrawFormattedText({0},{1},{2},{3},{4},{5},{6},{7},[],{8},{9});",
+                 cWinStr,
+                 cProperties['Text'],
+                 alignmentX,
+                 alignmentY,
+                 addedTransparentToRGBStr(fontColorStr, fontTransparent),
+                 dataStrConvert(*getRefValue(cWidget, cProperties['Wrapat chars'], attributesSetDict)),
+                 flipHorStr,
+                 flipVerStr,
+                 rightToLeft,
+                 frameRectStr)
+
+    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
+    clearAfter = parseDontClearAfterStr(clearAfter)
+
+    historyPropDict.update({"clearAfter": clearAfter})
+
+    printAutoInd(f, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
+    printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
+
+
+    # -------------------------------------------------------------
+    #  we need to dummy draw stim for the next widget
+    # so here after we will print any code into delayedPrintCodes
+    # -------------------------------------------------------------
+
+    # ------------------------------------------------------------------
+    # Step 6: acquire responses
+    # ------------------------------------------------------------------
+    # after drawing the next widget's stimuli, get the duration first
+    # durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
+    # durStr = parseDurationStr(durStr)
+
+    # cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}) );")
+
+
+
+    # shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
+
+    # to be continue ...
+
+    # if the current widget is the last one in the timeline, just print response codes here
+    # if Func.getNextWidgetId(cWidget.widget_id) is None:
+    #     for cValue in cRespCodes:
+    #         printAutoInd(f, cValue)
+    #     cRespCodes = []
+    # ------------------------------------------
+    # the last step: upload the delayed codes
+    # ------------------------------------------
+    delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
+    delayedPrintCodes.update({'respCodes': cRespCodes})
+
+    return delayedPrintCodes
+
 
 
 
@@ -1448,15 +1687,15 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
 
 
-    shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
+    # shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
 
     # to be continue ...
 
     # if the current widget is the last one in the timeline, just print response codes here
-    if Func.getNextWidgetId(cWidget.widget_id) is None:
-        for cValue in cRespCodes:
-            printAutoInd(f, cValue)
-        cRespCodes = []
+    # if Func.getNextWidgetId(cWidget.widget_id) is None:
+    #     for cValue in cRespCodes:
+    #         printAutoInd(f, cValue)
+    #     cRespCodes = []
     # ------------------------------------------
     # the last step: upload the delayed codes
     # ------------------------------------------
