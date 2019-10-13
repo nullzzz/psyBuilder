@@ -26,8 +26,8 @@ class Switch(QWidget):
         self.case_area = CaseArea(self)
 
         self.default_properties: dict = {
-            "switch": self.switch_area.getProperties(),
-            "case": self.case_area.getProperties()
+            "Switch": self.switch_area.getProperties(),
+            "Case": self.case_area.getProperties()
         }
 
         self.ok_bt = QPushButton("OK")
@@ -78,8 +78,8 @@ class Switch(QWidget):
         return self.getProperties()
 
     def getProperties(self):
-        self.default_properties["switch"] = self.switch_area.getProperties()
-        self.default_properties["case"] = self.case_area.getProperties()
+        self.default_properties["Switch"] = self.switch_area.getProperties()
+        self.default_properties["Case"] = self.case_area.getProperties()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -93,8 +93,8 @@ class Switch(QWidget):
             self.loadSetting()
 
     def loadSetting(self):
-        self.switch_area.setProperties(self.default_properties.get("switch", ""))
-        self.case_area.setProperties(self.default_properties.get("case", {}))
+        self.switch_area.setProperties(self.default_properties.get("Switch", ""))
+        self.case_area.setProperties(self.default_properties.get("Case", {}))
 
     def clone(self, new_id: str):
         clone_widget = Switch(widget_id=new_id)
@@ -132,12 +132,14 @@ class Switch(QWidget):
         self.widget_id = new_id
 
     def getSwitch(self) -> str:
-        return self.default_properties.get("switch", "")
+        return self.default_properties.get("Switch", "")
 
-    def getCase(self) -> list:
+    def getCasesInfo(self) -> list:
         """
-
         :return: [case1, case2, ...]
         case1: dict
         """
+        return self.default_properties.get("Case", "")
+
+    def getCases(self):
         return [case.getCase() for case in self.case_area.case_list]
