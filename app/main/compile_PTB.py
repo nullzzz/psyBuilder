@@ -66,6 +66,7 @@ def debugPrint(input):
 #
 #     return inputStr
 
+
 def pyStr2MatlabStr(inputStr):
     if isinstance(inputStr, str):
         if isSingleQuotedStr(inputStr):
@@ -313,6 +314,20 @@ def getRefValueSet(cWidget, inputStr, attributesSetDict):
     return [inputStr, isRefValue, valueSet]
 
 
+def getSepcialRespsFormatAtts(cInputDevices, spFormatVarDict) -> dict:
+    # cInputDevices = cWidget.getInputDevice()
+    for cRespProperties in cInputDevices.values():
+        if cRespProperties['Device Type'] == 'keyboard':
+            updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+            updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
+        else:
+            updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+            updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+
+
+    # return spFormatVarDict
+
+
 def getSepcialFormatAtts():
     """
     : special varType:
@@ -320,35 +335,32 @@ def getSepcialFormatAtts():
     :
     """
     spFormatVarDict = dict()
-    # print(f"{Info.WID_WIDGET}")
-    # for widgetId, cWidget in Info.WID_WIDGET.items():
-    #     print({widgetId})
-    # notInCondWidgetIds = Info.WID_NODE.keys()
-    # print(f"{notInCondWidgetIds}")
+
     for widgetId, cWidget in Info.WID_WIDGET.items():
 
-        # if widgetId in notInCondWidgetIds:
-            # print(f"line 74 {widgetId}")
+
         cProperties = Func.getProperties(widgetId)
-        print(f"line 76 {widgetId}: {cProperties}\n\n")
+        # print(f"line 76 {widgetId}: {cProperties}\n\n")
 
         if Func.isWidgetType(widgetId, Info.CYCLE):
             pass
         elif Func.isWidgetType(widgetId, Info.SWITCH):
-            # print(f"{cWidget.getSwitch()}")
             pass
         elif Func.isWidgetType(widgetId, Info.IF):
             cTrueWidget = cWidget.getTrueWidget()
-            # cTrueWidget = cWidgetDict['widget']
+
 
             print(f"{cTrueWidget.getInfo()}")
             print(f"{cTrueWidget.getInputDevice()}")
-            print(f"test")
+            # print(f"test")
 
         elif Func.isWidgetType(widgetId, Info.TEXT):
             updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Width'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Height'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['X position'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Y position'], 'percent', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Style'], 'fontStyle', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Flip horizontal'], 'flipHorizontal', spFormatVarDict)
@@ -357,73 +369,54 @@ def getSepcialFormatAtts():
             updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
 
-            cInputDevices = cWidget.getInputDevice()
-            for cRespProperties in cInputDevices.values():
-                if cRespProperties['Device Type'] == 'keyboard':
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                else:
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            getSepcialRespsFormatAtts(cWidget.getInputDevice(), spFormatVarDict)
+
+            # cInputDevices = cWidget.getInputDevice()
+            # for cRespProperties in cInputDevices.values():
+            #     if cRespProperties['Device Type'] == 'keyboard':
+            #         updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
+            #         updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
+            #     else:
+            #         updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
+            #         updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
 
 
         elif Func.isWidgetType(widgetId, Info.VIDEO):
             # updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Width'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Height'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['X position'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Y position'], 'percent', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
 
-            cInputDevices = cWidget.getInputDevice()
-            for cRespProperties in cInputDevices.values():
-                if cRespProperties['Device Type'] == 'keyboard':
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                else:
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            getSepcialRespsFormatAtts(cWidget.getInputDevice(), spFormatVarDict)
 
         elif Func.isWidgetType(widgetId, Info.SOUND):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Wait for start'], 'waitForStart', spFormatVarDict)
 
-            cInputDevices = cWidget.getInputDevice()
-            for cRespProperties in cInputDevices.values():
-                if cRespProperties['Device Type'] == 'keyboard':
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                else:
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            getSepcialRespsFormatAtts(cWidget.getInputDevice(), spFormatVarDict)
 
-        elif Info.IMAGE == widgetId.split('.')[0]:
+        elif Func.isWidgetType(widgetId, Info.IMAGE):
             updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getFrameTransparent(), 'percent', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Width'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Height'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['X position'], 'percent', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Y position'], 'percent', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Clear after'], 'clearAfter', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
 
-            cInputDevices = cWidget.getInputDevice()
-            for cRespProperties in cInputDevices.values():
-                if cRespProperties['Device Type'] == 'keyboard':
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                else:
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            getSepcialRespsFormatAtts(cWidget.getInputDevice(), spFormatVarDict)
 
         elif Func.isWidgetType(widgetId, Info.SLIDER):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
             updateSpFormatVarDict(cProperties['pro']['Clear after'], 'clearAfter', spFormatVarDict)
 
-            cInputDevices = cWidget.getInputDevice()
-            for cRespProperties in cInputDevices.values():
-                if cRespProperties['Device Type'] == 'keyboard':
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', spFormatVarDict)
-                else:
-                    updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', spFormatVarDict)
-                    updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', spFormatVarDict)
+            getSepcialRespsFormatAtts(cWidget.getInputDevice(), spFormatVarDict)
 
     return spFormatVarDict
 
@@ -596,9 +589,11 @@ def shouldNotBeCitationCheck(keyStr,value):
     if isRefStr(value):
         throwCompileErrorInfo(f"'{keyStr}': the value should NOT be a citation!")
 
+
 def shouldNotBeEmptyCheck(keyStr,value):
     if value == '':
         throwCompileErrorInfo(f"'{keyStr}'should NOT be empty!")
+
 
 def outPutTriggerCheck(cWidget) -> dict:
     '''
@@ -647,7 +642,6 @@ def updateEnableKbKeysList(allowKeyStr):
         #         for char in item:
         #             enabledKBKeysList.add(char)
 
-
 def parseBooleanStr(inputStr, isRef=False):
     if isinstance(inputStr,str):
         if not isRef:
@@ -663,6 +657,79 @@ def parseBooleanStr(inputStr, isRef=False):
         else:
             inputStr = "0"
 
+    return inputStr
+
+
+def parseDontClearAfterStr(inputStr):
+    if isinstance(inputStr, str):
+        inputStr = removeSingleQuotes(inputStr)
+
+        if inputStr == "clear_0":
+            inputStr = '0'
+        elif inputStr == "notClear_1":
+            inputStr = '1'
+        elif inputStr == "noNothing_2":
+            inputStr = '2'
+    return inputStr
+
+
+def parseDurationStr(inputStr):
+    if isinstance(inputStr, str):
+        inputStr = removeSingleQuotes(inputStr)
+
+        if inputStr == "(Infinite)":
+            inputStr = "6000" # an extramely impossible value
+        elif re.fullmatch("\d+~\d+", inputStr):
+            cDurRange = inputStr.split('~')
+            inputStr = f"{cDurRange[0]},{cDurRange[1]}"
+
+    return inputStr
+
+
+def parseEndActionStr(endActionStr):
+    if endActionStr == 'Terminate':
+        endActionStr = '1'
+    else:
+        endActionStr = '0'
+
+    return endActionStr
+
+
+def parseFilenameStr(inputStr, isRef = False) -> str:
+
+    if not isRef:
+        toBeSavedDir = os.path.dirname(Info.FILE_NAME)
+
+        if  len(toBeSavedDir) <= len(inputStr):
+            if inputStr[:len(toBeSavedDir)] == toBeSavedDir:
+                inputStr = inputStr[len(toBeSavedDir)-1:]
+
+    return inputStr
+
+
+
+    return inputStr
+
+
+def parseFontStyleStr(inputStr):
+    if isinstance(inputStr, str):
+        inputStr = removeSingleQuotes(inputStr)
+        if inputStr == "normal_0":
+            inputStr = '0'
+        elif inputStr == "bold_1":
+            inputStr = '1'
+        elif inputStr == "italic_2":
+            inputStr = '2'
+        elif inputStr == "underline_4":
+            inputStr = '4'
+        elif inputStr == "outline_8":
+            inputStr = '8'
+        elif inputStr == "overline_16":
+            inputStr = '16'
+        elif inputStr == "condense_32":
+            inputStr = '32'
+        elif inputStr == "extend_64":
+            inputStr = '64'
     return inputStr
 
 
@@ -695,27 +762,6 @@ def parseKbCorRespStr(kbCorRespStr, isRefValue, devType) -> str:
     return kbCorRespCodesStr
 
 
-def parseDurationStr(inputStr):
-    if isinstance(inputStr, str):
-        inputStr = removeSingleQuotes(inputStr)
-
-        if inputStr == "(Infinite)":
-            inputStr = "6000" # an extramely impossible value
-        elif re.fullmatch("\d+~\d+", inputStr):
-            cDurRange = inputStr.split('~')
-            inputStr = f"{cDurRange[0]},{cDurRange[1]}"
-
-    return inputStr
-
-
-def parseEndActionStr(endActionStr):
-    if endActionStr == 'Terminate':
-        endActionStr = '1'
-    else:
-        endActionStr = '0'
-
-    return endActionStr
-
 def parsePercentStr(inputStr):
     if isinstance(inputStr, str):
         if isPercentStr(inputStr):
@@ -728,57 +774,6 @@ def parsePercentStr(inputStr):
         outputValue = inputStr
 
     return outputValue
-
-
-def parseFontStyleStr(inputStr):
-    if isinstance(inputStr, str):
-        inputStr = removeSingleQuotes(inputStr)
-        if inputStr == "normal_0":
-            inputStr = '0'
-        elif inputStr == "bold_1":
-            inputStr = '1'
-        elif inputStr == "italic_2":
-            inputStr = '2'
-        elif inputStr == "underline_4":
-            inputStr = '4'
-        elif inputStr == "outline_8":
-            inputStr = '8'
-        elif inputStr == "overline_16":
-            inputStr = '16'
-        elif inputStr == "condense_32":
-            inputStr = '32'
-        elif inputStr == "extend_64":
-            inputStr = '64'
-    return inputStr
-
-
-def parseDontClearAfterStr(inputStr):
-    if isinstance(inputStr, str):
-        inputStr = removeSingleQuotes(inputStr)
-
-        if inputStr == "clear_0":
-            inputStr = '0'
-        elif inputStr == "notClear_1":
-            inputStr = '1'
-        elif inputStr == "noNothing_2":
-            inputStr = '2'
-    return inputStr
-
-
-def parseFilenameStr(inputStr, isRef = False) -> str:
-
-    if not isRef:
-        toBeSavedDir = os.path.dirname(Info.FILE_NAME)
-
-        if  len(toBeSavedDir) <= len(inputStr):
-            if inputStr[:len(toBeSavedDir)] == toBeSavedDir:
-                inputStr = inputStr[len(toBeSavedDir)-1:]
-
-    return inputStr
-
-
-
-    return inputStr
 
 
 def parseRTWindowStr(inputStr):
@@ -806,14 +801,6 @@ def parseStretchModeStr(inputStr, isRef = False):
                 inputStr = "0"
 
     return inputStr
-
-
-def printDelayedCodes(delayedPrintCodes, keyName, inputStr, *argins):
-    global isDummyPrint
-
-    # delayedPrintCodes = {'codesAfFip': [], 'respCodes': []}
-    if not isDummyPrint:
-        delayedPrintCodes[keyName].append = f"{inputStr}".format(*argins)
 
 
 # noinspection PyStringFormat
@@ -883,63 +870,184 @@ def printAutoInd(f, inputStr, *argins):
         cIndents = 0
 
 
-def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-    cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
+def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+    global spFormatVarDict
+    # start from 1 to compatible with MATLAB
+    cLoopLevel += 1
+    attributesSetDict = attributesSetDict.copy()
+    cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
-    for cWidgetId in cTimelineWidgetIds:
-        cWidget = Info.WID_WIDGET[cWidgetId]
+    attributesSetDict.setdefault(f"{cWidgetName}.cLoop", [cLoopLevel, f"iLoop_{cLoopLevel}", {f"iLoop_{cLoopLevel}"}])
+    attributesSetDict.setdefault(f"{cWidgetName}.rowNums",
+                                 [cLoopLevel, f"size({cWidgetName}.attr,1)", {f"size({cWidgetName}.attr,1)"}])
 
-        cWidgetType = cWidget.widget_id.split('.')[0]
+    cLoopIterStr = attributesSetDict[f"{cWidgetName}.cLoop"][1]
 
+    # create the design matrix  (table) for the current cycle
+    startExpStr = cWidgetName + '.attr = cell2table({...'
+    printAutoInd(f, '% create the designMatrix of the current cycle (loop)')
 
-        if Info.CYCLE == cWidgetType:
-            delayedPrintCodes = printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+    printAutoInd(f, '{0}', startExpStr)
 
-        elif cWidgetType in [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO]:
-            delayedPrintCodes = printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+    for iRow in range(cWidget.rowCount()):
+        cRowDict = cWidget.getAttributes(iRow)
+        if 0 == iRow:
+            endExpStr = "},'VariableNames',{" + ''.join("'" + key + "' " for key in cRowDict.keys()) + "});"
 
-        elif Info.OPEN == cWidgetType:
-            pass
-        elif Info.DC == cWidgetType:
-            pass
-        elif Info.CALIBRATION == cWidgetType:
-            pass
-        elif Info.ACTION == cWidgetType:
-            pass
-        elif Info.STARTR == cWidgetType:
-            pass
-        elif Info.ENDR == cWidgetType:
-            pass
-        elif Info.Log == cWidgetType:
-            pass
-        elif Info.QUEST_INIT == cWidgetType:
-            pass
-        elif Info.QUEST_GET_VALUE == cWidgetType:
-            pass
-        elif Info.QUEST_UPDATE == cWidgetType:
-            pass
-            # delayedPrintCodes = printImageWdiget(cWidget, f, delayedPrintCodes)
+        for key, value in cRowDict.items():
+            # get the referenced var value
+            cValue, isRefValue, cRefValueSet = getRefValueSet(cWidget, value, attributesSetDict)
 
-    # CYCLE = "Cycle"
-    # SOUND = "Sound"
-    # TEXT = "Text"
-    # IMAGE = "Image"
-    # VIDEO = "Video"
-    # SLIDER = "Slider"
-    # OPEN = "Open"
-    # DC = "DC"
-    # CALIBRATION = "Calibration"
-    # ACTION = "Action"
-    # STARTR = "StartR"
-    # ENDR = "EndR"
-    # CLOSE = "Close"
-    # QUEST_INIT = "QuestInit"
-    # QUEST_UPDATE = "QuestUpdate"
-    # QUEST_GET_VALUE = "QuestGetValue"
-    # IF = "If"
-    # SWITCH = "Switch"
-    # TIMELINE = "Timeline"
+            cKeyAttrName = f"{Func.getWidgetName(cWidget.widget_id)}.attr.{key}"
+
+            # handle the references and the values in special format (e.g., percent, duration)
+            # --- replaced the percentageStr--------/
+            if cKeyAttrName in spFormatVarDict:
+                if spFormatVarDict[cKeyAttrName] == 'percent':
+                    cValue = parsePercentStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'dur':
+                    cValue = parseDurationStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'fontStyle':
+                    cValue = parseFontStyleStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'clearAfter':
+                    cValue = parseDontClearAfterStr(cValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'flipHorizontal':
+                    cValue = parseBooleanStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'flipVertical':
+                    cValue = parseBooleanStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'rightToLeft':
+                    cValue = parseBooleanStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'enableFrame':
+                    cValue = parseBooleanStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'waitForStart':
+                    cValue = parseBooleanStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'kbCorrectResp':
+                    cValue = parseKbCorRespStr(cValue,isRefValue,'keyboard')
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'noKbDevCorrectResp':
+                    cValue = parseKbCorRespStr(cValue,isRefValue,'noneKbDevs')
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'kbAllowKeys':
+                    cValue = parseKbCorRespStr(cValue,isRefValue,'keyboard')
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'noKbAllowKeys':
+                    cValue = parseKbCorRespStr(cValue,isRefValue,'noneKbDevs')
+                    cRowDict[key] = cValue
+
+            #     TO BE CONTINUING... FOR ALL OTHER Special Types
+            # --------------------------------------\
+
+            cAttributeName = f"{cWidgetName}.attr.{key}"
+
+            if not isRefValue:
+                cRefValueSet = {cValue}
+
+            if cAttributeName in attributesSetDict:
+                preValueSet = attributesSetDict[cAttributeName][2]
+            else:
+                preValueSet = set()
+
+            attributesSetDict.update(
+                {cAttributeName: [cLoopLevel, f"{cAttributeName}{{{cLoopIterStr}}}", cRefValueSet.union(preValueSet)]})
+
+        # print out the design matrix of the current Cycle
+        if '' == cRowDict['Weight']:
+            cRepeat = 1
+        else:
+            cRepeat = dataStrConvert(cRowDict['Weight'])
+
+        for iRep in range(cRepeat):
+            printAutoInd(f, '{0}', "".join(
+                addCurlyBrackets(dataStrConvert(*getRefValue(cWidget, value, attributesSetDict), False, False)) + " "
+                for key, value in cRowDict.items()) + ";...")
+
+    printAutoInd(f, '{0}\n', endExpStr)
+    # Shuffle the designMatrix:
+    cycleOrderStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict))
+    cycleOrderByStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrderBy(), attributesSetDict))
+
+    #  to make sure the weight is one for counterbalance selection of order ----/
+    if cycleOrderStr == "'CounterBalance'":
+        cCycleWeightList = cWidget.getAttributeValues(0)
+        for cLineWeight in cCycleWeightList:
+            if dataStrConvert(cLineWeight) != 1:
+                throwCompileErrorInfo(
+                    f"Found an uncompilable error in Cycle {Func.getWidgetName(cWidget.widget_id)}:\nFor CounterBalance selection, the timeline weight should be 1")
+    # ------------------------------------------------------------------------\
+
+    # attributesSetDict.setdefault(f"{cWidgetName}.rowNums", [cLoopLevel, f"size({cWidgetName}.attr,1)"])
+
+    printAutoInd(f, "%---Shuffle the DesignMatrix-----/")
+    printAutoInd(f, 'cShuffledIdx = ShuffleCycleOrder({0},{1},{2},subInfo);',
+                 attributesSetDict[f"{cWidgetName}.rowNums"][1], cycleOrderStr, cycleOrderByStr)
+    printAutoInd(f, '{0}.attr = {0}.attr(cShuffledIdx,:);', cWidgetName)
+    printAutoInd(f, "%--------------------------------\\\n")
+
+    # cycling
+    printAutoInd(f, '% looping across each row of the {0}.attr:{1}', cWidgetName, cLoopIterStr)
+    printAutoInd(f, 'for {0} = size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
+
+    cLoopOpIdxStr = cLoopIterStr + "_cOpR"
+
+    printAutoInd(f, "opRowIdx = opRowIdx + 1; % set the output variables row num")
+    printAutoInd(f, "{0} = opRowIdx;", cLoopOpIdxStr)
+
+    # handle each timeline
+    cTimeLineList = cWidget.getTimelines()
+    # squeeze the timelines
+    cTimelineSet = set()
+
+    for iTimeline in cTimeLineList:
+        cTimelineSet.add(iTimeline[1])
+
+    printAutoInd(f, '% switch across timeline types')
+    printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
+
+    for iTimeline_id in cTimelineSet:
+        if '' == iTimeline_id:
+            throwCompileErrorInfo(f"In {cWidgetName}: Timeline should not be empty!")
+        else:
+            printAutoInd(f, 'case {0}', f"{addSingleQuotes(Func.getWidgetName(iTimeline_id))}")
+            # printAutoInd(f, "{0}_rIdx    = opRowIdx;", Func.getWidgetName(iTimeline_id))
+            printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+
+    printAutoInd(f, 'otherwise ')
+    printAutoInd(f, '% do nothing ')
+    printAutoInd(f, 'end%switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
+
+    printAutoInd(f, 'end % {0}', cLoopIterStr)
     # to be continue ...
+
+    return delayedPrintCodes
+
+
+def printDelayedCodes(delayedPrintCodes, keyName, inputStr, *argins):
+    global isDummyPrint
+
+    # delayedPrintCodes = {'codesAfFip': [], 'respCodes': []}
+    if not isDummyPrint:
+        delayedPrintCodes[keyName].append = f"{inputStr}".format(*argins)
 
 
 def printRespCodes(f, delayedPrintCodes):
@@ -959,39 +1067,6 @@ def printRespCodes(f, delayedPrintCodes):
             cRowStr = "}}".join(cRowStr.split('}'))
             printAutoInd(f,cRowStr)
         delayedPrintCodes = []
-
-    return delayedPrintCodes
-
-
-
-
-
-
-def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-
-    # print comments to indicate the current frame order
-    # Step 1: draw the content of current frame
-    cWidgetType = cWidget.widget_id.split('.')[0]
-
-    if Info.TEXT == cWidgetType:
-        delayedPrintCodes = drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
-    elif Info.IMAGE == cWidgetType:
-        delayedPrintCodes = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
-
-
-    # step 2: print delayed resp codes or none if the widget is the first one
-    #         print comments to indicate the current frame order if it is not the first one
-    delayedPrintCodes = printRespCodes(f, delayedPrintCodes)
-
-    # STEP 3: flip screen
-    flipScreen(cWidget, f, cLoopLevel)
-
-    # step 4: send trigger
-    delayedPrintCodes = printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
-
-
-    # step 5: make the delayed resp codes for the current frame
-    checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
 
     return delayedPrintCodes
 
@@ -1036,6 +1111,34 @@ def flipScreen(cWidget, f, cLoopLevel):
                  Func.getWidgetName(cWidget.widget_id),
                  cOpRowIdxStr)
 
+
+def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+
+    # print comments to indicate the current frame order
+    # Step 1: draw the content of current frame
+    cWidgetType = cWidget.widget_id.split('.')[0]
+
+    if Info.TEXT == cWidgetType:
+        delayedPrintCodes = drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+    elif Info.IMAGE == cWidgetType:
+        delayedPrintCodes = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+
+
+    # step 2: print delayed resp codes or none if the widget is the first one
+    #         print comments to indicate the current frame order if it is not the first one
+    delayedPrintCodes = printRespCodes(f, delayedPrintCodes)
+
+    # STEP 3: flip screen
+    flipScreen(cWidget, f, cLoopLevel)
+
+    # step 4: send trigger
+    delayedPrintCodes = printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
+
+
+    # step 5: make the delayed resp codes for the current frame
+    checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
+
+    return delayedPrintCodes
 
 
 def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
@@ -1102,6 +1205,65 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
         printAutoInd(f, "% ----------------------------------\\\n")
 
     return delayedPrintCodes
+
+
+def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+    cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
+
+    for cWidgetId in cTimelineWidgetIds:
+        cWidget = Info.WID_WIDGET[cWidgetId]
+
+        cWidgetType = cWidget.widget_id.split('.')[0]
+
+
+        if Info.CYCLE == cWidgetType:
+            delayedPrintCodes = printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+
+        elif cWidgetType in [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO]:
+            delayedPrintCodes = printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+
+        elif Info.OPEN == cWidgetType:
+            pass
+        elif Info.DC == cWidgetType:
+            pass
+        elif Info.CALIBRATION == cWidgetType:
+            pass
+        elif Info.ACTION == cWidgetType:
+            pass
+        elif Info.STARTR == cWidgetType:
+            pass
+        elif Info.ENDR == cWidgetType:
+            pass
+        elif Info.Log == cWidgetType:
+            pass
+        elif Info.QUEST_INIT == cWidgetType:
+            pass
+        elif Info.QUEST_GET_VALUE == cWidgetType:
+            pass
+        elif Info.QUEST_UPDATE == cWidgetType:
+            pass
+            # delayedPrintCodes = printImageWdiget(cWidget, f, delayedPrintCodes)
+
+    # CYCLE = "Cycle"
+    # SOUND = "Sound"
+    # TEXT = "Text"
+    # IMAGE = "Image"
+    # VIDEO = "Video"
+    # SLIDER = "Slider"
+    # OPEN = "Open"
+    # DC = "DC"
+    # CALIBRATION = "Calibration"
+    # ACTION = "Action"
+    # STARTR = "StartR"
+    # ENDR = "EndR"
+    # CLOSE = "Close"
+    # QUEST_INIT = "QuestInit"
+    # QUEST_UPDATE = "QuestUpdate"
+    # QUEST_GET_VALUE = "QuestGetValue"
+    # IF = "If"
+    # SWITCH = "Switch"
+    # TIMELINE = "Timeline"
+    # to be continue ...
 
 
 def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
@@ -1305,7 +1467,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
     cRespCodes.append("%=================================================\\n")
 
-    # shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
+    shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
 
     # to be continue ...
 
@@ -1475,8 +1637,6 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     delayedPrintCodes.update({'respCodes': cRespCodes})
 
     return delayedPrintCodes
-
-
 
 
 def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
@@ -1680,176 +1840,6 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
 
 
-def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-    global spFormatVarDict
-    # start from 1 to compatible with MATLAB
-    cLoopLevel += 1
-    attributesSetDict = attributesSetDict.copy()
-    cWidgetName = Func.getWidgetName(cWidget.widget_id)
-
-    attributesSetDict.setdefault(f"{cWidgetName}.cLoop", [cLoopLevel, f"iLoop_{cLoopLevel}", {f"iLoop_{cLoopLevel}"}])
-    attributesSetDict.setdefault(f"{cWidgetName}.rowNums",
-                                 [cLoopLevel, f"size({cWidgetName}.attr,1)", {f"size({cWidgetName}.attr,1)"}])
-
-    cLoopIterStr = attributesSetDict[f"{cWidgetName}.cLoop"][1]
-
-    # create the design matrix  (table) for the current cycle
-    startExpStr = cWidgetName + '.attr = cell2table({...'
-    printAutoInd(f, '% create the designMatrix of the current cycle (loop)')
-
-    printAutoInd(f, '{0}', startExpStr)
-
-    for iRow in range(cWidget.rowCount()):
-        cRowDict = cWidget.getAttributes(iRow)
-        if 0 == iRow:
-            endExpStr = "},'VariableNames',{" + ''.join("'" + key + "' " for key in cRowDict.keys()) + "});"
-
-        for key, value in cRowDict.items():
-            # get the referenced var value
-            cValue, isRefValue, cRefValueSet = getRefValueSet(cWidget, value, attributesSetDict)
-
-            cKeyAttrName = f"{Func.getWidgetName(cWidget.widget_id)}.attr.{key}"
-
-            # handle the references and the values in special format (e.g., percent, duration)
-            # --- replaced the percentageStr--------/
-            if cKeyAttrName in spFormatVarDict:
-                if spFormatVarDict[cKeyAttrName] == 'percent':
-                    cValue = parsePercentStr(cValue)
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'dur':
-                    cValue = parseDurationStr(cValue)
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'fontStyle':
-                    cValue = parseFontStyleStr(cValue)
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'clearAfter':
-                    cValue = parseDontClearAfterStr(cValue)
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'flipHorizontal':
-                    cValue = parseBooleanStr(cValue, isRefValue)
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'flipVertical':
-                    cValue = parseBooleanStr(cValue, isRefValue)
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'rightToLeft':
-                    cValue = parseBooleanStr(cValue, isRefValue)
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'enableFrame':
-                    cValue = parseBooleanStr(cValue, isRefValue)
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'waitForStart':
-                    cValue = parseBooleanStr(cValue, isRefValue)
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'kbCorrectResp':
-                    cValue = parseKbCorRespStr(cValue,isRefValue,'keyboard')
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'noKbDevCorrectResp':
-                    cValue = parseKbCorRespStr(cValue,isRefValue,'noneKbDevs')
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'kbAllowKeys':
-                    cValue = parseKbCorRespStr(cValue,isRefValue,'keyboard')
-                    cRowDict[key] = cValue
-
-                elif spFormatVarDict[cKeyAttrName] == 'noKbAllowKeys':
-                    cValue = parseKbCorRespStr(cValue,isRefValue,'noneKbDevs')
-                    cRowDict[key] = cValue
-
-            #     TO BE CONTINUING... FOR ALL OTHER Special Types
-            # --------------------------------------\
-
-            cAttributeName = f"{cWidgetName}.attr.{key}"
-
-            if not isRefValue:
-                cRefValueSet = {cValue}
-
-            if cAttributeName in attributesSetDict:
-                preValueSet = attributesSetDict[cAttributeName][2]
-            else:
-                preValueSet = set()
-
-            attributesSetDict.update(
-                {cAttributeName: [cLoopLevel, f"{cAttributeName}{{{cLoopIterStr}}}", cRefValueSet.union(preValueSet)]})
-
-        # print out the design matrix of the current Cycle
-        if '' == cRowDict['Weight']:
-            cRepeat = 1
-        else:
-            cRepeat = dataStrConvert(cRowDict['Weight'])
-
-        for iRep in range(cRepeat):
-            printAutoInd(f, '{0}', "".join(
-                addCurlyBrackets(dataStrConvert(*getRefValue(cWidget, value, attributesSetDict), False, False)) + " "
-                for key, value in cRowDict.items()) + ";...")
-
-    printAutoInd(f, '{0}\n', endExpStr)
-    # Shuffle the designMatrix:
-    cycleOrderStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict))
-    cycleOrderByStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrderBy(), attributesSetDict))
-
-    #  to make sure the weight is one for counterbalance selection of order ----/
-    if cycleOrderStr == "'CounterBalance'":
-        cCycleWeightList = cWidget.getAttributeValues(0)
-        for cLineWeight in cCycleWeightList:
-            if dataStrConvert(cLineWeight) != 1:
-                throwCompileErrorInfo(
-                    f"Found an uncompilable error in Cycle {Func.getWidgetName(cWidget.widget_id)}:\nFor CounterBalance selection, the timeline weight should be 1")
-    # ------------------------------------------------------------------------\
-
-    # attributesSetDict.setdefault(f"{cWidgetName}.rowNums", [cLoopLevel, f"size({cWidgetName}.attr,1)"])
-
-    printAutoInd(f, "%---Shuffle the DesignMatrix-----/")
-    printAutoInd(f, 'cShuffledIdx = ShuffleCycleOrder({0},{1},{2},subInfo);',
-                 attributesSetDict[f"{cWidgetName}.rowNums"][1], cycleOrderStr, cycleOrderByStr)
-    printAutoInd(f, '{0}.attr = {0}.attr(cShuffledIdx,:);', cWidgetName)
-    printAutoInd(f, "%--------------------------------\\\n")
-
-    # cycling
-    printAutoInd(f, '% looping across each row of the {0}.attr:{1}', cWidgetName, cLoopIterStr)
-    printAutoInd(f, 'for {0} = size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
-
-    cLoopOpIdxStr = cLoopIterStr + "_cOpR"
-
-    printAutoInd(f, "opRowIdx = opRowIdx + 1; % set the output variables row num")
-    printAutoInd(f, "{0} = opRowIdx;", cLoopOpIdxStr)
-
-    # handle each timeline
-    cTimeLineList = cWidget.getTimelines()
-    # squeeze the timelines
-    cTimelineSet = set()
-
-    for iTimeline in cTimeLineList:
-        cTimelineSet.add(iTimeline[1])
-
-    printAutoInd(f, '% switch across timeline types')
-    printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
-
-    for iTimeline_id in cTimelineSet:
-        if '' == iTimeline_id:
-            throwCompileErrorInfo(f"In {cWidgetName}: Timeline should not be empty!")
-        else:
-            printAutoInd(f, 'case {0}', f"{addSingleQuotes(Func.getWidgetName(iTimeline_id))}")
-            # printAutoInd(f, "{0}_rIdx    = opRowIdx;", Func.getWidgetName(iTimeline_id))
-            printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel, delayedPrintCodes)
-
-    printAutoInd(f, 'otherwise ')
-    printAutoInd(f, '% do nothing ')
-    printAutoInd(f, 'end%switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
-
-    printAutoInd(f, 'end % {0}', cLoopIterStr)
-    # to be continue ...
-
-    return delayedPrintCodes
 
 
 """ useless, because the timeline type will dependent on selected input when the selection order is counterbalanced
