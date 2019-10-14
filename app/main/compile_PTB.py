@@ -1437,9 +1437,13 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     cRespCodes.append(f"end % if RT window is not negative")
 
     cRespCodes.append(f"if any(keyCodes(beCheckedRespDevs(iRespDev).allowAble))")
-    cRespCodes.append(f"eval([beCheckedRespDevs(iRespDev).beUpatedVar,'.rt   = secs - beCheckedRespDevs(iRespDev).startTime);']);")
-    cRespCodes.append(f"eval([beCheckedRespDevs(iRespDev).beUpatedVar,'.resp = find(keyCode);']);")
-    cRespCodes.append(f"eval([beCheckedRespDevs(iRespDev).beUpatedVar,'.acc  = all(ismember(beCheckedRespDevs(iRespDev).resp, beCheckedRespDevs(iRespDev).corResp));']);\n")
+    cRespCodes.append(f"cFrameRt   = secs - beCheckedRespDevs(iRespDev).startTime;")
+    cRespCodes.append(f"cFrameResp = find(keyCode);")
+    cRespCodes.append(f"cFrameAcc  = all(ismember(beCheckedRespDevs(iRespDev).resp, beCheckedRespDevs(iRespDev).corResp));\n")
+
+    cRespCodes.append(f"eval([beCheckedRespDevs(iRespDev).beUpatedVar,'.rt   = cFrameRt;']);")
+    cRespCodes.append(f"eval([beCheckedRespDevs(iRespDev).beUpatedVar,'.resp = cFrameResp;']);")
+    cRespCodes.append(f"eval([beCheckedRespDevs(iRespDev).beUpatedVar,'.acc  = cFrameAcc;']);\n")
     cRespCodes.append(f"beCheckedRespDevs(iRespDev).isOn = false;")
     cRespCodes.append(f"if beCheckedRespDevs(iRespDev).endAction")
     cRespCodes.append(f"break; % break out while")
@@ -2154,6 +2158,9 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "winIFIs           = zeros({0},1);", iMonitor - 1)
         printAutoInd(f, "fullRects         = zeros({0},4);", iMonitor - 1)
         printAutoInd(f, "beCheckedRespDevs = [];")
+        printAutoInd(f, "cFrameRt          = [];")
+        printAutoInd(f, "cFrameAcc         = [];")
+        printAutoInd(f, "cFrameResp        = [];")
 
         printAutoInd(f, "%--- open windows ---/")
         printAutoInd(f, "for iWin = 1:numel(monitors)")
