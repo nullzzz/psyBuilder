@@ -421,6 +421,32 @@ def getSepcialFormatAtts():
     return spFormatVarDict
 
 
+def getOutputDevCountsDict() -> dict:
+    output_devices = Info.OUTPUT_DEVICE_INFO
+
+    iMonitor = 0
+    iParal = 0
+    iNetPort = 0
+    iSerial = 0
+    iSound = 0
+
+    for outDev_Id, cDevice in output_devices.items():
+
+        if cDevice['Device Type'] == Info.DEV_SCREEN:
+            iMonitor += 1
+        elif cDevice['Device Type'] == Info.DEV_NETWORK_PORT:
+            iNetPort += 1
+        elif cDevice['Device Type'] == Info.DEV_PARALLEL_PORT:
+            iParal += 1
+        elif cDevice['Device Type'] == Info.DEV_SERIAL_PORT:
+            iSerial += 1
+        elif cDevice['Device Type'] == Info.DEV_SOUND:
+            iSound += 1
+
+    return {Info.DEV_SCREEN:iMonitor,Info.DEV_NETWORK_PORT:iNetPort,Info.DEV_PARALLEL_PORT:iParal,Info.DEV_SERIAL_PORT:iSerial,Info.DEV_SOUND:iSound}
+
+
+
 def getWidLoopLevel(wid: str) -> int:
     """
     :only cycle can increase the loop level
@@ -1092,7 +1118,7 @@ def flipScreen(cWidget, f, cLoopLevel):
     if Func.getWidgetPosition(cWidget.widget_id) == 0:
         printAutoInd(f, "% for first event, flip immediately.. ")
         f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
-        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},{3},{4});\n", Func.getWidgetName(cWidget.widget_id),
+        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},{3},{4}); %#ok<*STRNU>\n", Func.getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr, cWinStr, 0, clearAfter)
     else:
         # printAutoInd(f, f"if cDurs({cWinIdx}) > 0")
@@ -1105,15 +1131,11 @@ def flipScreen(cWidget, f, cLoopLevel):
         #              Func.getWidgetName(cWidget.widget_id),
         #              cOpRowIdxStr, cWinStr, clearAfter)
 
-        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3},cDurs({4}) + lastScrOnsettime({4}) - 0.003 );\n",
+        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3},cDurs({4}) + lastScrOnsettime({4}) - 0.003 ); %#ok<*STRNU>\n",
                      Func.getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr, cWinStr, clearAfter, cWinIdx)
 
-    # updated the screen flip times in matlab
-    printAutoInd(f, "lastScrOnsettime({0}) = {1}.onsettime({2});\n",
-                  cWinIdx,
-                 Func.getWidgetName(cWidget.widget_id),
-                 cOpRowIdxStr)
+
 
 
 def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
@@ -1151,6 +1173,8 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"
     cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
+    cWinIdx = historyPropDict['cWinIdx']
+
     # ---------------------------------------------------------------------------------------
     # Step 1: print out previous widget's codes that suppose to be print just after the Flip
     # ----------------------------------------------------------------------------------------
@@ -1185,8 +1209,9 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
 
         if devType == 'parallel_port':
             # currently only ppl need to be reset to zero
-            cOutDeviceDict[cDevName] = [devType,pulseDur,outputDevNameIdxDict.get(cDevName)]
-
+            cOutDeviceDict[cDevName] = ['1', pulseDur,
+                                        re.split('(\(\d*\))', outputDevNameIdxDict.get(cDevName))[1][1:-1]]
+            # cOutDeviceDict[cDevName] = [devType,pulseDur, parallelPortNumInMatlab]
             if Info.PLATFORM == 'linux':
                 printAutoInd(f, "lptoutMex({0},{1});", outputDevNameIdxDict.get(cDevName), msgValue)
             elif Info.PLATFORM == 'windows':
@@ -1194,19 +1219,29 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
             elif Info.PLATFORM == 'mac':
                 printAutoInd(f, "% currently, under Mac OX we just do nothing for parallel ports")
 
-            printAutoInd(f, "isParallelOn = true; ")
+            # printAutoInd(f, "isParallelOn = true; ")
 
         elif devType == 'network_port':
             printAutoInd(f, "pnet({0},'write',{1});", outputDevNameIdxDict.get(cDevName), msgValue)
+            cOutDeviceDict[cDevName] = ['2', pulseDur,
+                                        re.split('(\(\d*\))', outputDevNameIdxDict.get(cDevName))[1][1:-1]]
 
         elif devType == 'serial_port':
             printAutoInd(f, "[ign, when] = IOPort('Write', {0}, {1});", outputDevNameIdxDict.get(cDevName), msgValue)
+            cOutDeviceDict[cDevName] = ['3', pulseDur,
+                                        re.split('(\(\d*\))', outputDevNameIdxDict.get(cDevName))[1][1:-1]]
 
     historyPropDict.update({'cOutDevices':cOutDeviceDict})
 
     if len(output_device) > 0:
         printAutoInd(f, "{0}_msgEndTime({1}) = GetSecs;", cWidgetName, cOpRowIdxStr)
         printAutoInd(f, "% ----------------------------------\\\n")
+
+    # updated the screen flip times in matlab
+    printAutoInd(f, "lastScrOnsettime({0}) = {1}.onsettime({2}); %temp save the last screen onsettimes\n",
+                 cWinIdx,
+                 Func.getWidgetName(cWidget.widget_id),
+                 cOpRowIdxStr)
 
     return delayedPrintCodes
 
@@ -1279,7 +1314,11 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
     cAfFlipCodes = delayedPrintCodes.get('codesAfFlip',[])
     cRespCodes = delayedPrintCodes.get('respCodes',[])
-    cOutDeviceDict = delayedPrintCodes.get('cOutDevices',{})
+
+    cOutDeviceDict = historyPropDict.get('cOutDevices',{})
+    historyPropDict.update({'cOutDevices': {}})
+
+    outDevCountsDict = getOutputDevCountsDict()
 
 
     allInputDevs = historyPropDict.get('allInputDevs',{})
@@ -1317,8 +1356,6 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
         cInputDevices.update({key:value})
 
 
-
-
     # under windows: all keyboards and mouses will be treated as a single device
     if Info.PLATFORM == 'windows':
         if nKbs > 1 or nMouses > 1:
@@ -1347,6 +1384,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
 
     # Step 3:
+
     cRespCodes.append("%============ acquire responses ==================/")
 
     if len(cInputDevices) > 0:
@@ -1391,7 +1429,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
             noRespStr = dataStrConvert(*getRefValue(cWidget, cProperties['No Resp'], attributesSetDict), True)
 
             # get resp output dev name
-            respOutDevStr, isRefValue = getRefValue(cWidget, cProperties['Output Device'], attributesSetDict)
+            respOutDevNameStr, isRefValue = getRefValue(cWidget, cProperties['Output Device'], attributesSetDict)
 
             # get dev type and devIndexesVarName
             if cProperties['Device Type'] == 'keyboard':
@@ -1410,73 +1448,47 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
                 devIndexesVarName = "rbIndices"
                 cDevType = 4
 
-            # get device type
-            # get the start time of the response window
-            # get the isOn
+            # if the response code send port is a parallel
+            if respOutDevNameStr == '' or respOutDevNameStr == 'none':
+                needTobeRetStr = 'false'
+                respCodeDevIdxStr = '0'
+            else:
+                respCodeDevIdxStr = cOutDeviceDict[respOutDevNameStr][2]
 
-            cRespCodes.append(f"cRespDevs({iRespDev}) = struct('beUpdatedVar','{cWidgetName}({cOpRowIdxStr})','allowAble',{allowableKeysStr},'corResp',{corRespStr},'rtWindow',{rtWindowStr},'endAction',{endActionStr},'type',{cDevType},'index',{devIndexesVarName}({inputDevNameIdxDict[cProperties['Device Name']]}),'startTime',lastScrOnsettime({cWinIdx}),'isOn',true,'right',{rightStr},'wrong',{wrongStr},'noResp',{noRespStr},'respOutDevName',{respOutDevStr}  );")
-            # cRespCodes.append(f"cRespDevs({iRespDev}) = makeRespDevStruct('{cWidgetName}({cOpRowIdxStr})',{allowableKeysStr},{corRespStr},{rtWindowStr},{endActionStr},{cDevType},{inputDevNameIdxDict[cProperties['Device Name']]},{devIndexesVarName},lastScrOnsettime({cWinIdx}),true); ")
+                if cOutDeviceDict[respOutDevNameStr][2] == '1':
+                    needTobeRetStr = 'true'
+                else:
+                    needTobeRetStr = 'false'
+
+            cRespCodes.append(
+                f"cRespDevs({iRespDev}) = struct('beUpdatedVar','{cWidgetName}({cOpRowIdxStr})','allowAble',{allowableKeysStr},'corResp',{corRespStr},'rtWindow',{rtWindowStr},'endAction',{endActionStr},'type',{cDevType},'index',{devIndexesVarName}({inputDevNameIdxDict[cProperties['Device Name']]}),'startTime',lastScrOnsettime({cWinIdx}),'isOn',true,'needTobeReset',{needTobeRetStr},'right',{rightStr},'wrong',{wrongStr},'noResp',{noRespStr},'respCodeDevIdx',{respCodeDevIdxStr}  );")
             iRespDev += 1
 
 
+        cRespCodes.append("%-------------------------\\\n")
         cRespCodes.append(f"beCheckedRespDevs = [beCheckedRespDevs, cRespDevs];")
         # cRespCodes.append(f"beCheckedRespDevs = beCheckedRespDevs([beCheckedRespDevs(:).isOn]);")
-        cRespCodes.append("%-------------------------\\")
-
-
-
-    #     if devType == 'parallel_port':
-    #         # currently only ppl need to be reset to zero
-    #         cOutDeviceDict[cDevName] = [devType,pulseDur,outputDevNameIdxDict.get(cDevName)]
-    #
-    #         if Info.PLATFORM == 'linux':
-    #             printAutoInd(f, "lptoutMex({0},{1});", outputDevNameIdxDict.get(cDevName), msgValue)
-    #         elif Info.PLATFORM == 'windows':
-    #             printAutoInd(f, "io64(io64Obj,{0},{1});", outputDevNameIdxDict.get(cDevName), msgValue)
-    #         elif Info.PLATFORM == 'mac':
-    #             printAutoInd(f, "% currently, under Mac OX we just do nothing for parallel ports")
-    #
-    #         printAutoInd(f, "isParallelOn = true; ")
-    #
-    #     elif devType == 'network_port':
-    #         printAutoInd(f, "pnet({0},'write',{1});", outputDevNameIdxDict.get(cDevName), msgValue)
-    #
-    #     elif devType == 'serial_port':
-    #         printAutoInd(f, "[ign, when] = IOPort('Write', {0}, {1});", outputDevNameIdxDict.get(cDevName), msgValue)
-    #
-    # historyPropDict.update({'cOutDevices':cOutDeviceDict})
-
-
-
-
-    cOutDeviceDict = historyPropDict.get('cOutDevices',{})
-    historyPropDict.update({'cOutDevices':{}})
-    print(f"{cOutDeviceDict}")
 
     cRespCodes.append(f"secs = GetSecs; ")
     cRespCodes.append(f"while secs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) - 0.003")
 
-    if len(cOutDeviceDict) > 0:
-        cRespCodes.append(f"if secs - lastScrOnsettime({cWinIdx}) > 0.01")
-        for cDevName in cOutDeviceDict.keys():
-            if Info.PLATFORM == 'linux':
-                cRespCodes.append(f"lptoutMex({outputDevNameIdxDict.get(cDevName)}, 0);")
-            elif Info.PLATFORM == 'windows':
-                cRespCodes.append(f"io64(io64Obj, {outputDevNameIdxDict.get(cDevName)}, 0);")
-            elif Info.PLATFORM == 'mac':
-                cRespCodes.append("% currently, under Mac OX we just do nothing for parallel ports")
-
-        cRespCodes.append(f"isParallelOn = false; ")
-        cRespCodes.append(f"end % reset parallel port to zero")
-
     cRespCodes.append(f"for iRespDev = 1:numel(beCheckedRespDevs) ")
     cRespCodes.append(f"if beCheckedRespDevs(iRespDev).isOn")
     cRespCodes.append(f"[keyIsDown,secs,keyCode] = responseCheck(beCheckedRespDevs(iRespDev).type,beCheckedRespDevs(iRespDev).index);")
-    cRespCodes.append(f"if beCheckedRespDevs(iRespDev).rtWindow > 0")
-    cRespCodes.append(f"if secs - beCheckedRespDevs(iRespDev).startTime > beCheckedRespDevs(iRespDev).rtWindow")
+
+    if outDevCountsDict[Info.DEV_PARALLEL_PORT]>0 and len(cOutDeviceDict) > 0:
+        cRespCodes.append(f"if beCheckedRespDevs(iRespDev).needTobeReset && (secs - beCheckedRespDevs(iRespDev).startTime) > 0.01 % currently set to 10 ms")
+        if Info.PLATFORM == 'linux':
+            cRespCodes.append(f"lptoutMex(parPort(beCheckedRespDevs(iRespDev).respCodeDevIdx).port, 0);")
+        elif Info.PLATFORM == 'windows':
+            cRespCodes.append(f"io64(io64Obj, parPort(beCheckedRespDevs(iRespDev).respCodeDevIdx).port, 0);")
+        elif Info.PLATFORM == 'mac':
+            cRespCodes.append("% currently, under Mac OX we just do nothing for parallel ports")
+        cRespCodes.append(f"end")
+
+    cRespCodes.append(f"if beCheckedRespDevs(iRespDev).rtWindow > 0 && (secs - beCheckedRespDevs(iRespDev).startTime) > beCheckedRespDevs(iRespDev).rtWindow")
     cRespCodes.append(f"beCheckedRespDevs(iRespDev).isOn = false;")
-    cRespCodes.append(f"end % if out of RT Window")
-    cRespCodes.append(f"end % if RT window is not negative")
+    cRespCodes.append(f"end % if RT window is not negative and cTime is out of RT Window")
 
     cRespCodes.append(f"if any(keyCodes(beCheckedRespDevs(iRespDev).allowAble))")
     cRespCodes.append(f"cFrame.Rt   = secs - beCheckedRespDevs(iRespDev).startTime;")
@@ -1494,21 +1506,26 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     cRespCodes.append(f"end % for iRespDev")
     cRespCodes.append(f"WaitSecs(0.001); % to give the cpu a little bit break ")
     cRespCodes.append(f"end % while")
+    cRespCodes.append(f"%------ remove unchecked respDevs ------/")
     cRespCodes.append(f"if ~isempty(beCheckedRespDevs)")
     cRespCodes.append(f"beCheckedRespDevs(~[beCheckedRespDevs(:).isOn])          = [];")
     cRespCodes.append(f"beCheckedRespDevs([beCheckedRespDevs(:).rtWindow] == -1) = []; % excluded '(Same as duration)' ")
     cRespCodes.append(f"end ")
+    cRespCodes.append(f"%---------------------------------------\\n")
 
-    if len(cOutDeviceDict) > 0:
-        cRespCodes.append(f"if isParallelOn ")
-        for cDevName in cOutDeviceDict.keys():
-            if Info.PLATFORM == 'linux':
-                cRespCodes.append(f"lptoutMex({outputDevNameIdxDict.get(cDevName)}, 0);")
-            elif Info.PLATFORM == 'windows':
-                cRespCodes.append(f"io64(io64Obj, {outputDevNameIdxDict.get(cDevName)}, 0);")
-            elif Info.PLATFORM == 'mac':
-                cRespCodes.append("% currently, under Mac OX we just do nothing for parallel ports")
-        cRespCodes.append(f"end ")
+    if outDevCountsDict[Info.DEV_PARALLEL_PORT]>0 and len(cOutDeviceDict) > 0:
+        cRespCodes.append(f"if cDurs({cWinIdx}) < 0.01 ")
+        cRespCodes.append(f"for iRespDev = 1:numel(beCheckedRespDevs) ")
+        cRespCodes.append(f"if beCheckedRespDevs(iRespDev).needTobeReset")
+        if Info.PLATFORM == 'linux':
+            cRespCodes.append(f"lptoutMex(parPort(beCheckedRespDevs(iRespDev).respCodeDevIdx).port, 0);")
+        elif Info.PLATFORM == 'windows':
+            cRespCodes.append(f"io64(io64Obj, parPort(beCheckedRespDevs(iRespDev).respCodeDevIdx).port, 0);")
+        elif Info.PLATFORM == 'mac':
+            cRespCodes.append("% currently, under Mac OX we just do nothing for parallel ports")
+        cRespCodes.append(f"end % if needTobeSet")
+        cRespCodes.append(f"end % for iRespDev")
+        cRespCodes.append(f"end % if cFrame Dur less than 10 ms")
 
     cRespCodes.append("%=================================================\\n")
 
@@ -2422,8 +2439,11 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         #              ''.join("'" + cItem + "'," for cItem in enabledKBKeysList)[:-1], "}));")
         debugPrint(enabledKBKeysList)
         enabledKBKeysList = enabledKBKeysList.difference({'','0'})
-        printAutoInd(f, "{0}{1}{2}\n", "RestrictKeysForKbCheck(unique([",
-                     ''.join(cItem + ", " for cItem in enabledKBKeysList)[:-2], "]));")
+        enabledKBKeysList = set(enabledKBKeysList)
+        # printAutoInd(f, "{0}{1}{2}\n", "RestrictKeysForKbCheck(unique([",
+        #              ''.join(cItem + ", " for cItem in enabledKBKeysList)[:-2], "]));")
+        printAutoInd(f, "{0}{1}{2}\n", "RestrictKeysForKbCheck([",
+                     ''.join(cItem + ", " for cItem in enabledKBKeysList)[:-2], "]);")
         printAutoInd(f, "end %  end of subfun2\n")
 
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
@@ -2533,25 +2553,25 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
             iSubFunNum += 1
 
-        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        printAutoInd(f, "% subfun {0}: makeRespDevStruct", iSubFunNum)
-        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        printAutoInd(f, "function  cRespDev = makeRespDevStruct(beUpatedVar, allowAble,corResp,rtWindow,endAction,devType,devIndex,respDevIndexes,startTime,isOn)")
-        printAutoInd(f, "cRespDev.beUpatedVar = beUpatedVar;")
-        printAutoInd(f, "cRespDev.allowAble   = allowAble;")
-        printAutoInd(f, "cRespDev.corResp     = corResp;")
-        printAutoInd(f, "cRespDev.rtWindow    = rtWindow;")
-        printAutoInd(f, "cRespDev.endAction   = endAction;")
-        printAutoInd(f, "cRespDev.type        = devType;")
-        printAutoInd(f, "cRespDev.index       = respDevIndexes(devIndex);")
-        printAutoInd(f, "cRespDev.startTime   = startTime;")
-        printAutoInd(f, "cRespDev.isOn        = isOn;")
-        printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
+        # printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        # printAutoInd(f, "% subfun {0}: makeRespDevStruct", iSubFunNum)
+        # printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        # printAutoInd(f, "function  cRespDev = makeRespDevStruct(beUpatedVar, allowAble,corResp,rtWindow,endAction,devType,devIndex,respDevIndexes,startTime,isOn)")
+        # printAutoInd(f, "cRespDev.beUpatedVar = beUpatedVar;")
+        # printAutoInd(f, "cRespDev.allowAble   = allowAble;")
+        # printAutoInd(f, "cRespDev.corResp     = corResp;")
+        # printAutoInd(f, "cRespDev.rtWindow    = rtWindow;")
+        # printAutoInd(f, "cRespDev.endAction   = endAction;")
+        # printAutoInd(f, "cRespDev.type        = devType;")
+        # printAutoInd(f, "cRespDev.index       = respDevIndexes(devIndex);")
+        # printAutoInd(f, "cRespDev.startTime   = startTime;")
+        # printAutoInd(f, "cRespDev.isOn        = isOn;")
+        # printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
+        #
+        # iSubFunNum += 1
 
-        iSubFunNum += 1
-
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        printAutoInd(f, "% subfun {0}: makeRespDevStruct", iSubFunNum)
+        printAutoInd(f, "% subfun {0}: responseCheck", iSubFunNum)
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f,"function [keyIsDown,secs,keyCode]= responseCheck(respDevType,respDevIndex)")
         printAutoInd(f,"% respDevType 1,2,3,4 for keyboard, mouse, gamepad, and response box respectively")
