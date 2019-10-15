@@ -728,13 +728,10 @@ def parseFilenameStr(inputStr, isRef = False) -> str:
 
         if  len(toBeSavedDir) <= len(inputStr):
             if inputStr[:len(toBeSavedDir)] == toBeSavedDir:
-                inputStr = inputStr[len(toBeSavedDir)-1:]
+                inputStr = inputStr[len(toBeSavedDir):]
 
-    return inputStr
+    return [inputStr, toBeSavedDir]
 
-
-
-    return inputStr
 
 
 def parseFontStyleStr(inputStr):
@@ -1321,7 +1318,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     outDevCountsDict = getOutputDevCountsDict()
 
 
-    allInputDevs = historyPropDict.get('allInputDevs',{})
+    # allInputDevs = historyPropDict.get('allInputDevs',{})
 
     cWinIdx = historyPropDict['cWinIdx']
 
@@ -1363,7 +1360,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
             throwCompileErrorInfo(f"{cWidgetName}: {tobeShowStr}")
     # -------------------------------------------------------------------------------
 
-    allInputDevs.update(cInputDevices)
+    # allInputDevs.update(cInputDevices)
 
     # Step 2: get the current screen duration that determined by the next flip
     # after drawing the next widget's stimuli, get the duration first
@@ -1474,7 +1471,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
     cRespCodes.append(f"for iRespDev = 1:numel(beCheckedRespDevs) ")
     cRespCodes.append(f"if beCheckedRespDevs(iRespDev).isOn")
-    cRespCodes.append(f"[keyIsDown,secs,keyCode] = responseCheck(beCheckedRespDevs(iRespDev).type,beCheckedRespDevs(iRespDev).index);")
+    cRespCodes.append(f"[~,secs,keyCode] = responseCheck(beCheckedRespDevs(iRespDev).type,beCheckedRespDevs(iRespDev).index);")
 
     if outDevCountsDict[Info.DEV_PARALLEL_PORT]>0 and len(cOutDeviceDict) > 0:
         cRespCodes.append(f"if beCheckedRespDevs(iRespDev).needTobeReset && (secs - beCheckedRespDevs(iRespDev).startTime) > 0.01 % currently set to 10 ms")
@@ -1511,7 +1508,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     cRespCodes.append(f"beCheckedRespDevs(~[beCheckedRespDevs(:).isOn])          = [];")
     cRespCodes.append(f"beCheckedRespDevs([beCheckedRespDevs(:).rtWindow] == -1) = []; % excluded '(Same as duration)' ")
     cRespCodes.append(f"end ")
-    cRespCodes.append(f"%---------------------------------------\\n")
+    cRespCodes.append(f"%---------------------------------------\\\n")
 
     if outDevCountsDict[Info.DEV_PARALLEL_PORT]>0 and len(cOutDeviceDict) > 0:
         cRespCodes.append(f"if cDurs({cWinIdx}) < 0.01 ")
@@ -1527,7 +1524,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
         cRespCodes.append(f"end % for iRespDev")
         cRespCodes.append(f"end % if cFrame Dur less than 10 ms")
 
-    cRespCodes.append("%=================================================\\n")
+    cRespCodes.append("%=================================================\\\n")
 
     shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
 
@@ -1594,7 +1591,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
     # 2) handle file name:
     cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
-    cFilenameStr = parseFilenameStr(cFilenameStr,isRef)
+    cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr,isRef)
 
     # 3) check the mirror up/down parameter:
     isMirrorUpDownStr = parseBooleanStr(cWidget.getIsMirrorUpAndDown())
@@ -1647,10 +1644,10 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
                          addedTransparentToRGBStr(frameFillColor, frameTransparent), borderWidth)
 
     # make texture
-    printAutoInd(f, "cImData   = imread(fullfile({0})));",cFilenameStr)
-    printAutoInd(f, "cImIndex  = MakeTexture({0}, cImData);",cWinStr)
+    printAutoInd(f, "cImData    = imread(fullfile(cFolder,{0}) );",addSingleQuotes(cFilenameStr))
+    printAutoInd(f, "cImIndex   = MakeTexture({0}, cImData);",cWinStr)
 
-    printAutoInd(f, "cDestRect = makeImDestRect(cFrameRect, size(cImData), {0});", stretchModeStr)
+    printAutoInd(f, "cDestRect  = makeImDestRect(cFrameRect, size(cImData), {0});", stretchModeStr)
     #  print out the text
 
     if isMirrorUpDownStr == '1' or isMirrorLeftRightStr == '1':
@@ -2128,7 +2125,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         # if u'\u4e00' <= char <= u'\u9fa5':  # 判断是否是汉字
 
         # printAutoInd(f, "% get input device indices")
-        printAutoInd(f, "kbIndices      = unique(GetKeyboardIndices());")
+        printAutoInd(f, "kbIndices      = unique(GetKeyboardIndices);")
 
         if iGamepad > 1:
             if Info.PLATFORM == 'windows':
@@ -2214,9 +2211,12 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "lastScrOnsettime  = zeros({0},1);", iMonitor - 1)
         printAutoInd(f, "cDurs             = zeros({0},1);", iMonitor - 1)
         printAutoInd(f, "winIFIs           = zeros({0},1);", iMonitor - 1)
-        printAutoInd(f, "fullRects         = zeros({0},4);", iMonitor - 1)
-        printAutoInd(f, "beCheckedRespDevs = [];")
-        printAutoInd(f, "cFrame = struct('rt',[],'acc',[],'resp',[]);")
+        printAutoInd(f, "fullRects         = zeros({0},4);\n", iMonitor - 1)
+        # printAutoInd(f, "beCheckedRespDevs = [];")
+        printAutoInd(f,"beCheckedRespDevs    = struct('beUpdatedVar','','allowAble',[],'corResp',[],'rtWindow',[],'endAction',[],'type',[],'index',[],'startTime',[],'isOn',[],'needTobeReset',[],'right',[],'wrong',[],'noResp',[],'respCodeDevIdx',[]);")
+        printAutoInd(f,"beCheckedRespDevs(1) = [];")
+        printAutoInd(f, "cFrame    = struct('rt',[],'acc',[],'resp',[]);")
+        printAutoInd(f, "cFrame(1) = [];")
 
         printAutoInd(f, "%--- open windows ---/")
         printAutoInd(f, "for iWin = 1:numel(monitors)")
@@ -2421,7 +2421,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
         printAutoInd(f, "function detectAbortKey(abortKeyCode)")
-        printAutoInd(f, "[keyIsDown, ign, keyCode] = responseCheck(-1);")
+        printAutoInd(f, "[keyIsDown, ~, keyCode] = responseCheck(-1);")
         printAutoInd(f, "if keyIsDown && keyCode(abortKeyCode)")
 
         printAutoInd(f, "error('The experiment was aborted by the experimenter!');")
