@@ -18,9 +18,9 @@ class SoundGeneral(QWidget):
             "Stream refill": "0",
             "Start offset": "0",
             "Stop offset": "0",
-            "Repetitions": "0",
+            "Repetitions": "1",
             "Volume control": 0,
-            "Volume": "100",
+            "Volume": "1",
             "Latency Bias": 0,
             "Bias time": "0",
             "Sound Device": "",
@@ -35,7 +35,7 @@ class SoundGeneral(QWidget):
 
         self.volume_control.stateChanged.connect(self.volumeChecked)
         self.volume = PigLineEdit()
-        self.volume.setText("0")
+        self.volume.setText("1")
 
         self.latency_bias = QCheckBox("Latency Bias (ms):")  # Latency Bias
         self.latency_bias.setLayoutDirection(Qt.RightToLeft)
@@ -49,7 +49,7 @@ class SoundGeneral(QWidget):
 
         self.start_offset = PigLineEdit("0")
         self.stop_offset = PigLineEdit("0")
-        self.repetitions = PigLineEdit()
+        self.repetitions = PigLineEdit("1")
 
         self.sound = PigComboBox()
 
@@ -66,7 +66,7 @@ class SoundGeneral(QWidget):
 
     def setUI(self):
         self.stream_refill.addItems(["0", "1", "2"])
-        self.repetitions.setText("0")
+        self.repetitions.setText("1")
         self.buffer_size.setText("5000")
         self.volume.setEnabled(False)
         self.bias_time.setEnabled(False)

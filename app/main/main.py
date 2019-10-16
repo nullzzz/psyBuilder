@@ -500,7 +500,9 @@ class PsyApplication(QMainWindow):
             widget_id = tree[1]
             setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
             # 只保存源widget的数据，引用创建的wid没有必要保存
+
             if widget_id == Info.WID_WIDGET[widget_id].widget_id:
+                # print(f"{Info.WID_WIDGET[widget_id].getInfo()}")
                 setting.setValue(widget_id, Info.WID_WIDGET[widget_id].getInfo())
 
     def resetView(self):
