@@ -545,7 +545,6 @@ class Structure(QDockWidget):
                     setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
                     properties = setting.value(widget_id)
                     if properties:
-                        print(f"{properties}")
                         Func.restore(widget_id, properties)
                     # 连接信号
                     self.widgetSignalsLink.emit(widget_id)
