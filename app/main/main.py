@@ -106,8 +106,9 @@ class PsyApplication(QMainWindow):
         self.tracker_init = TrackerInit()
         self.tracker_init.setWindowModality(Qt.ApplicationModal)
 
-        # self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
-        # self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
+        self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
+        self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
+
         devices_menu = menu_bar.addMenu("&Devices")
 
         output_devices_action = QAction("&Output Devices", self)
@@ -139,8 +140,10 @@ class PsyApplication(QMainWindow):
         icon = QIcon(Func.getImage("dock_visible.png"))
 
         self.linux_action.setIcon(icon)
+
         self.windows_action.setIcon(icon)
         self.windows_action.setIconVisibleInMenu(False)
+
         self.mac_action.setIcon(icon)
         self.mac_action.setIconVisibleInMenu(False)
 
@@ -166,8 +169,10 @@ class PsyApplication(QMainWindow):
         # icon = QIcon(Func.getImage("dock_visible.png"))
 
         self.before_event_action.setIcon(icon)
+
         self.before_trial_action.setIcon(icon)
         self.before_trial_action.setIconVisibleInMenu(False)
+
         self.before_exp_action.setIcon(icon)
         self.before_exp_action.setIconVisibleInMenu(False)
 
@@ -481,7 +486,7 @@ class PsyApplication(QMainWindow):
         setting.setValue("WIDGET_TYPE_NAME_COUNT", Info.WIDGET_TYPE_NAME_COUNT.copy())
         setting.setValue("WIDGET_TYPE_ID_COUNT", Info.WIDGET_TYPE_ID_COUNT.copy())
 
-        structure_tree: list = self.structure.getStructure("李扬是个大瓜皮")
+        structure_tree: list = self.structure.getStructure("who")
         self.loadOutTree(structure_tree)
         setting.setValue("STRUCTURE_TREE", structure_tree)
 
@@ -500,7 +505,9 @@ class PsyApplication(QMainWindow):
             widget_id = tree[1]
             setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
             # 只保存源widget的数据，引用创建的wid没有必要保存
+
             if widget_id == Info.WID_WIDGET[widget_id].widget_id:
+                # print(f"{Info.WID_WIDGET[widget_id].getInfo()}")
                 setting.setValue(widget_id, Info.WID_WIDGET[widget_id].getInfo())
 
     def resetView(self):
@@ -603,7 +610,7 @@ class PsyApplication(QMainWindow):
             self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
             Info.IMAGE_LOAD_MODE = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
-            # print(c)
+            print(f"{c}")
             imageLoadMode = c if c else "before_event"
             self.before_event_action.setIconVisibleInMenu(imageLoadMode == "before_event")
             self.before_trial_action.setIconVisibleInMenu(imageLoadMode == "before_trial")
@@ -661,7 +668,7 @@ class PsyApplication(QMainWindow):
         img10.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
         lab11.setAlignment(Qt.AlignVCenter|Qt.AlignHCenter)
 
-        lab01.setText("Personal info")
+        lab01.setText("Yang Zhang, Ph.D, Prof.\nDepartment of Psychology, Soochow University")
         lab11.setText("Personal info")
         img00.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))
         img10.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))

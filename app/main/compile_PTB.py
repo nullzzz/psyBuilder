@@ -72,6 +72,7 @@ def pyStr2MatlabStr(inputStr):
         if isSingleQuotedStr(inputStr):
             inputStr = inputStr[1:-1]
         inputStr = re.sub("'", "''", inputStr)
+        inputStr = "\\n".join(inputStr.split("\n"))# replace the \n with \\n so that we chould print it with \n to matlab
         # inputStr = re.sub(r"\\\%","%",inputStr)
     return inputStr
 
@@ -704,7 +705,7 @@ def parseDurationStr(inputStr):
         inputStr = removeSingleQuotes(inputStr)
 
         if inputStr == "(Infinite)":
-            inputStr = "6000" # an extramely impossible value
+            inputStr = "6000000" # an extramely impossible value
         elif re.fullmatch("\d+~\d+", inputStr):
             cDurRange = inputStr.split('~')
             inputStr = f"{cDurRange[0]},{cDurRange[1]}"
@@ -1127,10 +1128,12 @@ def flipScreen(cWidget, f, cLoopLevel):
         # printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3});\n",
         #              Func.getWidgetName(cWidget.widget_id),
         #              cOpRowIdxStr, cWinStr, clearAfter)
-
-        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},cScrFlipTime,{3},cDurs({4}) + lastScrOnsettime({4}) - 0.003 ); %#ok<*STRNU>\n",
+        # [VBLTimestamp StimulusOnsetTime FlipTimestamp Missed Beampos] =
+        # Screen('Flip', windowPtr[, when] [, dontclear][, dontsync] [,
+        #     multiflip]);
+        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},cDurs({3}) + lastScrOnsettime({3}) - 0.003,{4}); %#ok<*STRNU>\n",
                      Func.getWidgetName(cWidget.widget_id),
-                     cOpRowIdxStr, cWinStr, clearAfter, cWinIdx)
+                     cOpRowIdxStr, cWinStr, cWinIdx, clearAfter)
 
 
 
@@ -1145,6 +1148,8 @@ def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         delayedPrintCodes = drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     elif Info.IMAGE == cWidgetType:
         delayedPrintCodes = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+    # elif Info.SOUND == cWidgetType:
+    #     delayedPrintCodes = drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
 
     # step 2: print delayed resp codes or none if the widget is the first one
@@ -1467,7 +1472,8 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
         # cRespCodes.append(f"beCheckedRespDevs = beCheckedRespDevs([beCheckedRespDevs(:).isOn]);")
 
     cRespCodes.append(f"secs = GetSecs; ")
-    cRespCodes.append(f"while secs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) - 0.003")
+    cRespCodes.append(f"while numel(beCheckedRespDevs) > 1 && (secs < cDurs({cWinIdx}) + lastScrOnsettime({cWinIdx}) - 0.003)")
+
 
     cRespCodes.append(f"for iRespDev = 1:numel(beCheckedRespDevs) ")
     cRespCodes.append(f"if beCheckedRespDevs(iRespDev).isOn")
@@ -1543,6 +1549,160 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     delayedPrintCodes.update({'respCodes': cRespCodes})
 
     return delayedPrintCodes
+
+
+def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
+
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+    cRespCodes = []
+    cAfFlipCodes = []
+
+    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip',[])
+    cRespCodes = delayedPrintCodes.get('respCodes',[])
+
+    if Func.getWidgetPosition(cWidget.widget_id) == 0:
+        # Step 2: print out help info for the current widget
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, Func.getWidgetPosition(cWidget.widget_id) + 1,
+                     Func.getWidgetName(cWidget.widget_id))
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
+    debugPrint("-- dev name id map---/")
+    debugPrint(inputDevNameIdxDict)
+    debugPrint(outputDevNameIdxDict)
+    debugPrint("----------------------\\")
+
+    cProperties = Func.getProperties(cWidget.widget_id)
+    debugPrint(f"{cWidget.widget_id} properties:")
+    debugPrint(f"{cProperties}")
+    debugPrint("-------------------------------\\")
+
+    debugPrint(f"line 714: {attributesSetDict}")
+    # ------------------------------------------------
+    # Step 1: draw the stimuli for the current widget
+    # -------------------------------------------------
+    # 1) get the win id info in matlab format winIds(idNum)
+    shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
+
+    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
+
+    cWinIdx = outputDevNameIdxDict.get(cScreenName)
+    cWinStr = f"winIds({cWinIdx})"
+
+    historyPropDict.update({"cScreenName": cScreenName})
+    historyPropDict.update({"cWinIdx": cWinIdx})
+    historyPropDict.update({"cWinStr": cWinStr})
+
+
+    # 2) handle file name:
+    cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
+    cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr,isRef)
+
+    # 3) check the mirror up/down parameter:
+    isMirrorUpDownStr = parseBooleanStr(cWidget.getIsMirrorUpAndDown())
+
+    # 3) check the mirror left/right parameter:
+    isMirrorLeftRightStr = parseBooleanStr(cWidget.getIsMirrorLeftAndRight())
+
+    # 4) check the rotate parameter:
+    rotateStr, isRef = getRefValue(cWidget, cWidget.getRotate(), attributesSetDict)
+
+    # 5) check the stretch mode parameter:
+    if cProperties['Stretch']:
+        # ""、Both、LeftRight、UpDown、[attr]
+        stretchModeStr = parseStretchModeStr(*getRefValue(cWidget, cProperties['Stretch mode'], attributesSetDict))
+    else:
+        stretchModeStr = "0"
+
+    # 6) check the Transparent parameter:
+    imageTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Transparent'], attributesSetDict))
+
+
+    # 7) check the parameter winRect
+    sx = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
+    sy = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
+    cWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
+    cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
+
+    printAutoInd(f, "cFrameRect = makeFrameRect({0}, {1}, {2}, {3}, fullRects({4},:));",sx,sy,cWidth,cHeight,cWinIdx)
+
+    # before we draw the image， we draw the frame rect first:
+    borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
+    borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border width'], attributesSetDict))
+    frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame fill color'], attributesSetDict))
+    frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
+
+    # get enable parameter
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
+    isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+
+    if isBkFrameEnable == '1':
+
+        # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
+        if (frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]):
+            printAutoInd(f, "Screen('FillRect',{0},{1}, cFrameRect);", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent))
+
+        # draw the frame only when the frame color is different from the frame fill color
+        if borderColor != frameFillColor:
+            printAutoInd(f, "Screen('frameRect',{0},{1},cFrameRect,{2});", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent), borderWidth)
+
+    # make texture
+    printAutoInd(f, "cImData    = imread(fullfile(cFolder,{0}) );",addSingleQuotes(cFilenameStr))
+    printAutoInd(f, "cImIndex   = MakeTexture({0}, cImData);",cWinStr)
+
+    printAutoInd(f, "cDestRect  = makeImDestRect(cFrameRect, size(cImData), {0});", stretchModeStr)
+    #  print out the text
+
+    if isMirrorUpDownStr == '1' or isMirrorLeftRightStr == '1':
+        printAutoInd(f, "[xc, yc] = RectCenter(cDestRect);        % get the center of the destRect")
+        printAutoInd(f, "Screen('glPushMatrix', {0});             % enter into mirror mode",cWinStr)
+        printAutoInd(f, "Screen('glTranslate', {0}, xc, yc, 0);   % translate origin into the center of destRect",cWinStr)
+        if isMirrorLeftRightStr == '1':
+            leftRightStr = '-1'
+        else:
+            leftRightStr = '1'
+
+        if isMirrorUpDownStr == '1':
+            upDownStr = '-1'
+        else:
+            upDownStr = '1'
+
+        printAutoInd(f, "Screen('glScale', {0}, {1}, {2}, 1);     % mirror the drawn image",cWinStr,leftRightStr,upDownStr)
+        printAutoInd(f, "Screen('glTranslate', {0}, -xc, -yc, 0); % undo the translations",cWinStr)
+
+    printAutoInd(f, "DrawTexture({0}, cImIndex ,[] ,cDestRect ,{1} ,[] , abs({2}));",
+                 cWinStr,
+                 rotateStr,
+                 imageTransparent)
+
+    if isMirrorUpDownStr == '1' or isMirrorLeftRightStr == '1':
+        printAutoInd(f, "Screen('glPopMatrix', {0}); % restore to non mirror mode", cWinStr)
+
+
+    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
+    clearAfter = parseDontClearAfterStr(clearAfter)
+
+    historyPropDict.update({"clearAfter": clearAfter})
+
+    printAutoInd(f, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
+    printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
+
+
+    # ------------------------------------------
+    # the last step: upload the delayed codes
+    # ------------------------------------------
+
+    cRespCodes.append(f"% close the texture corresponding to {cFilenameStr}")
+    cRespCodes.append(f"Screen('Close', cImIndex);\n")
+
+    delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
+    delayedPrintCodes.update({'respCodes': cRespCodes})
+
+    return delayedPrintCodes
+
 
 
 def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
@@ -1743,11 +1903,13 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
 
     # 2) handle the text content
-    cProperties['Text'], ign = getRefValue(cWidget, cProperties['Text'], attributesSetDict)
+    cProperties['Text'], isRef = getRefValue(cWidget, cProperties['Text'], attributesSetDict)
 
     if isContainChStr(cProperties['Text']):
         cProperties['Text'] = "[" + "".join(f"{ord(value)} " for value in cProperties['Text']) + "]"
     else:
+        print(f"{cProperties['Text']}")
+        cProperties['Text'] = '\\n'.join(cProperties['Text'].split('\n'))
         cProperties['Text'] = addSingleQuotes(pyStr2MatlabStr(cProperties['Text']))
 
     # 3) check the alignment X parameter:
@@ -2026,7 +2188,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "cRandSeed = RandStream('mt19937ar','Seed','shuffle');")
         printAutoInd(f, "RandStream.setGlobalStream(cRandSeed);")
         printAutoInd(f, "%-----------------------------------------------------\\\n")
-        printAutoInd(f, "hideCursor;            % hide mouse cursor")
+        printAutoInd(f, "HideCursor;            % hide mouse cursor")
 
         if Info.PLATFORM == 'windows':
             printAutoInd(f, "ShowHideWinTaskbar(0); % hide the window taskbar")
@@ -2192,8 +2354,8 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
             elif cDevice['Device Type'] == Info.DEV_SOUND:
 
-                outputDevNameIdxDict.update({cDevice['Device Name']: f"audioDevs({iSound})"})
-                printAutoInd(f, "audioDevs({0}).idx      = {1};", iSound, cDevice['Device Port'])
+                outputDevNameIdxDict.update({cDevice['Device Name']: f"audioIds({iSound})"})
+                printAutoInd(f, "audioDevs({0}).port     = {1};", iSound, cDevice['Device Port'])
                 printAutoInd(f, "audioDevs({0}).name     = '{1}';", iSound, cDevice['Device Name'])
                 if 'auto' == cDevice['Sampling Rate']:
                     printAutoInd(f, "audioDevs({0}).fs       = []; % the default value in PTB is 48000 Hz\n", iSound)
@@ -2282,12 +2444,12 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         if iSound > 1:
             printAutoInd(f, "%--open output audio devs----/")
             printAutoInd(f, "InitializePsychSound(1);\n")
-            printAutoInd(f, "audioDevs = zeros({0},1);", iSound - 1)
+            printAutoInd(f, "audioIds = zeros({0},1);", iSound - 1)
             # printAutoInd(f,"audioFs = getAudioFsFromFirstAudioFile;")
 
             printAutoInd(f, "for iCount = 1:numel(audioDevs)")
             printAutoInd(f,
-                         "audioDevs(iCount) = PsychPortAudio('Open',audioDevs(iCount).idx,1,[],audioDevs(iCount).fs,2);", )
+                         "audioIds(iCount) = PsychPortAudio('Open',audioDevs(iCount).port,1,[],audioDevs(iCount).fs,2);" )
             printAutoInd(f, "end % iCount")
             printAutoInd(f, "%----------------------------\\\n")
 
@@ -2312,7 +2474,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         if Info.PLATFORM == 'windows':
             printAutoInd(f, "ShowHideWinTaskbar(1);      % show the window taskbar.")
 
-        printAutoInd(f, "save({0}.filename); % save the results\n", cFilenameOnly)
+        printAutoInd(f, "save(subInfo.filename); % save the results\n")
 
         #  close opened devices
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
@@ -2352,8 +2514,8 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         if iSound > 1:
             printAutoInd(f, "%--- close outputAudio devs--/")
 
-            printAutoInd(f, "for iCount = 1:numel(serialCons)")
-            printAutoInd(f, "PsychPortAudio('Close', audioDevs(iCount));")
+            printAutoInd(f, "for iCount = 1:numel(audioIds)")
+            printAutoInd(f, "PsychPortAudio('Close', audioIds(iCount));")
             printAutoInd(f, "end % iCount")
             printAutoInd(f, "%----------------------------\\\n")
 
@@ -2399,15 +2561,15 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         if iSound > 1:
             printAutoInd(f, "%close outputAudio devs:")
 
-            printAutoInd(f, "for iCount = 1:numel(serialCons)")
-            printAutoInd(f, "PsychPortAudio('Close', audioDevs(iCount));")
+            printAutoInd(f, "for iCount = 1:numel(audioIds)")
+            printAutoInd(f, "PsychPortAudio('Close', audioIds(iCount));")
             printAutoInd(f, "end % iCount")
             # close Cedrus response box
             if iRespBox > 1:
                 printAutoInd(f, "%close Cedrus response boxes:")
                 printAutoInd(f, "CedrusResponseBox('CloseAll');\n")
 
-        printAutoInd(f, "save('{0}_debug');", cFilenameOnly)
+        printAutoInd(f, "save([subInfo.filename,'_debug']);")
         printAutoInd(f, "rethrow({0}_error);", cFilenameOnly)
 
         #
@@ -2421,7 +2583,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
         printAutoInd(f, "function detectAbortKey(abortKeyCode)")
-        printAutoInd(f, "[keyIsDown, ~, keyCode] = responseCheck(-1);")
+        printAutoInd(f, "[keyIsDown, ~, keyCode] = KbCheck(-1);")
         printAutoInd(f, "if keyIsDown && keyCode(abortKeyCode)")
 
         printAutoInd(f, "error('The experiment was aborted by the experimenter!');")
@@ -2464,7 +2626,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "end % if")
 
         printAutoInd(f, "if frameHeight <= 0")
-        printAutoInd(f, "frameHeight = -frameHigh*fullRect(4);")
+        printAutoInd(f, "frameHeight = -frameHeight*fullRect(4);")
         printAutoInd(f, "end % if")
 
         printAutoInd(f, "outRect = CenterRectOnPointd([0, 0, frameWidth, frameHeight], x, y);")
@@ -2534,7 +2696,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "if numel(cDur) > 1")
         printAutoInd(f, "cDur = rand*(cDur(2) - cDur(1)) + cDur(1);")
         printAutoInd(f, "end ")
-        printAutoInd(f, "cDur = round(cDur/cIFI);")
+        printAutoInd(f, "cDur = round(cDur/cIFI)*cIFI;")
         printAutoInd(f, "end %  end of subfun5")
 
         iSubFunNum = 6
