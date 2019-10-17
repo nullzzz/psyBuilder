@@ -1128,7 +1128,7 @@ def flipScreen(cWidget, f, cLoopLevel):
     # Flip the Screen
     if Func.getWidgetPosition(cWidget.widget_id) == 0:
         printAutoInd(f, "% for first event, flip immediately.. ")
-        f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
+        # f"{Func.getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
         printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},{3},{4}); %#ok<*STRNU>\n", Func.getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr, cWinStr, 0, clearAfter)
     else:
@@ -1148,6 +1148,43 @@ def flipScreen(cWidget, f, cLoopLevel):
                      Func.getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr, cWinStr, cWinIdx, clearAfter)
 
+def flipAudio(cWidget, f, cLoopLevel, attributesSetDict):
+    global historyPropDict, isDummyPrint
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+
+    cWinIdx = historyPropDict['cWinIdx']
+    cWinStr = historyPropDict['cWinStr']
+
+
+    # clearAfter = historyPropDict['clearAfter']
+    cSoundDevName, isRef = getRefValue(cWidget, cWidget.getSoundDeviceName(), attributesSetDict)
+    cSoundIdxStr = outputDevNameIdxDict.get(cSoundDevName)
+
+    if Func.getWidgetPosition(cWidget.widget_id) > 0:
+        # Step 2: print out help info for the current widget
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, Func.getWidgetPosition(cWidget.widget_id) + 1,
+                     Func.getWidgetName(cWidget.widget_id))
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
+
+
+    # Flip the Screen
+    if Func.getWidgetPosition(cWidget.widget_id) == 0:
+        printAutoInd(f, "% for first event, flip immediately.. ")
+        printAutoInd(f, "predictedVisOnset = PredictVisualOnsetForTime({0}, 0);",cWinStr)
+
+        printAutoInd(f, " PsychPortAudio('Start', {0}, 1, predictedVisOnset, 0); %\n", cSoundIdxStr)
+        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip', {2}, predictedVisOnset); %\n", Func.getWidgetName(cWidget.widget_id),
+                     cOpRowIdxStr, cWinStr)
+    else:
+        printAutoInd(f, "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - 0.003);", cWinStr, cWinIdx)
+        printAutoInd(f, "% schedule start of audio at exactly the predicted time caused by the next flip")
+        printAutoInd(f, " PsychPortAudio('Start', {0}, 1, predictedVisOnset, 0); %\n", cSoundIdxStr)
+        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},cDurs({3}) + lastScrOnsettime({3}) - 0.003); %#ok<*STRNU>\n",
+                     Func.getWidgetName(cWidget.widget_id),
+                     cOpRowIdxStr, cWinStr, cWinIdx)
+
 
 
 
@@ -1161,8 +1198,8 @@ def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         delayedPrintCodes = drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     elif Info.IMAGE == cWidgetType:
         delayedPrintCodes = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
-    # elif Info.SOUND == cWidgetType:
-    #     delayedPrintCodes = drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+    elif Info.SOUND == cWidgetType:
+        delayedPrintCodes = drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
 
     # step 2: print delayed resp codes or none if the widget is the first one
@@ -1170,7 +1207,10 @@ def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     delayedPrintCodes = printRespCodes(f, delayedPrintCodes)
 
     # STEP 3: flip screen
-    flipScreen(cWidget, f, cLoopLevel)
+    if Info.SOUND == cWidgetType:
+        flipAudio(cWidget, f, cLoopLevel, attributesSetDict)
+    else:
+        flipScreen(cWidget, f, cLoopLevel)
 
     # step 4: send trigger
     delayedPrintCodes = printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
@@ -1598,14 +1638,17 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
-    shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
+    # shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
+    #
+    # cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
 
-    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
-
-    cWinIdx = outputDevNameIdxDict.get(cScreenName)
+    # currently we just used the nearest previous flipped screen info
+    cWinIdx = historyPropDict.get("cWinIdx")
     cWinStr = f"winIds({cWinIdx})"
 
-    historyPropDict.update({"cScreenName": cScreenName})
+
+
+    # historyPropDict.update({"cScreenName": cScreenName})
     historyPropDict.update({"cWinIdx": cWinIdx})
     historyPropDict.update({"cWinStr": cWinStr})
 
@@ -1614,95 +1657,52 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
     cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr,isRef)
 
-    # 3) check the mirror up/down parameter:
-    isMirrorUpDownStr = parseBooleanStr(cWidget.getIsMirrorUpAndDown())
+    # 3) check the Buffer Size parameter:
+    bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
 
-    # 3) check the mirror left/right parameter:
-    isMirrorLeftRightStr = parseBooleanStr(cWidget.getIsMirrorLeftAndRight())
+    # 3) check the Stream refill parameter:
+    streamRefillStr, isRef = getRefValue(cWidget, cWidget.getRefillMode(), attributesSetDict)
 
-    # 4) check the rotate parameter:
-    rotateStr, isRef = getRefValue(cWidget, cWidget.getRotate(), attributesSetDict)
+    # 4) check the start offset in ms parameter:
+    startOffsetStr, isRef = getRefValue(cWidget, cWidget.getStartOffset(), attributesSetDict)
 
-    # 5) check the stretch mode parameter:
-    if cProperties['Stretch']:
-        # ""、Both、LeftRight、UpDown、[attr]
-        stretchModeStr = parseStretchModeStr(*getRefValue(cWidget, cProperties['Stretch mode'], attributesSetDict))
-    else:
-        stretchModeStr = "0"
+    # 5) check the stop offset in ms parameter:
+    StopOffsetStr, isRef = getRefValue(cWidget, cWidget.getStopOffset(), attributesSetDict)
 
-    # 6) check the Transparent parameter:
-    imageTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Transparent'], attributesSetDict))
+    # 6) check the repetitions parameter:
+    repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
 
+    # 7) check the volume control parameter:
+    isVolumeControl, isRef = getRefValue(cWidget, cWidget.getIsVolumeControl(), attributesSetDict)
 
-    # 7) check the parameter winRect
-    sx = dataStrConvert(*getRefValue(cWidget, cProperties['X position'], attributesSetDict))
-    sy = dataStrConvert(*getRefValue(cWidget, cProperties['Y position'], attributesSetDict))
-    cWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
-    cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
+    # 8) check the volume parameter:
+    volumeStr, isRef = getRefValue(cWidget, cWidget.getVolume(), attributesSetDict)
 
-    printAutoInd(f, "cFrameRect = makeFrameRect({0}, {1}, {2}, {3}, fullRects({4},:));",sx,sy,cWidth,cHeight,cWinIdx)
+    # 9) check the latencyBias control parameter:
+    isLantencyBiasControl, isRef = getRefValue(cWidget, cWidget.getIsLatencyBias(), attributesSetDict)
 
-    # before we draw the image， we draw the frame rect first:
-    borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
-    borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border width'], attributesSetDict))
-    frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame fill color'], attributesSetDict))
-    frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
+    # 10) check the volume parameter:
+    latencyBiasStr, isRef = getRefValue(cWidget, cWidget.getBiasTime(), attributesSetDict)
 
-    # get enable parameter
-    cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
-    isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+    # 11) check the sound device name parameter:
+    shouldNotBeCitationCheck('Sound device', cWidget.getSoundDeviceName())
+    cSoundDevName, isRef = getRefValue(cWidget, cWidget.getSoundDeviceName(), attributesSetDict)
+    cSoundIdxStr = outputDevNameIdxDict.get(cSoundDevName)
 
-    if isBkFrameEnable == '1':
+    # 12) check the volume parameter:
+    waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cWidget.getWaitForStart(), attributesSetDict))
 
-        # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
-        if (frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]):
-            printAutoInd(f, "Screen('FillRect',{0},{1}, cFrameRect);", cWinStr,
-                         addedTransparentToRGBStr(frameFillColor, frameTransparent))
+    # read audio file
+    printAutoInd(f, "cAudioData    = audioread(fullfile(cFolder,{0}) );", addSingleQuotes(cFilenameStr))
 
-        # draw the frame only when the frame color is different from the frame fill color
-        if borderColor != frameFillColor:
-            printAutoInd(f, "Screen('frameRect',{0},{1},cFrameRect,{2});", cWinStr,
-                         addedTransparentToRGBStr(frameFillColor, frameTransparent), borderWidth)
+    # make audio buffer
+    # printAutoInd(f, "cAudioIdx     = PsychPortAudio('CreateBuffer', {0}, cAudioData);",cSoundIdxStr)
 
-    # make texture
-    printAutoInd(f, "cImData    = imread(fullfile(cFolder,{0}) );",addSingleQuotes(cFilenameStr))
-    printAutoInd(f, "cImIndex   = MakeTexture({0}, cImData);",cWinStr)
-
-    printAutoInd(f, "cDestRect  = makeImDestRect(cFrameRect, size(cImData), {0});", stretchModeStr)
-    #  print out the text
-
-    if isMirrorUpDownStr == '1' or isMirrorLeftRightStr == '1':
-        printAutoInd(f, "[xc, yc] = RectCenter(cDestRect);        % get the center of the destRect")
-        printAutoInd(f, "Screen('glPushMatrix', {0});             % enter into mirror mode",cWinStr)
-        printAutoInd(f, "Screen('glTranslate', {0}, xc, yc, 0);   % translate origin into the center of destRect",cWinStr)
-        if isMirrorLeftRightStr == '1':
-            leftRightStr = '-1'
-        else:
-            leftRightStr = '1'
-
-        if isMirrorUpDownStr == '1':
-            upDownStr = '-1'
-        else:
-            upDownStr = '1'
-
-        printAutoInd(f, "Screen('glScale', {0}, {1}, {2}, 1);     % mirror the drawn image",cWinStr,leftRightStr,upDownStr)
-        printAutoInd(f, "Screen('glTranslate', {0}, -xc, -yc, 0); % undo the translations",cWinStr)
-
-    printAutoInd(f, "DrawTexture({0}, cImIndex ,[] ,cDestRect ,{1} ,[] , abs({2}));",
-                 cWinStr,
-                 rotateStr,
-                 imageTransparent)
-
-    if isMirrorUpDownStr == '1' or isMirrorLeftRightStr == '1':
-        printAutoInd(f, "Screen('glPopMatrix', {0}); % restore to non mirror mode", cWinStr)
+    #  draw buffer to  hw
+    # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioIdx, {1});",cSoundIdxStr, streamRefillStr)
+    printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioData, {1});",cSoundIdxStr, streamRefillStr)
 
 
-    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-    clearAfter = parseDontClearAfterStr(clearAfter)
-
-    historyPropDict.update({"clearAfter": clearAfter})
-
-    printAutoInd(f, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
 
 
@@ -1710,8 +1710,8 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # the last step: upload the delayed codes
     # ------------------------------------------
 
-    cRespCodes.append(f"% close the texture corresponding to {cFilenameStr}")
-    cRespCodes.append(f"Screen('Close', cImIndex);\n")
+    # cRespCodes.append(f"% delete audio buffer corresponding to {cFilenameStr}")
+    # cRespCodes.append(f"PsychPortAudio('DeleteBuffer', cAudioIdx, 0);\n")
 
     delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
     delayedPrintCodes.update({'respCodes': cRespCodes})
@@ -1919,7 +1919,6 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
     # 2) handle the text content
     cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
-
 
     # 3) check the alignment X parameter:
     alignmentX = dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
@@ -2452,7 +2451,7 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         #  initialize audio output devices
         if iSound > 1:
             printAutoInd(f, "%--open output audio devs----/")
-            printAutoInd(f, "InitializePsychSound(1);\n")
+            printAutoInd(f, "InitializePsychSound(1); % Initialize the audio driver, require low-latency preinit\n")
             printAutoInd(f, "audioIds = zeros({0},1);", iSound - 1)
             # printAutoInd(f,"audioFs = getAudioFsFromFirstAudioFile;")
 

@@ -337,6 +337,13 @@ class SoundDisplay(QMainWindow):
         """
         return self.pro_window.general.volume.text()
 
+    def getSoundDeviceName(self) -> str:
+        """
+        返回 sound device name
+        :return:
+        """
+        return self.pro_window.general.sound.currentText()
+
     def getIsLatencyBias(self) -> bool:
         """
         返回Pan控制
@@ -350,6 +357,13 @@ class SoundDisplay(QMainWindow):
         :return:
         """
         return self.pro_window.general.bias_time.text()
+
+    def getWaitForStart(self) -> str:
+        """
+        返回 wait_for_start
+        :return:
+        """
+        return self.pro_window.general.wait_for_start.currentText()
 
     def getDuration(self) -> str:
         """
