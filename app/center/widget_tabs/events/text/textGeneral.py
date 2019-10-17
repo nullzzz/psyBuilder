@@ -315,7 +315,7 @@ class TextTab1(QWidget):
         self.loadSetting()
 
     def loadSetting(self):
-        self.text_edit.setHtml(self.html)
+        self.text_edit.setHtml(self.default_properties["Html"])
 
         self.align_x.setCurrentText(self.default_properties["Alignment X"])
         self.align_y.setCurrentText(self.default_properties["Alignment Y"])
