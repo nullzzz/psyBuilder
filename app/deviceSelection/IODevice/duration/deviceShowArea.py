@@ -159,10 +159,16 @@ class ShowArea(QListWidget):
         for i in range(self.count()):
             item = self.item(i)
             if item.getDeviceId() == d_id:
-                item.changeDeviceName(name)
+
                 item.setText(name)
                 item.getInfo()
                 self.setCurrentItem(item)
+                item.changeDeviceName(name)
+                # updating devNames in the resp trigger devNames
+                self.device_id_name[d_id] = name
+                self.device_name = [value for value in self.device_id_name.values()]
+                self.usingOutputDeviceUpdate.emit(self.device_id_name)
+
 
     def changeAllowable(self, x):
         if self.currentItem():

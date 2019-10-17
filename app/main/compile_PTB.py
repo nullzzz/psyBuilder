@@ -68,9 +68,11 @@ def debugPrint(input):
 
 
 def pyStr2MatlabStr(inputStr):
+    #
     if isinstance(inputStr, str):
         if isSingleQuotedStr(inputStr):
             inputStr = inputStr[1:-1]
+
         inputStr = re.sub("'", "''", inputStr)
         inputStr = "\\n".join(inputStr.split("\n"))# replace the \n with \\n so that we chould print it with \n to matlab
         # inputStr = re.sub(r"\\\%","%",inputStr)
@@ -339,9 +341,7 @@ def getSepcialFormatAtts():
 
     for widgetId, cWidget in Info.WID_WIDGET.items():
 
-
         cProperties = Func.getProperties(widgetId)
-        # print(f"line 76 {widgetId}: {cProperties}\n\n")
 
         if Func.isWidgetType(widgetId, Info.CYCLE):
             pass
@@ -350,10 +350,8 @@ def getSepcialFormatAtts():
         elif Func.isWidgetType(widgetId, Info.IF):
             cTrueWidget = cWidget.getTrueWidget()
 
-
             print(f"{cTrueWidget.getInfo()}")
             print(f"{cTrueWidget.getInputDevice()}")
-            # print(f"test")
 
         elif Func.isWidgetType(widgetId, Info.TEXT):
             updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
@@ -369,6 +367,7 @@ def getSepcialFormatAtts():
             updateSpFormatVarDict(cProperties['Right to left'], 'rightToLeft', spFormatVarDict)
             updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', spFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', spFormatVarDict)
+            updateSpFormatVarDict(cProperties['Text'], 'textContent', spFormatVarDict)
 
             getSepcialRespsFormatAtts(cWidget.getInputDevice(), spFormatVarDict)
 
@@ -827,6 +826,16 @@ def parseStretchModeStr(inputStr, isRef = False):
     return inputStr
 
 
+def parseTextContentStr(inputStr, isRef = False) -> str:
+    if not isRef:
+        if isContainChStr(inputStr):
+            inputStr = "[" + "".join(f"{ord(value)} " for value in inputStr) + "]"
+        else:
+            #cinputStr = '\\n'.join(inputStr.split('\n')) have down in pyStr2MatlabStr
+            inputStr = addSingleQuotes(pyStr2MatlabStr(inputStr))
+
+    return inputStr
+
 # noinspection PyStringFormat
 def printAutoInd(f, inputStr, *argins):
     global cIndents, isPreLineSwitch, isDummyPrint
@@ -977,6 +986,10 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
 
                 elif spFormatVarDict[cKeyAttrName] == 'noKbAllowKeys':
                     cValue = parseKbCorRespStr(cValue,isRefValue,'noneKbDevs')
+                    cRowDict[key] = cValue
+
+                elif spFormatVarDict[cKeyAttrName] == 'textContent':
+                    cValue = parseTextContentStr(cValue,isRefValue)
                     cRowDict[key] = cValue
 
             #     TO BE CONTINUING... FOR ALL OTHER Special Types
@@ -1903,14 +1916,8 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
 
     # 2) handle the text content
-    cProperties['Text'], isRef = getRefValue(cWidget, cProperties['Text'], attributesSetDict)
+    cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
 
-    if isContainChStr(cProperties['Text']):
-        cProperties['Text'] = "[" + "".join(f"{ord(value)} " for value in cProperties['Text']) + "]"
-    else:
-        print(f"{cProperties['Text']}")
-        cProperties['Text'] = '\\n'.join(cProperties['Text'].split('\n'))
-        cProperties['Text'] = addSingleQuotes(pyStr2MatlabStr(cProperties['Text']))
 
     # 3) check the alignment X parameter:
     alignmentX = dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
@@ -2005,7 +2012,7 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     #  print out the text
     printAutoInd(f, "DrawFormattedText({0},{1},{2},{3},{4},{5},{6},{7},[],{8},{9});",
                  cWinStr,
-                 cProperties['Text'],
+                 cTextContentStr,
                  alignmentX,
                  alignmentY,
                  addedTransparentToRGBStr(fontColorStr, fontTransparent),
