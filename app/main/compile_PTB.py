@@ -1388,7 +1388,9 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     cRespCodes.append("%============ acquire responses ==================/")
 
     if len(cInputDevices) > 0:
+
         cRespCodes.append("%-- make respDev struct --/")
+        # cRespCodes.append("cRespDevs = []; \n")
 
         iRespDev = 1
         for cInputDev, cProperties in cInputDevices.items():
