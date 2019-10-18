@@ -26,9 +26,10 @@ isPreLineSwitch = 0
 enabledKBKeysList = set()
 isDummyPrint = False
 spFormatVarDict = dict()
-inputDevNameIdxDict = {}
-outputDevNameIdxDict = {}
-historyPropDict = {}
+inputDevNameIdxDict = dict()
+outputDevNameIdxDict = dict()
+historyPropDict = dict()
+cInfoDict = dict()
 
 
 def throwCompileErrorInfo(inputStr):
@@ -1148,6 +1149,8 @@ def flipScreen(cWidget, f, cLoopLevel):
                      Func.getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr, cWinStr, cWinIdx, clearAfter)
 
+
+
 def flipAudio(cWidget, f, cLoopLevel, attributesSetDict):
     global historyPropDict, isDummyPrint
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
@@ -1155,10 +1158,18 @@ def flipAudio(cWidget, f, cLoopLevel, attributesSetDict):
     cWinIdx = historyPropDict['cWinIdx']
     cWinStr = historyPropDict['cWinStr']
 
+    clearAfter = historyPropDict['clearAfter']
 
-    # clearAfter = historyPropDict['clearAfter']
+    # 2) check the sound dev parameter:
     cSoundDevName, isRef = getRefValue(cWidget, cWidget.getSoundDeviceName(), attributesSetDict)
     cSoundIdxStr = outputDevNameIdxDict.get(cSoundDevName)
+
+    # 3) check the repetitions parameter:
+    repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
+
+    # 4) get the isSyncToVbl parameter:
+    isSyncToVbl = cWidget.getSyncToVbl()
+
 
     if Func.getWidgetPosition(cWidget.widget_id) > 0:
         # Step 2: print out help info for the current widget
@@ -1168,23 +1179,33 @@ def flipAudio(cWidget, f, cLoopLevel, attributesSetDict):
         printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 
+    if isSyncToVbl:
+        # Flip the Screen
+        printAutoInd(f, "% sync to the vertical blank of screen:{0}",cWidget.getScreenName())
+        if Func.getWidgetPosition(cWidget.widget_id) == 0:
+            printAutoInd(f, "% for first event, play the audio at the immediately VBL .. ")
+            printAutoInd(f, "predictedVisOnset = PredictVisualOnsetForTime({0}, 0);",cWinStr)
 
-    # Flip the Screen
-    if Func.getWidgetPosition(cWidget.widget_id) == 0:
-        printAutoInd(f, "% for first event, flip immediately.. ")
-        printAutoInd(f, "predictedVisOnset = PredictVisualOnsetForTime({0}, 0);",cWinStr)
-
-        printAutoInd(f, " PsychPortAudio('Start', {0}, 1, predictedVisOnset, 0); %\n", cSoundIdxStr)
-        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip', {2}, predictedVisOnset); %\n", Func.getWidgetName(cWidget.widget_id),
-                     cOpRowIdxStr, cWinStr)
+            printAutoInd(f, " PsychPortAudio('Start', {0}, {1}, predictedVisOnset, 0); %\n", cSoundIdxStr, repetitionsStr)
+            printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip', {2}, predictedVisOnset, {3}); %\n", Func.getWidgetName(cWidget.widget_id),
+                         cOpRowIdxStr, cWinStr, clearAfter)
+        else:
+            printAutoInd(f, "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - 0.003);", cWinStr, cWinIdx)
+            printAutoInd(f, "% schedule start of audio at exactly the predicted time caused by the next flip")
+            printAutoInd(f, " PsychPortAudio('Start', {0}, {1}, predictedVisOnset, 0); %\n", cSoundIdxStr, repetitionsStr)
+            printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},cDurs({3}) + lastScrOnsettime({3}) - 0.003, {4}); %#ok<*STRNU>\n",
+                         Func.getWidgetName(cWidget.widget_id), cOpRowIdxStr, cWinStr, cWinIdx, clearAfter)
     else:
-        printAutoInd(f, "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - 0.003);", cWinStr, cWinIdx)
-        printAutoInd(f, "% schedule start of audio at exactly the predicted time caused by the next flip")
-        printAutoInd(f, " PsychPortAudio('Start', {0}, 1, predictedVisOnset, 0); %\n", cSoundIdxStr)
-        printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},cDurs({3}) + lastScrOnsettime({3}) - 0.003); %#ok<*STRNU>\n",
-                     Func.getWidgetName(cWidget.widget_id),
-                     cOpRowIdxStr, cWinStr, cWinIdx)
-
+        if Func.getWidgetPosition(cWidget.widget_id) == 0:
+            printAutoInd(f, "% for first event, play the audio immediately.. ")
+            printAutoInd(f, "{0}.onsettime({1}) = PsychPortAudio('Start', {2}, {3}, 0, 1); % wait for start and get the real start time\n",
+                         Func.getWidgetName(cWidget.widget_id), cOpRowIdxStr, cSoundIdxStr, repetitionsStr)
+        else:
+            printAutoInd(f, "% for multiple screens, use the maximum of the predicted onsettime")
+            printAutoInd(f,
+                         "{0}.onsettime({1}) = PsychPortAudio('Start', {2}, {3}, max(cDurs + lastScrOnsettime), 1); % % wait for start and get the real start time\n",
+                         Func.getWidgetName(cWidget.widget_id), cOpRowIdxStr, cSoundIdxStr,
+                         repetitionsStr)
 
 
 
@@ -1292,20 +1313,33 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
         printAutoInd(f, "{0}_msgEndTime({1}) = GetSecs;", cWidgetName, cOpRowIdxStr)
         printAutoInd(f, "% ----------------------------------\\\n")
 
+    cWidgetType = cWidget.widget_id.split('.')[0]
     # updated the screen flip times in matlab
-    printAutoInd(f, "lastScrOnsettime({0}) = {1}.onsettime({2}); %temp save the last screen onsettimes\n",
-                 cWinIdx,
-                 Func.getWidgetName(cWidget.widget_id),
-                 cOpRowIdxStr)
+    if Info.SOUND == cWidgetType:
+        printAutoInd(f, "% for event type of sound, make it to all lastScrOnsetime")
+        printAutoInd(f, "lastScrOnsettime(:) = {0}.onsettime({1}); % temp save the last screen onsettimes\n",
+                     Func.getWidgetName(cWidget.widget_id),
+                     cOpRowIdxStr)
+    else:
+        printAutoInd(f, "lastScrOnsettime({0}) = {1}.onsettime({2}); %temp save the last screen onsettimes\n",
+                     cWinIdx,
+                     Func.getWidgetName(cWidget.widget_id),
+                     cOpRowIdxStr)
 
     return delayedPrintCodes
 
 
 def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+    global cInfoDict, isDummyPrint
+
     cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
 
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
+
+        # for dummyPrint get the last widget id and loopNum
+        if isDummyPrint:
+            cInfoDict.update({'lastWidgetId':cWidgetId})
 
         cWidgetType = cWidget.widget_id.split('.')[0]
 
@@ -1361,7 +1395,7 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintC
 
 
 def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
-    global outputDevNameIdxDict, historyPropDict
+    global outputDevNameIdxDict, historyPropDict, isDummyPrint
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"
 
@@ -1375,13 +1409,11 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
     outDevCountsDict = getOutputDevCountsDict()
 
-
     # allInputDevs = historyPropDict.get('allInputDevs',{})
 
     cWinIdx = historyPropDict['cWinIdx']
 
     cInputDevices = cWidget.getInputDevice()
-
 
     # -------------------------------------------------------------------------------
     # Step 1: check parameters that should not be a citation value
@@ -1425,17 +1457,18 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     durStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cWidget.getDuration(), attributesSetDict)
     durStr = parseDurationStr(durStr)
 
-    if re.fullmatch("\d+,\d+", durStr):
-        cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}));\n")
+    cWidgetType = cWidget.widget_id.split('.')[0]
+    # updated the screen flip times in matlab
+    if Info.SOUND == cWidgetType:
+        if re.fullmatch("\d+,\d+", durStr):
+            cRespCodes.append(f"cDurs(:) = getDurValue([{durStr}],winIFIs({cWinIdx}), true);\n")
+        else:
+            cRespCodes.append(f"cDurs(:) = getDurValue({durStr},winIFIs({cWinIdx}), true);\n")
     else:
-        cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue({durStr},winIFIs({cWinIdx}));\n")
-
-    # cRespCodes.append(f"%-- initializing results vars --/")
-    # cRespCodes.append(f"{cWidgetName}_resp({cOpRowIdxStr}) = 0;")
-    # cRespCodes.append(f"{cWidgetName}_acc({cOpRowIdxStr})  = 0;")
-    # cRespCodes.append(f"{cWidgetName}_rt({cOpRowIdxStr})   = [];")
-    # cRespCodes.append(f"%-------------------------------\\")
-    # -------------------------------------------------------------------------------
+        if re.fullmatch("\d+,\d+", durStr):
+            cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue([{durStr}],winIFIs({cWinIdx}));\n")
+        else:
+            cRespCodes.append(f"cDurs({cWinIdx}) = getDurValue({durStr},winIFIs({cWinIdx}));\n")
 
 
     # Step 3:
@@ -1590,11 +1623,17 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
 
     # to be continue ...
+    # if not isDummyPrint and cWidget.widget_id == cInfoDict.get("lastWidgetId"):
+    #     cRespCodes.append(f"WaitSecs(cDurs({cWinIdx})); for the last event in all Exp, just wait for duration")
+    #
 
     # if the current widget is the last one in the timeline, just print response codes here
     if Func.getNextWidgetId(cWidget.widget_id) is None:
 
-        cRespCodes.append(f"beCheckedRespDevs = []; % empty be checked response devices")
+        cRespCodes.append(f"if numel(beCheckedRespDevs) < 1")
+        cRespCodes.append(f"WaitSecs(cDurs({cWinIdx})); for the last event in timeline just wait for duration")
+        cRespCodes.append(f"end")
+        cRespCodes.append(f"beCheckedRespDevs = []; % empty the to be checked response devices")
 
         cRespCodes = printRespCodes(f, cRespCodes)
     # ------------------------------------------
@@ -1638,12 +1677,13 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
-    # shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
-    #
-    # cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
+    shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
+
+    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
 
     # currently we just used the nearest previous flipped screen info
-    cWinIdx = historyPropDict.get("cWinIdx")
+    # cWinIdx = historyPropDict.get("cWinIdx")
+    cWinIdx = outputDevNameIdxDict.get(cScreenName)
     cWinStr = f"winIds({cWinIdx})"
 
 
@@ -1657,8 +1697,8 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
     cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr,isRef)
 
-    # 3) check the Buffer Size parameter:
-    bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
+    # # 3) check the Buffer Size parameter:
+    # bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
 
     # 3) check the Stream refill parameter:
     streamRefillStr, isRef = getRefValue(cWidget, cWidget.getRefillMode(), attributesSetDict)
@@ -1669,8 +1709,8 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # 5) check the stop offset in ms parameter:
     StopOffsetStr, isRef = getRefValue(cWidget, cWidget.getStopOffset(), attributesSetDict)
 
-    # 6) check the repetitions parameter:
-    repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
+    # # 6) check the repetitions parameter:
+    # repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
 
     # 7) check the volume control parameter:
     isVolumeControl, isRef = getRefValue(cWidget, cWidget.getIsVolumeControl(), attributesSetDict)
@@ -1692,6 +1732,12 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # 12) check the volume parameter:
     waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cWidget.getWaitForStart(), attributesSetDict))
 
+    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
+    clearAfter = parseDontClearAfterStr(clearAfter)
+
+    historyPropDict.update({"clearAfter": clearAfter})
+
+
     # read audio file
     printAutoInd(f, "cAudioData    = audioread(fullfile(cFolder,{0}) );", addSingleQuotes(cFilenameStr))
 
@@ -1701,6 +1747,12 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     #  draw buffer to  hw
     # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioIdx, {1});",cSoundIdxStr, streamRefillStr)
     printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioData, {1});",cSoundIdxStr, streamRefillStr)
+
+    if isVolumeControl:
+        printAutoInd(f, "PsychPortAudio('Volume', {0}, {1});\n", cSoundIdxStr, volumeStr)
+
+    if isLantencyBiasControl:
+        printAutoInd(f, "PsychPortAudio('LatencyBias', {0}, {1}/1000);\n", cSoundIdxStr, latencyBiasStr)
 
 
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
@@ -2103,12 +2155,18 @@ def getOutputnRows(globalSelf):
 
 
 def compilePTB(globalSelf):
-    # cInfo = compileCode(globalSelf,True,{})
-    cInfo = {}
-    compileCode(globalSelf, False, cInfo)
+    global cInfoDict
+    cInfoDict.clear()
+
+    compileCode(globalSelf,True)
+
+    compileCode(globalSelf, False)
+
+    cInfoDict.clear()
 
 
-def compileCode(globalSelf, isDummyCompile, cInfo):
+
+def compileCode(globalSelf, isDummyCompile):
     global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, cIndents, historyPropDict, isDummyPrint, spFormatVarDict
 
     # -----------initialize global variables ------/
@@ -2696,15 +2754,25 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "% subfun 5: getDurValue")
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        printAutoInd(f, "function cDur = getDurValue(cDur,cIFI)")
+        printAutoInd(f, "function cDur = getDurValue(cDur,cIFI, isSound)")
+        printAutoInd(f, "if nargin < 3")
+        printAutoInd(f, "isSound = false;")
+        printAutoInd(f, "end")
+
         printAutoInd(f, "if numel(cDur) == 1 && cDur == 0")
         printAutoInd(f, "return;")
         printAutoInd(f, "end")
+        printAutoInd(f, "return;")
+
         printAutoInd(f, "cDur = cDur./1000; % transform the unit from ms to sec")
         printAutoInd(f, "if numel(cDur) > 1")
         printAutoInd(f, "cDur = rand*(cDur(2) - cDur(1)) + cDur(1);")
         printAutoInd(f, "end ")
+
+        printAutoInd(f, "if isSound")
         printAutoInd(f, "cDur = round(cDur/cIFI)*cIFI;")
+        printAutoInd(f, "end ")
+
         printAutoInd(f, "end %  end of subfun5")
 
         iSubFunNum = 6
@@ -2786,9 +2854,8 @@ def compileCode(globalSelf, isDummyCompile, cInfo):
 
 
         # print(Info.WIDGET_TYPE_NAME_COUNT)
-        print(Info.IMAGE_LOAD_MODE)
+        # print(Info.IMAGE_LOAD_MODE)
 
     if not isDummyPrint:
         Func.log(f"Compile successful!:{compile_file_name}")  # print info to the output panel
 
-    return cInfo

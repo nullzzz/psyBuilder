@@ -70,6 +70,7 @@ class SoundTab1(QWidget):
 
         self.wait_for_start = PigComboBox()
         self.wait_for_start.addItems(("No", "Yes"))
+        self.wait_for_start.setEnabled(False)
 
         # added by yang
         self.sync_to_vbl = QCheckBox("Sync to Screen VBL:")  # Latency Bias
@@ -96,16 +97,8 @@ class SoundTab1(QWidget):
         self.start_offset.setReg(r"\d+")
         self.stop_offset.setReg(r"\d+")
         self.repetitions.setReg(r"(\d+)|(\d*\.?\d{,2})")
-        # valid_input = QRegExp("(\d+)|(\[[_\d\w]+\]")
-        # self.start_offset.setValidator(QRegExpValidator(valid_input, self))
-        # self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
-        #
-        # valid_input = QRegExp(r"(\d+)|(\d*\.?d+)|(\[[_\d\w]+\]")
-        #
-        # self.repetitions.setValidator(QRegExpValidator(valid_input, self))
 
         self.stream_refill.addItems(["0", "1", "2"])
-        # self.repetitions.addItems(["Yes", "No"])
         self.repetitions.setText("1")
         self.buffer_size.setText("5000")
         # self.start_offset.setText("0")
@@ -127,12 +120,6 @@ class SoundTab1(QWidget):
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l16.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l17.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-
-        # layout2.addRow("Dont Clear After:", self.clear_after)
-        # layout2.addRow("Screen Name:", self.screen_name)
-
 
         group1 = QGroupBox()
         layout1 = QGridLayout()
@@ -140,8 +127,8 @@ class SoundTab1(QWidget):
         layout1.addWidget(self.file_name, 0, 1, 1, 2)
         layout1.addWidget(self.open_bt, 0, 3, 1, 1)
 
-        layout1.addWidget(l1, 1, 0)
-        layout1.addWidget(self.buffer_size, 1, 1)
+        # layout1.addWidget(l1, 1, 0)
+        # layout1.addWidget(self.buffer_size, 1, 1)
 
         layout1.addWidget(l2, 2, 0)
         layout1.addWidget(self.stream_refill, 2, 1)
