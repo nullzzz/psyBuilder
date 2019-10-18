@@ -1,7 +1,7 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRegExp
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
     QFileDialog, QCompleter, QSizePolicy
-
+from PyQt5.QtGui import QRegExpValidator
 from app.func import Func
 from app.lib import PigLineEdit, PigComboBox
 
@@ -21,10 +21,13 @@ class SoundTab1(QWidget):
             "Repetitions": "1",
             "Volume control": 0,
             "Volume": "1",
-            "Latency Bias": 0,
+            "Latency bias": 0,
             "Bias time": "0",
-            "Sound Device": "",
-            "Wait for start": "No"
+            "Sound device": "",
+            "Wait for start": "No",
+            "Sync to vbl": 1,
+            "Clear after": "clear_0",
+            "Screen name": "screen.0"
         }
         self.file_name = PigLineEdit()
         self.open_bt = QPushButton("open file")
@@ -34,6 +37,7 @@ class SoundTab1(QWidget):
         self.volume_control.setLayoutDirection(Qt.RightToLeft)
 
         self.volume_control.stateChanged.connect(self.volumeChecked)
+
         self.volume = PigLineEdit()
         self.volume.setText("1")
 
@@ -41,6 +45,7 @@ class SoundTab1(QWidget):
         self.latency_bias.setLayoutDirection(Qt.RightToLeft)
 
         self.latency_bias.stateChanged.connect(self.latencyBiasChecked)
+
         self.bias_time = PigLineEdit()
         self.bias_time.setText("0")
 
@@ -66,12 +71,39 @@ class SoundTab1(QWidget):
         self.wait_for_start = PigComboBox()
         self.wait_for_start.addItems(("No", "Yes"))
 
+        # added by yang
+        self.sync_to_vbl = QCheckBox("Sync to Screen VBL:")  # Latency Bias
+        self.sync_to_vbl.setLayoutDirection(Qt.RightToLeft)
+        self.sync_to_vbl.setChecked(True)
+
+        self.sync_to_vbl.stateChanged.connect(self.syncToVblChecked)
+
+        self.clear_after = PigComboBox()
+        self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
+        self.clear_after.setEnabled(self.sync_to_vbl.checkState())
+
+        self.using_screen_id: str = ""
+        self.screen_name = PigComboBox()
+        self.screen_info = Func.getScreenInfo()
+        self.screen_name.addItems(self.screen_info.values())
+        self.screen_name.currentTextChanged.connect(self.changeScreen)
+        self.screen_name.setEnabled(self.sync_to_vbl.checkState())
+
         self.setGeneral()
 
     def setGeneral(self):
-        # valid_input = QRegExp(r"(\d+)|(\[[_\d\w]+\]")
+
+        self.start_offset.setReg(r"\d+")
+        self.stop_offset.setReg(r"\d+")
+        self.repetitions.setReg(r"(\d+)|(\d*\.?\d{,2})")
+        # valid_input = QRegExp("(\d+)|(\[[_\d\w]+\]")
         # self.start_offset.setValidator(QRegExpValidator(valid_input, self))
         # self.stop_offset.setValidator(QRegExpValidator(valid_input, self))
+        #
+        # valid_input = QRegExp(r"(\d+)|(\d*\.?d+)|(\[[_\d\w]+\]")
+        #
+        # self.repetitions.setValidator(QRegExpValidator(valid_input, self))
+
         self.stream_refill.addItems(["0", "1", "2"])
         # self.repetitions.addItems(["Yes", "No"])
         self.repetitions.setText("1")
@@ -87,12 +119,20 @@ class SoundTab1(QWidget):
         l3 = QLabel("Start Offset (ms):")
         l4 = QLabel("Stop Offset (ms):")
         l5 = QLabel("Repetitions:")
+        # l16 = QLabel("Dont Clear After:")
+        # l17 = QLabel("Sync Screen Name:")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l16.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l17.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        # layout2.addRow("Dont Clear After:", self.clear_after)
+        # layout2.addRow("Screen Name:", self.screen_name)
+
 
         group1 = QGroupBox()
         layout1 = QGridLayout()
@@ -113,13 +153,25 @@ class SoundTab1(QWidget):
 
         layout1.addWidget(l5, 5, 0)
         layout1.addWidget(self.repetitions, 5, 1)
+
+        # sound are froce to sync with a VBL
+        # layout1.addWidget(l16, 6, 0)
+        # layout1.addWidget(self.clear_after, 6, 1)
+        #
+        # layout1.addWidget(l17, 7, 0)
+        # layout1.addWidget(self.screen_name, 7, 1)
+
         group1.setLayout(layout1)
 
         l6 = QLabel("Sound Device:")
         l7 = QLabel("Wait For Start:")
+        l8 = QLabel("Dont Clear After:")
+
 
         l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l8.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
 
         group2 = QGroupBox()
         layout2 = QGridLayout()
@@ -127,16 +179,22 @@ class SoundTab1(QWidget):
         self.bias_time.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
         self.volume.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
         # layout2.addWidget(l6, 0, 0, 1, 1)
-        layout2.addWidget(self.volume_control, 0, 0, )
-        layout2.addWidget(self.volume, 0, 1, )
-        layout2.addWidget(l6, 0, 2)
-        layout2.addWidget(self.sound, 0, 3)
+        layout2.addWidget(self.sync_to_vbl, 0, 0, )
+        layout2.addWidget(self.screen_name, 0, 1, )
+        layout2.addWidget(l8, 0, 2)
+        layout2.addWidget(self.clear_after, 0, 3)
+
+        # layout2.addWidget(l6, 0, 0, 1, 1)
+        layout2.addWidget(self.volume_control, 1, 0, )
+        layout2.addWidget(self.volume, 1, 1, )
+        layout2.addWidget(l6, 1, 2)
+        layout2.addWidget(self.sound, 1, 3)
 
         # layout2.addWidget(l7, 1, 0, 1, 1)
-        layout2.addWidget(self.latency_bias, 1, 0)
-        layout2.addWidget(self.bias_time, 1, 1)
-        layout2.addWidget(l7, 1, 2)
-        layout2.addWidget(self.wait_for_start, 1, 3)
+        layout2.addWidget(self.latency_bias, 2, 0)
+        layout2.addWidget(self.bias_time, 2, 1)
+        layout2.addWidget(l7, 2, 2)
+        layout2.addWidget(self.wait_for_start, 2, 3)
 
         group2.setLayout(layout2)
 
@@ -148,6 +206,7 @@ class SoundTab1(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
+        # refresh sound Dev
         self.sound_info = Func.getSoundInfo()
         sound_id = self.using_sound_id
         self.sound.clear()
@@ -157,10 +216,28 @@ class SoundTab1(QWidget):
             self.sound.setCurrentText(sound_name)
             self.using_sound_id = sound_id
 
+        # refresh screen
+        self.screen_info = Func.getScreenInfo()
+        screen_id = self.using_screen_id
+        self.screen_name.clear()
+        self.screen_name.addItems(self.screen_info.values())
+        screen_name = self.screen_info.get(screen_id)
+        if screen_name:
+            self.screen_name.setCurrentText(screen_name)
+            self.using_screen_id = screen_id
+
     def changeSound(self, sound):
         for k, v in self.sound_info.items():
             if v == sound:
                 self.using_sound_id = k
+                break
+
+
+
+    def changeScreen(self, screen):
+        for k, v in self.screen_info.items():
+            if v == screen:
+                self.using_screen_id = k
                 break
 
     # 打开文件夹
@@ -186,6 +263,14 @@ class SoundTab1(QWidget):
         else:
             self.bias_time.setEnabled(False)
 
+    def syncToVblChecked(self, e):
+        if e == 2:
+            self.clear_after.setEnabled(True)
+            self.screen_name.setEnabled(True)
+        else:
+            self.clear_after.setEnabled(False)
+            self.screen_name.setEnabled(False)
+
     def setSound(self, sound: list):
         selected = self.sound.currentText()
         self.sound.clear()
@@ -203,12 +288,17 @@ class SoundTab1(QWidget):
         self.buffer_size.setCompleter(QCompleter(self.attributes))
         self.start_offset.setCompleter(QCompleter(self.attributes))
         self.stop_offset.setCompleter(QCompleter(self.attributes))
+        self.repetitions.setCompleter(QCompleter(self.attributes))
         self.volume.setCompleter(QCompleter(self.attributes))
         self.bias_time.setCompleter(QCompleter(self.attributes))
         # self.sound_device.setCompleter(QCompleter(self.attributes))
         # self.wait_for_start.setCompleter(QCompleter(self.attributes))
 
     def getInfo(self):
+        """
+        历史遗留函数
+        :return:
+        """
         self.default_properties.clear()
         self.default_properties["File name"] = self.file_name.text()
         self.default_properties["Buffer size"] = self.buffer_size.text()
@@ -222,7 +312,18 @@ class SoundTab1(QWidget):
         self.default_properties["Bias time"] = self.bias_time.text()
         self.default_properties["Sound device"] = self.sound.currentText()
         self.default_properties["Wait for start"] = self.wait_for_start.currentText()
+        self.default_properties["Sync to vbl"] = self.sync_to_vbl.checkState()
+        self.default_properties["Clear after"] = self.clear_after.currentText()
 
+        if Func.getDeviceNameById(self.using_screen_id):
+            self.default_properties["Screen name"] = Func.getDeviceNameById(self.using_screen_id)
+        else:
+            self.default_properties["Screen name"] = self.screen_name.currentText()
+
+        return self.default_properties
+
+    def getProperties(self):
+        self.getInfo()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -242,6 +343,9 @@ class SoundTab1(QWidget):
         self.bias_time.setText(self.default_properties["Bias time"])
         self.sound.setCurrentText((self.default_properties["Sound device"]))
         self.wait_for_start.setCurrentText(self.default_properties["Wait for start"])
+        self.sync_to_vbl.setCheckState(self.default_properties["Sync to vbl"])
+        self.clear_after.setCurrentText(self.default_properties["Clear after"])
+        self.screen_name.setCurrentText(self.default_properties["Screen name"])
 
     def clone(self):
         clone_page = SoundTab1()

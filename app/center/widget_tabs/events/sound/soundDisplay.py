@@ -330,12 +330,33 @@ class SoundDisplay(QMainWindow):
         """
         return bool(self.pro_window.general.volume_control.checkState())
 
+    def getSyncToVbl(self) -> bool:
+        """
+        返回音量控制
+        :return:
+        """
+        return bool(self.pro_window.general.sync_to_vbl.checkState())
+
     def getVolume(self) -> str:
         """
         返回音量
         :return:
         """
         return self.pro_window.general.volume.text()
+
+    def getClearAfter(self) -> str:
+        """
+        返回是否clear after
+        :return:
+        """
+        return self.pro_window.general.clear_after.currentText()
+
+    def getScreenName(self) -> str:
+        """
+        返回Screen Name
+        :return:
+        """
+        return self.pro_window.general.screen_name.currentText()
 
     def getSoundDeviceName(self) -> str:
         """
