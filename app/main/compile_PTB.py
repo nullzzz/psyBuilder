@@ -1631,7 +1631,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     if Func.getNextWidgetId(cWidget.widget_id) is None:
 
         cRespCodes.append(f"if numel(beCheckedRespDevs) < 1")
-        cRespCodes.append(f"WaitSecs(cDurs({cWinIdx})); for the last event in timeline just wait for duration")
+        cRespCodes.append(f"WaitSecs(cDurs({cWinIdx})); %for the last event in timeline just wait for duration")
         cRespCodes.append(f"end")
         cRespCodes.append(f"beCheckedRespDevs = []; % empty the to be checked response devices")
 
@@ -2762,7 +2762,6 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f, "if numel(cDur) == 1 && cDur == 0")
         printAutoInd(f, "return;")
         printAutoInd(f, "end")
-        printAutoInd(f, "return;")
 
         printAutoInd(f, "cDur = cDur./1000; % transform the unit from ms to sec")
         printAutoInd(f, "if numel(cDur) > 1")
