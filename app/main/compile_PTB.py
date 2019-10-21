@@ -1905,9 +1905,9 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
     # make texture
     printAutoInd(f, "cImData    = imread(fullfile(cFolder,{0}) );",addSingleQuotes(cFilenameStr))
-    printAutoInd(f, "cImIndex   = MakeTexture({0}, cImData);",cWinStr)
+    printAutoInd(f, "cImIndex   = Screen('MakeTexture',{0}, cImData);",cWinStr)
 
-    printAutoInd(f, "cDestRect  = makeImDestRect(cFrameRect, size(cImData), {0});", stretchModeStr)
+    printAutoInd(f, "[cDestRect, cSourceRect]  = makeImDestRect(cFrameRect, size(cImData), {0});", stretchModeStr)
     #  print out the text
 
     if isMirrorUpDownStr == '1' or isMirrorLeftRightStr == '1':
@@ -1927,7 +1927,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         printAutoInd(f, "Screen('glScale', {0}, {1}, {2}, 1);     % mirror the drawn image",cWinStr,leftRightStr,upDownStr)
         printAutoInd(f, "Screen('glTranslate', {0}, -xc, -yc, 0); % undo the translations",cWinStr)
 
-    printAutoInd(f, "DrawTexture({0}, cImIndex ,[] ,cDestRect ,{1} ,[] , abs({2}));",
+    printAutoInd(f, "Screen('DrawTexture', {0}, cImIndex, cSourceRect, cDestRect, {1}, [], abs({2}));",
                  cWinStr,
                  rotateStr,
                  imageTransparent)
@@ -2920,18 +2920,38 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "% subfun {0}: makeImDestRect", iSubFunNum)
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        printAutoInd(f,"function destRect = makeImDestRect(cFrameRect,imDataSize,stretchMode)")
-        printAutoInd(f,"destRect = centerRect([0 0 imDataSize(1) imDataSize(2)], cFrameRect);")
+        printAutoInd(f, "function [destRect, cSourceRect] = makeImDestRect(cFrameRect,imDataSize,stretchMode)\n")
+        printAutoInd(f, "cSourceRect = [0 0 imDataSize(2) imDataSize(1)];")
+        printAutoInd(f, "destRect    = CenterRect(cSourceRect, cFrameRect);")
 
-        printAutoInd(f,"% caculate the width:")
-        printAutoInd(f,"if ismember(stretchMode,[1 3])")
-        printAutoInd(f,"destRect([1,3]) = cFrameRect([1,3]);")
-        printAutoInd(f,"end ")
+        printAutoInd(f, "% calculate the width:")
+        printAutoInd(f, "if ismember(stretchMode,[1 3])")
+        printAutoInd(f, "destRect([1,3]) = cFrameRect([1,3]);")
+        printAutoInd(f, "end ")
 
-        printAutoInd(f,"% caculate the height")
-        printAutoInd(f,"if ismember(stretchMode,[2 3])")
-        printAutoInd(f,"destRect([2,4]) = cFrameRect([2,4]);")
-        printAutoInd(f,"end")
+        printAutoInd(f, "% calculate the height")
+        printAutoInd(f, "if ismember(stretchMode,[2 3])")
+        printAutoInd(f, "destRect([2,4]) = cFrameRect([2,4]);")
+        printAutoInd(f, "end")
+
+        printAutoInd(f, "% in case of no stretch and the imData is larger than frameRect")
+        printAutoInd(f, "if stretchMode == 0")
+        printAutoInd(f, "destWidth  = RectWidth(destRect);")
+        printAutoInd(f, "destHeight = RectHeight(destRect);\n")
+
+        printAutoInd(f, "if destWidth < imDataSize(2)")
+        printAutoInd(f, "halfShrinkWPixes = (imDataSize(2) - destWidth)/2;\n")
+        printAutoInd(f, "cSourceRect([1,3]) = cSourceRect([1,3]) + [floor(halfShrinkWPixes), -ceil(halfShrinkWPixes)];")
+        printAutoInd(f, "destRect([1,3])    = cFrameRect([1,3]);")
+        printAutoInd(f, "end ")
+
+        printAutoInd(f, "if destHeight < imDataSize(1)")
+        printAutoInd(f, "halfShrinkHPixes = (imDataSize(1) - destHeight)/2;\n")
+        printAutoInd(f, "cSourceRect([2,4]) = cSourceRect([2,4]) + [floor(halfShrinkHPixes), -ceil(halfShrinkHPixes)];")
+        printAutoInd(f, "destRect([2,4])    = cFrameRect([2,4]);")
+        printAutoInd(f, "end ")
+
+        printAutoInd(f, "end % if stretchMode")
         printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
         iSubFunNum += 1
 
