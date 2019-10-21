@@ -339,8 +339,8 @@ def getSepcialFormatAtts():
         elif Func.isWidgetType(widgetId, Info.IF):
             cTrueWidget = cWidget.getTrueWidget()
 
-            print(f"{cTrueWidget.getInfo()}")
-            print(f"{cTrueWidget.getInputDevice()}")
+            # print(f"{cTrueWidget.getInfo()}")
+            # print(f"{cTrueWidget.getInputDevice()}")
 
         elif Func.isWidgetType(widgetId, Info.TEXT):
             updateSpFormatVarDict(cWidget.getTransparent(), 'percent', spFormatVarDict)
@@ -892,7 +892,7 @@ def printAutoInd(f, inputStr, *argins):
         cIndents = 0
 
 
-def getMaxmiumOpDataRows() -> int:
+def getMaximumOpDataRows() -> int:
     MaxOpDataRows = updateTLOpDataRow(Info.WID_WIDGET[f"{Info.TIMELINE}.0"], 0)
 
     return MaxOpDataRows
@@ -2483,19 +2483,50 @@ def compileCode(globalSelf, isDummyCompile):
         # printAutoInd(f, "cFrame(1) = [];")
 
         if not isDummyCompile:
+            maximumOpDataRows = getMaximumOpDataRows()
+
             for cWidgetId in Info.WID_NODE.keys():
-                cWidget = Info.WID_WIDGET(cWidgetId)
+                print(f"{cWidgetId}")
+
+                cWidget = Info.WID_WIDGET.get(cWidgetId)
                 cWidgetType = cWidgetId.split('.')[0]
+                cWidgetName = Func.getWidgetName(cWidgetId)
+
                 if cWidgetType in [Info.SOUND, Info.IMAGE, Info.TEXT, Info.VIDEO, Info.SLIDER]:
                     output_device = cWidget.getOutputDevice()
-                    printAutoInd(f, "{0} = repmat(cFrame,{1},1);", Func.getWidgetName(cWidgetId), getMaxmiumOpDataRows())
+                    printAutoInd(f, "{0} = repmat(cFrame,{1},1);", cWidgetName, maximumOpDataRows)
 
                     if len(output_device) > 0:
-                        printAutoInd(f, "{0}({1}).msgEndTime = [];", Func.getWidgetName(cWidgetId),
-                                     getMaxmiumOpDataRows())
-                elif cWidgetType in [Info.IF, Info.SWITCH]:
-                    pass
+                        printAutoInd(f, "{0}({1}).msgEndTime = [];", cWidgetName, maximumOpDataRows)
 
+                elif cWidgetType == Info.IF:
+                    printAutoInd(f, "{0} = repmat(cFrame,{1},1);", cWidgetName, maximumOpDataRows)
+
+                    print(f"{cWidget.getTrueWidget()}")
+
+                    cTrueWidget = cWidget.getTrueWidget()
+                    cFalseWidget = cWidget.getFalseWidget()
+                    nTrueOutputDev = 0
+                    nFalseOutputDev = 0
+
+                    if cTrueWidget is not None:
+                        nTrueOutputDev = len(cTrueWidget.getOutputDevice())
+                    if cFalseWidget is not None:
+                        nFalseOutputDev = len(cFalseWidget.getOutputDevice())
+
+                    if nTrueOutputDev>0 or nFalseOutputDev > 0:
+                        printAutoInd(f, "{0}({1}).msgEndTime = [];", cWidgetName, maximumOpDataRows)
+
+
+
+                elif cWidgetType == Info.SWITCH:
+                    printAutoInd(f, "{0} = repmat(cFrame,{1},1);", cWidgetName, maximumOpDataRows)
+
+                    for cCaseDict in cWidget.getCases():
+                        if cCaseDict['Widget'] is not None:
+                            if Info.WID_WIDGET.get(cCaseDict['Widget id']).getOutputDevice():
+                                printAutoInd(f, "{0}({1}).msgEndTime = [];", cWidgetName, maximumOpDataRows)
+                                break
 
         printAutoInd(f, "%-----------------------\\\n")
 
