@@ -893,14 +893,9 @@ def printAutoInd(f, inputStr, *argins):
 
 
 def getMaxmiumOpDataRows() -> int:
-    MaxOpDataRows = 0
+    MaxOpDataRows = updateTLOpDataRow(Info.WID_WIDGET[f"{Info.TIMELINE}.0"], 0)
 
     return MaxOpDataRows
-
-
-def updateCycleOpDataRows(cCyleWdiget, opDataRowsInPy:int) -> int:
-
-    return opDataRowsInPy
 
 
 def updateTLOpDataRow(cTLWidget, opDataRowsInPy:int) -> int:
@@ -916,6 +911,25 @@ def updateTLOpDataRow(cTLWidget, opDataRowsInPy:int) -> int:
 
     return opDataRowsInPy
 
+
+def updateCycleOpDataRows(cCyleWdiget, opDataRowsInPy:int) -> int:
+
+    cTimeLineids = cCyleWdiget.getTimelines()
+
+    for iRow in range(cCyleWdiget.rowCount()):
+        cRowDict = cCyleWdiget.getAttributes(iRow)
+        cTLid = cTimeLineids[iRow]
+        # print(f"{cTLid}")
+        cTLWidget = Info.WID_WIDGET[cTLid[1]]
+
+        if '' == cRowDict['Weight']:
+            cRepeat = 1
+        else:
+            cRepeat = dataStrConvert(cRowDict['Weight'])
+
+        for iRep in range(cRepeat):
+            opDataRowsInPy = updateTLOpDataRow(cTLWidget, opDataRowsInPy)
+    return opDataRowsInPy
 
 
 def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
@@ -1329,7 +1343,7 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
     historyPropDict.update({'cOutDevices':cOutDeviceDict})
 
     if len(output_device) > 0:
-        printAutoInd(f, "{0}_msgEndTime({1}) = GetSecs;", cWidgetName, cOpRowIdxStr)
+        printAutoInd(f, "{0}.msgEndTime({1}) = GetSecs;", cWidgetName, cOpRowIdxStr)
         printAutoInd(f, "% ----------------------------------\\\n")
 
     cWidgetType = cWidget.widget_id.split('.')[0]
@@ -2177,7 +2191,7 @@ def compilePTB(globalSelf):
     global cInfoDict
     cInfoDict.clear()
 
-    compileCode(globalSelf,True)
+    # compileCode(globalSelf,True)
 
     compileCode(globalSelf, False)
 
@@ -2454,7 +2468,7 @@ def compileCode(globalSelf, isDummyCompile):
 
         printAutoInd(f, "%====================================\\\n")
 
-        printAutoInd(f, "disableSomeKbKeys; % restrictKeysForKbCheck")
+        printAutoInd(f, "disableSomeKbKeys; % restrictKeysForKbCheck \n")
 
         printAutoInd(f, "%--- initialize vars ---/")
         printAutoInd(f, "winIds            = zeros({0},1);", iMonitor - 1)
@@ -2465,12 +2479,23 @@ def compileCode(globalSelf, isDummyCompile):
         #
         printAutoInd(f,"beCheckedRespDevs    = struct('beUpdatedVar','','allowAble',[],'corResp',[],'rtWindow',[],'endAction',[],'type',[],'index',[],'startTime',[],'isOn',[],'needTobeReset',[],'right',[],'wrong',[],'noResp',[],'respCodeDevIdx',[]);")
         printAutoInd(f,"beCheckedRespDevs(1) = [];")
-        printAutoInd(f, "cFrame    = struct('rt',[],'acc',[],'resp',[],'onsettime',[]);")
+        printAutoInd(f, "cFrame    = struct('rt',[],'acc',[],'resp',[],'onsettime',[]);\n")
         # printAutoInd(f, "cFrame(1) = [];")
 
         if not isDummyCompile:
             for cWidgetId in Info.WID_NODE.keys():
-                printAutoInd(f, "{0} = repmat(cFrame,{1},1);", Func.getWidgetName(cWidgetId), cInfoDict.get('maxmiumRows',1000))
+                cWidget = Info.WID_WIDGET(cWidgetId)
+                cWidgetType = cWidgetId.split('.')[0]
+                if cWidgetType in [Info.SOUND, Info.IMAGE, Info.TEXT, Info.VIDEO, Info.SLIDER]:
+                    output_device = cWidget.getOutputDevice()
+                    printAutoInd(f, "{0} = repmat(cFrame,{1},1);", Func.getWidgetName(cWidgetId), getMaxmiumOpDataRows())
+
+                    if len(output_device) > 0:
+                        printAutoInd(f, "{0}({1}).msgEndTime = [];", Func.getWidgetName(cWidgetId),
+                                     getMaxmiumOpDataRows())
+                elif cWidgetType in [Info.IF, Info.SWITCH]:
+                    pass
+
 
         printAutoInd(f, "%-----------------------\\\n")
 
