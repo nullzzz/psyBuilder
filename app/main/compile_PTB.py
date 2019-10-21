@@ -2482,6 +2482,7 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f, "cFrame    = struct('rt',[],'acc',[],'resp',[],'onsettime',[]);\n")
         #
         # print(f"{Info.IMAGE_LOAD_MODE}")
+        # print(f"{Info.PLATFORM}")
         # print out initialize OP vars
         if not isDummyCompile:
             maximumOpDataRows = getMaximumOpDataRows()
