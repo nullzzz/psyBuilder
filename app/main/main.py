@@ -546,7 +546,6 @@ class PsyApplication(QMainWindow):
             self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
             Info.PLATFORM = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
-            print(c)
             platform = c if c else "linux"
             self.linux_action.setIconVisibleInMenu(platform == "linux")
             self.windows_action.setIconVisibleInMenu(platform == "windows")

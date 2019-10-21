@@ -14,7 +14,7 @@ class IconChoose(QWidget):
     {
         "stim type": "Image",
         "event name": "",
-        "pro window": {}
+        "Pro window": {}
     }
     """
     # 发送到上一层, 由上一层再转至properties (properties)
@@ -76,6 +76,7 @@ class IconChoose(QWidget):
             self.name_line.clear()
             self.name_line.setEnabled(False)
             self.widget = None
+            self.pro_window = None
             return
 
         pix_map = Func.getWidgetImage(self.event_type, "pixmap")
@@ -122,10 +123,10 @@ class IconChoose(QWidget):
 
     def getInfo(self):
         self.default_properties.clear()
-        if self.pro_window:
-            self.default_properties["pro window"] = self.pro_window.getInfo().copy()
+        if self.pro_window is not None:
+            self.default_properties["Pro window"] = self.pro_window.getInfo().copy()
         else:
-            self.default_properties["pro window"] = {}
+            self.default_properties["Pro window"] = {}
         self.default_properties["Stim type"] = self.event_type
         self.default_properties["Event name"] = self.event_name
         return self.default_properties
@@ -144,7 +145,7 @@ class IconChoose(QWidget):
         self.event_types.setCurrentText(self.default_properties.get("Stim type", "None"))
         self.name_line.setText(self.default_properties.get("Event name", ""))
 
-        if self.default_properties.get("pro window", None):
+        if self.pro_window is not None:
             if isinstance(self.pro_window, Slider):
                 self.pro_window.restore(self.default_properties.get("Pro window", {}))
             else:
