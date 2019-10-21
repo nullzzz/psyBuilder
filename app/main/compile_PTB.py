@@ -2307,8 +2307,8 @@ def compileCode(globalSelf, isDummyCompile):
         eyetracker_devices = Info.TRACKER_INFO
         quest_devices = Info.QUEST_INFO
 
-        print(f"eyetracker: {eyetracker_devices}")
-        print(f"quest: {quest_devices}")
+        # print(f"eyetracker: {eyetracker_devices}")
+        # print(f"quest: {quest_devices}")
 
         debugPrint('-------------/')
         debugPrint(output_devices)
@@ -2481,12 +2481,13 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f,"beCheckedRespDevs(1) = [];")
         printAutoInd(f, "cFrame    = struct('rt',[],'acc',[],'resp',[],'onsettime',[]);\n")
         #
+        # print(f"{Info.IMAGE_LOAD_MODE}")
         # print out initialize OP vars
         if not isDummyCompile:
             maximumOpDataRows = getMaximumOpDataRows()
 
             for cWidgetId in Info.WID_NODE.keys():
-                print(f"{cWidgetId}")
+                # print(f"{cWidgetId}")
 
                 cWidget = Info.WID_WIDGET.get(cWidgetId)
                 cWidgetType = cWidgetId.split('.')[0]
@@ -2502,7 +2503,7 @@ def compileCode(globalSelf, isDummyCompile):
                 elif cWidgetType == Info.IF:
                     printAutoInd(f, "{0} = repmat(cFrame,{1},1);", cWidgetName, maximumOpDataRows)
 
-                    print(f"{cWidget.getTrueWidget()}")
+                    # print(f"{cWidget.getTrueWidget()}")
 
                     cTrueWidget = cWidget.getTrueWidget()
                     cFalseWidget = cWidget.getFalseWidget()
@@ -2957,8 +2958,6 @@ def compileCode(globalSelf, isDummyCompile):
 
 
 
-        # print(Info.WIDGET_TYPE_NAME_COUNT)
-        # print(Info.IMAGE_LOAD_MODE)
 
     if not isDummyPrint:
         Func.log(f"Compile successful!:{compile_file_name}")  # print info to the output panel

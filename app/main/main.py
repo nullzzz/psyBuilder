@@ -436,13 +436,12 @@ class PsyApplication(QMainWindow):
             slider_count = setting.value("SLIDER_COUNT")
             if slider_count:
                 Info.SLIDER_COUNT = slider_count
-
+            # recover platform info
             platform = setting.value("PLATFORM")
             Info.PLATFORM = platform
             self.changePlatform(platform)
 
             image_load_mode = setting.value("IMAGE_LOAD_MODE")
-            # print(f"load setting: {image_load_mode}")
             Info.IMAGE_LOAD_MODE = image_load_mode
             self.changeImageLoadMode(image_load_mode)
             # 恢复widgets
@@ -493,7 +492,6 @@ class PsyApplication(QMainWindow):
         # 当前输出平台
         setting.setValue("PLATFORM", Info.PLATFORM)
         setting.setValue("IMAGE_LOAD_MODE", Info.IMAGE_LOAD_MODE)
-        # print(f"save setting: {Info.IMAGE_LOAD_MODE}")
 
         Func.log(f"{Info.FILE_NAME} saved successful!")
 
