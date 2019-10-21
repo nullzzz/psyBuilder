@@ -56,18 +56,6 @@ def debugPrint(input):
         print(input)
 
 
-#
-# def dontClearAfterTransStr(inputStr):
-#     if inputStr == "'clear_0'":
-#         inputStr = "0"
-#     elif inputStr == "'notClear_1'":
-#         inputStr = "1"
-#     elif inputStr == "'doNothing_2'":
-#         inputStr = "2"
-#
-#     return inputStr
-
-
 def pyStr2MatlabStr(inputStr):
     #
     if isinstance(inputStr, str):
@@ -904,10 +892,39 @@ def printAutoInd(f, inputStr, *argins):
         cIndents = 0
 
 
+def getMaxmiumOpDataRows() -> int:
+    MaxOpDataRows = 0
+
+    return MaxOpDataRows
+
+
+def updateCycleOpDataRows(cCyleWdiget, opDataRowsInPy:int) -> int:
+
+    return opDataRowsInPy
+
+
+def updateTLOpDataRow(cTLWidget, opDataRowsInPy:int) -> int:
+    cTimelineWidgetIds = Func.getWidgetIDInTimeline(cTLWidget.widget_id)
+
+    for cWidgetId in cTimelineWidgetIds:
+        cWidget = Info.WID_WIDGET[cWidgetId]
+
+        if Func.isWidgetType(cWidgetId,Info.CYCLE):
+            opDataRowsInPy = updateCycleOpDataRows(cWidget, opDataRowsInPy)
+
+    opDataRowsInPy += 1
+
+    return opDataRowsInPy
+
+
+
 def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-    global spFormatVarDict
+    global spFormatVarDict, cInfoDict
     # start from 1 to compatible with MATLAB
     cLoopLevel += 1
+
+    # cOpDataRowNum = cInfoDict.get('maxmiumRows')
+
     attributesSetDict = attributesSetDict.copy()
     cWidgetName = Func.getWidgetName(cWidget.widget_id)
 
@@ -1015,6 +1032,8 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
         else:
             cRepeat = dataStrConvert(cRowDict['Weight'])
 
+        # cOpDataRowNum = cOpDataRowNum + cRepeat
+
         for iRep in range(cRepeat):
             printAutoInd(f, '{0}', "".join(
                 addCurlyBrackets(dataStrConvert(*getRefValue(cWidget, value, attributesSetDict), False, False)) + " "
@@ -1067,7 +1086,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
             throwCompileErrorInfo(f"In {cWidgetName}: Timeline should not be empty!")
         else:
             printAutoInd(f, 'case {0}', f"{addSingleQuotes(Func.getWidgetName(iTimeline_id))}")
-            # printAutoInd(f, "{0}_rIdx    = opRowIdx;", Func.getWidgetName(iTimeline_id))
+
             printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
     printAutoInd(f, 'otherwise ')
@@ -2167,10 +2186,13 @@ def compilePTB(globalSelf):
 
 
 def compileCode(globalSelf, isDummyCompile):
-    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, cIndents, historyPropDict, isDummyPrint, spFormatVarDict
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, cIndents, historyPropDict, isDummyPrint, spFormatVarDict, cInfoDict
 
     # -----------initialize global variables ------/
     isDummyPrint = isDummyCompile
+
+    cInfoDict.update({'maxmiumRows':1})
+
 
     delayedPrintCodes = {'codesAfFip': [], 'respCodes': []}
 
@@ -2434,17 +2456,23 @@ def compileCode(globalSelf, isDummyCompile):
 
         printAutoInd(f, "disableSomeKbKeys; % restrictKeysForKbCheck")
 
-        printAutoInd(f, "%===== initialize output devices ========/")
+        printAutoInd(f, "%--- initialize vars ---/")
         printAutoInd(f, "winIds            = zeros({0},1);", iMonitor - 1)
         printAutoInd(f, "lastScrOnsettime  = zeros({0},1);", iMonitor - 1)
         printAutoInd(f, "cDurs             = zeros({0},1);", iMonitor - 1)
         printAutoInd(f, "winIFIs           = zeros({0},1);", iMonitor - 1)
         printAutoInd(f, "fullRects         = zeros({0},4);\n", iMonitor - 1)
-        # printAutoInd(f, "beCheckedRespDevs = [];")
+        #
         printAutoInd(f,"beCheckedRespDevs    = struct('beUpdatedVar','','allowAble',[],'corResp',[],'rtWindow',[],'endAction',[],'type',[],'index',[],'startTime',[],'isOn',[],'needTobeReset',[],'right',[],'wrong',[],'noResp',[],'respCodeDevIdx',[]);")
         printAutoInd(f,"beCheckedRespDevs(1) = [];")
-        printAutoInd(f, "cFrame    = struct('rt',[],'acc',[],'resp',[]);")
-        printAutoInd(f, "cFrame(1) = [];")
+        printAutoInd(f, "cFrame    = struct('rt',[],'acc',[],'resp',[],'onsettime',[]);")
+        # printAutoInd(f, "cFrame(1) = [];")
+
+        if not isDummyCompile:
+            for cWidgetId in Info.WID_NODE.keys():
+                printAutoInd(f, "{0} = repmat(cFrame,{1},1);", Func.getWidgetName(cWidgetId), cInfoDict.get('maxmiumRows',1000))
+
+        printAutoInd(f, "%-----------------------\\\n")
 
         printAutoInd(f, "%--- open windows ---/")
         printAutoInd(f, "for iWin = 1:numel(monitors)")
@@ -2458,6 +2486,7 @@ def compileCode(globalSelf, isDummyCompile):
 
         printAutoInd(f, "%--------------------\\\n")
 
+        printAutoInd(f, "%===== initialize output devices ========/")
         # initialize TCPIP connections
         if iNetPort > 1:
             printAutoInd(f, "%--- open TCPIPs ----/")
