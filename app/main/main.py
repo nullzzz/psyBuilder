@@ -610,7 +610,7 @@ class PsyApplication(QMainWindow):
             self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
             Info.IMAGE_LOAD_MODE = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
-            print(f"{c}")
+
             imageLoadMode = c if c else "before_event"
             self.before_event_action.setIconVisibleInMenu(imageLoadMode == "before_event")
             self.before_trial_action.setIconVisibleInMenu(imageLoadMode == "before_trial")

@@ -2480,8 +2480,8 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f,"beCheckedRespDevs    = struct('beUpdatedVar','','allowAble',[],'corResp',[],'rtWindow',[],'endAction',[],'type',[],'index',[],'startTime',[],'isOn',[],'needTobeReset',[],'right',[],'wrong',[],'noResp',[],'respCodeDevIdx',[]);")
         printAutoInd(f,"beCheckedRespDevs(1) = [];")
         printAutoInd(f, "cFrame    = struct('rt',[],'acc',[],'resp',[],'onsettime',[]);\n")
-        # printAutoInd(f, "cFrame(1) = [];")
-
+        #
+        # print out initialize OP vars
         if not isDummyCompile:
             maximumOpDataRows = getMaximumOpDataRows()
 
