@@ -1254,6 +1254,8 @@ def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         delayedPrintCodes = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     elif Info.SOUND == cWidgetType:
         delayedPrintCodes = drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+    elif Info.SLIDER == cWidgetType:
+        delayedPrintCodes = drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
 
 
     # step 2: print delayed resp codes or none if the widget is the first one
@@ -1676,6 +1678,147 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     delayedPrintCodes.update({'respCodes': cRespCodes})
 
     return delayedPrintCodes
+
+
+def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
+
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+    cRespCodes = []
+    cAfFlipCodes = []
+
+    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip',[])
+    cRespCodes = delayedPrintCodes.get('respCodes',[])
+
+    if Func.getWidgetPosition(cWidget.widget_id) == 0:
+        # Step 2: print out help info for the current widget
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, Func.getWidgetPosition(cWidget.widget_id) + 1,
+                     Func.getWidgetName(cWidget.widget_id))
+        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
+    debugPrint("-- dev name id map---/")
+    debugPrint(inputDevNameIdxDict)
+    debugPrint(outputDevNameIdxDict)
+
+
+    cProperties = Func.getProperties(cWidget.widget_id)
+    debugPrint("----------------------\\")
+
+
+    cItems = cProperties['item']
+
+    zVlaues = [value['z'] for value in cItems.values()]
+
+    itemIds = [value['z'] for value in cItems.values()]
+
+    sortedZIdx = sorted(range(len(zVlaues)), key=zVlaues.__getitem__)
+
+
+
+    debugPrint(f"{cWidget.widget_id} properties:")
+    debugPrint(f"{cProperties}")
+    debugPrint("-------------------------------\\")
+
+    debugPrint(f"line 714: {attributesSetDict}")
+    # ------------------------------------------------
+    # Step 1: draw the stimuli for the current widget
+    # -------------------------------------------------
+    # 1) get the win id info in matlab format winIds(idNum)
+    shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
+
+    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
+
+    # currently we just used the nearest previous flipped screen info
+    # cWinIdx = historyPropDict.get("cWinIdx")
+    cWinIdx = outputDevNameIdxDict.get(cScreenName)
+    cWinStr = f"winIds({cWinIdx})"
+
+
+
+    # historyPropDict.update({"cScreenName": cScreenName})
+    historyPropDict.update({"cWinIdx": cWinIdx})
+    historyPropDict.update({"cWinStr": cWinStr})
+
+
+    # 2) handle file name:
+    cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
+    cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr,isRef)
+
+    # # 3) check the Buffer Size parameter:
+    # bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
+
+    # 3) check the Stream refill parameter:
+    streamRefillStr, isRef = getRefValue(cWidget, cWidget.getRefillMode(), attributesSetDict)
+
+    # 4) check the start offset in ms parameter:
+    startOffsetStr, isRef = getRefValue(cWidget, cWidget.getStartOffset(), attributesSetDict)
+
+    # 5) check the stop offset in ms parameter:
+    StopOffsetStr, isRef = getRefValue(cWidget, cWidget.getStopOffset(), attributesSetDict)
+
+    # # 6) check the repetitions parameter:
+    # repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
+
+    # 7) check the volume control parameter:
+    isVolumeControl, isRef = getRefValue(cWidget, cWidget.getIsVolumeControl(), attributesSetDict)
+
+    # 8) check the volume parameter:
+    volumeStr, isRef = getRefValue(cWidget, cWidget.getVolume(), attributesSetDict)
+
+    # 9) check the latencyBias control parameter:
+    isLantencyBiasControl, isRef = getRefValue(cWidget, cWidget.getIsLatencyBias(), attributesSetDict)
+
+    # 10) check the volume parameter:
+    latencyBiasStr, isRef = getRefValue(cWidget, cWidget.getBiasTime(), attributesSetDict)
+
+    # 11) check the sound device name parameter:
+    shouldNotBeCitationCheck('Sound device', cWidget.getSoundDeviceName())
+    cSoundDevName, isRef = getRefValue(cWidget, cWidget.getSoundDeviceName(), attributesSetDict)
+    cSoundIdxStr = outputDevNameIdxDict.get(cSoundDevName)
+
+    # 12) check the volume parameter:
+    waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cWidget.getWaitForStart(), attributesSetDict))
+
+    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
+    clearAfter = parseDontClearAfterStr(clearAfter)
+
+    historyPropDict.update({"clearAfter": clearAfter})
+
+
+    # read audio file
+    printAutoInd(f, "cAudioData    = audioread(fullfile(cFolder,{0}) );", addSingleQuotes(cFilenameStr))
+
+    # make audio buffer
+    # printAutoInd(f, "cAudioIdx     = PsychPortAudio('CreateBuffer', {0}, cAudioData);",cSoundIdxStr)
+
+    #  draw buffer to  hw
+    # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioIdx, {1});",cSoundIdxStr, streamRefillStr)
+    printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioData, {1});",cSoundIdxStr, streamRefillStr)
+
+    if isVolumeControl:
+        printAutoInd(f, "PsychPortAudio('Volume', {0}, {1});\n", cSoundIdxStr, volumeStr)
+
+    if isLantencyBiasControl:
+        printAutoInd(f, "PsychPortAudio('LatencyBias', {0}, {1}/1000);\n", cSoundIdxStr, latencyBiasStr)
+
+
+    printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
+
+
+    # ------------------------------------------
+    # the last step: upload the delayed codes
+    # ------------------------------------------
+
+    # cRespCodes.append(f"% delete audio buffer corresponding to {cFilenameStr}")
+    # cRespCodes.append(f"PsychPortAudio('DeleteBuffer', cAudioIdx, 0);\n")
+
+    delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
+    delayedPrintCodes.update({'respCodes': cRespCodes})
+
+    return delayedPrintCodes
+
+
 
 
 def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
