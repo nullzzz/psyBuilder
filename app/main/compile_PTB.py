@@ -137,7 +137,13 @@ def dataStrConvert(dataStr, isRef=False, transMATStr=False, transPercent=True):
             elif isRgbWithBracketsStr(dataStr):
                 outData = dataStr
 
+            elif isRgbaWithBracketsStr(dataStr):
+                outData = dataStr
+
             elif isRgbStr(dataStr):
+                outData = addSquBrackets(dataStr)
+
+            elif isRgbaStr(dataStr):
                 outData = addSquBrackets(dataStr)
 
             elif isIntStr(dataStr):
@@ -512,6 +518,14 @@ def isRgbStr(inputStr):
     isRgbFormat = re.fullmatch("^\d+,\d+,\d+$", inputStr)
     return isRgbFormat
 
+
+def isRgbaStr(inputStr):
+    isRgbaFormat = re.fullmatch("^\d+,\d+,\d+,\d+$", inputStr)
+    return isRgbaFormat
+
+def isRgbaWithBracketsStr(inputStr):
+    isRgbaFormat = re.fullmatch("^\[\d+,\d+,\d+,\d+\]$", inputStr)
+    return isRgbaFormat
 
 def isRgbWithBracketsStr(inputStr):
     isRgbFormat = re.fullmatch("^\[\d+,\d+,\d+\]$", inputStr)
@@ -1753,20 +1767,85 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
             fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
             borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
 
-
-            if lineWidth == '0' or fillColor == borderColor:
+            if fillColor == "[0,0,0,0]":
+                printAutoInd(f, "Screen('FrameRect' ,{0} ,{1} ,CenterRectOnPoint([0, 0, {2}, {3}], {4}, {5}) ,{6});", cWinStr, borderColor,cWidth, cHeight, centerX, centerY, lineWidth)
+            elif lineWidth == '0' or fillColor == borderColor:
                 printAutoInd(f, "Screen('FillRect',{0} ,{1}, CenterRectOnPoint([0, 0, {2}, {3}], {4}, {5}));", cWinStr, fillColor,cWidth, cHeight, centerX, centerY)
             else:
-                printAutoInd("cRect = CenterRectOnPoint([0, 0, {0}, {1}], {2}, {3});",cWidth, cHeight, centerX, centerY)
-                printAutoInd(f, "Screen('FillRect',{0} ,{1}, cRect);", cWinStr, fillColor)
-                printAutoInd(f, "Screen('FrameRect',{0} ,{1},cRect ,{2});", cWinStr, borderColor,lineWidth)
+                printAutoInd(f, "cRect = CenterRectOnPoint([0, 0, {0}, {1}], {2}, {3});",cWidth, cHeight, centerX, centerY)
+                printAutoInd(f, "Screen('FillRect' ,{0} ,{1} ,cRect);", cWinStr, fillColor)
+                printAutoInd(f, "Screen('FrameRect' ,{0} ,{1} ,cRect ,{2});", cWinStr, borderColor,lineWidth)
 
         elif cItemType == 'circle':
-            pass
+            centerX = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict))
+            centerY = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict))
+            cWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Width'], attributesSetDict))
+            cHeight = dataStrConvert(*getRefValue(cWidget, cItemProperties['Height'], attributesSetDict))
+            lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border width'], attributesSetDict))
+
+            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
+
+            if fillColor == "[0,0,0,0]":
+                printAutoInd(f, "Screen('FrameOval' ,{0} ,{1} ,CenterRectOnPoint([0, 0, {2}, {3}], {4}, {5}) ,{6}, {6});", cWinStr, borderColor,cWidth, cHeight, centerX, centerY, lineWidth)
+            elif lineWidth == '0' or fillColor == borderColor:
+                printAutoInd(f, "Screen('FillOval',{0} ,{1}, CenterRectOnPoint([0, 0, {2}, {3}], {4}, {5}));", cWinStr, fillColor,cWidth, cHeight, centerX, centerY)
+            else:
+                printAutoInd(f, "cRect = CenterRectOnPoint([0, 0, {0}, {1}], {2}, {3});",cWidth, cHeight, centerX, centerY)
+                printAutoInd(f, "Screen('FillOval' ,{0} ,{1} ,cRect);", cWinStr, fillColor)
+                printAutoInd(f, "Screen('FrameOval' ,{0} ,{1} ,cRect ,{2}, {2});", cWinStr, borderColor,lineWidth)
+
         elif cItemType == 'polygon':
-            pass
+            lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border width'], attributesSetDict))
+
+            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
+
+            points = cItemProperties['Points']
+            parsedPoints = []
+            for cXY in points:
+                cX = getRefValue(cWidget, cXY[0], attributesSetDict)
+                cY = getRefValue(cWidget, cXY[1], attributesSetDict)
+
+                parsedPoints.append([cX, cY])
+
+            pointListStr = "".join(cXY[0] + "," + cXY[1] + ";" for cXY in parsedPoints)
+            pointListStr = addSquBrackets(pointListStr[0:-1])
+
+            if fillColor == "[0,0,0,0]":
+                printAutoInd(f, "Screen('FramePoly' ,{0} ,{1} ,{2} ,{3});", cWinStr, borderColor, pointListStr , lineWidth)
+            elif lineWidth == '0' or fillColor == borderColor:
+                printAutoInd(f, "Screen('FillPoly',{0} ,{1} , {2});", cWinStr, fillColor, pointListStr)
+            else:
+                printAutoInd(f, "cPointList = {0};",pointListStr)
+                printAutoInd(f, "Screen('FillPoly' ,{0} ,{1} ,cPointList);", cWinStr, fillColor)
+                printAutoInd(f, "Screen('FramePoly' ,{0} ,{1} ,cPointList ,{2}, {2});", cWinStr, borderColor,lineWidth)
+
         elif cItemType == 'arc':
-            pass
+            centerX = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict))
+            centerY = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict))
+            cWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Width'], attributesSetDict))
+            cHeight = dataStrConvert(*getRefValue(cWidget, cItemProperties['Height'], attributesSetDict))
+            lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border width'], attributesSetDict))
+
+            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
+
+            angleStart = dataStrConvert(*getRefValue(cWidget, cItemProperties['Angle start'], attributesSetDict))
+            angleLength = dataStrConvert(*getRefValue(cWidget, cItemProperties['Angle length'], attributesSetDict))
+
+            if fillColor == "[0,0,0,0]":
+                printAutoInd(f,
+                             "Screen('FrameArc' ,{0} ,{1} ,CenterRectOnPoint([0, 0, {2}, {3}], {4}, {5}),{6},{7} ,{8}, {8});",
+                             cWinStr, borderColor, cWidth, cHeight, centerX, centerY, angleStart, angleLength, lineWidth)
+            elif lineWidth == '0' or fillColor == borderColor:
+                printAutoInd(f, "Screen('FillArc',{0} ,{1}, CenterRectOnPoint([0, 0, {2}, {3}], {4}, {5}), {6}, {7});", cWinStr,
+                             fillColor, cWidth, cHeight, centerX, centerY, angleStart, angleLength)
+            else:
+                printAutoInd(f, "cRect = CenterRectOnPoint([0, 0, {0}, {1}], {2}, {3});", cWidth, cHeight, centerX, centerY)
+                printAutoInd(f, "Screen('FillArc' ,{0} ,{1} ,cRect ,{2} ,{3});", cWinStr, fillColor, angleStart, angleLength)
+                printAutoInd(f, "Screen('FrameArc' ,{0} ,{1} ,cRect ,{2}, {3}, {4}, {4});", cWinStr, borderColor, angleStart, angleLength, lineWidth)
+
         elif cItemType == 'gabor':
             pass
         elif cItemType == 'snow':
