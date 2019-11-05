@@ -1706,6 +1706,29 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     debugPrint("----------------------\\")
 
 
+
+    # ------------------------------------------------
+    # Step 1: draw the stimuli for the current widget
+    # -------------------------------------------------
+    # 1) get the win id info in matlab format winIds(idNum)
+    shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
+
+    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
+
+    # currently we just used the nearest previous flipped screen info
+    # cWinIdx = historyPropDict.get("cWinIdx")
+    cWinIdx = outputDevNameIdxDict.get(cScreenName)
+    cWinStr = f"winIds({cWinIdx})"
+
+
+
+    # historyPropDict.update({"cScreenName": cScreenName})
+    historyPropDict.update({"cWinIdx": cWinIdx})
+    historyPropDict.update({"cWinStr": cWinStr})
+
+    # ------------------------------------------------
+    # Step 2: draw eachItem
+    # -------------------------------------------------
     cItems = cProperties['items']
 
     # zVlaues = [value['z'] for value in cItems.values()]
@@ -1716,14 +1739,28 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     itemIds = itemIds[-1::-1] # reverse the key id order in ascend
 
 
-    for cItemId in ItemIds:
+    for cItemId in itemIds:
         cItemType = cItemId.split('_')[0]
         cItemProperties = cItems[cItemId]
         if cItemType == 'rect':
 
+            centerX = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict))
+            centerY = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict))
+            cWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Width'], attributesSetDict))
+            cHeight = dataStrConvert(*getRefValue(cWidget, cItemProperties['Height'], attributesSetDict))
+            lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border width'], attributesSetDict))
+
+            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
 
 
-            pass
+            if lineWidth == '0' or fillColor == borderColor:
+                printAutoInd(f, "Screen('FillRect',{0} ,{1}, CenterRectOnPoint([0, 0, {2}, {3}], {4}, {5}));", cWinStr, fillColor,cWidth, cHeight, centerX, centerY)
+            else:
+                printAutoInd("cRect = CenterRectOnPoint([0, 0, {0}, {1}], {2}, {3});",cWidth, cHeight, centerX, centerY)
+                printAutoInd(f, "Screen('FillRect',{0} ,{1}, cRect);", cWinStr, fillColor)
+                printAutoInd(f, "Screen('FrameRect',{0} ,{1},cRect ,{2});", cWinStr, borderColor,lineWidth)
+
         elif cItemType == 'circle':
             pass
         elif cItemType == 'polygon':
@@ -1754,87 +1791,70 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     debugPrint("-------------------------------\\")
 
     debugPrint(f"line 714: {attributesSetDict}")
-    # ------------------------------------------------
-    # Step 1: draw the stimuli for the current widget
-    # -------------------------------------------------
-    # 1) get the win id info in matlab format winIds(idNum)
-    shouldNotBeCitationCheck('Screen Name',cWidget.getScreenName())
-
-    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
-
-    # currently we just used the nearest previous flipped screen info
-    # cWinIdx = historyPropDict.get("cWinIdx")
-    cWinIdx = outputDevNameIdxDict.get(cScreenName)
-    cWinStr = f"winIds({cWinIdx})"
 
 
-
-    # historyPropDict.update({"cScreenName": cScreenName})
-    historyPropDict.update({"cWinIdx": cWinIdx})
-    historyPropDict.update({"cWinStr": cWinStr})
-
-
-    # 2) handle file name:
-    cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
-    cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr,isRef)
-
-    # # 3) check the Buffer Size parameter:
-    # bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
-
-    # 3) check the Stream refill parameter:
-    streamRefillStr, isRef = getRefValue(cWidget, cWidget.getRefillMode(), attributesSetDict)
-
-    # 4) check the start offset in ms parameter:
-    startOffsetStr, isRef = getRefValue(cWidget, cWidget.getStartOffset(), attributesSetDict)
-
-    # 5) check the stop offset in ms parameter:
-    StopOffsetStr, isRef = getRefValue(cWidget, cWidget.getStopOffset(), attributesSetDict)
-
-    # # 6) check the repetitions parameter:
-    # repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
-
-    # 7) check the volume control parameter:
-    isVolumeControl, isRef = getRefValue(cWidget, cWidget.getIsVolumeControl(), attributesSetDict)
-
-    # 8) check the volume parameter:
-    volumeStr, isRef = getRefValue(cWidget, cWidget.getVolume(), attributesSetDict)
-
-    # 9) check the latencyBias control parameter:
-    isLantencyBiasControl, isRef = getRefValue(cWidget, cWidget.getIsLatencyBias(), attributesSetDict)
-
-    # 10) check the volume parameter:
-    latencyBiasStr, isRef = getRefValue(cWidget, cWidget.getBiasTime(), attributesSetDict)
-
-    # 11) check the sound device name parameter:
-    shouldNotBeCitationCheck('Sound device', cWidget.getSoundDeviceName())
-    cSoundDevName, isRef = getRefValue(cWidget, cWidget.getSoundDeviceName(), attributesSetDict)
-    cSoundIdxStr = outputDevNameIdxDict.get(cSoundDevName)
-
-    # 12) check the volume parameter:
-    waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cWidget.getWaitForStart(), attributesSetDict))
-
-    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-    clearAfter = parseDontClearAfterStr(clearAfter)
-
-    historyPropDict.update({"clearAfter": clearAfter})
-
-
-    # read audio file
-    printAutoInd(f, "cAudioData    = audioread(fullfile(cFolder,{0}) );", addSingleQuotes(cFilenameStr))
-
-    # make audio buffer
-    # printAutoInd(f, "cAudioIdx     = PsychPortAudio('CreateBuffer', {0}, cAudioData);",cSoundIdxStr)
-
-    #  draw buffer to  hw
-    # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioIdx, {1});",cSoundIdxStr, streamRefillStr)
-    printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioData, {1});",cSoundIdxStr, streamRefillStr)
-
-    if isVolumeControl:
-        printAutoInd(f, "PsychPortAudio('Volume', {0}, {1});\n", cSoundIdxStr, volumeStr)
-
-    if isLantencyBiasControl:
-        printAutoInd(f, "PsychPortAudio('LatencyBias', {0}, {1}/1000);\n", cSoundIdxStr, latencyBiasStr)
-
+    #
+    # # 2) handle file name:
+    # cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
+    # cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr,isRef)
+    #
+    # # # 3) check the Buffer Size parameter:
+    # # bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
+    #
+    # # 3) check the Stream refill parameter:
+    # streamRefillStr, isRef = getRefValue(cWidget, cWidget.getRefillMode(), attributesSetDict)
+    #
+    # # 4) check the start offset in ms parameter:
+    # startOffsetStr, isRef = getRefValue(cWidget, cWidget.getStartOffset(), attributesSetDict)
+    #
+    # # 5) check the stop offset in ms parameter:
+    # StopOffsetStr, isRef = getRefValue(cWidget, cWidget.getStopOffset(), attributesSetDict)
+    #
+    # # # 6) check the repetitions parameter:
+    # # repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
+    #
+    # # 7) check the volume control parameter:
+    # isVolumeControl, isRef = getRefValue(cWidget, cWidget.getIsVolumeControl(), attributesSetDict)
+    #
+    # # 8) check the volume parameter:
+    # volumeStr, isRef = getRefValue(cWidget, cWidget.getVolume(), attributesSetDict)
+    #
+    # # 9) check the latencyBias control parameter:
+    # isLantencyBiasControl, isRef = getRefValue(cWidget, cWidget.getIsLatencyBias(), attributesSetDict)
+    #
+    # # 10) check the volume parameter:
+    # latencyBiasStr, isRef = getRefValue(cWidget, cWidget.getBiasTime(), attributesSetDict)
+    #
+    # # 11) check the sound device name parameter:
+    # shouldNotBeCitationCheck('Sound device', cWidget.getSoundDeviceName())
+    # cSoundDevName, isRef = getRefValue(cWidget, cWidget.getSoundDeviceName(), attributesSetDict)
+    # cSoundIdxStr = outputDevNameIdxDict.get(cSoundDevName)
+    #
+    # # 12) check the volume parameter:
+    # waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cWidget.getWaitForStart(), attributesSetDict))
+    #
+    # clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
+    # clearAfter = parseDontClearAfterStr(clearAfter)
+    #
+    # historyPropDict.update({"clearAfter": clearAfter})
+    #
+    #
+    # # read audio file
+    # printAutoInd(f, "cAudioData    = audioread(fullfile(cFolder,{0}) );", addSingleQuotes(cFilenameStr))
+    #
+    # # make audio buffer
+    # # printAutoInd(f, "cAudioIdx     = PsychPortAudio('CreateBuffer', {0}, cAudioData);",cSoundIdxStr)
+    #
+    # #  draw buffer to  hw
+    # # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioIdx, {1});",cSoundIdxStr, streamRefillStr)
+    # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioData, {1});",cSoundIdxStr, streamRefillStr)
+    #
+    # if isVolumeControl:
+    #     printAutoInd(f, "PsychPortAudio('Volume', {0}, {1});\n", cSoundIdxStr, volumeStr)
+    #
+    # if isLantencyBiasControl:
+    #     printAutoInd(f, "PsychPortAudio('LatencyBias', {0}, {1}/1000);\n", cSoundIdxStr, latencyBiasStr)
+    #
 
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
 

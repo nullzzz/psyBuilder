@@ -477,13 +477,28 @@ class Slider(QMainWindow):
         self.widget_id = new_widget_id
 
 
-
     def getDuration(self) -> str:
         """
         返回duration
         :return:
         """
         return self.pro_window.duration.duration.currentText()
+
+
+    def getClearAfter(self) -> str:
+        """
+        返回是否clear after
+        :return:
+        """
+        return self.pro_window.general.clear_after.currentText()
+
+    def getScreenName(self) -> str:
+        """
+        返回Screen Name
+        :return:
+        """
+        return self.pro_window.general.screen_name.currentText()
+
 
     def getOutputDevice(self) -> dict:
         """
