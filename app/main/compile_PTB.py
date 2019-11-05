@@ -1706,13 +1706,46 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     debugPrint("----------------------\\")
 
 
-    cItems = cProperties['item']
+    cItems = cProperties['items']
 
-    zVlaues = [value['z'] for value in cItems.values()]
+    # zVlaues = [value['z'] for value in cItems.values()]
+    # the items were already sorted in descend order
 
-    itemIds = [value['z'] for value in cItems.values()]
 
-    sortedZIdx = sorted(range(len(zVlaues)), key=zVlaues.__getitem__)
+    itemIds = [key for key in cItems.keys()]
+    itemIds = itemIds[-1::-1] # reverse the key id order in ascend
+
+
+    for cItemId in ItemIds:
+        cItemType = cItemId.split('_')[0]
+        cItemProperties = cItems[cItemId]
+        if cItemType == 'rect':
+
+
+
+            pass
+        elif cItemType == 'circle':
+            pass
+        elif cItemType == 'polygon':
+            pass
+        elif cItemType == 'arc':
+            pass
+        elif cItemType == 'gabor':
+            pass
+        elif cItemType == 'snow':
+            pass
+        elif cItemType == 'text':
+            pass
+        elif cItemType == 'sound':
+            pass
+        elif cItemType == 'video':
+            pass
+        elif cItemType == 'image':
+            pass
+
+
+
+    # sortedZIdx = sorted(range(len(zVlaues)), key=zVlaues.__getitem__)
 
 
 
