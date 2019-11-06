@@ -56,6 +56,9 @@ class LineItem(QGraphicsLineItem):
         y1 = self.line().y1()
         x2 = self.line().x2()
         y2 = self.line().y2()
+
+        print(f"{self.line().p1().x()},{self.line().p1().y()}")
+
         self.pro_window.setPosition(x1, y1, x2, y2)
 
     def setWidth(self, width):
