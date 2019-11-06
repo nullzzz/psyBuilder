@@ -75,6 +75,7 @@ class PixItem(QGraphicsPixmapItem):
     def getName(self):
         return self.item_name
 
+    # ！！！ 别删
     # def mousePressEvent(self, event):
     #     if self.item_type < 8:
     #         if event.button() == Qt.LeftButton and event.modifiers() == Qt.AltModifier:

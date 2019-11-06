@@ -156,6 +156,7 @@ class Scene(QGraphicsScene):
     def mouseReleaseEvent(self, mouseEvent):
         if self.line and self.my_mode == self.InsertLine:
             item = LineItem(self.line.line())
+            item.setPosition()
             self.addItem(item)
             self.itemAdd.emit(item.getName())
             self.update()
@@ -170,6 +171,7 @@ class Scene(QGraphicsScene):
     def getInfo(self):
         item_info: dict = {}
         for item in self.items():
+            item.setPosition()
             item_info[item.getName()] = item.getInfo()
         return item_info
 
@@ -198,6 +200,17 @@ class Scene(QGraphicsScene):
                     item = DiaItem(DiaItem.Rect, k)
                 elif k.startswith("circle"):
                     item = DiaItem(DiaItem.Circle, k)
+                else:
+                    x1: str = v.get("X1")
+                    y1: str = v.get("Y1")
+                    x2: str = v.get("X2")
+                    y2: str = v.get("Y2")
+                    if x1.startswith("[") or x2.startswith("[") or y1.startswith("[") or y2.startswith("["):
+                        line = QLineF(100, 100, 200, 200)
+                    else:
+                        line = QLineF(float(x1), float(y1), float(x2), float(y2))
+                    item = LineItem(line, k)
+                    item.setLine(line)
                 self.addItem(item)
                 item.setProperties(v)
                 item.apply()
