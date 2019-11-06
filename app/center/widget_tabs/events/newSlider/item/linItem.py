@@ -102,6 +102,7 @@ class LineItem(QGraphicsLineItem):
         self.changeSomething()
 
     def getInfo(self):
+        self.setPosition()
         self.default_properties = {
             'name': self.item_name,
             'z': self.zValue(),

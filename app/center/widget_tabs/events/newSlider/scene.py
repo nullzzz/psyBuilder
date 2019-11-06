@@ -200,7 +200,7 @@ class Scene(QGraphicsScene):
                     item = DiaItem(DiaItem.Rect, k)
                 elif k.startswith("circle"):
                     item = DiaItem(DiaItem.Circle, k)
-                else:
+                elif k.startswith("line"):
                     x1: str = v.get("X1")
                     y1: str = v.get("Y1")
                     x2: str = v.get("X2")
@@ -211,6 +211,7 @@ class Scene(QGraphicsScene):
                         line = QLineF(float(x1), float(y1), float(x2), float(y2))
                     item = LineItem(line, k)
                     item.setLine(line)
+
                 self.addItem(item)
                 item.setProperties(v)
                 item.apply()

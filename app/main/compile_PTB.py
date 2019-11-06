@@ -697,7 +697,7 @@ def parseDontClearAfterStr(inputStr):
             inputStr = '0'
         elif inputStr == "notClear_1":
             inputStr = '1'
-        elif inputStr == "noNothing_2":
+        elif inputStr == "doNothing_2":
             inputStr = '2'
     return inputStr
 
@@ -1756,6 +1756,16 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     for cItemId in itemIds:
         cItemType = cItemId.split('_')[0]
         cItemProperties = cItems[cItemId]
+        if cItemType == 'line':
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
+            lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border width'], attributesSetDict))
+            cX1 = dataStrConvert(*getRefValue(cWidget, cItemProperties['X1'], attributesSetDict))
+            cY1 = dataStrConvert(*getRefValue(cWidget, cItemProperties['Y1'], attributesSetDict))
+            cX2 = dataStrConvert(*getRefValue(cWidget, cItemProperties['X2'], attributesSetDict))
+            cY2 = dataStrConvert(*getRefValue(cWidget, cItemProperties['Y2'], attributesSetDict))
+
+            printAutoInd(f, "Screen('DrawLine' ,{0} ,{1} ,{2} ,{3} ,{4} ,{5} ,{6});", cWinStr, borderColor, cX1, cY1, cX2, cY2, lineWidth)
+
         if cItemType == 'rect':
 
             centerX = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict))
@@ -1807,7 +1817,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                 cX = getRefValue(cWidget, cXY[0], attributesSetDict)
                 cY = getRefValue(cWidget, cXY[1], attributesSetDict)
 
-                parsedPoints.append([cX, cY])
+                parsedPoints.append([cX[0], cY[0]])
 
             pointListStr = "".join(cXY[0] + "," + cXY[1] + ";" for cXY in parsedPoints)
             pointListStr = addSquBrackets(pointListStr[0:-1])
@@ -1869,72 +1879,13 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     debugPrint(f"{cProperties}")
     debugPrint("-------------------------------\\")
 
-    debugPrint(f"line 714: {attributesSetDict}")
 
+    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['pro']['Clear after'], attributesSetDict))
+    clearAfter = parseDontClearAfterStr(clearAfter)
 
-    #
-    # # 2) handle file name:
-    # cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
-    # cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr,isRef)
-    #
-    # # # 3) check the Buffer Size parameter:
-    # # bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
-    #
-    # # 3) check the Stream refill parameter:
-    # streamRefillStr, isRef = getRefValue(cWidget, cWidget.getRefillMode(), attributesSetDict)
-    #
-    # # 4) check the start offset in ms parameter:
-    # startOffsetStr, isRef = getRefValue(cWidget, cWidget.getStartOffset(), attributesSetDict)
-    #
-    # # 5) check the stop offset in ms parameter:
-    # StopOffsetStr, isRef = getRefValue(cWidget, cWidget.getStopOffset(), attributesSetDict)
-    #
-    # # # 6) check the repetitions parameter:
-    # # repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
-    #
-    # # 7) check the volume control parameter:
-    # isVolumeControl, isRef = getRefValue(cWidget, cWidget.getIsVolumeControl(), attributesSetDict)
-    #
-    # # 8) check the volume parameter:
-    # volumeStr, isRef = getRefValue(cWidget, cWidget.getVolume(), attributesSetDict)
-    #
-    # # 9) check the latencyBias control parameter:
-    # isLantencyBiasControl, isRef = getRefValue(cWidget, cWidget.getIsLatencyBias(), attributesSetDict)
-    #
-    # # 10) check the volume parameter:
-    # latencyBiasStr, isRef = getRefValue(cWidget, cWidget.getBiasTime(), attributesSetDict)
-    #
-    # # 11) check the sound device name parameter:
-    # shouldNotBeCitationCheck('Sound device', cWidget.getSoundDeviceName())
-    # cSoundDevName, isRef = getRefValue(cWidget, cWidget.getSoundDeviceName(), attributesSetDict)
-    # cSoundIdxStr = outputDevNameIdxDict.get(cSoundDevName)
-    #
-    # # 12) check the volume parameter:
-    # waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cWidget.getWaitForStart(), attributesSetDict))
-    #
-    # clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-    # clearAfter = parseDontClearAfterStr(clearAfter)
-    #
-    # historyPropDict.update({"clearAfter": clearAfter})
-    #
-    #
-    # # read audio file
-    # printAutoInd(f, "cAudioData    = audioread(fullfile(cFolder,{0}) );", addSingleQuotes(cFilenameStr))
-    #
-    # # make audio buffer
-    # # printAutoInd(f, "cAudioIdx     = PsychPortAudio('CreateBuffer', {0}, cAudioData);",cSoundIdxStr)
-    #
-    # #  draw buffer to  hw
-    # # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioIdx, {1});",cSoundIdxStr, streamRefillStr)
-    # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, cAudioData, {1});",cSoundIdxStr, streamRefillStr)
-    #
-    # if isVolumeControl:
-    #     printAutoInd(f, "PsychPortAudio('Volume', {0}, {1});\n", cSoundIdxStr, volumeStr)
-    #
-    # if isLantencyBiasControl:
-    #     printAutoInd(f, "PsychPortAudio('LatencyBias', {0}, {1}/1000);\n", cSoundIdxStr, latencyBiasStr)
-    #
+    historyPropDict.update({"clearAfter": clearAfter})
 
+    printAutoInd(f, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
     printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
 
 

@@ -18,7 +18,7 @@ class SliderGeneral(QWidget):
         }
 
         self.clear_after = PigComboBox()
-        self.clear_after.addItems(("Yes", "No"))
+        self.clear_after.addItems(("clear_0", "notClear_1","doNothing_2"))
 
         self.using_screen_id: str = "screen.0"
         self.screen_name = PigComboBox()
@@ -31,7 +31,7 @@ class SliderGeneral(QWidget):
     def setGeneral(self):
         layout = QFormLayout()
         layout.addRow("Screen Name:", self.screen_name)
-        layout.addRow("Clear After:", self.clear_after)
+        layout.addRow("Dont Clear After:", self.clear_after)
 
         self.setLayout(layout)
 
