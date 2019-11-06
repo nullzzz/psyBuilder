@@ -116,7 +116,8 @@ class OtherItem(QGraphicsPixmapItem):
             orientation = 0 if __orientation.startswith("[") else float(__orientation)
 
             __back_color = self.default_properties['Back color']
-            back_color = (128.0, 128.0, 128.0) if __back_color.startswith("[") else tuple(float(x) for x in __back_color.split(","))
+            back_color = (128.0, 128.0, 128.0) if __back_color.startswith("[") else tuple(
+                float(x) for x in __back_color.split(","))
 
             __sdx = self.default_properties['SDx']
             sdx = 30 if __sdx.startswith("[") else int(__sdx)
@@ -129,7 +130,7 @@ class OtherItem(QGraphicsPixmapItem):
             pix = QPixmap(qimage2ndarray.array2qimage(gabor_stimulate))
             self.setPixmap(pix.scaled(w, h, Qt.KeepAspectRatio))
 
-        self.setPos(QPoint(cx - (w /2), cy - (h /2)))
+        self.setPos(QPoint(cx - (w / 2), cy - (h / 2)))
 
         x = self.boundingRect().center().x()
         y = self.boundingRect().center().y()
@@ -152,7 +153,7 @@ class OtherItem(QGraphicsPixmapItem):
         return snow
 
     @staticmethod
-    def getGabor(cycles_per_pix, contrast, phase, orientation, back_color:tuple, width, height, sdx, sdy):
+    def getGabor(cycles_per_pix, contrast, phase, orientation, back_color: tuple, width, height, sdx, sdy):
         phase = (phase % 360) * (np.pi / 180)
         orientation = (orientation % 360) * (np.pi / 180)
         # to force the width and height to be even

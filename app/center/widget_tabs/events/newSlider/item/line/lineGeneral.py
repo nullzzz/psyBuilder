@@ -1,11 +1,8 @@
-import numpy as np
-from PyQt5.QtCore import QRegExp, Qt
-from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QFormLayout, QGroupBox, QGridLayout, QSpinBox, QLabel, QCompleter
-from PyQt5.QtWidgets import (QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QDesktopWidget)
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QFormLayout, QGroupBox, QGridLayout, QLabel, QCompleter
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
-from app.info import Info
-from app.lib import PigComboBox, ColorListEditor, PigLineEdit
+from app.lib import ColorListEditor, PigLineEdit
 
 
 class LineGeneral(QWidget):
@@ -116,11 +113,7 @@ class LineGeneral(QWidget):
             self.default_properties = properties
             self.loadSetting()
 
-    def setPos(self, x, y):
-        self.cx_pos.setCurrentText(str(int(x)))
-        self.cy_pos.setCurrentText(str(int(y)))
-
-    def setLineColor(self,color):
+    def setLineColor(self, color):
         if not self.border_color.currentText().startswith("["):
             cRGBA = color.getRgb()
             self.border_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")

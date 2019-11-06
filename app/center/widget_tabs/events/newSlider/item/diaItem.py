@@ -204,13 +204,6 @@ class DiaItem(QGraphicsPolygonItem):
         else:
             super(DiaItem, self).mouseMoveEvent(mouseEvent)
 
-        self.setPosition()
-        self.setWh()
-        if self.item_type == self.Polygon:
-            self.setVertex()
-        self.setPoint()
-
-
     def mousePressEvent(self, mouseEvent):
         if mouseEvent.button() != Qt.LeftButton:
             return
@@ -244,15 +237,10 @@ class DiaItem(QGraphicsPolygonItem):
         self.pro_window.show()
 
     def setPosition(self):
-        """
-        change the properties in pro_window
-        :return:
-        """
         self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def setWh(self):
-
-        self.pro_window.setWh(self.noOutLineBoundingRect().width(), self.noOutLineBoundingRect().height())
+        self.pro_window.setWh(self.boundingRect().width(), self.boundingRect().height())
 
     def setVertex(self):
         points = []
@@ -315,10 +303,6 @@ class DiaItem(QGraphicsPolygonItem):
         return new
 
     def changeSomething(self):
-        """
-        property setting to show
-        :return:
-        """
         __cx = self.default_properties["Center X"]
         cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
         __cy = self.default_properties["Center Y"]

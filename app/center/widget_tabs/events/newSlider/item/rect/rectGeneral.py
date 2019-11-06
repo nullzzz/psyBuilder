@@ -71,8 +71,8 @@ class RectGeneral(QWidget):
         layout2.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
         layout2.setLabelAlignment(Qt.AlignLeft)
 
-        self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
-        self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
+        self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
         layout2.addRow(l2, self.border_color)
         layout2.addRow(l3, self.border_width)
