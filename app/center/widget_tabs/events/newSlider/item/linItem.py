@@ -52,10 +52,12 @@ class LineItem(QGraphicsLineItem):
         self.pro_window.show()
 
     def setPosition(self):
-        x1 = self.line().x1()
-        y1 = self.line().y1()
-        x2 = self.line().x2()
-        y2 = self.line().y2()
+        x1 = self.line().x1() + self.scenePos().x()
+        y1 = self.line().y1() + self.scenePos().y()
+        x2 = self.line().x2() + self.scenePos().x()
+        y2 = self.line().y2() + self.scenePos().y()
+        self.setPos(0, 0)
+        self.setLine(x1, y1, x2, y2)
         self.pro_window.setPosition(x1, y1, x2, y2)
 
     def setWidth(self, width):
@@ -129,12 +131,6 @@ class LineItem(QGraphicsLineItem):
         pen.setWidth(width)
         self.setPen(pen)
         self.update()
-
-        data: dict = {
-            "line color": color,
-            "line width": width,
-        }
-        # self.propertyChanged.emit(data)
 
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):

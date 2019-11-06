@@ -103,7 +103,6 @@ class DiaItem(QGraphicsPolygonItem):
         self.border_width = width
         self.pro_window.setLineWidth(width)
 
-
     def boundingRect(self):
         return self.polygon().boundingRect().adjusted(-self.pen().width(),
                                                       -self.pen().width(),
@@ -317,7 +316,6 @@ class DiaItem(QGraphicsPolygonItem):
             a = 255
         else:
             r, g, b, a = color
-
 
         self.setBrush(QColor(r, g, b, a))
         # border color

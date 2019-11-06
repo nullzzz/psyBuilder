@@ -71,11 +71,10 @@ class Scene(QGraphicsScene):
             else:
                 return
             self.addItem(item)
-            item.setPos(event.scenePos()) # move the item in the scene
+            item.setPos(event.scenePos())  # move the item in the scene
 
-            item.setPosition() # update the general tab
-            item.getInfo()     # get default_property from general tab
-
+            item.setPosition()  # update the general tab
+            item.getInfo()  # get default_property from general tab
 
             # todo 苟且一下
             if item_type == DiaItem.Polygon:
@@ -109,8 +108,7 @@ class Scene(QGraphicsScene):
         for item in self.selectedItems():
             if isinstance(item, DiaItem):
                 item.setBrush(color)
-                item.setItemColor(color)# update the default properties in GeneralTab
-
+                item.setItemColor(color)  # update the default properties in GeneralTab
 
     def setLineWidth(self, width):
         for item in self.selectedItems():

@@ -63,7 +63,6 @@ class RectGeneral(QWidget):
 
         group1.setLayout(layout1)
 
-
         group2 = QGroupBox("")
         layout2 = QFormLayout()
 
@@ -71,8 +70,8 @@ class RectGeneral(QWidget):
         layout2.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
         layout2.setLabelAlignment(Qt.AlignLeft)
 
-        self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
-        self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
+        self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
         layout2.addRow(l2, self.border_color)
         layout2.addRow(l3, self.border_width)
@@ -123,15 +122,16 @@ class RectGeneral(QWidget):
         if not self._height.text().startswith("["):
             self._height.setText(str(int(h)))
 
-    def setItemColor(self,color):
+    def setItemColor(self, color):
         if not self.fill_color.currentText().startswith("["):
             cRGBA = color.getRgb()
             self.fill_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
 
-    def setLineColor(self,color):
+    def setLineColor(self, color):
         if not self.border_color.currentText().startswith("["):
             cRGBA = color.getRgb()
             self.border_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
+
     # 加载参数设置
     def loadSetting(self):
         self.cx_pos.setText(self.default_properties["Center X"])

@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsItem
 from app.center.widget_tabs.events.newSlider.item.image import ImageProperty
 from app.center.widget_tabs.events.newSlider.item.itemMenu import ItemMenu
 from app.center.widget_tabs.events.newSlider.item.sound import SoundProperty
-from app.center.widget_tabs.events.newSlider.item.text import TextProperty
 from app.center.widget_tabs.events.newSlider.item.video import VideoProperty
 from app.func import Func
 from app.info import Info
@@ -16,7 +15,7 @@ class PixItem(QGraphicsPixmapItem):
     """
     Image、Text、Video、Sound
     """
-    Image, Video, Sound = [5,7,8]
+    Image, Video, Sound = [5, 7, 8]
 
     name = {
         Image: "image",
