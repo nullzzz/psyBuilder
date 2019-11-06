@@ -231,12 +231,11 @@ class DiaItem(QGraphicsPolygonItem):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setPosition()
         self.setWh()
-        if self.item_type == self.Polygon:
-            self.setVertex()
-        self.setPoint()
         self.pro_window.show()
 
     def setPosition(self):
+        if self.item_type == self.Polygon:
+            self.setVertex()
         self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def setWh(self):
@@ -429,5 +428,3 @@ class DiaItem(QGraphicsPolygonItem):
             self.pro_window.general.default_properties["Fill color"] = rgb
             self.default_properties["Fill color"] = rgb
             self.pro_window.general.fill_color.setCurrentText(rgb)
-
-        # self.pro_window.setItemColor(color)

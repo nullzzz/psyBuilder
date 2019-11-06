@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QRect
-from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush, QKeySequence
+from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMainWindow, QMenu, QAction, \
-    QComboBox, QColorDialog, QFrame
+    QComboBox, QColorDialog
 
 from app.center.widget_tabs.events.newSlider.item.diaItem import DiaItem
 from app.center.widget_tabs.events.newSlider.item.linItem import LineItem
@@ -141,7 +141,7 @@ class Slider(QMainWindow):
 
         width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
 
-        self.view.setMaximumSize(width/2, height/2)
+        self.view.setMaximumSize(width / 2, height / 2)
         self.scene.setSceneRect(0, 0, width, height)
         self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
@@ -244,7 +244,6 @@ class Slider(QMainWindow):
 
     def getProperties(self):
         return self.getInfo()
-
 
     def getShowProperties(self):
         info = self.pro_window.default_properties.copy()
