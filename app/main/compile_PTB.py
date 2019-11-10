@@ -707,7 +707,7 @@ def parseDurationStr(inputStr):
         inputStr = removeSingleQuotes(inputStr)
 
         if inputStr == "(Infinite)":
-            inputStr = "6000000" # an extramely impossible value
+            inputStr = "6000000" # an extremely impossible value
         elif re.fullmatch("\d+~\d+", inputStr):
             cDurRange = inputStr.split('~')
             inputStr = f"{cDurRange[0]},{cDurRange[1]}"
@@ -1750,9 +1750,24 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
 
 
     itemIds = [key for key in cItems.keys()]
-    itemIds = itemIds[-1::-1] # reverse the key id order in ascend
+    itemIds.reverse() # reverse the key id order
+    # itemIds = itemIds[-1::-1] # reverse the key id order in ascend
+    # loop twice, once for audio and once for all visual stimuli
+    for cItemId in itemIds:
+        cItemType = cItemId.split('_')[0]
+        cItemProperties = cItems[cItemId]
+        if cItemType == 'sound':
 
 
+
+
+
+            pass
+            itemIds.remove(cItemId)
+        else:
+            pass
+
+    # loop to handle all visual stimuli
     for cItemId in itemIds:
         cItemType = cItemId.split('_')[0]
         cItemProperties = cItems[cItemId]
