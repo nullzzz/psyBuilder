@@ -300,7 +300,7 @@ class SoundDisplay(QMainWindow):
         返回Refill Mode
         :return:
         """
-        return self.pro_window.general.refill_mode.currentText()
+        return self.pro_window.general.stream_refill.currentText()
 
     def getStartOffset(self) -> str:
         """
@@ -321,7 +321,7 @@ class SoundDisplay(QMainWindow):
         返回Loop
         :return:
         """
-        return self.pro_window.general.repetitions.currentText()
+        return self.pro_window.general.repetitions.text()
 
     def getIsVolumeControl(self) -> bool:
         """

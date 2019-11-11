@@ -1919,12 +1919,14 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
 
 
 
-def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes, cProperties = []):
     global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
     cRespCodes = []
     cAfFlipCodes = []
+
+    isNotInSlide = True
 
     cAfFlipCodes = delayedPrintCodes.get('codesAfFlip',[])
     cRespCodes = delayedPrintCodes.get('respCodes',[])
@@ -1941,7 +1943,11 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     debugPrint(outputDevNameIdxDict)
     debugPrint("----------------------\\")
 
-    cProperties = Func.getProperties(cWidget.widget_id)
+    if len(cProperties) == 0:
+        cProperties = Func.getProperties(cWidget.widget_id)
+    else:
+        isNotInSlide = False
+
     debugPrint(f"{cWidget.widget_id} properties:")
     debugPrint(f"{cProperties}")
     debugPrint("-------------------------------\\")
@@ -1968,43 +1974,43 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
 
     # 2) handle file name:
-    cFilenameStr, isRef = getRefValue(cWidget, cWidget.getFilename(), attributesSetDict)
+    cFilenameStr, isRef = getRefValue(cWidget, cProperties['File name'], attributesSetDict)
     cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr,isRef)
 
     # # 3) check the Buffer Size parameter:
     # bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
 
     # 3) check the Stream refill parameter:
-    streamRefillStr, isRef = getRefValue(cWidget, cWidget.getRefillMode(), attributesSetDict)
+    streamRefillStr, isRef = getRefValue(cWidget, cProperties['Stream refill'], attributesSetDict)
 
     # 4) check the start offset in ms parameter:
-    startOffsetStr, isRef = getRefValue(cWidget, cWidget.getStartOffset(), attributesSetDict)
+    startOffsetStr, isRef = getRefValue(cWidget, cProperties['Start offset'], attributesSetDict)
 
     # 5) check the stop offset in ms parameter:
-    StopOffsetStr, isRef = getRefValue(cWidget, cWidget.getStopOffset(), attributesSetDict)
+    StopOffsetStr, isRef = getRefValue(cWidget, cProperties['Stop offset'], attributesSetDict)
 
     # # 6) check the repetitions parameter:
     # repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
 
     # 7) check the volume control parameter:
-    isVolumeControl, isRef = getRefValue(cWidget, cWidget.getIsVolumeControl(), attributesSetDict)
+    isVolumeControl, isRef = getRefValue(cWidget, cProperties['Volume control'], attributesSetDict)
 
     # 8) check the volume parameter:
-    volumeStr, isRef = getRefValue(cWidget, cWidget.getVolume(), attributesSetDict)
+    volumeStr, isRef = getRefValue(cWidget, cProperties['Volume'], attributesSetDict)
 
     # 9) check the latencyBias control parameter:
-    isLantencyBiasControl, isRef = getRefValue(cWidget, cWidget.getIsLatencyBias(), attributesSetDict)
+    isLantencyBiasControl, isRef = getRefValue(cWidget, cProperties['Latency bias'], attributesSetDict)
 
     # 10) check the volume parameter:
-    latencyBiasStr, isRef = getRefValue(cWidget, cWidget.getBiasTime(), attributesSetDict)
+    latencyBiasStr, isRef = getRefValue(cWidget, cProperties['Bias time'], attributesSetDict)
 
     # 11) check the sound device name parameter:
-    shouldNotBeCitationCheck('Sound device', cWidget.getSoundDeviceName())
-    cSoundDevName, isRef = getRefValue(cWidget, cWidget.getSoundDeviceName(), attributesSetDict)
+    shouldNotBeCitationCheck('Sound device', cProperties['Sound device'])
+    cSoundDevName, isRef = getRefValue(cWidget, cProperties['Sound device'], attributesSetDict)
     cSoundIdxStr = outputDevNameIdxDict.get(cSoundDevName)
 
     # 12) check the volume parameter:
-    waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cWidget.getWaitForStart(), attributesSetDict))
+    waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cProperties['Wait for start'], attributesSetDict))
 
     clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
     clearAfter = parseDontClearAfterStr(clearAfter)
@@ -2028,8 +2034,8 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     if isLantencyBiasControl:
         printAutoInd(f, "PsychPortAudio('LatencyBias', {0}, {1}/1000);\n", cSoundIdxStr, latencyBiasStr)
 
-
-    printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
+    if isNotInSlide:
+        printAutoInd(f, "detectAbortKey(abortKeyCode); % check abort key in the start of every event\n")
 
 
     # ------------------------------------------
