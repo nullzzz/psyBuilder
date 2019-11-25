@@ -707,7 +707,7 @@ def parseDurationStr(inputStr):
         inputStr = removeSingleQuotes(inputStr)
 
         if inputStr == "(Infinite)":
-            inputStr = "6000000" # an extremely impossible value
+            inputStr = "999000" # an extremely impossible value maximium of 1000 second
         elif re.fullmatch("\d+~\d+", inputStr):
             cDurRange = inputStr.split('~')
             inputStr = f"{cDurRange[0]},{cDurRange[1]}"
