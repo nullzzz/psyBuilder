@@ -3237,11 +3237,10 @@ def compileCode(globalSelf, isDummyCompile):
 
         if haveGaborStim:
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            printAutoInd(f, "% subfun {0}: makeImDestRect", iSubFunNum)
+            printAutoInd(f, "% subfun {0}: makeGabor_bcl", iSubFunNum)
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             printAutoInd(f, "function stim = makeGabor_bcl(spFreq,Contrast,phase,orientation,pixsPerDeg,bkColor,stimSize,periodsCoveredByOneStandardDeviation)")
-            printAutoInd(f,
-                         "function stim = makeGabor_bcl(spFreq,Contrast,phase,orientation,pixsPerDeg,bkColor,stimSize,periodsCoveredByOneStandardDeviation)")
+            printAutoInd(f, "% function stim = makeGabor_bcl(spFreq,Contrast,phase,orientation,pixsPerDeg,bkColor,stimSize,periodsCoveredByOneStandardDeviation)")
             printAutoInd(f, "%")
             printAutoInd(f, "% argins:")
             printAutoInd(f, "% ")
@@ -3277,16 +3276,14 @@ def compileCode(globalSelf, isDummyCompile):
             printAutoInd(f, "end")
             printAutoInd(f, " ")
             printAutoInd(f, "halfWidthOfGrid   = stimSize / 2;")
-            printAutoInd(f,
-                         "widthArray        = (-halfWidthOfGrid) : halfWidthOfGrid-1;  % widthArray is used in creating the meshgrid.")
+            printAutoInd(f, "widthArray        = (-halfWidthOfGrid) : halfWidthOfGrid-1;  % widthArray is used in creating the meshgrid.")
             printAutoInd(f, " ")
             printAutoInd(f, "[x,y]             = meshgrid(widthArray, widthArray);")
             printAutoInd(f, " ")
             printAutoInd(f, "cicleMask = (x/halfWidthOfGrid).^2 + (y/halfWidthOfGrid).^2;")
             printAutoInd(f, "cicleMask = cicleMask >= 1;")
             printAutoInd(f, " ")
-            printAutoInd(f,
-                         "circularGaussianMaskMatrix            = exp(-((x .^ 2) + (y .^ 2)) / (gaussianSpaceConstant ^ 2));")
+            printAutoInd(f, "circularGaussianMaskMatrix            = exp(-((x .^ 2) + (y .^ 2)) / (gaussianSpaceConstant ^ 2));")
             printAutoInd(f, "circularGaussianMaskMatrix(cicleMask) = 0;")
             printAutoInd(f, " ")
             printAutoInd(f, " ")
