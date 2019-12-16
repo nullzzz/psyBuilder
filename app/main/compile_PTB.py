@@ -708,7 +708,7 @@ def parseDurationStr(inputStr):
         inputStr = removeSingleQuotes(inputStr)
 
         if inputStr == "(Infinite)":
-            inputStr = "6000000" # an extremely impossible value
+            inputStr = "999000" # an extremely impossible value maximium of 1000 second
         elif re.fullmatch("\d+~\d+", inputStr):
             cDurRange = inputStr.split('~')
             inputStr = f"{cDurRange[0]},{cDurRange[1]}"
@@ -1763,8 +1763,8 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
 
 
 
-            pass
             itemIds.remove(cItemId)
+            pass
         else:
             pass
 
@@ -1873,8 +1873,31 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                 printAutoInd(f, "Screen('FrameArc' ,{0} ,{1} ,cRect ,{2}, {3}, {4}, {4});", cWinStr, borderColor, angleStart, angleLength, lineWidth)
 
         elif cItemType == 'gabor':
-            haveGaborStim = True
-            pass
+
+            centerX = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict))
+            centerY = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict))
+            cWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Width'], attributesSetDict))
+            cHeight = dataStrConvert(*getRefValue(cWidget, cItemProperties['Height'], attributesSetDict))
+            cSpatialFreq = dataStrConvert(*getRefValue(cWidget, cItemProperties['Spatial'], attributesSetDict))
+            cContrast = dataStrConvert(*getRefValue(cWidget, cItemProperties['Contrast'], attributesSetDict))
+            cPhase = dataStrConvert(*getRefValue(cWidget, cItemProperties['Phase'], attributesSetDict))
+            cOrientation = dataStrConvert(*getRefValue(cWidget, cItemProperties['Orientation'], attributesSetDict))
+            cRotation = dataStrConvert(*getRefValue(cWidget, cItemProperties['Rotation'], attributesSetDict))
+            cSDx = dataStrConvert(*getRefValue(cWidget, cItemProperties['SDx'], attributesSetDict))
+            cSDy = dataStrConvert(*getRefValue(cWidget, cItemProperties['SDy'], attributesSetDict))
+
+            cBackColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Back color'], attributesSetDict))
+            cTransparency = dataStrConvert(*getRefValue(cWidget, cItemProperties['Transparency'], attributesSetDict))
+
+            printAutoInd(f, "{0}Mx = makeGabor_bcl({1}, {2}, {3}, {4}, {5}, [{6},{7}], {8}, {9});",cItemId , cSpatialFreq,
+                         cContrast, cPhase, cOrientation,cBackColor,cWidth, cHeight, cSDx, cSDy)
+
+            printAutoInd(f, "{0}Idx = Screen('MakeTexture',{1}, {0}Mx);",cItemId, cWinStr)
+
+            printAutoInd(f, "Screen('DrawTexture', {0}, cImIndex, [], CenterRectOnPointd([0,0,size({1}Mx,2),({1}Mx,1)], {2}, {3}), {4}, [], abs({5}));",
+                         cWinStr, cItemId,centerX,centerY,
+                         cRotation,
+                         cTransparency)
         elif cItemType == 'snow':
             pass
         elif cItemType == 'text':
