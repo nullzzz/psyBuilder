@@ -24,6 +24,7 @@ from lib.wait_dialog import WaitDialog
 cIndents = 0
 isPreLineSwitch = 0
 haveGaborStim = False
+haveSnowStim = False
 enabledKBKeysList = set()
 isDummyPrint = False
 spFormatVarDict = dict()
@@ -1696,7 +1697,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
 
 def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint, haveGaborStim
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint, haveGaborStim, haveSnowStim
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
     cRespCodes = []
@@ -1890,7 +1891,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
             cBackColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Back color'], attributesSetDict))
             cTransparency = dataStrConvert(*getRefValue(cWidget, cItemProperties['Transparency'], attributesSetDict))
 
-            printAutoInd(f, "{0}Mx = makeGabor_bcl({1}, {2}, {3}, {4}, {5}, [{6},{7}], {8}, {9});",cItemId , cSpatialFreq,
+            printAutoInd(f, "{0}Mx  = makeGabor_bcl({1}, {2}, {3}, {4}, {5}, [{6},{7}], {8}, {9});",cItemId , cSpatialFreq,
                          cContrast, cPhase, cOrientation,cBackColor,cWidth, cHeight, cSDx, cSDy)
 
             printAutoInd(f, "{0}Idx = Screen('MakeTexture',{1}, {0}Mx);",cItemId, cWinStr)
@@ -1900,7 +1901,9 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                          cRotation,
                          cTransparency)
         elif cItemType == 'snow':
-            pass
+            haveSnowStim = True
+
+
         elif cItemType == 'text':
             pass
         elif cItemType == 'sound':
@@ -3266,7 +3269,7 @@ def compileCode(globalSelf, isDummyCompile):
             printAutoInd(f, "pixelsPerPeriod    = (1/spFreq)*pixsPerDeg;")
             printAutoInd(f, " ")
             printAutoInd(f, " ")
-            printAutoInd(f, "gaussianSpaceConstant = periodsCoveredByOneStandardDeviation  * pixelsPerPeriod;")
+            printAutoInd(f, "gaussianSpaceConstant = periodsCoveredByOneStandardDeviation * pixelsPerPeriod;")
             printAutoInd(f, " ")
             printAutoInd(f, "% *** If the grating is clipped on the sides, increase stimSize.")
             printAutoInd(f, "if mod(stimSize,2)")
