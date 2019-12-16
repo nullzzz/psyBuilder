@@ -1873,6 +1873,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                 printAutoInd(f, "Screen('FrameArc' ,{0} ,{1} ,cRect ,{2}, {3}, {4}, {4});", cWinStr, borderColor, angleStart, angleLength, lineWidth)
 
         elif cItemType == 'gabor':
+            haveGaborStim = True
 
             centerX = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict))
             centerY = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict))
