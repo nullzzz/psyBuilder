@@ -23,6 +23,7 @@ from lib.wait_dialog import WaitDialog
 
 cIndents = 0
 isPreLineSwitch = 0
+haveGaborStim = False
 enabledKBKeysList = set()
 isDummyPrint = False
 spFormatVarDict = dict()
@@ -1695,7 +1696,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
 
 
 def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
+    global enabledKBKeysList, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint, haveGaborStim
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
     cRespCodes = []
@@ -1872,6 +1873,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                 printAutoInd(f, "Screen('FrameArc' ,{0} ,{1} ,cRect ,{2}, {3}, {4}, {4});", cWinStr, borderColor, angleStart, angleLength, lineWidth)
 
         elif cItemType == 'gabor':
+            haveGaborStim = True
             pass
         elif cItemType == 'snow':
             pass
@@ -3204,6 +3206,78 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
         iSubFunNum += 1
 
+
+
+        if haveGaborStim:
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "% subfun {0}: makeImDestRect", iSubFunNum)
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "function stim = makeGabor_bcl(spFreq,Contrast,phase,orientation,pixsPerDeg,bkColor,stimSize,periodsCoveredByOneStandardDeviation)")
+            printAutoInd(f,
+                         "function stim = makeGabor_bcl(spFreq,Contrast,phase,orientation,pixsPerDeg,bkColor,stimSize,periodsCoveredByOneStandardDeviation)")
+            printAutoInd(f, "%")
+            printAutoInd(f, "% argins:")
+            printAutoInd(f, "% ")
+            printAutoInd(f, "% spFreq      [double] : spatial frequency of the gratting cpd")
+            printAutoInd(f, "% Contrast    [double] : Contrast of the gratting 0~1 [1]")
+            printAutoInd(f, "% phase       [double] : phase of the gratting [0] ")
+            printAutoInd(f, "% orientation [double] : orientation of the gratting [0] ")
+            printAutoInd(f, "% pixsPerDeg  [double] : pixels per visual degree")
+            printAutoInd(f, "% bkColor     [RGB]    : rgb values of the backgroud color")
+            printAutoInd(f, "% stimSize    [double] : full stim size ")
+            printAutoInd(f, "% periodsCoveredByOneStandardDeviation [double]:")
+            printAutoInd(f, "% To enlarge the gaussian mask, increase periodsCoveredByOneStandardDeviation.")
+            printAutoInd(f, "% ")
+            printAutoInd(f, "% outargs:")
+            printAutoInd(f, "% ")
+            printAutoInd(f, "% stim    [stimSize, stimsize, numel(bkColor)]: a 2D (Gray color) or 3D matrix (RGB) with values from 0 to 255")
+            printAutoInd(f, "% ")
+            printAutoInd(f, " % Written by Yang Zhang Sat Apr 16 23:00:04 2016")
+            printAutoInd(f, " % Soochow University, China")
+            printAutoInd(f, " ")
+            printAutoInd(f, " ")
+            printAutoInd(f, " ")
+            printAutoInd(f, " % pixelsPerPeriod% How many pixels will each period/cycle occupy?")
+            printAutoInd(f, " ")
+            printAutoInd(f, "pixelsPerPeriod    = (1/spFreq)*pixsPerDeg;")
+            printAutoInd(f, " ")
+            printAutoInd(f, " ")
+            printAutoInd(f, "gaussianSpaceConstant = periodsCoveredByOneStandardDeviation  * pixelsPerPeriod;")
+            printAutoInd(f, " ")
+            printAutoInd(f, "% *** If the grating is clipped on the sides, increase stimSize.")
+            printAutoInd(f, "if mod(stimSize,2)")
+            printAutoInd(f, "	stimSize = stimSize - 1;")
+            printAutoInd(f, "end")
+            printAutoInd(f, " ")
+            printAutoInd(f, "halfWidthOfGrid   = stimSize / 2;")
+            printAutoInd(f,
+                         "widthArray        = (-halfWidthOfGrid) : halfWidthOfGrid-1;  % widthArray is used in creating the meshgrid.")
+            printAutoInd(f, " ")
+            printAutoInd(f, "[x,y]             = meshgrid(widthArray, widthArray);")
+            printAutoInd(f, " ")
+            printAutoInd(f, "cicleMask = (x/halfWidthOfGrid).^2 + (y/halfWidthOfGrid).^2;")
+            printAutoInd(f, "cicleMask = cicleMask >= 1;")
+            printAutoInd(f, " ")
+            printAutoInd(f,
+                         "circularGaussianMaskMatrix            = exp(-((x .^ 2) + (y .^ 2)) / (gaussianSpaceConstant ^ 2));")
+            printAutoInd(f, "circularGaussianMaskMatrix(cicleMask) = 0;")
+            printAutoInd(f, " ")
+            printAutoInd(f, " ")
+            printAutoInd(f, "f = 2*pi*spFreq/pixsPerDeg;")
+            printAutoInd(f, "a = cos(orientation)*f;")
+            printAutoInd(f, "b = sin(orientation)*f;")
+            printAutoInd(f, " ")
+            printAutoInd(f, "layer  = 255.*circularGaussianMaskMatrix.*(cos(a*x+b*y+phase)*Contrast+1)/2;	")
+            printAutoInd(f, " ")
+            printAutoInd(f, "stim   = repmat(layer,[1 1 numel(bkColor)]);")
+            printAutoInd(f, " ")
+            printAutoInd(f, "for iDim = 1:numel(bkColor)")
+            printAutoInd(f, "	stim(:,:,iDim) = stim(:,:,iDim) + (1-circularGaussianMaskMatrix).*bkColor(iDim);")
+            printAutoInd(f, "end")
+            printAutoInd(f, " ")
+            printAutoInd(f, "% stim  = stim + (1-circularGaussianMaskMatrix).*bkColor(1);")
+            printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
+            iSubFunNum += 1
 
 
 
