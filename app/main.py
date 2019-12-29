@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QDockWidget
+from PyQt5.QtWidgets import QMainWindow
 
 from .attributes import Attributes
 from .center import Center
