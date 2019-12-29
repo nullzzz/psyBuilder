@@ -5,10 +5,10 @@ class Info(object):
     # image path
     Image_Path = "images"
 
-    # max count of each add_type of widget
+    # max count of each type of widget
     MaxWidgetCount = 10000
 
-    # widget add_type
+    # widget type
     Timeline = 0
     Cycle = 1
     Sound = 2
@@ -17,7 +17,7 @@ class Info(object):
     Video = 5
     Slider = 6
 
-    # widget add_type name
+    # widget type name
     WidgetType = {
         Timeline: "Timeline",
         Cycle: "Cycle",
@@ -28,7 +28,7 @@ class Info(object):
         Slider: "Slider"
     }
 
-    # add node add_type
+    # add node type
     AddNode = 0
     CopyNode = 1
     ReferNode = 2

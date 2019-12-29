@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QDataStream, QByteArray, QIODevice, QMimeData, QPoint, QSize
+from PyQt5.QtCore import QDataStream, QByteArray, QIODevice, QMimeData, QPoint, QSize
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListView, QListWidget, QListWidgetItem, QTabWidget, QFrame
 
@@ -50,7 +50,7 @@ class WidgetIconList(QListWidget):
         drag.setMimeData(mime_data)
         drag.setHotSpot(QPoint(12, 12))
         drag.setPixmap(item.icon().pixmap(QSize(50, 50)))
-        drag.exec(Qt.CopyAction)
+        drag.exec()
 
 
 class WidgetIconBar(QTabWidget):
@@ -61,15 +61,18 @@ class WidgetIconBar(QTabWidget):
         self.eye_tracker = WidgetIconList()
         self.quest = WidgetIconList()
         self.condition = WidgetIconList()
-        # add events items
+        # todo add events items
         self.events.addItem(WidgetIconItem(Info.Cycle))
-        self.events.addItem(WidgetIconItem(Info.Sound))
-        self.events.addItem(WidgetIconItem(Info.Text))
-        self.events.addItem(WidgetIconItem(Info.Image))
-        self.events.addItem(WidgetIconItem(Info.Video))
-        self.events.addItem(WidgetIconItem(Info.Slider))
+        # self.events.addItem(WidgetIconItem(Info.Sound))
+        # self.events.addItem(WidgetIconItem(Info.Text))
+        # self.events.addItem(WidgetIconItem(Info.Image))
+        # self.events.addItem(WidgetIconItem(Info.Video))
+        # self.events.addItem(WidgetIconItem(Info.Slider))
+
         # todo add eye_tracker items
+
         # todo add quest items
+
         # todo add condition items
 
         self.addTab(self.events, "Events")
