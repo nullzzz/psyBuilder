@@ -28,15 +28,15 @@ class Center(QMainWindow):
     def linkSignals(self) -> None:
         """
         link necessary signals
-        :return:
+        @return:
         """
         self.tab_widget.currentChanged.connect(self.dealTabChange)
 
     def openTab(self, widget_id: int) -> None:
         """
         open widget as tab according to its widget_id
-        :param widget_id:
-        :return:
+        @param widget_id:
+        @return:
         """
         # open widget as a tab in tab widget
         # first, we should ensure this widget has been created
@@ -49,8 +49,8 @@ class Center(QMainWindow):
     def closeTab(self, widget_id: int) -> None:
         """
         close widget in tab widget
-        :param widget_id:
-        :return:
+        @param widget_id:
+        @return:
         """
         widget = Kernel.Widgets[widget_id]
         self.tab_widget.closeTab(widget)
@@ -58,9 +58,9 @@ class Center(QMainWindow):
     def changeTabName(self, widget_id: int, widget_name: str) -> None:
         """
         if widget's was changed, its tab name should be changed as well.
-        :param widget_id:
-        :param widget_name: new widget's name
-        :return:
+        @param widget_id:
+        @param widget_name: new widget's name
+        @return:
         """
         widget = Kernel.Widgets[widget_id]
         self.tab_widget.changeTabName(widget, widget_name)
@@ -68,7 +68,7 @@ class Center(QMainWindow):
     def initInitialTimeline(self):
         """
         init initial timeline for other items
-        :return:
+        @return:
         """
         widget_id = Func.generateWidgetId(Info.Timeline)
         widget_name = f"{Info.WidgetType[Info.Timeline]}.0"
@@ -80,8 +80,8 @@ class Center(QMainWindow):
     def dealTabChange(self, index: int):
         """
         when tab current tab change, we need to emit signal to refresh other docks.
-        :param index:
-        :return:
+        @param index:
+        @return:
         """
         # if close all tab, index will be -1
         if index != -1:

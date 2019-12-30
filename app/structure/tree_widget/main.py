@@ -17,10 +17,10 @@ class TreeWidget(QTreeWidget):
     def addNode(self, parent_widget_id: int, widget_id: int, widget_name: str):
         """
         add node to its self
-        :param parent_widget_id:
-        :param widget_id:
-        :param widget_name:
-        :return:
+        @param parent_widget_id:
+        @param widget_id:
+        @param widget_name:
+        @return:
         """
         # if it has parent node
         if parent_widget_id:

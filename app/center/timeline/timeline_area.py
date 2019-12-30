@@ -22,16 +22,16 @@ class TimelineScene(QGraphicsScene):
     def addTimelineItem(self, item: TimelineItem, index: int) -> None:
         """
         add timeline item in this scene
-        :param item:
-        :param index: the index of item which starts from 0
-        :return:
+        @param item:
+        @param index: the index of item which starts from 0
+        @return:
         """
 
     def deleteTimelineItem(self, index: int) -> None:
         """
         delete timeline item in this scene
-        :param index: the index of item which starts from 0
-        :return:
+        @param index: the index of item which starts from 0
+        @return:
         """
 
 
@@ -52,10 +52,10 @@ class TimelineArea(QGraphicsView):
     def addTimelineItem(self, widget_type: int = None, widget_id: int = None, index: int = 0) -> None:
         """
         add timeline item into timeline
-        :param widget_type: item add_type.
-        :param widget_id: if id is provided, we don't need to create new one.
-        :param index: index of item
-        :return:
+        @param widget_type: item add_type.
+        @param widget_id: if id is provided, we don't need to create new one.
+        @param index: index of item
+        @return:
         """
         # create new item
         timeline_item = TimelineItem(widget_type=widget_type, widget_id=widget_id)
@@ -65,14 +65,14 @@ class TimelineArea(QGraphicsView):
     def deleteTimelineItem(self, index: int):
         """
         delete in this area
-        :param index:
-        :return:
+        @param index:
+        @return:
         """
 
     def itemCount(self) -> int:
         """
         count of items
-        :return:
+        @return:
         """
         return self.scene.item_count
 

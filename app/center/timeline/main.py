@@ -24,3 +24,11 @@ class TimelineWidget(TabItemWidget):
         :return:
         """
         return self.timeline_area.itemCount()
+
+    def addItem(self, widget_type: str = None, widget_id: int = None, widget_name: str = None):
+        """
+        @p@return widget_type: 
+        @p@return widget_id: 
+        @p@return widget_name: 
+        @return: 
+        """

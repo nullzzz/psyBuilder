@@ -17,8 +17,8 @@ class Func(QWidget):
     def generateWidgetId(widget_type: int) -> int:
         """
         it' used to generate widget id which is used to discern different widget.
-        :param widget_type: the add_type of widget, such as timeline.
-        :return: new widget id
+        @param widget_type: the add_type of widget, such as timeline.
+        @return: new widget id
         """
         # get the current num of this add_type which has been created.
         count = Kernel.WidgetTypeCount[widget_type]
@@ -32,8 +32,8 @@ class Func(QWidget):
     def generateWidgetName(widget_type: int) -> str:
         """
         it' used to generate widget id which is used to discern different widget.
-        :param widget_type: the add_type of widget, such as timeline.
-        :return: new widget id
+        @param widget_type: the add_type of widget, such as timeline.
+        @return: new widget id
         """
         widget_type_name = Info.WidgetType[widget_type]
         while True:
@@ -47,9 +47,9 @@ class Func(QWidget):
     def createWidget(widget_id: int, widget_name: str) -> None:
         """
         create widget according to its widget id and set its name
-        :param widget_id:
-        :param widget_name: its name
-        :return:
+        @param widget_id:
+        @param widget_name: its name
+        @return:
         """
         widget_type = widget_id // Info.MaxWidgetCount
         # todo add other items into this function
@@ -73,8 +73,8 @@ class Func(QWidget):
         """
         check the validity of widget name.
         It should be unique, unless it's a reference.
-        :param widget_name:
-        :return: validity
+        @param widget_name:
+        @return: validity
         """
         # name should start with a letter
         if not re.match(r"^[a-zA-Z].*$", widget_name):
@@ -88,10 +88,10 @@ class Func(QWidget):
     def getImage(image_path: str, type: int = 0) -> QPixmap or QIcon:
         """
         get image from its relative path, return qt image object, include QPixmap or QIcon.
-        :param image_path: its relative path
-        :param type: 0: pixmap (default),
+        @param image_path: its relative path
+        @param type: 0: pixmap (default),
                      1: icon
-        :return: Qt image object
+        @return: Qt image object
         """
         path = os.path.join(Info.Image_Path, image_path)
         if not type:
@@ -102,9 +102,9 @@ class Func(QWidget):
     def print(information: str, information_type: int = 0) -> None:
         """
         print information in output.
-        :param information:
-        :param information_type: 0 none
+        @param information:
+        @param information_type: 0 none
                                  1 success
                                  2 fail
-        :return:
+        @return:
         """

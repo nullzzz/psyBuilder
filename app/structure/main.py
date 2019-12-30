@@ -19,11 +19,11 @@ class Structure(DockWidget):
         1. copy other
         2. refer other
         3. move other
-        :param parent_widget_id: its parent
-        :param widget_id: its id
-        :param widget_name: its name
-        :param add_type: add type
-        :return: 
+        @param parent_widget_id: its parent
+        @param widget_id: its id
+        @param widget_name: its name
+        @param add_type: add type
+        @return: 
         """
         # discern different type
         if add_type == Info.AddNode:
@@ -40,39 +40,39 @@ class Structure(DockWidget):
     def addNodeAdd(self, parent_widget_id: int, widget_id: int, widget_name: str):
         """
 
-        :param parent_widget_id:
-        :param widget_id:
-        :param widget_name:
-        :return:
+        @param parent_widget_id:
+        @param widget_id:
+        @param widget_name:
+        @return:
         """
         # todo add node add
 
     def addNodeCopy(self, parent_widget_id: int, widget_id: int, widget_name: str):
         """
 
-        :param parent_widget_id:
-        :param widget_id:
-        :param widget_name:
-        :return:
+        @param parent_widget_id:
+        @param widget_id:
+        @param widget_name:
+        @return:
         """
         # todo add node copy
 
     def addNodeRefer(self, parent_widget_id: int, widget_id: int, widget_name: str):
         """
 
-        :param parent_widget_id:
-        :param widget_id:
-        :param widget_name:
-        :return:
+        @param parent_widget_id:
+        @param widget_id:
+        @param widget_name:
+        @return:
         """
         # todo add node refer
 
     def addNodeMove(self, parent_widget_id: int, widget_id: int, widget_name: str):
         """
 
-        :param parent_widget_id:
-        :param widget_id:
-        :param widget_name:
-        :return:
+        @param parent_widget_id:
+        @param widget_id:
+        @param widget_name:
+        @return:
         """
         # todo add node move

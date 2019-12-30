@@ -28,13 +28,13 @@ class Psy(QMainWindow):
     def initMenuBar(self) -> None:
         """
         init its menu bar, including file, view, devices, building and help
-        :return:
+        @return:
         """
 
     def initDockWidget(self) -> None:
         """
         init all dock widget, including structure, properties, center, output and center
-        :return:
+        @return:
         """
         # attributes
         self.attributes = Attributes(self)

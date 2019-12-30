@@ -37,11 +37,11 @@ class Output(DockWidget):
     def print(self, information: str, information_type: int = 0) -> None:
         """
         print information in its text edit
-        :param information:
-        :param information_type: 0 none
+        @param information:
+        @param information_type: 0 none
                                  1 success
                                  2 fail
-        :return:
+        @return:
         """
         self.text_edit.append(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         # none

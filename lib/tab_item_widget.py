@@ -31,7 +31,7 @@ class TabItemWidget(QWidget):
         You should finish the job.
 
         get this widget's properties to show it in Properties Window.
-        :return: a dict of properties
+        @return: a dict of properties
         """
 
     def getHiddenAttributes(self) -> dict:
@@ -41,7 +41,7 @@ class TabItemWidget(QWidget):
         every widget has global attributes and own attributes,
         we get global attributes through common function Func.getAttributes(widget_id) and
         we get widget's own attributes through this function.
-        :return: dict of attributes
+        @return: dict of attributes
         """
 
     """
@@ -53,7 +53,7 @@ class TabItemWidget(QWidget):
         You should finish the job.
 
         return necessary data for restoring this widget.
-        :return:
+        @return:
         """
 
     def restore(self, data):
@@ -61,8 +61,8 @@ class TabItemWidget(QWidget):
         You should finish the job.
 
         restore this widget according to data.
-        :param data: necessary data for restoring this widget
-        :return:
+        @param data: necessary data for restoring this widget
+        @return:
         """
 
     def copy(self, widget_id: int):
@@ -70,16 +70,16 @@ class TabItemWidget(QWidget):
         You should finish the job.
 
         return a copy of this widget, and set the widget id of the copy.
-        :param widget_id:
-        :return:
+        @param widget_id:
+        @return:
         """
 
     def changeWidgetId(self, widget_id: int):
         """
         change this widget's widget id, because referable widget may be deleted and we
         need to change widget id.
-        :param widget_id:
-        :return:
+        @param widget_id:
+        @return:
         """
         self.widget_id = widget_id
 

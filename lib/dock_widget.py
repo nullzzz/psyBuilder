@@ -13,8 +13,8 @@ class SizeContainerWidget(QWidget):
     def setWidget(self, widget: QWidget):
         """
         设置包含的widget
-        :param widget:
-        :return:
+        @param widget:
+        @return:
         """
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -40,7 +40,7 @@ class DockWidget(QDockWidget):
         """
         we can't set initial size of dock widget,
         but we can achieve this goal by using a widget embed in dock widget.
-        :param QWidget:
-        :return:
+        @param QWidget:
+        @return:
         """
         self.size_container.setWidget(QWidget)

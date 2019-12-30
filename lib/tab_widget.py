@@ -20,10 +20,10 @@ class TabWidget(QTabWidget):
     def openTab(self, widget: QWidget, widget_type: str, name: str) -> None:
         """
         open widget as a tab
-        :param widget:
-        :param name: widget's name
-        :param widget_type: widget's icon picture path
-        :return:
+        @param widget:
+        @param name: widget's name
+        @param widget_type: widget's icon picture path
+        @return:
         """
         # widget may has been opened
         index = self.indexOf(widget)
@@ -36,8 +36,8 @@ class TabWidget(QTabWidget):
     def closeTab(self, widget: QWidget) -> None:
         """
         close tab in this tab widget
-        :param widget:
-        :return:
+        @param widget:
+        @return:
         """
         index = self.indexOf(widget)
         if index != -1:
@@ -46,9 +46,9 @@ class TabWidget(QTabWidget):
     def changeTabName(self, widget: QWidget, widget_name: str):
         """
         change tab's name
-        :param widget:
-        :param widget_name:
-        :return:
+        @param widget:
+        @param widget_name:
+        @return:
         """
         index = self.indexOf(widget)
         if index != -1:
