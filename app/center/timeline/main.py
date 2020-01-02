@@ -23,7 +23,7 @@ class Timeline(TabItemWidget):
         self.setLayout(grid)
 
         # todo delete test
-        for i in range(5):
+        for i in range(1):
             self.addItem(0, i, "timeline_0", i)
 
     def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = None):

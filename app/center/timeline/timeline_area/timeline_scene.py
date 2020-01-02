@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsGridLayout, QGraphicsWidget
 
 from ..timeline_item import TimelineItem
+from ..timeline_name_item import TimelineNameItem
 
 
 class TimelineScene(QGraphicsScene):
@@ -16,7 +17,6 @@ class TimelineScene(QGraphicsScene):
         self.layout.setRowFixedHeight(0, 100)
         # set a container widget to set layout
         self.container = QGraphicsWidget(None, Qt.Widget)
-        self.container.setObjectName("Test")
         # set container's pos, namely top left.
         self.container.setPos(0, 0)
         self.container.setLayout(self.layout)
@@ -36,6 +36,8 @@ class TimelineScene(QGraphicsScene):
         self.layout.addItem(timeline_item, 0, col, Qt.AlignCenter)
         # add text item
         item_name = timeline_item.widget_name
+        name_item = TimelineNameItem(item_name)
+        self.layout.addItem(name_item, 2, col, Qt.AlignCenter)
 
     def deleteTimelineItem(self, index: int):
         """
