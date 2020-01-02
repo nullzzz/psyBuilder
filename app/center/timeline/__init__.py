@@ -1,1 +1,1 @@
-from .main import TimelineWidget
+from .main import Timeline

@@ -53,9 +53,9 @@ class WidgetIconList(QListWidget):
         drag.exec()
 
 
-class WidgetIconBar(QTabWidget):
+class IconBar(QTabWidget):
     def __init__(self, parent=None):
-        super(WidgetIconBar, self).__init__(parent)
+        super(IconBar, self).__init__(parent)
         # set its icon lists
         self.events = WidgetIconList()
         self.eye_tracker = WidgetIconList()

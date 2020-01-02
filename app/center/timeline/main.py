@@ -1,34 +1,50 @@
 from PyQt5.QtWidgets import QGridLayout
 
 from lib import TabItemWidget
+from .icon_bar import IconBar
 from .timeline_area import TimelineArea
-from .timeline_bar import WidgetIconBar
 
 
-class TimelineWidget(TabItemWidget):
+class Timeline(TabItemWidget):
+    """
+    timeline widget: 1. icon bar to choose item
+                     2. area to place item, and this area is graphics view.
+    """
+
     def __init__(self, widget_id: int, widget_name: str):
-        super(TimelineWidget, self).__init__(widget_id, widget_name)
-        # widget icon bar
-        self.widget_icon_bar = WidgetIconBar()
-        # timeline area
+        super(Timeline, self).__init__(widget_id, widget_name)
+        # set its icon bar and timeline area
+        self.icon_bar = IconBar()
         self.timeline_area = TimelineArea()
-        # set layout
+        # set its layout
         grid = QGridLayout(self)
-        grid.addWidget(self.widget_icon_bar, 0, 0, 1, 1)
+        grid.addWidget(self.icon_bar, 0, 0, 1, 1)
         grid.addWidget(self.timeline_area, 1, 0, 1, 1)
         self.setLayout(grid)
 
-    def itemCount(self) -> int:
+    def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = None):
         """
-        count of items
-        :return:
+        add timeline item into its timeline area
+        @param widget_type: item's type
+        @param widget_id: item' widget id, if it's provided, we need to generate a new one through its widget type
+        @param widget_name: like widget id above
+        @param index: the index of the item
+        @return:
         """
-        return self.timeline_area.itemCount()
+        # I think it should be left to timeline area
+        self.timeline_area.addItem(widget_type, widget_id, widget_name, index)
 
-    def addItem(self, widget_type: str = None, widget_id: int = None, widget_name: str = None):
+    def deleteItem(self, widget_id: int):
         """
-        @p@return widget_type: 
-        @p@return widget_id: 
-        @p@return widget_name: 
-        @return: 
+        delete timeline item in its timeline area through item's widget id
+        @param widget_id: item's widget id
+        @return:
+        """
+        # I think it should be left to timeline area
+        self.timeline_area.deleteItem(widget_id)
+
+    def itemCount(self):
+        """
+        the num of timeline items
+        @return:
         """
