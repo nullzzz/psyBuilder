@@ -75,6 +75,9 @@ class IconBar(QTabWidget):
 
         # todo add condition items
 
+        # todo delete test
+        self.setMaximumHeight(100)
+
         self.addTab(self.events, "Events")
         self.addTab(self.eye_tracker, "Eye Tracker")
         self.addTab(self.quest, "Quest")

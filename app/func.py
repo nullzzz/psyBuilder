@@ -1,6 +1,7 @@
 import os
 import re
 
+from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QWidget
 
@@ -85,7 +86,7 @@ class Func(QWidget):
         return False, "Name already exists."
 
     @staticmethod
-    def getImage(image_path: str, type: int = 0) -> QPixmap or QIcon:
+    def getImage(image_path: str, type: int = 0, size: QSize = None) -> QPixmap or QIcon:
         """
         get image from its relative path, return qt image object, include QPixmap or QIcon.
         @param image_path: its relative path
@@ -95,7 +96,7 @@ class Func(QWidget):
         """
         path = os.path.join(Info.Image_Path, image_path)
         if not type:
-            return QPixmap(path)
+            return QPixmap(path).scaled(size)
         return QIcon(path)
 
     @staticmethod

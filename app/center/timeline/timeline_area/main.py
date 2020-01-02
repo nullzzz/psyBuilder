@@ -30,6 +30,7 @@ class TimelineArea(QGraphicsView):
         # generate a timeline item
         timeline_item = TimelineItem(widget_type=widget_type, widget_id=widget_id, widget_name=widget_name)
         # add it to its scene
+        self.timeline_scene.addTimelineItem(timeline_item, index)
 
     def deleteItem(self, widget_id: int):
         """

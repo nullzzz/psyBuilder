@@ -22,6 +22,10 @@ class Timeline(TabItemWidget):
         grid.addWidget(self.timeline_area, 1, 0, 1, 1)
         self.setLayout(grid)
 
+        # todo delete test
+        self.addItem(0, 0, "timeline_0", 0)
+        self.addItem(1, 10, "cycle_0", 1)
+
     def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = None):
         """
         add timeline item into its timeline area

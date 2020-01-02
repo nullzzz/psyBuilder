@@ -1,10 +1,24 @@
-from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsLayoutItem
+from PyQt5.QtCore import QSize
+from PyQt5.QtWidgets import QGraphicsProxyWidget, QSizePolicy, QLabel
 
 from app.func import Func
 from app.info import Info
 
 
-class TimelineItem(QGraphicsLayoutItem):
+class TimelineLabel(QLabel):
+    """
+
+    """
+
+    def __init__(self, pixmap):
+        super(TimelineLabel, self).__init__(None)
+        # set its qss id
+        self.setObjectName("TimelineLabel")
+        # set its pixmap
+        self.setPixmap(pixmap)
+
+
+class TimelineItem(QGraphicsProxyWidget):
     """
     it is widget_type item in timeline.
     """
@@ -27,6 +41,18 @@ class TimelineItem(QGraphicsLayoutItem):
         if not self.widget_name:
             self.widget_name = Func.generateWidgetName(widget_type)
         # select its widget_type according to its widget type.
-        self.pixmap_item = QGraphicsPixmapItem()
-        self.pixmap_item.setPixmap(Func.getImage(f"widgets/{Info.WidgetType[widget_type]}"))
-        self.setGraphicsItem(self.pixmap_item)
+        label = TimelineLabel(Func.getImage(f"widgets/{Info.WidgetType[widget_type]}", size=QSize(50, 50)))
+        self.setWidget(label)
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+
+    def zoomIn(self):
+        """
+        start zoom in animation
+        @return:
+        """
+
+    def zoomOut(self):
+        """
+        start zoom out animation
+        @return:
+        """
