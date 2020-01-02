@@ -65,11 +65,11 @@ class TabItemWidget(QWidget):
         @return:
         """
 
-    def copy(self, widget_id: int):
+    def copy(self, widget_id: int, widget_name: str):
         """
         You should finish the job.
 
-        return a copy of this widget, and set the widget id of the copy.
+        return a copy of this widget, and set the widget id and name of the copy.
         @param widget_id:
         @return:
         """

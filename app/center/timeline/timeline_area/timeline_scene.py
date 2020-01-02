@@ -13,9 +13,10 @@ class TimelineScene(QGraphicsScene):
         super(TimelineScene, self).__init__(None)
         # layout
         self.layout = QGraphicsGridLayout()
-        self.layout.setRowFixedHeight(0, 50)
+        self.layout.setRowFixedHeight(0, 100)
         # set a container widget to set layout
         self.container = QGraphicsWidget(None, Qt.Widget)
+        self.container.setObjectName("Test")
         # set container's pos, namely top left.
         self.container.setPos(0, 0)
         self.container.setLayout(self.layout)
@@ -31,7 +32,7 @@ class TimelineScene(QGraphicsScene):
         """
         # add timeline item
         col = index * 2 + 1
-        self.layout.setColumnFixedWidth(col, 50)
+        self.layout.setColumnFixedWidth(col, 100)
         self.layout.addItem(timeline_item, 0, col, Qt.AlignCenter)
         # add text item
         item_name = timeline_item.widget_name

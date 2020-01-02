@@ -1,3 +1,4 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsView
 
 from app.info import Info
@@ -12,11 +13,15 @@ class TimelineArea(QGraphicsView):
 
     def __init__(self, parent=None):
         super(TimelineArea, self).__init__(parent)
+        # set its id
+        self.setObjectName("TimelineArea")
         # set its scene
         self.timeline_scene = TimelineScene()
         self.setScene(self.timeline_scene)
         # set its drag mode
         self.setDragMode(QGraphicsView.ScrollHandDrag)
+        # set its alignment
+        self.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
 
     def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = None):
         """

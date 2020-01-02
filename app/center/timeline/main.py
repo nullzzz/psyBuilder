@@ -23,8 +23,8 @@ class Timeline(TabItemWidget):
         self.setLayout(grid)
 
         # todo delete test
-        self.addItem(0, 0, "timeline_0", 0)
-        self.addItem(1, 10, "cycle_0", 1)
+        for i in range(5):
+            self.addItem(0, i, "timeline_0", i)
 
     def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = None):
         """
@@ -37,6 +37,8 @@ class Timeline(TabItemWidget):
         """
         # I think it should be left to timeline area
         self.timeline_area.addItem(widget_type, widget_id, widget_name, index)
+        # refresh its ui
+        self.update()
 
     def deleteItem(self, widget_id: int):
         """

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QGraphicsProxyWidget, QSizePolicy, QLabel
 
 from app.func import Func
@@ -7,7 +7,7 @@ from app.info import Info
 
 class TimelineLabel(QLabel):
     """
-
+    timeline label
     """
 
     def __init__(self, pixmap):
@@ -16,6 +16,7 @@ class TimelineLabel(QLabel):
         self.setObjectName("TimelineLabel")
         # set its pixmap
         self.setPixmap(pixmap)
+        self.setAlignment(Qt.AlignCenter)
 
 
 class TimelineItem(QGraphicsProxyWidget):

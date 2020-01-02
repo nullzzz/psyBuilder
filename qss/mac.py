@@ -1,4 +1,4 @@
-mac_qss = """
+timeline_label = """
 QLabel#TimelineLabel{
     background-color: transparent;
 }
@@ -8,3 +8,21 @@ QLabel#TimelineLabel:hover{
     padding: 2px;
 }
 """
+
+timeline_area = """
+QGraphicsView#TimelineArea{
+}
+"""
+
+test = """
+QGraphicsWidget#test{
+    border: 10px solid lightBlue;
+}"""
+
+icon_bar = """
+QTabWidget#IconBar{
+    max-height:100px;
+}
+"""
+
+mac_qss = timeline_label + icon_bar + timeline_area + test

@@ -56,6 +56,8 @@ class WidgetIconList(QListWidget):
 class IconBar(QTabWidget):
     def __init__(self, parent=None):
         super(IconBar, self).__init__(parent)
+        # set its id
+        self.setObjectName("IconBar")
         # set its icon lists
         self.events = WidgetIconList()
         self.eye_tracker = WidgetIconList()
@@ -74,9 +76,6 @@ class IconBar(QTabWidget):
         # todo add quest items
 
         # todo add condition items
-
-        # todo delete test
-        self.setMaximumHeight(100)
 
         self.addTab(self.events, "Events")
         self.addTab(self.eye_tracker, "Eye Tracker")
