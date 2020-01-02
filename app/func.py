@@ -55,8 +55,8 @@ class Func(QWidget):
         # todo add other items into this function
         widget = None
         if widget_type == Info.Timeline:
-            from app.center import TimelineWidget
-            widget = TimelineWidget(widget_id, widget_name)
+            from app.center import Timeline
+            widget = Timeline(widget_id, widget_name)
         elif widget_type == Info.Cycle:
             from app.center.events import Cycle
             widget = Cycle(widget_id, widget_name)
