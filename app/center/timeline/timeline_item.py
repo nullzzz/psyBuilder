@@ -45,15 +45,3 @@ class TimelineItem(QGraphicsProxyWidget):
         label = TimelineLabel(Func.getImage(f"widgets/{Info.WidgetType[widget_type]}", size=QSize(50, 50)))
         self.setWidget(label)
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-
-    def zoomIn(self):
-        """
-        start zoom in animation
-        @return:
-        """
-
-    def zoomOut(self):
-        """
-        start zoom out animation
-        @return:
-        """

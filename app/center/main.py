@@ -1,10 +1,10 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QDockWidget, QMainWindow
+from PyQt5.QtWidgets import QMainWindow
 
 from app.func import Func
 from app.info import Info
 from app.kernel import Kernel
-from lib import DockWidget, TabWidget
+from lib import TabWidget
 
 
 class Center(QMainWindow):

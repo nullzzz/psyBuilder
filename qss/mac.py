@@ -3,7 +3,7 @@ QLabel#TimelineLabel{
     background-color: transparent;
 }
 QLabel#TimelineLabel:hover{
-    border: 2px solid lightBlue;
+    border: 2px solid rgb(227,227,227);
     border-radius: 4px;
     padding: 2px;
 }
@@ -23,7 +23,12 @@ QTabWidget#IconBar{
 timeline_line_edit = """
 QLineEdit#TimelineLineEdit{
     border: 0px;
-}"""
+}
+QLineEdit#TimelineLineEdit:focus{
+        border: 0.5px solid gray;
+        border-radius: 1px;
+}
+"""
 
 test = """
 """
