@@ -19,8 +19,6 @@ class TimelineScene(QGraphicsScene):
         self.container.setLayout(self.layout)
         # add container to itself
         self.addItem(self.container)
-        self.count = 0
-        #
 
     def addTimelineItem(self, timeline_item, timeline_name_item, index: int):
         """

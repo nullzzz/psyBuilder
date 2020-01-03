@@ -24,10 +24,6 @@ timeline_line_edit = """
 QLineEdit#TimelineLineEdit{
     border: 0px;
 }
-QLineEdit#TimelineLineEdit:focus{
-        border: 0.5px solid gray;
-        border-radius: 1px;
-}
 """
 
 test = """

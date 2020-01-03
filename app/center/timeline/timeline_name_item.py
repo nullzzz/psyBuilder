@@ -13,6 +13,25 @@ class TimelineLineEdit(QLineEdit):
         self.setObjectName("TimelineLineEdit")
         # set its align
         self.setAlignment(Qt.AlignCenter)
+        # link signals
+        self.linkSignals()
+
+    def linkSignals(self):
+        """
+        link signals
+        @return:
+        """
+        # clear its cursor when enter/return pressed
+        self.editingFinished.connect(lambda: self.setReadOnly(True))
+
+    def mousePressEvent(self, e):
+        """
+        override this func.
+        @param e:
+        @return:
+        """
+        super(TimelineLineEdit, self).mousePressEvent(e)
+        self.setReadOnly(False)
 
 
 class TimelineNameItem(QGraphicsProxyWidget):
@@ -20,17 +39,19 @@ class TimelineNameItem(QGraphicsProxyWidget):
     it is widget_type item in timeline.
     """
     # emit its content when text change
-    textChanged = pyqtSignal(str)
+    textChanged = pyqtSignal(int, str)
     # edit
     editFinishing = pyqtSignal()
 
-    def __init__(self, widget_name: str = ""):
+    def __init__(self, widget_id: int, widget_name: str = ""):
         """
         init item
         @param parent:
         @param widget_name: like widget_id above.
         """
         super(TimelineNameItem, self).__init__(None)
+        # data
+        self.widget_id = widget_id
         self.pre_text = widget_name
         self.line_edit = TimelineLineEdit(widget_name)
         self.setWidget(self.line_edit)
@@ -71,7 +92,7 @@ class TimelineNameItem(QGraphicsProxyWidget):
             # change pre text
             self.pre_text = self.text()
             # emit change signal
-            self.textChanged.emit(self.text())
+            self.textChanged.emit(self.widget_id, self.text())
 
     def undo(self):
         """
