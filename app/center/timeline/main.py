@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QGridLayout
 from lib import TabItemWidget
 from .icon_bar import IconBar
 from .timeline_area import TimelineArea
+from .timeline_item import TimelineItem
+from .timeline_name_item import TimelineNameItem
 
 
 class Timeline(TabItemWidget):
@@ -22,9 +24,18 @@ class Timeline(TabItemWidget):
         grid.addWidget(self.timeline_area, 1, 0, 1, 1)
         self.setLayout(grid)
 
+        # link signals
+        self.linkSignals()
+
         # todo delete test
         for i in range(1):
             self.addItem(0, i, "timeline_0", i)
+
+    def linkSignals(self) -> None:
+        """
+        link signals
+        @return:
+        """
 
     def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = None):
         """
@@ -35,8 +46,11 @@ class Timeline(TabItemWidget):
         @param index: the index of the item
         @return:
         """
+        # generate a timeline item and timeline name item
+        timeline_item = TimelineItem(widget_type=widget_type, widget_id=widget_id, widget_name=widget_name)
+        timeline_name_item = TimelineNameItem(widget_name)
         # I think it should be left to timeline area
-        self.timeline_area.addItem(widget_type, widget_id, widget_name, index)
+        self.timeline_area.addItem(timeline_item, timeline_name_item, index)
         # refresh its ui
         self.update()
 

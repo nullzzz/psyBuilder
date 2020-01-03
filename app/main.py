@@ -1,8 +1,9 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QApplication
 
 from app.func import Func
 from app.info import Info
+from lib import WaitDialog
 from .attributes import Attributes
 from .center import Center
 from .output import Output
@@ -19,6 +20,8 @@ class Psy(QMainWindow):
         super(Psy, self).__init__()
         # set its title
         self.setWindowTitle("Psy Builder")
+        # set its wait thread
+        self.wait_dialog = WaitDialog()
         # init menu bar
 
         # init dock widget
@@ -79,6 +82,7 @@ class Psy(QMainWindow):
         link signals between dock widgets
         @return:
         """
+        # todo link dock widgets' signals
 
     def linkWidgetSignals(self, widget_type: int, widget):
         """
@@ -87,4 +91,25 @@ class Psy(QMainWindow):
         @param widget:
         @return:
         """
-        print(widget_type, widget)
+        # todo link widget's signals
+        # common
+        # from lib import TabItemWidget
+        # widget: TabItemWidget
+        widget.waitStart.connect(self.startWait)
+        widget.waitEnd.connect(self.endWait)
+
+    def startWait(self):
+        """
+        show wait dialog
+        @return:
+        """
+        self.wait_dialog.show()
+        QApplication.processEvents()
+
+    def endWait(self):
+        """
+        hide wait dialog
+        @return:
+        """
+        self.wait_dialog.hide()
+        QApplication.processEvents()

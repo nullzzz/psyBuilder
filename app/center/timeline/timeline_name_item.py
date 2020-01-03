@@ -21,6 +21,8 @@ class TimelineNameItem(QGraphicsProxyWidget):
     """
     # emit its content when text change
     textChanged = pyqtSignal(str)
+    # edit
+    editFinishing = pyqtSignal()
 
     def __init__(self, widget_name: str = ""):
         """
@@ -64,6 +66,7 @@ class TimelineNameItem(QGraphicsProxyWidget):
         @return:
         """
         # if changed
+        self.editFinishing.emit()
         if self.text() != self.pre_text:
             # change pre text
             self.pre_text = self.text()

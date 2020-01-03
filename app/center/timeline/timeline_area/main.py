@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QGraphicsView
 
 from app.info import Info
 from .timeline_scene import TimelineScene
-from ..timeline_item import TimelineItem
 
 
 class TimelineArea(QGraphicsView):
@@ -22,8 +21,15 @@ class TimelineArea(QGraphicsView):
         self.setDragMode(QGraphicsView.ScrollHandDrag)
         # set its alignment
         self.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        # link signals
 
-    def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = None):
+    def linkSignals(self):
+        """
+        link signals
+        @return:
+        """
+
+    def addItem(self, timeline_item, timeline_name_item, index: int = None):
         """
         add timeline item into its scene
         @param widget_type: item's type
@@ -32,10 +38,8 @@ class TimelineArea(QGraphicsView):
         @param index: the index of the item
         @return:
         """
-        # generate a timeline item
-        timeline_item = TimelineItem(widget_type=widget_type, widget_id=widget_id, widget_name=widget_name)
         # add it to its scene
-        self.timeline_scene.addTimelineItem(timeline_item, index)
+        self.timeline_scene.addTimelineItem(timeline_item, timeline_name_item, index)
 
     def deleteItem(self, widget_id: int):
         """

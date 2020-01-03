@@ -1,24 +1,21 @@
 from PyQt5.QtCore import QSize, pyqtProperty, QTimer, Qt
 from PyQt5.QtGui import QColor, QPainter
-from PyQt5.QtWidgets import QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QDialog
 
 
-class LoadWidget(QWidget):
-    Color = QColor(24, 189, 155)  # 圆圈颜色
-    Clockwise = True  # 顺时针还是逆时针
+class WaitDialog(QDialog):
+    Color = QColor(24, 189, 155)
+    Clockwise = True
     Delta = 36
 
-    def __init__(self, *args, color=None, clockwise=True, **kwargs):
-        super(LoadWidget, self).__init__(*args, **kwargs)
+    def __init__(self):
+        super(WaitDialog, self).__init__(None)
         self.angle = 0
-        self.Clockwise = clockwise
-        if color:
-            self.Color = color
         self._timer = QTimer(self, timeout=self.update)
         self._timer.start(1)
 
     def paintEvent(self, event):
-        super(LoadWidget, self).paintEvent(event)
+        super(WaitDialog, self).paintEvent(event)
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.translate(self.width() / 2, self.height() / 2)
@@ -63,32 +60,9 @@ class LoadWidget(QWidget):
 
     @delta.setter
     def delta(self, delta: int):
-        if self.delta != delta:
-            self.delta = delta
+        if self.Delta != delta:
+            self.Delta = delta
             self.update()
 
     def sizeHint(self) -> QSize:
         return QSize(100, 100)
-
-
-class Window(QWidget):
-
-    def __init__(self, *args, **kwargs):
-        super(Window, self).__init__(*args, **kwargs)
-        layout = QHBoxLayout(self)
-        layout.addWidget(LoadWidget(self))
-        # layout.addWidget(CircleProgressBar(
-        #     self, color=QColor(255, 0, 0), clockwise=False))
-        # layout.addWidget(CircleProgressBar(self, styleSheet="""
-        #     qproperty-color: rgb(0, 255, 0);
-        # """))
-
-
-if __name__ == '__main__':
-    import sys
-    from PyQt5.QtWidgets import QApplication
-
-    app = QApplication(sys.argv)
-    w = Window()
-    w.show()
-    sys.exit(app.exec_())
