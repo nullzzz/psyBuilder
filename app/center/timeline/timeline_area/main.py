@@ -68,6 +68,7 @@ class TimelineArea(QGraphicsView):
         in this function, we should have some feedback such as cartoon.
         """
         # todo some feedback in drag move in timeline area
+        self.timeline_scene.insertAnimation(e.pos())
 
     def dropEvent(self, e):
         """

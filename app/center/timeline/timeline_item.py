@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtWidgets import QGraphicsProxyWidget, QSizePolicy, QLabel
 
 from app.func import Func
@@ -24,6 +24,9 @@ class TimelineItem(QGraphicsProxyWidget):
     it is widget_type item in timeline.
     """
 
+    # when item clicked, emit its widget id
+    clicked = pyqtSignal(int)
+
     def __init__(self, parent=None, widget_type: int = None, widget_id: int = None, widget_name: str = ""):
         """
         init item
@@ -45,3 +48,7 @@ class TimelineItem(QGraphicsProxyWidget):
         label = TimelineLabel(Func.getImage(f"widgets/{Info.WidgetType[widget_type]}", size=QSize(50, 50)))
         self.setWidget(label)
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+
+    def mouseDoubleClickEvent(self, e):
+        super(TimelineItem, self).mouseDoubleClickEvent(e)
+        self.clicked.emit(self.widget_id)

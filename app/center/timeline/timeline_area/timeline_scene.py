@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QTransform
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsGridLayout, QGraphicsWidget
 
 
@@ -9,6 +10,8 @@ class TimelineScene(QGraphicsScene):
 
     def __init__(self):
         super(TimelineScene, self).__init__(None)
+        # data
+        self.item_count = 0
         # layout
         self.layout = QGraphicsGridLayout()
         self.layout.setRowFixedHeight(0, 100)
@@ -33,6 +36,8 @@ class TimelineScene(QGraphicsScene):
         self.layout.addItem(timeline_item, 0, index, Qt.AlignCenter)
         # add text item
         self.layout.addItem(timeline_name_item, 2, index, Qt.AlignCenter)
+        # change data
+        self.item_count += 1
 
     def deleteTimelineItem(self, index: int):
         """
@@ -40,3 +45,17 @@ class TimelineScene(QGraphicsScene):
         @param index:
         @return:
         """
+        # change data
+        self.item_count -= 1
+
+    def insertAnimation(self, pos):
+        """
+        animation of insert
+        @param pos:
+        @return:
+        """
+        # computer items which should be moved.
+        print("=" * 10)
+        print(pos)
+        print(self.itemAt(pos, QTransform()))
+        print("=" * 10)

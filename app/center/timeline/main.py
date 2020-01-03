@@ -16,6 +16,8 @@ class Timeline(TabItemWidget):
 
     # when item's name changed, emit its widget id. (widget_id, new_text)
     itemNameChanged = pyqtSignal(int, str)
+    # when item clicked, emit its widget id
+    itemClicked = pyqtSignal(int)
 
     def __init__(self, widget_id: int, widget_name: str):
         super(Timeline, self).__init__(widget_id, widget_name)
@@ -33,7 +35,7 @@ class Timeline(TabItemWidget):
 
         # todo delete test
         for i in range(10):
-            self.addItem(0, i, f"timeline_{i}", i)
+            self.addItem(0, i + 10, f"timeline_{i}", i)
 
     def linkSignals(self) -> None:
         """
@@ -53,9 +55,12 @@ class Timeline(TabItemWidget):
         # generate a timeline item and timeline name item
         timeline_item = TimelineItem(widget_type=widget_type, widget_id=widget_id, widget_name=widget_name)
         timeline_name_item = TimelineNameItem(widget_id, widget_name)
+
         # link items' signals
+        timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
         timeline_name_item.textChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
-        # I think it should be left to timeline area
+
+        # it should be left to timeline area
         self.timeline_area.addItem(timeline_item, timeline_name_item, index)
         # refresh its ui
         self.update()
@@ -66,7 +71,7 @@ class Timeline(TabItemWidget):
         @param widget_id: item's widget id
         @return:
         """
-        # I think it should be left to timeline area
+        # it should be left to timeline area
         self.timeline_area.deleteItem(widget_id)
 
     def itemCount(self):
