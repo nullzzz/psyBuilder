@@ -1,7 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow
 
-from app.func import Func
 from app.info import Info
 from app.kernel import Kernel
 from lib import TabWidget
@@ -64,18 +63,6 @@ class Center(QMainWindow):
         """
         widget = Kernel.Widgets[widget_id]
         self.tab_widget.changeTabName(widget, widget_name)
-
-    def initInitialTimeline(self):
-        """
-        init initial timeline for other items
-        @return:
-        """
-        widget_id = Func.generateWidgetId(Info.Timeline)
-        widget_name = f"{Info.WidgetType[Info.Timeline]}.0"
-        # create timeline widget
-        Func.createWidget(widget_id, widget_name)
-        # set it as tab
-        self.openTab(widget_id)
 
     def dealTabChange(self, index: int):
         """

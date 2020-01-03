@@ -5,6 +5,8 @@ class Kernel(object):
     """
     This Class is used to store main data, without any configuration or function.
     """
+    # bind total software to psy
+    Psy = None
 
     # wid -> widget
     Widgets = {}

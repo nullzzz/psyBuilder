@@ -2,8 +2,6 @@ class Info(object):
     """
     This class is used to store all configuration of this software, without any data.
     """
-    # bind total software to psy
-    Psy = None
 
     # image path
     Image_Path = "images"

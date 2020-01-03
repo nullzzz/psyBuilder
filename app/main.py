@@ -1,6 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow
 
+from app.func import Func
+from app.info import Info
 from .attributes import Attributes
 from .center import Center
 from .output import Output
@@ -21,9 +23,20 @@ class Psy(QMainWindow):
 
         # init dock widget
         self.initDockWidget()
+        #
+        self.linkSignals()
 
-        # init initial timeline
-        self.center.initInitialTimeline()
+    def initInitialTimeline(self):
+        """
+        init initial timeline for other items
+        @return:
+        """
+        widget_id = Func.generateWidgetId(Info.Timeline)
+        widget_name = f"{Info.WidgetType[Info.Timeline]}.0"
+        # create timeline widget
+        Func.createWidget(widget_id, widget_name)
+        # set timeline as a tab
+        self.center.openTab(widget_id)
 
     def initMenuBar(self) -> None:
         """
@@ -60,3 +73,18 @@ class Psy(QMainWindow):
 
         self.addDockWidget(Qt.RightDockWidgetArea, self.attributes)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.output)
+
+    def linkSignals(self):
+        """
+        link signals between dock widgets
+        @return:
+        """
+
+    def linkWidgetSignals(self, widget_type: int, widget):
+        """
+        link widget's signals according to its widget type.
+        @param widget_type:
+        @param widget:
+        @return:
+        """
+        print(widget_type, widget)

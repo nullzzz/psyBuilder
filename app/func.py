@@ -67,17 +67,20 @@ class Func(QWidget):
         # change data set in Kernel
         Kernel.Widgets[widget_id] = widget
         Kernel.Names[widget_name] = [widget_id]
+
         # link necessary signals
         Func.linkWidgetSignals(widget_type, widget)
 
     @staticmethod
-    def linkWidgetSignals(widget_type: int, widget: QWidget):
+    def linkWidgetSignals(widget_type: int, widget):
         """
         link widget's signals according to its widget type.
         @param widget_type:
         @param widget:
         @return:
         """
+        # It should be left to Psy
+        Kernel.Psy.linkWidgetSignals(widget_type, widget)
 
     @staticmethod
     def checkWidgetNameValidity(widget_name: str) -> (bool, str):
@@ -119,4 +122,4 @@ class Func(QWidget):
                                  2 fail
         @return:
         """
-        Info.Psy.output.print(information, information_type)
+        Kernel.Psy.output.print(information, information_type)
