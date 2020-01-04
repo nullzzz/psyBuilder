@@ -1,25 +1,11 @@
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
-from PyQt5.QtWidgets import QGraphicsProxyWidget, QSizePolicy, QLabel
+from PyQt5.QtWidgets import QLabel
 
 from app.func import Func
 from app.info import Info
 
 
-class TimelineLabel(QLabel):
-    """
-    timeline label
-    """
-
-    def __init__(self, pixmap):
-        super(TimelineLabel, self).__init__(None)
-        # set its qss id
-        self.setObjectName("TimelineLabel")
-        # set its pixmap
-        self.setPixmap(pixmap)
-        self.setAlignment(Qt.AlignCenter)
-
-
-class TimelineItem(QGraphicsProxyWidget):
+class TimelineItem(QLabel):
     """
     it is widget_type item in timeline.
     """
@@ -27,7 +13,7 @@ class TimelineItem(QGraphicsProxyWidget):
     # when item clicked, emit its widget id
     clicked = pyqtSignal(int)
 
-    def __init__(self, parent=None, widget_type: int = None, widget_id: int = None, widget_name: str = ""):
+    def __init__(self, widget_type: int = None, widget_id: int = None, widget_name: str = ""):
         """
         init item
         @param parent:
@@ -35,7 +21,9 @@ class TimelineItem(QGraphicsProxyWidget):
         @param widget_id: if widget_id has provided, we don't need to generate a new widget_id
         @param widget_name: like widget_id above.
         """
-        super(TimelineItem, self).__init__(parent)
+        super(TimelineItem, self).__init__(None)
+        # set its qss id
+        self.setObjectName("TimelineItem")
         # if widget_id/widget_name has provided
         self.widget_id = widget_id
         self.widget_name = widget_name
@@ -45,9 +33,10 @@ class TimelineItem(QGraphicsProxyWidget):
         if not self.widget_name:
             self.widget_name = Func.generateWidgetName(widget_type)
         # select its widget_type according to its widget type.
-        label = TimelineLabel(Func.getImage(f"widgets/{Info.WidgetType[widget_type]}", size=QSize(50, 50)))
-        self.setWidget(label)
-        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        pixmap = Func.getImage(f"widgets/{Info.WidgetType[widget_type]}", size=QSize(50, 50))
+        # set its pixmap
+        self.setPixmap(pixmap)
+        self.setAlignment(Qt.AlignCenter)
 
     def mouseDoubleClickEvent(self, e):
         super(TimelineItem, self).mouseDoubleClickEvent(e)

@@ -18,13 +18,15 @@ class WidgetIconItem(QListWidgetItem):
         super(WidgetIconItem, self).__init__(icon, widget_type_name)
 
 
-class WidgetIconList(QListWidget):
+class IconList(QListWidget):
     """
     a bar to place widgets' icon and we can drag icons to timeline area to create widget.
     """
 
     def __init__(self, parent=None):
-        super(WidgetIconList, self).__init__(parent)
+        super(IconList, self).__init__(parent)
+        # set its qss id
+        self.setObjectName("IconList")
         # set view mode
         self.setViewMode(QListView.IconMode)
         # set orientation and base
@@ -59,10 +61,10 @@ class IconBar(QTabWidget):
         # set its id
         self.setObjectName("IconBar")
         # set its icon lists
-        self.events = WidgetIconList()
-        self.eye_tracker = WidgetIconList()
-        self.quest = WidgetIconList()
-        self.condition = WidgetIconList()
+        self.events = IconList()
+        self.eye_tracker = IconList()
+        self.quest = IconList()
+        self.condition = IconList()
         # todo add events items
         self.events.addItem(WidgetIconItem(Info.Cycle))
         # self.events.addItem(WidgetIconItem(Info.Sound))

@@ -21,6 +21,8 @@ class Timeline(TabItemWidget):
 
     def __init__(self, widget_id: int, widget_name: str):
         super(Timeline, self).__init__(widget_id, widget_name)
+        # set its qss id
+        self.setObjectName("Timeline")
         # set its icon bar and timeline area
         self.icon_bar = IconBar()
         self.timeline_area = TimelineArea()
@@ -53,7 +55,7 @@ class Timeline(TabItemWidget):
         @return:
         """
         # generate a timeline item and timeline name item
-        timeline_item = TimelineItem(widget_type=widget_type, widget_id=widget_id, widget_name=widget_name)
+        timeline_item = TimelineItem(widget_type, widget_id, widget_name)
         timeline_name_item = TimelineNameItem(widget_id, widget_name)
 
         # link items' signals

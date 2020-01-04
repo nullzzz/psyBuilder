@@ -1,83 +1,78 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGraphicsView
+from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
 from app.info import Info
-from .timeline_scene import TimelineScene
+from .timeline_table import TimelineTable
 
 
-class TimelineArea(QGraphicsView):
-    """
-    area to place timeline item
+class TimelineArea(QFrame):
     """
 
-    def __init__(self, parent=None):
-        super(TimelineArea, self).__init__(parent)
-        # set its id
+    """
+
+    def __init__(self):
+        super(TimelineArea, self).__init__(None)
+        # set its qss id
         self.setObjectName("TimelineArea")
-        # set its scene
-        self.timeline_scene = TimelineScene()
-        self.setScene(self.timeline_scene)
-        # set its drag mode
-        self.setDragMode(QGraphicsView.ScrollHandDrag)
-        # set its alignment
-        self.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        # link signals
+        # timeline table
+        self.timeline_table = TimelineTable()
+        # set its layout
+        layout = QVBoxLayout()
+        layout.addStretch(1)
+        layout.addWidget(self.timeline_table, 1)
+        layout.addStretch(1)
+        self.setLayout(layout)
+        # accept drops
+        self.setAcceptDrops(True)
 
-    def linkSignals(self):
+    def addItem(self, timeline_item, timeline_name_item, index: int):
         """
-        link signals
+        add item in timeline table but I left it to timeline table
+        @param timeline_item:
+        @param timeline_name_item:
+        @param index:
         @return:
         """
-
-    def addItem(self, timeline_item, timeline_name_item, index: int = None):
-        """
-        add timeline item into its scene
-        @param widget_type: item's type
-        @param widget_id: item' widget id, if it's provided, we need to generate a new one through its widget type
-        @param widget_name: like widget id above
-        @param index: the index of the item
-        @return:
-        """
-        # add it to its scene
-        self.timeline_scene.addTimelineItem(timeline_item, timeline_name_item, index)
+        self.timeline_table.addItem(timeline_item, timeline_name_item, index)
 
     def deleteItem(self, widget_id: int):
         """
-        delete a timeline item in its scene
+        delete item in timeline table but I left it to timeline table
         @param widget_id:
         @return:
         """
-        # get item's index
-
-        # delete item in scene through its index
+        self.timeline_table.deleteItem(widget_id)
 
     def dragEnterEvent(self, e):
         """
-        drag icon into this widget, this widget just accepts several special pattern
+
+        @param e:
+        @return:
         """
         data_format = e.mimeData().formats()[0]
         if data_format == Info.IconBarToTimeline:
-            # if drag from icon bar to timeline
+            # drag from icon bar
             e.accept()
         else:
             e.ignore()
 
     def dragMoveEvent(self, e):
         """
-        move icon in this widget, we don't need to justify its data format.
-        in this function, we should have some feedback such as cartoon.
-        """
-        # todo some feedback in drag move in timeline area
-        self.timeline_scene.insertAnimation(e.pos())
 
-    def dropEvent(self, e):
+        @param e:
+        @return:
         """
-        drop icon into this widget, process other procedures
-        """
-        # todo deal with drop event in timeline area
 
     def dragLeaveEvent(self, e):
         """
-        drag icon leave this widget, ignore this drag
+
+        @param e:
+        @return:
         """
         e.ignore()
+
+    def dropEvent(self, e):
+        """
+
+        @param e:
+        @return:
+        """

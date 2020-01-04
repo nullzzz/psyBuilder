@@ -109,7 +109,9 @@ class Func(QWidget):
         """
         path = os.path.join(Info.Image_Path, image_path)
         if not type:
-            return QPixmap(path).scaled(size)
+            if size:
+                return QPixmap(path).scaled(size)
+            return QPixmap(path)
         return QIcon(path)
 
     @staticmethod
