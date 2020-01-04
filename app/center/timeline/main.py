@@ -36,8 +36,8 @@ class Timeline(TabItemWidget):
         self.linkSignals()
 
         # todo delete test
-        for i in range(10):
-            self.addItem(0, i + 10, f"timeline_{i}", i)
+        for i in range(0, 9):
+            self.addItem(0, i + 1, f"timeline_{i}", i)
 
     def linkSignals(self) -> None:
         """

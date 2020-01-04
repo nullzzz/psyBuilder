@@ -15,6 +15,7 @@ class TimelineNameItem(QLineEdit):
         # data
         self.widget_id = widget_id
         self.pre_text = widget_name
+        self.setText(widget_name)
         # set its id
         self.setObjectName("TimelineNameItem")
         # set its align
