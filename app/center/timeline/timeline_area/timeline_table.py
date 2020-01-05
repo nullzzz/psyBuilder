@@ -148,13 +148,11 @@ class TimelineTable(QTableWidget):
         """
         if direction:
             # right
-            self.cellWidget(0, col).setAlignment(Qt.AlignRight)
-            # self.item(2, col).setTextAlignment(Qt.AlignRight)
+            self.cellWidget(0, col).setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             self.move_cols[1] = col
         else:
             # left
-            self.cellWidget(0, col).setAlignment(Qt.AlignLeft)
-            # self.item(2, col).setTextAlignment(Qt.AlignLeft)
+            self.cellWidget(0, col).setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             self.move_cols[0] = col
 
     def resetAlignment(self):
@@ -166,7 +164,6 @@ class TimelineTable(QTableWidget):
         for col in self.move_cols:
             if col != -2:
                 self.cellWidget(0, col).setAlignment(Qt.AlignCenter)
-                # self.item(2, col).setTextAlignment(Qt.AlignCenter)
         # reset data
         self.move_cols = [-2, -2]
 

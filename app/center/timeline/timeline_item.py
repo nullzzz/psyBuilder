@@ -81,7 +81,7 @@ class TimelineItem(QLabel):
         mime_data.setData(Info.MoveInTimeline, data)
         drag = QDrag(self)
         drag.setMimeData(mime_data)
-        drag.setHotSpot(QPoint(12, 12))
+        drag.setHotSpot(QPoint(25, 25))
         drag.setPixmap(Func.getImage(f"widgets/{Info.WidgetType[self.widget_type]}", size=QSize(50, 50)))
         drag.exec()
 
@@ -97,6 +97,6 @@ class TimelineItem(QLabel):
         mime_data.setData(Info.CopyInTimeline, data)
         drag = QDrag(self)
         drag.setMimeData(mime_data)
-        drag.setHotSpot(QPoint(12, 12))
+        drag.setHotSpot(QPoint(25, 25))
         drag.setPixmap(Func.getImage(f"widgets/{Info.WidgetType[self.widget_type]}", size=QSize(50, 50)))
         drag.exec()

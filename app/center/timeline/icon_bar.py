@@ -50,7 +50,7 @@ class IconList(QListWidget):
         # generate a draggable item
         drag = QDrag(self)
         drag.setMimeData(mime_data)
-        drag.setHotSpot(QPoint(12, 12))
+        drag.setHotSpot(QPoint(25, 25))
         drag.setPixmap(item.icon().pixmap(QSize(50, 50)))
         drag.exec()
 

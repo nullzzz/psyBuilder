@@ -42,3 +42,7 @@ class Info(object):
 
     # timeline initial length of arrow
     InitialArrowLength = 10
+
+    # signals' origin
+    TimelineSignal = 0
+    StructureSignal = 1

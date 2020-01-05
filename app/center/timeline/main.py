@@ -1,6 +1,7 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QGridLayout
 
+from app.info import Info
 from lib import TabItemWidget
 from .icon_bar import IconBar
 from .timeline_area import TimelineArea
@@ -14,10 +15,10 @@ class Timeline(TabItemWidget):
                      2. area to place item, and this area is graphics view.
     """
 
-    # when item's name changed, emit its widget id. (widget_id, new_text)
-    itemNameChanged = pyqtSignal(int, str)
-    # when item clicked, emit its widget id
-    itemClicked = pyqtSignal(int)
+    # when item's name changed, emit its widget id. (Info.TimelineSignal, widget_id, new_text)
+    itemNameChanged = pyqtSignal(int, int, str)
+    # when item clicked, emit its widget id. (Info.TimelineSignal, widget_id)
+    itemClicked = pyqtSignal(int, int)
 
     def __init__(self, widget_id: int, widget_name: str):
         super(Timeline, self).__init__(widget_id, widget_name)
@@ -40,9 +41,8 @@ class Timeline(TabItemWidget):
         link signals
         @return:
         """
-        self.timeline_area.itemNameChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
-        self.itemClicked.connect(lambda widget_id: print(widget_id))
-        self.itemNameChanged.connect(lambda widget_id, text: print(widget_id, text))
+        self.timeline_area.itemNameChanged.connect(
+            lambda widget_id, text: self.itemNameChanged.emit(Info.TimelineSignal, widget_id, text))
 
     def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = 0):
         """
@@ -59,7 +59,7 @@ class Timeline(TabItemWidget):
         # bind timeline name item to timeline item
         timeline_item.timeline_name_item = timeline_name_item
         # link items' signals
-        timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
+        timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(Info.TimelineSignal, widget_id))
         # later work should be left to timeline table
         self.timeline_area.addItem(timeline_item, timeline_name_item, index)
         # refresh its ui

@@ -97,6 +97,10 @@ class Psy(QMainWindow):
         # widget: TabItemWidget
         widget.waitStart.connect(self.startWait)
         widget.waitEnd.connect(self.endWait)
+        # timeline
+        if widget_type == Info.Timeline:
+            widget.itemNameChanged.connect(self.dealItemNameChanged)
+            widget.itemClicked.connect(self.dealItemClicked)
 
     def startWait(self):
         """
@@ -113,3 +117,22 @@ class Psy(QMainWindow):
         """
         self.wait_dialog.hide()
         QApplication.processEvents()
+
+    def dealItemNameChanged(self, origin_widget: int, widget_id: int, text: str):
+        """
+
+        @param origin_widget:
+        @param widget_id:
+        @param text:
+        @return:
+        """
+        print("item name change", origin_widget, widget_id, text)
+
+    def dealItemClicked(self, origin_widget: int, widget_id: int):
+        """
+
+        @param origin_widget:
+        @param widget_id:
+        @return:
+        """
+        print("item click", origin_widget, widget_id)
