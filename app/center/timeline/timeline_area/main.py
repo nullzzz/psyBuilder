@@ -79,7 +79,7 @@ class TimelineArea(QFrame):
             # save widget name and widget name
             timeline_item = self.timeline_table.cellWidget(0, self.move_col)
             self.move_widget_id = timeline_item.widget_id
-            self.move_widget_name = timeline_item.timeline_name_item.widget_name
+            self.move_widget_name = timeline_item.timeline_name_item.text()
             # delete items
             self.timeline_table.deleteItem(self.move_widget_id)
             e.accept()

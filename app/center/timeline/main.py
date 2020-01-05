@@ -65,7 +65,7 @@ class Timeline(TabItemWidget):
         # refresh its ui
         self.update()
         # return valid widget_id, widget_name
-        return timeline_name_item.widget_id, timeline_name_item.widget_name
+        return timeline_item.widget_id, timeline_name_item.text()
 
     def deleteItem(self, widget_id: int):
         """
