@@ -61,6 +61,10 @@ class TimelineArea(QFrame):
         @param e:
         @return:
         """
+        # get x
+        x = e.pos().x()
+        # item animation
+        self.timeline_table.moveItemAnimation(x)
 
     def dragLeaveEvent(self, e):
         """
@@ -68,6 +72,8 @@ class TimelineArea(QFrame):
         @param e:
         @return:
         """
+        # reset
+        self.timeline_table.resetAlignment()
         e.ignore()
 
     def dropEvent(self, e):
@@ -76,3 +82,11 @@ class TimelineArea(QFrame):
         @param e:
         @return:
         """
+        # reset
+        self.timeline_table.resetAlignment()
+        # data format
+        data_format = e.mimeData().formats()[0]
+        if data_format == Info.IconBarToTimeline:
+            e.accept()
+        else:
+            e.ignore()

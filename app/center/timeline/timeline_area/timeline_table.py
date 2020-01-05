@@ -25,6 +25,7 @@ class TimelineTable(QTableWidget):
         self.initTable()
         # data
         self.item_count = 0
+        self.move_cols = [-2, -2]
 
     def initTable(self):
         """
@@ -112,3 +113,64 @@ class TimelineTable(QTableWidget):
                 self.removeColumn(index)
             # change data
             self.item_count -= 1
+
+    def setAlignment(self, col: int, direction: int = 0):
+        """
+        set alignment of item in table
+        @param col:
+        @param direction: 0. left
+                          1. right
+        @return:
+        """
+        if direction:
+            # right
+            self.cellWidget(0, col).setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            self.cellWidget(2, col).setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            self.move_cols[1] = col
+        else:
+            # left
+            self.cellWidget(0, col).setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            self.cellWidget(2, col).setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            self.move_cols[0] = col
+
+    def resetAlignment(self):
+        """
+
+        @return:
+        """
+        # reset alignment
+        for col in self.move_cols:
+            if col != -2:
+                self.cellWidget(0, col).setAlignment(Qt.AlignCenter)
+                self.cellWidget(2, col).setAlignment(Qt.AlignCenter)
+        # reset data
+        self.move_cols = [-2, -2]
+
+    def moveItemAnimation(self, x: int):
+        """
+        show animation according to horizontal coordinate
+        @param x: horizontal coordinate
+        @return:
+        """
+        # reset alignment
+        self.resetAlignment()
+        # get the column corresponding to the x coordinate
+        col = self.columnAt(x)
+        # show animation according to col
+        # if excel the range, col will be -1
+        if col == -1 or col >= self.item_count:
+            # we just need rightest item
+            self.setAlignment(self.item_count - 1, 0)
+            self.move_cols[0] = self.item_count - 1
+        else:
+            # we need just mouse in left or right half
+            if self.columnAt(x + 50) == col:
+                # in the left half
+                self.setAlignment(col, 1)
+                if col:
+                    self.setAlignment(col - 1, 0)
+            else:
+                # in the right half
+                self.setAlignment(col, 0)
+                if col + 1 < self.item_count:
+                    self.setAlignment(col + 1, 1)
