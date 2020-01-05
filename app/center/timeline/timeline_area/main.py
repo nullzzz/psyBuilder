@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QDataStream, QIODevice
+from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal
 from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
 from app.info import Info
@@ -9,6 +9,9 @@ class TimelineArea(QFrame):
     """
 
     """
+
+    # when widget's name is changed, emit this signal (widget id, text)
+    itemNameChanged = pyqtSignal(int, str)
 
     def __init__(self, parent):
         super(TimelineArea, self).__init__(parent)
@@ -24,6 +27,19 @@ class TimelineArea(QFrame):
         self.setLayout(layout)
         # accept drops
         self.setAcceptDrops(True)
+        # link signals
+        self.linkSignals()
+        # data
+        self.move_col = -1
+        self.move_widget_id = -1
+        self.move_widget_name = ""
+
+    def linkSignals(self):
+        """
+
+        @return:
+        """
+        self.timeline_table.itemNameChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
 
     def addItem(self, timeline_item, timeline_name_item, index: int):
         """
@@ -54,6 +70,22 @@ class TimelineArea(QFrame):
         if data_format == Info.IconBarToTimeline:
             # drag from icon bar
             e.accept()
+        elif data_format == Info.MoveInTimeline:
+            # move in this timeline
+            data = e.mimeData().data(data_format)
+            stream = QDataStream(data, QIODevice.ReadOnly)
+            self.move_col = stream.readInt()
+            # save widget name and widget name
+            timeline_item = self.timeline_table.cellWidget(0, self.move_col)
+            self.move_widget_id = timeline_item.widget_id
+            self.move_widget_name = timeline_item.timeline_name_item.widget_name
+            # delete items
+            self.timeline_table.deleteItem(self.move_widget_id)
+            e.accept()
+        elif data_format == Info.CopyInTimeline:
+            # todo copy in this timeline
+            print("copy")
+            e.accept()
         else:
             e.ignore()
 
@@ -76,6 +108,14 @@ class TimelineArea(QFrame):
         """
         # reset
         self.timeline_table.resetAlignment()
+        # if move item, we also need reset item in timeline
+        if self.move_col != -1:
+            # add origin item in timeline
+            self.parent().addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name, index=self.move_col)
+            # reset move data
+            self.move_col = -1
+            self.move_widget_id = -1
+            self.move_widget_name = ""
         e.ignore()
 
     def dropEvent(self, e):
@@ -93,7 +133,18 @@ class TimelineArea(QFrame):
             # simply add a item in timeline
             stream = QDataStream(data, QIODevice.ReadOnly)
             widget_type = stream.readInt()
-            self.parent().addItem(widget_type=widget_type, index=self.timeline_table.columnAt(e.pos().x()))
+            index = self.timeline_table.columnAt(e.pos().x())
+            self.parent().addItem(widget_type=widget_type, index=index)
+            # accept
+            e.accept()
+        elif data_format == Info.MoveInTimeline:
+            # add origin item in timeline
+            index = self.timeline_table.columnAt(e.pos().x())
+            self.parent().addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name, index=index)
+            # reset move data
+            self.move_col = -1
+            self.move_widget_id = -1
+            self.move_widget_name = ""
             # accept
             e.accept()
         else:

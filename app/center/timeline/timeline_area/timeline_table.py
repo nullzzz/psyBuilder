@@ -1,14 +1,18 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QFrame, QLabel
 
 from app.func import Func
 from app.info import Info
+from ..timeline_name_item import TimelineNameItem
 
 
 class TimelineTable(QTableWidget):
     """
     table to place timeline item and timeline name item
     """
+
+    # when widget's name is changed, emit this signal (widget id, text)
+    itemNameChanged = pyqtSignal(int, str)
 
     def __init__(self):
         super(TimelineTable, self).__init__(None)
@@ -26,6 +30,16 @@ class TimelineTable(QTableWidget):
         # data
         self.item_count = 0
         self.move_cols = [-2, -2]
+        # link signals
+        self.linkSignals()
+        self.count = 0
+
+    def linkSignals(self):
+        """
+        link signals
+        @return:
+        """
+        self.itemChanged.connect(self.dealCellChanged)
 
     def initTable(self):
         """
@@ -84,7 +98,7 @@ class TimelineTable(QTableWidget):
         self.insertColumn(index)
         self.setArrow(index, "timeline/line.png")
         self.setCellWidget(0, index, timeline_item)
-        self.setCellWidget(2, index, timeline_name_item)
+        self.setItem(2, index, timeline_name_item)
         # change data
         self.item_count += 1
         # if initial length is not full, we should delete one column
@@ -98,10 +112,7 @@ class TimelineTable(QTableWidget):
         @return:
         """
         # find index of widget_id
-        index = -1
-        for col in range(self.item_count):
-            if widget_id == self.cellWidget(0, col).widget_id:
-                index = col
+        index = self.itemColumn(widget_id)
         # delete
         if index != -1:
             # if item count is greater than the initial length, we should delete arrow line
@@ -116,6 +127,17 @@ class TimelineTable(QTableWidget):
             # change data
             self.item_count -= 1
 
+    def itemColumn(self, widget_id: int):
+        """
+        find item's col according to its widget id
+        @param widget_id:
+        @return:
+        """
+        for col in range(self.item_count):
+            if widget_id == self.cellWidget(0, col).widget_id:
+                return col
+        return -1
+
     def setAlignment(self, col: int, direction: int = 0):
         """
         set alignment of item in table
@@ -127,12 +149,12 @@ class TimelineTable(QTableWidget):
         if direction:
             # right
             self.cellWidget(0, col).setAlignment(Qt.AlignRight)
-            self.cellWidget(2, col).setAlignment(Qt.AlignRight)
+            # self.item(2, col).setTextAlignment(Qt.AlignRight)
             self.move_cols[1] = col
         else:
             # left
             self.cellWidget(0, col).setAlignment(Qt.AlignLeft)
-            self.cellWidget(2, col).setAlignment(Qt.AlignLeft)
+            # self.item(2, col).setTextAlignment(Qt.AlignLeft)
             self.move_cols[0] = col
 
     def resetAlignment(self):
@@ -144,7 +166,7 @@ class TimelineTable(QTableWidget):
         for col in self.move_cols:
             if col != -2:
                 self.cellWidget(0, col).setAlignment(Qt.AlignCenter)
-                self.cellWidget(2, col).setAlignment(Qt.AlignCenter)
+                # self.item(2, col).setTextAlignment(Qt.AlignCenter)
         # reset data
         self.move_cols = [-2, -2]
 
@@ -177,3 +199,17 @@ class TimelineTable(QTableWidget):
                     self.setAlignment(col, 0)
                     if col + 1 < self.item_count:
                         self.setAlignment(col + 1, 1)
+
+    def dealCellChanged(self, item):
+        """
+        when cell changed, we need to make judgement
+        @param item:
+        @return:
+        """
+        # we just deal this type
+        if type(item) == TimelineNameItem:
+            # if this item was just added in the table, we ignore it
+            if not item.new:
+                self.itemNameChanged.emit(item.widget_id, item.text())
+            else:
+                item.new = False

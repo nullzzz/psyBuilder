@@ -1,82 +1,43 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QLineEdit
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTableWidgetItem
+
+from app.func import Func
 
 
-class TimelineNameItem(QLineEdit):
+class TimelineNameItem(QTableWidgetItem):
     """
 
     """
 
-    # emit its content when text change
-    textChanged = pyqtSignal(int, str)
-
-    def __init__(self, widget_id: int, widget_name: str = ""):
+    def __init__(self, widget_type: int, widget_id: int, widget_name: str = ""):
         super(TimelineNameItem, self).__init__(None)
-        # data
+        # set data, we assure widget type and widget id is valid
+        self.widget_type = widget_type
         self.widget_id = widget_id
-        self.pre_text = widget_name
-        self.setText(widget_name)
-        # set its id
-        self.setObjectName("TimelineNameItem")
+        self.widget_name = widget_name
+        # widget name may be none, we should generate new one
+        if not self.widget_name:
+            self.widget_name = Func.generateWidgetName(widget_type)
+        # set widget name
+        self.setText(self.widget_name)
+        # a flag
+        self.new = True
         # set its align
-        self.setAlignment(Qt.AlignCenter)
-        # link signals
-        self.linkSignals()
+        self.setTextAlignment(Qt.AlignCenter)
 
-    def linkSignals(self):
+    def setText(self, widget_name: str):
         """
-        link signals
+        override func
+        @param widget_name:
         @return:
         """
-        # clear its cursor when enter/return pressed
-        self.editingFinished.connect(lambda: self.setReadOnly(True))
-        # emit signal when finish editing
-        self.editingFinished.connect(self.finishEditing)
+        super(TimelineNameItem, self).setText(widget_name)
+        self.widget_name = widget_name
 
     def setWidgetId(self, widget_id: int):
         """
-        change its widget if
+        change its widget id
         @param widget_id:
         @return:
         """
         self.widget_id = widget_id
-
-    def setWidgetName(self, widget_name: str):
-        """
-
-        @param widget_name:
-        @return:
-        """
-        self.widget_name = widget_name
-        self.setText(widget_name)
-        self.pre_text = widget_name
-
-    def mousePressEvent(self, e):
-        """
-        override this func.
-        @param e:
-        @return:
-        """
-        super(TimelineNameItem, self).mousePressEvent(e)
-        self.setReadOnly(False)
-
-    def mouseDoubleClickEvent(self, e):
-        """
-        override this func.
-        @param e:
-        @return:
-        """
-        super(TimelineNameItem, self).mousePressEvent(e)
-        self.setReadOnly(False)
-
-    def finishEditing(self):
-        """
-        emit content of line edit when finish editing and content changed
-        @return:
-        """
-        # if changed
-        if self.text() != self.pre_text:
-            # change pre text
-            self.pre_text = self.text()
-            # emit change signal
-            self.textChanged.emit(self.widget_id, self.text())

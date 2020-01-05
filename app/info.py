@@ -37,6 +37,8 @@ class Info(object):
 
     # drag type
     IconBarToTimeline = "0"
+    CopyInTimeline = "1"
+    MoveInTimeline = "2"
 
     # timeline initial length of arrow
     InitialArrowLength = 10

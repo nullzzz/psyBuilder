@@ -40,6 +40,7 @@ class Timeline(TabItemWidget):
         link signals
         @return:
         """
+        self.timeline_area.itemNameChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
         self.itemClicked.connect(lambda widget_id: print(widget_id))
         self.itemNameChanged.connect(lambda widget_id, text: print(widget_id, text))
 
@@ -52,19 +53,13 @@ class Timeline(TabItemWidget):
         @param index: the index of the item
         @return:
         """
-
         # generate a timeline item and timeline name item
-        timeline_item = TimelineItem(widget_type, widget_id, widget_name)
-        timeline_name_item = TimelineNameItem(widget_id, widget_name)
-        if not widget_id:
-            timeline_name_item.setWidgetId(timeline_item.widget_id)
-        if not widget_name:
-            timeline_name_item.setWidgetName(timeline_item.widget_name)
-        
+        timeline_item = TimelineItem(widget_type, widget_id)
+        timeline_name_item = TimelineNameItem(timeline_item.widget_type, timeline_item.widget_id, widget_name)
+        # bind timeline name item to timeline item
+        timeline_item.timeline_name_item = timeline_name_item
         # link items' signals
         timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
-        timeline_name_item.textChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
-
         # later work should be left to timeline table
         self.timeline_area.addItem(timeline_item, timeline_name_item, index)
         # refresh its ui
