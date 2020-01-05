@@ -17,8 +17,8 @@ class Timeline(TabItemWidget):
 
     # when item's name changed, emit its widget id. (Info.TimelineSignal, widget_id, new_text)
     itemNameChanged = pyqtSignal(int, int, str)
-    # when item clicked, emit its widget id. (Info.TimelineSignal, widget_id)
-    itemClicked = pyqtSignal(int, int)
+    # when item clicked, emit its widget id. (widget_id)
+    itemClicked = pyqtSignal(int)
 
     def __init__(self, widget_id: int, widget_name: str):
         super(Timeline, self).__init__(widget_id, widget_name)
@@ -59,11 +59,13 @@ class Timeline(TabItemWidget):
         # bind timeline name item to timeline item
         timeline_item.timeline_name_item = timeline_name_item
         # link items' signals
-        timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(Info.TimelineSignal, widget_id))
+        timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
         # later work should be left to timeline table
         self.timeline_area.addItem(timeline_item, timeline_name_item, index)
         # refresh its ui
         self.update()
+        # return valid widget_id, widget_name
+        return timeline_name_item.widget_id, timeline_name_item.widget_name
 
     def deleteItem(self, widget_id: int):
         """

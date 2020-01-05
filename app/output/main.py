@@ -13,7 +13,7 @@ class Output(DockWidget):
 
     def __init__(self, parent=None):
         super(Output, self).__init__(parent)
-        # main widget is a text edit
+        # main widget is a widget_name edit
         self.text_edit = QTextEdit()
         self.text_edit.setReadOnly(True)
         # first str is work path of this software
@@ -36,7 +36,7 @@ class Output(DockWidget):
 
     def print(self, information: str, information_type: int = 0) -> None:
         """
-        print information in its text edit
+        print information in its widget_name edit
         @param information:
         @param information_type: 0 none
                                  1 success

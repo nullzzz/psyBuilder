@@ -75,3 +75,12 @@ class Center(QMainWindow):
             # emit currentWidgetChange signal to refresh other docks.
             widget = self.tab_widget.widget(index)
             self.currentWidgetChange.emit(widget.widget_id)
+
+    def changeItemNameInTimeline(self, widget_id, widget_name):
+        """
+        change item's name in all related timelines according to widget id
+        @param widget_id:
+        @param widget_name:
+        @return:
+        """
+        # todo change item's name in all related timelines

@@ -36,4 +36,48 @@ QFrame#TimelineArea{
 }
 """
 
-mac_qss = timeline_item + icon_bar + timeline_area + timeline_table
+tab_bar = """
+QTabWidget::pane {
+    background-color: rgb(236,236,236);
+}
+
+QTabWidget::tab-bar {
+    left: 0px;
+}
+
+QTabBar::tab {
+    background: rgb(246,246,246);
+    border: 1px solid rgb(201,201,201);
+    border-left: 0.5px solid rgb(201,201,201);
+    min-height: 26px;
+    min-width: 100px;
+    text-align: center;
+}
+
+QTabBar::tab:selected{
+    background: rgb(246,246,246);
+    border-bottom:0px;
+}
+
+QTabBar::tab:!selected {
+    background: rgb(221,221,221);
+}
+
+QTabBar::tab:hover {
+    background: rgb(198,198,198);
+}
+
+QTabBar::close-button {
+    image: url(images/tab_bar/close.ico);
+}
+
+QTabBar::close-button:hover {
+    background: rgb(211,211,211);
+}
+
+QTabBar::close-button:pressed {
+    background: rgb(201,201,201);
+}
+"""
+
+mac_qss = timeline_item + icon_bar + timeline_area + timeline_table + tab_bar

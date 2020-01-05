@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal
 from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
+from app.func import Func
 from app.info import Info
 from .timeline_table import TimelineTable
 
@@ -10,7 +11,7 @@ class TimelineArea(QFrame):
 
     """
 
-    # when widget's name is changed, emit this signal (widget id, text)
+    # when widget's name is changed, emit this signal (widget id, widget_name)
     itemNameChanged = pyqtSignal(int, str)
 
     def __init__(self, parent):
@@ -134,7 +135,11 @@ class TimelineArea(QFrame):
             stream = QDataStream(data, QIODevice.ReadOnly)
             widget_type = stream.readInt()
             index = self.timeline_table.columnAt(e.pos().x())
-            self.parent().addItem(widget_type=widget_type, index=index)
+            widget_id, widget_name = self.parent().addItem(widget_type=widget_type, index=index)
+            # create widget
+            self.parent().waitStart.emit()
+            Func.createWidget(widget_id, widget_name)
+            self.parent().waitEnd.emit()
             # accept
             e.accept()
         elif data_format == Info.MoveInTimeline:

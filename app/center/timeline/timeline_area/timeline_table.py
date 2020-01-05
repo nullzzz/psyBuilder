@@ -11,7 +11,7 @@ class TimelineTable(QTableWidget):
     table to place timeline item and timeline name item
     """
 
-    # when widget's name is changed, emit this signal (widget id, text)
+    # when widget's name is changed, emit this signal (widget id, widget_name)
     itemNameChanged = pyqtSignal(int, str)
 
     def __init__(self):

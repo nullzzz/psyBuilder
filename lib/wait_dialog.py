@@ -4,15 +4,18 @@ from PyQt5.QtWidgets import QDialog
 
 
 class WaitDialog(QDialog):
-    Color = QColor(24, 189, 155)
+    Color = QColor(0, 0, 0)
     Clockwise = True
     Delta = 36
 
     def __init__(self):
-        super(WaitDialog, self).__init__(None)
+        super(WaitDialog, self).__init__(None, Qt.FramelessWindowHint)
         self.angle = 0
         self._timer = QTimer(self, timeout=self.update)
         self._timer.start(1)
+        self.setStyleSheet("background:transparent")
+        self.setFixedHeight(30)
+        self.setFixedWidth(30)
 
     def paintEvent(self, event):
         super(WaitDialog, self).paintEvent(event)

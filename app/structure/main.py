@@ -76,3 +76,12 @@ class Structure(DockWidget):
         @return:
         """
         # todo add node move
+
+    def changeNodeName(self, widget_id: int, widget_name: str):
+        """
+        change node's widget_name in all related nodes according to widget id
+        @param widget_id:
+        @param widget_name:
+        @return:
+        """
+        # todo change node's widget_name in all related nodes

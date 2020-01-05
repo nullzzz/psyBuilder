@@ -29,18 +29,6 @@ class Psy(QMainWindow):
         #
         self.linkSignals()
 
-    def initInitialTimeline(self):
-        """
-        init initial timeline for other items
-        @return:
-        """
-        widget_id = Func.generateWidgetId(Info.Timeline)
-        widget_name = f"{Info.WidgetType[Info.Timeline]}.0"
-        # create timeline widget
-        Func.createWidget(widget_id, widget_name)
-        # set timeline as a tab
-        self.center.openTab(widget_id)
-
     def initMenuBar(self) -> None:
         """
         init its menu bar, including file, view, devices, building and help
@@ -76,6 +64,18 @@ class Psy(QMainWindow):
 
         self.addDockWidget(Qt.RightDockWidgetArea, self.attributes)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.output)
+
+    def initInitialTimeline(self):
+        """
+        init initial timeline for other items
+        @return:
+        """
+        widget_id = Func.generateWidgetId(Info.Timeline)
+        widget_name = Func.generateWidgetName(Info.Timeline)
+        # create timeline widget
+        Func.createWidget(widget_id, widget_name)
+        # set timeline as a tab
+        self.center.openTab(widget_id)
 
     def linkSignals(self):
         """
@@ -118,21 +118,36 @@ class Psy(QMainWindow):
         self.wait_dialog.hide()
         QApplication.processEvents()
 
-    def dealItemNameChanged(self, origin_widget: int, widget_id: int, text: str):
+    def dealItemNameChanged(self, origin_widget: int, widget_id: int, widget_name: str):
         """
 
         @param origin_widget:
         @param widget_id:
-        @param text:
+        @param widget_name:
         @return:
         """
-        print("item name change", origin_widget, widget_id, text)
+        print("item name change", origin_widget, widget_id, widget_name)
+        # change widget's name
+        Func.changeWidgetName(widget_id, widget_name)
+        # change tab's name
+        self.center.changeTabName(widget_id, widget_name)
+        if origin_widget == Info.TimelineSignal:
+            # if signal from timeline
+            self.structure.changeNodeName(widget_id, widget_name)
+        elif origin_widget == Info.StructureSignal:
+            # if signal from timeline
+            self.center.changeItemNameInTimeline(widget_id, widget_name)
 
-    def dealItemClicked(self, origin_widget: int, widget_id: int):
+    def dealItemClicked(self, widget_id: int):
         """
 
         @param origin_widget:
         @param widget_id:
         @return:
         """
-        print("item click", origin_widget, widget_id)
+        print("item click", widget_id)
+        # open tab
+        self.center.openTab(widget_id)
+        # change attributes and properties
+        self.attributes.showAttributes(widget_id)
+        self.properties.showProperties(widget_id)
