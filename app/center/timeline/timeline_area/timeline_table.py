@@ -78,16 +78,18 @@ class TimelineTable(QTableWidget):
         @param index:
         @return:
         """
-        # because I init some arrow, So i need to judge if i need to add new arrow line
-        # if item count is greater than the initial length, we should add new arrow line
-        if self.item_count > Info.InitialArrowLength - 2:
-            # add new column
-            self.insertColumn(index)
-            self.setArrow(index, "timeline/line.png")
+        # no matter what, insert a column first
+        if index > self.item_count or index == -1:
+            index = self.item_count
+        self.insertColumn(index)
+        self.setArrow(index, "timeline/line.png")
         self.setCellWidget(0, index, timeline_item)
         self.setCellWidget(2, index, timeline_name_item)
         # change data
         self.item_count += 1
+        # if initial length is not full, we should delete one column
+        if self.item_count < Info.InitialArrowLength - 1:
+            self.removeColumn(Info.InitialArrowLength - 2)
 
     def deleteItem(self, widget_id: int):
         """
@@ -124,13 +126,13 @@ class TimelineTable(QTableWidget):
         """
         if direction:
             # right
-            self.cellWidget(0, col).setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            self.cellWidget(2, col).setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            self.cellWidget(0, col).setAlignment(Qt.AlignRight)
+            self.cellWidget(2, col).setAlignment(Qt.AlignRight)
             self.move_cols[1] = col
         else:
             # left
-            self.cellWidget(0, col).setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            self.cellWidget(2, col).setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            self.cellWidget(0, col).setAlignment(Qt.AlignLeft)
+            self.cellWidget(2, col).setAlignment(Qt.AlignLeft)
             self.move_cols[0] = col
 
     def resetAlignment(self):
@@ -157,20 +159,21 @@ class TimelineTable(QTableWidget):
         # get the column corresponding to the x coordinate
         col = self.columnAt(x)
         # show animation according to col
-        # if excel the range, col will be -1
-        if col == -1 or col >= self.item_count:
-            # we just need rightest item
-            self.setAlignment(self.item_count - 1, 0)
-            self.move_cols[0] = self.item_count - 1
-        else:
-            # we need just mouse in left or right half
-            if self.columnAt(x + 50) == col:
-                # in the left half
-                self.setAlignment(col, 1)
-                if col:
-                    self.setAlignment(col - 1, 0)
+        if self.item_count:
+            # if excel the range, col will be -1
+            if col == -1 or col >= self.item_count:
+                # we just need rightest item
+                self.setAlignment(self.item_count - 1, 0)
+                self.move_cols[0] = self.item_count - 1
             else:
-                # in the right half
-                self.setAlignment(col, 0)
-                if col + 1 < self.item_count:
-                    self.setAlignment(col + 1, 1)
+                # we need just mouse in left or right half
+                if self.columnAt(x + 50) == col:
+                    # in the left half
+                    self.setAlignment(col, 1)
+                    if col:
+                        self.setAlignment(col - 1, 0)
+                else:
+                    # in the right half
+                    self.setAlignment(col, 0)
+                    if col + 1 < self.item_count:
+                        self.setAlignment(col + 1, 1)

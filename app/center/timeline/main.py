@@ -4,8 +4,6 @@ from PyQt5.QtWidgets import QGridLayout
 from lib import TabItemWidget
 from .icon_bar import IconBar
 from .timeline_area import TimelineArea
-from .timeline_item import TimelineItem
-from .timeline_name_item import TimelineNameItem
 
 
 class Timeline(TabItemWidget):
@@ -25,7 +23,7 @@ class Timeline(TabItemWidget):
         self.setObjectName("Timeline")
         # set its icon bar and timeline area
         self.icon_bar = IconBar()
-        self.timeline_area = TimelineArea()
+        self.timeline_area = TimelineArea(self)
         # set its layout
         grid = QGridLayout(self)
         grid.addWidget(self.icon_bar, 0, 0, 1, 1)
@@ -35,17 +33,13 @@ class Timeline(TabItemWidget):
         # link signals
         self.linkSignals()
 
-        # todo delete test
-        for i in range(0, 9):
-            self.addItem(0, i + 1, f"timeline_{i}", i)
-
     def linkSignals(self) -> None:
         """
         link signals
         @return:
         """
 
-    def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = None):
+    def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = 0):
         """
         add timeline item into its timeline area
         @param widget_type: item's type
@@ -54,16 +48,13 @@ class Timeline(TabItemWidget):
         @param index: the index of the item
         @return:
         """
-        # generate a timeline item and timeline name item
-        timeline_item = TimelineItem(widget_type, widget_id, widget_name)
-        timeline_name_item = TimelineNameItem(widget_id, widget_name)
+        # it should be left to timeline area
+        timeline_item, timeline_name_item = self.timeline_area.addItem(widget_type, widget_id, widget_name, index)
 
         # link items' signals
         timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
         timeline_name_item.textChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
 
-        # it should be left to timeline area
-        self.timeline_area.addItem(timeline_item, timeline_name_item, index)
         # refresh its ui
         self.update()
 

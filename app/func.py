@@ -25,7 +25,7 @@ class Func(QWidget):
         count = Kernel.WidgetTypeCount[widget_type]
         # widget id = widget_type * 10000 + count
         widget_id = widget_type * Info.MaxWidgetCount + count
-        # inc count of this widget add_type
+        # inc count of this widget type
         Kernel.WidgetTypeCount[widget_type] += 1
         return widget_id
 
@@ -40,9 +40,11 @@ class Func(QWidget):
         while True:
             # widget name = 'widget_type' _ 'count'
             widget_name = f"{widget_type_name}_{Kernel.WidgetNameCount[widget_type]}"
+            # inc count of this widget type
+            Kernel.WidgetNameCount[widget_type] += 1
+            # check name's validity
             if widget_name not in Kernel.Names:
                 return widget_name
-            Kernel.WidgetNameCount[widget_type] += 1
 
     @staticmethod
     def createWidget(widget_id: int, widget_name: str) -> None:
