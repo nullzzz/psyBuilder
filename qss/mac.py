@@ -80,4 +80,28 @@ QTabBar::close-button:pressed {
 }
 """
 
-mac_qss = timeline_item + icon_bar + timeline_area + timeline_table + tab_bar
+icon_list = """
+QListView#IconList{
+    show-decoration-selected: 1;
+    font-size: 12px;
+}
+
+QListView#IconList::Item{
+    min-height: 70px;
+    min-width: 100px;
+}
+
+QListView#IconList::Item:hover{
+    background: transparent;
+    border-radius:4px;
+    border: 2px solid rgb(186, 215, 251);
+}
+
+QListView#IconList::Item:selected{
+    background: rgb(204,233,255);
+    border-radius:4px;
+    border: 2px solid rgb(186, 215, 251);
+}
+"""
+
+mac_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar
