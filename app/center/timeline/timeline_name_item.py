@@ -33,7 +33,34 @@ class TimelineNameItem(QLineEdit):
         # emit signal when finish editing
         self.editingFinished.connect(self.finishEditing)
 
+    def setWidgetId(self, widget_id: int):
+        """
+        change its widget if
+        @param widget_id:
+        @return:
+        """
+        self.widget_id = widget_id
+
+    def setWidgetName(self, widget_name: str):
+        """
+
+        @param widget_name:
+        @return:
+        """
+        self.widget_name = widget_name
+        self.setText(widget_name)
+        self.pre_text = widget_name
+
     def mousePressEvent(self, e):
+        """
+        override this func.
+        @param e:
+        @return:
+        """
+        super(TimelineNameItem, self).mousePressEvent(e)
+        self.setReadOnly(False)
+
+    def mouseDoubleClickEvent(self, e):
         """
         override this func.
         @param e:
@@ -53,20 +80,3 @@ class TimelineNameItem(QLineEdit):
             self.pre_text = self.text()
             # emit change signal
             self.textChanged.emit(self.widget_id, self.text())
-
-    def setWidgetId(self, widget_id: int):
-        """
-        change its widget if
-        @param widget_id:
-        @return:
-        """
-        self.widget_id = widget_id
-
-    def setWidgetName(self, widget_name: str):
-        """
-
-        @param widget_name:
-        @return:
-        """
-        self.widget_name = widget_name
-        self.setText(widget_name)

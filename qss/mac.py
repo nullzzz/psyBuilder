@@ -17,17 +17,28 @@ QTabWidget#IconBar{
 
 timeline_name_item = """
 QLineEdit#TimelineNameItem{
-    border: 0px;
+    border: 0px solid white;
+}
+QLineEdit#TimelineNameItem:selected{
+    border: 10px solid blue;
 }
 """
 
 timeline_table = """
-QTableView{
-    selection-background-color: rgb(204,232,255);
+QTableView#TimelineTable{
+    selection-background-color: white;
 }
-QTableView::Item:selected {
+QTableView#TimelineTable::Item{
         background-color:white;
-        border: 0px solid lightblue;
+        border: 0px solid white;
+}
+QTableView#TimelineTable::Item:focus{
+        background-color:white;
+        border: 10px solid red;
+}
+QTableView#TimelineTable::Item:selected{
+        background-color:white;
+        border: 0px solid blue;
 }
 """
 

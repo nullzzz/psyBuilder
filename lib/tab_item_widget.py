@@ -37,6 +37,7 @@ class TabItemWidget(QWidget):
         get this widget's properties to show it in Properties Window.
         @return: a dict of properties
         """
+        return {}
 
     def getHiddenAttributes(self) -> dict:
         """
@@ -47,6 +48,7 @@ class TabItemWidget(QWidget):
         we get widget's own attributes through this function.
         @return: dict of attributes
         """
+        return {}
 
     """
     about widget
@@ -59,8 +61,9 @@ class TabItemWidget(QWidget):
         return necessary data for restoring this widget.
         @return:
         """
+        return {}
 
-    def restore(self, data):
+    def restore(self, data) -> None:
         """
         You should finish the job.
 
@@ -77,6 +80,7 @@ class TabItemWidget(QWidget):
         @param widget_id:
         @return:
         """
+        return None
 
     def changeWidgetId(self, widget_id: int):
         """

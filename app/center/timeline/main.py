@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import QGridLayout
 from lib import TabItemWidget
 from .icon_bar import IconBar
 from .timeline_area import TimelineArea
+from .timeline_item import TimelineItem
+from .timeline_name_item import TimelineNameItem
 
 
 class Timeline(TabItemWidget):
@@ -38,6 +40,8 @@ class Timeline(TabItemWidget):
         link signals
         @return:
         """
+        self.itemClicked.connect(lambda widget_id: print(widget_id))
+        self.itemNameChanged.connect(lambda widget_id, text: print(widget_id, text))
 
     def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = 0):
         """
@@ -48,13 +52,21 @@ class Timeline(TabItemWidget):
         @param index: the index of the item
         @return:
         """
-        # it should be left to timeline area
-        timeline_item, timeline_name_item = self.timeline_area.addItem(widget_type, widget_id, widget_name, index)
 
+        # generate a timeline item and timeline name item
+        timeline_item = TimelineItem(widget_type, widget_id, widget_name)
+        timeline_name_item = TimelineNameItem(widget_id, widget_name)
+        if not widget_id:
+            timeline_name_item.setWidgetId(timeline_item.widget_id)
+        if not widget_name:
+            timeline_name_item.setWidgetName(timeline_item.widget_name)
+        
         # link items' signals
         timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
         timeline_name_item.textChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
 
+        # later work should be left to timeline table
+        self.timeline_area.addItem(timeline_item, timeline_name_item, index)
         # refresh its ui
         self.update()
 
