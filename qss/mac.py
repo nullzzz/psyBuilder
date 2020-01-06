@@ -25,8 +25,8 @@ QTableView#TimelineTable::Item{
 }
 QTableView#TimelineTable::Item:selected{
     color: black;
-    background-color: transparent;
-    border: 0px solid blue;
+    background-color: rgb(204,233,255);
+    border: 2px solid rgb(186, 215, 251);
 }
 """
 

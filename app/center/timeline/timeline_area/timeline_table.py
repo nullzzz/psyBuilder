@@ -80,9 +80,10 @@ class TimelineTable(QTableWidget):
         # set column width
         self.setColumnWidth(col, width)
         # set pixmap
-        temp_label = QLabel()
-        temp_label.setPixmap(Func.getImage(image_path))
-        self.setCellWidget(1, col, temp_label)
+        label = QLabel()
+        label.setPixmap(Func.getImage(image_path))
+        label.setFocusPolicy(Qt.NoFocus)
+        self.setCellWidget(1, col, label)
 
     def addItem(self, timeline_item, timeline_name_item, index: int):
         """

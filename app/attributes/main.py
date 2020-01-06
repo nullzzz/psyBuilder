@@ -16,3 +16,10 @@ class Attributes(DockWidget):
         @return:
         """
         # todo show widget's attributes
+
+    def clearAttributes(self):
+        """
+        show widget's attributes
+        @return:
+        """
+        # todo clear widget's attributes

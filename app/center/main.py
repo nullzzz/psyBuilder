@@ -11,7 +11,7 @@ class Center(QMainWindow):
 
     """
     # when current widget change, emit this to refresh. (widget_id -> main)
-    currentWidgetChange = pyqtSignal(int)
+    currentWidgetChanged = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(Center, self).__init__(parent)
@@ -72,9 +72,11 @@ class Center(QMainWindow):
         """
         # if close all tab, index will be -1
         if index != -1:
-            # emit currentWidgetChange signal to refresh other docks.
+            # emit currentWidgetChanged signal to refresh other docks.
             widget = self.tab_widget.widget(index)
-            self.currentWidgetChange.emit(widget.widget_id)
+            self.currentWidgetChanged.emit(widget.widget_id)
+        else:
+            self.currentWidgetChanged.emit(-1)
 
     def changeItemNameInTimeline(self, widget_id, widget_name):
         """

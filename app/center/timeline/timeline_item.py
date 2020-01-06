@@ -13,6 +13,7 @@ class TimelineItem(QLabel):
 
     # when item clicked, emit its widget id
     clicked = pyqtSignal(int)
+    doubleClicked = pyqtSignal(int)
 
     def __init__(self, widget_type: int = None, widget_id: int = None):
         """
@@ -44,9 +45,23 @@ class TimelineItem(QLabel):
         self.setPixmap(pixmap)
         self.setAlignment(Qt.AlignCenter)
 
-    def mouseDoubleClickEvent(self, e):
-        super(TimelineItem, self).mouseDoubleClickEvent(e)
+    def mousePressEvent(self, e):
+        """
+
+        @param e:
+        @return:
+        """
+        super(TimelineItem, self).mousePressEvent(e)
         self.clicked.emit(self.widget_id)
+
+    def mouseDoubleClickEvent(self, e):
+        """
+
+        @param e:
+        @return:
+        """
+        super(TimelineItem, self).mouseDoubleClickEvent(e)
+        self.doubleClicked.emit(self.widget_id)
 
     def setWidgetId(self, widget_id: int):
         """

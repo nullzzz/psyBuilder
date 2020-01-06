@@ -83,6 +83,7 @@ class Psy(QMainWindow):
         @return:
         """
         # todo link dock widgets' signals
+        self.center.currentWidgetChanged.connect(self.dealCurrentTabChanged)
 
     def linkWidgetSignals(self, widget_type: int, widget):
         """
@@ -101,6 +102,7 @@ class Psy(QMainWindow):
         if widget_type == Info.Timeline:
             widget.itemNameChanged.connect(self.dealItemNameChanged)
             widget.itemClicked.connect(self.dealItemClicked)
+            widget.itemDoubleClicked.connect(self.dealItemDoubleClicked)
 
     def startWait(self):
         """
@@ -146,8 +148,33 @@ class Psy(QMainWindow):
         @return:
         """
         print("item click", widget_id)
-        # open tab
-        self.center.openTab(widget_id)
         # change attributes and properties
         self.attributes.showAttributes(widget_id)
         self.properties.showProperties(widget_id)
+
+    def dealItemDoubleClicked(self, widget_id: int):
+        """
+
+        @param widget_id:
+        @return:
+        """
+        print("item double click", widget_id)
+        # open tab
+        self.center.openTab(widget_id)
+
+    def dealCurrentTabChanged(self, widget_id: int):
+        """
+
+        @param widget_id:
+        @return:
+        """
+        print("current tab change", widget_id)
+        if widget_id == -1:
+            # it means that user close all tab and we should clear attributes and properties
+            # change attributes and properties
+            self.attributes.clearAttributes()
+            self.properties.clearProperties()
+        else:
+            # change attributes and properties
+            self.attributes.showAttributes(widget_id)
+            self.properties.showProperties(widget_id)
