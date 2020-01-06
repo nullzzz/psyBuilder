@@ -1,7 +1,7 @@
 import os
 import re
 
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QWidget
 
@@ -112,7 +112,7 @@ class Func(QWidget):
         path = os.path.join(Info.Image_Path, image_path)
         if not type:
             if size:
-                return QPixmap(path).scaled(size)
+                return QPixmap(path).scaled(size, transformMode=Qt.SmoothTransformation)
             return QPixmap(path)
         return QIcon(path)
 
