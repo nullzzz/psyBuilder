@@ -103,6 +103,7 @@ class Psy(QMainWindow):
             widget.itemNameChanged.connect(self.dealItemNameChanged)
             widget.itemClicked.connect(self.dealItemClicked)
             widget.itemDoubleClicked.connect(self.dealItemDoubleClicked)
+            widget.itemMoved.connect(self.dealItemMoved)
 
     def startWait(self):
         """
@@ -161,6 +162,18 @@ class Psy(QMainWindow):
         print("item double click", widget_id)
         # open tab
         self.center.openTab(widget_id)
+
+    def dealItemMoved(self, widget_id: int, origin_index: int, new_index: int):
+        """
+
+        @param widget_id:
+        @param origin_index:
+        @param new_index:
+        @return:
+        """
+        print("item move", widget_id, origin_index, new_index)
+        # move node in structure
+        self.structure.moveNode(widget_id, origin_index, new_index)
 
     def dealCurrentTabChanged(self, widget_id: int):
         """

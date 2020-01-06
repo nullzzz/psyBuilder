@@ -29,10 +29,8 @@ class TimelineTable(QTableWidget):
         self.initTable()
         # data
         self.item_count = 0
-        self.move_cols = [-2, -2]
         # link signals
         self.linkSignals()
-        self.count = 0
 
     def linkSignals(self):
         """
@@ -85,13 +83,13 @@ class TimelineTable(QTableWidget):
         label.setFocusPolicy(Qt.NoFocus)
         self.setCellWidget(1, col, label)
 
-    def addItem(self, timeline_item, timeline_name_item, index: int):
+    def addItem(self, timeline_item, timeline_name_item, index: int) -> int:
         """
         add item in timeline table
         @param timeline_item:
         @param timeline_name_item:
         @param index:
-        @return:
+        @return: add index
         """
         # no matter what, insert a column first
         if index > self.item_count or index == -1:
@@ -105,6 +103,7 @@ class TimelineTable(QTableWidget):
         # if initial length is not full, we should delete one column
         if self.item_count < Info.InitialArrowLength - 1:
             self.removeColumn(Info.InitialArrowLength - 2)
+        return index
 
     def deleteItem(self, widget_id: int):
         """
@@ -150,11 +149,11 @@ class TimelineTable(QTableWidget):
         if direction:
             # right
             self.cellWidget(0, col).setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            self.move_cols[1] = col
+            # self.move_cols[1] = col
         else:
             # left
             self.cellWidget(0, col).setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            self.move_cols[0] = col
+            # self.move_cols[0] = col
 
     def resetAlignment(self):
         """
@@ -162,11 +161,8 @@ class TimelineTable(QTableWidget):
         @return:
         """
         # reset alignment
-        for col in self.move_cols:
-            if col != -2:
-                self.cellWidget(0, col).setAlignment(Qt.AlignCenter)
-        # reset data
-        self.move_cols = [-2, -2]
+        for col in range(self.item_count):
+            self.cellWidget(0, col).setAlignment(Qt.AlignCenter)
 
     def moveItemAnimation(self, x: int):
         """
@@ -182,21 +178,23 @@ class TimelineTable(QTableWidget):
         if self.item_count:
             # if excel the range, col will be -1
             if col == -1 or col >= self.item_count:
-                # we just need rightest item
-                self.setAlignment(self.item_count - 1, 0)
-                self.move_cols[0] = self.item_count - 1
+                # all items left
+                for i in range(self.item_count):
+                    self.setAlignment(i, 0)
             else:
-                # we need just mouse in left or right half
+                # we need judge mouse in left or right half
                 if self.columnAt(x + 50) == col:
                     # in the left half
-                    self.setAlignment(col, 1)
-                    if col:
-                        self.setAlignment(col - 1, 0)
+                    for i in range(col):
+                        self.setAlignment(i, 0)
+                    for i in range(col, self.item_count):
+                        self.setAlignment(i, 1)
                 else:
                     # in the right half
-                    self.setAlignment(col, 0)
-                    if col + 1 < self.item_count:
-                        self.setAlignment(col + 1, 1)
+                    for i in range(col + 1):
+                        self.setAlignment(i, 0)
+                    for i in range(col + 1, self.item_count):
+                        self.setAlignment(i, 1)
 
     def dealCellChanged(self, item):
         """

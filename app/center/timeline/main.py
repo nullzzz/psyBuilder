@@ -20,6 +20,10 @@ class Timeline(TabItemWidget):
     # when item clicked, emit its widget id. (widget_id)
     itemClicked = pyqtSignal(int)
     itemDoubleClicked = pyqtSignal(int)
+    # item move, emit signal. (widget_id, origin index, new index)
+    itemMoved = pyqtSignal(int, int, int)
+    # item delete. (widget_id)
+    itemDeleted = pyqtSignal(int)
 
     def __init__(self, widget_id: int, widget_name: str):
         super(Timeline, self).__init__(widget_id, widget_name)
@@ -44,8 +48,11 @@ class Timeline(TabItemWidget):
         """
         self.timeline_area.itemNameChanged.connect(
             lambda widget_id, text: self.itemNameChanged.emit(Info.TimelineSignal, widget_id, text))
+        self.timeline_area.itemMoved.connect(
+            lambda widget_id, origin_index, new_index: self.itemMoved.emit(widget_id, origin_index, new_index))
 
-    def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = 0):
+    def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = 0) -> (
+            int, str, int):
         """
         add timeline item into its timeline area
         @param widget_type: item's type
@@ -63,11 +70,11 @@ class Timeline(TabItemWidget):
         timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
         timeline_item.doubleClicked.connect(lambda widget_id: self.itemDoubleClicked.emit(widget_id))
         # later work should be left to timeline table
-        self.timeline_area.addItem(timeline_item, timeline_name_item, index)
+        index = self.timeline_area.addItem(timeline_item, timeline_name_item, index)
         # refresh its ui
         self.update()
         # return valid widget_id, widget_name
-        return timeline_item.widget_id, timeline_name_item.text()
+        return timeline_item.widget_id, timeline_name_item.text(), index
 
     def deleteItem(self, widget_id: int):
         """

@@ -13,6 +13,8 @@ class TimelineArea(QFrame):
 
     # when widget's name is changed, emit this signal (widget id, widget_name)
     itemNameChanged = pyqtSignal(int, str)
+    # item move, emit signal(widget_id, origin index, new index)
+    itemMoved = pyqtSignal(int, int, int)
 
     def __init__(self, parent):
         super(TimelineArea, self).__init__(parent)
@@ -42,16 +44,16 @@ class TimelineArea(QFrame):
         """
         self.timeline_table.itemNameChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
 
-    def addItem(self, timeline_item, timeline_name_item, index: int):
+    def addItem(self, timeline_item, timeline_name_item, index: int) -> int:
         """
         add item in timeline table
         @param timeline_item:
         @param timeline_name_item:
         @param index:
-        @return:
+        @return: final add index
         """
         # left work to timeline table
-        self.timeline_table.addItem(timeline_item, timeline_name_item, index)
+        return self.timeline_table.addItem(timeline_item, timeline_name_item, index)
 
     def deleteItem(self, widget_id: int):
         """
@@ -135,7 +137,7 @@ class TimelineArea(QFrame):
             stream = QDataStream(data, QIODevice.ReadOnly)
             widget_type = stream.readInt()
             index = self.timeline_table.columnAt(e.pos().x())
-            widget_id, widget_name = self.parent().addItem(widget_type=widget_type, index=index)
+            widget_id, widget_name, _ = self.parent().addItem(widget_type=widget_type, index=index)
             # create widget
             self.parent().waitStart.emit()
             Func.createWidget(widget_id, widget_name)
@@ -145,7 +147,11 @@ class TimelineArea(QFrame):
         elif data_format == Info.MoveInTimeline:
             # add origin item in timeline
             index = self.timeline_table.columnAt(e.pos().x())
-            self.parent().addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name, index=index)
+            _, _, index = self.parent().addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name,
+                                                index=index)
+            # emit signal
+            if index != self.move_col:
+                self.itemMoved.emit(self.move_widget_id, self.move_col, index)
             # reset move data
             self.move_col = -1
             self.move_widget_id = -1
