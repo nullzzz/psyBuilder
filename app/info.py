@@ -40,9 +40,6 @@ class Info(object):
     CopyInTimeline = "1"
     MoveInTimeline = "2"
 
-    # timeline initial length of arrow
-    InitialArrowLength = 10
-
     # signals' origin
     TimelineSignal = 0
     StructureSignal = 1

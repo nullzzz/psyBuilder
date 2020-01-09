@@ -1,4 +1,5 @@
-from PyQt5.QtCore import QSize, Qt, pyqtSignal, QMimeData, QDataStream, QIODevice, QByteArray, QPoint
+from PyQt5.QtCore import (QSize, Qt, pyqtSignal, QMimeData, QDataStream, QIODevice, QByteArray, QPoint, QRect,
+                          pyqtProperty, QPropertyAnimation)
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QLabel
 
@@ -14,6 +15,8 @@ class TimelineItem(QLabel):
     # when item clicked, emit its widget id
     clicked = pyqtSignal(int)
     doubleClicked = pyqtSignal(int)
+
+    IconSize = 48
 
     def __init__(self, widget_type: int = None, widget_id: int = None):
         """
@@ -31,6 +34,9 @@ class TimelineItem(QLabel):
         # set data
         self.widget_id = widget_id
         self.widget_type = widget_type
+        # frame_animation
+        self.frame_animation = QPropertyAnimation(self, b"frame_rect")
+        self.geometry_animation = QPropertyAnimation(self, b"geometry")
         # if widget_id has provided, widget type may be not provided
         if not widget_type:
             if not widget_id:
@@ -40,14 +46,48 @@ class TimelineItem(QLabel):
         if not self.widget_id:
             self.widget_id = Func.generateWidgetId(widget_type)
         # select its widget_type according to its widget type.
-        pixmap = Func.getImage(f"widgets/{Info.WidgetType[self.widget_type]}", size=QSize(48, 48))
+        pixmap = Func.getImage(f"widgets/{Info.WidgetType[self.widget_type]}",
+                               size=QSize(TimelineItem.IconSize, TimelineItem.IconSize))
         # set its pixmap
         self.setPixmap(pixmap)
         self.setAlignment(Qt.AlignCenter)
 
-    def mousePressEvent(self, e):
+    def _set_frame_rect(self, frame_rect: QRect):
+        """
+        frame_animation
+        @param frame_rect:
+        @return:
+        """
+        self.setFrameRect(frame_rect)
+
+    frame_rect = pyqtProperty(QRect, fset=_set_frame_rect)
+
+    def startFrameAnimation(self, end: QRect):
         """
 
+        @param start:
+        @param end:
+        @return:
+        """
+        self.frame_animation.setDuration(1000)
+        self.frame_animation.setStartValue(self.frameRect())
+        self.frame_animation.setEndValue(end)
+        self.frame_animation.start()
+
+    def startGeometryAnimation(self, end: QRect):
+        """
+
+        @param end:
+        @return:
+        """
+        self.geometry_animation.setDuration(1000)
+        self.geometry_animation.setStartValue(self.geometry())
+        self.geometry_animation.setEndValue(end)
+        self.geometry_animation.start()
+
+    def mousePressEvent(self, e):
+        """
+        emit click signal
         @param e:
         @return:
         """
@@ -56,7 +96,7 @@ class TimelineItem(QLabel):
 
     def mouseDoubleClickEvent(self, e):
         """
-
+        emit double click signal
         @param e:
         @return:
         """
@@ -65,7 +105,7 @@ class TimelineItem(QLabel):
 
     def setWidgetId(self, widget_id: int):
         """
-        change its widget if
+        change its widget id
         @param widget_id:
         @return:
         """
@@ -73,7 +113,7 @@ class TimelineItem(QLabel):
 
     def mouseMoveEvent(self, e):
         """
-
+        drag event and discern copy and move by modifiers
         @param e:
         @return:
         """
@@ -112,6 +152,6 @@ class TimelineItem(QLabel):
         mime_data.setData(Info.CopyInTimeline, data)
         drag = QDrag(self)
         drag.setMimeData(mime_data)
-        drag.setHotSpot(QPoint(24, 24 ))
+        drag.setHotSpot(QPoint(24, 24))
         drag.setPixmap(Func.getImage(f"widgets/{Info.WidgetType[self.widget_type]}", size=QSize(48, 48)))
         drag.exec()

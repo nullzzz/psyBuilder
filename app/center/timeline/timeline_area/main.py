@@ -1,12 +1,12 @@
-from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal
-from PyQt5.QtWidgets import QFrame, QVBoxLayout
+from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal, Qt
+from PyQt5.QtWidgets import QFrame, QVBoxLayout, QScrollArea
 
 from app.func import Func
 from app.info import Info
 from .timeline_table import TimelineTable
 
 
-class TimelineArea(QFrame):
+class TimelineArea(QScrollArea):
     """
 
     """
@@ -18,18 +18,23 @@ class TimelineArea(QFrame):
 
     def __init__(self, parent):
         super(TimelineArea, self).__init__(parent)
-        # set its qss id
-        self.setObjectName("TimelineArea")
         # timeline table
         self.timeline_table = TimelineTable()
+        # set container
+        container = QFrame()
+        # set container's qss id
+        container.setObjectName("TimelineArea")
         # set its layout
         layout = QVBoxLayout()
         layout.addStretch(1)
         layout.addWidget(self.timeline_table, 1)
         layout.addStretch(1)
-        self.setLayout(layout)
+        container.setLayout(layout)
         # accept drops
         self.setAcceptDrops(True)
+        self.setWidget(container)
+        self.setAlignment(Qt.AlignCenter)
+        self.setWidgetResizable(True)
         # link signals
         self.linkSignals()
         # data
@@ -100,7 +105,7 @@ class TimelineArea(QFrame):
         """
         # get x
         x = e.pos().x()
-        # item animation
+        # item frame_animation
         self.timeline_table.moveItemAnimation(x)
 
     def dragLeaveEvent(self, e):
@@ -110,7 +115,7 @@ class TimelineArea(QFrame):
         @return:
         """
         # reset
-        self.timeline_table.resetAlignment()
+        self.timeline_table.resetAlignmentAnimation()
         # if move item, we also need reset item in timeline
         if self.move_col != -1:
             # add origin item in timeline
@@ -128,7 +133,7 @@ class TimelineArea(QFrame):
         @return:
         """
         # reset
-        self.timeline_table.resetAlignment()
+        self.timeline_table.resetAlignmentAnimation()
         # data format
         data_format = e.mimeData().formats()[0]
         data = e.mimeData().data(data_format)
