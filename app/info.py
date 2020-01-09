@@ -39,6 +39,7 @@ class Info(object):
     IconBarToTimeline = "0"
     CopyInTimeline = "1"
     MoveInTimeline = "2"
+    AttributesToLineEdit = "3"
 
     # signals' origin
     TimelineSignal = 0

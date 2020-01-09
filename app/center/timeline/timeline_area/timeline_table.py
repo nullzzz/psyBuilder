@@ -1,12 +1,13 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QRect
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QFrame, QLabel, QAbstractItemView
+from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView
 
 from app.func import Func
+from lib import TableWidget
 from ..timeline_item import TimelineItem
 from ..timeline_name_item import TimelineNameItem
 
 
-class TimelineTable(QTableWidget):
+class TimelineTable(TableWidget):
     """
     table to place timeline item and timeline name item
     """
@@ -103,7 +104,7 @@ class TimelineTable(QTableWidget):
             index = self.item_count
 
         # we need animation, you can cancel it.
-        self.startMoveToNextAnimation(index)
+        # self.startMoveToNextAnimation(index)
 
         # insert new column to add new item
         self.insertColumn(index)
@@ -128,8 +129,8 @@ class TimelineTable(QTableWidget):
         # delete
         if index != -1:
             # we need animation, you can cancel it.
-            if index != self.item_count - 1:
-                self.startMoveToPreAnimation(index + 1)
+            # if index != self.item_count - 1:
+            #     self.startMoveToPreAnimation(index + 1)
 
             # if item count is greater than the initial length, we should delete arrow line
             if self.item_count > TimelineTable.InitialArrowLength - 2:
@@ -154,72 +155,9 @@ class TimelineTable(QTableWidget):
                 return col
         return -1
 
-    def startAlignmentAnimation(self, col: int, direction: int = 0):
+    def startItemAnimation(self, x: int):
         """
-        set alignment of item in table
-        @param col:
-        @param direction: 0. left
-                          1. right
-        @return:
-        """
-        widget: TimelineItem = self.cellWidget(0, col)
-        if direction:
-            # right
-            x = TimelineTable.Width - TimelineItem.IconSize
-            y = (TimelineTable.Height - TimelineItem.IconSize) / 2
-        else:
-            # left
-            x = 0
-            y = (TimelineTable.Height - TimelineItem.IconSize) / 2
-        frame_rect = QRect(x, y, TimelineItem.IconSize, TimelineItem.IconSize)
-        widget.startFrameAnimation(frame_rect)
-
-    def startMoveToNextAnimation(self, start_col: int):
-        """
-        start move to next animation and it starts form col provided.
-        @return:
-        """
-        for col in range(start_col, self.item_count):
-            widget: TimelineItem = self.cellWidget(0, col)
-            geometry = widget.geometry()
-            x = geometry.x() + TimelineTable.Width
-            y = geometry.y()
-            width = geometry.width()
-            height = geometry.height()
-            rect = QRect(x, y, width, height)
-            widget.startGeometryAnimation(rect)
-
-    def startMoveToPreAnimation(self, start_col: int):
-        """
-        start move to next animation and it starts form col provided.
-        @return:
-        """
-        for col in range(start_col, self.item_count):
-            widget: TimelineItem = self.cellWidget(0, col)
-            geometry = widget.geometry()
-            x = geometry.x() - TimelineTable.Width
-            y = geometry.y()
-            width = geometry.width()
-            height = geometry.height()
-            rect = QRect(x, y, width, height)
-            widget.startGeometryAnimation(rect)
-
-    def resetAlignmentAnimation(self):
-        """
-
-        @return:
-        """
-        # reset alignment
-        for col in range(self.item_count):
-            widget: TimelineItem = self.cellWidget(0, col)
-            x = (TimelineTable.Width - TimelineItem.IconSize) / 2
-            y = (TimelineTable.Height - TimelineItem.IconSize) / 2
-            frame_rect = QRect(x, y, TimelineItem.IconSize, TimelineItem.IconSize)
-            widget.startFrameAnimation(frame_rect)
-
-    def moveItemAnimation(self, x: int):
-        """
-        show frame_animation according to horizontal coordinate
+        show items' animation according to horizontal coordinate
         @param x: horizontal coordinate
         @return:
         """
@@ -246,6 +184,71 @@ class TimelineTable(QTableWidget):
                         self.startAlignmentAnimation(i, 0)
                     for i in range(col + 1, self.item_count):
                         self.startAlignmentAnimation(i, 1)
+
+    def startAlignmentAnimation(self, col: int, direction: int = 0):
+        """
+        set alignment of item in table in form of animation
+        @param col:
+        @param direction: 0. left
+                          1. right
+        @return:
+        """
+        widget: TimelineItem = self.cellWidget(0, col)
+        if direction:
+            # right
+            x = TimelineTable.Width - TimelineItem.IconSize
+            y = (TimelineTable.Height - TimelineItem.IconSize) / 2
+        else:
+            # left
+            x = 0
+            y = (TimelineTable.Height - TimelineItem.IconSize) / 2
+        frame_rect = QRect(x, y, TimelineItem.IconSize, TimelineItem.IconSize)
+        widget.startFrameAnimation(frame_rect)
+
+    def resetAlignmentAnimation(self):
+        """
+        reset alignment of item in table in form of animation
+        @return:
+        """
+        # reset alignment
+        for col in range(self.item_count):
+            widget: TimelineItem = self.cellWidget(0, col)
+            x = (TimelineTable.Width - TimelineItem.IconSize) / 2
+            y = (TimelineTable.Height - TimelineItem.IconSize) / 2
+            frame_rect = QRect(x, y, TimelineItem.IconSize, TimelineItem.IconSize)
+            widget.startFrameAnimation(frame_rect)
+
+    def startMoveToNextAnimation(self, start_col: int):
+        """
+        too many bugs.
+        move to next pos animation and it starts form col provided.
+        @return:
+        """
+        for col in range(start_col, self.item_count):
+            widget: TimelineItem = self.cellWidget(0, col)
+            geometry = widget.geometry()
+            x = geometry.x() + TimelineTable.Width
+            y = geometry.y()
+            width = geometry.width()
+            height = geometry.height()
+            rect = QRect(x, y, width, height)
+            widget.startGeometryAnimation(rect)
+
+    def startMoveToPreAnimation(self, start_col: int):
+        """
+        too many bugs.
+        move to pre pos animation and it starts form col provided.
+        @return:
+        """
+        for col in range(start_col, self.item_count):
+            widget: TimelineItem = self.cellWidget(0, col)
+            geometry = widget.geometry()
+            x = geometry.x() - TimelineTable.Width
+            y = geometry.y()
+            width = geometry.width()
+            height = geometry.height()
+            rect = QRect(x, y, width, height)
+            widget.startGeometryAnimation(rect)
 
     def dealCellChanged(self, item):
         """

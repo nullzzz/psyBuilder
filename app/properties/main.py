@@ -1,4 +1,6 @@
+from app.func import Func
 from lib import DockWidget
+from .properties_table import PropertiesTable
 
 
 class Properties(DockWidget):
@@ -8,6 +10,11 @@ class Properties(DockWidget):
 
     def __init__(self, parent=None):
         super(Properties, self).__init__(parent)
+        # properties table
+        self.properties_table = PropertiesTable()
+        self.setWidget(self.properties_table)
+        # current widget id
+        self.current_widget_id = -1
 
     def showProperties(self, widget_id: int):
         """
@@ -16,10 +23,19 @@ class Properties(DockWidget):
         @return:
         """
         # todo show widget's properties
+        if self.current_widget_id != widget_id:
+            # we should clear firstly
+            self.clearProperties()
+            # add
+            self.current_widget_id = widget_id
+            properties = Func.getWidgetProperties(widget_id)
+            sorted_properties = sorted(properties.items(), key=lambda x: x[0])
+            for key, value in sorted_properties:
+                self.properties_table.addProperty(key, str(value))
 
     def clearProperties(self):
         """
         show widget's properties
         @return:
         """
-        # todo clear widget's properties
+        self.properties_table.clear()

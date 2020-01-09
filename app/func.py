@@ -2,7 +2,7 @@ import os
 import re
 
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap, QIcon, QColor, QPainter
 from PyQt5.QtWidgets import QWidget
 
 from .info import Info
@@ -138,3 +138,36 @@ class Func(QWidget):
         """
         widget = Kernel.Widgets[widget_id]
         widget.widget_name = widget_name
+
+    @staticmethod
+    def getTrackingPix(text: str) -> QPixmap:
+        """
+        generate pixmap from text
+        @param text:
+        @return:
+        """
+        pix = QPixmap(200, 16)
+        pix.fill(QColor(0, 0, 0, 0))
+        painter = QPainter(pix)
+        painter.drawText(0, 0, 200, 16, Qt.TextSingleLine, text)
+        return pix
+
+    @staticmethod
+    def getWidgetAttributes(widget_id: int) -> dict:
+        """
+        get widget's attributes
+        @param widget_id:
+        @return:
+        """
+        # todo get widget's attributes
+        return {"widget_id": widget_id}
+
+    @staticmethod
+    def getWidgetProperties(widget_id: int) -> dict:
+        """
+        get widget's properties
+        @param widget_id:
+        @return:
+        """
+        # todo get widget's properties
+        return {"widget_id": widget_id}

@@ -106,7 +106,7 @@ class TimelineArea(QScrollArea):
         # get x
         x = e.pos().x()
         # item frame_animation
-        self.timeline_table.moveItemAnimation(x)
+        self.timeline_table.startItemAnimation(x)
 
     def dragLeaveEvent(self, e):
         """
