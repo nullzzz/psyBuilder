@@ -220,7 +220,7 @@ class Func(object):
         return widget.getProperties()
 
     @staticmethod
-    def isWidgetType(widget_id: int, widget_type: int):
+    def isWidgetType(widget_id: int, widget_type: int) -> bool:
         """
         judge widget_id's widget type
         @param self:
