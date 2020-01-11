@@ -50,16 +50,16 @@ class AttributesTable(TableWidget):
         for i in range(0, self.rowCount()):
             self.item(i, col).setIcon(Func.getImage(image_path, 1))
 
-    def addAttribute(self, attribute_name: str):
+    def addAttribute(self, attribute: str):
         """
         add an attribute into table
-        @param attribute_name:
+        @param attribute:
         @return:
         """
         # add new row
         self.insertRow(self.rowCount())
         # set item
-        item = QTableWidgetItem(attribute_name)
+        item = QTableWidgetItem(attribute)
         item.setFlags(Qt.ItemIsEnabled)
         self.setItem(self.rowCount() - 1, 0, item)
 

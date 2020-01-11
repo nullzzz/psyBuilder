@@ -3,13 +3,12 @@ import re
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QIcon, QColor, QPainter
-from PyQt5.QtWidgets import QWidget
 
 from .info import Info
 from .kernel import Kernel
 
 
-class Func(QWidget):
+class Func(object):
     """
     This class is used to store all common function.
     """
@@ -155,12 +154,60 @@ class Func(QWidget):
     @staticmethod
     def getWidgetAttributes(widget_id: int) -> dict:
         """
-        get widget's attributes
+        get widget's attributes and attributes' layer
         @param widget_id:
-        @return:
+        @return: {attribute: layer}
         """
-        # todo get widget's attributes
-        return {"widget_id": widget_id}
+        # global attributes
+        attributes = {"subName": 0, "subNum": 0, "sessionNum": 0, "subSex": 0, "subHandness": 0, "subAge": 0}
+
+        # todo attributes about quest, I don't know what they are.
+        pass
+
+        # get widget's hidden attributes
+        hidden_attributes = Kernel.Widgets[widget_id].getHiddenAttributes()
+
+        # get widget's attributes: 1. the attributes of the items in front of it in timeline (exclude cycle).
+        #                          2. parents' attributes. (only cycle)
+        #                          3. first parent cycle's hidden attribute
+        # get level of this widget, namely depth. It can be simplified by using DFS.
+        node = Kernel.Nodes[widget_id]
+        depth = -1
+        while node:
+            depth += 1
+            node = node.parent()
+        # do 1.
+        parent = node.parent()
+        if parent and Func.isWidgetType(parent.widget_id, Info.Timeline):
+            for i in range(parent.childCount()):
+                child_node = parent.child(i)
+                # until it self
+                if child_node.widget_id == widget_id:
+                    break
+                # ignore cycle before item
+                if not Func.isWidgetType(child_node.widget_id, Info.Cycle):
+                    for attribute in Kernel.Widgets[child_node.widget_id].getHiddenAttribute():
+                        attributes[f"{child_node.text(0)}.{attribute}"] = depth
+        # do 2. 3.
+        first = True
+        while node:
+            # we just need cycle
+            if Func.isWidgetType(node.widget_id, Info.Cycle):
+                cycle = Kernel.Widgets[node.widget_id]
+                cycle_name = node.text(0)
+                col_attributes = cycle.getColumnAttributes()
+                for attribute in col_attributes:
+                    attributes[f"{cycle_name}.attr.{attribute}"] = depth
+                # we need first cycle's hidden attribute
+                if first:
+                    first_cycle_hidden_attributes = Kernel.Widgets[node.widget_id].getHiddenAttribute()
+                    for attribute in first_cycle_hidden_attributes:
+                        attributes[f"{cycle_name}.{attribute}"] = depth
+                    first = False
+            depth -= 1
+            node = node.parent()
+        # return
+        return attributes
 
     @staticmethod
     def getWidgetProperties(widget_id: int) -> dict:
@@ -169,5 +216,16 @@ class Func(QWidget):
         @param widget_id:
         @return:
         """
-        # todo get widget's properties
-        return {"widget_id": widget_id}
+        widget = Kernel.Widgets[widget_id]
+        return widget.getProperties()
+
+    @staticmethod
+    def isWidgetType(widget_id: int, widget_type: int):
+        """
+        judge widget_id's widget type
+        @param self:
+        @param widget_id:
+        @param widget_type:
+        @return:
+        """
+        return widget_id // Info.MaxWidgetCount == widget_type

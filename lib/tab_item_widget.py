@@ -39,7 +39,7 @@ class TabItemWidget(QWidget):
         """
         return {}
 
-    def getHiddenAttributes(self) -> dict:
+    def getHiddenAttributes(self) -> list:
         """
         You should finish the job.
 
@@ -48,7 +48,7 @@ class TabItemWidget(QWidget):
         we get widget's own attributes through this function.
         @return: dict of attributes
         """
-        return {}
+        return []
 
     """
     about widget
