@@ -11,6 +11,8 @@ class StructureTree(QTreeWidget):
 
     def __init__(self):
         super(StructureTree, self).__init__(None)
+        # set one column
+        self.setColumnCount(1)
         # hide header
         self.setHeaderHidden(True)
         # draggable

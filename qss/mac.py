@@ -104,4 +104,28 @@ QListView#IconList::Item:selected{
 }
 """
 
-mac_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar
+structure_tree = """
+QTreeView::branch:has-siblings:!adjoins-Item {
+    border-image: url(image/vline.png) 0;
+}
+
+QTreeView::branch:has-siblings:adjoins-Item {
+    border-image: url(image/branch-more.png) 0;
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-Item {
+    border-image: url(image/branch-end.png) 0;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed, QTreeView::branch:closed:has-children:has-siblings {
+    border-image: none;
+    image: url(image/branch-closed.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-children:has-siblings  {
+        border-image: none;
+        image: url(image/branch-open.png);
+}
+"""
+
+mac_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree
