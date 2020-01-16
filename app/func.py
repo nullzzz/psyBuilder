@@ -173,9 +173,10 @@ class Func(object):
         # get level of this widget, namely depth. It can be simplified by using DFS.
         node = Kernel.Nodes[widget_id]
         depth = -1
-        while node:
+        temp_node = node
+        while temp_node:
             depth += 1
-            node = node.parent()
+            temp_node = temp_node.parent()
         # do 1.
         parent = node.parent()
         if parent and Func.isWidgetType(parent.widget_id, Info.Timeline):

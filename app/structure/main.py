@@ -1,6 +1,7 @@
 from app.info import Info
+from app.kernel import Kernel
 from lib import DockWidget
-from .tree_widget import TreeWidget
+from .structure_tree import StructureTree
 
 
 class Structure(DockWidget):
@@ -10,8 +11,8 @@ class Structure(DockWidget):
 
     def __init__(self, parent=None):
         super(Structure, self).__init__(parent)
-        self.tree_widget = TreeWidget()
-        self.setWidget(self.tree_widget)
+        self.structure_tree = StructureTree()
+        self.setWidget(self.structure_tree)
 
     def addNode(self, parent_widget_id: int, widget_id: int, widget_name: str, add_type: int = 0) -> None:
         """
@@ -47,6 +48,9 @@ class Structure(DockWidget):
         @return:
         """
         # todo add node add
+        node = self.structure_tree.addNode(parent_widget_id, widget_id, widget_name)
+        # add it to kernel
+        Kernel.Nodes[widget_id] = node
 
     def addNodeCopy(self, parent_widget_id: int, widget_id: int, widget_name: str):
         """

@@ -36,4 +36,5 @@ class Attributes(DockWidget):
         show widget's attributes
         @return:
         """
-        self.attributes_table.clear()
+        while self.attributes_table.rowCount():
+            self.attributes_table.removeRow(0)

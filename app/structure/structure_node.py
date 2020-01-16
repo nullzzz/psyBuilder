@@ -5,13 +5,13 @@ from app.func import Func
 from app.info import Info
 
 
-class TreeItemWidget(QTreeWidgetItem):
+class StructureNode(QTreeWidgetItem):
     """
-    
+
     """
 
     def __init__(self, parent=None, widget_id: int = None):
-        super(TreeItemWidget, self).__init__(parent)
+        super(StructureNode, self).__init__(parent)
         self.widget_id = widget_id
         # set its icon
         widget_type = Info.WidgetType[widget_id // Info.MaxWidgetCount]

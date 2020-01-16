@@ -74,6 +74,8 @@ class Psy(QMainWindow):
         widget_name = Func.generateWidgetName(Info.Timeline)
         # create timeline widget
         Func.createWidget(widget_id, widget_name)
+        # add node in structure
+        self.structure.addNode(-1, widget_id, widget_name, Info.AddNode)
         # set timeline as a tab
         self.center.openTab(widget_id)
 
