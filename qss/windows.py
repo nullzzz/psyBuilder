@@ -11,7 +11,7 @@ QLabel#TimelineItem:hover{
 
 icon_bar = """
 QTabWidget#IconBar{
-    max-height:88px;
+    max-height:90px;
 }
 """
 
@@ -82,6 +82,8 @@ QTabBar::close-button:pressed {
 
 icon_list = """
 QListView#IconList{
+    border: 1px solid rgb(204, 204, 204);
+    border-radius: 4px;
     show-decoration-selected: 1;
     font-size: 12px;
 }
@@ -104,4 +106,11 @@ QListView#IconList::Item:selected{
 }
 """
 
-windows_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar
+dock_widget = """
+QDockWidget::title {
+    text-align: left;
+    padding: 6px;
+}
+"""
+
+windows_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + dock_widget
