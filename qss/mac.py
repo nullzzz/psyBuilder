@@ -105,26 +105,39 @@ QListView#IconList::Item:selected{
 """
 
 structure_tree = """
+QTreeView::item:selected{
+    border: 1px solid rgb(186, 215, 251);
+    background: rgb(186, 215, 251);
+}
+
+QTreeView::item:hover{
+    border:1px solid rgb(186, 215, 251);
+}
+
+QTreeView::branch:selected{
+    background: rgb(186, 215, 251);
+}
+
 QTreeView::branch:has-siblings:!adjoins-Item {
-    border-image: url(images/vline.png) 0;
+    border-image: url(images/structure/vertical_line.png) 0;
 }
 
 QTreeView::branch:has-siblings:adjoins-Item {
-    border-image: url(images/branch-more.png) 0;
+    border-image: url(images/structure/branch_more.png) 0;
 }
 
 QTreeView::branch:!has-children:!has-siblings:adjoins-Item {
-    border-image: url(images/branch-end.png) 0;
+    border-image: url(images/structure/branch_end.png) 0;
 }
 
 QTreeView::branch:has-children:!has-siblings:closed, QTreeView::branch:closed:has-children:has-siblings {
     border-image: none;
-    image: url(images/branch-closed.png);
+    image: url(images/structure/branch_closed.png);
 }
 
 QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-children:has-siblings  {
-        border-image: none;
-        image: url(images/branch-open.png);
+    border-image: none;
+    image: url(images/structure/branch_open.png);
 }
 """
 
