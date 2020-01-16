@@ -17,7 +17,7 @@ QTabWidget#IconBar{
 
 timeline_table = """
 QTableView#TimelineTable{
-    selection-background-color: transparent;
+    selection-background-color: rgb(204,233,255);
 }
 QTableView#TimelineTable::Item{
     background-color:transparent;

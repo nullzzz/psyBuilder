@@ -22,6 +22,7 @@ class AttributesTable(TableWidget):
         # set one column and header sort
         self.setColumnCount(1)
         self.setHorizontalHeaderLabels(["Sort"])
+        self.horizontalHeader().setSortIndicatorShown(False)
         # it can sort
         self.sort_order = 1
         self.setSortingEnabled(True)
