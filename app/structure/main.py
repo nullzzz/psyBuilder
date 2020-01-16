@@ -11,6 +11,7 @@ class Structure(DockWidget):
     def __init__(self, parent=None):
         super(Structure, self).__init__(parent)
         self.tree_widget = TreeWidget()
+        self.setWidget(self.tree_widget)
 
     def addNode(self, parent_widget_id: int, widget_id: int, widget_name: str, add_type: int = 0) -> None:
         """

@@ -160,7 +160,7 @@ class Func(object):
         """
         # global attributes
         attributes = {"subName": 0, "subNum": 0, "sessionNum": 0, "subSex": 0, "subHandness": 0, "subAge": 0}
-
+        return attributes
         # todo attributes about quest, I don't know what they are.
         pass
 
