@@ -1,7 +1,6 @@
 from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal, Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QScrollArea
 
-from app.func import Func
 from app.info import Info
 from .timeline_table import TimelineTable
 
@@ -15,6 +14,10 @@ class TimelineArea(QScrollArea):
     itemNameChanged = pyqtSignal(int, str)
     # item move, emit signal(widget_id, origin index, new index)
     itemMoved = pyqtSignal(int, int, int)
+    # item add, emit signal(widget_id, widget_name, index, add_type(see info))
+    itemAdded = pyqtSignal(int, str, int, int)
+    # item delete, emit signal(widget_id)
+    itemDeleted = pyqtSignal(int)
 
     def __init__(self, parent):
         super(TimelineArea, self).__init__(parent)
@@ -142,11 +145,9 @@ class TimelineArea(QScrollArea):
             stream = QDataStream(data, QIODevice.ReadOnly)
             widget_type = stream.readInt()
             index = self.timeline_table.columnAt(e.pos().x())
-            widget_id, widget_name, _ = self.parent().addItem(widget_type=widget_type, index=index)
-            # create widget
-            self.parent().waitStart.emit()
-            Func.createWidget(widget_id, widget_name)
-            self.parent().waitEnd.emit()
+            widget_id, widget_name, index = self.parent().addItem(widget_type=widget_type, index=index)
+            # emit signal
+            self.itemAdded.emit(widget_id, widget_name, index, Info.AddItem)
             # accept
             e.accept()
         elif data_format == Info.MoveInTimeline:

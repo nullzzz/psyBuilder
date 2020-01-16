@@ -14,73 +14,62 @@ class Structure(DockWidget):
         self.structure_tree = StructureTree()
         self.setWidget(self.structure_tree)
 
-    def addNode(self, parent_widget_id: int, widget_id: int, widget_name: str, add_type: int = 0) -> None:
+    def addNode(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int, add_type: int = 0) -> None:
         """
         add a node to its tree widget, not just add, we should consider few conditions as follow.
-        0. simple add (default) 
+        0. simple add (default)
         1. copy other
         2. refer other
-        3. move other
-        @param parent_widget_id: its parent
-        @param widget_id: its id
-        @param widget_name: its name
-        @param add_type: add type
-        @return: 
+        @param parent_widget_id:
+        @param widget_id:
+        @param widget_name:
+        @param index:
+        @param add_type:
+        @return:
         """
         # discern different type
-        if add_type == Info.AddNode:
-            self.addNodeAdd(parent_widget_id, widget_id, widget_name)
-        elif add_type == Info.CopyNode:
-            self.addNodeCopy(parent_widget_id, widget_id, widget_name)
-        elif add_type == Info.ReferNode:
-            self.addNodeRefer(parent_widget_id, widget_id, widget_name)
-        elif add_type == Info.MoveNode:
-            self.addNodeMove(parent_widget_id, widget_id, widget_name)
-        else:
-            exit()
+        if add_type == Info.AddItem:
+            self.addNodeAdd(parent_widget_id, widget_id, widget_name, index)
+        elif add_type == Info.CopyItem:
+            self.addNodeCopy(parent_widget_id, widget_id, widget_name, index)
+        elif add_type == Info.ReferItem:
+            self.addNodeRefer(parent_widget_id, widget_id, widget_name, index)
 
-    def addNodeAdd(self, parent_widget_id: int, widget_id: int, widget_name: str):
+    def addNodeAdd(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int):
         """
 
         @param parent_widget_id:
         @param widget_id:
         @param widget_name:
+        @param index:
         @return:
         """
         # todo add node add
-        node = self.structure_tree.addNode(parent_widget_id, widget_id, widget_name)
+        node = self.structure_tree.addNode(parent_widget_id, widget_id, widget_name, index)
         # add it to kernel
         Kernel.Nodes[widget_id] = node
 
-    def addNodeCopy(self, parent_widget_id: int, widget_id: int, widget_name: str):
+    def addNodeCopy(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int):
         """
 
         @param parent_widget_id:
         @param widget_id:
         @param widget_name:
+        @param index:
         @return:
         """
         # todo add node copy
 
-    def addNodeRefer(self, parent_widget_id: int, widget_id: int, widget_name: str):
+    def addNodeRefer(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int):
         """
 
         @param parent_widget_id:
         @param widget_id:
         @param widget_name:
+        @param index:
         @return:
         """
         # todo add node refer
-
-    def addNodeMove(self, parent_widget_id: int, widget_id: int, widget_name: str):
-        """
-
-        @param parent_widget_id:
-        @param widget_id:
-        @param widget_name:
-        @return:
-        """
-        # todo add node move
 
     def changeNodeName(self, widget_id: int, widget_name: str):
         """

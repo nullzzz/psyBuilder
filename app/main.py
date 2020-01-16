@@ -1,8 +1,11 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
+from app.center.events import Cycle
+from app.center.timeline import Timeline
 from app.func import Func
 from app.info import Info
+from app.kernel import Kernel
 from lib import WaitDialog
 from .attributes import Attributes
 from .center import Center
@@ -73,9 +76,9 @@ class Psy(QMainWindow):
         widget_id = Func.generateWidgetId(Info.Timeline)
         widget_name = Func.generateWidgetName(Info.Timeline)
         # create timeline widget
-        Func.createWidget(widget_id, widget_name)
+        self.createWidget(widget_id, widget_name)
         # add node in structure
-        self.structure.addNode(-1, widget_id, widget_name, Info.AddNode)
+        self.structure.addNode(-1, widget_id, widget_name, Info.AddItem)
         # set timeline as a tab
         self.center.openTab(widget_id)
 
@@ -86,6 +89,29 @@ class Psy(QMainWindow):
         """
         # todo link dock widgets' signals
         self.center.currentWidgetChanged.connect(self.dealCurrentTabChanged)
+
+    def createWidget(self, widget_id: int, widget_name: str) -> None:
+        """
+        create widget according to its widget id and set its name
+        @param widget_id:
+        @param widget_name: its name
+        @return:
+        """
+        widget_type = widget_id // Info.MaxWidgetCount
+        # todo add other items into this function
+        widget = None
+        if widget_type == Info.Timeline:
+            widget = Timeline(widget_id, widget_name)
+        elif widget_type == Info.Cycle:
+            widget = Cycle(widget_id, widget_name)
+        else:
+            # if fail to create widget, exit.
+            exit()
+        # change data set in Kernel
+        Kernel.Widgets[widget_id] = widget
+        Kernel.Names[widget_name] = [widget_id]
+        # link necessary signals
+        self.linkWidgetSignals(widget_type, widget)
 
     def linkWidgetSignals(self, widget_type: int, widget):
         """
@@ -106,6 +132,8 @@ class Psy(QMainWindow):
             widget.itemClicked.connect(self.dealItemClicked)
             widget.itemDoubleClicked.connect(self.dealItemDoubleClicked)
             widget.itemMoved.connect(self.dealItemMoved)
+            widget.itemAdded.connect(self.dealItemAdded)
+            widget.itemDeleted.connect(self.dealItemDeleted)
 
     def startWait(self):
         """
@@ -123,6 +151,39 @@ class Psy(QMainWindow):
         self.wait_dialog.hide()
         QApplication.processEvents()
 
+    def dealItemAdded(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int, add_type: int):
+        """
+
+        @param parent_widget_id:
+        @param widget_id:
+        @param widget_name:
+        @param index:
+        @param add_type:
+        @return:
+        """
+        print("item added:", parent_widget_id, widget_id, widget_name, index, add_type)
+        # start wait
+        self.startWait()
+        # do job
+        if add_type == Info.AddItem:
+            self.createWidget(widget_id, widget_name)
+        elif add_type == Info.CopyItem:
+            pass
+        elif add_type == Info.ReferItem:
+            pass
+        # add node in structure
+        self.structure.addNode(parent_widget_id, widget_id, widget_name, index, add_type)
+        # end wait
+        self.endWait()
+
+    def dealItemDeleted(self, widget_id: int):
+        """
+
+        @param widget_id:
+        @return:
+        """
+        print("item deleted:", widget_id)
+
     def dealItemNameChanged(self, origin_widget: int, widget_id: int, widget_name: str):
         """
 
@@ -131,7 +192,7 @@ class Psy(QMainWindow):
         @param widget_name:
         @return:
         """
-        print("item name change", origin_widget, widget_id, widget_name)
+        print("item name change:", origin_widget, widget_id, widget_name)
         # change widget's name
         Func.changeWidgetName(widget_id, widget_name)
         # change tab's name
@@ -150,7 +211,7 @@ class Psy(QMainWindow):
         @param widget_id:
         @return:
         """
-        print("item click", widget_id)
+        print("item click:", widget_id)
         # change attributes and properties
         self.attributes.showAttributes(widget_id)
         self.properties.showProperties(widget_id)
@@ -161,7 +222,7 @@ class Psy(QMainWindow):
         @param widget_id:
         @return:
         """
-        print("item double click", widget_id)
+        print("item double click:", widget_id)
         # open tab
         self.center.openTab(widget_id)
 
@@ -173,7 +234,7 @@ class Psy(QMainWindow):
         @param new_index:
         @return:
         """
-        print("item move", widget_id, origin_index, new_index)
+        print("item move:", widget_id, origin_index, new_index)
         # move node in structure
         self.structure.moveNode(widget_id, origin_index, new_index)
 
@@ -183,7 +244,7 @@ class Psy(QMainWindow):
         @param widget_id:
         @return:
         """
-        print("current tab change", widget_id)
+        print("current tab change:", widget_id)
         if widget_id == -1:
             # it means that user close all tab and we should clear attributes and properties
             # change attributes and properties

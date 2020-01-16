@@ -29,11 +29,11 @@ class Info(object):
         Slider: "Slider"
     }
 
-    # add node type
-    AddNode = 0
-    CopyNode = 1
-    ReferNode = 2
-    MoveNode = 3
+    # add type
+    AddItem = 0
+    CopyItem = 1
+    ReferItem = 2
+    MoveItem = 3
 
     # drag type
     IconBarToTimeline = "0"

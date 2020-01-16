@@ -15,15 +15,17 @@ class Timeline(TabItemWidget):
                      2. area to place item, and this area is graphics view.
     """
 
+    # add new item, emit item's widget id and its index in timeline. (parent_widget_id, widget_id, widget_name, index, add_type)
+    itemAdded = pyqtSignal(int, int, str, int, int)
+    # item move, emit signal. (widget_id, origin index, new index)
+    itemMoved = pyqtSignal(int, int, int)
+    # item delete. (widget_id)
+    itemDeleted = pyqtSignal(int)
     # when item's name changed, emit its widget id. (Info.TimelineSignal, widget_id, new_text)
     itemNameChanged = pyqtSignal(int, int, str)
     # when item clicked, emit its widget id. (widget_id)
     itemClicked = pyqtSignal(int)
     itemDoubleClicked = pyqtSignal(int)
-    # item move, emit signal. (widget_id, origin index, new index)
-    itemMoved = pyqtSignal(int, int, int)
-    # item delete. (widget_id)
-    itemDeleted = pyqtSignal(int)
 
     def __init__(self, widget_id: int, widget_name: str):
         super(Timeline, self).__init__(widget_id, widget_name)
@@ -46,6 +48,10 @@ class Timeline(TabItemWidget):
         link signals
         @return:
         """
+        self.timeline_area.itemAdded.connect(
+            lambda widget_id, widget_name, index, add_type: self.itemAdded.emit(self.widget_id, widget_id, widget_name,
+                                                                                index, add_type))
+        self.timeline_area.itemDeleted.connect(lambda widget_id: self.itemDeleted.emit(widget_id))
         self.timeline_area.itemNameChanged.connect(
             lambda widget_id, text: self.itemNameChanged.emit(Info.TimelineSignal, widget_id, text))
         self.timeline_area.itemMoved.connect(

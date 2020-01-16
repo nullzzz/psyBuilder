@@ -16,4 +16,7 @@ class StructureNode(QTreeWidgetItem):
         # set its icon
         widget_type = Info.WidgetType[widget_id // Info.MaxWidgetCount]
         self.setIcon(0, Func.getImage(f"widgets/{widget_type}", 1))
-        self.setFlags(Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+        if widget_id:
+            self.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
+        else:
+            self.setFlags(Qt.NoItemFlags | Qt.ItemIsSelectable | Qt.ItemIsEnabled)

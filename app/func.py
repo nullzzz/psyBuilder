@@ -46,44 +46,6 @@ class Func(object):
                 return widget_name
 
     @staticmethod
-    def createWidget(widget_id: int, widget_name: str) -> None:
-        """
-        create widget according to its widget id and set its name
-        @param widget_id:
-        @param widget_name: its name
-        @return:
-        """
-        widget_type = widget_id // Info.MaxWidgetCount
-        # todo add other items into this function
-        widget = None
-        if widget_type == Info.Timeline:
-            from app.center import Timeline
-            widget = Timeline(widget_id, widget_name)
-        elif widget_type == Info.Cycle:
-            from app.center.events import Cycle
-            widget = Cycle(widget_id, widget_name)
-        else:
-            # if fail to create widget, exit.
-            exit()
-        # change data set in Kernel
-        Kernel.Widgets[widget_id] = widget
-        Kernel.Names[widget_name] = [widget_id]
-
-        # link necessary signals
-        Func.linkWidgetSignals(widget_type, widget)
-
-    @staticmethod
-    def linkWidgetSignals(widget_type: int, widget):
-        """
-        link widget's signals according to its widget type.
-        @param widget_type:
-        @param widget:
-        @return:
-        """
-        # It should be left to Psy
-        Kernel.Psy.linkWidgetSignals(widget_type, widget)
-
-    @staticmethod
     def checkWidgetNameValidity(widget_name: str) -> (bool, str):
         """
         check the validity of widget name.
