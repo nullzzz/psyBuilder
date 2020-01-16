@@ -11,13 +11,13 @@ QLabel#TimelineItem:hover{
 
 icon_bar = """
 QTabWidget#IconBar{
-    max-height:100px;
+    max-height:88px;
 }
 """
 
 timeline_table = """
 QTableView#TimelineTable{
-    selection-background-color: transparent;
+    selection-background-color: rgb(204,233,255);
 }
 QTableView#TimelineTable::Item{
     background-color:transparent;
@@ -25,8 +25,8 @@ QTableView#TimelineTable::Item{
 }
 QTableView#TimelineTable::Item:selected{
     color: black;
-    background-color: transparent;
-    border: 0px solid blue;
+    background-color: rgb(204,233,255);
+    border: 2px solid rgb(186, 215, 251);
 }
 """
 
@@ -80,4 +80,28 @@ QTabBar::close-button:pressed {
 }
 """
 
-windows_qss = timeline_item + icon_bar + timeline_area + timeline_table + tab_bar
+icon_list = """
+QListView#IconList{
+    show-decoration-selected: 1;
+    font-size: 12px;
+}
+
+QListView#IconList::Item{
+    min-height: 60px;
+    min-width: 100px;
+}
+
+QListView#IconList::Item:hover{
+    background: transparent;
+    border-radius:4px;
+    border: 2px solid rgb(186, 215, 251);
+}
+
+QListView#IconList::Item:selected{
+    background: rgb(204,233,255);
+    border-radius:4px;
+    border: 2px solid rgb(186, 215, 251);
+}
+"""
+
+windows_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar
