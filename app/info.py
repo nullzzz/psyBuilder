@@ -12,21 +12,11 @@ class Info(object):
     # widget type
     Timeline = 0
     Cycle = 1
-    Sound = 2
-    Text = 3
-    Image = 4
-    Video = 5
-    Slider = 6
 
     # widget type name
     WidgetType = {
         Timeline: "Timeline",
         Cycle: "Cycle",
-        Sound: "Sound",
-        Text: "Text",
-        Image: "Image",
-        Video: "Video",
-        Slider: "Slider"
     }
 
     # add type

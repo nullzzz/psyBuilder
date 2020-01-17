@@ -72,7 +72,7 @@ class TabItemWidget(QWidget):
         @return:
         """
 
-    def copy(self, widget_id: int, widget_name: str):
+    def clone(self, widget_id: int, widget_name: str):
         """
         You should finish the job.
 

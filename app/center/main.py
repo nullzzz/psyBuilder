@@ -77,12 +77,3 @@ class Center(QMainWindow):
             self.currentWidgetChanged.emit(widget.widget_id)
         else:
             self.currentWidgetChanged.emit(-1)
-
-    def changeItemNameInTimeline(self, widget_id, widget_name):
-        """
-        change item's name in all related timelines according to widget id
-        @param widget_id:
-        @param widget_name:
-        @return:
-        """
-        # todo change item's name in all related timelines

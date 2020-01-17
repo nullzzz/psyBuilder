@@ -144,6 +144,19 @@ class TimelineTable(TableWidget):
             # change data
             self.item_count -= 1
 
+    def renameItem(self, origin_widget_name: str, new_widget_name: str):
+        """
+        change item's name.
+        @param origin_widget_name:
+        @param new_widget_name:
+        @return:
+        """
+        for col in range(self.item_count):
+            item = self.item(2, col)
+            if item.text() == origin_widget_name:
+                item.setText(new_widget_name)
+                break
+
     def itemColumn(self, widget_id: int):
         """
         find item's col according to its widget id

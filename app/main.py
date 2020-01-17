@@ -78,7 +78,7 @@ class Psy(QMainWindow):
         # create timeline widget
         self.createWidget(widget_id, widget_name)
         # add node in structure
-        self.structure.addNode(-1, widget_id, widget_name, Info.AddItem)
+        self.structure.addNode(-1, widget_id, widget_name, 0)
         # set timeline as a tab
         self.center.openTab(widget_id)
 
@@ -112,6 +112,15 @@ class Psy(QMainWindow):
         Kernel.Names[widget_name] = [widget_id]
         # link necessary signals
         self.linkWidgetSignals(widget_type, widget)
+
+    def cloneWidget(self, origin_widget_id, new_widget_id, widget_name):
+        """
+        clone widget
+        @param origin_widget_id:
+        @param new_widget_id:
+        @param widget_name:
+        @return:
+        """
 
     def linkWidgetSignals(self, widget_type: int, widget):
         """
@@ -166,13 +175,15 @@ class Psy(QMainWindow):
         self.startWait()
         # do job
         if add_type == Info.AddItem:
+            # create widget firstly
             self.createWidget(widget_id, widget_name)
+            # todo add node in structure
+            self.structure.addNode(parent_widget_id, widget_id, widget_name, index)
         elif add_type == Info.CopyItem:
+            # clone widget firstly
             pass
         elif add_type == Info.ReferItem:
             pass
-        # add node in structure
-        self.structure.addNode(parent_widget_id, widget_id, widget_name, index, add_type)
         # end wait
         self.endWait()
 
@@ -184,25 +195,26 @@ class Psy(QMainWindow):
         """
         print("item deleted:", widget_id)
 
-    def dealItemNameChanged(self, origin_widget: int, widget_id: int, widget_name: str):
+    def dealItemNameChanged(self, origin_widget: int, parent_widget_id: int, widget_id: int, widget_name: str):
         """
-
-        @param origin_widget:
+        when item's name changed, we deal some job.
+        @param origin_widget: where is the signal from, including timeline and structure
+        @param parent_widget_id: item's parent
         @param widget_id:
-        @param widget_name:
+        @param widget_name: new name
         @return:
         """
-        print("item name change:", origin_widget, widget_id, widget_name)
+        print("item name change:", origin_widget, parent_widget_id, widget_id, widget_name)
         # change widget's name
-        Func.changeWidgetName(widget_id, widget_name)
+        widget = Kernel.Widgets[widget_id]
+        widget.widget_name = widget_name
         # change tab's name
         self.center.changeTabName(widget_id, widget_name)
-        if origin_widget == Info.TimelineSignal:
-            # if signal from timeline
-            self.structure.changeNodeName(widget_id, widget_name)
-        elif origin_widget == Info.StructureSignal:
-            # if signal from timeline
-            self.center.changeItemNameInTimeline(widget_id, widget_name)
+        # change item's and nodes' name
+        if origin_widget==Info.StructureSignal:
+            # we need change item's name if signal comes from structure
+            timeline = Kernel.Widgets[parent_widget_id]
+            timeline.renameItem()
 
     def dealItemClicked(self, widget_id: int):
         """
@@ -235,7 +247,7 @@ class Psy(QMainWindow):
         @return:
         """
         print("item move:", widget_id, origin_index, new_index)
-        # move node in structure
+        # todo move node in structure
         self.structure.moveNode(widget_id, origin_index, new_index)
 
     def dealCurrentTabChanged(self, widget_id: int):

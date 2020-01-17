@@ -71,6 +71,15 @@ class TimelineArea(QScrollArea):
         """
         self.timeline_table.deleteItem(widget_id)
 
+    def renameItem(self, origin_widget_name: str, new_widget_name: str):
+        """
+        change item's name.
+        @param origin_widget_name:
+        @param new_widget_name:
+        @return:
+        """
+        self.timeline_table.renameItem(origin_widget_name, new_widget_name)
+
     def dragEnterEvent(self, e):
         """
 

@@ -89,16 +89,6 @@ class Func(object):
         """
         Kernel.Psy.output.print(information, information_type)
 
-    @staticmethod
-    def changeWidgetName(widget_id: int, widget_name: str):
-        """
-        change widget.widget_name
-        @param widget_id:
-        @param widget_name:
-        @return:
-        """
-        widget = Kernel.Widgets[widget_id]
-        widget.widget_name = widget_name
 
     @staticmethod
     def getTrackingPix(text: str) -> QPixmap:

@@ -21,8 +21,8 @@ class Timeline(TabItemWidget):
     itemMoved = pyqtSignal(int, int, int)
     # item delete. (widget_id)
     itemDeleted = pyqtSignal(int)
-    # when item's name changed, emit its widget id. (Info.TimelineSignal, widget_id, new_text)
-    itemNameChanged = pyqtSignal(int, int, str)
+    # when item's name changed, emit its widget id. (Info.TimelineSignal, parent_widget_id, widget_id, new_text)
+    itemNameChanged = pyqtSignal(int, int, int, str)
     # when item clicked, emit its widget id. (widget_id)
     itemClicked = pyqtSignal(int)
     itemDoubleClicked = pyqtSignal(int)
@@ -53,7 +53,7 @@ class Timeline(TabItemWidget):
                                                                                 index, add_type))
         self.timeline_area.itemDeleted.connect(lambda widget_id: self.itemDeleted.emit(widget_id))
         self.timeline_area.itemNameChanged.connect(
-            lambda widget_id, text: self.itemNameChanged.emit(Info.TimelineSignal, widget_id, text))
+            lambda widget_id, text: self.itemNameChanged.emit(Info.TimelineSignal, self.widget_id, widget_id, text))
         self.timeline_area.itemMoved.connect(
             lambda widget_id, origin_index, new_index: self.itemMoved.emit(widget_id, origin_index, new_index))
 
@@ -91,8 +91,18 @@ class Timeline(TabItemWidget):
         # it should be left to timeline area
         self.timeline_area.deleteItem(widget_id)
 
+    def renameItem(self, origin_widget_name: str, new_widget_name: str):
+        """
+        change item's name.
+        @param origin_widget_name:
+        @param new_widget_name:
+        @return:
+        """
+        self.timeline_area.renameItem(origin_widget_name, new_widget_name)
+
     def itemCount(self):
         """
         the num of timeline items
         @return:
         """
+        return self.timeline_area.timeline_table.item_count

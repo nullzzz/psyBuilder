@@ -19,20 +19,10 @@ class Kernel(object):
     WidgetTypeCount = {
         Info.Timeline: 0,
         Info.Cycle: 0,
-        Info.Sound: 0,
-        Info.Text: 0,
-        Info.Image: 0,
-        Info.Video: 0,
-        Info.Slider: 0,
     }
 
     # it's used to counter the count of widget name should go.
     WidgetNameCount = {
         Info.Timeline: 0,
         Info.Cycle: 0,
-        Info.Sound: 0,
-        Info.Text: 0,
-        Info.Image: 0,
-        Info.Video: 0,
-        Info.Slider: 0,
     }

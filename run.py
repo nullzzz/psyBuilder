@@ -13,8 +13,10 @@ if __name__ == '__main__':
     psy = Psy()
     # bind psy to Kernel.Psy
     Kernel.Psy = psy
+    # init initial timeline
     psy.initInitialTimeline()
     psy.showMaximized()
+    # choose qss
     if platform.system() == "Windows":
         app.setStyleSheet(windows_qss)
     else:

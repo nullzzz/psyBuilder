@@ -20,3 +20,13 @@ class StructureNode(QTreeWidgetItem):
             self.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
         else:
             self.setFlags(Qt.NoItemFlags | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+    def moveChild(self, index: int, node: QTreeWidgetItem):
+        """
+        move child
+        @param index:
+        @param node:
+        @return:
+        """
+        self.removeChild(node)
+        self.insertChild(index, node)

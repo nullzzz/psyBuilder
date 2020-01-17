@@ -39,6 +39,7 @@ QFrame#TimelineArea{
 tab_bar = """
 QTabWidget::pane {
     background-color: rgb(236,236,236);
+    min-height:70px;
 }
 
 QTabWidget::tab-bar {
@@ -86,6 +87,7 @@ QListView#IconList{
     border-radius: 4px;
     show-decoration-selected: 1;
     font-size: 12px;
+    min-height:66px;
 }
 
 QListView#IconList::Item{

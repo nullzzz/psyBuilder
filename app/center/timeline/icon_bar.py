@@ -67,11 +67,6 @@ class IconBar(QTabWidget):
         self.condition = IconList()
         # todo add events items
         self.events.addItem(WidgetIconItem(Info.Cycle))
-        # self.events.addItem(WidgetIconItem(Info.Sound))
-        # self.events.addItem(WidgetIconItem(Info.Text))
-        # self.events.addItem(WidgetIconItem(Info.Image))
-        # self.events.addItem(WidgetIconItem(Info.Video))
-        # self.events.addItem(WidgetIconItem(Info.Slider))
 
         # todo add eye_tracker items
 

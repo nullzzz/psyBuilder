@@ -33,8 +33,7 @@ class StructureTree(QTreeWidget):
             node = StructureNode(parent=parent_node, widget_id=widget_id)
             node.setText(0, widget_name)
             # add node
-            parent_node.removeChild(node)
-            parent_node.insertChild(index, node)
+            parent_node.moveChild(index, node)
             # expand node to show its children
             parent_node.setExpanded(True)
         else:
@@ -44,3 +43,14 @@ class StructureTree(QTreeWidget):
             self.addTopLevelItem(node)
             self.collapseItem(node)
         return node
+
+    def moveNode(self, widget_id: int, index: int):
+        """
+        move node
+        @param widget_id:
+        @param index:
+        @return:
+        """
+        node = Kernel.Nodes[widget_id]
+        parent = node.parent()
+        parent.moveChild(index, node)
