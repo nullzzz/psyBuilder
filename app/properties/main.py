@@ -22,7 +22,6 @@ class Properties(DockWidget):
         @param widget_id:
         @return:
         """
-        # todo show widget's properties
         if self.current_widget_id != widget_id:
             # we should clear firstly
             self.clearProperties()

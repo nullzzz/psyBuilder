@@ -45,7 +45,7 @@ class TimelineTable(TableWidget):
         link signals
         @return:
         """
-        self.itemChanged.connect(self.dealCellChanged)
+        self.itemChanged.connect(self.dealItemChanged)
 
     def initTable(self):
         """
@@ -263,7 +263,7 @@ class TimelineTable(TableWidget):
             rect = QRect(x, y, width, height)
             widget.startGeometryAnimation(rect)
 
-    def dealCellChanged(self, item):
+    def dealItemChanged(self, item):
         """
         when cell changed, we need to make judgement
         @param item:

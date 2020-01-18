@@ -89,7 +89,6 @@ class Func(object):
         """
         Kernel.Psy.output.print(information, information_type)
 
-
     @staticmethod
     def getTrackingPix(text: str) -> QPixmap:
         """

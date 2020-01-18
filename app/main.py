@@ -151,15 +151,18 @@ class Psy(QMainWindow):
         show wait dialog
         @return:
         """
+        QApplication.processEvents()
         self.wait_dialog.show()
         QApplication.processEvents()
+
 
     def endWait(self):
         """
         hide wait dialog
         @return:
         """
-        self.wait_dialog.hide()
+        QApplication.processEvents()
+        self.wait_dialog.close()
         QApplication.processEvents()
 
     def dealItemAdded(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int, add_type: int):

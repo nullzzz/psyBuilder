@@ -16,23 +16,11 @@ class Output(DockWidget):
         # main widget is a widget_name edit
         self.text_edit = QTextEdit()
         self.text_edit.setReadOnly(True)
+        self.scroll_bar = self.text_edit.verticalScrollBar()
         # first str is work path of this software
         self.text_edit.setHtml(f"<b>{QDir().currentPath()}</b>")
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
         self.setWidget(self.text_edit)
-
-        # todo delete, test here
-        self.print("test information.")
-        self.print("test information.", 1)
-        self.print("test information.", 1)
-        self.print("test information.", 1)
-        self.print("test information.", 2)
-        self.print("test information.", 1)
-        self.print("test information.", 2)
-        self.print("test information.", 2)
-        self.print("test information.", 1)
-        self.print("test information.", 1)
-        self.print("test information.", 2)
 
     def print(self, information: str, information_type: int = 0) -> None:
         """
@@ -52,3 +40,5 @@ class Output(DockWidget):
         else:
             self.text_edit.append(f'<b style="color:rgb(199,84,80)">[fail]</b> {information}')
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
+        # to the bottom
+        self.scroll_bar.setSliderPosition(self.scroll_bar.maximum())
