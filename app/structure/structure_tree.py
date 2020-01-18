@@ -1,3 +1,4 @@
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTreeWidget
 
 from app.kernel import Kernel
@@ -8,6 +9,11 @@ class StructureTree(QTreeWidget):
     """
 
     """
+
+    # when node is double clicked, emit signal (widget_id)
+    itemDoubleClicked = pyqtSignal(int)
+    # when node is double deleted, emit signal ( widget_id)
+    itemDeleted = pyqtSignal(int)
 
     def __init__(self):
         super(StructureTree, self).__init__(None)
@@ -54,3 +60,13 @@ class StructureTree(QTreeWidget):
         node = Kernel.Nodes[widget_id]
         parent = node.parent()
         parent.moveChild(index, node)
+
+    def mouseDoubleClickEvent(self, e):
+        """
+
+        @param e:
+        @return:
+        """
+        item = self.itemAt(e.pos())
+        if item:
+            self.itemDoubleClicked.emit(item.widget_id)

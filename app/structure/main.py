@@ -1,3 +1,5 @@
+from PyQt5.QtCore import pyqtSignal
+
 from app.kernel import Kernel
 from lib import DockWidget
 from .structure_tree import StructureTree
@@ -8,10 +10,25 @@ class Structure(DockWidget):
     This widget is used to output information about states of software.
     """
 
+    # when node is double clicked, emit signal (widget_id)
+    itemDoubleClicked = pyqtSignal(int)
+    # when node is double deleted, emit signal (origin_widget,widget_id)
+    itemDeleted = pyqtSignal(int, int)
+
     def __init__(self, parent=None):
         super(Structure, self).__init__(parent)
         self.structure_tree = StructureTree()
         self.setWidget(self.structure_tree)
+        # link signals
+        self.linkSignals()
+
+    def linkSignals(self):
+        """
+        link signals
+        @return:
+        """
+        self.structure_tree.itemDoubleClicked.connect(lambda widget_id: self.itemDoubleClicked.emit(widget_id))
+        self.structure_tree.itemDeleted.connect(lambda widget_id: self.itemDeleted.emit(widget_id))
 
     def addNode(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int):
         """

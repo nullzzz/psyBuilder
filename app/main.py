@@ -89,6 +89,8 @@ class Psy(QMainWindow):
         """
         # todo link dock widgets' signals
         self.center.currentWidgetChanged.connect(self.dealCurrentTabChanged)
+        self.structure.itemDoubleClicked.connect(self.dealItemDoubleClicked)
+        self.structure.itemDeleted.connect(self.dealItemDeleted)
 
     def createWidget(self, widget_id: int, widget_name: str) -> None:
         """
@@ -187,13 +189,13 @@ class Psy(QMainWindow):
         # end wait
         self.endWait()
 
-    def dealItemDeleted(self, widget_id: int):
+    def dealItemDeleted(self, origin_widget: int, widget_id: int):
         """
 
         @param widget_id:
         @return:
         """
-        print("item deleted:", widget_id)
+        print("item deleted:", origin_widget, widget_id)
 
     def dealItemNameChanged(self, origin_widget: int, parent_widget_id: int, widget_id: int, widget_name: str):
         """
@@ -211,7 +213,7 @@ class Psy(QMainWindow):
         # change tab's name
         self.center.changeTabName(widget_id, widget_name)
         # change item's and nodes' name
-        if origin_widget==Info.StructureSignal:
+        if origin_widget == Info.StructureSignal:
             # we need change item's name if signal comes from structure
             timeline = Kernel.Widgets[parent_widget_id]
             timeline.renameItem()
