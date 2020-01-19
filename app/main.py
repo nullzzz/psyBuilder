@@ -99,7 +99,7 @@ class Psy(QMainWindow):
         @param widget_name: its name
         @return:
         """
-        widget_type = widget_id // Info.MaxWidgetCount
+        widget_type = Func.getWidgetType(widget_id)
         # todo add other items into this function
         widget = None
         if widget_type == Info.Timeline:
@@ -124,6 +124,18 @@ class Psy(QMainWindow):
         @return:
         """
 
+    def referWidget(self, origin_widget_id: int) -> int:
+        """
+        refer widget
+        @param origin_widget_id: origin widget's widget id
+        @return: new widget id
+        """
+        # generate new widget id
+        widget_type = Func.getWidgetType(origin_widget_id)
+        widget_id = Func.generateWidgetId(widget_type)
+        # refer widget by mapping widget id to same widget
+        Kernel.Widgets[widget_id] = Kernel.Widgets[origin_widget_id]
+
     def linkWidgetSignals(self, widget_type: int, widget):
         """
         link widget's signals according to its widget type.
@@ -133,16 +145,20 @@ class Psy(QMainWindow):
         """
         # todo link widget's signals
         # common
-        # from lib import TabItemWidget
-        # widget: TabItemWidget
+        widget.propertiesChanged.connect(self.dealPropertiesChanged)
         widget.waitStart.connect(self.startWait)
         widget.waitEnd.connect(self.endWait)
-        # timeline
+        # unique
         if widget_type == Info.Timeline:
+            # timeline
             widget.itemNameChanged.connect(self.dealItemNameChanged)
             widget.itemClicked.connect(self.dealItemClicked)
             widget.itemDoubleClicked.connect(self.dealItemDoubleClicked)
             widget.itemMoved.connect(self.dealItemMoved)
+            widget.itemAdded.connect(self.dealItemAdded)
+            widget.itemDeleted.connect(self.dealItemDeleted)
+        elif widget_type == Info.Cycle:
+            # cycle
             widget.itemAdded.connect(self.dealItemAdded)
             widget.itemDeleted.connect(self.dealItemDeleted)
 
@@ -151,19 +167,24 @@ class Psy(QMainWindow):
         show wait dialog
         @return:
         """
-        QApplication.processEvents()
         self.wait_dialog.show()
         QApplication.processEvents()
-
 
     def endWait(self):
         """
         hide wait dialog
         @return:
         """
-        QApplication.processEvents()
         self.wait_dialog.close()
         QApplication.processEvents()
+
+    def dealPropertiesChanged(self, widget_id: int):
+        """
+        when properties changed, refresh properties window.
+        @param widget_id:
+        @return:
+        """
+        self.properties.showProperties(widget_id)
 
     def dealItemAdded(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int, add_type: int):
         """
@@ -182,8 +203,19 @@ class Psy(QMainWindow):
         if add_type == Info.AddItem:
             # create widget firstly
             self.createWidget(widget_id, widget_name)
-            # todo add node in structure
+            # we should consider a lot of things here because of reference.
+            # we also need add node in those reference parents
+            # add node in origin parent node
             self.structure.addNode(parent_widget_id, widget_id, widget_name, index)
+            # add node in refer parent node
+            refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
+            for refer_parent_widget_id in refer_parent_widget_ids:
+                # we need exclude origin parent widget id
+                if refer_parent_widget_id != parent_widget_id:
+                    # refer widget
+                    refer_widget_id = self.referWidget(widget_id)
+                    # add refer node in refer parent
+                    self.structure.addNode(refer_parent_widget_id, refer_widget_id, widget_name, index)
         elif add_type == Info.CopyItem:
             # clone widget firstly
             pass

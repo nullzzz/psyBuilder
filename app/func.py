@@ -172,6 +172,24 @@ class Func(object):
         return widget.getProperties()
 
     @staticmethod
+    def getWidgetName(widget_id: int):
+        """
+        get widget's name
+        @param widget_id:
+        @return:
+        """
+        return Kernel.Widgets[widget_id].widget_name
+
+    @staticmethod
+    def getWidgetType(widget_id: int) -> int:
+        """
+        get widget's type
+        @param widget_id:
+        @return:
+        """
+        return widget_id // Info.MaxWidgetCount
+
+    @staticmethod
     def isWidgetType(widget_id: int, widget_type: int) -> bool:
         """
         judge widget_id's widget type
@@ -180,4 +198,24 @@ class Func(object):
         @param widget_type:
         @return:
         """
-        return widget_id // Info.MaxWidgetCount == widget_type
+        return Func.getWidgetType(widget_id) == widget_type
+
+    @staticmethod
+    def checkReferValidity(target_timeline: int, widget_id: int):
+        """
+        when refer widget, we should check validity
+        @param target_timeline: target timeline's widget id
+        @param widget_id: widget which we want to refer
+        @return:
+        """
+        # todo check refer validity
+
+    @staticmethod
+    def getWidgetReference(widget_id: int):
+        """
+        get list of reference widget's widget id
+        @param widget_id:
+        @return:
+        """
+        widget_name = Func.getWidgetName(widget_id)
+        return Kernel.Names[widget_name]

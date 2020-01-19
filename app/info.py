@@ -23,7 +23,6 @@ class Info(object):
     AddItem = 0
     CopyItem = 1
     ReferItem = 2
-    MoveItem = 3
 
     # drag type
     IconBarToTimeline = "0"
@@ -34,3 +33,4 @@ class Info(object):
     # signals' origin
     TimelineSignal = 0
     StructureSignal = 1
+    CycleSignal = 2

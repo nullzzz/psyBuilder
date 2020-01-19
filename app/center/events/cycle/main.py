@@ -1,3 +1,4 @@
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout
 
 from lib import TabItemWidget
@@ -8,6 +9,11 @@ class Cycle(TabItemWidget):
     """
 
     """
+
+    # when add new timeline, emit signal(parent_widget_id, widget_id, widget_name, index, add_type)
+    itemAdded = pyqtSignal(int, int, str, int, int)
+    # when delete signals, emit signal(origin_widget, widget_id)
+    itemDeleted = pyqtSignal(int, int)
 
     def __init__(self, widget_id: int, widget_name: str):
         super(Cycle, self).__init__(widget_id, widget_name)

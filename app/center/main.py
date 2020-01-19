@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow
 
 from app.info import Info
 from app.kernel import Kernel
+from app.func import Func
 from lib import TabWidget
 
 
@@ -41,7 +42,7 @@ class Center(QMainWindow):
         # first, we should ensure this widget has been created
         if widget_id in Kernel.Widgets:
             # this widget may have been opened in tab widget
-            widget_type = Info.WidgetType[widget_id // Info.MaxWidgetCount]
+            widget_type = Info.WidgetType[Func.getWidgetType(widget_id)]
             widget = Kernel.Widgets[widget_id]
             self.tab_widget.openTab(widget, widget_type, widget.widget_name)
 
