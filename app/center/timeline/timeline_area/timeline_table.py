@@ -125,7 +125,7 @@ class TimelineTable(TableWidget):
         @return:
         """
         # find index of widget_id
-        index = self.itemColumn(widget_id)
+        index = self.itemIndex(widget_id)
         # delete
         if index != -1:
             # we need animation, you can cancel it.
@@ -157,7 +157,7 @@ class TimelineTable(TableWidget):
                 item.setText(new_widget_name)
                 break
 
-    def itemColumn(self, widget_id: int):
+    def itemIndex(self, widget_id: int) -> int:
         """
         find item's col according to its widget id
         @param widget_id:
@@ -165,6 +165,18 @@ class TimelineTable(TableWidget):
         """
         for col in range(self.item_count):
             if widget_id == self.cellWidget(0, col).widget_id:
+                return col
+        return -1
+
+    def itemExist(self, widget_id: int) -> int:
+        """
+        if item or its reference exist in this timeline, return its index, else -1
+        @param widget_id:
+        @return:
+        """
+        widget_name = Func.getWidgetName(widget_id)
+        for col in range(self.item_count):
+            if widget_name == self.cellWidget(2, col).text():
                 return col
         return -1
 

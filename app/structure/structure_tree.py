@@ -1,6 +1,9 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMimeData, QPoint
+from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QTreeWidget
 
+from app.func import Func
+from app.info import Info
 from app.kernel import Kernel
 from .structure_node import StructureNode
 
@@ -61,6 +64,12 @@ class StructureTree(QTreeWidget):
         parent = node.parent()
         parent.moveChild(index, node)
 
+    def deleteNode(self):
+        """
+
+        @return:
+        """
+
     def mouseDoubleClickEvent(self, e):
         """
 
@@ -70,3 +79,72 @@ class StructureTree(QTreeWidget):
         item = self.itemAt(e.pos())
         if item:
             self.itemDoubleClicked.emit(item.widget_id)
+
+    def mouseMoveEvent(self, e):
+        """
+        drag node to timeline, but we can't move or copy cycle
+        @param e:
+        @return:
+        """
+        item = self.itemAt(e.pos())
+        if item and item.widget_id:
+            widget_id = item.widget_id
+            if e.modifiers() == Qt.ControlModifier:
+                # ctrl -> copy
+                if not Func.isWidgetType(widget_id, Info.Cycle):
+                    self.copyDrag(widget_id)
+            elif e.modifiers() == Qt.ShiftModifier:
+                # shift -> move
+                if not Func.isWidgetType(widget_id, Info.Cycle):
+                    self.moveDrag(widget_id)
+            else:
+                # none -> refer
+                self.referDrag(widget_id)
+
+    def moveDrag(self, widget_id: int):
+        """
+
+        @param widget_id:
+        @return:
+        """
+        data = QByteArray()
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        stream.writeInt(widget_id)
+        mime_data = QMimeData()
+        mime_data.setData(Info.StructureMoveToTimeline, data)
+        drag = QDrag(self)
+        drag.setMimeData(mime_data)
+        drag.setHotSpot(QPoint(12, 12))
+        drag.exec()
+
+    def copyDrag(self, widget_id: int):
+        """
+
+        @param widget_id:
+        @return:
+        """
+        data = QByteArray()
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        stream.writeInt(widget_id)
+        mime_data = QMimeData()
+        mime_data.setData(Info.StructureCopyToTimeline, data)
+        drag = QDrag(self)
+        drag.setMimeData(mime_data)
+        drag.setHotSpot(QPoint(12, 12))
+        drag.exec()
+
+    def referDrag(self, widget_id: int):
+        """
+
+        @param widget_id:
+        @return:
+        """
+        data = QByteArray()
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        stream.writeInt(widget_id)
+        mime_data = QMimeData()
+        mime_data.setData(Info.StructureReferToTimeline, data)
+        drag = QDrag(self)
+        drag.setMimeData(mime_data)
+        drag.setHotSpot(QPoint(12, 12))
+        drag.exec()

@@ -24,6 +24,9 @@ class Info(object):
     CopyInTimeline = "1"
     MoveInTimeline = "2"
     AttributesToLineEdit = "3"
+    StructureMoveToTimeline = "4"
+    StructureCopyToTimeline = "5"
+    StructureReferToTimeline = "6"
 
     # signals' origin
     TimelineSignal = 0

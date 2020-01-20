@@ -91,13 +91,13 @@ class TimelineArea(QScrollArea):
         @return:
         """
         data_format = e.mimeData().formats()[0]
-        if data_format == Info.IconBarToTimeline:
-            # drag from icon bar
+        data = e.mimeData().data(data_format)
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        if data_format == Info.IconBarToTimeline or data_format == Info.CopyInTimeline or data_format == Info.StructureCopyToTimeline:
+            # drag from icon bar or copy
             e.accept()
         elif data_format == Info.MoveInTimeline:
-            # move in this timeline
-            data = e.mimeData().data(data_format)
-            stream = QDataStream(data, QIODevice.ReadOnly)
+            # move item in timeline
             self.move_col = stream.readInt()
             # save widget name and widget name
             timeline_item = self.timeline_table.cellWidget(0, self.move_col)
@@ -106,9 +106,18 @@ class TimelineArea(QScrollArea):
             # delete items
             self.timeline_table.deleteItem(self.move_widget_id)
             e.accept()
-        elif data_format == Info.CopyInTimeline:
-            # todo copy in this timeline
-            print("copy")
+        elif data_format == Info.StructureMoveToTimeline or data_format == Info.StructureReferToTimeline:
+            # get widget id
+            widget_id = stream.readInt()
+            self.move_col = self.timeline_table.itemExist(widget_id)
+            # if exist in this timeline, it just move in timeline
+            if self.move_col != -1:
+                # save widget id and widget name
+                timeline_item = self.timeline_table.cellWidget(0, self.move_col)
+                self.move_widget_id = timeline_item.widget_id
+                self.move_widget_name = timeline_item.timeline_name_item.text()
+                # delete items
+                self.timeline_table.deleteItem(self.move_widget_id)
             e.accept()
         else:
             e.ignore()
