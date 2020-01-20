@@ -19,11 +19,6 @@ class Info(object):
         Cycle: "Cycle",
     }
 
-    # add type
-    AddItem = 0
-    CopyItem = 1
-    ReferItem = 2
-
     # drag type
     IconBarToTimeline = "0"
     CopyInTimeline = "1"

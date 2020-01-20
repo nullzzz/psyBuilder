@@ -12,10 +12,14 @@ class TimelineArea(QScrollArea):
 
     # when widget's name is changed, emit this signal (widget id, widget_name)
     itemNameChanged = pyqtSignal(int, str)
+    # item add, emit signal (widget_id, widget_name, index)
+    itemAdded = pyqtSignal(int, str, int)
+    # item copied, emit signal (origin_widget_id, new_widget_id, new_widget_name)
+    itemCopied = pyqtSignal(int, int, str)
+    # item copied, emit signal (origin_widget_id, new_widget_id)
+    itemReferenced = pyqtSignal(int, int)
     # item move, emit signal(widget_id, origin index, new index)
     itemMoved = pyqtSignal(int, int, int)
-    # item add, emit signal(widget_id, widget_name, index, add_type(see info))
-    itemAdded = pyqtSignal(int, str, int, int)
     # item delete, emit signal(widget_id)
     itemDeleted = pyqtSignal(int)
 
@@ -156,7 +160,7 @@ class TimelineArea(QScrollArea):
             index = self.timeline_table.columnAt(e.pos().x())
             widget_id, widget_name, index = self.parent().addItem(widget_type=widget_type, index=index)
             # emit signal
-            self.itemAdded.emit(widget_id, widget_name, index, Info.AddItem)
+            self.itemAdded.emit(widget_id, widget_name, index)
             # accept
             e.accept()
         elif data_format == Info.MoveInTimeline:

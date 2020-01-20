@@ -10,8 +10,8 @@ class Cycle(TabItemWidget):
 
     """
 
-    # when add new timeline, emit signal(parent_widget_id, widget_id, widget_name, index, add_type)
-    itemAdded = pyqtSignal(int, int, str, int, int)
+    # when add new timeline, emit signal(parent_widget_id, widget_id, widget_name, index)
+    itemAdded = pyqtSignal(int, int, str, int)
     # when delete signals, emit signal(origin_widget, widget_id)
     itemDeleted = pyqtSignal(int, int)
 

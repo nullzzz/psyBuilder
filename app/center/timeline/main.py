@@ -15,8 +15,12 @@ class Timeline(TabItemWidget):
                      2. area to place item, and this area is graphics view.
     """
 
-    # add new item, emit item's widget id and its index in timeline. (parent_widget_id, widget_id, widget_name, index, add_type)
-    itemAdded = pyqtSignal(int, int, str, int, int)
+    # add new item, emit item's widget id and its index in timeline. (parent_widget_id, widget_id, widget_name, index)
+    itemAdded = pyqtSignal(int, int, str, int)
+    # item copied, emit signal (parent_widget_id, origin_widget_id, new_widget_id, new_widget_name)
+    itemCopied = pyqtSignal(int, int, int, str)
+    # item copied, emit signal (parent_widget_id, origin_widget_id, new_widget_id)
+    itemReferenced = pyqtSignal(int, int, int)
     # item move, emit signal. (widget_id, origin index, new index)
     itemMoved = pyqtSignal(int, int, int)
     # item delete. (origin_widget, widget_id)
@@ -48,12 +52,25 @@ class Timeline(TabItemWidget):
         link signals
         @return:
         """
+        #
         self.timeline_area.itemAdded.connect(
-            lambda widget_id, widget_name, index, add_type: self.itemAdded.emit(self.widget_id, widget_id, widget_name,
-                                                                                index, add_type))
+            lambda widget_id, widget_name, index: self.itemAdded.emit(self.widget_id, widget_id, widget_name, index))
+        #
+        self.timeline_area.itemCopied.connect(
+            lambda origin_widget_id, new_widget_id, new_widget_name: self.itemCopied.emit(self.widget_id,
+                                                                                          origin_widget_id,
+                                                                                          new_widget_id,
+                                                                                          new_widget_name))
+        #
+        self.timeline_area.itemReferenced.connect(
+            lambda origin_widget_id, new_widget_id: self.itemReferenced.emit(self.widget_id, origin_widget_id,
+                                                                             new_widget_id, ))
+        #
         self.timeline_area.itemDeleted.connect(lambda widget_id: self.itemDeleted.emit(Info.TimelineSignal, widget_id))
+        #
         self.timeline_area.itemNameChanged.connect(
             lambda widget_id, text: self.itemNameChanged.emit(Info.TimelineSignal, self.widget_id, widget_id, text))
+        #
         self.timeline_area.itemMoved.connect(
             lambda widget_id, origin_index, new_index: self.itemMoved.emit(widget_id, origin_index, new_index))
 

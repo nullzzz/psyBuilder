@@ -115,16 +115,16 @@ class Psy(QMainWindow):
         # link necessary signals
         self.linkWidgetSignals(widget_type, widget)
 
-    def cloneWidget(self, origin_widget_id, new_widget_id, widget_name):
+    def copyWidget(self, origin_widget_id, new_widget_id, new_widget_name):
         """
-        clone widget
+        copy widget
         @param origin_widget_id:
         @param new_widget_id:
-        @param widget_name:
+        @param new_widget_name:
         @return:
         """
 
-    def referWidget(self, origin_widget_id: int) -> int:
+    def referWidget(self, origin_widget_id: int, new_widget_id: int = -1) -> int:
         """
         refer widget
         @param origin_widget_id: origin widget's widget id
@@ -132,9 +132,12 @@ class Psy(QMainWindow):
         """
         # generate new widget id
         widget_type = Func.getWidgetType(origin_widget_id)
-        widget_id = Func.generateWidgetId(widget_type)
+        widget_id = new_widget_id
+        if widget_id == -1:
+            widget_id = Func.generateWidgetId(widget_type)
         # refer widget by mapping widget id to same widget
         Kernel.Widgets[widget_id] = Kernel.Widgets[origin_widget_id]
+        return widget_id
 
     def linkWidgetSignals(self, widget_type: int, widget):
         """
@@ -156,6 +159,8 @@ class Psy(QMainWindow):
             widget.itemDoubleClicked.connect(self.dealItemDoubleClicked)
             widget.itemMoved.connect(self.dealItemMoved)
             widget.itemAdded.connect(self.dealItemAdded)
+            widget.itemCopied.connect(self.dealItemCopied)
+            widget.itemReferenced.connect(self.dealItemReferenced)
             widget.itemDeleted.connect(self.dealItemDeleted)
         elif widget_type == Info.Cycle:
             # cycle
@@ -186,7 +191,7 @@ class Psy(QMainWindow):
         """
         self.properties.showProperties(widget_id)
 
-    def dealItemAdded(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int, add_type: int):
+    def dealItemAdded(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int):
         """
 
         @param parent_widget_id:
@@ -196,33 +201,46 @@ class Psy(QMainWindow):
         @param add_type:
         @return:
         """
-        print("item added:", parent_widget_id, widget_id, widget_name, index, add_type)
+        print("item added:", parent_widget_id, widget_id, widget_name, index)
         # start wait
         self.startWait()
         # do job
-        if add_type == Info.AddItem:
-            # create widget firstly
-            self.createWidget(widget_id, widget_name)
-            # we should consider a lot of things here because of reference.
-            # we also need add node in those reference parents
-            # add node in origin parent node
-            self.structure.addNode(parent_widget_id, widget_id, widget_name, index)
-            # add node in refer parent node
-            refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
-            for refer_parent_widget_id in refer_parent_widget_ids:
-                # we need exclude origin parent widget id
-                if refer_parent_widget_id != parent_widget_id:
-                    # refer widget
-                    refer_widget_id = self.referWidget(widget_id)
-                    # add refer node in refer parent
-                    self.structure.addNode(refer_parent_widget_id, refer_widget_id, widget_name, index)
-        elif add_type == Info.CopyItem:
-            # clone widget firstly
-            pass
-        elif add_type == Info.ReferItem:
-            pass
+        # create widget firstly
+        self.createWidget(widget_id, widget_name)
+        # we should consider a lot of things here because of reference.
+        # we also need add node in those reference parents
+        # add node in origin parent node
+        self.structure.addNode(parent_widget_id, widget_id, widget_name, index)
+        # add node in refer parent node
+        refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
+        for refer_parent_widget_id in refer_parent_widget_ids:
+            # we need exclude origin parent widget id
+            if refer_parent_widget_id != parent_widget_id:
+                # refer widget
+                refer_widget_id = self.referWidget(widget_id)
+                # add refer node in refer parent
+                self.structure.addNode(refer_parent_widget_id, refer_widget_id, widget_name, index)
         # end wait
         self.endWait()
+
+    def dealItemCopied(self, origin_widget_id: int, new_widget_id: int, new_widget_name: int):
+        """
+
+        @param origin_widget_id:
+        @param new_widget_id:
+        @param new_widget_name:
+        @return:
+        """
+        print("item copied: ", origin_widget_id, new_widget_id, new_widget_name)
+
+    def dealItemReferenced(self, origin_widget_id: int, new_widget_id: int):
+        """
+
+        @param origin_widget_id:
+        @param new_widget_id:
+        @return:
+        """
+        print("item referenced: ", origin_widget_id, new_widget_id)
 
     def dealItemDeleted(self, origin_widget: int, widget_id: int):
         """
@@ -253,6 +271,18 @@ class Psy(QMainWindow):
             timeline = Kernel.Widgets[parent_widget_id]
             timeline.renameItem()
 
+    def dealItemMoved(self, widget_id: int, origin_index: int, new_index: int):
+        """
+
+        @param widget_id:
+        @param origin_index:
+        @param new_index:
+        @return:
+        """
+        print("item move:", widget_id, origin_index, new_index)
+        # todo move node in structure
+        self.structure.moveNode(widget_id, origin_index, new_index)
+
     def dealItemClicked(self, widget_id: int):
         """
 
@@ -274,18 +304,6 @@ class Psy(QMainWindow):
         print("item double click:", widget_id)
         # open tab
         self.center.openTab(widget_id)
-
-    def dealItemMoved(self, widget_id: int, origin_index: int, new_index: int):
-        """
-
-        @param widget_id:
-        @param origin_index:
-        @param new_index:
-        @return:
-        """
-        print("item move:", widget_id, origin_index, new_index)
-        # todo move node in structure
-        self.structure.moveNode(widget_id, origin_index, new_index)
 
     def dealCurrentTabChanged(self, widget_id: int):
         """
