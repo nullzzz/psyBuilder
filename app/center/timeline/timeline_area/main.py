@@ -1,6 +1,7 @@
-from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal, Qt
+from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal, Qt, QByteArray
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QScrollArea
 
+from app.func import Func
 from app.info import Info
 from .timeline_table import TimelineTable
 
@@ -14,10 +15,10 @@ class TimelineArea(QScrollArea):
     itemNameChanged = pyqtSignal(int, str)
     # item add, emit signal (widget_id, widget_name, index)
     itemAdded = pyqtSignal(int, str, int)
-    # item copied, emit signal (origin_widget_id, new_widget_id, new_widget_name)
-    itemCopied = pyqtSignal(int, int, str)
-    # item copied, emit signal (origin_widget_id, new_widget_id)
-    itemReferenced = pyqtSignal(int, int)
+    # item copied, emit signal (origin_widget_id, new_widget_id, new_widget_name, index)
+    itemCopied = pyqtSignal(int, int, str, int)
+    # item copied, emit signal (origin_widget_id, new_widget_id, index)
+    itemReferenced = pyqtSignal(int, int, int)
     # item move, emit signal(widget_id, origin index, new index)
     itemMoved = pyqtSignal(int, int, int)
     # item delete, emit signal(widget_id)
@@ -132,6 +133,7 @@ class TimelineArea(QScrollArea):
         x = e.pos().x()
         # item frame_animation
         self.timeline_table.startItemAnimation(x)
+        e.accept()
 
     def dragLeaveEvent(self, e):
         """
@@ -162,29 +164,94 @@ class TimelineArea(QScrollArea):
         # data format
         data_format = e.mimeData().formats()[0]
         data = e.mimeData().data(data_format)
+        index = self.timeline_table.columnAt(e.pos().x())
         if data_format == Info.IconBarToTimeline:
-            # simply add a item in timeline
-            stream = QDataStream(data, QIODevice.ReadOnly)
-            widget_type = stream.readInt()
-            index = self.timeline_table.columnAt(e.pos().x())
-            widget_id, widget_name, index = self.parent().addItem(widget_type=widget_type, index=index)
-            # emit signal
-            self.itemAdded.emit(widget_id, widget_name, index)
+            # add item in timeline simply
+            self.dealAddDrag(data, index)
             # accept
             e.accept()
         elif data_format == Info.MoveInTimeline:
-            # add origin item in timeline
-            index = self.timeline_table.columnAt(e.pos().x())
-            _, _, index = self.parent().addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name,
-                                                index=index)
-            # emit signal
-            if index != self.move_col:
-                self.itemMoved.emit(self.move_widget_id, self.move_col, index)
-            # reset move data
-            self.move_col = -1
-            self.move_widget_id = -1
-            self.move_widget_name = ""
+            # move item in timeline, we have deleted item above, now we add item.
+            self.dealMoveDrag(data, index)
+            # accept
+            e.accept()
+        elif data_format == Info.CopyInTimeline:
+            # copy item in timeline
+            self.dealCopyDrag(data, index)
+            # accept
+            e.accept()
+        elif data_format == Info.StructureMoveToTimeline:
+            # move item in different timeline
+            if self.move_col != -1:
+                # if item exist in this timeline, it just move item in timeline
+                pass
+            else:
+                # we add item in this timeline and delete it in other timeline
+                pass
+            # accept
+            e.accept()
+        elif data_format == Info.StructureReferToTimeline:
+            if self.move_col != -1:
+                # if item exist in timeline, it just move item in timeline
+                pass
+            else:
+                # we refer item in this timeline
+                pass
             # accept
             e.accept()
         else:
             e.ignore()
+
+    def dealAddDrag(self, data: QByteArray, index: int):
+        """
+
+        @param data:
+        @param index:
+        @return:
+        """
+        # simply add a item in timeline
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        widget_type = stream.readInt()
+        widget_id, widget_name, index = self.parent().addItem(widget_type=widget_type, index=index)
+        # emit signal
+        self.itemAdded.emit(widget_id, widget_name, index)
+
+    def dealMoveDrag(self, data: QByteArray, index: int):
+        """
+
+        @param data:
+        @param index:
+        @return:
+        """
+        _, _, index = self.parent().addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name,
+                                            index=index)
+        # emit signal
+        if index != self.move_col:
+            self.itemMoved.emit(self.move_widget_id, self.move_col, index)
+        # reset move data
+        self.move_col = -1
+        self.move_widget_id = -1
+        self.move_widget_name = ""
+
+    def dealCopyDrag(self, data: QByteArray, index: int):
+        """
+
+        @param data:
+        @param index:
+        @return:
+        """
+        # simply add a item in timeline
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        origin_widget_id = stream.readInt()
+        widget_type = Func.getWidgetType(origin_widget_id)
+        new_widget_id, new_widget_name, index = self.parent().addItem(widget_type=widget_type, index=index)
+        # emit signal
+        self.itemCopied.emit(origin_widget_id, new_widget_id, new_widget_name, index)
+
+    def dealReferDrag(self, data: QByteArray, index: int):
+        """
+
+        @param data:
+        @param index:
+        @return:
+        """

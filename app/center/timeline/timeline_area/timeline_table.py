@@ -1,7 +1,9 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QRect
-from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu
 
 from app.func import Func
+from app.info import Info
 from lib import TableWidget
 from ..timeline_item import TimelineItem
 from ..timeline_name_item import TimelineNameItem
@@ -39,6 +41,8 @@ class TimelineTable(TableWidget):
         self.item_count = 0
         # link signals
         self.linkSignals()
+        # set menu and shortcut
+        self.setMenuAndShortcut()
 
     def linkSignals(self):
         """
@@ -46,6 +50,52 @@ class TimelineTable(TableWidget):
         @return:
         """
         self.itemChanged.connect(self.dealItemChanged)
+
+    def setMenuAndShortcut(self):
+        """
+        set menu and shortcut
+        @return:
+        """
+        self.menu = QMenu()
+        # copy action
+        self.copy_action = self.menu.addAction(Func.getImage("menu/copy.png", 1), "Copy", self.copyActionFunc,
+                                               QKeySequence(QKeySequence.Copy))
+
+    def contextMenuEvent(self, e):
+        """
+
+        @param e:
+        @return:
+        """
+        col = self.columnAt(e.pos().x())
+        row = self.rowAt(e.pos().y())
+        if row == 0 and col <= self.item_count:
+            widget = self.cellWidget(row, col)
+            if widget:
+                widget_id = widget.widget_id
+                if Func.isWidgetType(widget_id, Info.Cycle):
+                    self.copy_action.setEnabled(False)
+                self.menu.exec(self.mapToGlobal(e.pos()))
+
+    def copyActionFunc(self):
+        """
+
+        @return:
+        """
+        print("copy")
+
+    def deleteActionFunc(self):
+        """
+
+        @return:
+        """
+        print("delete")
+
+    def deleteActionFunc(self):
+        """
+
+        @return:
+        """
 
     def initTable(self):
         """

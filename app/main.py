@@ -26,7 +26,7 @@ class Psy(QMainWindow):
         # set its wait thread
         self.wait_dialog = WaitDialog()
         # init menu bar
-
+        self.initMenuBar()
         # init dock widget
         self.initDockWidget()
         #
@@ -123,6 +123,8 @@ class Psy(QMainWindow):
         @param new_widget_name:
         @return:
         """
+        new_widget = Kernel.Widgets[origin_widget_id].copy(new_widget_id, new_widget_name)
+        Kernel.Widgets[new_widget_id] = new_widget
 
     def referWidget(self, origin_widget_id: int, new_widget_id: int = -1) -> int:
         """
@@ -223,24 +225,69 @@ class Psy(QMainWindow):
         # end wait
         self.endWait()
 
-    def dealItemCopied(self, origin_widget_id: int, new_widget_id: int, new_widget_name: int):
+    def dealItemCopied(self, parent_widget_id: int, origin_widget_id: int, new_widget_id: int, new_widget_name: str,
+                       index: int):
         """
 
+        @param parent_widget_id:
         @param origin_widget_id:
         @param new_widget_id:
         @param new_widget_name:
+        @param index:
         @return:
         """
-        print("item copied: ", origin_widget_id, new_widget_id, new_widget_name)
+        print("item copied: ", parent_widget_id, origin_widget_id, new_widget_id, new_widget_name, index)
+        # start wait
+        self.startWait()
+        # do job
+        # copy widget firstly
+        self.copyWidget(origin_widget_id, new_widget_id, new_widget_name)
+        # we should consider a lot of things here because of reference.
+        # we also need add node in those reference parents
+        # add node in origin parent node
+        self.structure.addNode(parent_widget_id, new_widget_id, new_widget_name, index)
+        # add node in refer parent node
+        refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
+        for refer_parent_widget_id in refer_parent_widget_ids:
+            # we need exclude origin parent widget id
+            if refer_parent_widget_id != parent_widget_id:
+                # refer widget
+                refer_widget_id = self.referWidget(new_widget_id)
+                # add refer node in refer parent
+                self.structure.addNode(refer_parent_widget_id, refer_widget_id, new_widget_name, index)
+        # end wait
+        self.endWait()
 
-    def dealItemReferenced(self, origin_widget_id: int, new_widget_id: int):
+    def dealItemReferenced(self, parent_widget_id: int, origin_widget_id: int, new_widget_id: int, index: int):
         """
 
+        @param parent_widget_id:
         @param origin_widget_id:
         @param new_widget_id:
+        @param index:
         @return:
         """
         print("item referenced: ", origin_widget_id, new_widget_id)
+        # start wait
+        self.startWait()
+        # do job
+        # copy widget firstly
+        self.referWidget(origin_widget_id, new_widget_id)
+        # we should consider a lot of things here because of reference.
+        # we also need add node in those reference parents
+        # add node in origin parent node
+        self.structure.addNode(parent_widget_id, new_widget_id, new_widget_name, index)
+        # add node in refer parent node
+        refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
+        for refer_parent_widget_id in refer_parent_widget_ids:
+            # we need exclude origin parent widget id
+            if refer_parent_widget_id != parent_widget_id:
+                # refer widget
+                refer_widget_id = self.referWidget(new_widget_id)
+                # add refer node in refer parent
+                self.structure.addNode(refer_parent_widget_id, refer_widget_id, new_widget_name, index)
+        # end wait
+        self.endWait()
 
     def dealItemDeleted(self, origin_widget: int, widget_id: int):
         """
