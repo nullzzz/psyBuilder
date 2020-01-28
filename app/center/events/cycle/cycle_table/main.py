@@ -1,6 +1,9 @@
+import re
+
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTableWidget
 
+from lib import MessageBox
 from .attribute_item import AttributeItem
 from .timeline_item import TimelineItem
 from .weight_item import WeightItem
@@ -16,12 +19,21 @@ class CycleTable(QTableWidget):
 
     def __init__(self):
         super(CycleTable, self).__init__(None)
-        self.setColumnCount(10)
-        self.setRowCount(10)
         # col attributes and its default value
         self.attributes = ["Weight", "Timeline"]
         self.default_value = {"Weight": "1", "Timeline": ""}
         #
+        self.setColumnCount(2)
+        self.setHorizontalHeaderLabels(self.attributes)
+        # link signals
+        self.linkSignals()
+
+    def linkSignals(self):
+        """
+
+        @return:
+        """
+        self.itemChanged.connect(self.dealItemChanged)
 
     def addRow(self, index: int):
         """
@@ -47,9 +59,11 @@ class CycleTable(QTableWidget):
         @return:
         """
 
-    def addAttribtueColumn(self, index: int):
+    def addAttribtueColumn(self, index: int, attribute: str):
         """
         add attribute column
+        @param index:
+        @param attribute:
         @return:
         """
 
@@ -68,11 +82,18 @@ class CycleTable(QTableWidget):
         """
         # if this item was just added in the table, we ignore it
         if not item.new:
+            text = item.text()
             if type(item) == WeightItem:
-                pass
+                # only positive number
+                if not re.match(r"^[0-9]+$", text):
+                    MessageBox.information(self, "warning", "value must be positive integer.")
+                    item.redo()
+                else:
+                    item.save()
             elif type(item) == TimelineItem:
-                pass
+                print("Timeline item changed")
+                item: TimelineItem
             elif type(item) == AttributeItem:
-                pass
+                print("Attribute item changed")
         else:
             item.new = False

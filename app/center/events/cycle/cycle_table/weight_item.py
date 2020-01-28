@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QTableWidgetItem
+from lib import TableWidgetItem
 
 
-class WeightItem(QTableWidgetItem):
+class WeightItem(TableWidgetItem):
     def __init__(self, value: str):
         super(WeightItem, self).__init__(value)
         # a flag

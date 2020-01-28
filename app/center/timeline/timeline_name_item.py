@@ -1,16 +1,16 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableWidgetItem
 
 from app.func import Func
+from lib import TableWidgetItem
 
 
-class TimelineNameItem(QTableWidgetItem):
+class TimelineNameItem(TableWidgetItem):
     """
 
     """
 
     def __init__(self, widget_type: int, widget_id: int, widget_name: str = ""):
-        super(TimelineNameItem, self).__init__(None)
+        super(TimelineNameItem, self).__init__(widget_name)
         # set data, we assure widget type and widget id is valid
         self.widget_type = widget_type
         self.widget_id = widget_id

@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QTableWidgetItem
+from lib import TableWidgetItem
 
 
-class AttributeItem(QTableWidgetItem):
+class AttributeItem(TableWidgetItem):
     def __init__(self, value: str):
         super(AttributeItem, self).__init__(value)
         # a flag

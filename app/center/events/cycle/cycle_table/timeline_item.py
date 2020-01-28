@@ -1,11 +1,8 @@
-from PyQt5.QtWidgets import QTableWidgetItem
+from lib import TableWidgetItem
 
 
-class TimelineItem(QTableWidgetItem):
+class TimelineItem(TableWidgetItem):
     def __init__(self):
         super(TimelineItem, self).__init__(None)
         # a flag
         self.new = True
-
-
-

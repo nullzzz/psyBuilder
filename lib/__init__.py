@@ -5,4 +5,5 @@ from .message_box import MessageBox
 from .tab_item_widget import TabItemWidget
 from .tab_widget import TabWidget
 from .table_widget import TableWidget
+from .table_widget_item import TableWidgetItem
 from .wait_dialog import WaitDialog
