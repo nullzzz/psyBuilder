@@ -34,9 +34,7 @@ class TimelineArea(QScrollArea):
         container.setObjectName("TimelineArea")
         # set its layout
         layout = QVBoxLayout()
-        layout.addStretch(1)
         layout.addWidget(self.timeline_table, 1)
-        layout.addStretch(1)
         container.setLayout(layout)
         # accept drops
         self.setAcceptDrops(True)
@@ -101,7 +99,7 @@ class TimelineArea(QScrollArea):
             # move item in timeline
             self.move_col = stream.readInt()
             # save widget name and widget name
-            timeline_item = self.timeline_table.cellWidget(0, self.move_col)
+            timeline_item = self.timeline_table.cellWidget(TimelineTable.item_row, self.move_col)
             self.move_widget_id = timeline_item.widget_id
             self.move_widget_name = timeline_item.timeline_name_item.text()
             # delete items
@@ -114,7 +112,7 @@ class TimelineArea(QScrollArea):
             # if exist in this timeline, it just move in timeline
             if self.move_col != -1:
                 # save widget id and widget name
-                timeline_item = self.timeline_table.cellWidget(0, self.move_col)
+                timeline_item = self.timeline_table.cellWidget(TimelineTable.item_row, self.move_col)
                 self.move_widget_id = timeline_item.widget_id
                 self.move_widget_name = timeline_item.timeline_name_item.text()
                 # delete items

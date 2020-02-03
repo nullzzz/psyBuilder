@@ -219,3 +219,12 @@ class Func(object):
         """
         widget_name = Func.getWidgetName(widget_id)
         return Kernel.Names[widget_name]
+
+    @staticmethod
+    def checkWidgetNameExisted(widget_name: str):
+        """
+
+        @param widget_name:
+        @return:
+        """
+        return widget_name in Kernel.Names

@@ -18,6 +18,11 @@ class TimelineTable(TableWidget):
     InitialArrowLength = 10
     Height = 100
     Width = 100
+    #
+    top_row = 0
+    item_row = 1
+    arrow_row = 2
+    name_row = 3
 
     # when widget's name is changed, emit this signal (widget id, widget_name)
     itemNameChanged = pyqtSignal(int, str)
@@ -29,8 +34,7 @@ class TimelineTable(TableWidget):
         # hide its scroll bar
         self.horizontalHeader().setVisible(False)
         self.verticalHeader().setVisible(False)
-        # self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setAutoScroll(False)
+        self.setAutoScroll(True)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         # hide its grid lines
         self.setFrameStyle(QFrame.NoFrame)
@@ -69,7 +73,7 @@ class TimelineTable(TableWidget):
         """
         col = self.columnAt(e.pos().x())
         row = self.rowAt(e.pos().y())
-        if row == 0 and col <= self.item_count:
+        if row == self.item_row and col <= self.item_count:
             widget = self.cellWidget(row, col)
             if widget:
                 widget_id = widget.widget_id
@@ -91,30 +95,26 @@ class TimelineTable(TableWidget):
         """
         print("delete")
 
-    def deleteActionFunc(self):
-        """
-
-        @return:
-        """
-
     def initTable(self):
         """
         init table: 1. arrow
                     2. three row
         @return:
         """
-        # 3 rows and 10 columns
-        self.setRowCount(3)
-        self.setRowHeight(0, TimelineTable.Height)
+        # 5 rows and 10 columns
+        self.setRowCount(5)
+        self.setRowHeight(self.item_row, TimelineTable.Height)
         self.setColumnCount(10)
         # set initial arrow
         for col in range(TimelineTable.InitialArrowLength - 1):
-            self.setUnselectableItem(0, col)
+            self.setUnselectableItem(self.top_row, col)
+            self.setUnselectableItem(self.item_row, col)
             self.setArrow(col, "timeline/line.png")
-            self.setUnselectableItem(2, col)
-        self.setUnselectableItem(0, TimelineTable.InitialArrowLength - 1)
+            self.setUnselectableItem(self.name_row, col)
+        self.setUnselectableItem(self.top_row, TimelineTable.InitialArrowLength - 1)
+        self.setUnselectableItem(self.item_row, TimelineTable.InitialArrowLength - 1)
         self.setArrow(TimelineTable.InitialArrowLength - 1, "timeline/arrow.png", 50)
-        self.setUnselectableItem(2, TimelineTable.InitialArrowLength - 1)
+        self.setUnselectableItem(self.name_row, TimelineTable.InitialArrowLength - 1)
 
     def setUnselectableItem(self, row: int, col: int):
         """
@@ -139,7 +139,7 @@ class TimelineTable(TableWidget):
         label = QLabel()
         label.setPixmap(Func.getImage(image_path))
         label.setFocusPolicy(Qt.NoFocus)
-        self.setCellWidget(1, col, label)
+        self.setCellWidget(self.arrow_row, col, label)
 
     def addItem(self, timeline_item, timeline_name_item, index: int) -> int:
         """
@@ -159,8 +159,9 @@ class TimelineTable(TableWidget):
         # insert new column to add new item
         self.insertColumn(index)
         self.setArrow(index, "timeline/line.png")
-        self.setCellWidget(0, index, timeline_item)
-        self.setItem(2, index, timeline_name_item)
+        self.setUnselectableItem(self.top_row, index)
+        self.setCellWidget(self.item_row, index, timeline_item)
+        self.setItem(self.name_row, index, timeline_name_item)
         # change data
         self.item_count += 1
         # if initial length is not full, we should delete one column
@@ -187,9 +188,10 @@ class TimelineTable(TableWidget):
                 self.removeColumn(index)
             else:
                 self.insertColumn(TimelineTable.InitialArrowLength - 2)
-                self.setUnselectableItem(0, TimelineTable.InitialArrowLength - 1)
+                self.setUnselectableItem(self.top_row, TimelineTable.InitialArrowLength - 1)
+                self.setUnselectableItem(self.item_row, TimelineTable.InitialArrowLength - 1)
                 self.setArrow(TimelineTable.InitialArrowLength - 2, "timeline/line.png")
-                self.setUnselectableItem(2, TimelineTable.InitialArrowLength - 2)
+                self.setUnselectableItem(self.name_row, TimelineTable.InitialArrowLength - 2)
                 self.removeColumn(index)
             # change data
             self.item_count -= 1
@@ -202,7 +204,7 @@ class TimelineTable(TableWidget):
         @return:
         """
         for col in range(self.item_count):
-            item = self.item(2, col)
+            item = self.item(self.name_row, col)
             if item.text() == origin_widget_name:
                 item.setText(new_widget_name)
                 break
@@ -214,7 +216,7 @@ class TimelineTable(TableWidget):
         @return:
         """
         for col in range(self.item_count):
-            if widget_id == self.cellWidget(0, col).widget_id:
+            if widget_id == self.cellWidget(self.item_row, col).widget_id:
                 return col
         return -1
 
@@ -226,7 +228,7 @@ class TimelineTable(TableWidget):
         """
         widget_name = Func.getWidgetName(widget_id)
         for col in range(self.item_count):
-            if widget_name == self.cellWidget(2, col).text():
+            if widget_name == self.cellWidget(self.name_row, col).text():
                 return col
         return -1
 
@@ -268,7 +270,7 @@ class TimelineTable(TableWidget):
                           1. right
         @return:
         """
-        widget: TimelineItem = self.cellWidget(0, col)
+        widget: TimelineItem = self.cellWidget(self.item_row, col)
         if direction:
             # right
             x = TimelineTable.Width - TimelineItem.IconSize
@@ -287,7 +289,7 @@ class TimelineTable(TableWidget):
         """
         # reset alignment
         for col in range(self.item_count):
-            widget: TimelineItem = self.cellWidget(0, col)
+            widget: TimelineItem = self.cellWidget(self.item_row, col)
             x = (TimelineTable.Width - TimelineItem.IconSize) / 2
             y = (TimelineTable.Height - TimelineItem.IconSize) / 2
             frame_rect = QRect(x, y, TimelineItem.IconSize, TimelineItem.IconSize)
@@ -300,7 +302,7 @@ class TimelineTable(TableWidget):
         @return:
         """
         for col in range(start_col, self.item_count):
-            widget: TimelineItem = self.cellWidget(0, col)
+            widget: TimelineItem = self.cellWidget(self.item_row, col)
             geometry = widget.geometry()
             x = geometry.x() + TimelineTable.Width
             y = geometry.y()
@@ -316,7 +318,7 @@ class TimelineTable(TableWidget):
         @return:
         """
         for col in range(start_col, self.item_count):
-            widget: TimelineItem = self.cellWidget(0, col)
+            widget: TimelineItem = self.cellWidget(self.item_row, col)
             geometry = widget.geometry()
             x = geometry.x() - TimelineTable.Width
             y = geometry.y()

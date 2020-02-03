@@ -14,14 +14,17 @@ class CycleTable(QTableWidget):
 
     """
 
-    # when widget's name is changed, emit this signal (widget id, widget_name)
-    timelineNameChanged = pyqtSignal(int, str)
+    # when timeline is added, emit this signal (widget id, widget_name)
+    timelineAdded = pyqtSignal(int, str)
+    timelineDeleted = pyqtSignal(int)
 
     def __init__(self):
         super(CycleTable, self).__init__(None)
         # col attributes and its default value
         self.attributes = ["Weight", "Timeline"]
         self.default_value = {"Weight": "1", "Timeline": ""}
+        # timeline_name:[count in this table, widget_id]
+        self.timelines = {}
         #
         self.setColumnCount(2)
         self.setHorizontalHeaderLabels(self.attributes)
@@ -76,7 +79,7 @@ class CycleTable(QTableWidget):
 
     def dealItemChanged(self, item):
         """
-        when cell changed, we need to make judgement
+        when cell changed, we need to make some judgement
         @param item:
         @return:
         """
@@ -86,13 +89,13 @@ class CycleTable(QTableWidget):
             if type(item) == WeightItem:
                 # only positive number
                 if not re.match(r"^[0-9]+$", text):
-                    MessageBox.information(self, "warning", "value must be positive integer.")
+                    MessageBox.information(self, "warning", "Value must be positive integer.")
                     item.redo()
                 else:
                     item.save()
             elif type(item) == TimelineItem:
-                print("Timeline item changed")
-                item: TimelineItem
+                print("Timeline item changed", "Name must start with a letter and contain only letters, numbers and _.")
+
             elif type(item) == AttributeItem:
                 print("Attribute item changed")
         else:
