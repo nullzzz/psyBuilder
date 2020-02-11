@@ -297,6 +297,24 @@ class Psy(QMainWindow):
         @return:
         """
         print("item deleted:", origin_widget, widget_id)
+        # close tab
+        self.center.closeTab(widget_id)
+        # delete node in structure (we need delete data in Kernel.Nodes and Kernel.Names) and item in timeline or timeline in cycle
+        widget_name = Func.getWidgetName(widget_id)
+        if origin_widget == Info.StructureSignal:
+            # delete item in timeline or timeline in cycle
+            if Func.isWidgetType(widget_id, Info.Timeline):
+                # delete timeline in cycle
+                cycle: Cycle = Kernel.Widgets[Func.getWidgetParent(widget_id)]
+                cycle.deleteTimeline(widget_name)
+            else:
+                # delete item in timeline
+                timeline: Timeline = Kernel.Widgets[Func.getWidgetParent(widget_id)]
+                timeline.deleteItem(widget_name)
+        # todo delete node and reference nodes in reference parent nodes
+        pass
+        # delete data (Kernel.Widgets Kernel.Names)
+        pass
 
     def dealItemNameChanged(self, origin_widget: int, parent_widget_id: int, widget_id: int, widget_name: str):
         """

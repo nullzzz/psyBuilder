@@ -79,6 +79,17 @@ class CycleTable(QTableWidget):
         @return:
         """
 
+    def deleteTimeline(self, timeline: str):
+        """
+        delete
+        @param timeline:
+        @return:
+        """
+        for row in range(self.rowCount() - 1, -1, -1):
+            if self.item(row, 1).text() == timeline:
+                self.removeRow(row)
+        del self.timelines[timeline]
+
     def dealItemChanged(self, item):
         """
         when cell changed, we need to make some judgement

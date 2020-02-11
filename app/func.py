@@ -211,7 +211,7 @@ class Func(object):
         # todo check refer validity
 
     @staticmethod
-    def getWidgetReference(widget_id: int):
+    def getWidgetReference(widget_id: int) -> list:
         """
         get list of reference widget's widget id
         @param widget_id:
@@ -219,6 +219,15 @@ class Func(object):
         """
         widget_name = Func.getWidgetName(widget_id)
         return Kernel.Names[widget_name]
+
+    @staticmethod
+    def getWidgetParent(widget_id: int) -> int:
+        """
+        get parent's widget id
+        @param widget_id:
+        @return:
+        """
+        return Kernel.Nodes[widget_id].parent().widget_id
 
     @staticmethod
     def checkWidgetNameExisted(widget_name: str):

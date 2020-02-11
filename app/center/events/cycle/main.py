@@ -73,3 +73,11 @@ class Cycle(TabItemWidget):
         """
         # todo get column attributes
         return []
+
+    def deleteTimeline(self, widget_name: str):
+        """
+
+        @param widget_name:
+        @return:
+        """
+

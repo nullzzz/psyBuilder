@@ -100,13 +100,14 @@ class Timeline(TabItemWidget):
         # return valid widget_id, widget_name
         return timeline_item.widget_id, timeline_name_item.text(), index
 
-    def deleteItem(self, widget_id: int):
+    def deleteItem(self, widget_name: str):
         """
-        delete timeline item in its timeline area through item's widget id
+        delete timeline item in its timeline area through item's name
         @param widget_id: item's widget id
         @return:
         """
         # it should be left to timeline area
+        widget_id = self.itemWidgetId(widget_name)
         self.timeline_area.deleteItem(widget_id)
 
     def renameItem(self, origin_widget_name: str, new_widget_name: str):
@@ -124,3 +125,11 @@ class Timeline(TabItemWidget):
         @return:
         """
         return self.timeline_area.timeline_table.item_count
+
+    def itemWidgetId(self, widget_name: str):
+        """
+
+        @param widget_name:
+        @return:
+        """
+        return self.timeline_area.itemWidgetId(widget_name)

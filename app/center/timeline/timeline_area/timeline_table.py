@@ -3,7 +3,6 @@ from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu
 
 from app.func import Func
-from app.info import Info
 from lib import TableWidget
 from ..timeline_item import TimelineItem
 from ..timeline_name_item import TimelineNameItem
@@ -26,6 +25,7 @@ class TimelineTable(TableWidget):
 
     # when widget's name is changed, emit this signal (widget id, widget_name)
     itemNameChanged = pyqtSignal(int, str)
+    itemDeleted = pyqtSignal(int)
 
     def __init__(self):
         super(TimelineTable, self).__init__(None)
@@ -62,8 +62,8 @@ class TimelineTable(TableWidget):
         """
         self.menu = QMenu()
         # copy action
-        self.copy_action = self.menu.addAction(Func.getImage("menu/copy.png", 1), "Copy", self.copyActionFunc,
-                                               QKeySequence(QKeySequence.Copy))
+        self.delete_action = self.menu.addAction(Func.getImage("menu/delete.png", 1), "Delete", self.deleteActionFunc,
+                                                 QKeySequence(QKeySequence.Copy))
 
     def contextMenuEvent(self, e):
         """
@@ -74,26 +74,19 @@ class TimelineTable(TableWidget):
         col = self.columnAt(e.pos().x())
         row = self.rowAt(e.pos().y())
         if row == self.item_row and col <= self.item_count:
-            widget = self.cellWidget(row, col)
-            if widget:
-                widget_id = widget.widget_id
-                if Func.isWidgetType(widget_id, Info.Cycle):
-                    self.copy_action.setEnabled(False)
+            if self.cellWidget(row, col):
                 self.menu.exec(self.mapToGlobal(e.pos()))
-
-    def copyActionFunc(self):
-        """
-
-        @return:
-        """
-        print("copy")
 
     def deleteActionFunc(self):
         """
 
         @return:
         """
-        print("delete")
+        widget_id = self.cellWidget(self.currentRow(), self.currentColumn()).widget_id
+        # emit signal
+        self.itemDeleted.emit(widget_id)
+        # delete column
+        self.deleteItem(widget_id)
 
     def initTable(self):
         """
@@ -230,6 +223,18 @@ class TimelineTable(TableWidget):
         for col in range(self.item_count):
             if widget_name == self.cellWidget(self.name_row, col).text():
                 return col
+        return -1
+
+    def itemWidgetId(self, widget_name: str):
+        """
+
+        @param widget_name:
+        @return:
+        """
+        for col in range(self.item_count):
+            widget = self.cellWidget(self.name_row, col)
+            if widget_name == widget.text():
+                return widget.widget_id
         return -1
 
     def startItemAnimation(self, x: int):

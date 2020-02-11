@@ -54,6 +54,7 @@ class TimelineArea(QScrollArea):
         @return:
         """
         self.timeline_table.itemNameChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
+        self.timeline_table.itemDeleted.connect(lambda widget_id: self.itemDeleted.emit(widget_id))
 
     def addItem(self, timeline_item, timeline_name_item, index: int) -> int:
         """
@@ -66,13 +67,13 @@ class TimelineArea(QScrollArea):
         # left work to timeline table
         return self.timeline_table.addItem(timeline_item, timeline_name_item, index)
 
-    def deleteItem(self, widget_id: int):
+    def deleteItem(self, widget_name: str):
         """
         delete item in timeline table but I left it to timeline table
         @param widget_id:
         @return:
         """
-        self.timeline_table.deleteItem(widget_id)
+        self.timeline_table.deleteItem(widget_name)
 
     def renameItem(self, origin_widget_name: str, new_widget_name: str):
         """
@@ -82,6 +83,14 @@ class TimelineArea(QScrollArea):
         @return:
         """
         self.timeline_table.renameItem(origin_widget_name, new_widget_name)
+
+    def itemWidgetId(self, widget_name: str):
+        """
+        get item's widget id through its widget name
+        @param widget_name:
+        @return:
+        """
+        self.timeline_table.itemWidgetId(widget_name)
 
     def dragEnterEvent(self, e):
         """
