@@ -276,7 +276,8 @@ class Psy(QMainWindow):
         # we should consider a lot of things here because of reference.
         # we also need add node in those reference parents
         # add node in origin parent node
-        self.structure.addNode(parent_widget_id, new_widget_id, new_widget_name, index)
+        widget_name = Func.getWidgetName(origin_widget_id)
+        self.structure.addNode(parent_widget_id, new_widget_id, widget_name, index)
         # add node in refer parent node
         refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
         for refer_parent_widget_id in refer_parent_widget_ids:
@@ -285,7 +286,7 @@ class Psy(QMainWindow):
                 # refer widget
                 refer_widget_id = self.referWidget(new_widget_id)
                 # add refer node in refer parent
-                self.structure.addNode(refer_parent_widget_id, refer_widget_id, new_widget_name, index)
+                self.structure.addNode(refer_parent_widget_id, refer_widget_id, widget_name, index)
         # end wait
         self.endWait()
 

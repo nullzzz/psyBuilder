@@ -6,3 +6,4 @@ class WeightItem(TableWidgetItem):
         super(WeightItem, self).__init__(value)
         # a flag
         self.new = True
+        self.pattern = r"^[0-9]+$"

@@ -6,3 +6,4 @@ class TimelineItem(TableWidgetItem):
         super(TimelineItem, self).__init__(None)
         # a flag
         self.new = True
+        self.pattern = r"^[a-zA-Z][a-zA-Z0-9_]*$"

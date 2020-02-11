@@ -9,7 +9,10 @@ class TableWidgetItem(QTableWidgetItem):
     def __init__(self, value: str = ""):
         super(TableWidgetItem, self).__init__(value)
         # save old text to redo
-        self.old_text = value
+        if value:
+            self.old_text = value
+        else:
+            self.old_text = ""
 
     def redo(self):
         """

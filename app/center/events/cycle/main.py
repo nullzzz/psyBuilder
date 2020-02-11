@@ -2,6 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout, QToolBar, QAction
 
 from app.func import Func
+from app.info import Info
 from lib import TabItemWidget
 from .cycle_table import CycleTable
 
@@ -30,6 +31,17 @@ class Cycle(TabItemWidget):
         self.setToolBar()
         # init one row
         self.cycle_table.addRow(0)
+        # link signals
+        self.linkSignals()
+
+    def linkSignals(self):
+        """
+
+        @return:
+        """
+        self.cycle_table.timelineAdded.connect(
+            lambda widget_id, widget_name, index: self.itemAdded.emit(self.widget_id, widget_id, widget_name, index))
+        self.cycle_table.timelineDeleted.connect(lambda widget_id: self.itemDeleted.emit(Info.CycleSignal, widget_id))
 
     def setToolBar(self):
         """
