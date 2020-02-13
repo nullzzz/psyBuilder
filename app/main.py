@@ -311,10 +311,38 @@ class Psy(QMainWindow):
                 # delete item in timeline
                 timeline: Timeline = Kernel.Widgets[Func.getWidgetParent(widget_id)]
                 timeline.deleteItem(widget_name)
-        # todo delete node and reference nodes in reference parent nodes
-        pass
-        # delete data (Kernel.Widgets Kernel.Names)
-        pass
+        # delete node and reference nodes in reference parent nodes
+        reference_parents = Func.getWidgetReference(Func.getWidgetParent(widget_id))
+        for reference_parent in reference_parents:
+            children = Func.getWidgetChildren(reference_parent)
+            for child_widget_id, child_widget_name in children:
+                if child_widget_name == widget_name:
+                    self.deleteNodeRecursive(child_widget_id, child_widget_name)
+                    break
+
+    def deleteNodeRecursive(self, widget_id: int, widget_name: str):
+        """
+
+        @param widget_id: root node's widget id
+        @param widget_name: root node's widget name
+        @return:
+        """
+        if Func.isWidgetType(widget_id, Info.Cycle) or Func.isWidgetType(widget_id, Info.Timeline):
+            for child_widget_id, child_widget_name in Func.getWidgetChildren(widget_id):
+                self.deleteNodeRecursive(child_widget_id, child_widget_name)
+        # delete data (Kernel.Nodes, Kernel.Widgets, Kernel.Name)
+        node = Kernel.Nodes[widget_id]
+        node.parent().removeChild(node)
+        del Kernel.Nodes[widget_id]
+        reference: list = Kernel.Names[widget_name]
+        if len(reference) == 1:
+            del Kernel.Names[widget_name]
+        else:
+            if reference[0] == widget_id:
+                # if widget is origin widget, we should change widget's widget id
+                Kernel.Widgets[widget_id].changeWidgetId(reference[1])
+            reference.remove(widget_id)
+        del Kernel.Widgets[widget_id]
 
     def dealItemNameChanged(self, origin_widget: int, parent_widget_id: int, widget_id: int, widget_name: str):
         """

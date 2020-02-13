@@ -221,6 +221,15 @@ class Func(object):
         return Kernel.Names[widget_name]
 
     @staticmethod
+    def checkWidgetNameExisted(widget_name: str) -> bool:
+        """
+
+        @param widget_name:
+        @return:
+        """
+        return widget_name in Kernel.Names
+
+    @staticmethod
     def getWidgetParent(widget_id: int) -> int:
         """
         get parent's widget id
@@ -230,10 +239,26 @@ class Func(object):
         return Kernel.Nodes[widget_id].parent().widget_id
 
     @staticmethod
-    def checkWidgetNameExisted(widget_name: str):
+    def getWidgetChild(widget_id: int, index: int) -> (int, str):
         """
 
-        @param widget_name:
-        @return:
+        @param widget_id:
+        @param index:
+        @return: child's widget id and widget name
         """
-        return widget_name in Kernel.Names
+        child = Kernel.Nodes[widget_id].child(index)
+        return child.widget_id, child.text(0)
+
+    @staticmethod
+    def getWidgetChildren(widget_id: int) -> list:
+        """
+
+        @param widget_id:
+        @return: list of children's widget id and widget name
+        """
+        root = Kernel.Nodes[widget_id]
+        children = []
+        for i in range(root.childCount()):
+            child = root.child(i)
+            children.append((child.widget_id, child.text(0)))
+        return children
