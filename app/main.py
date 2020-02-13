@@ -299,10 +299,6 @@ class Psy(QMainWindow):
         @return:
         """
         print("item deleted:", origin_widget, widget_id)
-        print("+" * 10)
-        print(Kernel.Names)
-        print(Kernel.Nodes)
-        print(Kernel.Widgets)
         # close tab
         self.center.closeTab(widget_id)
         # delete node in structure (we need delete data in Kernel.Nodes and Kernel.Names) and item in timeline or timeline in cycle
@@ -325,11 +321,6 @@ class Psy(QMainWindow):
                 if child_widget_name == widget_name:
                     self.deleteNodeRecursive(child_widget_id, child_widget_name)
                     break
-        print("+" * 10)
-        print(Kernel.Names)
-        print(Kernel.Nodes)
-        print(Kernel.Widgets)
-        print("+" * 10)
 
     def deleteNodeRecursive(self, widget_id: int, widget_name: str):
         """

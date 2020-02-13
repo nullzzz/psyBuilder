@@ -40,13 +40,18 @@ class CycleTable(QTableWidget):
         """
         self.itemChanged.connect(self.dealItemChanged)
 
-    def addRow(self, index: int):
+    def addRow(self, index: int = -1):
         """
-        add row in table
+        add row in timeline
+        @param index: row's index, if -1, add in the bottom
         @return:
         """
-        # insert new row
-        self.insertRow(index)
+        if index != -1:
+            # insert new row
+            self.insertRow(index)
+        else:
+            index = self.rowCount()
+            self.addRow(index)
         # add items, weight, timeline and attributes
         weight_item = WeightItem(self.default_value[self.attributes[0]])
         self.setItem(index, 0, weight_item)

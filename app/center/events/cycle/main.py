@@ -51,8 +51,10 @@ class Cycle(TabItemWidget):
         self.tool_bar.setMovable(False)
         self.tool_bar.setFloatable(False)
         # add action
+        # todo add insert action and connect function
         setting_action = QAction(Func.getImage("tool_bar/setting.png", 1), "Setting", self)
         add_row_action = QAction(Func.getImage("tool_bar/add_row.png", 1), "Add Row", self)
+        add_row_action.triggered.connect(self.addRow)
         add_rows_action = QAction(Func.getImage("tool_bar/add_rows.png", 1), "Add Rows", self)
         delete_row_action = QAction(Func.getImage("tool_bar/delete_row.png", 1), "Delete Row", self)
         add_column_action = QAction(Func.getImage("tool_bar/add_column.png", 1), "Add Row", self)
@@ -74,10 +76,17 @@ class Cycle(TabItemWidget):
         # todo get column attributes
         return []
 
-    def deleteTimeline(self, widget_name: str):
+    def deleteTimeline(self, timeline: str):
         """
 
-        @param widget_name:
+        @param timeline:
         @return:
         """
+        self.cycle_table.deleteTimeline(timeline)
 
+    def addRow(self):
+        """
+
+        @return:
+        """
+        self.cycle_table.addRow()
