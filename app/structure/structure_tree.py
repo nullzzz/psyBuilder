@@ -64,11 +64,12 @@ class StructureTree(QTreeWidget):
         parent = node.parent()
         parent.moveChild(index, node)
 
-    def deleteNode(self):
+    def deleteNode(self, node: StructureNode):
         """
 
         @return:
         """
+        node.parent().removeChild(node)
 
     def mouseDoubleClickEvent(self, e):
         """
@@ -94,9 +95,10 @@ class StructureTree(QTreeWidget):
                 if not Func.isWidgetType(widget_id, Info.Cycle):
                     self.copyDrag(widget_id)
             elif e.modifiers() == Qt.ShiftModifier:
-                # shift -> move
-                if not Func.isWidgetType(widget_id, Info.Cycle):
-                    self.moveDrag(widget_id)
+                # todo move to timeline (shift -> move)
+                # if not Func.isWidgetType(widget_id, Info.Cycle):
+                #     self.moveDrag(widget_id)
+                pass
             else:
                 # none -> refer
                 self.referDrag(widget_id)

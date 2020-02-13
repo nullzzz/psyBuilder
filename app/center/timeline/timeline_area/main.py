@@ -19,8 +19,8 @@ class TimelineArea(QScrollArea):
     itemCopied = pyqtSignal(int, int, str, int)
     # item copied, emit signal (origin_widget_id, new_widget_id, index)
     itemReferenced = pyqtSignal(int, int, int)
-    # item move, emit signal(widget_id, origin index, new index)
-    itemMoved = pyqtSignal(int, int, int)
+    # item move, emit signal(origin_timeline, widget_id, origin index, new index)
+    itemMoved = pyqtSignal(int, int, int, int)
     # item delete, emit signal(widget_id)
     itemDeleted = pyqtSignal(int)
 
@@ -67,13 +67,13 @@ class TimelineArea(QScrollArea):
         # left work to timeline table
         return self.timeline_table.addItem(timeline_item, timeline_name_item, index)
 
-    def deleteItem(self, widget_name: str):
+    def deleteItem(self, widget_id: int):
         """
         delete item in timeline table but I left it to timeline table
         @param widget_id:
         @return:
         """
-        self.timeline_table.deleteItem(widget_name)
+        self.timeline_table.deleteItem(widget_id)
 
     def renameItem(self, origin_widget_name: str, new_widget_name: str):
         """
@@ -234,7 +234,7 @@ class TimelineArea(QScrollArea):
                                             index=index)
         # emit signal
         if index != self.move_col:
-            self.itemMoved.emit(self.move_widget_id, self.move_col, index)
+            self.itemMoved.emit(self.parent().widget_id, self.move_widget_id, self.move_col, index)
         # reset move data
         self.move_col = -1
         self.move_widget_id = -1

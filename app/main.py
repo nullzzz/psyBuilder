@@ -134,11 +134,13 @@ class Psy(QMainWindow):
         """
         # generate new widget id
         widget_type = Func.getWidgetType(origin_widget_id)
+        widget_name = Func.getWidgetName(origin_widget_id)
         widget_id = new_widget_id
         if widget_id == -1:
             widget_id = Func.generateWidgetId(widget_type)
-        # refer widget by mapping widget id to same widget
+        # refer widget by mapping widget id to same widget (Kernel.Widgets, Kernel.Names)
         Kernel.Widgets[widget_id] = Kernel.Widgets[origin_widget_id]
+        Kernel.Names[widget_name].append(widget_id)
         return widget_id
 
     def linkWidgetSignals(self, widget_type: int, widget):
@@ -297,6 +299,10 @@ class Psy(QMainWindow):
         @return:
         """
         print("item deleted:", origin_widget, widget_id)
+        print("+" * 10)
+        print(Kernel.Names)
+        print(Kernel.Nodes)
+        print(Kernel.Widgets)
         # close tab
         self.center.closeTab(widget_id)
         # delete node in structure (we need delete data in Kernel.Nodes and Kernel.Names) and item in timeline or timeline in cycle
@@ -319,6 +325,11 @@ class Psy(QMainWindow):
                 if child_widget_name == widget_name:
                     self.deleteNodeRecursive(child_widget_id, child_widget_name)
                     break
+        print("+" * 10)
+        print(Kernel.Names)
+        print(Kernel.Nodes)
+        print(Kernel.Widgets)
+        print("+" * 10)
 
     def deleteNodeRecursive(self, widget_id: int, widget_name: str):
         """
@@ -332,7 +343,7 @@ class Psy(QMainWindow):
                 self.deleteNodeRecursive(child_widget_id, child_widget_name)
         # delete data (Kernel.Nodes, Kernel.Widgets, Kernel.Name)
         node = Kernel.Nodes[widget_id]
-        node.parent().removeChild(node)
+        self.structure.deleteNode(widget_id)
         del Kernel.Nodes[widget_id]
         reference: list = Kernel.Names[widget_name]
         if len(reference) == 1:
@@ -359,23 +370,75 @@ class Psy(QMainWindow):
         widget.widget_name = widget_name
         # change tab's name
         self.center.changeTabName(widget_id, widget_name)
-        # change item's and nodes' name
+        # todo change item's and nodes' name
         if origin_widget == Info.StructureSignal:
             # we need change item's name if signal comes from structure
             timeline = Kernel.Widgets[parent_widget_id]
             timeline.renameItem()
 
-    def dealItemMoved(self, widget_id: int, origin_index: int, new_index: int):
+    def dealItemMoved(self, origin_parent, dest_parent, widget_id: int, origin_index: int, new_index: int):
         """
 
+        @param origin_parent:
+        @param dest_parent:
         @param widget_id:
         @param origin_index:
         @param new_index:
         @return:
         """
-        print("item move:", widget_id, origin_index, new_index)
-        # todo move node in structure
-        self.structure.moveNode(widget_id, origin_index, new_index)
+        print("item move:", origin_parent, dest_parent, widget_id, origin_index, new_index)
+        widget_name = Func.getWidgetName(widget_id)
+        if origin_parent == dest_parent:
+            # move in its parent
+            reference_parents = Func.getWidgetReference(origin_parent)
+            for reference_parent in reference_parents:
+                parent_node = Kernel.Nodes[reference_parent]
+                for i in range(parent_node.childCount()):
+                    child = parent_node.child(i)
+                    if child.text(0) == widget_name:
+                        self.structure.moveNode(child.widget_id, origin_index, new_index)
+        else:
+            # move to other parent, both origin widget and dest parent must be origin widget (first widget?).
+            # delete node in origin parent, add node in dest parent (including reference)
+            delete_children = []
+            reference_parents = Func.getWidgetReference(origin_parent)
+            for reference_parent in reference_parents:
+                parent_node = Kernel.Nodes[reference_parent]
+                for i in range(parent_node.childCount()):
+                    child = parent_node.child(i)
+                    if child.text(0) == widget_name:
+                        delete_children.append(child.widget_id)
+                        self.structure.deleteNode(child.widget_id)
+            # add node in dest parent. However, we need add or delete some node.
+            reference_parents = Func.getWidgetReference(dest_parent)
+            if len(reference_parents) <= len(delete_children):
+                # we need delete some children's widget id
+                count = 0
+                while count < len(reference_parents):
+                    reference_parent = reference_parents[count]
+                    child_widget_id = delete_children[count]
+                    # add node in reference parent
+                    self.structure.addNode(reference_parent, child_widget_id, widget_name, new_index)
+                    count += 1
+                # delete some children's widget id, (Kernel.Nodes, Kernel.Names)
+                while count < len(delete_children):
+                    Kernel.Names[widget_name].remove(delete_children[count])
+                    del Kernel.Nodes[delete_children[count]]
+                    count += 1
+            else:
+                # we need add some children's widget id
+                count = 0
+                while count < len(reference_parents):
+                    reference_parent = reference_parents[count]
+                    child_widget_id = delete_children[count]
+                    # add node in reference parent
+                    self.structure.addNode(reference_parent, child_widget_id, widget_name, new_index)
+                    count += 1
+                while count < len(reference_parents):
+                    reference_parent = reference_parents[count]
+                    child_widget_id = self.referWidget(widget_id)
+                    self.structure.addNode(reference_parent, child_widget_id, widget_name, new_index)
+                    count += 1
 
     def dealItemClicked(self, widget_id: int):
         """

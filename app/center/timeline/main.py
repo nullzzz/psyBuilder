@@ -21,8 +21,8 @@ class Timeline(TabItemWidget):
     itemCopied = pyqtSignal(int, int, int, str, int)
     # item referenced, emit signal (parent_widget_id, origin_widget_id, new_widget_id, index)
     itemReferenced = pyqtSignal(int, int, int, int)
-    # item move, emit signal. (widget_id, origin index, new index)
-    itemMoved = pyqtSignal(int, int, int)
+    # item move, emit signal. (origin_timeline, dest_timeline, widget_id, origin index, new index)
+    itemMoved = pyqtSignal(int, int, int, int, int)
     # item delete. (origin_widget, widget_id)
     itemDeleted = pyqtSignal(int, int)
     # when item's name changed, emit its widget id. (Info.TimelineSignal, parent_widget_id, widget_id, new_text)
@@ -73,7 +73,10 @@ class Timeline(TabItemWidget):
             lambda widget_id, text: self.itemNameChanged.emit(Info.TimelineSignal, self.widget_id, widget_id, text))
         #
         self.timeline_area.itemMoved.connect(
-            lambda widget_id, origin_index, new_index: self.itemMoved.emit(widget_id, origin_index, new_index))
+            lambda origin_timeline, widget_id, origin_index, new_index: self.itemMoved.emit(origin_timeline,
+                                                                                            self.widget_id, widget_id,
+                                                                                            origin_index,
+                                                                                            new_index))
 
     def addItem(self, widget_type: int = None, widget_id: int = None, widget_name: str = None, index: int = 0) -> (
             int, str, int):

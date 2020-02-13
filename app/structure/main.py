@@ -62,3 +62,12 @@ class Structure(DockWidget):
         @return:
         """
         self.structure_tree.moveNode(widget_id, new_index)
+
+    def deleteNode(self, widget_id: int):
+        """
+
+        @param widget_id:
+        @return:
+        """
+        node = Kernel.Nodes[widget_id]
+        self.structure_tree.deleteNode(node)
