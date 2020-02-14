@@ -33,6 +33,7 @@ class Cycle(TabItemWidget):
         self.cycle_table.addRow(0)
         # link signals
         self.linkSignals()
+        # set shortcut
 
     def linkSignals(self):
         """

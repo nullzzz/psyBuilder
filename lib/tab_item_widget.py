@@ -1,5 +1,6 @@
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QWidget, QShortcut
 
 
 class TabItemWidget(QWidget):
@@ -90,6 +91,22 @@ class TabItemWidget(QWidget):
         @return:
         """
         self.widget_id = widget_id
+
+    """
+    Set shortcut
+    """
+
+    def setShortcut(self, key_sequence: QKeySequence, func):
+        """
+        set shortcut
+        @param key_sequence:
+        @param func:
+        @return:
+        """
+        shortcut = QShortcut(key_sequence, self)
+        shortcut.setContext(Qt.WidgetWithChildrenShortcut)
+        shortcut.activated.connect(func)
+        return shortcut
 
     """
     other function may be needed to all, but I forget those.

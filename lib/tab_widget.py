@@ -1,5 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QTabWidget, QWidget
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QTabWidget, QWidget, QShortcut
 
 from app.func import Func
 
@@ -16,6 +17,17 @@ class TabWidget(QTabWidget):
         # set tab can be closed, it makes me concerned.
         self.setTabsClosable(True)
         self.tabCloseRequested.connect(self.removeTab)
+        # set short and menu
+        self.setMenuAndShortcut()
+
+    def setMenuAndShortcut(self):
+        """
+
+        @return:
+        """
+        # close current tab
+        self.close_shortcut = QShortcut(QKeySequence(QKeySequence.Close), self)
+        self.close_shortcut.activated.connect(lambda: self.removeTab(self.currentIndex()))
 
     def openTab(self, widget: QWidget, widget_type: str, name: str) -> None:
         """
