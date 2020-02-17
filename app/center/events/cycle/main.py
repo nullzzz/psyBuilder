@@ -91,3 +91,12 @@ class Cycle(TabItemWidget):
         @return:
         """
         self.cycle_table.addRow()
+
+    def copy(self, widget_id: int, widget_name: str):
+        """
+        return copy of this widget
+        @param widget_id:
+        @param widget_name:
+        @return:
+        """
+        return Cycle(widget_id, widget_name)

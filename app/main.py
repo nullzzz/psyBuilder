@@ -358,6 +358,7 @@ class Psy(QMainWindow):
         print("item name change:", origin_widget, parent_widget_id, widget_id, widget_name)
         # change widget's name
         widget = Kernel.Widgets[widget_id]
+        old_widget_name = Func.getWidgetName(widget_id)
         widget.widget_name = widget_name
         # change tab's name
         self.center.changeTabName(widget_id, widget_name)
@@ -367,7 +368,6 @@ class Psy(QMainWindow):
             timeline.renameItem()
         # change node's name in structure and reference parent's child
         # get it's old name to get its reference
-        old_widget_name = Func.getWidgetName(widget_id)
         change_widget_ids = [widget_id]
         reference_parents = Func.getWidgetReference(Func.getWidgetParent(widget_id))
         for reference_parent in reference_parents:
@@ -376,7 +376,8 @@ class Psy(QMainWindow):
                 if child_widget_name == old_widget_name:
                     # change node's text
                     self.structure.changeNodeName(child_widget_id, widget_name)
-                    change_widget_ids.append(child_widget_id)
+                    if child_widget_id != widget_id:
+                        change_widget_ids.append(child_widget_id)
                     break
         # change data (Kernel.Names, [Kernel.Widget])
         # if reference widget change its name, we should change it to a copy widget
@@ -408,6 +409,7 @@ class Psy(QMainWindow):
                 copy_widget = self.copyWidget(origin_widget_id, widget_id, widget_name)
                 for change_widget_id in change_widget_ids:
                     Kernel.Widgets[change_widget_id] = copy_widget
+        print(Kernel.Names)
 
     def dealItemMoved(self, origin_parent, dest_parent, widget_id: int, origin_index: int, new_index: int):
         """

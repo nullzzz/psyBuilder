@@ -146,6 +146,7 @@ class CycleTable(QTableWidget):
                             if not re.match(item.pattern, text):
                                 MessageBox.information(self, "warning",
                                                        "Name must start with a letter and contain only letters, numbers and _.")
+                                item.redo()
                             else:
                                 if text not in self.timelines:
                                     # new timeline in this cycle

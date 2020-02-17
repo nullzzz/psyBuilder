@@ -1,9 +1,11 @@
+import re
+
 from PyQt5.QtCore import Qt, pyqtSignal, QRect
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu, QShortcut
 
 from app.func import Func
-from lib import TableWidget
+from lib import TableWidget, MessageBox
 from ..timeline_item import TimelineItem
 from ..timeline_name_item import TimelineNameItem
 
@@ -105,7 +107,7 @@ class TimelineTable(TableWidget):
         @return:
         """
         # 5 rows and 10 columns
-        self.setRowCount(5)
+        self.setRowCount(4)
         self.setRowHeight(self.item_row, TimelineTable.Height)
         self.setColumnCount(10)
         # set initial arrow
@@ -352,6 +354,14 @@ class TimelineTable(TableWidget):
         if type(item) == TimelineNameItem:
             # if this item was just added in the table, we ignore it
             if not item.new:
-                self.itemNameChanged.emit(item.widget_id, item.text())
+                if item.text() != item.old_text:
+                    # check its validity
+                    if re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", item.text()):
+                        self.itemNameChanged.emit(item.widget_id, item.text())
+                        item.save()
+                    else:
+                        MessageBox.information(self, "warning",
+                                               "Name must start with a letter and contain only letters, numbers and _.")
+                        item.redo()
             else:
                 item.new = False
