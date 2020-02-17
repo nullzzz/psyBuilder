@@ -125,6 +125,7 @@ class Psy(QMainWindow):
         """
         new_widget = Kernel.Widgets[origin_widget_id].copy(new_widget_id, new_widget_name)
         Kernel.Widgets[new_widget_id] = new_widget
+        return new_widget
 
     def referWidget(self, origin_widget_id: int, new_widget_id: int = -1) -> int:
         """
@@ -333,7 +334,6 @@ class Psy(QMainWindow):
             for child_widget_id, child_widget_name in Func.getWidgetChildren(widget_id):
                 self.deleteNodeRecursive(child_widget_id, child_widget_name)
         # delete data (Kernel.Nodes, Kernel.Widgets, Kernel.Name)
-        node = Kernel.Nodes[widget_id]
         self.structure.deleteNode(widget_id)
         del Kernel.Nodes[widget_id]
         reference: list = Kernel.Names[widget_name]
@@ -348,7 +348,7 @@ class Psy(QMainWindow):
 
     def dealItemNameChanged(self, origin_widget: int, parent_widget_id: int, widget_id: int, widget_name: str):
         """
-        when item's name changed, we deal some job.
+        when item's name changed, we deal some job. we forbid changing timeline's name
         @param origin_widget: where is the signal from, including timeline and structure
         @param parent_widget_id: item's parent
         @param widget_id:
@@ -361,11 +361,53 @@ class Psy(QMainWindow):
         widget.widget_name = widget_name
         # change tab's name
         self.center.changeTabName(widget_id, widget_name)
-        # todo change item's and nodes' name
         if origin_widget == Info.StructureSignal:
             # we need change item's name if signal comes from structure
             timeline = Kernel.Widgets[parent_widget_id]
             timeline.renameItem()
+        # change node's name in structure and reference parent's child
+        # get it's old name to get its reference
+        old_widget_name = Func.getWidgetName(widget_id)
+        change_widget_ids = [widget_id]
+        reference_parents = Func.getWidgetReference(Func.getWidgetParent(widget_id))
+        for reference_parent in reference_parents:
+            children = Func.getWidgetChildren(reference_parent)
+            for child_widget_id, child_widget_name in children:
+                if child_widget_name == old_widget_name:
+                    # change node's text
+                    self.structure.changeNodeName(child_widget_id, widget_name)
+                    change_widget_ids.append(child_widget_id)
+                    break
+        # change data (Kernel.Names, [Kernel.Widget])
+        # if reference widget change its name, we should change it to a copy widget
+        if len(change_widget_ids) == len(Kernel.Names[old_widget_name]):
+            # if we change all, we just need to change key in Kernel.Names
+            Kernel.Names[widget_name] = Kernel.Names[old_widget_name]
+            del Kernel.Names[old_widget_name]
+        else:
+            # we need change
+            origin_widget_id = Kernel.Names[old_widget_name][0]
+            # save new name
+            Kernel.Names[widget_name] = change_widget_ids
+            # copy widget and map widget id to widget
+            # remove change widget id from Kernel.Names[old_widget_name]
+            for change_widget_id in change_widget_ids:
+                Kernel.Names[widget_name].remove(change_widget_id)
+            if origin_widget_id in change_widget_ids:
+                # copy new widget and widget's widget id is now Kernel.Names[old_widget_name][0]
+                # and change it map
+                # change origin widget's widget id
+                Kernel.Widgets[widget_id].changeWidgetId(Kernel.Names[old_widget_name][0])
+                # copy this widget
+                copy_widget = self.copyWidget(Kernel.Names[old_widget_name][0], widget_id, widget_name)
+                # map
+                for change_widget_id in change_widget_ids:
+                    Kernel.Widgets[change_widget_id] = copy_widget
+            else:
+                # copy widget and widget's widget id is change_widget_id[0], and map it to all
+                copy_widget = self.copyWidget(origin_widget_id, widget_id, widget_name)
+                for change_widget_id in change_widget_ids:
+                    Kernel.Widgets[change_widget_id] = copy_widget
 
     def dealItemMoved(self, origin_parent, dest_parent, widget_id: int, origin_index: int, new_index: int):
         """

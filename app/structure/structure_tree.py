@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMimeData, QPoint
-from PyQt5.QtGui import QDrag
-from PyQt5.QtWidgets import QTreeWidget
+from PyQt5.QtGui import QDrag, QKeySequence
+from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut
 
 from app.func import Func
 from app.info import Info
@@ -26,6 +26,46 @@ class StructureTree(QTreeWidget):
         self.setHeaderHidden(True)
         # draggable
         self.setDragEnabled(True)
+        # set menu and shortcut
+        self.setMenuAndShortcut()
+
+    def setMenuAndShortcut(self):
+        """
+
+        @return:
+        """
+        # menu
+        self.menu = QMenu()
+        self.delete_action = self.menu.addAction(Func.getImage("menu/delete.png", 1), "Delete", self.deleteActionFunc,
+                                                 QKeySequence(QKeySequence.Delete))
+        self.rename_action = self.menu.addAction(Func.getImage("menu/rename.png", 1), "Rename", self.renameActionFunc,
+                                                 QKeySequence("F2"))
+        # shortcut
+        self.rename_shortcut = QShortcut(QKeySequence('F2'), self)
+        self.rename_shortcut.setContext(Qt.WidgetWithChildrenShortcut)
+        self.rename_shortcut.activated.connect(self.renameActionFunc)
+        self.delete_shortcut = QShortcut(QKeySequence("Delete"), self)
+        self.delete_shortcut.setContext(Qt.WidgetWithChildrenShortcut)
+        self.delete_shortcut.activated.connect(self.deleteActionFunc)
+        self.backspace_shortcut = QShortcut(QKeySequence("Backspace"), self)
+        self.backspace_shortcut.setContext(Qt.WidgetWithChildrenShortcut)
+        self.backspace_shortcut.activated.connect(self.deleteActionFunc)
+
+    def contextMenuEvent(self, e):
+        """
+
+        @param e:
+        @return:
+        """
+        item = self.currentItem()
+        if item:
+            self.rename_action.setEnabled(False)
+            self.delete_action.setEnabled(False)
+            if item.widget_id:
+                self.delete_action.setEnabled(True)
+                if not Func.isWidgetType(item.widget_id, Info.Timeline):
+                    self.rename_action.setEnabled(True)
+            self.menu.exec(self.mapToGlobal(e.pos()))
 
     def addNode(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int):
         """
@@ -110,7 +150,7 @@ class StructureTree(QTreeWidget):
         @return:
         """
         data = QByteArray()
-        stream = QDataStream(data, QIODevice.ReadOnly)
+        stream = QDataStream(data, QIODevice.ReadWrite)
         stream.writeInt(widget_id)
         mime_data = QMimeData()
         mime_data.setData(Info.StructureMoveToTimeline, data)
@@ -126,7 +166,7 @@ class StructureTree(QTreeWidget):
         @return:
         """
         data = QByteArray()
-        stream = QDataStream(data, QIODevice.ReadOnly)
+        stream = QDataStream(data, QIODevice.ReadWrite)
         stream.writeInt(widget_id)
         mime_data = QMimeData()
         mime_data.setData(Info.StructureCopyToTimeline, data)
@@ -142,7 +182,7 @@ class StructureTree(QTreeWidget):
         @return:
         """
         data = QByteArray()
-        stream = QDataStream(data, QIODevice.ReadOnly)
+        stream = QDataStream(data, QIODevice.ReadWrite)
         stream.writeInt(widget_id)
         mime_data = QMimeData()
         mime_data.setData(Info.StructureReferToTimeline, data)
@@ -150,3 +190,17 @@ class StructureTree(QTreeWidget):
         drag.setMimeData(mime_data)
         drag.setHotSpot(QPoint(12, 12))
         drag.exec()
+
+    def deleteActionFunc(self):
+        """
+        delete action
+        @return:
+        """
+        print("delete")
+
+    def renameActionFunc(self):
+        """
+
+        @return:
+        """
+        print("rename")

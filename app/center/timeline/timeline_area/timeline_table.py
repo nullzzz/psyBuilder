@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QRect
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu
+from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu, QShortcut
 
 from app.func import Func
 from lib import TableWidget
@@ -63,7 +63,14 @@ class TimelineTable(TableWidget):
         self.menu = QMenu()
         # copy action
         self.delete_action = self.menu.addAction(Func.getImage("menu/delete.png", 1), "Delete", self.deleteActionFunc,
-                                                 QKeySequence(QKeySequence.Copy))
+                                                 QKeySequence(QKeySequence.Delete))
+        # shortcut
+        self.delete_shortcut = QShortcut(QKeySequence(QKeySequence("Delete")), self)
+        self.delete_shortcut.setContext(Qt.WidgetWithChildrenShortcut)
+        self.delete_shortcut.activated.connect(self.deleteActionFunc)
+        self.backspace_shortcut = QShortcut(QKeySequence(QKeySequence("Backspace")), self)
+        self.backspace_shortcut.setContext(Qt.WidgetWithChildrenShortcut)
+        self.backspace_shortcut.activated.connect(self.deleteActionFunc)
 
     def contextMenuEvent(self, e):
         """
@@ -82,11 +89,14 @@ class TimelineTable(TableWidget):
 
         @return:
         """
-        widget_id = self.cellWidget(self.currentRow(), self.currentColumn()).widget_id
-        # emit signal
-        self.itemDeleted.emit(widget_id)
-        # delete column
-        self.deleteItem(widget_id)
+        try:
+            widget_id = self.cellWidget(self.currentRow(), self.currentColumn()).widget_id
+            # emit signal
+            self.itemDeleted.emit(widget_id)
+            # delete column
+            self.deleteItem(widget_id)
+        except:
+            pass
 
     def initTable(self):
         """
@@ -221,7 +231,7 @@ class TimelineTable(TableWidget):
         """
         widget_name = Func.getWidgetName(widget_id)
         for col in range(self.item_count):
-            if widget_name == self.cellWidget(self.name_row, col).text():
+            if widget_name == self.item(self.name_row, col).text():
                 return col
         return -1
 
