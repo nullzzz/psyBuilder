@@ -357,8 +357,12 @@ class TimelineTable(TableWidget):
                 if item.text() != item.old_text:
                     # check its validity
                     if re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", item.text()):
-                        self.itemNameChanged.emit(item.widget_id, item.text())
-                        item.save()
+                        if Func.checkWidgetNameExisted(item.text()):
+                            MessageBox.information(self, "warning", "Name existed.")
+                            item.redo()
+                        else:
+                            self.itemNameChanged.emit(item.widget_id, item.text())
+                            item.save()
                     else:
                         MessageBox.information(self, "warning",
                                                "Name must start with a letter and contain only letters, numbers and _.")
