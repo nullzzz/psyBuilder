@@ -90,7 +90,7 @@ class TimelineArea(QScrollArea):
         @param widget_name:
         @return:
         """
-        self.timeline_table.itemWidgetId(widget_name)
+        return self.timeline_table.itemWidgetId(widget_name)
 
     def dragEnterEvent(self, e):
         """

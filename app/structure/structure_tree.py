@@ -1,3 +1,5 @@
+import re
+
 from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMimeData, QPoint
 from PyQt5.QtGui import QDrag, QKeySequence
 from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut
@@ -5,6 +7,7 @@ from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut
 from app.func import Func
 from app.info import Info
 from app.kernel import Kernel
+from lib import MessageBox
 from .structure_node import StructureNode
 
 
@@ -15,8 +18,10 @@ class StructureTree(QTreeWidget):
 
     # when node is double clicked, emit signal (widget_id)
     itemDoubleClicked = pyqtSignal(int)
-    # when node is double deleted, emit signal ( widget_id)
+    # when node is double deleted, emit signal (widget_id)
     itemDeleted = pyqtSignal(int)
+    # when node is changed, emit(parent_widget_id, widget_id, widget_name)
+    itemNameChanged = pyqtSignal(int, int, str)
 
     def __init__(self):
         super(StructureTree, self).__init__(None)
@@ -26,8 +31,17 @@ class StructureTree(QTreeWidget):
         self.setHeaderHidden(True)
         # draggable
         self.setDragEnabled(True)
+        # link signals
+        self.linkSignals()
         # set menu and shortcut
         self.setMenuAndShortcut()
+
+    def linkSignals(self):
+        """
+        link signals
+        @return:
+        """
+        self.itemChanged.connect(self.dealItemChanged)
 
     def setMenuAndShortcut(self):
         """
@@ -191,16 +205,40 @@ class StructureTree(QTreeWidget):
         drag.setHotSpot(QPoint(12, 12))
         drag.exec()
 
+    def dealItemChanged(self, item: StructureNode, index: int):
+        """
+
+        @return:
+        """
+        if item.changed():
+            if re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", item.text(0)):
+                if Func.checkWidgetNameExisted(item.text(0)):
+                    MessageBox.information(self, "warning", "Name existed.")
+                    item.redo()
+                else:
+                    self.itemNameChanged.emit(item.parent().widget_id, item.widget_id, item.text(0))
+                    item.save()
+            else:
+                MessageBox.information(self, "warning",
+                                       "Name must start with a letter and contain only letters, numbers and _.")
+                item.redo()
+
     def deleteActionFunc(self):
         """
         delete action
         @return:
         """
-        print("delete")
+        # get current item
+        item = self.currentItem()
+        if type(item) == StructureNode:
+            self.itemDeleted.emit(item.widget_id)
 
     def renameActionFunc(self):
         """
 
         @return:
         """
-        print("rename")
+        # get current item
+        item = self.currentItem()
+        if type(item) == StructureNode and not Func.isWidgetType(item.widget_id, Info.Timeline):
+            self.editItem(item, 0)

@@ -1,5 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 
+from app.info import Info
 from app.kernel import Kernel
 from lib import DockWidget
 from .structure_tree import StructureTree
@@ -14,6 +15,8 @@ class Structure(DockWidget):
     itemDoubleClicked = pyqtSignal(int)
     # when node is double deleted, emit signal (origin_widget,widget_id)
     itemDeleted = pyqtSignal(int, int)
+    # when node is changed, emit(origin_widget, parent_widget_id, widget_id, widget_name)
+    itemNameChanged = pyqtSignal(int, int, int, str)
 
     def __init__(self, parent=None):
         super(Structure, self).__init__(parent)
@@ -28,7 +31,12 @@ class Structure(DockWidget):
         @return:
         """
         self.structure_tree.itemDoubleClicked.connect(lambda widget_id: self.itemDoubleClicked.emit(widget_id))
-        self.structure_tree.itemDeleted.connect(lambda widget_id: self.itemDeleted.emit(widget_id))
+        self.structure_tree.itemDeleted.connect(
+            lambda widget_id: self.itemDeleted.emit(Info.StructureSignal, widget_id))
+        self.structure_tree.itemNameChanged.connect(
+            lambda parent_widget_id, widget_id, widget_name: self.itemNameChanged.emit(Info.StructureSignal,
+                                                                                       parent_widget_id, widget_id,
+                                                                                       widget_name))
 
     def addNode(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int):
         """

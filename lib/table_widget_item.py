@@ -34,5 +34,5 @@ class TableWidgetItem(QTableWidgetItem):
         @param p_str:
         @return:
         """
-        super(TableWidgetItem, self).setText(p_str)
         self.old_text = p_str
+        super(TableWidgetItem, self).setText(p_str)

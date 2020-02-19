@@ -91,6 +91,7 @@ class Psy(QMainWindow):
         self.center.currentWidgetChanged.connect(self.dealCurrentTabChanged)
         self.structure.itemDoubleClicked.connect(self.dealItemDoubleClicked)
         self.structure.itemDeleted.connect(self.dealItemDeleted)
+        self.structure.itemNameChanged.connect(self.dealItemNameChanged)
 
     def createWidget(self, widget_id: int, widget_name: str) -> None:
         """
@@ -365,7 +366,7 @@ class Psy(QMainWindow):
         if origin_widget == Info.StructureSignal:
             # we need change item's name if signal comes from structure
             timeline = Kernel.Widgets[parent_widget_id]
-            timeline.renameItem()
+            timeline.renameItem(old_widget_name, widget_name)
         # change node's name in structure and reference parent's child
         # get it's old name to get its reference
         change_widget_ids = [widget_id]
@@ -409,7 +410,6 @@ class Psy(QMainWindow):
                 copy_widget = self.copyWidget(origin_widget_id, widget_id, widget_name)
                 for change_widget_id in change_widget_ids:
                     Kernel.Widgets[change_widget_id] = copy_widget
-        print(Kernel.Names)
 
     def dealItemMoved(self, origin_parent, dest_parent, widget_id: int, origin_index: int, new_index: int):
         """

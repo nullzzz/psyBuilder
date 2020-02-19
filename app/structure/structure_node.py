@@ -12,6 +12,7 @@ class StructureNode(QTreeWidgetItem):
 
     def __init__(self, parent=None, widget_id: int = None):
         super(StructureNode, self).__init__(parent)
+        self.old_text = ""
         self.widget_id = widget_id
         # set its icon
         widget_type = Info.WidgetType[Func.getWidgetType(widget_id)]
@@ -20,6 +21,7 @@ class StructureNode(QTreeWidgetItem):
             self.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
         else:
             self.setFlags(Qt.NoItemFlags | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
 
     def moveChild(self, index: int, node: QTreeWidgetItem):
         """
@@ -30,3 +32,34 @@ class StructureNode(QTreeWidgetItem):
         """
         self.removeChild(node)
         self.insertChild(index, node)
+
+    def setText(self, p_int, p_str):
+        """
+        save text as old_text
+        @param p_int:
+        @param p_str:
+        @return:
+        """
+        self.old_text = p_str
+        super(StructureNode, self).setText(p_int, p_str)
+
+    def save(self):
+        """
+
+        @return:
+        """
+        self.old_text = self.text(0)
+
+    def redo(self):
+        """
+
+        @return:
+        """
+        self.setText(0, self.old_text)
+
+    def changed(self):
+        """
+
+        @return:
+        """
+        return self.old_text != self.text(0)

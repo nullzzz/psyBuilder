@@ -244,7 +244,7 @@ class TimelineTable(TableWidget):
         @return:
         """
         for col in range(self.item_count):
-            widget = self.cellWidget(self.name_row, col)
+            widget = self.item(self.name_row, col)
             if widget_name == widget.text():
                 return widget.widget_id
         return -1
