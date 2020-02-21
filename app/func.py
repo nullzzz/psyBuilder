@@ -265,8 +265,4 @@ class Func(object):
 
     @staticmethod
     def getWidgetIndex(widget_id: int):
-        """
-
-                @param widget_id:
-                @return:
-                """
+        """"""
