@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
 from app.center.events import Cycle
@@ -21,12 +22,13 @@ class Psy(QMainWindow):
 
     def __init__(self):
         super(Psy, self).__init__()
+        # init menu bar
+        self.initMenuBar()
         # set its title
         self.setWindowTitle("Psy Builder")
         # set its wait thread
         self.wait_dialog = WaitDialog()
-        # init menu bar
-        self.initMenuBar()
+
         # init dock widget
         self.initDockWidget()
         #
@@ -37,6 +39,14 @@ class Psy(QMainWindow):
         init its menu bar, including file, view, devices, building and help
         @return:
         """
+        menu_bar = self.menuBar()
+        # file menu
+        file_menu = menu_bar.addMenu("File")
+        file_menu.addAction("New", self.newFileActionFunc, QKeySequence(QKeySequence.New))
+        file_menu.addAction("Open", self.newFileActionFunc, QKeySequence(QKeySequence.Open))
+        file_menu.addAction("Save", self.newFileActionFunc, QKeySequence(QKeySequence.Save))
+        file_menu.addAction("Save As", self.newFileActionFunc, QKeySequence(QKeySequence.SaveAs))
+        file_menu.addAction("Exit", self.exitActionFunc, QKeySequence())
 
     def initDockWidget(self) -> None:
         """
@@ -152,7 +162,7 @@ class Psy(QMainWindow):
         @param widget:
         @return:
         """
-        # todo link widget's signals
+        # todo link special widget's signals
         # common
         widget.propertiesChanged.connect(self.dealPropertiesChanged)
         widget.waitStart.connect(self.startWait)
@@ -196,6 +206,32 @@ class Psy(QMainWindow):
         @return:
         """
         self.properties.showProperties(widget_id)
+
+    def newFileActionFunc(self):
+        """
+        new file
+        @return:
+        """
+        print("new file")
+
+    def openActionFunc(self):
+        """
+        open file
+        @return:
+        """
+
+    def saveActionFunc(self):
+        """
+        save file
+        @return:
+        """
+
+    def exitActionFunc(self):
+        """
+        exit software
+        @return:
+        """
+        QApplication.exit()
 
     def dealItemAdded(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int):
         """
