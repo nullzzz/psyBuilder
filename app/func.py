@@ -262,3 +262,11 @@ class Func(object):
             child = root.child(i)
             children.append((child.widget_id, child.text(0)))
         return children
+
+    @staticmethod
+    def getWidgetIndex(widget_id: int):
+        """
+
+                @param widget_id:
+                @return:
+                """

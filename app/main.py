@@ -39,14 +39,22 @@ class Psy(QMainWindow):
         init its menu bar, including file, view, devices, building and help
         @return:
         """
-        menu_bar = self.menuBar()
+        self.menu_bar = self.menuBar()
         # file menu
-        file_menu = menu_bar.addMenu("File")
-        file_menu.addAction("New", self.newFileActionFunc, QKeySequence(QKeySequence.New))
-        file_menu.addAction("Open", self.newFileActionFunc, QKeySequence(QKeySequence.Open))
-        file_menu.addAction("Save", self.newFileActionFunc, QKeySequence(QKeySequence.Save))
-        file_menu.addAction("Save As", self.newFileActionFunc, QKeySequence(QKeySequence.SaveAs))
-        file_menu.addAction("Exit", self.exitActionFunc, QKeySequence())
+        self.file_menu = self.menu_bar.addMenu("File")
+        self.file_menu.addAction("New", self.newActionFunc, QKeySequence(QKeySequence.New))
+        self.file_menu.addAction("Open", self.openActionFunc, QKeySequence(QKeySequence.Open))
+        self.file_menu.addAction("Save", self.saveActionFunc, QKeySequence(QKeySequence.Save))
+        self.file_menu.addAction("Save As", self.saveAsActionFunc, QKeySequence(QKeySequence.SaveAs))
+        # view
+        self.view_menu = self.menu_bar.addMenu("View")
+        self.view_menu.addAction("Default View", self.defaultViewAction, QKeySequence())
+        # device
+        self.device_menu = self.menu_bar.addMenu("Device")
+        # building
+        self.building_menu = self.menu_bar.addMenu("Building")
+        # help
+        self.help_menu = self.menu_bar.addMenu("Help")
 
     def initDockWidget(self) -> None:
         """
@@ -207,7 +215,7 @@ class Psy(QMainWindow):
         """
         self.properties.showProperties(widget_id)
 
-    def newFileActionFunc(self):
+    def newActionFunc(self):
         """
         new file
         @return:
@@ -219,19 +227,28 @@ class Psy(QMainWindow):
         open file
         @return:
         """
+        print("open")
 
     def saveActionFunc(self):
         """
         save file
         @return:
         """
+        print("save")
 
-    def exitActionFunc(self):
+    def saveAsActionFunc(self):
         """
-        exit software
+        save file as
         @return:
         """
-        QApplication.exit()
+        print("save as")
+
+    def defaultViewAction(self):
+        """
+
+        @return:
+        """
+        print("default view")
 
     def dealItemAdded(self, parent_widget_id: int, widget_id: int, widget_name: str, index: int):
         """

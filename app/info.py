@@ -32,3 +32,8 @@ class Info(object):
     TimelineSignal = 0
     StructureSignal = 1
     CycleSignal = 2
+
+    #########################################
+    # Variables set for compatibility       #
+    # It is best to discard it in later use #
+    #########################################
