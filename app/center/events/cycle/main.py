@@ -1,13 +1,13 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QVBoxLayout, QToolBar, QAction
+from PyQt5.QtWidgets import QAction
 
 from app.func import Func
 from app.info import Info
-from lib import TabItemWidget
+from lib import TabItemMainWindow
 from .cycle_table import CycleTable
 
 
-class Cycle(TabItemWidget):
+class Cycle(TabItemMainWindow):
     """
 
     """
@@ -20,13 +20,7 @@ class Cycle(TabItemWidget):
     def __init__(self, widget_id: int, widget_name: str):
         super(Cycle, self).__init__(widget_id, widget_name)
         self.cycle_table = CycleTable()
-        layout = QVBoxLayout()
-        self.tool_bar = QToolBar("ToolBar")
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        layout.addWidget(self.tool_bar)
-        layout.addWidget(self.cycle_table)
-        self.setLayout(layout)
+        self.setCentralWidget(self.cycle_table)
         # set tool bar
         self.setToolBar()
         # init one row
@@ -49,6 +43,7 @@ class Cycle(TabItemWidget):
 
         @return:
         """
+        self.tool_bar = self.addToolBar("Tool Bar")
         self.tool_bar.setMovable(False)
         self.tool_bar.setFloatable(False)
         # add action

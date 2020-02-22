@@ -1,8 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QMainWindow
 
 
-class TabItemWidget(QWidget):
+class TabItemMainWindow(QMainWindow):
     """
     base class for widgets which will be tab in tab widget
 
@@ -21,7 +21,7 @@ class TabItemWidget(QWidget):
     waitEnd = pyqtSignal()
 
     def __init__(self, widget_id: int, widget_name: str):
-        super(TabItemWidget, self).__init__(None)
+        super(TabItemMainWindow, self).__init__(None)
         # widget_id is used to distinguish different widgets
         self.widget_id = widget_id
         self.widget_name = widget_name
