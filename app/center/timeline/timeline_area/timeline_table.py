@@ -5,6 +5,7 @@ from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu, QShortcut
 
 from app.func import Func
+from app.info import Info
 from lib import TableWidget, MessageBox
 from ..timeline_item import TimelineItem
 from ..timeline_name_item import TimelineNameItem
@@ -352,20 +353,16 @@ class TimelineTable(TableWidget):
         """
         # we just deal this type
         if type(item) == TimelineNameItem:
-            # if this item was just added in the table, we ignore it
-            if not item.new:
-                if item.text() != item.old_text:
-                    # check its validity
-                    if re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", item.text()):
-                        if Func.checkWidgetNameExisted(item.text()):
-                            MessageBox.information(self, "warning", "Name existed.")
-                            item.redo()
-                        else:
-                            self.itemNameChanged.emit(item.widget_id, item.text())
-                            item.save()
-                    else:
-                        MessageBox.information(self, "warning",
-                                               "Name must start with a letter and contain only letters, numbers and _.")
+            # if text isn't changed, we ignore it
+            if item.changed():
+                # check its validity
+                if re.match(Info.widgetPattern[0], item.text()):
+                    if Func.checkWidgetNameExisted(item.text()):
+                        MessageBox.information(self, "warning", "Name existed.")
                         item.redo()
-            else:
-                item.new = False
+                    else:
+                        self.itemNameChanged.emit(item.widget_id, item.text())
+                        item.save()
+                else:
+                    MessageBox.information(self, "warning", Info.widgetPattern[1])
+                    item.redo()

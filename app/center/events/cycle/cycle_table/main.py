@@ -101,13 +101,13 @@ class CycleTable(QTableWidget):
         @param item:
         @return:
         """
-        # if this item was just added in the table, we ignore it
-        if not item.new:
+        # if text isn't changed, we ignore it
+        if item.changed():
             text = item.text()
             if type(item) == WeightItem:
                 # only positive number
-                if not re.match(item.pattern, text):
-                    MessageBox.information(self, "warning", "Value must be positive integer.")
+                if not re.match(Info.weightPattern[0], text):
+                    MessageBox.information(self, "warning", Info.weightPattern[1])
                     item.redo()
                 else:
                     item.save()
@@ -116,18 +116,38 @@ class CycleTable(QTableWidget):
                 # empty => something: maybe add a timeline
                 # something => another something: maybe add a timeline, maybe delete a timeline
                 # something => empty: maybe delete a timeline
-                # if text isn't changed, we ignore it
-                if text != item.old_text:
-                    if not item.old_text:
-                        # empty => something, if something is valid and new timeline, emit add signal
-                        if not re.match(item.pattern, text):
-                            MessageBox.information(self, "warning",
-                                                   "Name must start with a letter and contain only letters, numbers and _.")
+                if not item.old_text:
+                    # empty => something, if something is valid and new timeline, emit add signal
+                    if not re.match(Info.widgetPattern[0], text):
+                        MessageBox.information(self, "warning", Info.widgetPattern[1])
+                        item.redo()
+                    else:
+                        if text not in self.timelines:
+                            # if it is new timeline in this cycle, but may have existed in other cycles
+                            if Func.checkWidgetNameExisted(widget_name=text):
+                                MessageBox.information(self, "warning", "Name already exists in other cycles.")
+                                item.redo()
+                            else:
+                                # generate new timeline's widget_id
+                                widget_id = Func.generateWidgetId(Info.Timeline)
+                                self.timelineAdded.emit(widget_id, text, len(self.timelines))
+                                self.timelines[text] = [widget_id, 1]
+                                item.save()
+
+                        else:
+                            self.timelines[text][1] += 1
+                            item.save()
+                else:
+                    if text:
+                        # something => another something
+                        if not re.match(Info.widgetPattern[0], text):
+                            MessageBox.information(self, "warning", Info.widgetPattern[1])
                             item.redo()
                         else:
                             if text not in self.timelines:
-                                # if it is new timeline in this cycle, but may have existed in other cycles
+                                # new timeline in this cycle
                                 if Func.checkWidgetNameExisted(widget_name=text):
+                                    # valid
                                     MessageBox.information(self, "warning", "Name already exists in other cycles.")
                                     item.redo()
                                 else:
@@ -135,55 +155,29 @@ class CycleTable(QTableWidget):
                                     widget_id = Func.generateWidgetId(Info.Timeline)
                                     self.timelineAdded.emit(widget_id, text, len(self.timelines))
                                     self.timelines[text] = [widget_id, 1]
-                                    item.save()
-
-                            else:
-                                self.timelines[text][1] += 1
-                                item.save()
-                    else:
-                        if text:
-                            # something => another something
-                            if not re.match(item.pattern, text):
-                                MessageBox.information(self, "warning",
-                                                       "Name must start with a letter and contain only letters, numbers and _.")
-                                item.redo()
-                            else:
-                                if text not in self.timelines:
-                                    # new timeline in this cycle
-                                    if Func.checkWidgetNameExisted(widget_name=text):
-                                        # valid
-                                        MessageBox.information(self, "warning", "Name already exists in other cycles.")
-                                        item.redo()
-                                    else:
-                                        # generate new timeline's widget_id
-                                        widget_id = Func.generateWidgetId(Info.Timeline)
-                                        self.timelineAdded.emit(widget_id, text, len(self.timelines))
-                                        self.timelines[text] = [widget_id, 1]
-                                        # secondly check old text
-                                        self.timelines[item.old_text][1] -= 1
-                                        if not self.timelines[item.old_text][1]:
-                                            # if user delete all this timeline, we delete data
-                                            self.timelineDeleted.emit(self.timelines[item.old_text][0])
-                                            del self.timelines[item.old_text]
-                                        item.save()
-                                else:
-                                    # simply change data and check old text
-                                    self.timelines[text][1] += 1
+                                    # secondly check old text
                                     self.timelines[item.old_text][1] -= 1
                                     if not self.timelines[item.old_text][1]:
                                         # if user delete all this timeline, we delete data
                                         self.timelineDeleted.emit(self.timelines[item.old_text][0])
                                         del self.timelines[item.old_text]
                                     item.save()
-                        else:
-                            # something => empty
-                            self.timelines[item.old_text][1] -= 1
-                            if not self.timelines[item.old_text][1]:
-                                # if user delete all this timeline, we delete data
-                                self.timelineDeleted.emit(self.timelines[item.old_text][0])
-                                del self.timelines[item.old_text]
-                            item.save()
+                            else:
+                                # simply change data and check old text
+                                self.timelines[text][1] += 1
+                                self.timelines[item.old_text][1] -= 1
+                                if not self.timelines[item.old_text][1]:
+                                    # if user delete all this timeline, we delete data
+                                    self.timelineDeleted.emit(self.timelines[item.old_text][0])
+                                    del self.timelines[item.old_text]
+                                item.save()
+                    else:
+                        # something => empty
+                        self.timelines[item.old_text][1] -= 1
+                        if not self.timelines[item.old_text][1]:
+                            # if user delete all this timeline, we delete data
+                            self.timelineDeleted.emit(self.timelines[item.old_text][0])
+                            del self.timelines[item.old_text]
+                        item.save()
             elif type(item) == AttributeItem:
                 print("Attribute item changed")
-        else:
-            item.new = False

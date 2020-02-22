@@ -34,6 +34,11 @@ class Info(object):
     StructureSignal = 1
     CycleSignal = 2
 
+    # name pattern
+    widgetPattern = [r"^[a-zA-Z][a-zA-Z0-9_]*$",
+                     "Name must start with a letter and contain only letters, numbers and _."]
+    weightPattern = ""
+
     # device type
     INPUT_DEVICE = 0
     OUTPUT_DEVICE = 1

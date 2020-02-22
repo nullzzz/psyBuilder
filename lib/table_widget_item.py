@@ -36,3 +36,10 @@ class TableWidgetItem(QTableWidgetItem):
         """
         self.old_text = p_str
         super(TableWidgetItem, self).setText(p_str)
+
+    def changed(self):
+        """
+
+        @return:
+        """
+        return self.old_text != self.text()
