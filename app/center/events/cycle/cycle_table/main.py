@@ -26,6 +26,8 @@ class CycleTable(QTableWidget):
         # col attributes and its default value
         self.attributes = ["Weight", "Timeline"]
         self.default_value = {"Weight": "1", "Timeline": ""}
+        self.alt_key = False
+        self.drag_copy_row_col = [-2, -2]
         # timeline_name : [widget_id, count in this table]
         self.timelines = {}
         #
@@ -196,6 +198,34 @@ class CycleTable(QTableWidget):
                         item.save()
             elif type(item) == AttributeItem:
                 print("Attribute item changed")
+
+    def mouseMoveEvent(self, e):
+        """
+        when dragging the mouse while holding down alt/option
+        @param e:
+        @return:
+        """
+        super(CycleTable, self).mouseMoveEvent(e)
+        # 如果是已经按住alt，并刚刚开始滑动
+        if e.modifiers() == Qt.AltModifier:
+            if not self.alt_key:
+                row = self.rowAt(e.pos().y())
+                col = self.columnAt(e.pos().x())
+                if row != -1 and col != -1:
+                    self.drag_copy_row_col = [row, col]
+                    self.alt_key = True
+                    self.setCursor(Qt.CrossCursor)
+
+    def mouseReleaseEvent(self, e):
+        """
+
+        @param e:
+        @return:
+        """
+        if self.alt_key:
+            print(self.drag_copy_row_col)
+            self.alt_key = False
+            self.unsetCursor()
 
     def copyActionFunc(self):
         """
