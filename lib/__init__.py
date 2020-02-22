@@ -1,4 +1,5 @@
 # import all modules
+from .color_list_editor import ColorListEditor
 from .dialog import Dialog
 from .dock_widget import DockWidget
 from .message_box import MessageBox
@@ -7,4 +8,6 @@ from .tab_item_widget import TabItemWidget
 from .tab_widget import TabWidget
 from .table_widget import TableWidget
 from .table_widget_item import TableWidgetItem
+from .var_combo_box import VarComboBox
+from .var_line_edit import VarLineEdit
 from .wait_dialog import WaitDialog
