@@ -1,7 +1,8 @@
 import re
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QTableWidget
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QTableWidget, QShortcut
 
 from app.func import Func
 from app.info import Info
@@ -32,6 +33,8 @@ class CycleTable(QTableWidget):
         self.setHorizontalHeaderLabels(self.attributes)
         # link signals
         self.linkSignals()
+        # set menu and shortcut
+        self.setMenuAndShortcut()
 
     def linkSignals(self):
         """
@@ -39,6 +42,18 @@ class CycleTable(QTableWidget):
         @return:
         """
         self.itemChanged.connect(self.dealItemChanged)
+
+    def setMenuAndShortcut(self):
+        """
+        set menu and shortcut
+        @return:
+        """
+        self.copy_shortcut = QShortcut(QKeySequence(QKeySequence.Copy), self)
+        self.copy_shortcut.setContext(Qt.WidgetWithChildrenShortcut)
+        self.copy_shortcut.activated.connect(self.copyActionFunc)
+        self.paste_shortcut = QShortcut(QKeySequence(QKeySequence.Paste), self)
+        self.paste_shortcut.setContext(Qt.WidgetWithChildrenShortcut)
+        self.paste_shortcut.activated.connect(self.pasteActionFunc)
 
     def addRow(self, index: int = -1):
         """
@@ -181,3 +196,17 @@ class CycleTable(QTableWidget):
                         item.save()
             elif type(item) == AttributeItem:
                 print("Attribute item changed")
+
+    def copyActionFunc(self):
+        """
+        copy data to table
+        @return:
+        """
+        print("copy")
+
+    def pasteActionFunc(self):
+        """
+        paste data to table
+        @return:
+        """
+        print("paste")
