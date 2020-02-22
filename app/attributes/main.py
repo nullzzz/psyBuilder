@@ -27,7 +27,7 @@ class Attributes(DockWidget):
             self.clearAttributes()
             # add
             self.current_widget_id = widget_id
-            attributes: dict = Func.getWidgetAttributes(widget_id)
+            attributes: list = Func.getWidgetAttributes(widget_id)
             for attribute in attributes:
                 self.attributes_table.addAttribute(attribute)
 

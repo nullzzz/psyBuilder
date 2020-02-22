@@ -260,7 +260,6 @@ class Psy(QMainWindow):
         @param add_type:
         @return:
         """
-        print("item added:", parent_widget_id, widget_id, widget_name, index)
         # start wait
         self.startWait()
         # do job
@@ -293,7 +292,6 @@ class Psy(QMainWindow):
         @param index:
         @return:
         """
-        print("item copied: ", parent_widget_id, origin_widget_id, new_widget_id, new_widget_name, index)
         # start wait
         self.startWait()
         # do job
@@ -324,7 +322,6 @@ class Psy(QMainWindow):
         @param index:
         @return:
         """
-        print("item referenced: ", origin_widget_id, new_widget_id)
         # start wait
         self.startWait()
         # do job
@@ -353,7 +350,6 @@ class Psy(QMainWindow):
         @param widget_id:
         @return:
         """
-        print("item deleted:", origin_widget, widget_id)
         # close tab
         self.center.closeTab(widget_id)
         # delete node in structure (we need delete data in Kernel.Nodes and Kernel.Names) and item in timeline or timeline in cycle
@@ -409,7 +405,6 @@ class Psy(QMainWindow):
         @param widget_name: new name
         @return:
         """
-        print("item name change:", origin_widget, parent_widget_id, widget_id, widget_name)
         # change widget's name
         widget = Kernel.Widgets[widget_id]
         old_widget_name = Func.getWidgetName(widget_id)
@@ -474,7 +469,6 @@ class Psy(QMainWindow):
         @param new_index:
         @return:
         """
-        print("item move:", origin_parent, dest_parent, widget_id, origin_index, new_index)
         widget_name = Func.getWidgetName(widget_id)
         if origin_parent == dest_parent:
             # move in its parent
@@ -535,7 +529,6 @@ class Psy(QMainWindow):
         @param widget_id:
         @return:
         """
-        print("item click:", widget_id)
         # change attributes and properties
         self.attributes.showAttributes(widget_id)
         self.properties.showProperties(widget_id)
@@ -546,7 +539,6 @@ class Psy(QMainWindow):
         @param widget_id:
         @return:
         """
-        print("item double click:", widget_id)
         # open tab
         self.center.openTab(widget_id)
 
@@ -556,7 +548,6 @@ class Psy(QMainWindow):
         @param widget_id:
         @return:
         """
-        print("current tab change:", widget_id)
         if widget_id == -1:
             # it means that user close all tab and we should clear attributes and properties
             # change attributes and properties

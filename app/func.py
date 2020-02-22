@@ -104,31 +104,22 @@ class Func(object):
         return pix
 
     @staticmethod
-    def getWidgetAttributes(widget_id: int) -> dict:
+    def getWidgetAttributes(widget_id: int) -> list:
         """
         get widget's attributes and attributes' layer
         @param widget_id:
         @return: {attribute: layer}
         """
         # global attributes
-        attributes = {"subName": 0, "subNum": 0, "sessionNum": 0, "subSex": 0, "subHandness": 0, "subAge": 0}
-        return attributes
-        # todo attributes about quest, I don't know what they are.
-        pass
-
-        # get widget's hidden attributes
-        hidden_attributes = Kernel.Widgets[widget_id].getHiddenAttributes()
-
+        attributes = ["subName", "subNum", "sessionNum", "subSex", "subHandness", "subAge"]
+        # attributes about quest
+        for key, value in Kernel.QuestInfo.items():
+            attributes.append(f"{value.get('Quest Name')}.cValue")
         # get widget's attributes: 1. the attributes of the items in front of it in timeline (exclude cycle).
         #                          2. parents' attributes. (only cycle)
         #                          3. first parent cycle's hidden attribute
         # get level of this widget, namely depth. It can be simplified by using DFS.
         node = Kernel.Nodes[widget_id]
-        depth = -1
-        temp_node = node
-        while temp_node:
-            depth += 1
-            temp_node = temp_node.parent()
         # do 1.
         parent = node.parent()
         if parent and Func.isWidgetType(parent.widget_id, Info.Timeline):
@@ -140,9 +131,10 @@ class Func(object):
                 # ignore cycle before item
                 if not Func.isWidgetType(child_node.widget_id, Info.Cycle):
                     for attribute in Kernel.Widgets[child_node.widget_id].getHiddenAttribute():
-                        attributes[f"{child_node.text(0)}.{attribute}"] = depth
+                        attributes.append(f"{child_node.text(0)}.{attribute}")
         # do 2. 3.
         first = True
+        node = node.parent()
         while node:
             # we just need cycle
             if Func.isWidgetType(node.widget_id, Info.Cycle):
@@ -150,14 +142,13 @@ class Func(object):
                 cycle_name = node.text(0)
                 col_attributes = cycle.getColumnAttributes()
                 for attribute in col_attributes:
-                    attributes[f"{cycle_name}.attr.{attribute}"] = depth
+                    attributes.append(f"{cycle_name}.attr.{attribute}")
                 # we need first cycle's hidden attribute
                 if first:
-                    first_cycle_hidden_attributes = Kernel.Widgets[node.widget_id].getHiddenAttribute()
+                    first_cycle_hidden_attributes = Kernel.Widgets[node.widget_id].getHiddenAttributes()
                     for attribute in first_cycle_hidden_attributes:
-                        attributes[f"{cycle_name}.{attribute}"] = depth
+                        attributes.append(f"{cycle_name}.{attribute}")
                     first = False
-            depth -= 1
             node = node.parent()
         # return
         return attributes

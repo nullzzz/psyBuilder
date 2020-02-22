@@ -54,6 +54,15 @@ class TabItemMainWindow(QMainWindow):
     about widget
     """
 
+    def changeWidgetId(self, widget_id: int):
+        """
+        change this widget's widget id, because referable widget may be deleted and we
+        need to change widget id.
+        @param widget_id:
+        @return:
+        """
+        self.widget_id = widget_id
+
     def store(self):
         """
         You should finish the job.
@@ -81,15 +90,6 @@ class TabItemMainWindow(QMainWindow):
         @return:
         """
         return None
-
-    def changeWidgetId(self, widget_id: int):
-        """
-        change this widget's widget id, because referable widget may be deleted and we
-        need to change widget id.
-        @param widget_id:
-        @return:
-        """
-        self.widget_id = widget_id
 
     """
     other function may be needed to all, but I forget those.

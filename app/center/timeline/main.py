@@ -136,3 +136,21 @@ class Timeline(TabItemWidget):
         @return:
         """
         return self.timeline_area.itemWidgetId(widget_name)
+
+    def store(self):
+        """
+        todo You should finish the job.
+
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return {}
+
+    def restore(self, data) -> None:
+        """
+        todo You should finish the job.
+
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """

@@ -17,7 +17,7 @@ class PropertiesTable(TableWidget):
         self.horizontalHeader().setStretchLastSection(True)
         self.setShowGrid(False)
         # set two columns
-        self.setColumnCount(1)
+        self.setColumnCount(2)
 
     def addProperty(self, property_name: str, property_value: str):
         """
@@ -37,3 +37,11 @@ class PropertiesTable(TableWidget):
         value_item.setFlags(Qt.ItemIsEnabled)
         value_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.setItem(self.rowCount() - 1, 1, value_item)
+
+    def resizeEvent(self, QResizeEvent):
+        """
+        resize width of col
+        @param QResizeEvent:
+        @return:
+        """
+        self.setColumnWidth(0, self.width() / 2)
