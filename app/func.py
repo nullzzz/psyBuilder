@@ -3,6 +3,7 @@ import re
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QIcon, QColor, QPainter
+from PyQt5.QtWidgets import QDesktopWidget
 
 from .info import Info
 from .kernel import Kernel
@@ -264,5 +265,235 @@ class Func(object):
         return children
 
     @staticmethod
-    def getWidgetIndex(widget_id: int):
-        """"""
+    def getWidgetIndex(widget_id: int) -> int:
+        """
+        get widget's index in timeline
+        @param widget_id:
+        @return:
+        """
+        if Func.isWidgetType(widget_id, Info.Timeline):
+            return -1
+        node = Kernel.Nodes[widget_id]
+        if node.parent():
+            return node.parent().indexOfChild(node)
+        else:
+            return -1
+
+    @staticmethod
+    def getWidgetLevel(widget_id: int) -> int:
+        """
+        get the depth from this widget id to the root node(initial timeline)
+        @param widget_id:
+        @return:
+        """
+        depth = 0
+        node = Kernel.Nodes[widget_id].parent()
+        while node:
+            node = node.parent()
+            depth += 1
+        return depth
+
+    @staticmethod
+    def getWidgetHeight(widget_id: int) -> int:
+        """
+        get the height of the tree with this widget id as the root node
+        @param widget_id:
+        @return:
+        """
+        node = Kernel.Nodes[widget_id]
+        max_height = 0
+        for i in range(node.childCount()):
+            child = node.child(i)
+            height = Func.getWidgetHeight(child.widget_id)
+            if height > max_height:
+                max_height = height
+        return max_height + 1
+
+    @staticmethod
+    def getNextWidget(widget_id: int) -> int:
+        """
+        get its next widget's widget id in timeline
+        @param widget_id:
+        @return:
+        """
+        index = Func.getWidgetIndex(widget_id)
+        if index != -1:
+            try:
+                node = Kernel.Nodes[widget_id]
+                return node.parent().child(index + 1).widget_id
+            except:
+                return -1
+        else:
+            return -1
+
+    @staticmethod
+    def getPreviousWidget(widget_id: int) -> int:
+        """
+        get its previous widget's widget id in timeline
+        @param widget_id:
+        @return:
+        """
+        index = Func.getWidgetIndex(widget_id)
+        if index != -1 and index != 0:
+            try:
+                node = Kernel.Nodes[widget_id]
+                return node.parent().child(index - 1).widget_id
+            except:
+                return -1
+        else:
+            return -1
+
+    @staticmethod
+    def isCitingValue(value: str) -> bool:
+        # print(f"line 616: {value}")
+        if re.fullmatch(r"\[[A-Za-z]+[a-zA-Z\._0-9]*\]", value):
+            return True
+        return False
+
+    @staticmethod
+    def getCurrentScreenRes(screen_id: str) -> tuple:
+        resolution = Info.OUTPUT_DEVICE_INFO[screen_id].get('Resolution', "auto")
+        # print(f"------------/")
+        # print(f"{screen_id}")
+
+        wh = resolution.lower().split('x')
+
+        if len(wh) > 1:
+            width = int(wh[0])
+            height = int(wh[1])
+            # print(f"{width},{height}")
+        else:
+            scr_rect = QDesktopWidget().screenGeometry()
+            width = scr_rect.width()
+            height = scr_rect.height()
+        #     print(f"{scr_rect}")
+        # print(f"------------\\")
+        return width, height
+
+    @staticmethod
+    def isRGBStr(RGBStr: str):
+        if re.fullmatch("^\d+,\d+,\d+$", RGBStr):
+            output = RGBStr.split(',')
+            return output
+
+        return False
+
+    @staticmethod
+    def createDeviceId(device_type: str):
+        current_id = Info.device_count[device_type]
+        Info.device_count[device_type] = current_id + 1
+        return f"{device_type}.{current_id}"
+
+    @staticmethod
+    def getScreen() -> list:
+        screens = []
+        for k, v in Info.OUTPUT_DEVICE_INFO.items():
+            if k.startswith("screen"):
+                screens.append(v["Device Name"])
+        return screens
+
+    @staticmethod
+    def getScreenInfo() -> dict:
+        info: dict = {}
+        for k, v in Info.OUTPUT_DEVICE_INFO.items():
+            if k.startswith("screen"):
+                info[k] = v["Device Name"]
+        return info
+
+    @staticmethod
+    def getSoundInfo() -> dict:
+        info: dict = {}
+        for k, v in Info.OUTPUT_DEVICE_INFO.items():
+            if k.startswith("sound"):
+                info[k] = v["Device Name"]
+        return info
+
+    @staticmethod
+    def getSound() -> list:
+        sounds = []
+        for k, v in Info.OUTPUT_DEVICE_INFO.items():
+            if k.startswith("sound"):
+                sounds.append(v["Device Name"])
+        return sounds
+
+    @staticmethod
+    def getDeviceInfoByName(device_name: str) -> dict or None:
+        """
+        由设备名称获取设备信息
+        :param device_name:
+        :return: device info dict
+        """
+        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
+            if device_name == v.get("Device Name"):
+                return v
+        return
+
+    @staticmethod
+    def getDeviceNameById(device_id: str):
+        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
+            if device_id == k:
+                # print(627)
+                # print(v.get("Device Name"))
+                return v.get("Device Name")
+        return ""
+
+    @staticmethod
+    def getDeviceIdByName(device_name: str):
+        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
+            if device_name == v.get("Device Name"):
+                return k
+        return ""
+
+    @staticmethod
+    def getQuestInfo():
+        info: dict = {}
+        for k, v in Info.QUEST_INFO.items():
+            info[k] = v.get("Quest Name")
+        return info
+
+    @staticmethod
+    def getTrackerInfo():
+        info: dict = {}
+        for k, v in Info.TRACKER_INFO.items():
+            info[k] = v.get("Tracker Name")
+        return info
+
+    #########################################
+    # Variables set for compatibility       #
+    # It is best to discard it in later use #
+    #########################################
+
+    @staticmethod
+    def getWidgetPosition(widget_id: int) -> int:
+        return Func.getWidgetIndex(widget_id)
+
+    @staticmethod
+    def getNextWidgetId(widget_id: int) -> int:
+        return Func.getNextWidget(widget_id)
+
+    @staticmethod
+    def getPreviousWidgetId(widget_id: int) -> int:
+        return Func.getPreviousWidget(widget_id)
+
+    @staticmethod
+    def getWidgetIDInTimeline(timeline_widget_id: int) -> list:
+        return Func.getWidgetChildren(timeline_widget_id)
+
+    @staticmethod
+    def getParentWid(widget_id: int) -> int:
+        return Func.getWidgetParent(widget_id)
+
+    @staticmethod
+    def log(text, error=False, timer=True):
+        if error:
+            Func.print(text, 2)
+        else:
+            Func.print(text)
+
+    @staticmethod
+    def getWidLevel(widget_id: int) -> int:
+        return Func.getWidgetLevel(widget_id)
+
+    @staticmethod
+    def getWidgetsTotalLayer(widget_id: int) -> int:
+        return Func.getWidgetHeight(widget_id)

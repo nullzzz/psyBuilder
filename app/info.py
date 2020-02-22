@@ -1,6 +1,7 @@
 class Info(object):
     """
     This class is used to store all configuration of this software, without any data.
+    The variables in it will not change.
     """
 
     # image path
@@ -33,7 +34,38 @@ class Info(object):
     StructureSignal = 1
     CycleSignal = 2
 
+    # device type
+    INPUT_DEVICE = 0
+    OUTPUT_DEVICE = 1
+
+    # 限制输入的正则表达式
+    RE_NUMBER = r"\[\w+\]|\d+"
+    RE_FLOAT = r"\[\w+\]|\d+\.\d+"
+    RE_NUM_PERCENT = r"\[\w+\]|\d+%?|\d+"
+
+    # possible useful in the future
+    REF_VALUE_SEPERATOR = "@"
+
+    #
+    DEV_NETWORK_PORT = "network_port"
+    DEV_SCREEN = "screen"
+    DEV_PARALLEL_PORT = "parallel_port"
+    DEV_SERIAL_PORT = "serial_port"
+    DEV_SOUND = "sound"
+
     #########################################
     # Variables set for compatibility       #
     # It is best to discard it in later use #
     #########################################
+    PLATFORM: str = "linux"
+    IMAGE_LOAD_MODE: str = "before_event"
+    WID_WIDGET = {}
+    WID_NODE: dict = {}
+    NAME_WID: dict = {}
+    QUEST_INFO: dict = {}
+    TRACKER_INFO: dict = {}
+    INPUT_DEVICE_INFO: dict = {}
+    OUTPUT_DEVICE_INFO: dict = {}
+    device_count = None
+    SLIDER_COUNT = None
+    FILE_NAME = None
