@@ -123,8 +123,8 @@ class CycleTable(QTableWidget):
             text = item.text()
             if type(item) == WeightItem:
                 # only positive number
-                if not re.match(Info.weightPattern[0], text):
-                    MessageBox.information(self, "warning", Info.weightPattern[1])
+                if not re.match(Info.WeightPattern[0], text):
+                    MessageBox.information(self, "warning", Info.WeightPattern[1])
                     item.redo()
                 else:
                     item.save()
@@ -135,8 +135,8 @@ class CycleTable(QTableWidget):
                 # something => empty: maybe delete a timeline
                 if not item.old_text:
                     # empty => something, if something is valid and new timeline, emit add signal
-                    if not re.match(Info.widgetPattern[0], text):
-                        MessageBox.information(self, "warning", Info.widgetPattern[1])
+                    if not re.match(Info.WidgetPattern[0], text):
+                        MessageBox.information(self, "warning", Info.WidgetPattern[1])
                         item.redo()
                     else:
                         if text not in self.timelines:
@@ -157,8 +157,8 @@ class CycleTable(QTableWidget):
                 else:
                     if text:
                         # something => another something
-                        if not re.match(Info.widgetPattern[0], text):
-                            MessageBox.information(self, "warning", Info.widgetPattern[1])
+                        if not re.match(Info.WidgetPattern[0], text):
+                            MessageBox.information(self, "warning", Info.WidgetPattern[1])
                             item.redo()
                         else:
                             if text not in self.timelines:

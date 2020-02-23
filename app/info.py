@@ -35,9 +35,9 @@ class Info(object):
     CycleSignal = 2
 
     # name pattern
-    widgetPattern = [r"^[a-zA-Z][a-zA-Z0-9_]*$",
+    WidgetPattern = [r"^[a-zA-Z][a-zA-Z0-9_]*$",
                      "Name must start with a letter and contain only letters, numbers and _."]
-    weightPattern = ""
+    WeightPattern = [r"^\+?[1-9][0-9]*$", "Only positive number is enabled."]
 
     # device type
     INPUT_DEVICE = 0
