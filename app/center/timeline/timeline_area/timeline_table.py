@@ -356,7 +356,7 @@ class TimelineTable(TableWidget):
             # if text isn't changed, we ignore it
             if item.changed():
                 # check its validity
-                if re.match(Info.widgetPattern[0], item.text()):
+                if re.match(Info.WidgetPattern[0], item.text()):
                     if Func.checkWidgetNameExisted(item.text()):
                         MessageBox.information(self, "warning", "Name existed.")
                         item.redo()
@@ -364,5 +364,5 @@ class TimelineTable(TableWidget):
                         self.itemNameChanged.emit(item.widget_id, item.text())
                         item.save()
                 else:
-                    MessageBox.information(self, "warning", Info.widgetPattern[1])
+                    MessageBox.information(self, "warning", Info.WidgetPattern[1])
                     item.redo()
