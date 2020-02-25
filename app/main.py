@@ -28,7 +28,6 @@ class Psy(QMainWindow):
         self.setWindowTitle("Psy Builder")
         # set its wait thread
         self.wait_dialog = WaitDialog()
-
         # init dock widget
         self.initDockWidget()
         #
@@ -76,13 +75,16 @@ class Psy(QMainWindow):
         # output
         self.output = Output()
         self.output.setWindowTitle("Output")
+        # link dock widgets' signals
+        self.center.currentWidgetChanged.connect(self.dealCurrentTabChanged)
+        self.structure.itemDoubleClicked.connect(self.dealItemDoubleClicked)
+        self.structure.itemDeleted.connect(self.dealItemDeleted)
+        self.structure.itemNameChanged.connect(self.dealItemNameChanged)
         # its initial layout
         self.addDockWidget(Qt.LeftDockWidgetArea, self.structure)
-
         self.splitDockWidget(self.structure, self.properties, Qt.Vertical)
         self.splitDockWidget(self.properties, self.output, Qt.Horizontal)
         self.splitDockWidget(self.output, self.attributes, Qt.Horizontal)
-
         self.addDockWidget(Qt.RightDockWidgetArea, self.attributes)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.output)
 
@@ -106,10 +108,6 @@ class Psy(QMainWindow):
         @return:
         """
         # todo link dock widgets' signals
-        self.center.currentWidgetChanged.connect(self.dealCurrentTabChanged)
-        self.structure.itemDoubleClicked.connect(self.dealItemDoubleClicked)
-        self.structure.itemDeleted.connect(self.dealItemDeleted)
-        self.structure.itemNameChanged.connect(self.dealItemNameChanged)
 
     def createWidget(self, widget_id: int, widget_name: str) -> None:
         """
