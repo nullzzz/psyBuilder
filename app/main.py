@@ -30,8 +30,6 @@ class Psy(QMainWindow):
         self.wait_dialog = WaitDialog()
         # init dock widget
         self.initDockWidget()
-        #
-        self.linkSignals()
 
     def initMenuBar(self) -> None:
         """
@@ -101,13 +99,6 @@ class Psy(QMainWindow):
         self.structure.addNode(-1, widget_id, widget_name, 0)
         # set timeline as a tab
         self.center.openTab(widget_id)
-
-    def linkSignals(self):
-        """
-        link signals between dock widgets
-        @return:
-        """
-        # todo link dock widgets' signals
 
     def createWidget(self, widget_id: int, widget_name: str) -> None:
         """
@@ -204,14 +195,6 @@ class Psy(QMainWindow):
         """
         self.wait_dialog.close()
         QApplication.processEvents()
-
-    def dealPropertiesChanged(self, widget_id: int):
-        """
-        when properties changed, refresh properties window.
-        @param widget_id:
-        @return:
-        """
-        self.properties.showProperties(widget_id)
 
     def newActionFunc(self):
         """
@@ -555,3 +538,11 @@ class Psy(QMainWindow):
             # change attributes and properties
             self.attributes.showAttributes(widget_id)
             self.properties.showProperties(widget_id)
+
+    def dealPropertiesChanged(self, widget_id: int):
+        """
+        when properties changed, refresh properties window.
+        @param widget_id:
+        @return:
+        """
+        self.properties.showProperties(widget_id)
