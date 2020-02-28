@@ -1,290 +1,134 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QInputDialog
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QAction
 
 from app.func import Func
+from app.info import Info
 from lib import TabItemMainWindow
-from .add_attribute import AddAttributeDialog
-from .add_attributes import AddAttributesDialog
-from .change_attribute import ChangeAttributeDialog
-from .properties.main import Properties
-from .timeline_table.main import TimelineTable
+from .cycle_table import CycleTable
+from .properties import Properties
 
 
 class Cycle(TabItemMainWindow):
-    def __init__(self, widget_id: str, widget_name: str):
+    """
+
+    """
+
+    # when add new timeline, emit signal(parent_widget_id, widget_id, widget_name, index)
+    itemAdded = pyqtSignal(int, int, str, int)
+    # when delete signals, emit signal(origin_widget, widget_id)
+    itemDeleted = pyqtSignal(int, int)
+
+    def __init__(self, widget_id: int, widget_name: str):
         super(Cycle, self).__init__(widget_id, widget_name)
-        # widget
-        self.timeline_table = TimelineTable(widget_id=self.widget_id)
+        self.cycle_table = CycleTable()
         self.properties = Properties()
-        self.setCentralWidget(self.timeline_table)
-        # menu and shortcut
-        self.setMenuAndShortcut()
-        # toolbar
-        self.setToolbar()
-        # signals
+        self.setCentralWidget(self.cycle_table)
+        # set tool bar
+        self.setToolBar()
+        # init one row
+        self.cycle_table.addRow(0)
+        # link signals
         self.linkSignals()
 
     def linkSignals(self):
-        self.properties.propertiesChange.connect(lambda: self.propertiesChange.emit(self.widget_id))
-        self.timeline_table.horizontalHeader().sectionDoubleClicked.connect(self.changeAttribute)
-
-    def setMenuAndShortcut(self):
         """
-        设置菜单和快捷键
-        :return:
+
+        @return:
         """
-        pass
+        self.cycle_table.timelineAdded.connect(
+            lambda widget_id, widget_name, index: self.itemAdded.emit(self.widget_id, widget_id, widget_name, index))
+        self.cycle_table.timelineDeleted.connect(lambda widget_id: self.itemDeleted.emit(Info.CycleSignal, widget_id))
+        self.properties.propertiesChanged.connect(lambda: self.propertiesChanged.emit(self.widget_id))
 
-    def setToolbar(self):
-        setting = QAction(QIcon(Func.getImage("setting.png")), "Setting", self)
-        add_row = QAction(QIcon(Func.getImage("add_row.png")), "Add Row", self)
-        add_rows = QAction(QIcon(Func.getImage("add_rows.png")), "Add Rows", self)
-        delete_rows = QAction(QIcon(Func.getImage("delete_rows.png")), "Delete Rows", self)
-        add_column = QAction(QIcon(Func.getImage("add_column.png")), "Add Column", self)
-        add_columns = QAction(QIcon(Func.getImage("add_columns.png")), "Add Columns", self)
-        delete_columns = QAction(QIcon(Func.getImage("delete_columns.png")), "Delete Columns", self)
+    def setToolBar(self):
+        """
 
-        setting.triggered.connect(self.set)
-        add_row.triggered.connect(self.addRow)
-        add_rows.triggered.connect(self.addRows)
-        delete_rows.triggered.connect(self.deleteRows)
-        add_column.triggered.connect(self.addAttribute)
-        add_columns.triggered.connect(self.addAttributes)
-        delete_columns.triggered.connect(self.deleteAttributes)
+        @return:
+        """
+        self.tool_bar = self.addToolBar("Tool Bar")
+        self.tool_bar.setMovable(False)
+        self.tool_bar.setFloatable(False)
+        # add action
+        self.tool_bar.addAction(Func.getImage("tool_bar/setting.png", 1), "Setting", self.properties.exec)
+        self.tool_bar.addAction(Func.getImage("tool_bar/add_row.png", 1), "Add Row", self.addRow)
+        add_rows_action = QAction(Func.getImage("tool_bar/add_rows.png", 1), "Add Rows", self)
+        delete_row_action = QAction(Func.getImage("tool_bar/delete_row.png", 1), "Delete Row", self)
+        add_column_action = QAction(Func.getImage("tool_bar/add_column.png", 1), "Add Row", self)
+        add_columns_action = QAction(Func.getImage("tool_bar/add_columns.png", 1), "Add Rows", self)
+        delete_column_action = QAction(Func.getImage("tool_bar/delete_column.png", 1), "Delete Row", self)
+        self.tool_bar.addAction(add_rows_action)
+        self.tool_bar.addAction(delete_row_action)
+        self.tool_bar.addAction(add_column_action)
+        self.tool_bar.addAction(add_columns_action)
+        self.tool_bar.addAction(delete_column_action)
 
-        self.toolbar = self.addToolBar('toolbar')
-        self.toolbar.setMovable(False)
-        self.toolbar.setFloatable(False)
-        self.toolbar.addAction(setting)
-        self.toolbar.addAction(add_row)
-        self.toolbar.addAction(add_rows)
-        self.toolbar.addAction(delete_rows)
-        self.toolbar.addAction(add_column)
-        self.toolbar.addAction(add_columns)
-        self.toolbar.addAction(delete_columns)
+    def getColumnAttributes(self) -> list:
+        """
+        return [attr1, attr2]
+        @return:
+        """
+        # todo get column attributes
+        return []
 
-    def set(self):
-        self.properties.exec()
+    def deleteTimeline(self, timeline: str):
+        """
+
+        @param timeline:
+        @return:
+        """
+        self.cycle_table.deleteTimeline(timeline)
 
     def addRow(self):
-        self.timeline_table.addRow()
+        """
 
-    def addRows(self):
-        try:
-            add_rows_dialog = QInputDialog()
-            add_rows_dialog.setModal(True)
-            add_rows_dialog.setWindowFlag(Qt.WindowCloseButtonHint)
+        @return:
+        """
+        self.cycle_table.addRow()
 
-            rows, flag = add_rows_dialog.getInt(self, "Add Rows", "Input rows you want to add.", 1, 1, 100, 1)
-            if flag:
-                while rows:
-                    self.timeline_table.addRow()
-                    rows -= 1
-        except Exception as e:
-            print(f"error {e} happens in add rows. [cycle/main.py]")
+    """
+    functions that must be override
+    """
 
-    def deleteRows(self):
-        try:
-            delete_rows = []
-            for i in range(len(self.timeline_table.selectedRanges()) - 1, -1, -1):
-                selected_range = self.timeline_table.selectedRanges()[i]
-                delete_rows.append([selected_range.bottomRow(), selected_range.topRow() - 1])
-            # merge rows
-            rows = [0 for i in range(self.timeline_table.rowCount())]
-            for delete_row_range in delete_rows:
-                for row in range(delete_row_range[0], delete_row_range[1], -1):
-                    rows[row] = 1
-            # delete rows
-            for i in range(len(rows) - 1, -1, -1):
-                if rows[i]:
-                    self.timeline_table.deleteRow(i)
-        except Exception as e:
-            print(f"error {e} happens in delete rows. [cycle/main.py]")
-
-    def addAttribute(self):
-        try:
-            dialog = AddAttributeDialog(attributes_exist=Func.getAttributes(self.widget_id))
-            dialog.attributeData.connect(self.timeline_table.addAttribute)
-            dialog.exec()
-        except Exception as e:
-            print(f"error {e} happens in add attribute. [cycle/main.py]")
-
-    def changeAttribute(self, col):
-        try:
-            attribute = self.timeline_table.col_attribute[col]
-            value = self.timeline_table.attribute_value[attribute]
-            dialog = ChangeAttributeDialog(col=col, attribute=attribute, value=value)
-            dialog.attributeData.connect(self.timeline_table.changeAttribute)
-            dialog.exec()
-        except Exception as e:
-            print(f"error {e} happens in change attribute. [cycle/main.py]")
-
-    def addAttributes(self):
-        try:
-            dialog = AddAttributesDialog(attributes_exist=Func.getAttributes(self.widget_id))
-            dialog.attributeData.connect(self.timeline_table.addAttributes)
-            dialog.exec()
-        except Exception as e:
-            print(f"error {e} happens in add attributes. [cycle/main.py]")
-
-    def deleteAttributes(self):
-        try:
-            delete_cols = []
-            for i in range(len(self.timeline_table.selectedRanges()) - 1, -1, -1):
-                selected_range = self.timeline_table.selectedRanges()[i]
-                delete_cols.append([selected_range.rightColumn(), selected_range.leftColumn() - 1])
-            # merge cols
-            cols = [0 for i in range(self.timeline_table.columnCount())]
-            for delete_col_range in delete_cols:
-                for col in range(delete_col_range[0], delete_col_range[1], -1):
-                    cols[col] = 1
-            # delete cols
-            for i in range(len(cols) - 1, -1, -1):
-                if cols[i]:
-                    self.timeline_table.deleteAttribute(i)
-        except Exception as e:
-            print(f"error {e} happens in delete attributes. [cycle/main.py]")
-
-    def deleteTimeline(self, timeline_name):
-        try:
-            row = 0
-            while row < self.timeline_table.rowCount():
-                if self.timeline_table.item(row, 1).text() == timeline_name:
-                    self.timeline_table.removeRow(row)
-                else:
-                    row += 1
-            del self.timeline_table.name_wid[timeline_name]
-            del self.timeline_table.name_count[timeline_name]
-        except Exception as e:
-            print(f"error {e} happens in delete timelines in cycle. [cycle/main.py]")
-
-    def renameTimeline(self, old_name, new_name):
-        try:
-            # rename
-            for row in range(self.timeline_table.rowCount()):
-                if self.timeline_table.item(row, 1).text() == old_name:
-                    self.timeline_table.item(row, 1).setText(new_name)
-            # data
-            self.timeline_table.name_wid[new_name] = self.timeline_table.name_wid[old_name]
-            self.timeline_table.name_count[new_name] = self.timeline_table.name_count[old_name]
-            del self.timeline_table.name_wid[old_name]
-            del self.timeline_table.name_count[old_name]
-        except Exception as e:
-            print(f"error {e} happens in rename timelines in cycle. [cycle/main.py]")
-
-    def getProperties(self):
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
         return self.properties.getProperties()
 
-    def setProperties(self, properties):
-        self.properties.setProperties(properties)
+    def getHiddenAttributes(self) -> list:
+        """
+        every widget has global attributes and own attributes,
+        we get global attributes through common function Func.getAttributes(widget_id) and
+        we get widget's own attributes through this function.
+        @return: dict of attributes
+        """
+        return ["cLoop", "rowNums"]
 
-    def changeWidgetId(self, widget_id):
-        self.widget_id = widget_id
-        self.timeline_table.widget_id = widget_id
+    def store(self):
+        """
+        todo You should finish the job.
 
-    def getInfo(self):
-        try:
-            info = {}
-            info['timeline_table'] = self.timeline_table.getInfo()
-            info['properties'] = self.getProperties()
-            return info
-        except Exception as e:
-            print(f"error {e} happens in get info. [cycle/main.py]")
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return {}
 
-    def restore(self, info: dict):
+    def restore(self, data) -> None:
         """
-        读取配置，恢复widget
-        :param info:
-        :return:
-        """
-        try:
-            self.setProperties(info['properties'])
-            self.timeline_table.restore(info['timeline_table'])
-        except Exception as e:
-            print(f"error {e} happens in restore. [cycle/main.py]")
+        todo You should finish the job.
 
-    def clone(self, copy_wid: str):
-        clone_cycle = Cycle(widget_id=copy_wid)
-        # timeline table
-        self.timeline_table.clone(clone_cycle.timeline_table)
-        # properties
-        clone_cycle.setProperties(self.getProperties())
-        return clone_cycle
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
 
-    def rowCount(self) -> int:
+    def copy(self, widget_id: int, widget_name: str):
         """
-        返回table共有多少行
-        :return:
-        """
-        return self.timeline_table.rowCount()
+        todo You should finish the job.
 
-    def columnCount(self) -> int:
+        return a copy of this widget, and set the widget id and name of the copy.
+        @param widget_id:
+        @return:
         """
-        返回table共有多少列
-        :return:
-        """
-        return self.timeline_table.columnCount()
-
-    def getHiddenAttribute(self):
-        hidden_attr = {
-            "cLoop": 0,
-            "rowNums": self.timeline_table.rowCount()
-        }
-        return hidden_attr
-
-    def getTimelines(self) -> list:
-        """
-        按顺序进行返回所有设置的timeline
-        格式为 [ [timeline_name, timeline_widget_id], [], ... ]
-        如果某行为空则改行对应的数据为[ '', '']
-        :return:
-        """
-        return self.timeline_table.getTimelines()
-
-    def getAttributes(self, row: int) -> dict:
-        """
-        按行索引返回该行的数据的一个字典
-        格式为{ attribute_name : attribute_value }
-        如果属性值未填写则为 ''
-        :param row: 行索引
-        :return:
-        """
-        return self.timeline_table.getAttributes(row)
-
-    def getAttributeValues(self, col: int) -> list:
-        """
-        通过输入的列索引，返回该列对应的attribute的所有value的一个列表
-        :param col: 列缩影s
-        :return: value的list
-        """
-        # col有效
-        if col < 0 or col >= self.timeline_table.columnCount():
-            raise Exception("invalid col index.")
-        #
-        values = []
-        # 遍历每行，将值取出
-        for row in range(self.timeline_table.rowCount()):
-            values.append(self.timeline_table.item(row, col).text())
-        return values
-
-    def getOrder(self) -> str:
-        """
-        得到设置界面中order的值
-        :return:
-        """
-        return self.getProperties()["order_combo"]
-
-    def getNoRepeatAfter(self) -> str:
-        """
-        如上类推
-        :return:
-        """
-        return self.getProperties()["no_repeat_after"]
-
-    def getOrderBy(self):
-        """
-        如上类推
-        :return:
-        """
-        return self.getProperties()["order_by_combo"]
+        return None

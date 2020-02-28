@@ -5,8 +5,7 @@ from PyQt5.QtWidgets import QApplication
 
 from app import Psy
 from app.kernel import Kernel
-from qss import mac_qss
-from qss import windows_qss
+from qss import mac_qss, windows_qss
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

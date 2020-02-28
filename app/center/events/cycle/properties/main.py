@@ -6,30 +6,29 @@ from .selection import Selection
 
 class Properties(QDialog):
     # 发送到cycle，告知发生properties变化 (null -> cycle)
-    propertiesChange = pyqtSignal()
+    propertiesChanged = pyqtSignal()
 
     def __init__(self, parent=None):
         super(Properties, self).__init__(parent)
+        # title
+        self.setWindowTitle("properties")
         # data
         self.properties = {"order_combo": 0, "no_repeat_after": 0, "order_by_combo": 0}
-        # widget
+        # tabs
         self.tab = QTabWidget(self)
         self.selection = Selection()
         self.tab.addTab(self.selection, 'Selection')
         self.setButtons()
-        # 美化
-        self.setWindowTitle("properties")
-        self.resize(600, 420)
         # layout
         layout = QVBoxLayout()
         layout.addWidget(self.tab, 7)
         layout.addWidget(self.btns, 1)
         layout.setSpacing(0)
         self.setLayout(layout)
+        self.resize(600, 420)
 
     def setButtons(self):
         self.btns = QWidget(self)
-
         self.ok_btn = QPushButton("OK")
         self.cancel_btn = QPushButton("Cancel")
         self.apply_btn = QPushButton("Apply")
@@ -53,7 +52,7 @@ class Properties(QDialog):
         self.properties['order_combo'] = self.selection.order_combo.currentIndex()
         self.properties['no_repeat_after'] = self.selection.no_repeat_after.currentIndex()
         self.properties['order_by_combo'] = self.selection.order_by_combo.currentIndex()
-        self.propertiesChange.emit()
+        self.propertiesChanged.emit()
 
     def cancel(self):
         self.selection.order_combo.setCurrentIndex(self.properties['order_combo'])
