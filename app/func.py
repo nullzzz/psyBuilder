@@ -1,5 +1,4 @@
 import os
-import os
 import re
 
 from PyQt5.QtCore import Qt, QSize
@@ -588,6 +587,7 @@ class Func(object):
     ###############################
     #         new version         #
     ###############################
+
     @staticmethod
     def getWidget(widget_id: str):
         """

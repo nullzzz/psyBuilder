@@ -1,1 +1,1 @@
-from .imageDisplay import ImageProperty
+from .imageDisplay import ImageDisplay

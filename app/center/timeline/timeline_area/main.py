@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal, QByteArray
 from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
-from app.func_ import Func
+from app.func import Func
 from app.info import Info
 from .timeline_table import TimelineTable
 

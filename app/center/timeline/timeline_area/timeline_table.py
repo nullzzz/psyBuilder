@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, pyqtSignal, QRect
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu, QShortcut
 
-from app.func_ import Func
+from app.func import Func
 from app.info import Info
 from lib import TableWidget, MessageBox
 from .timeline_item import TimelineItem

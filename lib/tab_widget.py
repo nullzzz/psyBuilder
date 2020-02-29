@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QWidget, QShortcut
 
-from app.func_ import Func
+from app.func import Func
 
 
 class TabWidget(QTabWidget):

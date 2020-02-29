@@ -1,9 +1,9 @@
 import time
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
-from app.center.widget_tabs.events.newSlider.slider import Slider
+from app.center.events.newSlider.slider import Slider
 from app.func import Func
 from app.info import Info
 from lib import VarComboBox, VarLineEdit
@@ -84,8 +84,7 @@ class IconChoose(QWidget):
             self.pro_window = None
             return
 
-        pix_map = Func.getWidgetImage(self.event_type, "pixmap")
-        self.icon_label.setPixmap(pix_map.scaled(100, 100))
+        self.icon_label.setPixmap(Func.getImage(f"widgets/{self.event_type}", size=QSize(100, 100)))
 
         # 创建widget
         self.widget_id = Func.generateWidgetId(current_type)

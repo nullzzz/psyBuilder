@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow
 
-from app.func_ import Func
+from app.func import Func
 from app.kernel import Kernel
 from lib import TabWidget
 
@@ -25,7 +25,7 @@ class Center(QMainWindow):
         """
         link necessary signals
         """
-        self.tab_widget.currentChanged.connect(self.dealTabChange)
+        self.tab_widget.currentChanged.connect(self.handleTabChange)
 
     def openTab(self, widget_id: str):
         """
@@ -48,17 +48,16 @@ class Center(QMainWindow):
         widget = Kernel.Widgets[widget_id]
         self.tab_widget.closeTab(widget)
 
-    def changeTabName(self, widget_id: int, widget_name: str) -> None:
+    def changeTabName(self, widget, widget_name: str) -> None:
         """
         if widget's was changed, its tab name should be changed as well.
         @param widget_id:
         @param widget_name: new widget's name
         @return:
         """
-        widget = Kernel.Widgets[widget_id]
         self.tab_widget.changeTabName(widget, widget_name)
 
-    def dealTabChange(self, index: int):
+    def handleTabChange(self, index: int):
         """
         when tab current tab change, we need to emit signal to refresh other docks.
         @param index:

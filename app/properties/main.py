@@ -1,4 +1,4 @@
-from app.func_ import Func
+from app.func import Func
 from app.info import Info
 from lib import DockWidget
 from .properties_table import PropertiesTable

@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 
-from app.func_ import Func
+from app.func import Func
 from lib import TableWidgetItem
 
 

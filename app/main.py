@@ -8,24 +8,28 @@ from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette, QFontMetrics
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLabel, QGridLayout, \
     QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame
 
-from app.attributes.main import Attributes
-from app.center import Center
-from app.center.events.durationPage import DurationPage
-from app.center.timeline import Timeline
-from app.deviceSelection.IODevice.globalDevices import GlobalDevice
-from app.deviceSelection.progressBar import LoadingTip
-from app.deviceSelection.quest.questinit import QuestInit
-from app.deviceSelection.tracker.trackerinit import TrackerInit
-from app.func import Func
-from app.info import Info
-from app.kernel import Kernel
-from app.output.main import Output
-from app.properties.main import Properties
-from app.registry import writeToRegistry
-from app.structure.main import Structure
 from lib import MessageBox, WaitDialog
+from .attributes import Attributes
+from .center import Center
+from .center.condition import IfBranch, Switch
+from .center.events import Cycle, ImageDisplay, Slider, SoundDisplay, TextDisplay, VideoDisplay
+from .center.events.durationPage import DurationPage
+from .center.eye_tracker import EyeAction, EyeCalibrate, EyeDC, EndR, Close, StartR, Open
+from .center.quest import QuestGetValue, QuestUpdate, QuestInit
+from .center.timeline import Timeline
 from .compile_PTB import compilePTB
-from ..deviceSelection.RX import RX
+from .deviceSelection.IODevice.globalDevices import GlobalDevice
+from .deviceSelection.RX import RX
+from .deviceSelection.progressBar import LoadingTip
+from .deviceSelection.quest.questinit import QuestInit
+from .deviceSelection.tracker.trackerinit import TrackerInit
+from .func import Func
+from .info import Info
+from .kernel import Kernel
+from .output import Output
+from .properties import Properties
+from .registry import writeToRegistry
+from .structure import Structure
 
 
 class Psy(QMainWindow):
@@ -216,6 +220,10 @@ class Psy(QMainWindow):
         self.addDockWidget(Qt.RightDockWidgetArea, self.attributes)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.output)
         # link signals
+        self.center.currentWidgetChanged.connect(self.handleCurrentTabChanged)
+        self.structure.itemDoubleClicked.connect(self.handleItemDoubleClicked)
+        self.structure.itemDeleted.connect(self.handleItemDeleted)
+        self.structure.itemNameChanged.connect(self.handleItemNameChanged)
         self.attributes.visibilityChanged.connect(self.checkVisible)
         self.structure.visibilityChanged.connect(self.checkVisible)
         self.properties.visibilityChanged.connect(self.checkVisible)
@@ -226,12 +234,45 @@ class Psy(QMainWindow):
         create widget, link its signals and store it into some data
         """
         widget_type = Func.getWidgetType(widget_id)
-        # todo add other items into this function
         widget = None
         if widget_type == Info.TIMELINE:
             widget = Timeline(widget_id, widget_name)
+        elif widget_type == Info.IF:
+            widget = IfBranch(widget_id, widget_name)
+        elif widget_type == Info.SWITCH:
+            widget = Switch(widget_id, widget_name)
         elif widget_type == Info.CYCLE:
-            pass
+            widget = Cycle(widget_id, widget_name)
+        elif widget_type == Info.IMAGE:
+            widget = ImageDisplay(widget_id, widget_name)
+        elif widget_type == Info.VIDEO:
+            widget = VideoDisplay(widget_id, widget_name)
+        elif widget_type == Info.TEXT:
+            widget = TextDisplay(widget_id, widget_name)
+        elif widget_type == Info.SOUND:
+            widget = SoundDisplay(widget_id, widget_name)
+        elif widget_type == Info.SLIDER:
+            widget = Slider(widget_id, widget_name)
+        elif widget_type == Info.ACTION:
+            widget = EyeAction(widget_id, widget_name)
+        elif widget_type == Info.CALIBRATION:
+            widget = EyeCalibrate(widget_id, widget_name)
+        elif widget_type == Info.ENDR:
+            widget = EndR(widget_id, widget_name)
+        elif widget_type == Info.OPEN:
+            widget = Open(widget_id, widget_name)
+        elif widget_type == Info.DC:
+            widget = EyeDC(widget_id, widget_name)
+        elif widget_type == Info.STARTR:
+            widget = StartR(widget_id, widget_name)
+        elif widget_type == Info.LOG:
+            widget = Close(widget_id, widget_name)
+        elif widget_type == Info.QUEST_INIT:
+            widget = QuestInit(widget_id, widget_name)
+        elif widget_type == Info.QUEST_UPDATE:
+            widget = QuestUpdate(widget_id, widget_name)
+        elif widget_type == Info.QUEST_GET_VALUE:
+            widget = QuestGetValue(widget_id, widget_name)
         else:
             # if fail to create widget, exit.
             exit()

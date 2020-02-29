@@ -2,7 +2,7 @@ from PyQt5.QtCore import QDataStream, QByteArray, QIODevice, QMimeData, QPoint, 
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListView, QListWidget, QListWidgetItem, QTabWidget, QFrame
 
-from app.func_ import Func
+from app.func import Func
 from app.info import Info
 
 

@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
-from app.func_ import Func
+from app.func import Func
 
 
 class StructureNode(QTreeWidgetItem):

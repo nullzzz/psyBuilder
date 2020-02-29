@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMi
 from PyQt5.QtGui import QDrag, QKeySequence
 from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut
 
-from app.func_ import Func
+from app.func import Func
 from app.info import Info
 from app.kernel import Kernel
 from lib import MessageBox

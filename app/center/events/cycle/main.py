@@ -18,7 +18,7 @@ class Cycle(TabItemMainWindow):
     # when delete signals, emit signal(origin_widget, widget_id)
     itemDeleted = pyqtSignal(int, int)
 
-    def __init__(self, widget_id: int, widget_name: str):
+    def __init__(self, widget_id: str, widget_name: str):
         super(Cycle, self).__init__(widget_id, widget_name)
         self.cycle_table = CycleTable()
         self.properties = Properties()

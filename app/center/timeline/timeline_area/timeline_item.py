@@ -3,7 +3,7 @@ from PyQt5.QtCore import (QSize, Qt, pyqtSignal, QMimeData, QDataStream, QIODevi
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QLabel
 
-from app.func_ import Func
+from app.func import Func
 from app.info import Info
 
 
