@@ -47,13 +47,14 @@ class Center(QMainWindow):
         widget = Kernel.Widgets[widget_id]
         self.tab_widget.closeTab(widget)
 
-    def changeTabName(self, widget, widget_name: str) -> None:
+    def changeTabName(self, widget_id:str, widget_name: str) -> None:
         """
         if widget's was changed, its tab name should be changed as well.
         @param widget_id:
         @param widget_name: new widget's name
         @return:
         """
+        widget = Kernel.Widgets[widget_id]
         self.tab_widget.changeTabName(widget, widget_name)
 
     def handleTabChange(self, index: int):

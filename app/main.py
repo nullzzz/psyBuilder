@@ -243,7 +243,6 @@ class Psy(QMainWindow):
         """
         create widget, link its signals and store it into some data
         """
-        print(widget_id)
         widget_type = Func.getWidgetType(widget_id)
         widget = None
         if widget_type == Info.TIMELINE:
@@ -323,6 +322,10 @@ class Psy(QMainWindow):
         """
         widget_type = Func.getWidgetType(widget_id)
         # link common signals
+        widget.propertiesChanged.connect(self.handlePropertiesChanged)
+        widget.waitStart.connect(self.startWait)
+        widget.waitEnd.connect(self.endWait)
+        widget.tabClosed.connect(self.handleTabClosed)
         # link special signals
         if widget_type == Info.TIMELINE:
             # timeline
@@ -743,8 +746,6 @@ class Psy(QMainWindow):
             self.property_action.setIcon(icon)
         elif dock == "Output":
             self.output_action.setIcon(icon)
-        else:
-            print(f"wtf{dock}")
 
     def showDevices(self, device_type):
         """

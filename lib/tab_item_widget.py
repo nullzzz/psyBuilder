@@ -15,6 +15,7 @@ class TabItemWidget(QWidget):
 
     # you can show properties in Properties Window through this signal. (widget_id)
     propertiesChanged = pyqtSignal(str)
+    tabClosed = pyqtSignal(str)
     # you can show loading dialog window through this signal
     waitStart = pyqtSignal()
     # you can end loading dialog window through this signal

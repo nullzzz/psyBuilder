@@ -222,7 +222,6 @@ class TimelineArea(QFrame):
         stream = QDataStream(data, QIODevice.ReadOnly)
         widget_type = stream.readQString()
         widget_id, widget_name, index = self.addItem(widget_type=widget_type, index=index)
-        print(widget_id, widget_name, index)
         # emit signal
         self.itemAdded.emit(widget_id, widget_name, index)
 

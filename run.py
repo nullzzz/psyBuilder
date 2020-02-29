@@ -19,7 +19,7 @@ def compatible():
     Info.WID_NODE = Kernel.Nodes
     Info.WID_WIDGET = Kernel.Widgets
     Info.NAME_WID = Kernel.Names
-    Info.QUEST_DEVICE = Kernel.QuestInfo
+    Info.QUEST_INFO = Kernel.QuestInfo
 
 
 if __name__ == '__main__':

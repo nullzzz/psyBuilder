@@ -64,14 +64,24 @@ class IconBar(QTabWidget):
         self.eye_tracker = IconList()
         self.quest = IconList()
         self.condition = IconList()
-        # todo add events items
+        # add events items
         self.events.addItem(WidgetIconItem(Info.CYCLE))
-
-        # todo add eye_tracker items
-
-        # todo add quest items
-
-        # todo add condition items
+        self.events.addItem(WidgetIconItem(Info.IMAGE))
+        self.events.addItem(WidgetIconItem(Info.SLIDER))
+        self.events.addItem(WidgetIconItem(Info.SOUND))
+        self.events.addItem(WidgetIconItem(Info.TEXT))
+        self.events.addItem(WidgetIconItem(Info.VIDEO))
+        # add eye_tracker items
+        self.eye_tracker.addItem(WidgetIconItem(Info.CALIBRATION))
+        self.eye_tracker.addItem(WidgetIconItem(Info.DC))
+        self.eye_tracker.addItem(WidgetIconItem(Info.ENDR))
+        self.eye_tracker.addItem(WidgetIconItem(Info.LOG))
+        self.eye_tracker.addItem(WidgetIconItem(Info.STARTR))
+        # add quest items
+        self.quest.addItem(WidgetIconItem(Info.QUEST_UPDATE))
+        # add condition items
+        self.condition.addItem(WidgetIconItem(Info.IF))
+        self.condition.addItem(WidgetIconItem(Info.SWITCH))
 
         self.addTab(self.events, "Events")
         self.addTab(self.eye_tracker, "Eye Tracker")

@@ -135,65 +135,52 @@ class Func(object):
             pass
 
     @staticmethod
-    def getAttributes(widget_id, need_detail=False) -> dict or list:
+    def getAttributes(widget_id) -> dict or list:
         """
-        根据某个节点的wid得到它的属性，根据属性返回是否需要详细信息，
-        :param widget_id:
-        :param need_detail: 是否需要详细的信息即属性的值
-        :return:
+        get widget's attributes through its widget id
         """
-        attributes = {"subName": 0, "subNum": 0, "sessionNum": 0, "subSex": 0, "subHandness": 0, "subAge": 0}
-
-        # 添加quest设备全局参数
-        for k, v in Info.QUEST_INFO.items():
-            v: dict
-            quest_name = v.get("Quest Name")
-            attributes[f"{quest_name}.cValue"] = ""
-        node = Info.WID_NODE[widget_id]
-        node_parent = node.parent()
-        # 得到到第0层一共多少层
-        layer_count = -1
-        while node:
-            layer_count += 1
-            node = node.parent()
-        # 如果挂在timeline下要得到在其前面的兄弟节点的一些隐藏属性
-        if node_parent and node_parent.widget_id.startswith(Info.TIMELINE):
-            for i in range(node_parent.childCount()):
-                child_node = node_parent.child(i)
+        # global attributes
+        attributes = ["subName", "subNum", "sessionNum", "subSex", "subHandness", "subAge"]
+        # attributes about quest
+        for key, value in Kernel.QuestInfo.items():
+            attributes.append(f"{value.get('Quest Name')}.cValue")
+        # get widget's attributes: 1. the attributes of the items in front of it in timeline (exclude cycle).
+        #                          2. parents' attributes. (only cycle)
+        #                          3. first parent cycle's hidden attribute
+        # get level of this widget, namely depth. It can be simplified by using DFS.
+        node = Kernel.Nodes[widget_id]
+        # do 1.
+        parent = node.parent()
+        if parent and Func.isWidgetType(parent.widget_id, Info.TIMELINE):
+            for i in range(parent.childCount()):
+                child_node = parent.child(i)
+                # until it self
                 if child_node.widget_id == widget_id:
                     break
-                # cycle不要
-                if Func.isWidgetType(child_node.widget_id, Info.CYCLE):
-                    continue
-                for attribute in Info.WID_WIDGET[child_node.widget_id].getHiddenAttribute():
-                    attributes[f"{child_node.text(0)}.{attribute}"] = layer_count
-        # 其第一次父cycle的hide属性也要
-        # 往上递归
-        first_parent = True
-        node = Info.WID_NODE[widget_id].parent()
-        layer_count -= 1
+                # ignore cycle before item
+                if not Func.isWidgetType(child_node.widget_id, Info.CYCLE):
+                    for attribute in Kernel.Widgets[child_node.widget_id].getHiddenAttribute():
+                        attributes.append(f"{child_node.text(0)}.{attribute}")
+        # do 2. 3.
+        first = True
+        node = node.parent()
         while node:
-            # 每逢cycle要获得一次属性，且格式特殊
+            # we just need cycle
             if Func.isWidgetType(node.widget_id, Info.CYCLE):
-                cycle = Info.WID_WIDGET[node.widget_id]
+                cycle = Kernel.Widgets[node.widget_id]
                 cycle_name = node.text(0)
-                for attribute in cycle.timeline_table.col_attribute:
-                    # # 去重，只保留最近的值
-                    # if attribute not in attributes:
-                    #     attributes[f"{cycle_name}.attr.{attribute}"] = layer_count
-                    attributes[f"{cycle_name}.attr.{attribute}"] = layer_count
-                #
-                if first_parent:
-                    for attribute in Info.WID_WIDGET[node.widget_id].getHiddenAttribute():
-                        attributes[f"{node.text(0)}.{attribute}"] = layer_count
-                    first_parent = False
-            layer_count -= 1
+                col_attributes = cycle.getColumnAttributes()
+                for attribute in col_attributes:
+                    attributes.append(f"{cycle_name}.attr.{attribute}")
+                # we need first cycle's hidden attribute
+                if first:
+                    first_cycle_hidden_attributes = Kernel.Widgets[node.widget_id].getHiddenAttributes()
+                    for attribute in first_cycle_hidden_attributes:
+                        attributes.append(f"{cycle_name}.{attribute}")
+                    first = False
             node = node.parent()
-        # 是否需要详细信息
-        if need_detail:
-            return attributes
-        else:
-            return attributes.keys()
+        # return
+        return attributes
 
     @staticmethod
     def getWidgetPosition(widget_id: str) -> int:

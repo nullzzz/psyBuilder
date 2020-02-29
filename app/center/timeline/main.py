@@ -75,6 +75,8 @@ class Timeline(TabItemWidget):
         #
         self.timeline_area.itemNameChanged.connect(
             lambda widget_id, text: self.itemNameChanged.emit(Info.TimelineSend, widget_id, text))
+        self.timeline_area.itemClicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
+        self.timeline_area.itemDoubleClicked.connect(lambda widget_id: self.itemDoubleClicked.emit(widget_id))
 
     def addItem(self, widget_type: str = None, widget_id: str = None, widget_name: str = None, index: int = 0) -> (
             str, str, int):
