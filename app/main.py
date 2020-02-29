@@ -287,10 +287,20 @@ class Psy(QMainWindow):
         copy widget, link its signals and store it into some data
         """
 
-    def referWidget(self, origin_widget_id: str, new_widget_id: str):
+    def referWidget(self, origin_widget_id: str, new_widget_id: str = Info.ERROR_WIDGET_ID):
         """
-        refer widget and update some data
+        refer widget and update some data, if new_widget_id is Info.ERROR_WIDGET_ID, we generate new one
         """
+        # generate new widget id
+        widget_type = Func.getWidgetType(origin_widget_id)
+        widget_name = Func.getWidgetName(origin_widget_id)
+        widget_id = new_widget_id
+        if widget_id == Info.ERROR_WIDGET_ID:
+            widget_id = Func.generateWidgetId(widget_type)
+        # refer widget by mapping widget id to same widget (Kernel.Widgets, Kernel.Names)
+        Kernel.Widgets[widget_id] = Kernel.Widgets[origin_widget_id]
+        Kernel.Names[widget_name].append(widget_id)
+        return widget_id
 
     def linkWidgetSignals(self, widget_id: str, widget):
         """
@@ -439,98 +449,10 @@ class Psy(QMainWindow):
         open_file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)",
                                                         options=options)
         if open_file_name:
-            # 更新文件名
-            Info.FILE_NAME = open_file_name
-            Info.FILE_DIRECTORY = os.path.dirname(open_file_name)
-            # 从文件中读取配置
-            setting = QSettings(open_file_name, QSettings.IniFormat)
-            # 计数恢复
-            Info.WIDGET_TYPE_ID_COUNT = setting.value("WIDGET_TYPE_ID_COUNT")
-            Info.WIDGET_TYPE_NAME_COUNT = setting.value("WIDGET_TYPE_NAME_COUNT")
-
-            # 更新输入输出设备
-            input_device_info = setting.value("INPUT_DEVICE_INFO")
-            if input_device_info:
-                self.input_devices.setProperties(input_device_info)
-            Info.INPUT_DEVICE_INFO = input_device_info
-            output_device_info = setting.value("OUTPUT_DEVICE_INFO")
-            if output_device_info:
-                self.output_devices.setProperties(output_device_info)
-            Info.OUTPUT_DEVICE_INFO = output_device_info
-            quest_info = setting.value("QUEST_INFO")
-            if quest_info:
-                self.quest_init.setProperties(quest_info)
-            Info.QUEST_INFO = quest_info
-            tracker_info = setting.value("TRACKER_INFO")
-            if tracker_info:
-                self.tracker_init.setProperties(tracker_info)
-            Info.TRACKER_INFO = tracker_info
-            # 恢复布局
-            dock_layout = setting.value("DOCK_LAYOUT")
-            if dock_layout:
-                self.restoreState(dock_layout)
-            # 恢复slider命名计数
-            slider_count = setting.value("SLIDER_COUNT")
-            if slider_count:
-                Info.SLIDER_COUNT = slider_count
-            # recover platform info
-            platform = setting.value("PLATFORM")
-            Info.PLATFORM = platform
-            self.changePlatform(platform)
-
-            image_load_mode = setting.value("IMAGE_LOAD_MODE")
-            Info.IMAGE_LOAD_MODE = image_load_mode
-            self.changeImageLoadMode(image_load_mode)
-            # 恢复widgets
-            # 复原初始的Timeline
-            root_timeline: Timeline = Info.WID_WIDGET[f"{Info.TIMELINE}.0"]
-            # 将其数据取出
-            root_timeline_info = setting.value(f"{Info.TIMELINE}.0")
-            # 恢复
-            if root_timeline_info:
-                root_timeline.restore(root_timeline_info)
-
-            # 恢复name_wid
-            name_wid: dict = setting.value("NAME_WID")
-            if name_wid:
-                Info.NAME_WID = name_wid.copy()
-
-            # 恢复structure并恢复剩余widget
-            structure_tree: list = setting.value("STRUCTURE_TREE")
-            self.structure.loadStructure(structure_tree)
-        Func.log(f"{Info.FILE_NAME} loaded successful!")
+            pass
 
     def loadOut(self):
-        # 导出输入设备信息
-        input_device_info: dict = Info.INPUT_DEVICE_INFO.copy()
-        output_device_info: dict = Info.OUTPUT_DEVICE_INFO.copy()
-        quest_info: dict = Info.QUEST_INFO.copy()
-        tracker_info: dict = Info.TRACKER_INFO.copy()
-        # 当前布局信息
-        current_dock_layout = self.saveState()
-        name_wid = Info.NAME_WID.copy()
-        # slider命名计数
-        slider_count = Info.SLIDER_COUNT.copy()
-        setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
-        setting.setValue("INPUT_DEVICE_INFO", input_device_info)
-        setting.setValue("OUTPUT_DEVICE_INFO", output_device_info)
-        setting.setValue("QUEST_INFO", quest_info)
-        setting.setValue("TRACKER_INFO", tracker_info)
-        setting.setValue("DOCK_LAYOUT", current_dock_layout)
-        setting.setValue("SLIDER_COUNT", slider_count)
-        setting.setValue("NAME_WID", name_wid)
-        setting.setValue("WIDGET_TYPE_NAME_COUNT", Info.WIDGET_TYPE_NAME_COUNT.copy())
-        setting.setValue("WIDGET_TYPE_ID_COUNT", Info.WIDGET_TYPE_ID_COUNT.copy())
-
-        structure_tree: list = self.structure.getStructure("who")
-        self.loadOutTree(structure_tree)
-        setting.setValue("STRUCTURE_TREE", structure_tree)
-
-        # 当前输出平台
-        setting.setValue("PLATFORM", Info.PLATFORM)
-        setting.setValue("IMAGE_LOAD_MODE", Info.IMAGE_LOAD_MODE)
-
-        Func.log(f"{Info.FILE_NAME} saved successful!")
+        pass
 
     def loadOutTree(self, tree):
         if isinstance(tree, list):
@@ -640,7 +562,6 @@ class Psy(QMainWindow):
             self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
             Info.IMAGE_LOAD_MODE = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
-
             imageLoadMode = c if c else "before_event"
             self.before_event_action.setIconVisibleInMenu(imageLoadMode == "before_event")
             self.before_trial_action.setIconVisibleInMenu(imageLoadMode == "before_trial")
@@ -648,10 +569,9 @@ class Psy(QMainWindow):
 
     def compile(self):
         try:
-            # self.structure.getStructure().print_tree()
             compilePTB(self)
         except Exception as compileError:
-            Func.log(str(compileError), True, False)
+            Func.print(str(compileError), 2)
             traceback.print_exc()
 
     def registry(self):

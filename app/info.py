@@ -155,7 +155,7 @@ class Info(object):
     }
 
     # widget不同类型名称的对应数
-    WIDGET_TYPE_NAME_COUNT = {
+    WidgetNameCount = {
         CYCLE: 0,
         SOUND: 0,
         TEXT: 0,
@@ -179,7 +179,7 @@ class Info(object):
     }
 
     # widget不同类型id对应数
-    WIDGET_TYPE_ID_COUNT = {
+    WidgetTypeCount = {
         CYCLE: 0,
         SOUND: 0,
         TEXT: 0,

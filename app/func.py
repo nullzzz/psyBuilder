@@ -15,31 +15,6 @@ class Func(object):
     """
 
     @staticmethod
-    def getWidgetImage(widget_type: str, image_type: str = 'icon') -> QPixmap or QIcon:
-        """
-        todo update
-        返回widget_type对应的图片
-        :param widget_type: widget类型
-        :param image_type: 返回图片类型
-        :return: 
-        """
-        # 得到图片路径
-        if widget_type in Info.WIDGET_TYPE_IMAGE_PATH:
-            path = Info.WIDGET_TYPE_IMAGE_PATH[widget_type]
-            if image_type == "icon":
-                return QIcon(path)
-            else:
-                return QPixmap(path)
-        raise Exception("unknown widget type.")
-
-    @staticmethod
-    def getWidgetType(widget_id: str):
-        """
-        get widget's type through its widget id
-        """
-        return widget_id.split('.')[0]
-
-    @staticmethod
     def getImagePath(image_name: str) -> str:
         """
         返回指定name的图片路径
@@ -76,22 +51,9 @@ class Func(object):
                     widget.apply()
 
     @staticmethod
-    def restore(widget_id: str, properties: dict) -> None:
-        """
-        复原控件属性
-        :param widget_id: 控件id
-        :param properties: 控件属性
-        :return:
-        """
-        widget = Info.WID_WIDGET.get(widget_id, None)
-        if widget:
-            widget.restore(properties)
-        else:
-            print("No such widget")
-
-    @staticmethod
     def getProperties(widget_id, is_show: bool = False) -> dict:
         """
+        # todo This function is abandoned, It's better to use getWidgetProperties
         按widget_id得到对应widget的属性
         :param widget_id:
         :param is_show: 是否呈现在properties界面
@@ -107,17 +69,6 @@ class Func(object):
         return widget.getInfo()
 
     @staticmethod
-    def getWidgetName(widget_id: str) -> str:
-        """
-        根据widget_id得到对应widget的name
-        :param widget_id:
-        :return:
-        """
-        if widget_id in Info.WID_NODE:
-            return Info.WID_NODE[widget_id].text(0)
-        raise Exception(f"fail to get widget name for {widget_id}. [func.py]")
-
-    @staticmethod
     def getNameCount(widget_type: str) -> int:
         """
         某个widget type的name的已有count
@@ -125,9 +76,9 @@ class Func(object):
         :return:
         """
         count = -1
-        if widget_type in Info.WIDGET_TYPE_NAME_COUNT:
-            count = Info.WIDGET_TYPE_NAME_COUNT[widget_type]
-            Info.WIDGET_TYPE_NAME_COUNT[widget_type] += 1
+        if widget_type in Kernel.WidgetNameCount:
+            count = Kernel.WidgetNameCount[widget_type]
+            Kernel.WidgetNameCount[widget_type] += 1
         return count
 
     @staticmethod
@@ -166,64 +117,6 @@ class Func(object):
         :return: 是否存在引用
         """
         return len(Info.NAME_WID[name]) > 1
-
-    @staticmethod
-    def generateWidgetId(widget_type) -> str:
-        """
-        生成一个合法的widget_id
-        :param widget_type: widget的类型
-        :return: 生成的widget_id
-        """
-        if widget_type in Info.WIDGET_TYPE_ID_COUNT:
-            count = Info.WIDGET_TYPE_ID_COUNT[widget_type]
-            Info.WIDGET_TYPE_ID_COUNT[widget_type] += 1
-            return f"{widget_type}.{count}"
-        raise Exception('fail to generate widget id, because unknown widget type.')
-
-    @staticmethod
-    def checkTimelineNameValidity(name: str, cycle_widget_id: str) -> (int, str):
-        """
-        检测timeline的name的合法性，检测是否类似死锁等等
-        :param name: 要检测的name
-        :param cycle_widget_id: timeline所属的cycle
-        :return: 检测结果类型，及对应提示
-        """
-        if name not in Info.NAME_WID:
-            if not name:
-                return Info.TimelineNameError, ''
-            if re.match(r"^[a-zA-Z][a-zA-Z_0-9]*$", name):
-                return Info.TimelineNameRight, ''
-            return Info.TimelineNameError, ''
-        else:
-            # 如果已经存在，且为同一个cycle下的timeline，则返回正确，否则返回出错
-            cycle_node = Info.WID_NODE[cycle_widget_id]
-            # 因为timeline已经不允许引用了，所以不会出现父节点为不同的cycle，所以直接判断cycle下是否有那个name即可
-            try:
-                for index in range(cycle_node.childCount()):
-                    if cycle_node.child(index).text(0) == name:
-                        return Info.TimelineNameRight, ""
-            except Exception as e:
-                print(e)
-            return Info.TimelineParentError, ""
-            # 需求要求timeline不能引用，说不定哪天让我改回来，现将下方代码注释
-            # widget_id = Info.NAME_WID[name][0]
-            # # 类型
-            # if widget_id.split('.')[0] == Info.TIMELINE:
-            #     # 是否存在于父节点
-            #     # 对于判断想引用的timeline是不是cycle的父节点,
-            #     # 要确认所有引用的cycle的父节点timeline是不是在name的引用，比较繁琐啊
-            #     parent_timeline_list = []
-            #     for cycle_wid in Info.NAME_WID[Info.WID_NODE[cycle_widget_id].text(0)]:
-            #         node = Info.WID_NODE[cycle_wid].parent()
-            #         while node:
-            #             if node.widget_id.startswith(Info.TIMELINE):
-            #                 parent_timeline_list.append(node.widget_id)
-            #             node = node.parent()
-            #     for timeline_wid in parent_timeline_list:
-            #         if timeline_wid in Info.NAME_WID[name]:
-            #             return Info.TimelineParentError, ''
-            #     return Info.TimelineNameExist, widget_id
-            # return Info.TimelineTypeError, ''
 
     @staticmethod
     def delWidget(widget_id: str) -> None:
@@ -534,11 +427,6 @@ class Func(object):
             info[k] = v.get("Tracker Name")
         return info
 
-    # 控制台输出信息
-    @staticmethod
-    def log(text, error=False, timer=True):
-        pass
-
     @staticmethod
     def getParentWid(wid: str) -> str:
         """
@@ -723,12 +611,56 @@ class Func(object):
         """
         get widget's properties through its widget id
         """
+        # global attributes
+        attributes = ["subName", "subNum", "sessionNum", "subSex", "subHandness", "subAge"]
+        # attributes about quest
+        for key, value in Kernel.QuestInfo.items():
+            attributes.append(f"{value.get('Quest Name')}.cValue")
+        # get widget's attributes: 1. the attributes of the items in front of it in timeline (exclude cycle).
+        #                          2. parents' attributes. (only cycle)
+        #                          3. first parent cycle's hidden attribute
+        # get level of this widget, namely depth. It can be simplified by using DFS.
+        node = Kernel.Nodes[widget_id]
+        # do 1.
+        parent = node.parent()
+        if parent and Func.isWidgetType(parent.widget_id, Info.Timeline):
+            for i in range(parent.childCount()):
+                child_node = parent.child(i)
+                # until it self
+                if child_node.widget_id == widget_id:
+                    break
+                # ignore cycle before item
+                if not Func.isWidgetType(child_node.widget_id, Info.Cycle):
+                    for attribute in Kernel.Widgets[child_node.widget_id].getHiddenAttribute():
+                        attributes.append(f"{child_node.text(0)}.{attribute}")
+        # do 2. 3.
+        first = True
+        node = node.parent()
+        while node:
+            # we just need cycle
+            if Func.isWidgetType(node.widget_id, Info.Cycle):
+                cycle = Kernel.Widgets[node.widget_id]
+                cycle_name = node.text(0)
+                col_attributes = cycle.getColumnAttributes()
+                for attribute in col_attributes:
+                    attributes.append(f"{cycle_name}.attr.{attribute}")
+                # we need first cycle's hidden attribute
+                if first:
+                    first_cycle_hidden_attributes = Kernel.Widgets[node.widget_id].getHiddenAttributes()
+                    for attribute in first_cycle_hidden_attributes:
+                        attributes.append(f"{cycle_name}.{attribute}")
+                    first = False
+            node = node.parent()
+        # return
+        return attributes
 
     @staticmethod
     def getWidgetAttributes(widget_id: str):
         """
         get widget's attributes through its widget id
         """
+        widget = Kernel.Widgets[widget_id]
+        return widget.getProperties()
 
     @staticmethod
     def getImage(image_path: str, type: int = 0, size: QSize = None) -> QPixmap or QIcon:

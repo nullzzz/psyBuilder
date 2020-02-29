@@ -26,6 +26,23 @@ class Kernel(object):
 
     # it's used to counter the count of widget name should go.
     WidgetNameCount = {
-        Info.TIMELINE: 0,
         Info.CYCLE: 0,
+        Info.SOUND: 0,
+        Info.TEXT: 0,
+        Info.IMAGE: 0,
+        Info.VIDEO: 0,
+        Info.SLIDER: 0,
+        Info.BUG: 0,
+        Info.OPEN: 0,
+        Info.CALIBRATION: 0,
+        Info.ACTION: 0,
+        Info.STARTR: 0,
+        Info.ENDR: 0,
+        Info.LOG: 0,
+        Info.QUEST_INIT: 0,
+        Info.QUEST_UPDATE: 0,
+        Info.QUEST_GET_VALUE: 0,
+        Info.IF: 0,
+        Info.SWITCH: 0,
+        Info.TIMELINE: 1,
     }

@@ -61,7 +61,7 @@ class Structure(DockWidget):
         """
         Kernel.Nodes[widget_id].setText(0, widget_name)
 
-    def moveNode(self, widget_id: int, origin_index: int, new_index: int):
+    def moveNode(self, widget_id: str, origin_index: int, new_index: int):
         """
         move node in structure
         @param widget_id:
@@ -71,7 +71,7 @@ class Structure(DockWidget):
         """
         self.structure_tree.moveNode(widget_id, new_index)
 
-    def deleteNode(self, widget_id: int):
+    def deleteNode(self, widget_id: str):
         """
 
         @param widget_id:
