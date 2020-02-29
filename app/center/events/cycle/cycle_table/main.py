@@ -146,7 +146,7 @@ class CycleTable(QTableWidget):
                                 item.redo()
                             else:
                                 # generate new timeline's widget_id
-                                widget_id = Func.generateWidgetId(Info.Timeline)
+                                widget_id = Func.generateWidgetId(Info.TIMELINE)
                                 self.timelineAdded.emit(widget_id, text, len(self.timelines))
                                 self.timelines[text] = [widget_id, 1]
                                 item.save()
@@ -169,7 +169,7 @@ class CycleTable(QTableWidget):
                                     item.redo()
                                 else:
                                     # generate new timeline's widget_id
-                                    widget_id = Func.generateWidgetId(Info.Timeline)
+                                    widget_id = Func.generateWidgetId(Info.TIMELINE)
                                     self.timelineAdded.emit(widget_id, text, len(self.timelines))
                                     self.timelines[text] = [widget_id, 1]
                                     # secondly check old text

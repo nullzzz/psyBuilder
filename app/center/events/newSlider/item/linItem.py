@@ -2,8 +2,8 @@ from PyQt5.QtCore import Qt, QLineF, pyqtSignal
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsItem
 
-from .line.lineProperty import LineProperty
 from app.info import Info
+from .line.lineProperty import LineProperty
 
 
 class LineItem(QGraphicsLineItem):
@@ -34,7 +34,7 @@ class LineItem(QGraphicsLineItem):
         }
 
     def generateItemName(self) -> str:
-        name = "line"
+        name = Info.ITEM_LINE
         cnt = Info.SLIDER_COUNT.get(name)
         item_name = f"{name}_{cnt}"
         Info.SLIDER_COUNT[name] += 1

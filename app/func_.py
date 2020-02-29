@@ -135,7 +135,7 @@ class Func(object):
         @param widget_id:
         @return:
         """
-        if Func.isWidgetType(widget_id, Info.Timeline):
+        if Func.isWidgetType(widget_id, Info.TIMELINE):
             return -1
         node = Kernel.Nodes[widget_id]
         if node.parent():

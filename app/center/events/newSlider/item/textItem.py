@@ -17,7 +17,7 @@ class TextItem(QGraphicsTextItem):
     Text = 6
 
     name = {
-        Text: "text",
+        Text: Info.ITEM_TEXT,
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):

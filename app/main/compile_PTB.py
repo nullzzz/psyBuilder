@@ -5,6 +5,7 @@ import shutil
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox
+
 from app.func import Func
 from app.info import Info
 
@@ -149,25 +150,25 @@ def addCurlyBrackets(inputStr):
 
 
 # add single quotes
-def addSingleQuotes(inputStr:str) -> str:
+def addSingleQuotes(inputStr: str) -> str:
     outputStr = f"'{inputStr}'"
     return outputStr
 
 
 # add square brackets
-def addSquBrackets(inputStr:str) -> str:
+def addSquBrackets(inputStr: str) -> str:
     outputStr = f"[{inputStr}]"
     return outputStr
 
 
-def removeSingleQuotes(inputStr:str) -> str:
+def removeSingleQuotes(inputStr: str) -> str:
     if isinstance(inputStr, str):
         if re.fullmatch("'.+'", inputStr):  # any character except a new line
             inputStr = inputStr[1:-1]
     return inputStr
 
 
-def removeSquBrackets(inputStr:str) -> str:
+def removeSquBrackets(inputStr: str) -> str:
     if isinstance(inputStr, str):
         if re.fullmatch("\[.+\]", inputStr):  # any character except a new line
             inputStr = inputStr[1:-1]
@@ -194,7 +195,7 @@ def getAllNestedVars(inputStr, opVars=None) -> set:
     return set(opVars)
 
 
-def getCycleRealRows(widgetId:str) -> int:
+def getCycleRealRows(widgetId: str) -> int:
     cCycle = Info.WID_WIDGET[widgetId]
     weightList = cCycle.getAttributeValues(0)
 
@@ -370,16 +371,16 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
                 cItemType = getItemType(cItemId)
                 cItemProperties = cItems[cItemId]
 
-                if cItemType == 'image':
+                if cItemType == Info.ITEM_IMAGE:
                     updateSpFormatVarDict(cItemProperties['Transparent'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Width'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Height'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Center X'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Center Y'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Stretch mode'], 'stretchMode', cSpecialFormatVarDict)
-                elif cItemType == 'sound':
+                elif cItemType == Info.ITEM_SOUND:
                     updateSpFormatVarDict(cItemProperties['Wait for start'], 'waitForStart', cSpecialFormatVarDict)
-                elif cItemType == 'video':
+                elif cItemType == Info.ITEM_VIDEO:
                     updateSpFormatVarDict(cItemProperties['Transparent'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Width'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Height'], 'percent', cSpecialFormatVarDict)
@@ -484,7 +485,7 @@ def isSubWidgetOfIfOrSwitch(widgetOrId) -> bool:
     return isSubWidget
 
 
-def getAllEventWidgetsList(includedType:int = 1) -> list:
+def getAllEventWidgetsList(includedType: int = 1) -> list:
     allEventWidgets = []
     if includedType > 0:
         allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
@@ -498,7 +499,7 @@ def getAllEventWidgetsList(includedType:int = 1) -> list:
     return allEventWidgets
 
 
-def getAllEventWidgetNamesList(includedType:int = 1) -> list:
+def getAllEventWidgetNamesList(includedType: int = 1) -> list:
     cAllEventWidgetNameList = []
 
     if includedType > 0:
@@ -526,8 +527,7 @@ def getWidgetName(widgetOrId) -> str:
 
 
 def getWidgetPos(widgetOrId) -> None or int:
-
-    if isinstance(widgetOrId,str):
+    if isinstance(widgetOrId, str):
         cWidgetId = widgetOrId
     else:
         cWidgetId = widgetOrId.widget_id
@@ -567,14 +567,14 @@ def getWidgetEventPos(widget_id: str) -> int or None:
         return None
 
 
-def getNextWID(WID:str) -> None or str:
+def getNextWID(WID: str) -> None or str:
     if isSubWidgetOfIfOrSwitch(WID):
         return Func.getNextWidgetId(Func.getParentWid(WID))
     else:
         return Func.getNextWidgetId(WID)
 
 
-def getPreiousWID(WID:str) -> None or str:
+def getPreiousWID(WID: str) -> None or str:
     if isSubWidgetOfIfOrSwitch(WID):
         return Func.getPreviousWidgetId(Func.getParentWid(WID))
     else:
@@ -614,7 +614,7 @@ def isSoundRelatedWidget(cWidget) -> bool:
     elif Info.SLIDER == cWidgetType:
         itemIds = getSliderItemIds(cWidget)
 
-        if isContainItemType(itemIds, 'sound'):
+        if isContainItemType(itemIds, Info.ITEM_SOUND):
             haveSound = True
 
     return haveSound
@@ -703,7 +703,7 @@ def isVideoRelatedWidget(cWidget) -> bool:
     if Func.isWidgetType(cWidget.widget_id, Info.VIDEO):
         return True
     elif Func.isWidgetType(cWidget.widget_id, Info.SLIDER):
-        return isContainItemType(getSliderItemIds(cWidget), 'video')
+        return isContainItemType(getSliderItemIds(cWidget), Info.ITEM_VIDEO)
     else:
         return False
 
@@ -1198,11 +1198,11 @@ def getMaxSlaveSoundDevs() -> dict:
 
             cProperties = Func.getProperties(cWidget.widget_id)
 
-            if isContainItemType(itemIds, 'sound'):
+            if isContainItemType(itemIds, Info.ITEM_SOUND):
                 cSoundNumList = dict()
 
                 for cItemId in itemIds:
-                    if getItemType(cItemId) == 'sound':
+                    if getItemType(cItemId) == Info.ITEM_SOUND:
                         cItemPro = cProperties['items'][cItemId]
                         cSoundDevName = cItemPro['Sound device']
                         cSoundDevNum = cSoundNumList.get(cSoundDevName, 0)
@@ -1555,7 +1555,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
         printAutoInd(f, "isFirstVideoFrame = true;")
         printAutoInd(f, "secs              = GetSecs;\n")
 
-        cVideoItemNums = getSliderItemTypeNums(cWidget, 'video')
+        cVideoItemNums = getSliderItemTypeNums(cWidget, Info.ITEM_VIDEO)
         if cVideoItemNums <= 1:
             printAutoInd(f, "{0}_tPtr = 1;", cWidgetName)
             printAutoInd(f, "{0}_CPt  =-1;", cWidgetName)
@@ -1916,37 +1916,17 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintC
             delayedPrintCodes = printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
         elif Info.ENDR == cWidgetType:
             delayedPrintCodes = printETEndRWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
-        elif Info.Log == cWidgetType:
+        elif Info.LOG == cWidgetType:
             delayedPrintCodes = printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+            pass
+        elif Info.QUEST_UPDATE == cWidgetType:
+            delayedPrintCodes = printQuestUpateWidget(cWidget, f, attributesSetDict, delayedPrintCodes)
             pass
         # elif Info.QUEST_INIT == cWidgetType:
         #     pass
         # elif Info.QUEST_GET_VALUE == cWidgetType:
         #     pass
-        elif Info.QUEST_UPDATE == cWidgetType:
-            delayedPrintCodes = printQuestUpateWidget(cWidget, f, attributesSetDict, delayedPrintCodes)
-            pass
-            # delayedPrintCodes = printImageWdiget(cWidget, f, delayedPrintCodes)
 
-    # CYCLE = "Cycle"
-    # SOUND = "Sound"
-    # TEXT = "Text"
-    # IMAGE = "Image"
-    # VIDEO = "Video"
-    # SLIDER = "Slider"
-    # OPEN = "Open"
-    # DC = "DC"
-    # CALIBRATION = "Calibration"
-    # ACTION = "Action"
-    # STARTR = "StartR"
-    # ENDR = "EndR"
-    # CLOSE = "Close"
-    # QUEST_INIT = "QuestInit"
-    # QUEST_UPDATE = "QuestUpdate"
-    # QUEST_GET_VALUE = "QuestGetValue"
-    # IF = "If"
-    # SWITCH = "Switch"
-    # TIMELINE = "Timeline"
     # to be continue ...
     return delayedPrintCodes
 
@@ -2194,7 +2174,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     itemIds.reverse()  # reverse the key id order
     # itemIds = itemIds[-1::-1] # reverse the key id order in ascend
     printAutoInd(f, "% prepare audio materials for widget {0}", getWidgetName(cWidget.widget_id))
-    if isContainItemType(itemIds, 'sound'):
+    if isContainItemType(itemIds, Info.ITEM_SOUND):
         printAutoInd(f,
                      "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur);",
                      cWinStr, cWinIdx)
@@ -2204,7 +2184,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     for cItemId in itemIds:
         cItemProperties = cItems[cItemId]
 
-        if getItemType(cItemId) == 'sound':
+        if getItemType(cItemId) == Info.ITEM_SOUND:
             printAutoInd(f, "% create item: {0} in {1}", cItemId, getWidgetName(cWidget.widget_id))
             if iSoundSlave == 1:
                 printAutoInd(f, "% schedule start of audio at exactly the predicted time of the next flip")
@@ -2215,7 +2195,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
         else:
             pass
     # remove sound items
-    itemIds = [cItemId for cItemId in itemIds if getItemType(cItemId) != 'sound']
+    itemIds = [cItemId for cItemId in itemIds if getItemType(cItemId) != Info.ITEM_SOUND]
     '''
     loop to handle all visual stimuli
     '''
@@ -2230,14 +2210,14 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
         cItemProperties = cItems[cItemId]
         isItemRef = False
 
-        if cItemType in ['garbor', 'image', 'snow', 'text', 'video']:
+        if cItemType in [Info.ITEM_GABOR, Info.ITEM_IMAGE, Info.ITEM_SNOW, Info.ITEM_TEXT, Info.ITEM_VIDEO]:
             printAutoInd(f, "% prepare materials for item {0} in {1}", cItemId, cWidgetName)
 
         # printAutoInd(cVSLCodes, "% draw item {0} in {1}", cItemId, cWidgetName)
 
         cItemId = cWidgetName + '_' + cItemId
 
-        if cItemType == 'line':
+        if cItemType == Info.ITEM_LINE:
             borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
             lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border width'], attributesSetDict))
             cX1 = dataStrConvert(*getRefValue(cWidget, cItemProperties['X1'], attributesSetDict))
@@ -2248,7 +2228,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
             printAutoInd(cVSLCodes, "Screen('DrawLine', {0}, {1}, {2}, {3}, {4}, {5}, {6});", cWinStr, borderColor, cX1,
                          cY1, cX2, cY2, lineWidth)
 
-        if cItemType == 'rect':
+        if cItemType == Info.ITEM_RECT:
 
             centerX = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict))
             centerY = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict))
@@ -2273,7 +2253,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                 printAutoInd(cVSLCodes, "Screen('FrameRect' ,{0} ,{1} ,{2}cRect ,{3});", cWinStr, borderColor, cItemId,
                              lineWidth)
 
-        elif cItemType == 'circle':
+        elif cItemType == Info.ITEM_CIRCLE:
             centerX = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict))
             centerY = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict))
             cWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Width'], attributesSetDict))
@@ -2297,7 +2277,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                 printAutoInd(cVSLCodes, "Screen('FrameOval',{0}, {1}, {2}cRect, {3}, {3});", cWinStr, borderColor,
                              cItemId, lineWidth)
 
-        elif cItemType == 'polygon':
+        elif cItemType == Info.ITEM_POLYGON:
             lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border width'], attributesSetDict))
 
             fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
@@ -2325,7 +2305,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                 printAutoInd(cVSLCodes, "Screen('FramePoly', {0}, {1}, {2}cPointList, {3}, {3});", cWinStr, borderColor,
                              cItemId, lineWidth)
 
-        elif cItemType == 'arc':
+        elif cItemType == Info.ITEM_ARC:
             centerX = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict))
             centerY = dataStrConvert(*getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict))
             cWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Width'], attributesSetDict))
@@ -2421,7 +2401,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                          cRotation,
                          cTransparency)
 
-        elif cItemType == 'snow':
+        elif cItemType == Info.ITEM_SNOW:
             centerX, isCenterXRef = getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict)
             centerX = dataStrConvert(centerX, isCenterXRef)
 
@@ -2463,15 +2443,15 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                          cRotation,
                          cTransparency)
 
-        elif 'text' == cItemType:
+        elif Info.ITEM_TEXT == cItemType:
             cVSLCodes = drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes, cItemProperties,
                                           cVSLCodes)
-        elif cItemType == 'video':
+        elif cItemType == Info.ITEM_VIDEO:
             delayedPrintCodes, cVSLCodes = drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes,
                                                            cItemProperties, cVSLCodes, iVideoNum)
             iVideoNum += 1
 
-        elif cItemType == 'image':
+        elif cItemType == Info.ITEM_IMAGE:
             delayedPrintCodes, cVSLCodes, isImFileNameRef = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel,
                                                                             delayedPrintCodes, cItemProperties,
                                                                             cVSLCodes)
@@ -3045,7 +3025,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     else:
         cItemOrWidgetNameStr = cProperties['name']
 
-    cVideoItemNums = getSliderItemTypeNums(cWidget, 'video')
+    cVideoItemNums = getSliderItemTypeNums(cWidget, Info.ITEM_VIDEO)
 
     cAfFlipCodes = delayedPrintCodes.get('codesAfFlip', [])
     cBeFlipCodes = delayedPrintCodes.get('codesBeFlip', [])
@@ -3566,6 +3546,11 @@ def compileCode(globalSelf, isDummyCompile):
         return
 
     globalSelf.save()
+
+    print(f"WID_WIDGET: {list(Info.WID_WIDGET.keys())}")
+    print(f"WID_NODE: {list(Info.WID_NODE.keys())}")
+    print(f"=====================================\n")
+
     # get save path
     compile_file_name = ".".join(Info.FILE_NAME.split('.')[:-1]) + ".m"
     # open file
@@ -4140,7 +4125,8 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f, "end % main function \n\n\n\n\n\n\n")
 
         outDevCountsDict = getOutputDevCountsDict()
-        nOutPortsNums = outDevCountsDict[Info.DEV_PARALLEL_PORT] + outDevCountsDict[Info.DEV_NETWORK_PORT] + outDevCountsDict[Info.DEV_SERIAL_PORT]
+        nOutPortsNums = outDevCountsDict[Info.DEV_PARALLEL_PORT] + outDevCountsDict[Info.DEV_NETWORK_PORT] + \
+                        outDevCountsDict[Info.DEV_SERIAL_PORT]
 
         iSubFunNum = 1
 

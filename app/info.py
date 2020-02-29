@@ -45,20 +45,6 @@ class Info(object):
         "game pad": 0
     }
 
-    SLIDER_COUNT: dict = {
-        "polygon": 0,
-        "arc": 0,
-        "rect": 0,
-        "circle": 0,
-        "image": 0,
-        "text": 0,
-        "video": 0,
-        "sound": 0,
-        "snow": 0,
-        "gabor": 0,
-        "line": 0,
-    }
-
     # 当前导入导出文件名
     FILE_NAME: str = ""
 
@@ -101,7 +87,7 @@ class Info(object):
     ACTION = "Action"
     STARTR = "StartR"
     ENDR = "EndR"
-    Log = "Log"
+    LOG = "Log"
     QUEST_INIT = "QuestInit"
     QUEST_UPDATE = "QuestUpdate"
     QUEST_GET_VALUE = "QuestGetValue"
@@ -114,6 +100,33 @@ class Info(object):
     DEV_PARALLEL_PORT = "parallel_port"
     DEV_SERIAL_PORT = "serial_port"
     DEV_SOUND = "sound"
+
+    # FOR SLIDER ITEMS:
+    ITEM_POLYGON = "polygon"
+    ITEM_ARC = "arc"
+    ITEM_RECT = "rect"
+    ITEM_CIRCLE = "circle"
+    ITEM_IMAGE = "image"
+    ITEM_TEXT = "text"
+    ITEM_VIDEO = "video"
+    ITEM_SOUND = "sound"
+    ITEM_SNOW = "snow"
+    ITEM_GABOR = "gabor"
+    ITEM_LINE = "line"
+
+    SLIDER_COUNT: dict = {
+        ITEM_POLYGON: 0,
+        ITEM_ARC: 0,
+        ITEM_RECT: 0,
+        ITEM_CIRCLE: 0,
+        ITEM_IMAGE: 0,
+        ITEM_TEXT: 0,
+        ITEM_VIDEO: 0,
+        ITEM_SOUND: 0,
+        ITEM_SNOW: 0,
+        ITEM_GABOR: 0,
+        ITEM_LINE: 0,
+    }
 
     # 图片保存路径
     IMAGE_SOURCE_PATH = "image"
@@ -132,7 +145,7 @@ class Info(object):
         ACTION: os.path.join(IMAGE_SOURCE_PATH, "action_eye.png"),
         STARTR: os.path.join(IMAGE_SOURCE_PATH, "start_eye.png"),
         ENDR: os.path.join(IMAGE_SOURCE_PATH, "end_eye.png"),
-        Log: os.path.join(IMAGE_SOURCE_PATH, "close_eye.png"),
+        LOG: os.path.join(IMAGE_SOURCE_PATH, "close_eye.png"),
         QUEST_INIT: os.path.join(IMAGE_SOURCE_PATH, "start_quest.png"),
         QUEST_UPDATE: os.path.join(IMAGE_SOURCE_PATH, "update_quest.png"),
         QUEST_GET_VALUE: os.path.join(IMAGE_SOURCE_PATH, "get_value.png"),
@@ -156,7 +169,7 @@ class Info(object):
         ACTION: 0,
         STARTR: 0,
         ENDR: 0,
-        Log: 0,
+        LOG: 0,
         QUEST_INIT: 0,
         QUEST_UPDATE: 0,
         QUEST_GET_VALUE: 0,
@@ -180,7 +193,7 @@ class Info(object):
         ACTION: 0,
         STARTR: 0,
         ENDR: 0,
-        Log: 0,
+        LOG: 0,
         QUEST_INIT: 0,
         QUEST_UPDATE: 0,
         QUEST_GET_VALUE: 0,
@@ -206,9 +219,7 @@ class Info(object):
     Image_Path = "images"
 
     # widget type
-    ErrorWidgetId = ""
-    Timeline = "Timeline"
-    Cycle = "Cycle"
+    ERROR_WIDGET_ID = ""
 
     # drag type
     IconBarToTimeline = "0"

@@ -18,9 +18,9 @@ class PixItem(QGraphicsPixmapItem):
     Image, Video, Sound = [5, 7, 8]
 
     name = {
-        Image: "image",
-        Video: "video",
-        Sound: "sound",
+        Image: Info.ITEM_IMAGE,
+        Video: Info.ITEM_VIDEO,
+        Sound: Info.ITEM_SOUND,
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):

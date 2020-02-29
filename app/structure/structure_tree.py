@@ -75,7 +75,7 @@ class StructureTree(QTreeWidget):
             self.delete_action.setEnabled(False)
             if item.widget_id:
                 self.delete_action.setEnabled(True)
-                if not Func.isWidgetType(item.widget_id, Info.Timeline):
+                if not Func.isWidgetType(item.widget_id, Info.TIMELINE):
                     self.rename_action.setEnabled(True)
             self.menu.exec(self.mapToGlobal(e.pos()))
 
@@ -89,7 +89,7 @@ class StructureTree(QTreeWidget):
         @return:
         """
         # if it has parent node
-        if parent_widget_id != Info.ErrorWidgetId:
+        if parent_widget_id != Info.ERROR_WIDGET_ID:
             parent_node: StructureNode = Kernel.Nodes[parent_widget_id]
             node = StructureNode(parent=parent_node, widget_id=widget_id)
             node.setText(0, widget_name)
@@ -144,7 +144,7 @@ class StructureTree(QTreeWidget):
             widget_id = item.widget_id
             if e.modifiers() == Qt.ControlModifier:
                 # ctrl -> copy
-                if not Func.isWidgetType(widget_id, Info.Cycle):
+                if not Func.isWidgetType(widget_id, Info.CYCLE):
                     self.copyDrag(widget_id)
             elif e.modifiers() == Qt.ShiftModifier:
                 # todo move to timeline (shift -> move)
@@ -236,5 +236,5 @@ class StructureTree(QTreeWidget):
         """
         # get current item
         item = self.currentItem()
-        if type(item) == StructureNode and not Func.isWidgetType(item.widget_id, Info.Timeline):
+        if type(item) == StructureNode and not Func.isWidgetType(item.widget_id, Info.TIMELINE):
             self.editItem(item, 0)

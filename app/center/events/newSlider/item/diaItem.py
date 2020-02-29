@@ -14,10 +14,10 @@ class DiaItem(QGraphicsPolygonItem):
     Polygon, Circle, Arc, Rect = range(1, 5)
 
     name: dict = {
-        Polygon: "polygon",
-        Arc: "arc",
-        Circle: "circle",
-        Rect: "rect",
+        Polygon: Info.ITEM_POLYGON,
+        Arc: Info.ITEM_ARC,
+        Circle: Info.ITEM_CIRCLE,
+        Rect: Info.ITEM_RECT,
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):

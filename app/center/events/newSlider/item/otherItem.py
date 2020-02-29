@@ -13,8 +13,8 @@ from .snow import SnowProperty
 class OtherItem(QGraphicsPixmapItem):
     Snow, Gabor = 9, 10
     name = {
-        Snow: "snow",
-        Gabor: "gabor",
+        Snow: Info.ITEM_SNOW,
+        Gabor: Info.ITEM_GABOR,
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):

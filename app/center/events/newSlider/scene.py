@@ -2,6 +2,7 @@ from PyQt5.QtCore import pyqtSignal, Qt, QLineF
 from PyQt5.QtGui import QPen, QTransform, QKeyEvent
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem
 
+from app.info import Info
 from .item.diaItem import DiaItem
 from .item.lasso import Lasso
 from .item.linItem import LineItem
@@ -180,27 +181,27 @@ class Scene(QGraphicsScene):
             self.clear()
             for k, v in properties.items():
                 k: str
-                if k.startswith("image"):
+                if k.startswith(Info.ITEM_IMAGE):
                     item = PixItem(PixItem.Image, k)
-                elif k.startswith("text"):
+                elif k.startswith(Info.ITEM_TEXT):
                     item = TextItem(TextItem.Text, k)
-                elif k.startswith("video"):
+                elif k.startswith(Info.ITEM_VIDEO):
                     item = PixItem(PixItem.Video, k)
-                elif k.startswith("sound"):
+                elif k.startswith(Info.ITEM_SOUND):
                     item = PixItem(PixItem.Sound, k)
-                elif k.startswith("snow"):
+                elif k.startswith(Info.ITEM_SNOW):
                     item = OtherItem(OtherItem.Snow, k)
-                elif k.startswith("gabor"):
+                elif k.startswith(Info.ITEM_GABOR):
                     item = OtherItem(OtherItem.Gabor, k)
-                elif k.startswith("polygon"):
+                elif k.startswith(Info.ITEM_POLYGON):
                     item = DiaItem(DiaItem.Polygon, k)
-                elif k.startswith("arc"):
+                elif k.startswith(Info.ITEM_ARC):
                     item = DiaItem(DiaItem.Arc, k)
-                elif k.startswith("rect"):
+                elif k.startswith(Info.ITEM_RECT):
                     item = DiaItem(DiaItem.Rect, k)
-                elif k.startswith("circle"):
+                elif k.startswith(Info.ITEM_CIRCLE):
                     item = DiaItem(DiaItem.Circle, k)
-                elif k.startswith("line"):
+                elif k.startswith(Info.ITEM_LINE):
                     x1: str = v.get("X1")
                     y1: str = v.get("Y1")
                     x2: str = v.get("X2")

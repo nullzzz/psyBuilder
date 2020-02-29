@@ -17,7 +17,7 @@ class Properties(DockWidget):
         self.properties_table = PropertiesTable()
         self.setWidget(self.properties_table)
         # current widget id
-        self.current_widget_id = Info.ErrorWidgetId
+        self.current_widget_id = Info.ERROR_WIDGET_ID
 
     def showProperties(self, widget_id: str):
         """

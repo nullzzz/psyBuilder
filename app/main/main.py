@@ -207,8 +207,6 @@ class Psy(QMainWindow):
         self.setCentralWidget(self.center)
         # output
         self.output = Output()
-
-        # 添加dock widget
         # its initial layout
         self.addDockWidget(Qt.LeftDockWidgetArea, self.structure)
         self.splitDockWidget(self.structure, self.properties, Qt.Vertical)
@@ -216,7 +214,7 @@ class Psy(QMainWindow):
         self.splitDockWidget(self.output, self.attributes, Qt.Horizontal)
         self.addDockWidget(Qt.RightDockWidgetArea, self.attributes)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.output)
-
+        # link signals
         self.attributes.visibilityChanged.connect(self.checkVisible)
         self.structure.visibilityChanged.connect(self.checkVisible)
         self.properties.visibilityChanged.connect(self.checkVisible)
@@ -244,6 +242,12 @@ class Psy(QMainWindow):
         widget_type = Func.getWidgetType(widget_id)
         # link common signals
         # link special signals
+        if widget_type == Info.TIMELINE:
+            pass
+        elif widget_type == Info.CYCLE:
+            pass
+        elif widget_type == Info.IF or Info.SWITCH:
+            pass
 
     def handleItemClicked(self, widget_id: str):
         """

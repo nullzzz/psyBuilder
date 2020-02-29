@@ -20,12 +20,12 @@ class Kernel(object):
 
     # wid num of different add_type of widget
     WidgetTypeCount = {
-        Info.Timeline: 0,
-        Info.Cycle: 0,
+        Info.TIMELINE: 0,
+        Info.CYCLE: 0,
     }
 
     # it's used to counter the count of widget name should go.
     WidgetNameCount = {
-        Info.Timeline: 0,
-        Info.Cycle: 0,
+        Info.TIMELINE: 0,
+        Info.CYCLE: 0,
     }
