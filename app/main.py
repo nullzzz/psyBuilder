@@ -286,7 +286,6 @@ class Psy(QMainWindow):
             widget = QuestGetValue(widget_id, widget_name)
         else:
             # if fail to create widget, exit.
-            print(widget_type)
             MessageBox.information(self, "warning", f"unknown widget type '{widget_type}'.")
             exit()
         # change data set in Kernel
@@ -299,6 +298,9 @@ class Psy(QMainWindow):
         """
         copy widget, link its signals and store it into some data
         """
+        new_widget = Kernel.Widgets[origin_widget_id].copy(new_widget_id, new_widget_name)
+        Kernel.Widgets[new_widget_id] = new_widget
+        return new_widget
 
     def referWidget(self, origin_widget_id: str, new_widget_id: str = Info.ERROR_WIDGET_ID):
         """
@@ -367,52 +369,262 @@ class Psy(QMainWindow):
         """
         When item is copied, handle related affairs
         """
+        # start wait
+        self.startWait()
+        # do job
+        # copy widget firstly
+        self.copyWidget(origin_widget_id, new_widget_id, new_widget_name)
+        # we should consider a lot of things here because of reference.
+        # we also need add node in those reference parents
+        # add node in origin parent node
+        self.structure.addNode(parent_widget_id, new_widget_id, new_widget_name, index)
+        # add node in refer parent node
+        refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
+        for refer_parent_widget_id in refer_parent_widget_ids:
+            # we need exclude origin parent widget id
+            if refer_parent_widget_id != parent_widget_id:
+                # refer widget
+                refer_widget_id = self.referWidget(new_widget_id)
+                # add refer node in refer parent
+                self.structure.addNode(refer_parent_widget_id, refer_widget_id, new_widget_name, index)
+        # end wait
+        self.endWait()
 
     def handleItemReferenced(self, parent_widget_id: str, origin_widget_id: str, new_widget_id: str, index: int):
         """
         When item is referenced, handle related affairs
         """
+        # start wait
+        self.startWait()
+        # do job
+        # copy widget firstly
+        self.referWidget(origin_widget_id, new_widget_id)
+        # we should consider a lot of things here because of reference.
+        # we also need add node in those reference parents
+        # add node in origin parent node
+        widget_name = Func.getWidgetName(origin_widget_id)
+        self.structure.addNode(parent_widget_id, new_widget_id, widget_name, index)
+        # add node in refer parent node
+        refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
+        for refer_parent_widget_id in refer_parent_widget_ids:
+            # we need exclude origin parent widget id
+            if refer_parent_widget_id != parent_widget_id:
+                # refer widget
+                refer_widget_id = self.referWidget(new_widget_id)
+                # add refer node in refer parent
+                self.structure.addNode(refer_parent_widget_id, refer_widget_id, widget_name, index)
+        # end wait
+        self.endWait()
 
     def handleItemMoved(self, origin_parent_widget_id: str, dest_parent_widget_id: str, widget_id: str,
                         origin_index: int, dest_index: int):
         """
         When item is moved, handle related affairs
         """
+        widget_name = Func.getWidgetName(widget_id)
+        if origin_parent_widget_id == dest_parent_widget_id:
+            # move in its parent
+            reference_parents = Func.getWidgetReference(origin_parent_widget_id)
+            for reference_parent in reference_parents:
+                parent_node = Kernel.Nodes[reference_parent]
+                for i in range(parent_node.childCount()):
+                    child = parent_node.child(i)
+                    if child.text(0) == widget_name:
+                        self.structure.moveNode(child.widget_id, origin_index, dest_index)
+        else:
+            # move to other parent, both origin widget and dest parent must be origin widget (first widget?).
+            # delete node in origin parent, add node in dest parent (including reference)
+            delete_children = []
+            reference_parents = Func.getWidgetReference(origin_parent_widget_id)
+            for reference_parent in reference_parents:
+                parent_node = Kernel.Nodes[reference_parent]
+                for i in range(parent_node.childCount()):
+                    child = parent_node.child(i)
+                    if child.text(0) == widget_name:
+                        delete_children.append(child.widget_id)
+                        self.structure.deleteNode(child.widget_id)
+            # add node in dest parent. However, we need add or delete some node.
+            reference_parents = Func.getWidgetReference(dest_parent_widget_id)
+            if len(reference_parents) <= len(delete_children):
+                # we need delete some children's widget id
+                count = 0
+                while count < len(reference_parents):
+                    reference_parent = reference_parents[count]
+                    child_widget_id = delete_children[count]
+                    # add node in reference parent
+                    self.structure.addNode(reference_parent, child_widget_id, widget_name, dest_index)
+                    count += 1
+                # delete some children's widget id, (Kernel.Nodes, Kernel.Names)
+                while count < len(delete_children):
+                    Kernel.Names[widget_name].remove(delete_children[count])
+                    del Kernel.Nodes[delete_children[count]]
+                    count += 1
+            else:
+                # we need add some children's widget id
+                count = 0
+                while count < len(reference_parents):
+                    reference_parent = reference_parents[count]
+                    child_widget_id = delete_children[count]
+                    # add node in reference parent
+                    self.structure.addNode(reference_parent, child_widget_id, widget_name, dest_index)
+                    count += 1
+                while count < len(reference_parents):
+                    reference_parent = reference_parents[count]
+                    child_widget_id = self.referWidget(widget_id)
+                    self.structure.addNode(reference_parent, child_widget_id, widget_name, dest_index)
+                    count += 1
 
-    def handleItemDeleted(self, sender_widget: int, widget_id: int):
+    def handleItemDeleted(self, sender_widget: int, widget_id: str):
         """
         When item is deleted, handle related affairs
         """
+        # close tab
+        self.center.closeTab(widget_id)
+        # delete node in structure (we need delete data in Kernel.Nodes and Kernel.Names) and item in timeline or timeline in cycle
+        widget_name = Func.getWidgetName(widget_id)
+        if sender_widget == Info.StructureSend:
+            # delete item in timeline or timeline in cycle
+            if Func.isWidgetType(widget_id, Info.TIMELINE):
+                # delete timeline in cycle
+                cycle: Cycle = Kernel.Widgets[Func.getWidgetParent(widget_id)]
+                cycle.deleteTimeline(widget_name)
+            else:
+                # delete item in timeline
+                timeline: Timeline = Kernel.Widgets[Func.getWidgetParent(widget_id)]
+                timeline.deleteItem(widget_name)
+        # delete node and reference nodes in reference parent nodes
+        reference_parents = Func.getWidgetReference(Func.getWidgetParent(widget_id))
+        for reference_parent in reference_parents:
+            children = Func.getWidgetChildren(reference_parent)
+            for child_widget_id, child_widget_name in children:
+                if child_widget_name == widget_name:
+                    self.deleteNodeRecursive(child_widget_id, child_widget_name)
+                    break
+
+    def deleteNodeRecursive(self, widget_id: str, widget_name: str):
+        """
+
+        @param widget_id: root node's widget id
+        @param widget_name: root node's widget name
+        @return:
+        """
+        if Func.isWidgetType(widget_id, Info.CYCLE) or Func.isWidgetType(widget_id, Info.TIMELINE):
+            for child_widget_id, child_widget_name in Func.getWidgetChildren(widget_id):
+                self.deleteNodeRecursive(child_widget_id, child_widget_name)
+        # delete data (Kernel.Nodes, Kernel.Widgets, Kernel.Name)
+        self.structure.deleteNode(widget_id)
+        del Kernel.Nodes[widget_id]
+        reference: list = Kernel.Names[widget_name]
+        if len(reference) == 1:
+            del Kernel.Names[widget_name]
+        else:
+            if reference[0] == widget_id:
+                # if widget is origin widget, we should change widget's widget id
+                Kernel.Widgets[widget_id].changeWidgetId(reference[1])
+            reference.remove(widget_id)
+        del Kernel.Widgets[widget_id]
 
     def handleItemNameChanged(self, sender_widget: int, widget_id: str, new_widget_name: str):
         """
         When item'name is changed, handle related affairs
         """
+        # change widget's name
+
+        widget = Kernel.Widgets[widget_id]
+        old_widget_name = Func.getWidgetName(widget_id)
+        widget.widget_name = new_widget_name
+        # change tab's name
+        self.center.changeTabName(widget_id, new_widget_name)
+        #
+        parent_widget_id = Func.getWidgetParent(widget_id)
+        if sender_widget == Info.StructureSend:
+            # we need change item's name if signal comes from structure
+            timeline = Kernel.Widgets[parent_widget_id]
+            timeline.renameItem(old_widget_name, new_widget_name)
+        # change node's name in structure and reference parent's child
+        # get it's old name to get its reference
+        change_widget_ids = [widget_id]
+        reference_parents = Func.getWidgetReference(Func.getWidgetParent(widget_id))
+        for reference_parent in reference_parents:
+            children = Func.getWidgetChildren(reference_parent)
+            for child_widget_id, child_widget_name in children:
+                if child_widget_name == old_widget_name:
+                    # change node's text
+                    self.structure.changeNodeName(child_widget_id, new_widget_name)
+                    if child_widget_id != widget_id:
+                        change_widget_ids.append(child_widget_id)
+                    break
+        # change data (Kernel.Names, [Kernel.Widget])
+        # if reference widget change its name, we should change it to a copy widget
+        if len(change_widget_ids) == len(Kernel.Names[old_widget_name]):
+            # if we change all, we just need to change key in Kernel.Names
+            Kernel.Names[new_widget_name] = Kernel.Names[old_widget_name]
+            del Kernel.Names[old_widget_name]
+        else:
+            # we need change
+            origin_widget_id = Kernel.Names[old_widget_name][0]
+            # save new name
+            Kernel.Names[new_widget_name] = change_widget_ids
+            # copy widget and map widget id to widget
+            # remove change widget id from Kernel.Names[old_widget_name]
+            for change_widget_id in change_widget_ids:
+                Kernel.Names[new_widget_name].remove(change_widget_id)
+            if origin_widget_id in change_widget_ids:
+                # copy new widget and widget's widget id is now Kernel.Names[old_widget_name][0]
+                # and change it map
+                # change origin widget's widget id
+                Kernel.Widgets[widget_id].changeWidgetId(Kernel.Names[old_widget_name][0])
+                # copy this widget
+                copy_widget = self.copyWidget(Kernel.Names[old_widget_name][0], widget_id, new_widget_name)
+                # map
+                for change_widget_id in change_widget_ids:
+                    Kernel.Widgets[change_widget_id] = copy_widget
+            else:
+                # copy widget and widget's widget id is change_widget_id[0], and map it to all
+                copy_widget = self.copyWidget(origin_widget_id, widget_id, new_widget_name)
+                for change_widget_id in change_widget_ids:
+                    Kernel.Widgets[change_widget_id] = copy_widget
 
     def handleItemClicked(self, widget_id: str):
         """
         When item is clicked, handle related affairs
         """
+        # change attributes and properties
+        self.attributes.showAttributes(widget_id)
+        self.properties.showProperties(widget_id)
 
     def handleItemDoubleClicked(self, widget_id: str):
         """
         When item is double clicked, handle related affairs
         """
+        # open tab
+        self.center.openTab(widget_id)
 
     def handlePropertiesChanged(self, widget_id: str):
         """
         When item'properties is changed or to show it, handle related affairs
         """
+        self.properties.showProperties(widget_id)
 
-    def handleCurrentTabChanged(self, index: int):
+    def handleCurrentTabChanged(self, widget_id: str):
         """
 
         """
+        if widget_id == Info.ERROR_WIDGET_ID:
+            # it means that user close all tab and we should clear attributes and properties
+            # change attributes and properties
+            self.attributes.clearAttributes()
+            self.properties.clearProperties()
+        else:
+            # change attributes and properties
+            self.attributes.showAttributes(widget_id)
+            self.properties.showProperties(widget_id)
 
     def handleTabClosed(self, widget_id: str):
         """
 
         """
+        self.center.closeTab(widget_id)
 
     def newFile(self):
         python = sys.executable

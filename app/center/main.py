@@ -2,6 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow
 
 from app.func import Func
+from app.info import Info
 from app.kernel import Kernel
 from lib import TabWidget
 
@@ -37,7 +38,7 @@ class Center(QMainWindow):
         widget = Kernel.Widgets[widget_id]
         self.tab_widget.openTab(widget, widget_type, widget.widget_name)
 
-    def closeTab(self, widget_id: int) -> None:
+    def closeTab(self, widget_id: str) -> None:
         """
         close widget in tab widget
         @param widget_id:
@@ -67,4 +68,4 @@ class Center(QMainWindow):
             widget = self.tab_widget.widget(index)
             self.currentWidgetChanged.emit(widget.widget_id)
         else:
-            self.currentWidgetChanged.emit(-1)
+            self.currentWidgetChanged.emit(Info.ERROR_WIDGET_ID)

@@ -578,7 +578,7 @@ class Func(object):
         return child.widget_id, child.text(0)
 
     @staticmethod
-    def getWidgetChildren(widget_id: int) -> list:
+    def getWidgetChildren(widget_id: str) -> list:
         """
 
         @param widget_id:
@@ -611,6 +611,14 @@ class Func(object):
         """
         get widget's properties through its widget id
         """
+        widget = Kernel.Widgets[widget_id]
+        return widget.getProperties()
+
+    @staticmethod
+    def getWidgetAttributes(widget_id: str):
+        """
+        get widget's attributes through its widget id
+        """
         # global attributes
         attributes = ["subName", "subNum", "sessionNum", "subSex", "subHandness", "subAge"]
         # attributes about quest
@@ -623,14 +631,14 @@ class Func(object):
         node = Kernel.Nodes[widget_id]
         # do 1.
         parent = node.parent()
-        if parent and Func.isWidgetType(parent.widget_id, Info.Timeline):
+        if parent and Func.isWidgetType(parent.widget_id, Info.TIMELINE):
             for i in range(parent.childCount()):
                 child_node = parent.child(i)
                 # until it self
                 if child_node.widget_id == widget_id:
                     break
                 # ignore cycle before item
-                if not Func.isWidgetType(child_node.widget_id, Info.Cycle):
+                if not Func.isWidgetType(child_node.widget_id, Info.CYCLE):
                     for attribute in Kernel.Widgets[child_node.widget_id].getHiddenAttribute():
                         attributes.append(f"{child_node.text(0)}.{attribute}")
         # do 2. 3.
@@ -638,7 +646,7 @@ class Func(object):
         node = node.parent()
         while node:
             # we just need cycle
-            if Func.isWidgetType(node.widget_id, Info.Cycle):
+            if Func.isWidgetType(node.widget_id, Info.CYCLE):
                 cycle = Kernel.Widgets[node.widget_id]
                 cycle_name = node.text(0)
                 col_attributes = cycle.getColumnAttributes()
@@ -653,14 +661,6 @@ class Func(object):
             node = node.parent()
         # return
         return attributes
-
-    @staticmethod
-    def getWidgetAttributes(widget_id: str):
-        """
-        get widget's attributes through its widget id
-        """
-        widget = Kernel.Widgets[widget_id]
-        return widget.getProperties()
 
     @staticmethod
     def getImage(image_path: str, type: int = 0, size: QSize = None) -> QPixmap or QIcon:

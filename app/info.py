@@ -1,5 +1,3 @@
-import os
-
 from PyQt5.QtCore import QSettings
 
 
@@ -8,22 +6,22 @@ class Info(object):
     info类，主要存放一些配置信息及数据
     """
     # 编译平台：linux\windows\mac
-    PLATFORM: str = "linux"
+    PLATFORM = None
 
-    IMAGE_LOAD_MODE: str = "before_event"
+    IMAGE_LOAD_MODE = None
 
     # 保存widget_tabs的 (widget_id -> widget)
-    WID_WIDGET = {}
+    WID_WIDGET = None
 
     # 保存structure的 (widget_id -> node)
-    WID_NODE: dict = {}
+    WID_NODE: dict = None
 
     # 只在structure中进行name的处理，避免失误(name -> [wid1, wid2...]),
     # 必须要保证wid1是所有指向的widget的widget_id！
-    NAME_WID: dict = {}
+    NAME_WID: dict = None
 
     # 输入输出设备
-    QUEST_INFO: dict = {}
+    QUEST_INFO = None
     TRACKER_INFO: dict = {}
     INPUT_DEVICE_INFO: dict = {}
     OUTPUT_DEVICE_INFO: dict = {}
@@ -130,7 +128,6 @@ class Info(object):
 
     # 图片保存路径
     IMAGE_SOURCE_PATH = "image"
-
 
     ###########################################
     #               new version               #

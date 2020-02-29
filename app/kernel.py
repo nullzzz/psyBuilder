@@ -63,3 +63,5 @@ class Kernel(object):
         Info.SWITCH: 0,
         Info.TIMELINE: 0,
     }
+
+    QuestInfo = {}

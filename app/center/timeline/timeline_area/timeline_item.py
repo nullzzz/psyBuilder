@@ -136,7 +136,7 @@ class TimelineItem(QLabel):
         drag = QDrag(self)
         drag.setMimeData(mime_data)
         drag.setHotSpot(QPoint(24, 24))
-        drag.setPixmap(Func.getImage(f"widgets/{Info.WidgetType[self.widget_type]}", size=QSize(48, 48)))
+        drag.setPixmap(Func.getImage(f"widgets/{self.widget_type}", size=QSize(48, 48)))
         drag.exec()
 
     def copyDrag(self):
@@ -152,5 +152,5 @@ class TimelineItem(QLabel):
         drag = QDrag(self)
         drag.setMimeData(mime_data)
         drag.setHotSpot(QPoint(24, 24))
-        drag.setPixmap(Func.getImage(f"widgets/{Info.WidgetType[self.widget_type]}", size=QSize(48, 48)))
+        drag.setPixmap(Func.getImage(f"widgets/{self.widget_type}", size=QSize(48, 48)))
         drag.exec()
