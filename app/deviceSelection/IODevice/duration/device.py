@@ -19,7 +19,7 @@ class Device(QListWidgetItem):
         self.device_id = device_id
 
         # 设置图标
-        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
+        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.device_type))))
 
         self.default_properties = {
             "Device Type": self.device_type,

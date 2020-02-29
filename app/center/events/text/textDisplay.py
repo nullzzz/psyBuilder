@@ -46,9 +46,9 @@ class TextDisplay(TabItemMainWindow):
         self.setCentralWidget(self.text_label)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
+        open_pro = QAction(QIcon(Func.getImagePath("setting")), "setting", self)
         open_pro.triggered.connect(self.openPro)
-        pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
+        pre_view = QAction(QIcon(Func.getImagePath("preview")), "preview", self)
         pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
         # tool.addAction(pre_view)

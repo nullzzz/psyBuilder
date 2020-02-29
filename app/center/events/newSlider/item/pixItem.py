@@ -33,17 +33,17 @@ class PixItem(QGraphicsPixmapItem):
         self.attributes: list = []
         if self.item_type == self.Image:
             self.pro_window = ImageProperty()
-            self.setPixmap(QPixmap(Func.getImage("image.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImagePath("image.png")).scaled(100, 100))
         # elif self.item_type == self.Text:
         #     self.pro_window = TextProperty()
         #     # insert new text item here
         #     self.setPixmap(QPixmap(Func.getImage("text.png")).scaled(100, 100))
         elif self.item_type == self.Video:
             self.pro_window = VideoProperty()
-            self.setPixmap(QPixmap(Func.getImage("video.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImagePath("video.png")).scaled(100, 100))
         elif self.item_type == self.Sound:
             self.pro_window = SoundProperty()
-            self.setPixmap(QPixmap(Func.getImage("sound_item.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImagePath("sound_item.png")).scaled(100, 100))
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)

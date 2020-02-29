@@ -85,7 +85,7 @@ class Button(QPushButton):
         if text == "text":
             text = "textpointer"
 
-        fp = QPixmap(Func.getImage(f"{text}.png")).scaled(50, 50)
+        fp = QPixmap(Func.getImagePath(f"{text}.png")).scaled(50, 50)
         self.setIcon(QIcon(fp))
         self.setIconSize(QSize(50, 50))
         self.setMouseTracking(True)

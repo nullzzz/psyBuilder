@@ -44,7 +44,7 @@ class DeviceInDialog(QDialog):
             item = QListWidgetItem(device_name)
             item.setData(3, device_id)
             item.setData(4, device_name)
-            item.setIcon(QIcon(Func.getImage(f"{device_type}_device")))
+            item.setIcon(QIcon(Func.getImagePath(f"{device_type}_device")))
             self.devices_list.addItem(item)
 
 
@@ -89,6 +89,6 @@ class DeviceOutDialog(QDialog):
 
             item = QListWidgetItem(device_name)
             item.setData(3, device_id)
-            item.setIcon(QIcon(Func.getImage(f"{device_type}_device")))
+            item.setIcon(QIcon(Func.getImagePath(f"{device_type}_device")))
             self.devices_list.addItem(item)
             self.tip.hide()

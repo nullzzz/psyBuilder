@@ -27,7 +27,7 @@ class Tracker(QListWidgetItem):
         self.tobii_glasses_UDP_port_number = "0"
 
         # 设置图标
-        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.tracker_type))))
+        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.tracker_type))))
 
         self.default_properties = {
             "Tracker Type": self.tracker_type,

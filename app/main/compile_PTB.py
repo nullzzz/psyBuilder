@@ -26,7 +26,7 @@ stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDE
 def throwCompileErrorInfo(inputStr):
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Critical)
-    msg.setWindowIcon(QIcon(Func.getImage("icon.png")))
+    msg.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
 
     msg.setText(inputStr)
     msg.setWindowTitle("    Attention!   ")

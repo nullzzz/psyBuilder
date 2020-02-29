@@ -40,21 +40,21 @@ class AddDeleteButton(QLabel):
 
     def becomeDisabled(self):
         if self.button_type == 'add':
-            self.setPixmap(QPixmap(Func.getImage("add_disabled.png")))
+            self.setPixmap(QPixmap(Func.getImagePath("add_disabled.png")))
         elif self.button_type == 'delete':
-            self.setPixmap(QPixmap(Func.getImage("delete_disabled.png")))
+            self.setPixmap(QPixmap(Func.getImagePath("delete_disabled.png")))
 
     def becomeEnabled(self):
         if self.button_type == 'add':
-            self.setPixmap(QPixmap(Func.getImage('add.png')))
+            self.setPixmap(QPixmap(Func.getImagePath('add.png')))
         elif self.button_type == 'delete':
-            self.setPixmap(QPixmap(Func.getImage('delete.png')))
+            self.setPixmap(QPixmap(Func.getImagePath('delete.png')))
 
     def becomePressed(self):
         try:
             if self.button_type == 'add':
-                self.setPixmap(QPixmap(Func.getImage('add_press.png')))
+                self.setPixmap(QPixmap(Func.getImagePath('add_press.png')))
             elif self.button_type == 'del':
-                self.setPixmap(QPixmap(Func.getImage('delete_press.png')))
+                self.setPixmap(QPixmap(Func.getImagePath('delete_press.png')))
         except Exception as e:
             print(f"I can't solve {e}. [condition/addDeleteButton.py]")

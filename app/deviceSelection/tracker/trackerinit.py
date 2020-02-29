@@ -19,7 +19,7 @@ class TrackerInit(QWidget):
         super(TrackerInit, self).__init__(parent)
 
         self.setWindowTitle("Tracker")
-        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
 
         # 上方待选择设备
         self.tracker_list = QListWidget()

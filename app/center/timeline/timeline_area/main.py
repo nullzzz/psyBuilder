@@ -1,51 +1,49 @@
-from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal, Qt, QByteArray
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QScrollArea
+from PyQt5.QtCore import QDataStream, QIODevice, pyqtSignal, QByteArray
+from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
-from app.func import Func
+from app.func_ import Func
 from app.info import Info
 from .timeline_table import TimelineTable
 
 
-class TimelineArea(QScrollArea):
+class TimelineArea(QFrame):
     """
 
     """
 
+    # item clicked and double clicked (widget_id)
+    itemClicked = pyqtSignal(str)
+    itemDoubleClicked = pyqtSignal(str)
     # when widget's name is changed, emit this signal (widget id, widget_name)
-    itemNameChanged = pyqtSignal(int, str)
+    itemNameChanged = pyqtSignal(str, str)
     # item add, emit signal (widget_id, widget_name, index)
-    itemAdded = pyqtSignal(int, str, int)
+    itemAdded = pyqtSignal(str, str, int)
     # item copied, emit signal (origin_widget_id, new_widget_id, new_widget_name, index)
-    itemCopied = pyqtSignal(int, int, str, int)
-    # item copied, emit signal (origin_widget_id, new_widget_id, index)
-    itemReferenced = pyqtSignal(int, int, int)
+    itemCopied = pyqtSignal(str, str, str, int)
+    # item referenced, emit signal (origin_widget_id, new_widget_id, index)
+    itemReferenced = pyqtSignal(str, str, int)
     # item move, emit signal(origin_timeline, widget_id, origin index, new index)
-    itemMoved = pyqtSignal(int, int, int, int)
+    itemMoved = pyqtSignal(str, str, int, int)
     # item delete, emit signal(widget_id)
-    itemDeleted = pyqtSignal(int)
+    itemDeleted = pyqtSignal(str)
 
     def __init__(self, parent):
         super(TimelineArea, self).__init__(parent)
         # timeline table
         self.timeline_table = TimelineTable()
-        # set container
-        container = QFrame()
-        # set container's qss id
-        container.setObjectName("TimelineArea")
+        # set its qss id
+        self.setObjectName("TimelineArea")
         # set its layout
         layout = QVBoxLayout()
         layout.addWidget(self.timeline_table, 1)
-        container.setLayout(layout)
+        self.setLayout(layout)
         # accept drops
         self.setAcceptDrops(True)
-        self.setWidget(container)
-        self.setAlignment(Qt.AlignCenter)
-        self.setWidgetResizable(True)
         # link signals
         self.linkSignals()
         # data
         self.move_col = -1
-        self.move_widget_id = -1
+        self.move_widget_id = Info.ERROR_WIDGET_ID
         self.move_widget_name = ""
 
     def linkSignals(self):
@@ -53,10 +51,13 @@ class TimelineArea(QScrollArea):
 
         @return:
         """
+        self.timeline_table.itemClicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
+        self.timeline_table.itemDoubleClicked.connect(lambda widget_id: self.itemDoubleClicked.emit(widget_id))
         self.timeline_table.itemNameChanged.connect(lambda widget_id, text: self.itemNameChanged.emit(widget_id, text))
         self.timeline_table.itemDeleted.connect(lambda widget_id: self.itemDeleted.emit(widget_id))
 
-    def addItem(self, timeline_item, timeline_name_item, index: int) -> int:
+    def addItem(self, widget_type: str = None, widget_id: str = None, widget_name: str = None, index: int = 0) -> (
+            str, str, int):
         """
         add item in timeline table
         @param timeline_item:
@@ -65,9 +66,9 @@ class TimelineArea(QScrollArea):
         @return: final add index
         """
         # left work to timeline table
-        return self.timeline_table.addItem(timeline_item, timeline_name_item, index)
+        return self.timeline_table.addItem(widget_type, widget_id, widget_name, index)
 
-    def deleteItem(self, widget_id: int):
+    def deleteItem(self, widget_id: str):
         """
         delete item in timeline table but I left it to timeline table
         @param widget_id:
@@ -117,7 +118,8 @@ class TimelineArea(QScrollArea):
         elif data_format == Info.StructureMoveToTimeline or data_format == Info.StructureReferToTimeline:
             # get widget id
             widget_id = stream.readInt()
-            self.move_col = self.timeline_table.itemExist(widget_id)
+            widget_name = Func.getWidgetName(widget_id)
+            self.move_col = self.timeline_table.itemIndexByWidgetName(widget_name)
             # if exist in this timeline, it just move in timeline
             if self.move_col != -1:
                 # save widget id and widget name
@@ -153,10 +155,10 @@ class TimelineArea(QScrollArea):
         # if move item, we also need reset item in timeline
         if self.move_col != -1:
             # add origin item in timeline
-            self.parent().addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name, index=self.move_col)
+            self.addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name, index=self.move_col)
             # reset move data
             self.move_col = -1
-            self.move_widget_id = -1
+            self.move_widget_id = Info.ERROR_WIDGET_ID
             self.move_widget_name = ""
         e.ignore()
 
@@ -218,8 +220,8 @@ class TimelineArea(QScrollArea):
         """
         # simply add a item in timeline
         stream = QDataStream(data, QIODevice.ReadOnly)
-        widget_type = stream.readInt()
-        widget_id, widget_name, index = self.parent().addItem(widget_type=widget_type, index=index)
+        widget_type = stream.readQString()
+        widget_id, widget_name, index = self.addItem(widget_type=widget_type, index=index)
         # emit signal
         self.itemAdded.emit(widget_id, widget_name, index)
 
@@ -237,7 +239,7 @@ class TimelineArea(QScrollArea):
             self.itemMoved.emit(self.parent().widget_id, self.move_widget_id, self.move_col, index)
         # reset move data
         self.move_col = -1
-        self.move_widget_id = -1
+        self.move_widget_id = Info.ERROR_WIDGET_ID
         self.move_widget_name = ""
 
     def dealCopyDrag(self, data: QByteArray, index: int):
@@ -249,7 +251,7 @@ class TimelineArea(QScrollArea):
         """
         # simply add a item in timeline
         stream = QDataStream(data, QIODevice.ReadOnly)
-        origin_widget_id = stream.readInt()
+        origin_widget_id = stream.readQString()
         widget_type = Func.getWidgetType(origin_widget_id)
         new_widget_id, new_widget_name, index = self.parent().addItem(widget_type=widget_type, index=index)
         # emit signal

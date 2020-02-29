@@ -16,7 +16,7 @@ class Preview(QDialog):
         self.label.resize(400, 150)
 
         pix = QPixmap()
-        pix.load(Func.getImage("preview_tip"))
+        pix.load(Func.getImagePath("preview_tip"))
         self.label.setPixmap(pix)
         self.text.setReadOnly(True)
         screen = QDesktopWidget().screenGeometry()

@@ -9,15 +9,16 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLa
     QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame
 
 from app.attributes.main import Attributes
+from app.center import Center
 from app.center.events.durationPage import DurationPage
-from app.center.main import Center
-from app.center.timeline.main import Timeline
+from app.center.timeline import Timeline
 from app.deviceSelection.IODevice.globalDevices import GlobalDevice
 from app.deviceSelection.progressBar import LoadingTip
 from app.deviceSelection.quest.questinit import QuestInit
 from app.deviceSelection.tracker.trackerinit import TrackerInit
 from app.func import Func
 from app.info import Info
+from app.kernel import Kernel
 from app.output.main import Output
 from app.properties.main import Properties
 from app.registry import writeToRegistry
@@ -32,7 +33,7 @@ class Psy(QMainWindow):
         super(Psy, self).__init__(parent)
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
-        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
         # init menu bar
         self.initMenubar()
         # init dock widget
@@ -124,7 +125,7 @@ class Psy(QMainWindow):
         self.windows_action = QAction("&Windows", self)
         self.mac_action = QAction("&Mac", self)
 
-        icon = QIcon(Func.getImage("dock_visible.png"))
+        icon = QIcon(Func.getImagePath("dock_visible.png"))
 
         self.linux_action.setIcon(icon)
 
@@ -224,6 +225,21 @@ class Psy(QMainWindow):
         """
         create widget, link its signals and store it into some data
         """
+        widget_type = Func.getWidgetType(widget_id)
+        # todo add other items into this function
+        widget = None
+        if widget_type == Info.TIMELINE:
+            widget = Timeline(widget_id, widget_name)
+        elif widget_type == Info.CYCLE:
+            pass
+        else:
+            # if fail to create widget, exit.
+            exit()
+        # change data set in Kernel
+        Kernel.Widgets[widget_id] = widget
+        Kernel.Names[widget_name] = [widget_id]
+        # link necessary signals
+        self.linkWidgetSignals(widget_id, widget)
 
     def copyWidget(self, origin_widget_id: str, new_widget_id: str, new_widget_name: str):
         """
@@ -243,26 +259,44 @@ class Psy(QMainWindow):
         # link common signals
         # link special signals
         if widget_type == Info.TIMELINE:
-            pass
+            # timeline
+            widget.itemNameChanged.connect(self.dealItemNameChanged)
+            widget.itemClicked.connect(self.dealItemClicked)
+            widget.itemDoubleClicked.connect(self.dealItemDoubleClicked)
+            widget.itemMoved.connect(self.dealItemMoved)
+            widget.itemAdded.connect(self.dealItemAdded)
+            widget.itemCopied.connect(self.dealItemCopied)
+            widget.itemReferenced.connect(self.dealItemReferenced)
+            widget.itemDeleted.connect(self.dealItemDeleted)
         elif widget_type == Info.CYCLE:
             pass
         elif widget_type == Info.IF or Info.SWITCH:
             pass
 
-    def handleItemClicked(self, widget_id: str):
-        """
-        When item is clicked, handle related affairs
-        """
-
-    def handleItemDoubleClicked(self, widget_id: str):
-        """
-        When item is double clicked, handle related affairs
-        """
-
     def handleItemAdded(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int):
         """
         When item is added, handle related affairs
         """
+        # start wait
+        self.startWait()
+        # do job
+        # create widget firstly
+        self.createWidget(widget_id, widget_name)
+        # we should consider a lot of things here because of reference.
+        # we also need add node in those reference parents
+        # add node in origin parent node
+        self.structure.addNode(parent_widget_id, widget_id, widget_name, index)
+        # add node in refer parent node
+        refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
+        for refer_parent_widget_id in refer_parent_widget_ids:
+            # we need exclude origin parent widget id
+            if refer_parent_widget_id != parent_widget_id:
+                # refer widget
+                refer_widget_id = self.referWidget(widget_id)
+                # add refer node in refer parent
+                self.structure.addNode(refer_parent_widget_id, refer_widget_id, widget_name, index)
+        # end wait
+        self.endWait()
 
     def handleItemCopied(self, parent_widget_id: str, origin_widget_id: str, new_widget_id: str, new_widget_name: str,
                          index: int):
@@ -289,6 +323,31 @@ class Psy(QMainWindow):
     def handleItemNameChanged(self, sender_widget: int, widget_id: str, new_widget_name: str):
         """
         When item'name is changed, handle related affairs
+        """
+
+    def handleItemClicked(self, widget_id: str):
+        """
+        When item is clicked, handle related affairs
+        """
+
+    def handleItemDoubleClicked(self, widget_id: str):
+        """
+        When item is double clicked, handle related affairs
+        """
+
+    def handlePropertiesChanged(self, widget_id: str):
+        """
+        When item'properties is changed or to show it, handle related affairs
+        """
+
+    def handleCurrentTabChanged(self, index: int):
+        """
+
+        """
+
+    def handleTabClosed(self, widget_id: str):
+        """
+
         """
 
     def newFile(self):
@@ -483,7 +542,7 @@ class Psy(QMainWindow):
         """
         dock = self.sender().windowTitle()
         if is_visible:
-            icon = QIcon(Func.getImage("dock_visible.png"))
+            icon = QIcon(Func.getImagePath("dock_visible.png"))
         else:
             icon = QIcon("")
         if dock == "Attributes":
@@ -574,7 +633,7 @@ class Psy(QMainWindow):
         self.aboutWidget = QWidget()
         self.aboutWidget.setWindowTitle("About developers of PTB Builder 0.1")
         self.aboutWidget.setWindowModality(2)
-        self.aboutWidget.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.aboutWidget.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
         self.aboutWidget.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
 
         self.aboutWidget.setAutoFillBackground(True)
@@ -632,7 +691,7 @@ class Psy(QMainWindow):
 
         img00.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab01.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        img00.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))
+        img00.setPixmap(QPixmap(Func.getImagePath("authorInfo01.png")))
         lab01.setTextFormat(Qt.RichText)
         lab01.setTextInteractionFlags(Qt.TextBrowserInteraction)
         lab01.setOpenExternalLinks(True)
@@ -642,12 +701,12 @@ class Psy(QMainWindow):
         img10.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab11.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab11.setText("Zhe Yang, Ph.D, Associate Prof. \n Department of computer science, Soochow University")
-        img10.setPixmap(QPixmap(Func.getImage("authorInfo02.png")))
+        img10.setPixmap(QPixmap(Func.getImagePath("authorInfo02.png")))
 
         img20.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab21.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab21.setText("ChenZhi Feng, Ph.D, Prof. \n Department of Psychology, Soochow University")
-        img20.setPixmap(QPixmap(Func.getImage("authorInfo03.png")))
+        img20.setPixmap(QPixmap(Func.getImagePath("authorInfo03.png")))
 
         layout0 = QVBoxLayout()
         layout0.addWidget(te01)

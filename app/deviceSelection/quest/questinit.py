@@ -19,7 +19,7 @@ class QuestInit(QWidget):
         super(QuestInit, self).__init__(parent)
 
         self.setWindowTitle("Quest")
-        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
 
         # 上方待选择设备
         self.quest_list = QListWidget()

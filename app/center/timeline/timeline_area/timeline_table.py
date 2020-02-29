@@ -4,11 +4,11 @@ from PyQt5.QtCore import Qt, pyqtSignal, QRect
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu, QShortcut
 
-from app.func import Func
+from app.func_ import Func
 from app.info import Info
 from lib import TableWidget, MessageBox
-from ..timeline_item import TimelineItem
-from ..timeline_name_item import TimelineNameItem
+from .timeline_item import TimelineItem
+from .timeline_name_item import TimelineNameItem
 
 
 class TimelineTable(TableWidget):
@@ -26,9 +26,12 @@ class TimelineTable(TableWidget):
     arrow_row = 2
     name_row = 3
 
+    # item clicked and double clicked (widget_id)
+    itemClicked = pyqtSignal(str)
+    itemDoubleClicked = pyqtSignal(str)
     # when widget's name is changed, emit this signal (widget id, widget_name)
-    itemNameChanged = pyqtSignal(int, str)
-    itemDeleted = pyqtSignal(int)
+    itemNameChanged = pyqtSignal(str, str)
+    itemDeleted = pyqtSignal(str)
 
     def __init__(self):
         super(TimelineTable, self).__init__(None)
@@ -147,7 +150,8 @@ class TimelineTable(TableWidget):
         label.setFocusPolicy(Qt.NoFocus)
         self.setCellWidget(self.arrow_row, col, label)
 
-    def addItem(self, timeline_item, timeline_name_item, index: int) -> int:
+    def addItem(self, widget_type: str = None, widget_id: str = None, widget_name: str = None, index: int = 0) -> (
+            str, str, int):
         """
         add item in timeline table
         @param timeline_item:
@@ -155,6 +159,14 @@ class TimelineTable(TableWidget):
         @param index:
         @return: add index
         """
+        # generate a timeline item and timeline name item
+        timeline_item = TimelineItem(widget_type, widget_id)
+        timeline_name_item = TimelineNameItem(timeline_item.widget_type, timeline_item.widget_id, widget_name)
+        # link items' signals
+        timeline_item.clicked.connect(lambda widget_id: self.itemClicked.emit(widget_id))
+        timeline_item.doubleClicked.connect(lambda widget_id: self.itemDoubleClicked.emit(widget_id))
+        # bind timeline name item to timeline item
+        timeline_item.timeline_name_item = timeline_name_item
         # no matter what, insert a column first
         if index > self.item_count or index == -1:
             index = self.item_count
@@ -173,16 +185,16 @@ class TimelineTable(TableWidget):
         # if initial length is not full, we should delete one column
         if self.item_count < TimelineTable.InitialArrowLength - 1:
             self.removeColumn(TimelineTable.InitialArrowLength - 2)
-        return index
+        return widget_id, widget_name, index
 
-    def deleteItem(self, widget_id: int):
+    def deleteItem(self, widget_id: str):
         """
         delete item in timeline table
         @param widget_id:
         @return:
         """
         # find index of widget_id
-        index = self.itemIndex(widget_id)
+        index = self.itemIndexByWidgetId(widget_id)
         # delete
         if index != -1:
             # we need animation, you can cancel it.
@@ -215,7 +227,7 @@ class TimelineTable(TableWidget):
                 item.setText(new_widget_name)
                 break
 
-    def itemIndex(self, widget_id: int) -> int:
+    def itemIndexByWidgetId(self, widget_id: str) -> int:
         """
         find item's col according to its widget id
         @param widget_id:
@@ -226,13 +238,12 @@ class TimelineTable(TableWidget):
                 return col
         return -1
 
-    def itemExist(self, widget_id: int) -> int:
+    def itemIndexByWidgetName(self, widget_name: str) -> int:
         """
         if item or its reference exist in this timeline, return its index, else -1
         @param widget_id:
         @return:
         """
-        widget_name = Func.getWidgetName(widget_id)
         for col in range(self.item_count):
             if widget_name == self.item(self.name_row, col).text():
                 return col

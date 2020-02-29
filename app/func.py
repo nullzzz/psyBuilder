@@ -1,12 +1,13 @@
-import copy
+import os
 import os
 import re
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap, QIcon, QPainter, QColor
-from PyQt5.QtWidgets import QWidget, QDesktopWidget
+from PyQt5.QtWidgets import QDesktopWidget
 
 from app.info import Info
+from app.kernel import Kernel
 
 
 class Func(object):
@@ -17,6 +18,7 @@ class Func(object):
     @staticmethod
     def getWidgetImage(widget_type: str, image_type: str = 'icon') -> QPixmap or QIcon:
         """
+        todo update
         返回widget_type对应的图片
         :param widget_type: widget类型
         :param image_type: 返回图片类型
@@ -39,7 +41,7 @@ class Func(object):
         return widget_id.split('.')[0]
 
     @staticmethod
-    def getImage(image_name: str) -> str:
+    def getImagePath(image_name: str) -> str:
         """
         返回指定name的图片路径
         :param image_name:
@@ -241,127 +243,6 @@ class Func(object):
             pass
 
     @staticmethod
-    def createWidget(widget_id: str, visible: bool = True) -> QWidget:
-        """
-        根据widget_id创建对应类型的widget
-        :param widget_id:
-        :param visible: 是否添加到wid widget, condition
-        :return:
-        """
-        widget_type = widget_id.split('.')[0]
-        if widget_type == Info.TIMELINE:
-            from app.center.widget_tabs.timeline.main import Timeline
-            widget = Timeline(widget_id=widget_id)
-        # condition
-        elif widget_type == Info.IF:
-            from app.center.widget_tabs.condition.ifBranch.main import IfBranch
-            widget = IfBranch(widget_id=widget_id)
-        elif widget_type == Info.SWITCH:
-            from app.center.widget_tabs.condition.switch.main import Switch
-            widget = Switch(widget_id=widget_id)
-        # event
-        elif widget_type == Info.CYCLE:
-            from app.center.widget_tabs.events.cycle.main import Cycle
-            widget = Cycle(widget_id=widget_id)
-        elif widget_type == Info.IMAGE:
-            from app.center.widget_tabs.events.image.imageDisplay import ImageDisplay
-            widget = ImageDisplay(widget_id=widget_id)
-        elif widget_type == Info.VIDEO:
-            from app.center.widget_tabs.events.video.videoDisplay import VideoDisplay
-            widget = VideoDisplay(widget_id=widget_id)
-        elif widget_type == Info.TEXT:
-            from app.center.widget_tabs.events.text.textDisplay import TextDisplay
-            widget = TextDisplay(widget_id=widget_id)
-        elif widget_type == Info.SOUND:
-            from app.center.widget_tabs.events.sound.soundDisplay import SoundDisplay
-            widget = SoundDisplay(widget_id=widget_id)
-        elif widget_type == Info.SLIDER:
-            from app.center.widget_tabs.events.newSlider.slider import Slider
-            widget = Slider(widget_id=widget_id)
-        elif widget_type == Info.BUG:
-            from app.center.widget_tabs.events.newSlider.slider import Slider
-            widget = Slider(widget_id=widget_id)
-        # eye tracker
-        elif widget_type == Info.ACTION:
-            from app.center.widget_tabs.eye_tracker.action import EyeAction
-            widget = EyeAction(widget_id=widget_id)
-        elif widget_type == Info.CALIBRATION:
-            from app.center.widget_tabs.eye_tracker.calibrate import EyeCalibrate
-            widget = EyeCalibrate(widget_id=widget_id)
-        elif widget_type == Info.ENDR:
-            from app.center.widget_tabs.eye_tracker.endR import EndR
-            widget = EndR(widget_id=widget_id)
-        elif widget_type == Info.OPEN:
-            from app.center.widget_tabs.eye_tracker.open import Open
-            widget = Open(widget_id=widget_id)
-        elif widget_type == Info.DC:
-            from app.center.widget_tabs.eye_tracker.DC import EyeDC
-            widget = EyeDC(widget_id=widget_id)
-        elif widget_type == Info.STARTR:
-            from app.center.widget_tabs.eye_tracker.startR import StartR
-            widget = StartR(widget_id=widget_id)
-        elif widget_type == Info.Log:
-            from app.center.widget_tabs.eye_tracker.log import Close
-            widget = Close(widget_id=widget_id)
-        elif widget_type == Info.QUEST_INIT:
-            from app.center.widget_tabs.quest.start import QuestInit
-            widget = QuestInit(widget_id=widget_id)
-        elif widget_type == Info.QUEST_UPDATE:
-            from app.center.widget_tabs.quest.update import QuestUpdate
-            widget = QuestUpdate(widget_id=widget_id)
-        elif widget_type == Info.QUEST_GET_VALUE:
-            from app.center.widget_tabs.quest.getvalue import QuestGetValue
-            widget = QuestGetValue(widget_id=widget_id)
-        else:
-            widget = None
-        # 如果未生成实体，报错
-        if not widget:
-            raise Exception("fail to create widget, because of unknown widget type. [func.py]")
-        # 将新生成的widget存储到wid_widget中
-        if visible:
-            Info.WID_WIDGET[widget_id] = widget
-        return widget
-
-    @staticmethod
-    def copyWidget(new_widget_id, old_widget_id) -> None:
-        """
-        复制widget
-        :param new_widget_id: 新widget的widget id
-        :param old_widget_id: 被复制的widget的widget_id
-        :return: None
-        """
-        # 调用widget中实现的clone函数
-        Info.WID_WIDGET[new_widget_id] = Info.WID_WIDGET[old_widget_id].clone(new_widget_id)
-
-    @staticmethod
-    def referWidget(new_widget_id, old_widget_id) -> None:
-        """
-        引用widget，不同widget_id指向同一个widget，变成引用效果
-        :param new_widget_id:
-        :param old_widget_id:
-        :return:
-        """
-        # 这样做有一个问题，当源widget脱离后，其余的widget_id仍指向这个widget，
-        # 而这个widget内部绑定的widget_id是源widget的id
-        # 所以脱离时要进行一个检测：是否存在引用，是否是源widget_id
-        Info.WID_WIDGET[new_widget_id] = Info.WID_WIDGET[old_widget_id]
-
-    @staticmethod
-    def getReferWidgetIds(widget_id) -> list:
-        """
-        用来得到widget_id同引用的其他widget_id
-        :param widget_id:
-        :return:
-        """
-        try:
-            widget_ids: list = copy.deepcopy(Info.NAME_WID[Info.WID_NODE[widget_id].text(0)])
-            widget_ids.remove(widget_id)
-            return widget_ids
-        except Exception as e:
-            print(f"error {e} happens in get refer widget ids. [func.py]")
-            return []
-
-    @staticmethod
     def getAttributes(widget_id, need_detail=False) -> dict or list:
         """
         根据某个节点的wid得到它的属性，根据属性返回是否需要详细信息，
@@ -421,149 +302,6 @@ class Func(object):
             return attributes
         else:
             return attributes.keys()
-
-    @staticmethod
-    def getWidgetId(parent_widget_id, child_name) -> str:
-        """
-        通过parent的widget_id和自身name可以得到自身的widget_id
-        :param parent_widget_id: 父节点的widget_id
-        :param child_name: 自身name
-        :return:
-        """
-        parent_node = Info.WID_NODE[parent_widget_id]
-        for i in range(parent_node.childCount()):
-            if parent_node.child(i).text(0) == child_name:
-                return parent_node.child(i).widget_id
-        raise Exception("fail to get widget id.")
-
-    @staticmethod
-    def deleteItemInWidget(widget_id) -> None:
-        """
-        删除widget中的item，只有cycle和timeline中存在
-        :param widget_id:
-        :return:
-        """
-        try:
-            parent_wid: str = Info.WID_NODE[widget_id].parent().widget_id
-            name = Info.WID_NODE[widget_id].text(0)
-            if parent_wid.startswith(Info.TIMELINE):
-                Func.deleteWidgetIconInTimeline(parent_wid, name)
-            elif parent_wid.startswith(Info.CYCLE):
-                Func.deleteTimelineInCycle(parent_wid, name)
-        except Exception as e:
-            print(f"error {e} happens in delete widget icon in timeline. [func.py]")
-
-    @staticmethod
-    def deleteWidgetIconInTimeline(timeline_wid, icon_name) -> None:
-        """
-        删除timeline中的widget
-        :param timeline_wid: timeline的id
-        :param icon_name: 需要删除的item的name
-        :return:
-        """
-        try:
-            timeline = Info.WID_WIDGET[timeline_wid]
-            for col in range(1, timeline.widget_icon_area.widget_icon_table.widget_icon_count + 1):
-                if icon_name == timeline.widget_icon_area.widget_icon_table.item(3, col).text():
-                    timeline.widget_icon_area.widget_icon_table.removeColumn(col)
-                    return None
-            raise Exception('fail to delete widget icon in timeline, because no found.')
-        except Exception as e:
-            print(f"error {e} happens in delete widget icon in timeline. [func.py]")
-
-    @staticmethod
-    def deleteTimelineInCycle(cycle_wid, timeline_name):
-        try:
-            cycle = Info.WID_WIDGET[cycle_wid]
-            cycle.deleteTimeline(timeline_name)
-        except Exception as e:
-            print(f"error {e} happens in delete timeline in cycle. [func.py]")
-
-    @staticmethod
-    def renameItemInWidget(widget_id, new_name):
-        try:
-            parent_wid: str = Info.WID_NODE[widget_id].parent().widget_id
-            name = Info.WID_NODE[widget_id].text(0)
-            if parent_wid.startswith(Info.TIMELINE):
-                Func.renameWidgetIconInTimeline(parent_wid, name, new_name)
-            elif parent_wid.startswith(Info.CYCLE):
-                Func.renameTimelineInCycle(parent_wid, name, new_name)
-        except Exception as e:
-            print(f"error {e} happens in delete widget icon in timeline. [func.py]")
-
-    @staticmethod
-    def renameWidgetIconInTimeline(timeline_wid, icon_name, new_name):
-        try:
-            timeline = Info.WID_WIDGET[timeline_wid]
-            for col in range(1, timeline.widget_icon_area.widget_icon_table.widget_icon_count + 1):
-                if icon_name == timeline.widget_icon_area.widget_icon_table.item(3, col).text():
-                    timeline.widget_icon_area.widget_icon_table.setWidgetName(col, new_name)
-                    return None
-            raise Exception('fail to rename widget icon in timeline, because no found.')
-        except Exception as e:
-            print(f"error {e} happens in rename widget icon in timeline. [func.py]")
-
-    @staticmethod
-    def renameTimelineInCycle(cycle_wid, timeline_name, new_name):
-        try:
-            Info.WID_WIDGET[cycle_wid].renameTimeline(timeline_name, new_name)
-        except Exception as e:
-            print(f"error {e} happens in rename timeline in cycle. [func.py]")
-
-    @staticmethod
-    def checkReferValidity(target_timeline_wid: str, widget_id: str) -> bool:
-        """
-        当从structure中拖拽至timeline时，
-        :param target_timeline_wid: 目标的timeline的wid
-        :param widget_id: 被拖拽的wid
-        :return: 合法性
-        """
-        try:
-            # 如果目标timeline下已经存在该wid或者引用，即存在name相同的widget，返回可以引用
-            timeline_node = Info.WID_NODE[target_timeline_wid]
-            name = Info.WID_NODE[widget_id].text(0)
-            for index in range(timeline_node.childCount()):
-                if timeline_node.child(index).text(0) == name:
-                    return True
-            # 先确定被拖拽的widget所属的cycle是否与target的timeline所属的cycle是否为同一个
-            # target_timeline不能是第一层timeline，因为它没有父cycle
-            if target_timeline_wid == f"{Info.TIMELINE}.0":
-                return False
-            cycle_1_wid = timeline_node.parent().widget_id
-            # 根据widget得到父timeline
-            node = Info.WID_NODE[widget_id]
-            parent_timeline = node.parent()
-            # 如果是父亲为第一层timeline，其没有父cycle
-            if parent_timeline.widget_id == f"{Info.TIMELINE}.0":
-                return False
-            cycle_2_wid = parent_timeline.parent().widget_id
-            # 父cycle是否相同
-            if cycle_1_wid == cycle_2_wid:
-                return True
-            return False
-        except Exception as e:
-            print(f"error {e} happens in check validity of drag from structure. [func.py]")
-
-    @staticmethod
-    def checkMoveOrCopyValidity(target_timeline_wid: str, widget_id: str) -> bool:
-        """
-        check using attributes.
-        :param target_timeline_wid:
-        :param widget_id:
-        :return: its validity
-        """
-        # get attributes above target timeline wid.
-        target_attributes = Func.getAttributes(target_timeline_wid, need_detail=True)
-        # check using attributes.
-        try:
-            using_attributes = Info.WID_WIDGET[widget_id].getUsingAttributes()
-            for using_attribute in using_attributes:
-                if using_attribute not in target_attributes:
-                    return False
-            return True
-        except Exception as e:
-            print(e)
-            return False
 
     @staticmethod
     def getWidgetPosition(widget_id: str) -> int:
@@ -649,6 +387,7 @@ class Func(object):
     @staticmethod
     def getWidgetIDInTimeline(timeline_widget_id: str) -> list:
         """
+        todo update it
         得到一个timeline中所有的widget的widget_id的list，按顺序放置
         :param timeline_widget_id: timeline的widget_id
         :return:
@@ -845,3 +584,188 @@ class Func(object):
             if temp_count > max_child_count:
                 max_child_count = temp_count
         return 1 + max_child_count
+
+    ###############################
+    #         new version         #
+    ###############################
+    @staticmethod
+    def getWidget(widget_id: str):
+        """
+        get widget through its widget id
+        """
+        return Kernel.Widgets[widget_id]
+
+    @staticmethod
+    def getNode(widget_id: str):
+        """
+        get node through its widget id
+        """
+        return Kernel.Nodes[widget_id]
+
+    @staticmethod
+    def generateWidgetId(widget_type: str) -> str:
+        """
+        generate a valid widget id
+        """
+        count = Kernel.WidgetTypeCount[widget_type]
+        widget_id = f"{widget_type}.{count}"
+        Kernel.WidgetTypeCount[widget_type] += 1
+        return widget_id
+
+    @staticmethod
+    def generateWidgetName(widget_type: str) -> str:
+        """
+        generate a valid widget name
+        """
+        while True:
+            # widget name = 'widget_type' _ 'count'
+            widget_name = f"{widget_type}_{Kernel.WidgetNameCount[widget_type]}"
+            # inc count of this widget type
+            Kernel.WidgetNameCount[widget_type] += 1
+            # check name's validity
+            if widget_name not in Kernel.Names:
+                return widget_name
+
+    @staticmethod
+    def checkWidgetNameValidity(widget_name: str) -> (bool, str):
+        """
+        check the validity of widget name.
+        It should be unique, unless it's a reference.
+        """
+        if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", widget_name):
+            return False, "Name must start with a letter and contain only letters, numbers and _."
+        if widget_name in Kernel.Names:
+            return False, "Name already exists."
+        return True, ""
+
+    @staticmethod
+    def getWidgetType(widget_id: str):
+        """
+        get widget's type through its widget id
+        """
+        return widget_id.split('.')[0]
+
+    @staticmethod
+    def getWidgetName(widget_id: str):
+        """
+        get widget's name
+        """
+        return Kernel.Widgets[widget_id].widget_name
+
+    @staticmethod
+    def checkWidgetNameExisted(widget_name: str) -> bool:
+        """
+        check widget name whether existed
+        """
+        return widget_name in Kernel.Names
+
+    @staticmethod
+    def getWidgetReference(widget_id: str) -> list:
+        """
+        get list of reference widget's widget id
+        @param widget_id:
+        @return:
+        """
+        widget_name = Func.getWidgetName(widget_id)
+        return Kernel.Names[widget_name]
+
+    @staticmethod
+    def getWidgetParent(widget_id: str) -> str:
+        """
+        get parent's widget id
+        @param widget_id:
+        @return:
+        """
+        return Kernel.Nodes[widget_id].parent().widget_id
+
+    @staticmethod
+    def getWidgetChild(widget_id: str, index: int) -> (str, str):
+        """
+
+        @param widget_id:
+        @param index:
+        @return: child's widget id and widget name
+        """
+        child = Kernel.Nodes[widget_id].child(index)
+        return child.widget_id, child.text(0)
+
+    @staticmethod
+    def getWidgetChildren(widget_id: int) -> list:
+        """
+
+        @param widget_id:
+        @return: list of children's widget id and widget name
+        """
+        root = Kernel.Nodes[widget_id]
+        children = []
+        for i in range(root.childCount()):
+            child = root.child(i)
+            children.append((child.widget_id, child.text(0)))
+        return children
+
+    @staticmethod
+    def getWidgetIndex(widget_id: str) -> int:
+        """
+        get widget's index in timeline
+        @param widget_id:
+        @return:
+        """
+        if Func.isWidgetType(widget_id, Info.TIMELINE):
+            return -1
+        node = Kernel.Nodes[widget_id]
+        if node.parent():
+            return node.parent().indexOfChild(node)
+        else:
+            return -1
+
+    @staticmethod
+    def getWidgetProperties(widget_id: str):
+        """
+        get widget's properties through its widget id
+        """
+
+    @staticmethod
+    def getWidgetAttributes(widget_id: str):
+        """
+        get widget's attributes through its widget id
+        """
+
+    @staticmethod
+    def getImage(image_path: str, type: int = 0, size: QSize = None) -> QPixmap or QIcon:
+        """
+        get image from its relative path, return qt image object, include QPixmap or QIcon.
+        @param image_path: its relative path
+        @param type: 0: pixmap (default),
+                     1: icon
+        @return: Qt image object
+        """
+        path = os.path.join(Info.Image_Path, image_path)
+        if not type:
+            if size:
+                return QPixmap(path).scaled(size, transformMode=Qt.SmoothTransformation)
+            return QPixmap(path)
+        return QIcon(path)
+
+    @staticmethod
+    def startWait():
+        """
+        show loading window
+        """
+        Kernel.Psy.startWait()
+
+    @staticmethod
+    def endWait():
+        """
+        close loading window
+        """
+        Kernel.Psy.endWait()
+
+    @staticmethod
+    def print(information: str, information_type: int = 0):
+        """
+        print information in output.
+        information_type: 0 none
+                          1 success
+                          2 fail
+        """
+        Kernel.Psy.output.print(information, information_type)

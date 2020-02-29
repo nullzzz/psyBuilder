@@ -41,7 +41,7 @@ class GlobalDevice(QWidget):
         else:
             self.devices = ("mouse", "keyboard", "response box", "game pad")
             self.setWindowTitle("Input Devices")
-        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
         for device in self.devices:
             self.devices_list.addItem(Device(device))
 

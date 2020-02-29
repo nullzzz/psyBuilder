@@ -53,7 +53,7 @@ class RX(QWidget):
             Info.TRACKER_DEVICE_INFO = self.default_properties
             self.devices = ("tracker", "action")
             self.setWindowTitle("Tracker Devices")
-        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
         for device in self.devices:
             self.devices_list.addItem(Device(device))
 

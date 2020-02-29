@@ -28,21 +28,21 @@ class Slider(TabItemMainWindow):
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
-        self.open_action = QAction(QIcon(Func.getImage("setting")), "setting", self)
+        self.open_action = QAction(QIcon(Func.getImagePath("setting")), "setting", self)
         self.open_action.triggered.connect(self.openPro)
 
-        self.front_action = QAction(QIcon(Func.getImage("sendtoback.png")), "Bring to Front", self)
+        self.front_action = QAction(QIcon(Func.getImagePath("sendtoback.png")), "Bring to Front", self)
         self.front_action.setToolTip("Bring item to front")
         self.front_action.triggered.connect(self.toFront)
 
-        self.back_action = QAction(QIcon(Func.getImage("bringtofront.png")), "Sendto & Back", self)
+        self.back_action = QAction(QIcon(Func.getImagePath("bringtofront.png")), "Sendto & Back", self)
         self.back_action.setToolTip("Send item to back")
         self.back_action.triggered.connect(self.toBack)
 
-        self.open_item_action = QAction(QIcon(Func.getImage("setting.png")), "Properties", self)
+        self.open_item_action = QAction(QIcon(Func.getImagePath("setting.png")), "Properties", self)
         self.open_item_action.triggered.connect(self.openItem)
 
-        self.delete_action = QAction(QIcon(Func.getImage("trash.png")), "Delete", self)
+        self.delete_action = QAction(QIcon(Func.getImagePath("trash.png")), "Delete", self)
         self.delete_action.setShortcut("Ctrl+D")
         self.delete_action.setToolTip("Delete item from diagram")
         self.delete_action.triggered.connect(self.deleteItem)
@@ -59,7 +59,7 @@ class Slider(TabItemMainWindow):
         self.item_list.addItem("none")
         self.item_list.currentTextChanged.connect(self.selectItem)
 
-        self.item_pro_windows = QAction(QIcon(Func.getImage("item_pro.png")), "open item properties", self)
+        self.item_pro_windows = QAction(QIcon(Func.getImagePath("item_pro.png")), "open item properties", self)
         self.item_pro_windows.setToolTip("Open current item's properties")
         self.item_pro_windows.triggered.connect(self.openItem)
         self.item_pro_windows.setEnabled(False)
@@ -88,7 +88,7 @@ class Slider(TabItemMainWindow):
             self.createColorMenu(self.itemColorChanged, Qt.white))
         self.fillAction = self.fill_color_bt.menu().defaultAction()
         self.fill_color_bt.setIcon(
-            self.createColorButtonIcon(Func.getImage("floodfill.png"),
+            self.createColorButtonIcon(Func.getImagePath("floodfill.png"),
                                        Qt.white))
 
         self.line_color_bt = QToolButton()
@@ -97,7 +97,7 @@ class Slider(TabItemMainWindow):
             self.createColorMenu(self.lineColorChanged, Qt.black))
         self.lineAction = self.line_color_bt.menu().defaultAction()
         self.line_color_bt.setIcon(
-            self.createColorButtonIcon(Func.getImage("linecolor.png"),
+            self.createColorButtonIcon(Func.getImagePath("linecolor.png"),
                                        Qt.black))
         self.line_color_bt.clicked.connect(self.lineButtonTriggered)
 
@@ -108,13 +108,13 @@ class Slider(TabItemMainWindow):
         self.pointer_bt = QToolButton()
         self.pointer_bt.setCheckable(True)
         self.pointer_bt.setChecked(True)
-        self.pointer_bt.setIcon(QIcon(Func.getImage("pointer.png")))
+        self.pointer_bt.setIcon(QIcon(Func.getImagePath("pointer.png")))
         line_bt = QToolButton()
         line_bt.setCheckable(True)
-        line_bt.setIcon(QIcon(Func.getImage("linepointer.png")))
+        line_bt.setIcon(QIcon(Func.getImagePath("linepointer.png")))
         lasso_bt = QToolButton()
         lasso_bt.setCheckable(True)
-        lasso_bt.setIcon(QIcon(Func.getImage("lasso.png")))
+        lasso_bt.setIcon(QIcon(Func.getImagePath("lasso.png")))
 
         self.pointer_group = QButtonGroup()
         self.pointer_group.addButton(self.pointer_bt, Scene.MoveItem)
@@ -129,7 +129,7 @@ class Slider(TabItemMainWindow):
         self.background_bt.setPopupMode(QToolButton.MenuButtonPopup)
         self.background_bt.setMenu(
             self.createBackgroundMenu(self.changeBackground))
-        self.background_bt.setIcon(QIcon(Func.getImage("background4.png")))
+        self.background_bt.setIcon(QIcon(Func.getImagePath("background4.png")))
         self.background_bt.clicked.connect(self.fillButtonTriggered)
         self.setting.addWidget(self.background_bt)
 
@@ -195,7 +195,7 @@ class Slider(TabItemMainWindow):
             else:
                 r, g, b, a = color
         color = QColor(r, g, b, a)
-        self.line_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("linecolor.png"), color))
+        self.line_color_bt.setIcon(self.createColorButtonIcon(Func.getImagePath("linecolor.png"), color))
 
         fill_color: str = item.default_properties.get("Fill color", "0,0,0")
         if fill_color.startswith("["):
@@ -208,7 +208,7 @@ class Slider(TabItemMainWindow):
             else:
                 r, g, b, a = color
         color = QColor(r, g, b, a)
-        self.fill_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("floodfill.png"), color))
+        self.fill_color_bt.setIcon(self.createColorButtonIcon(Func.getImagePath("floodfill.png"), color))
 
     def setUI(self):
         self.setWindowTitle("Slider")
@@ -259,9 +259,9 @@ class Slider(TabItemMainWindow):
 
     def selectDiaItem(self, d):
         self.fill_color_bt.setIcon(
-            self.createColorButtonIcon(Func.getImage("floodfill.png"), QColor(d['itemcolor'])))
+            self.createColorButtonIcon(Func.getImagePath("floodfill.png"), QColor(d['itemcolor'])))
         self.line_color_bt.setIcon(
-            self.createColorButtonIcon(Func.getImage("linecolor.png"), QColor(d['linecolor'])))
+            self.createColorButtonIcon(Func.getImagePath("linecolor.png"), QColor(d['linecolor'])))
         self.line_wid_com.setCurrentText(str(d['linewidth']))
 
     def deleteItem(self):
@@ -305,11 +305,11 @@ class Slider(TabItemMainWindow):
             color = QColorDialog.getColor()
             if color.isValid():
                 self.fill_color_bt.setIcon(
-                    self.createColorButtonIcon(Func.getImage("floodfill.png"), color))
+                    self.createColorButtonIcon(Func.getImagePath("floodfill.png"), color))
                 self.scene.setItemColor(color)
         else:
             self.fill_color_bt.setIcon(
-                self.createColorButtonIcon(Func.getImage("floodfill.png"),
+                self.createColorButtonIcon(Func.getImagePath("floodfill.png"),
                                            QColor(self.fillAction.data())))
             self.fillButtonTriggered()
 
@@ -318,11 +318,11 @@ class Slider(TabItemMainWindow):
         if self.lineAction.data() == 'More..':
             color = QColorDialog.getColor()
             self.line_color_bt.setIcon(
-                self.createColorButtonIcon(Func.getImage("linecolor.png"), color))
+                self.createColorButtonIcon(Func.getImagePath("linecolor.png"), color))
             self.scene.setLineColor(color)
         else:
             self.line_color_bt.setIcon(
-                self.createColorButtonIcon(Func.getImage('linecolor.png'),
+                self.createColorButtonIcon(Func.getImagePath('linecolor.png'),
                                            QColor(self.lineAction.data())))
             self.lineButtonTriggered()
 
@@ -331,7 +331,7 @@ class Slider(TabItemMainWindow):
 
     def changeBackground(self):
         fn = f"background{self.sender().data()}.png"
-        fp = Func.getImage(fn)
+        fp = Func.getImagePath(fn)
         self.background_bt.setIcon(QIcon(fp))
         self.scene.setBackgroundBrush(QBrush(QPixmap(fp)))
         self.scene.update()
@@ -368,10 +368,10 @@ class Slider(TabItemMainWindow):
 
     def createBackgroundMenu(self, slot):
         back_menu = QMenu(self)
-        action1 = QAction(QIcon(Func.getImage("background1.png")), 'Blue Grid', self)
-        action2 = QAction(QIcon(Func.getImage("background2.png")), 'White Grid', self)
-        action3 = QAction(QIcon(Func.getImage("background3.png")), 'Gray Grid', self)
-        action4 = QAction(QIcon(Func.getImage("background4.png")), 'No Grid', self, )
+        action1 = QAction(QIcon(Func.getImagePath("background1.png")), 'Blue Grid', self)
+        action2 = QAction(QIcon(Func.getImagePath("background2.png")), 'White Grid', self)
+        action3 = QAction(QIcon(Func.getImagePath("background3.png")), 'Gray Grid', self)
+        action4 = QAction(QIcon(Func.getImagePath("background4.png")), 'No Grid', self, )
         action1.setData('1')
         action1.triggered.connect(slot)
         action2.setData('2')

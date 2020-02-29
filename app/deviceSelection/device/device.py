@@ -11,7 +11,7 @@ class Device(QListWidgetItem):
         self.device_type = device_type
         self.device_id = device_id
         # 设置图标
-        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
+        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.device_type))))
 
         self.default_properties = {
             "Device Type": self.device_type,
@@ -79,7 +79,7 @@ class Output(Device):
         self.device_id: str = device_id
 
         # 设置图标
-        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
+        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.device_type))))
 
     def getPort(self) -> str:
         return self.port
@@ -195,7 +195,7 @@ class Quest(Device):
         self.maximum = "1"
         self.is_log10_transform = "Yes"
         # 设置图标
-        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
+        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.device_type))))
 
     def getThreshold(self) -> str:
         return self.estimated_threshold
@@ -288,7 +288,7 @@ class Tracker(Device):
         self.tobii_glasses_UDP_port_number = "0"
 
         # 设置图标
-        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
+        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.device_type))))
 
     def getSelectTrackerType(self) -> str:
         return self.select_tracker_type
@@ -416,7 +416,7 @@ class Action(Device):
         self.device_type = device_type
         self.device_id = device_id
 
-        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
+        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.device_type))))
 
     def getInfo(self):
         self.default_properties.clear()

@@ -2,7 +2,7 @@ from PyQt5.QtCore import QDataStream, QByteArray, QIODevice, QMimeData, QPoint, 
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListView, QListWidget, QListWidgetItem, QTabWidget, QFrame
 
-from app.func import Func
+from app.func_ import Func
 from app.info import Info
 
 
@@ -11,7 +11,7 @@ class WidgetIconItem(QListWidgetItem):
     icon item in icon lists
     """
 
-    def __init__(self, widget_type: int):
+    def __init__(self, widget_type: str):
         self.widget_type = widget_type
         widget_type_name = Info.WidgetType[widget_type]
         icon = Func.getImage(f"widgets/{widget_type_name}", 1)
