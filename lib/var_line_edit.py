@@ -1,20 +1,17 @@
 import re
 
-from PyQt5.QtCore import QDataStream, QIODevice, QRegExp
+from PyQt5.QtCore import QDataStream, QIODevice, QRegExp, pyqtSignal
 from PyQt5.QtGui import QFont, QRegExpValidator
 from PyQt5.QtWidgets import QLineEdit
 
-from app.info import Info
 from .message_box import MessageBox
 
 
 class VarLineEdit(QLineEdit):
-    """
-
-    """
+    focusLost = pyqtSignal()
 
     def __init__(self, *__args):
-        super(VarLineEdit, self).__init__(__args)
+        super(VarLineEdit, self).__init__(*__args)
         self.setAcceptDrops(True)
         self.textChanged.connect(self.findVar)
         self.editingFinished.connect(self.checkValidity)
@@ -31,19 +28,18 @@ class VarLineEdit(QLineEdit):
         self.reg_exp: str = ""
 
     def dragEnterEvent(self, e):
-        if e.mimeData().hasFormat(Info.AttributesToLineEdit):
+        if e.mimeData().hasFormat("attributes/move-attribute"):
             e.accept()
         else:
             e.ignore()
 
     def dropEvent(self, e):
-        data = e.mimeData().data(Info.AttributesToLineEdit)
+        data = e.mimeData().data("attributes/move-attribute")
         stream = QDataStream(data, QIODevice.ReadOnly)
         text = f"[{stream.readQString()}]"
         self.setText(text)
 
-        # 检查变量
-
+    # 检查变量
     def findVar(self, text: str):
         if text.startswith("[") and text.endswith("]"):
             self.setStyleSheet("color: blue")
