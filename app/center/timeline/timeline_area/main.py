@@ -176,17 +176,17 @@ class TimelineArea(QFrame):
         index = self.timeline_table.columnAt(e.pos().x())
         if data_format == Info.IconBarToTimeline:
             # add item in timeline simply
-            self.dealAddDrag(data, index)
+            self.handleAddDrag(data, index)
             # accept
             e.accept()
         elif data_format == Info.MoveInTimeline:
             # move item in timeline, we have deleted item above, now we add item.
-            self.dealMoveDrag(data, index)
+            self.handleMoveDrag(data, index)
             # accept
             e.accept()
         elif data_format == Info.CopyInTimeline:
             # copy item in timeline
-            self.dealCopyDrag(data, index)
+            self.handleCopyDrag(data, index)
             # accept
             e.accept()
         elif data_format == Info.StructureMoveToTimeline:
@@ -211,7 +211,7 @@ class TimelineArea(QFrame):
         else:
             e.ignore()
 
-    def dealAddDrag(self, data: QByteArray, index: int):
+    def handleAddDrag(self, data: QByteArray, index: int):
         """
 
         @param data:
@@ -222,10 +222,11 @@ class TimelineArea(QFrame):
         stream = QDataStream(data, QIODevice.ReadOnly)
         widget_type = stream.readQString()
         widget_id, widget_name, index = self.addItem(widget_type=widget_type, index=index)
+        print(widget_id, widget_name, index)
         # emit signal
         self.itemAdded.emit(widget_id, widget_name, index)
 
-    def dealMoveDrag(self, data: QByteArray, index: int):
+    def handleMoveDrag(self, data: QByteArray, index: int):
         """
 
         @param data:
@@ -242,7 +243,7 @@ class TimelineArea(QFrame):
         self.move_widget_id = Info.ERROR_WIDGET_ID
         self.move_widget_name = ""
 
-    def dealCopyDrag(self, data: QByteArray, index: int):
+    def handleCopyDrag(self, data: QByteArray, index: int):
         """
 
         @param data:
@@ -257,7 +258,7 @@ class TimelineArea(QFrame):
         # emit signal
         self.itemCopied.emit(origin_widget_id, new_widget_id, new_widget_name, index)
 
-    def dealReferDrag(self, data: QByteArray, index: int):
+    def handleReferDrag(self, data: QByteArray, index: int):
         """
 
         @param data:

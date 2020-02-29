@@ -45,6 +45,16 @@ class Psy(QMainWindow):
         # wait dialog
         self.wait_dialog = WaitDialog()
 
+        # test
+        widget_id = Func.generateWidgetId(Info.TIMELINE)
+        widget_name = Func.generateWidgetName(Info.TIMELINE)
+        # create timeline widget
+        self.createWidget(widget_id, widget_name)
+        # add node in structure
+        self.structure.addNode(Info.ERROR_WIDGET_ID, widget_id, widget_name, 0)
+        # set timeline as a tab
+        self.center.openTab(widget_id)
+
     def initMenubar(self):
         """
         init top menubar
@@ -233,6 +243,7 @@ class Psy(QMainWindow):
         """
         create widget, link its signals and store it into some data
         """
+        print(widget_id)
         widget_type = Func.getWidgetType(widget_id)
         widget = None
         if widget_type == Info.TIMELINE:
@@ -275,6 +286,8 @@ class Psy(QMainWindow):
             widget = QuestGetValue(widget_id, widget_name)
         else:
             # if fail to create widget, exit.
+            print(widget_type)
+            MessageBox.information(self, "warning", f"unknown widget type '{widget_type}'.")
             exit()
         # change data set in Kernel
         Kernel.Widgets[widget_id] = widget
@@ -311,14 +324,14 @@ class Psy(QMainWindow):
         # link special signals
         if widget_type == Info.TIMELINE:
             # timeline
-            widget.itemNameChanged.connect(self.dealItemNameChanged)
-            widget.itemClicked.connect(self.dealItemClicked)
-            widget.itemDoubleClicked.connect(self.dealItemDoubleClicked)
-            widget.itemMoved.connect(self.dealItemMoved)
-            widget.itemAdded.connect(self.dealItemAdded)
-            widget.itemCopied.connect(self.dealItemCopied)
-            widget.itemReferenced.connect(self.dealItemReferenced)
-            widget.itemDeleted.connect(self.dealItemDeleted)
+            widget.itemNameChanged.connect(self.handleItemNameChanged)
+            widget.itemClicked.connect(self.handleItemClicked)
+            widget.itemDoubleClicked.connect(self.handleItemDoubleClicked)
+            widget.itemMoved.connect(self.handleItemMoved)
+            widget.itemAdded.connect(self.handleItemAdded)
+            widget.itemCopied.connect(self.handleItemCopied)
+            widget.itemReferenced.connect(self.handleItemReferenced)
+            widget.itemDeleted.connect(self.handleItemDeleted)
         elif widget_type == Info.CYCLE:
             pass
         elif widget_type == Info.IF or Info.SWITCH:

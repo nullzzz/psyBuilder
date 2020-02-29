@@ -13,9 +13,8 @@ class WidgetIconItem(QListWidgetItem):
 
     def __init__(self, widget_type: str):
         self.widget_type = widget_type
-        widget_type_name = Info.WidgetType[widget_type]
-        icon = Func.getImage(f"widgets/{widget_type_name}", 1)
-        super(WidgetIconItem, self).__init__(icon, widget_type_name)
+        icon = Func.getImage(f"widgets/{widget_type}", 1)
+        super(WidgetIconItem, self).__init__(icon, widget_type)
 
 
 class IconList(QListWidget):
@@ -44,7 +43,7 @@ class IconList(QListWidget):
         # write data into an object which can be brought by draggable item
         data = QByteArray()
         stream = QDataStream(data, QIODevice.WriteOnly)
-        stream.writeInt(item.widget_type)
+        stream.writeQString(item.widget_type)
         mime_data = QMimeData()
         mime_data.setData(Info.IconBarToTimeline, data)
         # generate a draggable item

@@ -185,7 +185,7 @@ class TimelineTable(TableWidget):
         # if initial length is not full, we should delete one column
         if self.item_count < TimelineTable.InitialArrowLength - 1:
             self.removeColumn(TimelineTable.InitialArrowLength - 2)
-        return widget_id, widget_name, index
+        return timeline_item.widget_id, timeline_name_item.text(), index
 
     def deleteItem(self, widget_id: str):
         """

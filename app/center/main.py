@@ -32,12 +32,10 @@ class Center(QMainWindow):
         open widget as tab according to its widget_id
         """
         # open widget as a tab in tab widget
-        # first, we should ensure this widget has been created
-        if widget_id in Kernel.Widgets:
-            # this widget may have been opened in tab widget
-            widget_type = Func.getWidgetType(widget_id)
-            widget = Kernel.Widgets[widget_id]
-            self.tab_widget.openTab(widget, widget_type, widget.widget_name)
+        # this widget may have been opened in tab widget
+        widget_type = Func.getWidgetType(widget_id)
+        widget = Kernel.Widgets[widget_id]
+        self.tab_widget.openTab(widget, widget_type, widget.widget_name)
 
     def closeTab(self, widget_id: int) -> None:
         """
