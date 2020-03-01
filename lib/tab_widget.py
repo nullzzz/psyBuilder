@@ -26,8 +26,10 @@ class TabWidget(QTabWidget):
         :return:
         """
         # close current tab
-        self.close_shortcut = QShortcut(QKeySequence(QKeySequence.Close), self)
-        self.close_shortcut.activated.connect(lambda: self.removeTab(self.currentIndex()))
+        QShortcut(QKeySequence(QKeySequence.Close), self).activated.connect(lambda: self.removeTab(self.currentIndex()))
+        # switch different tab
+        QShortcut(QKeySequence("Ctrl+left"), self).activated.connect(lambda: self.switchTab(1))
+        QShortcut(QKeySequence("Ctrl+right"), self).activated.connect(lambda: self.switchTab(0))
 
     def openTab(self, widget: QWidget, widget_type: str, name: str) -> None:
         """
@@ -65,3 +67,20 @@ class TabWidget(QTabWidget):
         index = self.indexOf(widget)
         if index != -1:
             self.setTabText(index, widget_name)
+
+    def switchTab(self, direct: int = 0):
+        """
+        change tab according to index
+        0:right
+        1:left
+        and loop
+        """
+        if direct:
+            index = self.currentIndex() + 1
+            if index >= self.count():
+                index = 0
+        else:
+            index = self.currentIndex() - 1
+            if index < 0:
+                index = self.count() - 1
+        self.setCurrentIndex(index)
