@@ -39,6 +39,7 @@ class Kernel(object):
         Info.IF: 0,
         Info.SWITCH: 0,
         Info.TIMELINE: 0,
+        Info.DC: 0,
     }
 
     # it's used to counter the count of widget name should go.
@@ -62,6 +63,7 @@ class Kernel(object):
         Info.IF: 0,
         Info.SWITCH: 0,
         Info.TIMELINE: 0,
+        Info.DC: 0,
     }
 
     QuestInfo = {}

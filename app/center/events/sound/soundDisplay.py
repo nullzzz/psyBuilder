@@ -140,7 +140,7 @@ class SoundDisplay(TabItemMainWindow):
             self.play_bt.setEnabled(False)
             self.tip.setText("Load your audio first!")
 
-        self.propertiesChanged.emit(self.getInfo())
+        self.propertiesChanged.emit(self.widget_id)
 
     def parseProperties(self):
         if self.pro_window.general.repetitions.text() != "0":

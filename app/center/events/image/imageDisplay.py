@@ -114,7 +114,7 @@ class ImageDisplay(TabItemMainWindow):
         else:
             self.label.clear()
         # 发送信号
-        self.propertiesChanged.emit(self.default_properties)
+        self.propertiesChanged.emit(self.widget_id)
 
     # 从pro获取参数
     def parseProperties(self):

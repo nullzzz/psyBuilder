@@ -437,7 +437,7 @@ class Slider(TabItemMainWindow):
     def apply(self):
         self.getInfo()
         # 发送信号
-        self.propertiesChanged.emit(self.pro_window.default_properties)
+        self.propertiesChanged.emit(self.widget_id)
 
     def restore(self, properties: dict):
         if isinstance(properties, dict):
