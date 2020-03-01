@@ -210,9 +210,20 @@ class TimelineTable(TableWidget):
                 self.setUnselectableItem(self.item_row, TimelineTable.InitialArrowLength - 1)
                 self.setArrow(TimelineTable.InitialArrowLength - 2, "timeline/line.png")
                 self.setUnselectableItem(self.name_row, TimelineTable.InitialArrowLength - 2)
+                # self.takeItem(self.top_row, index)
+                # self.takeItem(self.item_row, index)
+                # self.takeItem(self.arrow_row, index)
+                # self.takeItem(self.name_row, index)
                 self.removeColumn(index)
             # change data
             self.item_count -= 1
+
+    def moveItem(self, origin_index: int, dest_index: int):
+        """
+        remove item
+        """
+        # delete and add
+        pass
 
     def renameItem(self, origin_widget_name: str, new_widget_name: str):
         """

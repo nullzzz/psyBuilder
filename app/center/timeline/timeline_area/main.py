@@ -41,10 +41,6 @@ class TimelineArea(QFrame):
         self.setAcceptDrops(True)
         # link signals
         self.linkSignals()
-        # data
-        self.move_col = -1
-        self.move_widget_id = Info.ERROR_WIDGET_ID
-        self.move_widget_name = ""
 
     def linkSignals(self):
         """
@@ -75,6 +71,12 @@ class TimelineArea(QFrame):
         @return:
         """
         self.timeline_table.deleteItem(widget_id)
+
+    def moveItem(self, origin_index: int, dest_index: int):
+        """
+        remove item
+        """
+        self.timeline_table.moveItem(origin_index, dest_index)
 
     def renameItem(self, origin_widget_name: str, new_widget_name: str):
         """
@@ -107,27 +109,8 @@ class TimelineArea(QFrame):
             e.accept()
         elif data_format == Info.MoveInTimeline:
             # move item in timeline
-            self.move_col = stream.readInt()
-            # save widget name and widget name
-            timeline_item = self.timeline_table.cellWidget(TimelineTable.item_row, self.move_col)
-            self.move_widget_id = timeline_item.widget_id
-            self.move_widget_name = timeline_item.timeline_name_item.text()
-            # delete items
-            self.timeline_table.deleteItem(self.move_widget_id)
             e.accept()
         elif data_format == Info.StructureMoveToTimeline or data_format == Info.StructureReferToTimeline:
-            # get widget id
-            widget_id = stream.readInt()
-            widget_name = Func.getWidgetName(widget_id)
-            self.move_col = self.timeline_table.itemIndexByWidgetName(widget_name)
-            # if exist in this timeline, it just move in timeline
-            if self.move_col != -1:
-                # save widget id and widget name
-                timeline_item = self.timeline_table.cellWidget(TimelineTable.item_row, self.move_col)
-                self.move_widget_id = timeline_item.widget_id
-                self.move_widget_name = timeline_item.timeline_name_item.text()
-                # delete items
-                self.timeline_table.deleteItem(self.move_widget_id)
             e.accept()
         else:
             e.ignore()
@@ -152,14 +135,6 @@ class TimelineArea(QFrame):
         """
         # reset
         self.timeline_table.resetAlignmentAnimation()
-        # if move item, we also need reset item in timeline
-        if self.move_col != -1:
-            # add origin item in timeline
-            self.addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name, index=self.move_col)
-            # reset move data
-            self.move_col = -1
-            self.move_widget_id = Info.ERROR_WIDGET_ID
-            self.move_widget_name = ""
         e.ignore()
 
     def dropEvent(self, e):
@@ -225,22 +200,17 @@ class TimelineArea(QFrame):
         # emit signal
         self.itemAdded.emit(widget_id, widget_name, index)
 
-    def handleMoveDrag(self, data: QByteArray, index: int):
+    def handleMoveDrag(self, data: QByteArray, dest_index: int):
         """
 
-        @param data:
-        @param index:
-        @return:
         """
-        _, _, index = self.parent().addItem(widget_id=self.move_widget_id, widget_name=self.move_widget_name,
-                                            index=index)
         # emit signal
-        if index != self.move_col:
-            self.itemMoved.emit(self.parent().widget_id, self.move_widget_id, self.move_col, index)
-        # reset move data
-        self.move_col = -1
-        self.move_widget_id = Info.ERROR_WIDGET_ID
-        self.move_widget_name = ""
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        origin_index = stream.readInt()
+        if dest_index != self.move_col:
+            # move item
+            self.moveItem(origin_index, dest_index)
+            self.itemMoved.emit(self.parent().widget_id, self.move_widget_id, self.move_col, dest_index)
 
     def handleCopyDrag(self, data: QByteArray, index: int):
         """
@@ -253,7 +223,7 @@ class TimelineArea(QFrame):
         stream = QDataStream(data, QIODevice.ReadOnly)
         origin_widget_id = stream.readQString()
         widget_type = Func.getWidgetType(origin_widget_id)
-        new_widget_id, new_widget_name, index = self.parent().addItem(widget_type=widget_type, index=index)
+        new_widget_id, new_widget_name, index = self.addItem(widget_type=widget_type, index=index)
         # emit signal
         self.itemCopied.emit(origin_widget_id, new_widget_id, new_widget_name, index)
 
