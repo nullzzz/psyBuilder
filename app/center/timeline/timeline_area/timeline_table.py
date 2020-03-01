@@ -218,12 +218,18 @@ class TimelineTable(TableWidget):
             # change data
             self.item_count -= 1
 
-    def moveItem(self, origin_index: int, dest_index: int):
+    def moveItem(self, origin_index: int, dest_index: int) -> (str, int):
         """
-        remove item
+        move item
+        return widget id and index
         """
-        # delete and add
-        pass
+        widget_id = self.cellWidget(self.item_row, origin_index).widget_id
+        widget_name = self.item(self.name_row, origin_index).text()
+        # delete old
+        self.deleteItem(widget_id)
+        # add new
+        dest_index = self.addItem(widget_id=widget_id, widget_name=widget_name, index=dest_index)
+        return widget_id, dest_index
 
     def renameItem(self, origin_widget_name: str, new_widget_name: str):
         """

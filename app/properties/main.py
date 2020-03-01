@@ -40,4 +40,4 @@ class Properties(DockWidget):
         show widget's properties
         :return:
         """
-        self.properties_table.clear()
+        self.properties_table.setRowCount(0)

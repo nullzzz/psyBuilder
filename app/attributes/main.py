@@ -34,7 +34,6 @@ class Attributes(DockWidget):
 
     def clearAttributes(self):
         """
-        show widget's attributes
+        clear table
         """
-        while self.attributes_table.rowCount():
-            self.attributes_table.removeRow(0)
+        self.attributes_table.setRowCount(0)

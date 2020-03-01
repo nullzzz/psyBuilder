@@ -72,11 +72,12 @@ class TimelineArea(QFrame):
         """
         self.timeline_table.deleteItem(widget_id)
 
-    def moveItem(self, origin_index: int, dest_index: int):
+    def moveItem(self, origin_index: int, dest_index: int) -> (str, int):
         """
         remove item
+        return: widget id and new index
         """
-        self.timeline_table.moveItem(origin_index, dest_index)
+        return self.timeline_table.moveItem(origin_index, dest_index)
 
     def renameItem(self, origin_widget_name: str, new_widget_name: str):
         """
@@ -207,10 +208,10 @@ class TimelineArea(QFrame):
         # emit signal
         stream = QDataStream(data, QIODevice.ReadOnly)
         origin_index = stream.readInt()
-        if dest_index != self.move_col:
+        if dest_index != origin_index:
             # move item
-            self.moveItem(origin_index, dest_index)
-            self.itemMoved.emit(self.parent().widget_id, self.move_widget_id, self.move_col, dest_index)
+            widget_id, dest_index = self.moveItem(origin_index, dest_index)
+            self.itemMoved.emit(self.parent().widget_id, widget_id, origin_index, dest_index)
 
     def handleCopyDrag(self, data: QByteArray, index: int):
         """
