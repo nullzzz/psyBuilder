@@ -20,9 +20,12 @@
 
 ## func need to complete
 > see TabItemWidget/TabItemMainWindow
+> 请一定按照要求命名重写, 方便集中调用
 
 ## shortcut 
-> none
+> 可以通过设置快捷的上下文  
+> shortcut.setContext(Qt.WidgetWithChildrenShortcut)  
+> 来避免快捷键冲突
 
 ## api
 > getProperties(none) -> dict
