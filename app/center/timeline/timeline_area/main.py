@@ -103,15 +103,13 @@ class TimelineArea(QFrame):
         @return:
         """
         data_format = e.mimeData().formats()[0]
-        data = e.mimeData().data(data_format)
-        stream = QDataStream(data, QIODevice.ReadOnly)
-        if data_format == Info.IconBarToTimeline or data_format == Info.CopyInTimeline or data_format == Info.StructureCopyToTimeline:
+        if data_format == Info.IconBarToTimeline \
+                or data_format == Info.CopyInTimeline \
+                or data_format == Info.StructureCopyToTimeline \
+                or data_format == Info.MoveInTimeline \
+                or data_format == Info.StructureMoveToTimeline \
+                or data_format == Info.StructureReferToTimeline:
             # drag from icon bar or copy
-            e.accept()
-        elif data_format == Info.MoveInTimeline:
-            # move item in timeline
-            e.accept()
-        elif data_format == Info.StructureMoveToTimeline or data_format == Info.StructureReferToTimeline:
             e.accept()
         else:
             e.ignore()
@@ -149,20 +147,20 @@ class TimelineArea(QFrame):
         # data format
         data_format = e.mimeData().formats()[0]
         data = e.mimeData().data(data_format)
-        index = self.timeline_table.columnAt(e.pos().x())
+        dest_index = self.timeline_table.mouseDestIndex(e.pos().x())
         if data_format == Info.IconBarToTimeline:
             # add item in timeline simply
-            self.handleAddDrag(data, index)
+            self.handleAddDrag(data, dest_index)
             # accept
             e.accept()
         elif data_format == Info.MoveInTimeline:
             # move item in timeline, we have deleted item above, now we add item.
-            self.handleMoveDrag(data, index)
+            self.handleMoveDrag(data, dest_index)
             # accept
             e.accept()
         elif data_format == Info.CopyInTimeline:
             # copy item in timeline
-            self.handleCopyDrag(data, index)
+            self.handleCopyDrag(data, dest_index)
             # accept
             e.accept()
         elif data_format == Info.StructureMoveToTimeline:

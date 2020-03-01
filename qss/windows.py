@@ -115,4 +115,43 @@ QDockWidget::title {
 }
 """
 
-windows_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + dock_widget
+structure_tree = """
+QTreeView::item:selected {
+    border: 1px solid rgb(186, 215, 251);
+    background: rgb(186, 215, 251);
+}
+
+QTreeView::item:hover {
+    border:1px solid rgb(186, 215, 251);
+}
+
+QTreeView::branch:selected {
+    background: rgb(186, 215, 251);
+}
+
+QTreeView::branch:has-siblings:!adjoins-Item {
+    border-image: url(images/structure/vertical_line.png) 0;
+}
+
+QTreeView::branch:has-siblings:adjoins-Item {
+    border-image: url(images/structure/branch_more.png) 0;
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-Item {
+    border-image: url(images/structure/branch_end.png) 0;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    border-image: none;
+    image: url(images/structure/branch_closed.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings {
+    border-image: none;
+    image: url(images/structure/branch_open.png);
+}
+"""
+
+windows_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + dock_widget + structure_tree

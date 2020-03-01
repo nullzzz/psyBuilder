@@ -59,7 +59,7 @@ class TimelineTable(TableWidget):
         link signals
         @return:
         """
-        self.itemChanged.connect(self.dealItemChanged)
+        self.itemChanged.connect(self.handleItemChanged)
 
     def setMenuAndShortcut(self):
         """
@@ -228,7 +228,7 @@ class TimelineTable(TableWidget):
         # delete old
         self.deleteItem(widget_id)
         # add new
-        dest_index = self.addItem(widget_id=widget_id, widget_name=widget_name, index=dest_index)
+        _, _, dest_index = self.addItem(widget_id=widget_id, widget_name=widget_name, index=dest_index)
         return widget_id, dest_index
 
     def renameItem(self, origin_widget_name: str, new_widget_name: str):
@@ -373,7 +373,19 @@ class TimelineTable(TableWidget):
             rect = QRect(x, y, width, height)
             widget.startGeometryAnimation(rect)
 
-    def dealItemChanged(self, item):
+    def mouseDestIndex(self, x: int):
+        """
+        get the index pointed by the mouse according to the x coordinate
+        """
+        col = self.columnAt(x)
+        if col > self.item_count or col == -1:
+            return self.item_count
+        boundary = (col + 1 / 2) * self.Width
+        if x < boundary:
+            return col
+        return col + 1
+
+    def handleItemChanged(self, item):
         """
         when cell changed, we need to make judgement
         @param item:
