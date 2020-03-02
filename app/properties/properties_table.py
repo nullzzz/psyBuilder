@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView
 
 from lib import TableWidget
 
@@ -15,6 +15,8 @@ class PropertiesTable(TableWidget):
         self.horizontalHeader().setVisible(False)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setStretchLastSection(True)
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.setShowGrid(False)
         # set two columns
         self.setColumnCount(2)
@@ -37,11 +39,3 @@ class PropertiesTable(TableWidget):
         value_item.setFlags(Qt.ItemIsEnabled)
         value_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.setItem(self.rowCount() - 1, 1, value_item)
-
-    def resizeEvent(self, QResizeEvent):
-        """
-        resize width of col
-        :param QResizeEvent:
-        :return:
-        """
-        self.setColumnWidth(0, self.width() / 2)
