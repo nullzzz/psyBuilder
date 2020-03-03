@@ -2,9 +2,9 @@
 > widget_id用来唯一标识widget, 引用机制则是通过不同的widget_id指向同一个widget
 
 # 如何新增widget
-> 1. 继承lib.TabItemWidget/TabItemMainWindow类，完成对应模块
-> 2. 在Info中增加改类别new_widget_type = an_unique_int_value，并在WidgetType新增new_widget_type: widget_type_name
-> 3. 在Kernel的WidgetTypeCount和WidgetNameCount新增Info.new_widget_type: 0
+> 1. 继承lib.TabItemWidget/TabItemMainWindow类，并完成对应模块
+> 2. 在Info中增加改类别new_widget_type = widget_type_name
+> 3. 在Kernel的WidgetTypeCount和WidgetNameCount均新增Info.new_widget_type: 0
 > 4. 在app/main.py中导入相应类，并修改Psy类的的createWidget函数
 > 5. 如果有特殊的信号需要增加，修改Psy类的linkWidgetSignals函数
 > 6. 在images/widgets中放入图标，格式为png
@@ -19,5 +19,19 @@
 # 信号的处理
 > Psy主类中包括了创建widget及连接信号的函数, 因此所有widget的信号都被连接到Psy类中的函数handleXXXX, 但是要注意格式要求
 
-# 
+# 框架的安排
+> 按照布局共分为六块  
+> ## Center
+>> 为tab控件, 主要是多个模块的使用
+> ## Attributes
+>> 用来展示
+> ## Properties
+>> 用来展示
+> ## Structure
+>> 用来展示结构信息
+> ## Output
+>> 用来输出消息,通过Func.print函数
+> ## Menubar
+>> menubar所涉及的功能和函数
+
 

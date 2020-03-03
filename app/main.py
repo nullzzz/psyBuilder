@@ -17,18 +17,18 @@ from .center.events.durationPage import DurationPage
 from .center.eye_tracker import EyeAction, EyeCalibrate, EyeDC, EndR, Close, StartR, Open
 from .center.quest import QuestGetValue, QuestUpdate, QuestInit
 from .center.timeline import Timeline
-from .compile_PTB import compilePTB
-from .deviceSelection.IODevice.globalDevices import GlobalDevice
-from .deviceSelection.RX import RX
-from .deviceSelection.progressBar import LoadingTip
-from .deviceSelection.quest.questinit import QuestInit
-from .deviceSelection.tracker.trackerinit import TrackerInit
 from .func import Func
 from .info import Info
 from .kernel import Kernel
+from .menubar.compile_PTB import compilePTB
+from .menubar.deviceSelection.IODevice.globalDevices import GlobalDevice
+from .menubar.deviceSelection.RX import RX
+from .menubar.deviceSelection.progressBar import LoadingTip
+from .menubar.deviceSelection.quest.questinit import QuestInit
+from .menubar.deviceSelection.tracker.trackerinit import TrackerInit
+from .menubar.registry import writeToRegistry
 from .output import Output
 from .properties import Properties
-from .registry import writeToRegistry
 from .structure import Structure
 
 

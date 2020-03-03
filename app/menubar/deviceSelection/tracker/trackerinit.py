@@ -3,9 +3,9 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
     QPushButton, QInputDialog, QLineEdit
 
-from app.deviceSelection.tracker.describer import Describer
-from app.deviceSelection.tracker.device import Tracker
-from app.deviceSelection.tracker.selectionList import SelectArea
+from .describer import Describer
+from .device import Tracker
+from .selectionList import SelectArea
 from app.func import Func
 from app.info import Info
 from lib.message_box import MessageBox as QMessageBox

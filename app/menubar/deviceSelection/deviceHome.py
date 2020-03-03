@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QListWidget, QMenu, QListWidgetItem
 
-from app.deviceSelection.device.device import Device, Output, Quest, Tracker, Action
+from .device.device import Device, Output, Quest, Tracker, Action
 
 
 class DeviceHome(QListWidget):

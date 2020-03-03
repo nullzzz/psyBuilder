@@ -4,10 +4,10 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGroupBox, \
 
 from app.center.events.inDevicePro import InDeviceInfoAtDuration, InDeviceRespAtDuration
 from app.center.events.outDevicePro import OutDeviceInfoAtDuration
-from app.deviceSelection.IODevice.duration.InputDeviceItem import DeviceInItem
-from app.deviceSelection.IODevice.duration.OutputDeviceItem import DeviceOutItem
-from app.deviceSelection.IODevice.duration.deviceChooseDialog import DeviceInDialog, DeviceOutDialog
-from app.deviceSelection.IODevice.duration.deviceShowArea import ShowArea
+from app.menubar.deviceSelection.IODevice.duration.InputDeviceItem import DeviceInItem
+from app.menubar.deviceSelection.IODevice.duration.OutputDeviceItem import DeviceOutItem
+from app.menubar.deviceSelection.IODevice.duration.deviceChooseDialog import DeviceInDialog, DeviceOutDialog
+from app.menubar.deviceSelection.IODevice.duration.deviceShowArea import ShowArea
 from app.func import Func
 from app.info import Info
 from lib import VarComboBox

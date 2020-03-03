@@ -3,22 +3,22 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
     QPushButton, QInputDialog, QLineEdit
 
-from app.deviceSelection.IODevice.describer import Describer
-from app.deviceSelection.IODevice.device import Device
-from app.deviceSelection.IODevice.selectionList import SelectArea
 from app.func import Func
 from app.info import Info
 from lib import MessageBox
+from .IODevice.device import Device
+from .describer.describer import Describer
+from .deviceHome import DeviceHome
 
 
-class GlobalDevice(QWidget):
+class RX(QWidget):
     """
-    :param io_type: 输出、输入设备
+    :param device_type: 0-输出、1-输入设备、2-quest、3-tracker
     """
     deviceNameChanged = pyqtSignal(str, str)
 
-    def __init__(self, io_type=0, parent=None):
-        super(GlobalDevice, self).__init__(parent)
+    def __init__(self, device_type: int = 0, parent=None):
+        super(RX, self).__init__(parent)
 
         # 上方待选择设备
         self.devices_list = QListWidget()
@@ -32,37 +32,41 @@ class GlobalDevice(QWidget):
         self.devices_list.setIconSize(QSize(40, 40))
 
         # 设备类型
-        self.device_type = io_type
+        self.device_type = device_type
+        # 设备信息
+        self.default_properties: dict = {}
 
         # device_list是写死的
-        if io_type == Info.OUTPUT_DEVICE:
+        if device_type == Info.OUTPUT_DEVICE:
+            Info.OUTPUT_DEVICE_INFO = self.default_properties
             self.devices = ("serial_port", "parallel_port", "network_port", "screen", "sound")
             self.setWindowTitle("Output Devices")
-        else:
+        elif device_type == Info.INPUT_DEVICE:
+            Info.INPUT_DEVICE_INFO = self.default_properties
             self.devices = ("mouse", "keyboard", "response box", "game pad")
             self.setWindowTitle("Input Devices")
+        elif device_type == Info.QUEST_DEVICE:
+            Info.QUEST_DEVICE_INFO = self.default_properties
+            self.devices = ("quest",)
+            self.setWindowTitle("Quest Devices")
+        elif device_type == Info.TRACKER_DEVICE:
+            Info.TRACKER_DEVICE_INFO = self.default_properties
+            self.devices = ("tracker", "action")
+            self.setWindowTitle("Tracker Devices")
         self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
         for device in self.devices:
             self.devices_list.addItem(Device(device))
 
         # 已选择设备
-        self.selected_devices = SelectArea(self.device_type)
+        self.selected_devices = DeviceHome()
         self.selected_devices.itemDoubleClicked.connect(self.rename)
         self.selected_devices.itemDoubleClick.connect(self.rename)
-        self.selected_devices.itemChanged.connect(self.changeItem)
+        self.selected_devices.deviceChanged.connect(self.changeItem)
+        self.selected_devices.deviceDeleted.connect(self.changeItem)
 
         # 展示区
         self.describer = Describer()
-        self.describer.portChanged.connect(self.changePort)
-        self.describer.ipPortChanged.connect(self.changeIpPort)
-        self.describer.colorChanged.connect(self.changeColor)
-        self.describer.sampleChanged.connect(self.changeSample)
-        self.describer.baudChanged.connect(self.changeBaud)
-        self.describer.bitsChanged.connect(self.changeBits)
-        self.describer.clientChanged.connect(self.changeClient)
-        self.describer.samplingRateChanged.connect(self.changeSamplingRate)
-        self.describer.resolutionChanged.connect(self.changeResolution)
-        self.describer.refreshRateChanged.connect(self.changeRefreshRate)
+
         # 按键区
         self.ok_bt = QPushButton("OK")
         self.ok_bt.clicked.connect(self.ok)
@@ -99,40 +103,9 @@ class GlobalDevice(QWidget):
 
     def apply(self):
         self.getInfo()
-        default_properties: dict = self.selected_devices.getInfo()
 
-    def changeItem(self, device_type: str, device_name: str, device_port: str, others: dict):
-        self.describer.describe(device_type, device_name, device_port, others)
-
-    def changePort(self, port: str):
-        self.selected_devices.changeCurrentPort(port)
-
-    def changeColor(self, color: str):
-        self.selected_devices.changeCurrentColor(color)
-
-    def changeSample(self, sample: str):
-        self.selected_devices.changeCurrentSample(sample)
-
-    def changeIpPort(self, ip_port: str):
-        self.selected_devices.changeCurrentIpPort(ip_port)
-
-    def changeClient(self, client: str):
-        self.selected_devices.changeCurrentClient(client)
-
-    def changeSamplingRate(self, sampling_rate: str):
-        self.selected_devices.changeCurrentSamplingRate(sampling_rate)
-
-    def changeResolution(self, resolution: str):
-        self.selected_devices.changeCurrentResolution(resolution)
-
-    def changeRefreshRate(self, refresh_rate: str):
-        self.selected_devices.changeCurrentRefreshRate(refresh_rate)
-
-    def changeBaud(self, baud: str):
-        self.selected_devices.changeCurrentBaud(baud)
-
-    def changeBits(self, bits: str):
-        self.selected_devices.changeCurrentBits(bits)
+    def changeItem(self, device_id: str, info: dict):
+        self.describer.describe(device_id, info)
 
     def rename(self, item: Device):
         name: str = item.text()
@@ -141,29 +114,20 @@ class GlobalDevice(QWidget):
         text, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
         if ok and text != '' and "." not in text:
             text: str
-            if text.lower() in self.selected_devices.device_name and item_name != text.lower():
+            if text.lower() in self.selected_devices.device_list and item_name != text.lower():
                 MessageBox.warning(self, f"{text} is invalid!", "Device name must be unique and without spaces",
-                                    MessageBox.Ok)
+                                   MessageBox.Ok)
             else:
                 self.selected_devices.changeCurrentName(text)
                 self.describer.changeName(text)
-                self.getInfo()
+                # self.getInfo()
                 self.deviceNameChanged.emit(item.getDeviceId(), text)
 
     # 参数导出, 记录到Info
     def getInfo(self):
-        device_info: dict = self.selected_devices.getInfo()
-        if self.device_type:
-            Info.OUTPUT_DEVICE_INFO = device_info.copy()
-        else:
-            Info.INPUT_DEVICE_INFO = device_info.copy()
+
+        pass
 
     # 参数导入
     def setProperties(self, properties: dict):
-        self.selected_devices.clearAll()
         self.selected_devices.setProperties(properties)
-        # 更新全局信息
-        if self.device_type:
-            Info.OUTPUT_DEVICE_INFO.update(properties)
-        else:
-            Info.INPUT_DEVICE_INFO.update(properties)

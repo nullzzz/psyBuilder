@@ -58,18 +58,6 @@ class Info(object):
     # possible useful in the future
     REF_VALUE_SEPERATOR = "@"
 
-    # 区分不同的添加情况
-    WidgetAdd = 0
-    WidgetCopy = 1
-    WidgetRefer = 2
-    WidgetMove = 3
-    # Timeline name
-    TimelineNameError = 0
-    TimelineTypeError = 1
-    TimelineParentError = 2
-    TimelineNameRight = 3
-    TimelineNameExist = 4
-
     # widget type
     CYCLE = "Cycle"
     SOUND = "Sound"

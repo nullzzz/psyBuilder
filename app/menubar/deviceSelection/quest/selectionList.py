@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QListWidget, QMenu, QListWidgetItem
 
-from app.deviceSelection.quest.device import Quest
+from .device import Quest
 
 
 class SelectArea(QListWidget):

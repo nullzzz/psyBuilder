@@ -1,9 +1,9 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QLayout, QStackedWidget, QGridLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QStackedWidget, QGridLayout
 
-from app.deviceSelection.describer.io import Screen, Sound, Net, Serial, Shower, Parallel
-from app.deviceSelection.describer.quest import Quest
-from app.deviceSelection.describer.tracker import Tracker, Action
+from .io import Screen, Sound, Net, Serial, Parallel
+from .quest import Quest
+from .tracker import Tracker, Action
 
 
 class DefaultShow(QWidget):
