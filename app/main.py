@@ -33,8 +33,8 @@ from .structure import Structure
 
 
 class Psy(QMainWindow):
-    def __init__(self, parent=None):
-        super(Psy, self).__init__(parent)
+    def __init__(self, file_name: str = ""):
+        super(Psy, self).__init__(None)
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
@@ -54,6 +54,10 @@ class Psy(QMainWindow):
         self.structure.addNode(Info.ERROR_WIDGET_ID, widget_id, widget_name, 0)
         # set timeline as a tab
         self.center.openTab(widget_id)
+
+        # if file name is not none, we need to restore file
+        if file_name:
+            self.restore(file_name)
 
     def initMenubar(self):
         """
@@ -673,20 +677,31 @@ class Psy(QMainWindow):
         open file
         """
         options = QFileDialog.Options()
-        open_file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)",
-                                                        options=options)
-        if open_file_name:
-            pass
+        file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)",
+                                                   options=options)
+        if file_name:
+            self.restore(file_name)
 
     def store(self):
         """
         store data to file
         """
+        try:
+            # compatible
+            Kernel.FileName = Info.FILE_NAME
+            Kernel.Platform = Info.PLATFORM
+            # data in kernel
 
-    def restore(self):
+            # structure
+            Func.print("File successfully loaded.", 2)
+        except:
+            Func.print("File saving failed.", 2)
+
+    def restore(self, file_name):
         """
         restore data from file
         """
+        print(file_name)
 
     def setDockView(self, checked):
         """
