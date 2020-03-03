@@ -2,7 +2,7 @@ import re
 
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QTableWidget, QShortcut
+from PyQt5.QtWidgets import QTableWidget, QShortcut, QTableWidgetItem
 
 from app.func import Func
 from app.info import Info
@@ -18,8 +18,10 @@ class CycleTable(QTableWidget):
     """
 
     # when timeline is added, emit this signal (widget id, widget_name, index)
-    timelineAdded = pyqtSignal(int, str, int)
-    timelineDeleted = pyqtSignal(int)
+    timelineAdded = pyqtSignal(str, str, int)
+    timelineDeleted = pyqtSignal(str)
+    # when header is double clicked, emit signal (col, name, value)
+    headerDoubleClicked = pyqtSignal(int, str, str)
 
     def __init__(self):
         super(CycleTable, self).__init__(None)
@@ -43,7 +45,10 @@ class CycleTable(QTableWidget):
 
         @return:
         """
-        self.itemChanged.connect(self.dealItemChanged)
+        self.horizontalHeader().sectionDoubleClicked.connect(
+            lambda col: self.headerDoubleClicked.emit(col, self.attributes[col],
+                                                      self.default_value[self.attributes[col]]))
+        self.itemChanged.connect(self.handleItemChanged)
 
     def setMenuAndShortcut(self):
         """
@@ -68,7 +73,7 @@ class CycleTable(QTableWidget):
             self.insertRow(index)
         else:
             index = self.rowCount()
-            self.addRow(index)
+            self.insertRow(index)
         # add items, weight, timeline and attributes
         weight_item = WeightItem(self.default_value[self.attributes[0]])
         self.setItem(index, 0, weight_item)
@@ -86,37 +91,61 @@ class CycleTable(QTableWidget):
         @return:
         """
 
-    def addAttribtueColumn(self, index: int, attribute: str):
+    def addAttribtueColumn(self, col: int, attribute_name: str, attribute_value):
         """
         add attribute column
-        @param index:
-        @param attribute:
-        @return:
+        if col == -1, add last col
         """
+        # add new column
+        if col == -1:
+            col = self.columnCount()
+            self.insertColumn(self.columnCount())
+        else:
+            self.insertColumn(col)
+        # set header
+        self.setHorizontalHeaderItem(col, QTableWidgetItem(attribute_name))
+        # set value
+        for row in range(self.rowCount()):
+            attribute_item = AttributeItem(attribute_value)
+            self.setItem(row, col, attribute_item)
+        # related value
+        self.attributes.insert(col, attribute_name)
+        self.default_value[attribute_name] = attribute_value
 
-    def deleteAttributeColumn(self, index: int):
+    def changeAttributeColumn(self, col: int, attribute_name: str, attribute_value):
+        """
+        change attribute column: name and default value
+        """
+        # header
+        if attribute_name != self.attributes[col]:
+            self.horizontalHeaderItem(col).setText(attribute_name)
+            del self.default_value[attribute_name]
+        # data
+        self.attributes[col] = attribute_name
+        self.default_value[attribute_value] = attribute_name
+        # value: we just change empty to new default value
+        for row in range(self.rowCount()):
+            item = self.item(row, col)
+            if not item.text():
+                item.setText(attribute_value)
+
+    def deleteAttributeColumn(self, col: int):
         """
         delete attribute column
-        @param index:
-        @return:
         """
 
     def deleteTimeline(self, timeline: str):
         """
-        delete
-        @param timeline:
-        @return:
+        delete timeline in this cycle
         """
         for row in range(self.rowCount() - 1, -1, -1):
             if self.item(row, 1).text() == timeline:
                 self.removeRow(row)
         del self.timelines[timeline]
 
-    def dealItemChanged(self, item):
+    def handleItemChanged(self, item):
         """
         when cell changed, we need to make some judgement
-        @param item:
-        @return:
         """
         # if text isn't changed, we ignore it
         if item.changed():
@@ -219,8 +248,6 @@ class CycleTable(QTableWidget):
     def mouseReleaseEvent(self, e):
         """
 
-        @param e:
-        @return:
         """
         if self.alt_key:
             print(self.drag_copy_row_col)
@@ -230,13 +257,11 @@ class CycleTable(QTableWidget):
     def copyActionFunc(self):
         """
         copy data to table
-        @return:
         """
         print("copy")
 
     def pasteActionFunc(self):
         """
         paste data to table
-        @return:
         """
         print("paste")

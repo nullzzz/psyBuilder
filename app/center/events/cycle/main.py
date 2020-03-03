@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QAction
 from app.func import Func
 from app.info import Info
 from lib import TabItemMainWindow
+from .attribute_dialog import AttributeDialog
 from .cycle_table import CycleTable
 from .properties import Properties
 
@@ -14,14 +15,15 @@ class Cycle(TabItemMainWindow):
     """
 
     # when add new timeline, emit signal(parent_widget_id, widget_id, widget_name, index)
-    itemAdded = pyqtSignal(int, int, str, int)
-    # when delete signals, emit signal(origin_widget, widget_id)
-    itemDeleted = pyqtSignal(int, int)
+    itemAdded = pyqtSignal(str, str, str, int)
+    # when delete signals, emit signal(sender_widget, widget_id)
+    itemDeleted = pyqtSignal(int, str)
 
     def __init__(self, widget_id: str, widget_name: str):
         super(Cycle, self).__init__(widget_id, widget_name)
         self.cycle_table = CycleTable()
         self.properties = Properties()
+        self.attribute_dialog = AttributeDialog(self.cycle_table.default_value)
         self.setCentralWidget(self.cycle_table)
         # set tool bar
         self.setToolBar()
@@ -35,32 +37,34 @@ class Cycle(TabItemMainWindow):
 
         @return:
         """
-        self.cycle_table.timelineAdded.connect(
-            lambda widget_id, widget_name, index: self.itemAdded.emit(self.widget_id, widget_id, widget_name, index))
-        self.cycle_table.timelineDeleted.connect(lambda widget_id: self.itemDeleted.emit(Info.CycleSignal, widget_id))
+        self.cycle_table.headerDoubleClicked.connect(
+            lambda col, name, value: self.attribute_dialog.showWindow(0, col, name, value))
+        self.cycle_table.timelineDeleted.connect(lambda widget_id: self.itemDeleted.emit(Info.CycleSend, widget_id))
         self.properties.propertiesChanged.connect(lambda: self.propertiesChanged.emit(self.widget_id))
+        self.attribute_dialog.attributesAdded.connect(self.handleAttributesAdd)
+        self.attribute_dialog.attributesChanged.connect(self.handleAttributeChanged)
 
     def setToolBar(self):
         """
 
         @return:
         """
-        self.tool_bar = self.addToolBar("Tool Bar")
-        self.tool_bar.setMovable(False)
-        self.tool_bar.setFloatable(False)
+        tool_bar = self.addToolBar("Tool Bar")
+        tool_bar.setMovable(False)
+        tool_bar.setFloatable(False)
         # add action
-        self.tool_bar.addAction(Func.getImage("tool_bar/setting.png", 1), "Setting", self.properties.exec)
-        self.tool_bar.addAction(Func.getImage("tool_bar/add_row.png", 1), "Add Row", self.addRow)
+        tool_bar.addAction(Func.getImage("tool_bar/setting.png", 1), "Setting", self.properties.exec)
+        tool_bar.addAction(Func.getImage("tool_bar/add_row.png", 1), "Add Row", self.addRow)
         add_rows_action = QAction(Func.getImage("tool_bar/add_rows.png", 1), "Add Rows", self)
+        tool_bar.addAction(add_rows_action)
         delete_row_action = QAction(Func.getImage("tool_bar/delete_row.png", 1), "Delete Row", self)
-        add_column_action = QAction(Func.getImage("tool_bar/add_column.png", 1), "Add Row", self)
-        add_columns_action = QAction(Func.getImage("tool_bar/add_columns.png", 1), "Add Rows", self)
-        delete_column_action = QAction(Func.getImage("tool_bar/delete_column.png", 1), "Delete Row", self)
-        self.tool_bar.addAction(add_rows_action)
-        self.tool_bar.addAction(delete_row_action)
-        self.tool_bar.addAction(add_column_action)
-        self.tool_bar.addAction(add_columns_action)
-        self.tool_bar.addAction(delete_column_action)
+        tool_bar.addAction(delete_row_action)
+        tool_bar.addAction(Func.getImage("tool_bar/add_column.png", 1), "Add Attribute",
+                           lambda: self.attribute_dialog.showWindow(0))
+        tool_bar.addAction(Func.getImage("tool_bar/add_columns.png", 1), "Add Attributes",
+                           lambda: self.attribute_dialog.showWindow(1))
+        delete_column_action = QAction(Func.getImage("tool_bar/delete_column.png", 1), "Delete Attributes", self)
+        tool_bar.addAction(delete_column_action)
 
     def getColumnAttributes(self) -> list:
         """
@@ -84,6 +88,20 @@ class Cycle(TabItemMainWindow):
         @return:
         """
         self.cycle_table.addRow()
+
+    def handleAttributesAdd(self):
+        """
+        when user want to add new attributes
+        """
+        attributes = self.attribute_dialog.getAttributes()
+        for name, value in attributes:
+            self.cycle_table.addAttribtueColumn(-1, name, value)
+
+    def handleAttributeChanged(self, col: int, attribute_name: str, attribute_value: str):
+        """
+        when user change some attribute
+        """
+        self.cycle_table.changeAttributeColumn(col, attribute_name, attribute_value)
 
     """
     functions that must be override

@@ -201,7 +201,7 @@ class TimelineArea(QFrame):
 
     def handleMoveDrag(self, data: QByteArray, dest_index: int):
         """
-
+        when move drag drop.
         """
         # emit signal
         stream = QDataStream(data, QIODevice.ReadOnly)
@@ -213,7 +213,7 @@ class TimelineArea(QFrame):
 
     def handleCopyDrag(self, data: QByteArray, index: int):
         """
-
+        when copy drag drop.
         @param data:
         @param index:
         @return:
@@ -233,3 +233,6 @@ class TimelineArea(QFrame):
         @param index:
         @return:
         """
+        # if exist in this timeline, we need to change as move drag
+
+
