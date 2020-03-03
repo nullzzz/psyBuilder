@@ -66,4 +66,21 @@ class Kernel(object):
         Info.DC: 0,
     }
 
+    # 输入输出设备
     QuestInfo = {}
+    TrackerInfo = {}
+    InputDeviceInfo = {}
+    OutputDeviceInfo = {}
+    QuestDeviceInfo = {}
+    TrackerDeviceInfo = {}
+
+    device_count: dict = {
+        "serial_port": 0,
+        "parallel_port": 0,
+        "network_port": 0,
+        "screen": 0,
+        "mouse": 0,
+        "keyboard": 0,
+        "response box": 0,
+        "game pad": 0
+    }

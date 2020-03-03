@@ -3545,7 +3545,7 @@ def compileCode(globalSelf, isDummyCompile):
         QMessageBox.information(globalSelf, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
         return
 
-    globalSelf.save()
+    globalSelf.saveFile()
 
     print(f"WID_WIDGET: {list(Info.WID_WIDGET.keys())}")
     print(f"WID_NODE: {list(Info.WID_NODE.keys())}")

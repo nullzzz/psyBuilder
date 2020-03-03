@@ -8,8 +8,6 @@ class Info(object):
     # 编译平台：linux\windows\mac
     PLATFORM = None
 
-    IMAGE_LOAD_MODE = None
-
     # 保存widget_tabs的 (widget_id -> widget)
     WID_WIDGET = None
 
@@ -22,11 +20,11 @@ class Info(object):
 
     # 输入输出设备
     QUEST_INFO = None
-    TRACKER_INFO: dict = {}
-    INPUT_DEVICE_INFO: dict = {}
-    OUTPUT_DEVICE_INFO: dict = {}
-    QUEST_DEVICE_INFO: dict = {}
-    TRACKER_DEVICE_INFO: dict = {}
+    TRACKER_INFO = None
+    INPUT_DEVICE_INFO = None
+    OUTPUT_DEVICE_INFO = None
+    QUEST_DEVICE_INFO = None
+    TRACKER_DEVICE_INFO = None
     INPUT_DEVICE = 0
     OUTPUT_DEVICE = 1
     QUEST_DEVICE = 2
@@ -46,7 +44,7 @@ class Info(object):
     # 当前导入导出文件名
     FILE_NAME: str = ""
 
-    CONFIG = QSettings("./operation.ini", QSettings.IniFormat)
+    CONFIG = QSettings("./config.ini", QSettings.IniFormat)
     FILE_DIRECTORY: str = CONFIG.value("directory")
     IS_REGISTER: str = CONFIG.value("register")
 
@@ -115,7 +113,7 @@ class Info(object):
     }
 
     # 图片保存路径
-    IMAGE_SOURCE_PATH = "image"
+    ImageSourcePath = "image"
 
     ###########################################
     #               new version               #

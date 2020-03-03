@@ -3,7 +3,7 @@ import re
 import sys
 import traceback
 
-from PyQt5.QtCore import Qt, QSettings, QTimer
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette, QFontMetrics
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLabel, QGridLayout, \
     QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame
@@ -63,9 +63,9 @@ class Psy(QMainWindow):
         # file menu
         file_menu = menubar.addMenu("File")
         file_menu.addAction("New", self.newFile, QKeySequence(QKeySequence.New))
-        file_menu.addAction("Open", self.loadIn, QKeySequence(QKeySequence.Open))
-        file_menu.addAction("Save", self.save, QKeySequence(QKeySequence.Save))
-        file_menu.addAction("Save As", self.saveAs, QKeySequence(QKeySequence.SaveAs))
+        file_menu.addAction("Open", self.openFile, QKeySequence(QKeySequence.Open))
+        file_menu.addAction("Save", self.saveFile, QKeySequence(QKeySequence.Save))
+        file_menu.addAction("Save As", self.saveAsFile, QKeySequence(QKeySequence.SaveAs))
 
         # view menu
         view_menu = menubar.addMenu("&View")
@@ -285,7 +285,6 @@ class Psy(QMainWindow):
             widget = QuestGetValue(widget_id, widget_name)
         else:
             # if fail to create widget, exit.
-            MessageBox.information(self, "warning", f"unknown widget type '{widget_type}'.")
             exit()
         # change data set in Kernel
         Kernel.Widgets[widget_id] = widget
@@ -630,22 +629,23 @@ class Psy(QMainWindow):
         self.center.closeTab(widget_id)
 
     def newFile(self):
+        """
+        restart software
+        """
         python = sys.executable
         os.execl(python, python, *sys.argv)
 
-    def save(self):
+    def saveFile(self):
         """
-        这个就是在保存之前获取一下文件名
-        :return:
+        get file name and store data
         """
         if Info.FILE_NAME == "":
             if self.getFileName():
-                self.loadOut()
+                self.store()
         else:
-            self.loadOut()
-
+            self.store()
+        # config
         Info.CONFIG.setValue("directory", Info.FILE_DIRECTORY)
-        # print(f"{Info.FILE_DIRECTORY}")
 
     def getFileName(self) -> bool:
         """
@@ -662,16 +662,15 @@ class Psy(QMainWindow):
             return True
         return False
 
-    def saveAs(self):
+    def saveAsFile(self):
         self.getFileName()
         if Info.FILE_NAME:
             self.loadOut()
             Info.CONFIG.setValue("directory", Info.FILE_DIRECTORY)
 
-    def loadIn(self):
+    def openFile(self):
         """
-        恢复文件！
-        :return:
+        open file
         """
         options = QFileDialog.Options()
         open_file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)",
@@ -679,35 +678,15 @@ class Psy(QMainWindow):
         if open_file_name:
             pass
 
-    def loadOut(self):
-        pass
-
-    def loadOutTree(self, tree):
-        if isinstance(tree, list):
-            for i in tree:
-                self.loadOutTree(i)
-        elif isinstance(tree, tuple):
-            widget_id = tree[1]
-            setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
-            # 只保存源widget的数据，引用创建的wid没有必要保存
-
-            if widget_id == Info.WID_WIDGET[widget_id].widget_id:
-                # print(f"{Info.WID_WIDGET[widget_id].getInfo()}")
-                setting.setValue(widget_id, Info.WID_WIDGET[widget_id].getInfo())
-
-    def resetView(self):
+    def store(self):
         """
-        恢复默认布局
-        :return:
+        store data to file
         """
-        self.restoreState(self.default_dock_widget_layout)
 
-    def updateLayout(self):
+    def restore(self):
         """
-        重新设置默认布局
-        :return:
+        restore data from file
         """
-        self.default_dock_widget_layout = self.saveState()
 
     def setDockView(self, checked):
         """
@@ -766,9 +745,6 @@ class Psy(QMainWindow):
         else:
             DurationPage.INPUT_DEVICES = devices
 
-    def contextMenuEvent(self, QContextMenuEvent):
-        super().contextMenuEvent(QContextMenuEvent)
-
     def changePlatform(self, c):
         if isinstance(c, bool):
             self.linux_action.setIconVisibleInMenu(self.sender() is self.linux_action)
@@ -786,7 +762,7 @@ class Psy(QMainWindow):
             self.before_event_action.setIconVisibleInMenu(self.sender() is self.before_event_action)
             self.before_trial_action.setIconVisibleInMenu(self.sender() is self.before_trial_action)
             self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
-            Info.IMAGE_LOAD_MODE = self.sender().text().lstrip("&").lower()
+            Kernel.ImageLoadMode = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
             imageLoadMode = c if c else "before_event"
             self.before_event_action.setIconVisibleInMenu(imageLoadMode == "before_event")

@@ -13,13 +13,19 @@ def compatible():
     """
     bind kernel's varies to info
     """
+    # str (via store and restore)
     Info.FILE_NAME = Kernel.FileName
     Info.PLATFORM = Kernel.Platform
-    Info.IMAGE_LOAD_MODE = Kernel.ImageLoadMode
+    # dict (via pointer)
     Info.WID_NODE = Kernel.Nodes
     Info.WID_WIDGET = Kernel.Widgets
     Info.NAME_WID = Kernel.Names
     Info.QUEST_INFO = Kernel.QuestInfo
+    Info.TRACKER_INFO = Kernel.TrackerInfo
+    Info.INPUT_DEVICE_INFO = Kernel.InputDeviceInfo
+    Info.OUTPUT_DEVICE_INFO = Kernel.OutputDeviceInfo
+    Info.QUEST_DEVICE_INFO = Kernel.QuestDeviceInfo
+    Info.TRACKER_DEVICE_INFO = Kernel.TrackerInfo
 
 
 if __name__ == '__main__':

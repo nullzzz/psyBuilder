@@ -21,11 +21,11 @@ class Func(object):
         :param image_name:
         :return:
         """
-        return os.path.join(Info.IMAGE_SOURCE_PATH, image_name)
+        return os.path.join(Info.ImageSourcePath, image_name)
 
     @staticmethod
     def getPsyIconPath() -> str:
-        return os.path.join(Info.IMAGE_SOURCE_PATH, "psy.ico")
+        return os.path.join(Info.ImageSourcePath, "psy.ico")
 
     @staticmethod
     def getIOType(device_type: str) -> int:

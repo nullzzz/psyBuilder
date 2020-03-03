@@ -402,7 +402,7 @@ class TimelineTable(TableWidget):
                         item.redo()
                     else:
                         self.itemNameChanged.emit(item.widget_id, item.text())
-                        item.save()
+                        item.saveFile()
                 else:
                     MessageBox.information(self, "warning", Info.WidgetPattern[1])
                     item.redo()

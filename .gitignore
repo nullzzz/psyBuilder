@@ -135,4 +135,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-!/operation.ini
+!/config.ini

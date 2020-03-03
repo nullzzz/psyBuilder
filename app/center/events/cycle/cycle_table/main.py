@@ -156,7 +156,7 @@ class CycleTable(QTableWidget):
                     MessageBox.information(self, "warning", Info.WeightPattern[1])
                     item.redo()
                 else:
-                    item.save()
+                    item.saveFile()
             elif type(item) == TimelineItem:
                 item: TimelineItem
                 # empty => something: maybe add a timeline
