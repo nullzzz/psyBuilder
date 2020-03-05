@@ -292,8 +292,11 @@ class Psy(QMainWindow):
         """
         copy widget, link its signals and store it into some data
         """
+        # copy widget
         new_widget = Kernel.Widgets[origin_widget_id].copy(new_widget_id, new_widget_name)
         Kernel.Widgets[new_widget_id] = new_widget
+        # link signals
+        self.linkWidgetSignals(new_widget_id, new_widget)
         return new_widget
 
     def referWidget(self, origin_widget_id: str, new_widget_id: str = Info.ERROR_WIDGET_ID):
@@ -333,7 +336,9 @@ class Psy(QMainWindow):
             widget.itemReferenced.connect(self.handleItemReferenced)
             widget.itemDeleted.connect(self.handleItemDeleted)
         elif widget_type == Info.CYCLE:
-            pass
+            # cycle
+            widget.itemAdded.connect(self.handleItemAdded)
+            widget.itemDeleted.connect(self.handleItemDeleted)
         elif widget_type == Info.IF or Info.SWITCH:
             pass
 
@@ -661,7 +666,7 @@ class Psy(QMainWindow):
     def saveAsFile(self):
         self.getFileName()
         if Info.FILE_NAME:
-            self.loadOut()
+            self.store()
             Info.CONFIG.setValue("directory", Info.FILE_DIRECTORY)
 
     def openFile(self):
@@ -676,7 +681,7 @@ class Psy(QMainWindow):
 
     def store(self):
         """
-        store data to file
+        todo store data to file
         """
         try:
             # compatible
@@ -685,13 +690,13 @@ class Psy(QMainWindow):
             # data in kernel
 
             # structure
-            Func.print("File successfully loaded.", 2)
+            Func.print("File successfully saved.", 1)
         except:
             Func.print("File saving failed.", 2)
 
     def restore(self, file_name):
         """
-        restore data from file
+        todo restore data from file
         """
         print(file_name)
 

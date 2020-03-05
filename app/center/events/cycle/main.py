@@ -34,13 +34,14 @@ class Cycle(TabItemMainWindow):
 
     def linkSignals(self):
         """
-
-        @return:
+        link signals
         """
-        self.cycle_table.headerDoubleClicked.connect(
-            lambda col, name, value: self.attribute_dialog.showWindow(0, col, name, value))
+        self.cycle_table.timelineAdded.connect(
+            lambda widget_id, widget_name, index: self.itemAdded.emit(self.widget_id, widget_id, widget_name, index))
         self.cycle_table.timelineDeleted.connect(lambda widget_id: self.itemDeleted.emit(Info.CycleSend, widget_id))
         self.properties.propertiesChanged.connect(lambda: self.propertiesChanged.emit(self.widget_id))
+        self.cycle_table.headerDoubleClicked.connect(
+            lambda col, name, value: self.attribute_dialog.showWindow(0, col, name, value))
         self.attribute_dialog.attributesAdded.connect(self.handleAttributesAdd)
         self.attribute_dialog.attributesChanged.connect(self.handleAttributeChanged)
 
