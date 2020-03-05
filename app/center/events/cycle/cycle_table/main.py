@@ -156,7 +156,7 @@ class CycleTable(QTableWidget):
                     MessageBox.information(self, "warning", Info.WeightPattern[1])
                     item.redo()
                 else:
-                    item.saveFile()
+                    item.save()
             elif type(item) == TimelineItem:
                 item: TimelineItem
                 # empty => something: maybe add a timeline
@@ -226,6 +226,7 @@ class CycleTable(QTableWidget):
                             del self.timelines[item.old_text]
                         item.save()
             elif type(item) == AttributeItem:
+                # todo highlight var
                 print("Attribute item changed")
 
     def mouseMoveEvent(self, e):
@@ -235,7 +236,6 @@ class CycleTable(QTableWidget):
         @return:
         """
         super(CycleTable, self).mouseMoveEvent(e)
-        # 如果是已经按住alt，并刚刚开始滑动
         if e.modifiers() == Qt.AltModifier:
             if not self.alt_key:
                 row = self.rowAt(e.pos().y())
@@ -247,12 +247,35 @@ class CycleTable(QTableWidget):
 
     def mouseReleaseEvent(self, e):
         """
-
+        if mouse pressed with alt
         """
+        super(CycleTable, self).mouseReleaseEvent(e)
         if self.alt_key:
-            print(self.drag_copy_row_col)
             self.alt_key = False
             self.unsetCursor()
+            # copy data in selected col
+            end_row = self.rowAt(e.pos().y())
+            if end_row == -1:
+                # if user drag to the last row
+                end_row = self.rowCount() - 1
+            # copy
+            start_row, col = self.drag_copy_row_col
+            text = self.item(start_row, col).text()
+            deleted_texts = []
+            for row in range(self.drag_copy_row_col[0] + 1, end_row + 1):
+                item = self.item(row, col)
+                if col == 1 and item.text():
+                    deleted_texts.append(item.text())
+                item.setText(text)
+            # change data
+            self.timelines[text][1] += end_row - start_row
+            # if col == 1, namely user change timeline, we need to check and update data
+            for deleted_text in deleted_texts:
+                self.timelines[deleted_text][1] -= 1
+                if not self.timelines[deleted_text][1]:
+                    # if user delete all this timeline, we delete data
+                    self.timelineDeleted.emit(self.timelines[deleted_text][0])
+                    del self.timelines[deleted_text]
 
     def copyActionFunc(self):
         """
