@@ -9,8 +9,8 @@ from .attribute_area import AttributeArea
 
 
 class AttributeDialog(QDialog):
-    # when user add some attributes, emit signal
-    attributesAdded = pyqtSignal()
+    # when user add some attributes, emit signal (col)
+    attributesAdded = pyqtSignal(int)
     # when user change attributes, emit signal (col, attribute_name, attribute_value)
     attributesChanged = pyqtSignal(int, str, str)
 
@@ -20,7 +20,8 @@ class AttributeDialog(QDialog):
         # bind through pointer
         self.exist_attribute = exist_attribute
         self.attribute_areas = []
-        # if col != -1, it means that change attribute
+        # if change == True, it means that change attribute
+        self.change = False
         self.col = -1
         # title
         self.setWindowTitle("Add Attributes")
@@ -55,7 +56,7 @@ class AttributeDialog(QDialog):
         vertical_layout.addLayout(button_layout)
         self.setLayout(vertical_layout)
 
-    def addAttribute(self, name: str = "", value: str = ""):
+    def addAttribute(self, checked=False, name="", value=""):
         """
         add new attribute area into widget
         """
@@ -67,7 +68,7 @@ class AttributeDialog(QDialog):
         """
         click ok, and we check data
         """
-        if self.col == -1:
+        if not self.change:
             # add attribute
             for attribute_area in self.attribute_areas:
                 name = attribute_area.name()
@@ -78,7 +79,7 @@ class AttributeDialog(QDialog):
                     MessageBox.information(self, "warning",
                                            "Name must start with a letter and contain only letters, numbers and _.")
                     return
-            self.attributesAdded.emit()
+            self.attributesAdded.emit(self.col)
         else:
             # change attribute
             attribute_area = self.attribute_areas[0]
@@ -112,9 +113,12 @@ class AttributeDialog(QDialog):
         # clear attribute_areas
         self.attribute_areas.clear()
         # add new one
-        self.addAttribute(attribute_name, attribute_value)
-        # if col != -1, it means that user want to change attribute
+        self.addAttribute(name=attribute_name, value=attribute_value)
+        # if attribute != empty, it means that user want to change attribute
         # however, we don't allow user to change timeline' default value and weight's value must be positive num
+        self.change = False
+        if attribute_name:
+            self.change = True
         self.col = col
         if self.col != -1:
             if attribute_name == "Timeline":

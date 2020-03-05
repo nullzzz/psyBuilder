@@ -1,12 +1,13 @@
 import re
 
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QTableWidget, QShortcut, QTableWidgetItem
+from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice
+from PyQt5.QtGui import QKeySequence, QBrush, QColor
+from PyQt5.QtWidgets import QTableWidget, QShortcut, QTableWidgetItem, QMenu, QInputDialog
 
 from app.func import Func
 from app.info import Info
 from lib import MessageBox
+from .attribute_dialog import AttributeDialog
 from .attribute_item import AttributeItem
 from .timeline_item import TimelineItem
 from .weight_item import WeightItem
@@ -16,12 +17,9 @@ class CycleTable(QTableWidget):
     """
 
     """
-
     # when timeline is added, emit this signal (widget id, widget_name, index)
     timelineAdded = pyqtSignal(str, str, int)
     timelineDeleted = pyqtSignal(str)
-    # when header is double clicked, emit signal (col, name, value)
-    headerDoubleClicked = pyqtSignal(int, str, str)
 
     def __init__(self):
         super(CycleTable, self).__init__(None)
@@ -32,7 +30,10 @@ class CycleTable(QTableWidget):
         self.drag_copy_row_col = [-2, -2]
         # timeline_name : [widget_id, count in this table]
         self.timelines = {}
+        # attributes dialog
+        self.attribute_dialog = AttributeDialog(self.default_value)
         #
+        self.setAcceptDrops(True)
         self.setColumnCount(2)
         self.setHorizontalHeaderLabels(self.attributes)
         # link signals
@@ -45,16 +46,32 @@ class CycleTable(QTableWidget):
 
         @return:
         """
-        self.horizontalHeader().sectionDoubleClicked.connect(
-            lambda col: self.headerDoubleClicked.emit(col, self.attributes[col],
-                                                      self.default_value[self.attributes[col]]))
+        self.horizontalHeader().sectionDoubleClicked.connect(self.handleHeaderDoubleClicked)
         self.itemChanged.connect(self.handleItemChanged)
+        self.attribute_dialog.attributesAdded.connect(self.handleAttributesAdd)
+        self.attribute_dialog.attributesChanged.connect(self.handleAttributeChanged)
 
     def setMenuAndShortcut(self):
         """
         set menu and shortcut
         @return:
         """
+        # menu
+        self.menu = QMenu()
+        # copy action
+        self.copy_action = self.menu.addAction(Func.getImage("menu/copy.png", 1), "Copy",
+                                               self.copyActionFunc, QKeySequence())
+        self.paste_action = self.menu.addAction(Func.getImage("menu/paste.png", 1), "Paste",
+                                                self.pasteActionFunc, QKeySequence())
+        self.insert_row_action = self.menu.addAction(Func.getImage("menu/insert_row.png", 1), "Insert Row",
+                                                     self.insertRowsActionFunc, QKeySequence())
+        self.insert_col_action = self.menu.addAction(Func.getImage("menu/insert_col.png", 1), "Insert Attribute",
+                                                     self.insertAttributesActionFunc, QKeySequence())
+        self.delete_rows_action = self.menu.addAction(Func.getImage("menu/delete_row.png", 1), "Delete Rows",
+                                                      self.deleteRowsActionFunc, QKeySequence())
+        self.delete_cols_action = self.menu.addAction(Func.getImage("menu/delete_col.png", 1), "Delete Attributes",
+                                                      self.deleteAttributesActionFunc, QKeySequence())
+        # shortcut
         self.copy_shortcut = QShortcut(QKeySequence(QKeySequence.Copy), self)
         self.copy_shortcut.setContext(Qt.WidgetWithChildrenShortcut)
         self.copy_shortcut.activated.connect(self.copyActionFunc)
@@ -84,12 +101,20 @@ class CycleTable(QTableWidget):
             attribute_item = AttributeItem(default_value)
             self.setItem(index, col, attribute_item)
 
-    def deleteRow(self, index: int):
+    def deleteRow(self, row: int):
         """
         delete row
         @param index:
         @return:
         """
+        # delete row, consider timeline
+        timeline = self.item(row, 1).text()
+        if timeline:
+            self.timelines[timeline][1] -= 1
+            if not self.timelines[timeline]:
+                self.timelineDeleted.emit(self.timelines[timeline][0])
+                del self.timelines[timeline]
+        self.removeRow(row)
 
     def addAttribtueColumn(self, col: int, attribute_name: str, attribute_value):
         """
@@ -119,20 +144,26 @@ class CycleTable(QTableWidget):
         # header
         if attribute_name != self.attributes[col]:
             self.horizontalHeaderItem(col).setText(attribute_name)
-            del self.default_value[attribute_name]
+            del self.default_value[self.attributes[col]]
         # data
         self.attributes[col] = attribute_name
-        self.default_value[attribute_value] = attribute_name
+        self.default_value[attribute_name] = attribute_value
         # value: we just change empty to new default value
         for row in range(self.rowCount()):
             item = self.item(row, col)
             if not item.text():
                 item.setText(attribute_value)
 
-    def deleteAttributeColumn(self, col: int):
+    def deleteAttribute(self, col: int):
         """
         delete attribute column
         """
+        if col == 0 or col == 1:
+            return
+        # remove column
+        self.removeColumn(col)
+        # data
+        del self.default_value[self.attributes.pop(col)]
 
     def deleteTimeline(self, timeline: str):
         """
@@ -226,8 +257,32 @@ class CycleTable(QTableWidget):
                             del self.timelines[item.old_text]
                         item.save()
             elif type(item) == AttributeItem:
-                # todo highlight var
-                print("Attribute item changed")
+                if re.search(r"^\[.*?\]", text):
+                    item.setForeground(QBrush(QColor(0, 0, 255)))
+                else:
+                    item.setForeground(QBrush(QColor(0, 0, 0)))
+
+    def handleHeaderDoubleClicked(self, col: int):
+        """
+
+        """
+        name = self.attributes[col]
+        value = self.default_value[name]
+        self.attribute_dialog.showWindow(0, col, name, value)
+
+    def handleAttributesAdd(self, col: int):
+        """
+        when user want to add new attributes
+        """
+        attributes = self.attribute_dialog.getAttributes()
+        for name, value in attributes:
+            self.addAttribtueColumn(col, name, value)
+
+    def handleAttributeChanged(self, col: int, attribute_name: str, attribute_value: str):
+        """
+        when user change some attribute
+        """
+        self.changeAttributeColumn(col, attribute_name, attribute_value)
 
     def mouseMoveEvent(self, e):
         """
@@ -277,6 +332,111 @@ class CycleTable(QTableWidget):
                     self.timelineDeleted.emit(self.timelines[deleted_text][0])
                     del self.timelines[deleted_text]
 
+    def contextMenuEvent(self, e):
+        """
+        right mouse menu
+        """
+        # delete row/col, insert row/col, copy, paste
+        selected = len(self.selectedRanges())
+        if selected:
+            self.delete_rows_action.setEnabled(True)
+            self.delete_cols_action.setEnabled(True)
+
+            if selected > 1:
+                self.insert_row_action.setEnabled(False)
+                self.insert_col_action.setEnabled(False)
+            else:
+                self.insert_row_action.setEnabled(True)
+                left = self.selectedRanges()[0].leftColumn()
+                if left == 0 or left == 1:
+                    self.insert_col_action.setEnabled(False)
+                else:
+                    self.insert_col_action.setEnabled(True)
+            self.copy_action.setEnabled(True)
+            self.paste_action.setEnabled(True)
+        else:
+            self.delete_rows_action.setEnabled(False)
+            self.delete_cols_action.setEnabled(False)
+            self.insert_row_action.setEnabled(False)
+            self.insert_col_action.setEnabled(False)
+            self.copy_action.setEnabled(False)
+            self.paste_action.setEnabled(False)
+        self.menu.exec(self.mapToGlobal(e.pos()))
+
+    def addRowsActionFunc(self):
+        """
+        add rows through a dialog
+        """
+
+        rows, ok = QInputDialog(flags=Qt.WindowCloseButtonHint).getInt(self, "Add Rows",
+                                                                       "Enter the number of rows to be added: ", 1, 1,
+                                                                       100, 1)
+        if ok:
+            # if user press ok
+            while rows:
+                self.addRow()
+                rows -= 1
+
+    def insertRowsActionFunc(self):
+        """
+        insert row above of the selected range
+        """
+        top = self.selectedRanges()[0].topRow()
+        self.addRow(top)
+
+    def deleteRowsActionFunc(self):
+        """
+        func to delete rows action
+        """
+        # get select rows
+        delete_rows = [0 for i in range(self.rowCount())]
+        for select_range in self.selectedRanges():
+            for row in range(select_range.topRow(), select_range.bottomRow() + 1):
+                delete_rows[row] = 1
+        # delete rows (reverse)
+        for row in range(len(delete_rows) - 1, -1, -1):
+            if delete_rows[row]:
+                self.deleteRow(row)
+
+    def addAttributeActionFunc(self):
+        """
+        add attribute
+        """
+        self.attribute_dialog.showWindow(0)
+
+    def addAttributesActionFunc(self):
+        """
+        add attribute
+        """
+        self.attribute_dialog.showWindow(1)
+
+    def changeAttributeActionFunc(self):
+        """
+        add attribute
+        """
+        self.attribute_dialog.showWindow(0)
+
+    def insertAttributesActionFunc(self):
+        """
+        insert col left of the selected range
+        """
+        left = self.selectedRanges()[0].leftColumn()
+        self.attribute_dialog.showWindow(0, left)
+
+    def deleteAttributesActionFunc(self):
+        """
+        func to delete rows action
+        """
+        # get select cols
+        delete_cols = [0 for i in range(self.columnCount())]
+        for select_range in self.selectedRanges():
+            for col in range(select_range.leftColumn(), select_range.rightColumn() + 1):
+                delete_cols[col] = 1
+        # delete col (reverse)
+        for col in range(len(delete_cols) - 1, -1, -1):
+            if delete_cols[col]:
+                self.deleteAttribute(col)
+
     def copyActionFunc(self):
         """
         copy data to table
@@ -288,3 +448,38 @@ class CycleTable(QTableWidget):
         paste data to table
         """
         print("paste")
+
+    def dragEnterEvent(self, e):
+        """
+
+        """
+        if e.mimeData().hasFormat(Info.AttributesToLineEdit):
+            e.accept()
+        else:
+            e.ignore()
+
+    def dragMoveEvent(self, e):
+        """
+
+        """
+        e.accept()
+
+    def dropEvent(self, e):
+        """
+        drop in table
+        """
+        if e.mimeData().hasFormat(Info.AttributesToLineEdit):
+            # get pos
+            row = self.rowAt(e.pos().y())
+            col = self.columnAt(e.pos().x())
+            # can't be weight and timeline
+            if row != -1 and col >= 2:
+                data = e.mimeData().data(Info.AttributesToLineEdit)
+                stream = QDataStream(data, QIODevice.ReadOnly)
+                text = f"[{stream.readQString()}]"
+                self.item(row, col).setText(text)
+                e.accept()
+            else:
+                e.ignore()
+        else:
+            e.ignore()

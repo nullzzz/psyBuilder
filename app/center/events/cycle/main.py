@@ -1,10 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QAction
 
 from app.func import Func
 from app.info import Info
 from lib import TabItemMainWindow
-from .attribute_dialog import AttributeDialog
 from .cycle_table import CycleTable
 from .properties import Properties
 
@@ -23,7 +21,6 @@ class Cycle(TabItemMainWindow):
         super(Cycle, self).__init__(widget_id, widget_name)
         self.cycle_table = CycleTable()
         self.properties = Properties()
-        self.attribute_dialog = AttributeDialog(self.cycle_table.default_value)
         self.setCentralWidget(self.cycle_table)
         # set tool bar
         self.setToolBar()
@@ -40,10 +37,6 @@ class Cycle(TabItemMainWindow):
             lambda widget_id, widget_name, index: self.itemAdded.emit(self.widget_id, widget_id, widget_name, index))
         self.cycle_table.timelineDeleted.connect(lambda widget_id: self.itemDeleted.emit(Info.CycleSend, widget_id))
         self.properties.propertiesChanged.connect(lambda: self.propertiesChanged.emit(self.widget_id))
-        self.cycle_table.headerDoubleClicked.connect(
-            lambda col, name, value: self.attribute_dialog.showWindow(0, col, name, value))
-        self.attribute_dialog.attributesAdded.connect(self.handleAttributesAdd)
-        self.attribute_dialog.attributesChanged.connect(self.handleAttributeChanged)
 
     def setToolBar(self):
         """
@@ -56,16 +49,15 @@ class Cycle(TabItemMainWindow):
         # add action
         tool_bar.addAction(Func.getImage("tool_bar/setting.png", 1), "Setting", self.properties.exec)
         tool_bar.addAction(Func.getImage("tool_bar/add_row.png", 1), "Add Row", self.addRow)
-        add_rows_action = QAction(Func.getImage("tool_bar/add_rows.png", 1), "Add Rows", self)
-        tool_bar.addAction(add_rows_action)
-        delete_row_action = QAction(Func.getImage("tool_bar/delete_row.png", 1), "Delete Row", self)
-        tool_bar.addAction(delete_row_action)
+        tool_bar.addAction(Func.getImage("tool_bar/add_rows.png", 1), "Add Rows", self.cycle_table.addRowsActionFunc)
+        tool_bar.addAction(Func.getImage("tool_bar/delete_row.png", 1), "Delete Rows",
+                           self.cycle_table.deleteRowsActionFunc)
         tool_bar.addAction(Func.getImage("tool_bar/add_column.png", 1), "Add Attribute",
-                           lambda: self.attribute_dialog.showWindow(0))
+                           self.cycle_table.addAttributeActionFunc)
         tool_bar.addAction(Func.getImage("tool_bar/add_columns.png", 1), "Add Attributes",
-                           lambda: self.attribute_dialog.showWindow(1))
-        delete_column_action = QAction(Func.getImage("tool_bar/delete_column.png", 1), "Delete Attributes", self)
-        tool_bar.addAction(delete_column_action)
+                           self.cycle_table.addAttributesActionFunc)
+        tool_bar.addAction(Func.getImage("tool_bar/delete_column.png", 1), "Delete Attributes",
+                           self.cycle_table.deleteAttributesActionFunc)
 
     def getColumnAttributes(self) -> list:
         """
@@ -90,19 +82,17 @@ class Cycle(TabItemMainWindow):
         """
         self.cycle_table.addRow()
 
-    def handleAttributesAdd(self):
+    def deleteRow(self, row: int):
         """
-        when user want to add new attributes
+        delete row
         """
-        attributes = self.attribute_dialog.getAttributes()
-        for name, value in attributes:
-            self.cycle_table.addAttribtueColumn(-1, name, value)
+        self.cycle_table.deleteRow(row)
 
-    def handleAttributeChanged(self, col: int, attribute_name: str, attribute_value: str):
+    def deleteAttribute(self, col: int):
         """
-        when user change some attribute
+        delete attribute
         """
-        self.cycle_table.changeAttributeColumn(col, attribute_name, attribute_value)
+        self.cycle_table.deleteAttribute(col)
 
     """
     functions that must be override
