@@ -1,7 +1,7 @@
 from .info import Info
 
 
-class Kernel(object):
+class Kernel:
     """
     This Class is used to store main data, without any configuration or function.
     """

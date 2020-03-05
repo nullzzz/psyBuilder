@@ -9,14 +9,15 @@ class PropertiesTable(TableWidget):
 
     """
 
-    def __init__(self):
-        super(PropertiesTable, self).__init__(None)
+    def __init__(self, parent=None):
+        super(PropertiesTable, self).__init__(parent=parent)
         # about its ui
         self.horizontalHeader().setVisible(False)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setStretchLastSection(True)
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        # todo: due to the difference of qt version.
+        # self.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.setShowGrid(False)
         # set two columns
         self.setColumnCount(2)

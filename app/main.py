@@ -22,7 +22,6 @@ from .info import Info
 from .kernel import Kernel
 from .menubar.compile_PTB import compilePTB
 from .menubar.deviceSelection.IODevice.globalDevices import GlobalDevice
-from .menubar.deviceSelection.RX import RX
 from .menubar.deviceSelection.progressBar import LoadingTip
 from .menubar.deviceSelection.quest.questinit import QuestInit
 from .menubar.deviceSelection.tracker.trackerinit import TrackerInit
@@ -34,17 +33,17 @@ from .structure import Structure
 
 class Psy(QMainWindow):
     def __init__(self, file_name: str = ""):
-        super(Psy, self).__init__(None)
+        super(Psy, self).__init__(parent=None)
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
         # init menu bar
         self.initMenubar()
+
         # init dock widget
         self.initDockWidget()
         # wait dialog
         self.wait_dialog = WaitDialog()
-
         # test
         widget_id = Func.generateWidgetId(Info.TIMELINE)
         widget_name = Func.generateWidgetName(Info.TIMELINE)
@@ -54,7 +53,6 @@ class Psy(QMainWindow):
         self.structure.addNode(Info.ERROR_WIDGET_ID, widget_id, widget_name, 0)
         # set timeline as a tab
         self.center.openTab(widget_id)
-
         # if file name is not none, we need to restore file
         if file_name:
             self.restore(file_name)
@@ -105,9 +103,6 @@ class Psy(QMainWindow):
         self.tracker_init = TrackerInit()
         self.tracker_init.setWindowModality(Qt.ApplicationModal)
 
-        self.test_devices = RX(3)
-        self.test_devices.setWindowModality(Qt.ApplicationModal)
-
         self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
         self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
 
@@ -122,14 +117,10 @@ class Psy(QMainWindow):
         tracker_init_action = QAction("&Tracker", self)
         tracker_init_action.triggered.connect(self.tracker_init.show)
 
-        test_action = QAction("&Test", self)
-        test_action.triggered.connect(self.test_devices.show)
-
         devices_menu.addAction(output_devices_action)
         devices_menu.addAction(input_devices_action)
         devices_menu.addAction(quest_init_action)
         devices_menu.addAction(tracker_init_action)
-        devices_menu.addAction(test_action)
 
         # build menu
         build_menu = menubar.addMenu("&Building")
@@ -226,6 +217,7 @@ class Psy(QMainWindow):
         self.setCentralWidget(self.center)
         # output
         self.output = Output()
+
         # its initial layout
         self.addDockWidget(Qt.LeftDockWidgetArea, self.structure)
         self.splitDockWidget(self.structure, self.properties, Qt.Vertical)
