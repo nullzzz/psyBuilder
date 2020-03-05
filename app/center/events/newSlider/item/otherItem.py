@@ -18,7 +18,7 @@ class OtherItem(QGraphicsPixmapItem):
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):
-        super(OtherItem, self).__init__(parent=parent)
+        super(OtherItem, self).__init__()
 
         self.item_type = item_type
         self.item_name = item_name if item_name else self.generateItemName()
