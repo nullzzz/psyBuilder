@@ -2,7 +2,7 @@ import re
 
 from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice
 from PyQt5.QtGui import QKeySequence, QBrush, QColor
-from PyQt5.QtWidgets import QTableWidget, QShortcut, QTableWidgetItem, QMenu, QInputDialog
+from PyQt5.QtWidgets import QTableWidget, QShortcut, QTableWidgetItem, QMenu, QInputDialog, QApplication
 
 from app.func import Func
 from app.info import Info
@@ -28,6 +28,7 @@ class CycleTable(QTableWidget):
         self.default_value = {"Weight": "1", "Timeline": ""}
         self.alt_key = False
         self.drag_copy_row_col = [-2, -2]
+        self.untitled_attribute_count = 1
         # timeline_name : [widget_id, count in this table]
         self.timelines = {}
         # attributes dialog
@@ -111,12 +112,12 @@ class CycleTable(QTableWidget):
         timeline = self.item(row, 1).text()
         if timeline:
             self.timelines[timeline][1] -= 1
-            if not self.timelines[timeline]:
+            if not self.timelines[timeline][1]:
                 self.timelineDeleted.emit(self.timelines[timeline][0])
                 del self.timelines[timeline]
         self.removeRow(row)
 
-    def addAttribtueColumn(self, col: int, attribute_name: str, attribute_value):
+    def addAttribtue(self, col: int, attribute_name: str, attribute_value):
         """
         add attribute column
         if col == -1, add last col
@@ -276,7 +277,7 @@ class CycleTable(QTableWidget):
         """
         attributes = self.attribute_dialog.getAttributes()
         for name, value in attributes:
-            self.addAttribtueColumn(col, name, value)
+            self.addAttribtue(col, name, value)
 
     def handleAttributeChanged(self, col: int, attribute_name: str, attribute_value: str):
         """
@@ -439,15 +440,171 @@ class CycleTable(QTableWidget):
 
     def copyActionFunc(self):
         """
-        copy data to table
+        copy data from table
         """
-        print("copy")
+        # get system's clipboard
+        clipboard = QApplication.clipboard()
+        # get all selected items
+        items = self.selectedItems()
+        if items:
+            # check the validity of selected items, selected columns must be the same
+            # get length, left and right col
+            first_item = items[0]
+            left = first_item.column()
+            current_row = first_item.row()
+            rows = [[first_item]]
+            length = 1
+            for item in items[1:]:
+                if item.row() == current_row:
+                    rows[0].append(item)
+                    length += 1
+                else:
+                    break
+            right = items[length - 1].column()
+            # classify remainder items and check validity of selected areas
+            current_length = length
+            for i in range(length, len(items)):
+                item = items[i]
+                if item.row() == current_row:
+                    current_length += 1
+                    rows[-1].append(item)
+                else:
+                    # check validity
+                    if item.column() != left or current_length != length or items[i - 1].column() != right:
+                        MessageBox.information(self, "Warning",
+                                               "This operation can't be performed on multiple selection areas.")
+                    # update
+                    current_length = 1
+                    current_row = item.row()
+                    rows.append([item])
+            # check last row
+            if current_length != length or items[-1].column() != right:
+                MessageBox.information(self, "Warning",
+                                       "This operation can't be performed on multiple selection areas.")
+
+            copy_text = ""
+            for row in rows:
+                for i in range(length):
+                    item = row[i]
+                    if i == length - 1:
+                        if row == rows[-1]:
+                            copy_text = copy_text + item.text()
+                        else:
+                            copy_text = copy_text + item.text() + "\n"
+                    else:
+                        copy_text = copy_text + item.text() + "\t"
+            # output to system's clipboard
+            clipboard.setText(copy_text)
 
     def pasteActionFunc(self):
         """
         paste data to table
         """
-        print("paste")
+        # check the validity of selected area
+        select_ranges = self.selectedRanges()
+        # none area
+        if not len(select_ranges):
+            return
+        # many areas
+        if len(select_ranges) != 1:
+            MessageBox.information(self, 'Warning', "This operation can't be performed on multiple selection areas.")
+            return
+        # get start pos
+        start_row = select_ranges[0].topRow()
+        start_col = select_ranges[0].leftColumn()
+        # get paste text from system's clipboard
+        clipboard = QApplication.clipboard()
+        paste_text = clipboard.text()
+        # if text is none, we ignore it
+        if not paste_text:
+            return
+        # we only allow excel-like formats
+        # check the number of columns of each row is the same firstly
+        cols_count = 0
+        rows = re.split(r"\n", paste_text)
+        # under windows, the data ends with \n, so an invalid \n will be added, which needs to be deleted
+        if not rows[-1]:
+            rows.pop(-1)
+        # split data of each row
+        pasted_rows = []
+        for row in rows:
+            pasted_row = re.split(r'\t', row)
+            if not cols_count:
+                cols_count = len(pasted_row)
+            else:
+                if len(pasted_row) != cols_count:
+                    MessageBox.information(self, "Warning", "Cols split by '\\t' of each row must be same!")
+                    return
+            pasted_rows.append(pasted_row)
+        # traverse rows_data to cols_data
+        pasted_cols = [[] for i in range(cols_count)]
+        for i in range(len(pasted_rows)):
+            pasted_row = pasted_rows[i]
+            for j in range(cols_count):
+                # we need format the data
+                pasted_cols[j].append(re.sub(r"\r", "", pasted_row[j]))
+        # if it affects the weight/timeline column, we need to check the value
+        end_row = start_row + len(rows) - 1
+        end_col = start_col + cols_count - 1
+        # add new row into table
+        for i in range(self.rowCount(), end_row + 1):
+            self.addRow()
+        if not start_col:
+            # if it affect weight column, we only allow positive num
+            weight_values = pasted_cols[0]
+            for weight_value in weight_values:
+                if not re.match(Info.WeightPattern[0], weight_value):
+                    MessageBox.information(self, "warning", Info.WeightPattern[1])
+                    return
+        if (not start_col and cols_count > 1) or start_col == 1:
+            # if it affect weight column, we need to check the value
+            timeline_col = 1
+            if start_col == 1:
+                timeline_col = 0
+            timeline_names = pasted_cols[timeline_col]
+            for timeline_name in timeline_names:
+                # we ignore empty
+                if timeline_name:
+                    if not re.match(Info.WidgetPattern[0], timeline_name):
+                        MessageBox.information(self, "warning", Info.WidgetPattern[1])
+                        return
+            # now we add timelines into table
+            timeline_counter = {}
+            for row in range(start_row, end_row + 1):
+                old_timeline_name = self.item(row, 1).text()
+                if old_timeline_name:
+                    if old_timeline_name in timeline_counter:
+                        timeline_counter[old_timeline_name] -= 1
+                    else:
+                        timeline_counter[old_timeline_name] = -1
+                new_timeline_name = timeline_names[row - start_row]
+                # we ignore empty
+                if new_timeline_name:
+                    if new_timeline_name in timeline_counter:
+                        timeline_counter[new_timeline_name] += 1
+                    else:
+                        timeline_counter[new_timeline_name] = 1
+            # handle timeline counter
+            for timeline_name in timeline_counter:
+                if timeline_name in self.timelines:
+                    self.timelines[timeline_name][1] += timeline_counter[timeline_name]
+                    if not self.timelines[timeline_name][1]:
+                        # if count of this timeline is zero, we need to delete it
+                        self.timelineDeleted.emit(self.timelines[timeline_name][0])
+                        del self.timelines[timeline_name]
+                else:
+                    widget_id = Func.generateWidgetId(Info.TIMELINE)
+                    self.timelineAdded.emit(widget_id, timeline_name, len(self.timelines))
+                    self.timelines[timeline_name] = [widget_id, timeline_counter[timeline_name]]
+        # add attributes and fill text
+        for col in range(start_col, end_col + 1):
+            data_col = col - start_col
+            if col > self.columnCount() - 1:
+                self.addAttribtue(-1, f"untitled_var_{self.untitled_attribute_count}", pasted_cols[data_col][0])
+                self.untitled_attribute_count += 1
+            for row in range(start_row, end_row + 1):
+                data = pasted_cols[data_col][row - start_row]
+                self.item(row, col).setText(data)
 
     def dragEnterEvent(self, e):
         """
