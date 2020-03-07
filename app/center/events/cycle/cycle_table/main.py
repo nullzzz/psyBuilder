@@ -640,3 +640,45 @@ class CycleTable(QTableWidget):
                 e.ignore()
         else:
             e.ignore()
+
+    def store(self) -> dict:
+        """
+        store this widget
+        """
+        table = [[] for i in range(self.columnCount())]
+        for col in range(self.columnCount()):
+            for row in range(self.rowCount()):
+                table[col].append(self.item(row, col).text())
+        return {
+            "attributes": self.attributes,
+            "default_value": self.default_value,
+            "untitled_attribute_count": self.untitled_attribute_count,
+            "timelines": self.timelines,
+            "table": table
+        }
+
+    def restore(self, data: dict):
+        """
+        restore this widget
+        """
+        self.attributes = data["attributes"]
+        self.default_value = data["default_value"]
+        self.untitled_attribute_count = data["untitled_attribute_count"]
+        self.timelines = data["timelines"]
+        table = data["table"]
+        # set row, col and headers
+        self.setRowCount(len(table[0]))
+        self.setColumnCount(len(table))
+        self.setHorizontalHeaderLabels(self.attributes)
+        # restore each items
+        for col in range(self.columnCount()):
+            for row in range(self.rowCount()):
+                text = table[col][row]
+                if col == 0:
+                    item = WeightItem(text)
+                elif col == 1:
+                    item = TimelineItem()
+                else:
+                    item = AttributeItem(text)
+                self.setItem(row, col, item)
+                self.item(row, col).setText(text)

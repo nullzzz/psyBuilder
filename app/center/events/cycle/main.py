@@ -121,9 +121,9 @@ class Cycle(TabItemMainWindow):
         return necessary data for restoring this widget.
         @return:
         """
-        return {}
+        return {"cycle_table": self.cycle_table.store(), "properties": self.properties.getProperties()}
 
-    def restore(self, data) -> None:
+    def restore(self, data):
         """
         todo You should finish the job.
 
@@ -131,13 +131,5 @@ class Cycle(TabItemMainWindow):
         @param data: necessary data for restoring this widget
         @return:
         """
-
-    def copy(self, widget_id: int, widget_name: str):
-        """
-        todo You should finish the job.
-
-        return a copy of this widget, and set the widget id and name of the copy.
-        @param widget_id:
-        @return:
-        """
-        return None
+        self.cycle_table.restore(data["cycle_table"])
+        self.properties.setProperties(data["properties"])

@@ -148,8 +148,8 @@ class StructureTree(QTreeWidget):
                     self.copyDrag(widget_id)
             elif e.modifiers() == Qt.ShiftModifier:
                 # todo move to timeline (shift -> move)
-                # if not Func.isWidgetType(widget_id, Info.Cycle):
-                #     self.moveDrag(widget_id)
+                if not Func.isWidgetType(widget_id, Info.CYCLE):
+                    self.moveDrag(widget_id)
                 pass
             else:
                 # none -> refer
