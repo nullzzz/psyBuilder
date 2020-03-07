@@ -44,18 +44,19 @@ class Psy(QMainWindow):
         self.initDockWidget()
         # wait dialog
         self.wait_dialog = WaitDialog()
-        # test
-        widget_id = Func.generateWidgetId(Info.TIMELINE)
-        widget_name = Func.generateWidgetName(Info.TIMELINE)
-        # create timeline widget
-        self.createWidget(widget_id, widget_name)
-        # add node in structure
-        self.structure.addNode(Info.ERROR_WIDGET_ID, widget_id, widget_name, 0)
-        # set timeline as a tab
-        self.center.openTab(widget_id)
         # if file name is not none, we need to restore file
         if file_name:
             self.restore(file_name)
+        else:
+            # init initial timeline
+            widget_id = Func.generateWidgetId(Info.TIMELINE)
+            widget_name = Func.generateWidgetName(Info.TIMELINE)
+            # create timeline widget
+            self.createWidget(widget_id, widget_name)
+            # add node in structure
+            self.structure.addNode(Info.ERROR_WIDGET_ID, widget_id, widget_name, 0)
+            # set timeline as a tab
+            self.center.openTab(widget_id)
 
     def initMenubar(self):
         """
@@ -239,8 +240,11 @@ class Psy(QMainWindow):
         """
         create widget, link its signals and store it into some data
         """
+        QApplication.processEvents()
         widget_type = Func.getWidgetType(widget_id)
+        QApplication.processEvents()
         widget = None
+        QApplication.processEvents()
         if widget_type == Info.TIMELINE:
             widget = Timeline(widget_id, widget_name)
         elif widget_type == Info.IF:
@@ -283,10 +287,13 @@ class Psy(QMainWindow):
             # if fail to create widget, exit.
             exit()
         # change data set in Kernel
+        QApplication.processEvents()
         Kernel.Widgets[widget_id] = widget
         Kernel.Names[widget_name] = [widget_id]
         # link necessary signals
+        QApplication.processEvents()
         self.linkWidgetSignals(widget_id, widget)
+        QApplication.processEvents()
 
     def copyWidget(self, origin_widget_id: str, new_widget_id: str, new_widget_name: str):
         """
@@ -950,11 +957,9 @@ class Psy(QMainWindow):
         show loading window
         """
         self.wait_dialog.show()
-        QApplication.processEvents()
 
     def endWait(self):
         """
         close loading window
         """
         self.wait_dialog.close()
-        QApplication.processEvents()
