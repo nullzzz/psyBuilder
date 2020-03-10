@@ -1,11 +1,8 @@
-import re
-
 from PyQt5.QtCore import Qt, pyqtSignal, QRect
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu, QShortcut
 
 from app.func import Func
-from app.info import Info
 from lib import TableWidget, MessageBox
 from .timeline_item import TimelineItem
 from .timeline_name_item import TimelineNameItem
@@ -68,7 +65,8 @@ class TimelineTable(TableWidget):
         """
         self.menu = QMenu()
         # copy action
-        self.delete_action = self.menu.addAction(Func.getImageObject("menu/delete.png", 1), "Delete", self.deleteActionFunc,
+        self.delete_action = self.menu.addAction(Func.getImageObject("menu/delete.png", 1), "Delete",
+                                                 self.deleteActionFunc,
                                                  QKeySequence(QKeySequence.Delete))
         # shortcut
         self.delete_shortcut = QShortcut(QKeySequence(QKeySequence("Delete")), self)
@@ -396,13 +394,10 @@ class TimelineTable(TableWidget):
             # if text isn't changed, we ignore it
             if item.changed():
                 # check its validity
-                if re.match(Info.WidgetPattern[0], item.text()):
-                    if Func.checkWidgetNameExisted(item.text()):
-                        MessageBox.information(self, "warning", "Name existed.")
-                        item.redo()
-                    else:
-                        self.itemNameChanged.emit(item.widget_id, item.text())
-                        item.saveFile()
+                validity, tip = Func.checkWidgetNameValidity(item.text())
+                if validity:
+                    self.itemNameChanged.emit(item.widget_id, item.text())
+                    item.save()
                 else:
-                    MessageBox.information(self, "warning", Info.WidgetPattern[1])
+                    MessageBox.information(self, "warning", tip)
                     item.redo()

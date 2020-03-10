@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFrame, QVBoxLayout
 from app.func import Func
 from app.info import Info
 from .timeline_table import TimelineTable
-
+from lib import MessageBox
 
 class TimelineArea(QFrame):
     """
@@ -251,8 +251,12 @@ class TimelineArea(QFrame):
                 origin_widget_id, dest_index = self.moveItem(origin_index, dest_index)
                 self.itemMoved.emit(self.parent().widget_id, origin_widget_id, origin_index, dest_index)
         else:
-            # we need add item in this timeline
-            new_widget_id, _, index = self.addItem(widget_type=Func.getWidgetType(origin_widget_id),
-                                                   widget_name=widget_name,
-                                                   index=dest_index)
-            self.itemReferenced.emit(origin_widget_id, new_widget_id, index)
+            # we need to check refer validity
+            if Func.checkReferValidity(self.parent().widget_id, origin_widget_id):
+                # we need add item in this timeline
+                new_widget_id, _, index = self.addItem(widget_type=Func.getWidgetType(origin_widget_id),
+                                                       widget_name=widget_name,
+                                                       index=dest_index)
+                self.itemReferenced.emit(origin_widget_id, new_widget_id, index)
+            else:
+                MessageBox.information(self, 'Warning', 'Incompatible attributes.')

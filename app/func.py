@@ -596,3 +596,29 @@ class Func(object):
                           2 fail
         """
         Info.Psy.output.print(information, information_type)
+
+    @staticmethod
+    def checkReferValidity(target_timeline_widget_id: str, widget_id: str) -> bool:
+        """
+        当从structure中拖拽至timeline时，
+        :param target_timeline_widget_id: 目标的timeline的wid
+        :param widget_id: 被拖拽的wid
+        :return: 合法性
+        """
+        target_timeline_node = Info.Nodes[target_timeline_widget_id]
+        widget_name = Func.getWidgetName(widget_id)
+        # 先确定被拖拽的widget所属的cycle是否与target的timeline所属的cycle是否为同一个
+        # target_timeline不能是第一层timeline，因为它没有父cycle
+        if target_timeline_widget_id == f"{Info.TIMELINE}.0":
+            return False
+        cycle_1_wid = target_timeline_node.parent().widget_id
+        # 根据widget得到父timeline
+        parent_timeline_node = Info.Nodes[Func.getWidgetParent(widget_id)]
+        # 如果是父亲为第一层timeline，其没有父cycle
+        if parent_timeline_node.widget_id == f"{Info.TIMELINE}.0":
+            return False
+        cycle_2_wid = parent_timeline_node.parent().widget_id
+        # 父cycle是否相同
+        if cycle_1_wid == cycle_2_wid:
+            return True
+        return False

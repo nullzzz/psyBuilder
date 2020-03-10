@@ -410,7 +410,7 @@ class Psy(QMainWindow):
         # start wait
         self.startWait()
         # do job
-        # copy widget firstly
+        # refer widget firstly
         self.referWidget(origin_widget_id, new_widget_id)
         # we should consider a lot of things here because of reference.
         # we also need add node in those reference parents
