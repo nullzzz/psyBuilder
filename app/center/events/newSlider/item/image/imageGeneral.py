@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
     QFileDialog, QCompleter
 
-from lib import PigLineEdit, PigComboBox
+from lib import VarLineEdit, VarComboBox
 
 
 # image event专属页面
@@ -28,7 +28,7 @@ class ImageGeneral(QWidget):
             "Height": "100%",
         }
         # 打开文件
-        self.file_name = PigLineEdit()
+        self.file_name = VarLineEdit()
 
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
@@ -38,19 +38,19 @@ class ImageGeneral(QWidget):
         self.mirrorLR = QCheckBox("Mirror left/right")
 
         # Rotate
-        self.rotate = PigComboBox()
+        self.rotate = VarComboBox()
 
         # 拉伸模式
         self.stretch = QCheckBox("Stretch")
-        self.stretch_mode = PigComboBox()
+        self.stretch_mode = VarComboBox()
 
         # 背景色、透明度
-        self.transparent = PigComboBox()
+        self.transparent = VarComboBox()
 
-        self.x_pos = PigComboBox()
-        self.y_pos = PigComboBox()
-        self._width = PigComboBox()
-        self._height = PigComboBox()
+        self.x_pos = VarComboBox()
+        self.y_pos = VarComboBox()
+        self._width = VarComboBox()
+        self._height = VarComboBox()
 
         self.setGeneral()
 

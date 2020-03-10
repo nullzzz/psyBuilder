@@ -7,11 +7,11 @@ from PyQt5.QtWidgets import QComboBox, QMessageBox
 from app.info import Info
 
 
-class PigComboBox(QComboBox):
+class VarComboBox(QComboBox):
     focusLost = pyqtSignal()
 
     def __init__(self, parent=None):
-        super(PigComboBox, self).__init__(parent)
+        super(VarComboBox, self).__init__(parent)
         self.setAcceptDrops(True)
         self.setInsertPolicy(QComboBox.NoInsert)
         self.currentTextChanged.connect(self.findVar)

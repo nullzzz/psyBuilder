@@ -7,6 +7,6 @@ from .tab_item_widget import TabItemWidget
 from .tab_widget import TabWidget
 from .table_widget import TableWidget
 from .table_widget_item import TableWidgetItem
-from .var_combo_box import PigComboBox
-from .var_line_edit import PigLineEdit
+from .var_combo_box import VarComboBox
+from .var_line_edit import VarLineEdit
 from .wait_dialog import WaitDialog

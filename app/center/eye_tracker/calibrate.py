@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QApplication, QPushButton, QLineEdit, QVBoxL
     QGridLayout
 
 from app.func import Func
-from lib import PigComboBox, ColorListEditor, TabItemWidget
+from lib import VarComboBox, ColorListEditor, TabItemWidget
 
 
 class EyeCalibrate(TabItemWidget):
@@ -25,16 +25,16 @@ class EyeCalibrate(TabItemWidget):
             # "Screen": "screen.0",
         }
 
-        self.calibration_type = PigComboBox()
-        self.calibration_beep = PigComboBox()
+        self.calibration_type = VarComboBox()
+        self.calibration_beep = VarComboBox()
         self.target_color = ColorListEditor()
         self.target_color.setCurrentText("gray")
 
-        self.target_style = PigComboBox()
+        self.target_style = VarComboBox()
 
         self.using_tracker_id: str = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = PigComboBox()
+        self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
 

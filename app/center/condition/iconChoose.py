@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
 from app.func import Func
 from app.info import Info
-from lib import PigComboBox, PigLineEdit
+from lib import VarComboBox, VarLineEdit
 from ..events import Slider
 
 
@@ -28,7 +28,7 @@ class IconChoose(QWidget):
 
         self.attributes: list = []
 
-        self.event_types = PigComboBox()
+        self.event_types = VarComboBox()
         self.event_types.addItem("None")
         self.event_types.addItem(Info.IMAGE)
         self.event_types.addItem(Info.VIDEO)
@@ -36,7 +36,7 @@ class IconChoose(QWidget):
         self.event_types.addItem(Info.SOUND)
         self.event_types.addItem(Info.SLIDER)
         self.event_types.currentTextChanged.connect(self.changeIcon)
-        self.name_line = PigLineEdit()
+        self.name_line = VarLineEdit()
         self.name_line.setEnabled(False)
         self.name_line.textChanged.connect(self.changeName)
         self.icon_label = IconLabel()

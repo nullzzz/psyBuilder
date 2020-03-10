@@ -2,7 +2,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QCompleter
 
 from app.func import Func
-from lib import PigLineEdit, PigComboBox, TabItemWidget
+from lib import VarLineEdit, VarComboBox, TabItemWidget
 
 
 class EndR(TabItemWidget):
@@ -16,13 +16,13 @@ class EndR(TabItemWidget):
         self.default_properties = {"Statue message": "",
                                    "EyeTracker Name": "", }
 
-        self.status_message = PigLineEdit()
+        self.status_message = VarLineEdit()
 
         self.msg = ""
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = PigComboBox()
+        self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.bt_ok = QPushButton("OK")

@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGroupBox, QGridLayout, QVBoxLayout, QFormLayout, QHBoxLayout, \
     QCompleter, QSizePolicy
 
-from lib import PigLineEdit, ColorListEditor
+from lib import VarLineEdit, ColorListEditor
 
 
 class Point:
@@ -12,8 +12,8 @@ class Point:
         self.y_label = QLabel(y_l)
         self.x_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.y_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.x = PigLineEdit(x)
-        self.y = PigLineEdit(y)
+        self.x = VarLineEdit(x)
+        self.y = VarLineEdit(y)
 
     def getX(self):
         return self.x.text()
@@ -43,8 +43,8 @@ class PolygonGeneral(QWidget):
             "Fill color": "0,0,0,0"
         }
 
-        self.cx_pos = PigLineEdit("0")
-        self.cy_pos = PigLineEdit("0")
+        self.cx_pos = VarLineEdit("0")
+        self.cy_pos = VarLineEdit("0")
         self.cx_pos.setEnabled(False)
         self.cy_pos.setEnabled(False)
 
@@ -62,7 +62,7 @@ class PolygonGeneral(QWidget):
         # down
         self.border_color = ColorListEditor()
         self.border_color.setCurrentText("0,0,0")
-        self.border_width = PigLineEdit("1")
+        self.border_width = VarLineEdit("1")
 
         self.fill_color = ColorListEditor()
         self.fill_color.addTransparent()

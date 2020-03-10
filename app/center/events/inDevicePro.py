@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QCompleter, QGridLayout, QLabel
 
-from lib import PigLineEdit, PigComboBox
+from lib import VarLineEdit, VarComboBox
 
 
 class InDeviceRespAtDuration(QWidget):
@@ -16,11 +16,11 @@ class InDeviceRespAtDuration(QWidget):
         self.attributes = []
         self.using_output_device = {}
         self.current_output_device_id = ""
-        self.right = PigLineEdit()
+        self.right = VarLineEdit()
         self.right.textChanged.connect(lambda x: self.rightChanged.emit(x))
-        self.wrong = PigLineEdit()
+        self.wrong = VarLineEdit()
         self.wrong.textChanged.connect(lambda x: self.wrongChanged.emit(x))
-        self.ignore = PigLineEdit()
+        self.ignore = VarLineEdit()
         self.ignore.textChanged.connect(lambda x: self.ignoreChanged.emit(x))
         self.resp_trigger_out = QComboBox()
         self.resp_trigger_out.currentTextChanged.connect(self.changeOutput)
@@ -90,11 +90,11 @@ class InDeviceActionAtDuration(QWidget):
         self.using_output_device = {}
         self.current_output_device_id = ""
 
-        self.start = PigLineEdit()
+        self.start = VarLineEdit()
         self.start.textChanged.connect(lambda x: self.startChanged.emit(x))
-        self.end = PigLineEdit()
+        self.end = VarLineEdit()
         self.end.textChanged.connect(lambda x: self.endChanged.emit(x))
-        self.mean = PigLineEdit()
+        self.mean = VarLineEdit()
         self.mean.textChanged.connect(lambda x: self.meanChanged.emit(x))
         self.is_oval = QComboBox()
         self.is_oval.addItems(("No", "Yes"))
@@ -147,18 +147,18 @@ class InDeviceInfoAtDuration(QWidget):
 
         self.device_label = QLabel()
 
-        self.allowable = PigLineEdit()
+        self.allowable = VarLineEdit()
         self.allowable.textChanged.connect(lambda x: self.allowableChanged.emit(x))
 
-        self.correct = PigLineEdit()
+        self.correct = VarLineEdit()
         self.correct.textChanged.connect(lambda x: self.correctChanged.emit(x))
 
-        self.RT_window = PigComboBox()
+        self.RT_window = VarComboBox()
         self.RT_window.setEditable(True)
         self.RT_window.addItems(["(Same as duration)", "(End of timeline)", "1000", "2000", "3000", "4000", "5000"])
         self.RT_window.currentTextChanged.connect(lambda x: self.rtWindowChanged.emit(x))
 
-        self.end_action = PigComboBox()
+        self.end_action = VarComboBox()
         self.end_action.addItems(["Terminate", "(None)"])
         self.end_action.currentTextChanged.connect(lambda x: self.endActionChanged.emit(x))
         self.setUI()

@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QCompleter
 from PyQt5.QtWidgets import (QWidget)
 
-from lib import PigComboBox, PigLineEdit
+from lib import VarComboBox, VarLineEdit
 
 
 class GaborGeneral(QWidget):
@@ -25,19 +25,19 @@ class GaborGeneral(QWidget):
             "Transparency": "0"
         }
         # up
-        self.cx_pos = PigLineEdit()
-        self.cy_pos = PigLineEdit()
-        self._width = PigComboBox()
-        self._height = PigComboBox()
-        self.spatial = PigComboBox()
-        self.contrast = PigComboBox()
-        self.phase = PigComboBox()
-        self.orientation = PigComboBox()
-        self.back_color = PigComboBox()
-        self.sdx = PigComboBox()
-        self.sdy = PigComboBox()
-        self.rotation = PigComboBox()
-        self.transparency = PigComboBox()
+        self.cx_pos = VarLineEdit()
+        self.cy_pos = VarLineEdit()
+        self._width = VarComboBox()
+        self._height = VarComboBox()
+        self.spatial = VarComboBox()
+        self.contrast = VarComboBox()
+        self.phase = VarComboBox()
+        self.orientation = VarComboBox()
+        self.back_color = VarComboBox()
+        self.sdx = VarComboBox()
+        self.sdy = VarComboBox()
+        self.rotation = VarComboBox()
+        self.transparency = VarComboBox()
         self.setUI()
 
     # 生成frame页面

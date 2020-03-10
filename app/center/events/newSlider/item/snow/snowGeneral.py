@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QCompleter
 from PyQt5.QtWidgets import QWidget
 
-from lib import PigComboBox, PigLineEdit
+from lib import VarComboBox, VarLineEdit
 
 
 class SnowGeneral(QWidget):
@@ -20,13 +20,13 @@ class SnowGeneral(QWidget):
             "Transparency": "0"
         }
         # up
-        self.cx_pos = PigLineEdit()
-        self.cy_pos = PigLineEdit()
-        self._width = PigComboBox()
-        self._height = PigComboBox()
-        self.scale = PigComboBox()
-        self.rotation = PigComboBox()
-        self.transparency = PigComboBox()
+        self.cx_pos = VarLineEdit()
+        self.cy_pos = VarLineEdit()
+        self._width = VarComboBox()
+        self._height = VarComboBox()
+        self.scale = VarComboBox()
+        self.rotation = VarComboBox()
+        self.transparency = VarComboBox()
         self.setUI()
 
     # 生成frame页面

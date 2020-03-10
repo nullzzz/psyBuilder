@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QCompleter
 
-from lib import PigComboBox, MessageBox
+from lib import VarComboBox, MessageBox
 
 
 class SwitchCondition(QWidget):
@@ -11,7 +11,7 @@ class SwitchCondition(QWidget):
 
         self.attributes: list = []
 
-        self.switch_choice = PigComboBox()
+        self.switch_choice = VarComboBox()
         self.switch_choice.setEditable(True)
         self.switch_choice.setInsertPolicy(QComboBox.NoInsert)
         self.switch_choice.lineEdit().textChanged.connect(self.findVar)

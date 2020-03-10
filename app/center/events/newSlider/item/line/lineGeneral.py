@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFormLayout, QGroupBox, QGridLayout, QLabel, QCompleter
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
-from lib import ColorListEditor, PigLineEdit
+from lib import ColorListEditor, VarLineEdit
 
 
 class LineGeneral(QWidget):
@@ -20,15 +20,15 @@ class LineGeneral(QWidget):
             "Back width": '1',
         }
         # up
-        self.x_pos1 = PigLineEdit()
-        self.y_pos1 = PigLineEdit()
-        self.x_pos2 = PigLineEdit()
-        self.y_pos2 = PigLineEdit()
+        self.x_pos1 = VarLineEdit()
+        self.y_pos1 = VarLineEdit()
+        self.x_pos2 = VarLineEdit()
+        self.y_pos2 = VarLineEdit()
 
         # down
         self.border_color = ColorListEditor()
         self.border_color.setCurrentText("0,0,0")
-        self.border_width = PigLineEdit()
+        self.border_width = VarLineEdit()
         self.border_width.setReg(r"\d+")
         self.border_width.setText("2")
         self.setUI()

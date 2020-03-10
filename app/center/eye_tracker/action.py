@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QLabel, QApplication, QPushButton, QLineEdit, QVBoxL
     QGridLayout
 
 from app.func import Func
-from lib import PigComboBox, TabItemWidget
+from lib import VarComboBox, TabItemWidget
 
 
 class EyeAction(TabItemWidget):
@@ -14,11 +14,11 @@ class EyeAction(TabItemWidget):
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
-        self.status_message = PigComboBox()
+        self.status_message = VarComboBox()
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = PigComboBox()
+        self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
 

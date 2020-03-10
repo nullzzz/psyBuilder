@@ -5,13 +5,14 @@ from PyQt5.QtGui import QFont, QRegExpValidator
 from PyQt5.QtWidgets import QLineEdit
 
 from .message_box import MessageBox
+from app.info import Info
 
 
-class PigLineEdit(QLineEdit):
+class VarLineEdit(QLineEdit):
     focusLost = pyqtSignal()
 
     def __init__(self, *__args):
-        super(PigLineEdit, self).__init__(*__args)
+        super(VarLineEdit, self).__init__(*__args)
         self.setAcceptDrops(True)
         self.textChanged.connect(self.findVar)
         self.editingFinished.connect(self.checkValidity)
@@ -28,13 +29,13 @@ class PigLineEdit(QLineEdit):
         self.reg_exp: str = ""
 
     def dragEnterEvent(self, e):
-        if e.mimeData().hasFormat("attributes/move-attribute"):
+        if e.mimeData().hasFormat(Info.AttributesToLineEdit):
             e.accept()
         else:
             e.ignore()
 
     def dropEvent(self, e):
-        data = e.mimeData().data("attributes/move-attribute")
+        data = e.mimeData().data(Info.AttributesToLineEdit)
         stream = QDataStream(data, QIODevice.ReadOnly)
         text = f"[{stream.readQString()}]"
         self.setText(text)

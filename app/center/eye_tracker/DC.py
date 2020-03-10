@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QWidget, QLabel, QLineEdit
     QCompleter
 
 from app.func import Func
-from lib import PigLineEdit, PigComboBox, ColorListEditor, TabItemWidget, MessageBox
+from lib import VarLineEdit, VarComboBox, ColorListEditor, TabItemWidget, MessageBox
 
 
 class EyeDC(TabItemWidget):
@@ -26,13 +26,13 @@ class EyeDC(TabItemWidget):
             "EyeTracker Name": "",
             # "Screen": "screen.0",
         }
-        self.x_pos = PigLineEdit()
+        self.x_pos = VarLineEdit()
         self.x_pos.installEventFilter(self)
-        self.y_pos = PigLineEdit()
+        self.y_pos = VarLineEdit()
         self.y_pos.installEventFilter(self)
         self.target_color = ColorListEditor()
         self.target_color.setCurrentText("128,128,128")
-        self.target_style = PigComboBox()
+        self.target_style = VarComboBox()
 
         self.show_display_with_drift_correction_target = QCheckBox("Show Display With Drift-Correction Target")
         self.show_display_with_drift_correction_target.stateChanged.connect(self.statueChanged)
@@ -41,7 +41,7 @@ class EyeDC(TabItemWidget):
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = PigComboBox()
+        self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
 

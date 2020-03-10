@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, Q
                              QCompleter)
 
 from app.func import Func
-from lib import PigLineEdit, PigComboBox, MessageBox, TabItemWidget
+from lib import VarLineEdit, VarComboBox, MessageBox, TabItemWidget
 
 
 class QuestInit(TabItemWidget):
@@ -29,16 +29,16 @@ class QuestInit(TabItemWidget):
             "Is log10 transform": "quest test value",
         }
 
-        self.estimated_threshold = PigLineEdit()
-        self.std_dev = PigLineEdit()
-        self.desired_proportion = PigLineEdit()
-        self.steepness = PigLineEdit()
-        self.proportion = PigLineEdit()
-        self.chance_level = PigLineEdit()
-        self.method = PigComboBox()
-        self.minimum = PigLineEdit()
-        self.maximum = PigLineEdit()
-        self.is_log10_transform = PigLineEdit()
+        self.estimated_threshold = VarLineEdit()
+        self.std_dev = VarLineEdit()
+        self.desired_proportion = VarLineEdit()
+        self.steepness = VarLineEdit()
+        self.proportion = VarLineEdit()
+        self.chance_level = VarLineEdit()
+        self.method = VarComboBox()
+        self.minimum = VarLineEdit()
+        self.maximum = VarLineEdit()
+        self.is_log10_transform = VarLineEdit()
 
         self.estimated_threshold.textChanged.connect(self.findVar)
         self.std_dev.textChanged.connect(self.findVar)

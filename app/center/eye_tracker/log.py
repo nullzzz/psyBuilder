@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLa
     QGridLayout, QCheckBox, QTextEdit, QListWidget, QAbstractItemView
 
 from app.func import Func
-from lib import PigLineEdit, PigComboBox, TabItemWidget
+from lib import VarLineEdit, VarComboBox, TabItemWidget
 
 
 class Close(TabItemWidget):
@@ -17,11 +17,11 @@ class Close(TabItemWidget):
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
 
-        self.pause_between_msg = PigLineEdit("1")
+        self.pause_between_msg = VarLineEdit("1")
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = PigComboBox()
+        self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.default_properties = {

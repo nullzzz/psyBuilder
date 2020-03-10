@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QGridLayout, QFormLayout, QVBoxLayout, QCompleter, QSpacerItem, \
     QSizePolicy
 
-from lib import ColorListEditor, PigLineEdit
+from lib import ColorListEditor, VarLineEdit
 
 
 class RectGeneral(QWidget):
@@ -17,16 +17,16 @@ class RectGeneral(QWidget):
             "Fill color": "0,0,0,0"
         }
 
-        self.cx_pos = PigLineEdit("0")
-        self.cy_pos = PigLineEdit("0")
+        self.cx_pos = VarLineEdit("0")
+        self.cy_pos = VarLineEdit("0")
 
-        self._width = PigLineEdit("200")
-        self._height = PigLineEdit("200")
+        self._width = VarLineEdit("200")
+        self._height = VarLineEdit("200")
 
         # down
         self.border_color = ColorListEditor()
         self.border_color.setCurrentText("0,0,0")
-        self.border_width = PigLineEdit("1")
+        self.border_width = VarLineEdit("1")
         self.fill_color = ColorListEditor()
         self.fill_color.addTransparent()
         self.setUI()

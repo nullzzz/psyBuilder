@@ -2,10 +2,10 @@ from PyQt5.QtCore import Qt, QRegExp, pyqtSignal
 from PyQt5.QtGui import QColor, QIcon, QRegExpValidator, QFont
 from PyQt5.QtWidgets import QComboBox, QColorDialog, QMessageBox
 
-from .var_combo_box import PigComboBox
+from .var_combo_box import VarComboBox
 
 
-class ColorListEditor(PigComboBox):
+class ColorListEditor(VarComboBox):
     colorChanged = pyqtSignal(str)
     color_map: dict = {
         "white": "255,255,255",

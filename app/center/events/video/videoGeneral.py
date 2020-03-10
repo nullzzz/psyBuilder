@@ -2,7 +2,7 @@ from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtWidgets import QPushButton, QSpinBox, QGridLayout, QLabel, QFileDialog, QCompleter, QWidget
 
 from app.func import Func
-from lib import PigComboBox, PigLineEdit
+from lib import VarComboBox, VarLineEdit
 
 
 class VideoTab1(QWidget):
@@ -19,23 +19,23 @@ class VideoTab1(QWidget):
             "Screen name": "screen.0"
         }
         # general
-        self.file_name = PigLineEdit()
+        self.file_name = VarLineEdit()
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
-        self.start_pos = PigLineEdit()
-        self.end_pos = PigLineEdit()
+        self.start_pos = VarLineEdit()
+        self.end_pos = VarLineEdit()
 
         # 倍速
-        self.playback_rate = PigComboBox()
+        self.playback_rate = VarComboBox()
         self.playback_rate_tip = QLabel()
         self.transparent = QSpinBox()
-        self.aspect_ratio = PigComboBox()
+        self.aspect_ratio = VarComboBox()
 
-        self.clear_after = PigComboBox()
+        self.clear_after = VarComboBox()
 
         self.using_screen_id: str = "screen.0"
-        self.screen_name = PigComboBox()
+        self.screen_name = VarComboBox()
         self.screen_info = Func.getScreenInfo()
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)

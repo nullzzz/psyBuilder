@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
     QApplication, QFileDialog, QCompleter, QFormLayout
 
 from app.func import Func
-from lib import PigLineEdit, PigComboBox
+from lib import VarLineEdit, VarComboBox
 
 
 # image event专属页面
@@ -27,7 +27,7 @@ class ImageTab1(QWidget):
             "Screen name": "screen.0"
         }
         # 打开文件
-        self.file_name = PigLineEdit()
+        self.file_name = VarLineEdit()
 
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
@@ -37,22 +37,22 @@ class ImageTab1(QWidget):
         self.mirrorLR = QCheckBox("Mirror left/right")
 
         # Rotate
-        self.rotate = PigLineEdit("0")
+        self.rotate = VarLineEdit("0")
         self.rotate.setReg(r"\[\w+\]|\d+")
 
         # 拉伸模式
         self.stretch = QCheckBox("Stretch")
-        self.stretch_mode = PigComboBox()
+        self.stretch_mode = VarComboBox()
 
         # 背景色、透明度、Clear&Screen
         # self.back_color = ColorListEditor()
-        self.transparent = PigLineEdit("100%")
+        self.transparent = VarLineEdit("100%")
         self.transparent.setReg(r"[0-9]%|[1-9][0-9]%|100%|\[\w+\]")
 
-        self.clear_after = PigComboBox()
+        self.clear_after = VarComboBox()
 
         self.using_screen_id: str = ""
-        self.screen_name = PigComboBox()
+        self.screen_name = VarComboBox()
         self.screen_info = Func.getScreenInfo()
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)

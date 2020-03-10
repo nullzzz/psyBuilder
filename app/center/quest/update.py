@@ -2,7 +2,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout
 
 from app.func import Func
-from lib import PigComboBox, TabItemWidget
+from lib import VarComboBox, TabItemWidget
 
 
 class QuestUpdate(TabItemWidget):
@@ -15,11 +15,11 @@ class QuestUpdate(TabItemWidget):
         self.tip2.setReadOnly(True)
         self.attributes = []
         self.default_properties = {"Is correct": "1"}
-        self.response_variable = PigComboBox()
+        self.response_variable = VarComboBox()
         self.response_variable.addItems(["1", "0"])
 
         self.quest_info = Func.getQuestInfo()
-        self.quest_name = PigComboBox()
+        self.quest_name = VarComboBox()
         self.quest_name.currentTextChanged.connect(self.changeQuestId)
 
         self.using_quest_id = ""

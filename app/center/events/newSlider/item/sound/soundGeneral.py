@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
     QFileDialog, QCompleter, QSpacerItem, QSizePolicy
 
 from app.func import Func
-from lib import PigLineEdit, PigComboBox
+from lib import VarLineEdit, VarComboBox
 
 
 # sound event专属页面
@@ -26,7 +26,7 @@ class SoundGeneral(QWidget):
             "Sound Device": "",
             "Wait for start": "No"
         }
-        self.file_name = PigLineEdit()
+        self.file_name = VarLineEdit()
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
@@ -34,32 +34,32 @@ class SoundGeneral(QWidget):
         self.volume_control.setLayoutDirection(Qt.RightToLeft)
 
         self.volume_control.stateChanged.connect(self.volumeChecked)
-        self.volume = PigLineEdit()
+        self.volume = VarLineEdit()
         self.volume.setText("1")
 
         self.latency_bias = QCheckBox("Latency Bias (ms):")  # Latency Bias
         self.latency_bias.setLayoutDirection(Qt.RightToLeft)
 
         self.latency_bias.stateChanged.connect(self.latencyBiasChecked)
-        self.bias_time = PigLineEdit()
+        self.bias_time = VarLineEdit()
         self.bias_time.setText("0")
 
-        self.buffer_size = PigLineEdit()
-        self.stream_refill = PigComboBox()
+        self.buffer_size = VarLineEdit()
+        self.stream_refill = VarComboBox()
 
-        self.start_offset = PigLineEdit("0")
-        self.stop_offset = PigLineEdit("0")
-        self.repetitions = PigLineEdit("1")
+        self.start_offset = VarLineEdit("0")
+        self.stop_offset = VarLineEdit("0")
+        self.repetitions = VarLineEdit("1")
 
-        self.sound = PigComboBox()
+        self.sound = VarComboBox()
 
         self.using_sound_id: str = ""
-        self.sound = PigComboBox()
+        self.sound = VarComboBox()
         self.sound_info = Func.getSoundInfo()
         self.sound.addItems(self.sound_info.values())
         self.sound.currentTextChanged.connect(self.changeSound)
 
-        self.wait_for_start = PigComboBox()
+        self.wait_for_start = VarComboBox()
         self.wait_for_start.addItems(("No", "Yes"))
 
         self.setUI()

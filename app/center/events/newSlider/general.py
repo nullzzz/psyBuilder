@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QFormLayout
 
 from app.func import Func
-from lib import PigComboBox
+from lib import VarComboBox
 
 
 # slider专属页面
@@ -17,11 +17,11 @@ class SliderGeneral(QWidget):
             "Screen name": "screen.0"
         }
 
-        self.clear_after = PigComboBox()
+        self.clear_after = VarComboBox()
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
         self.using_screen_id: str = "screen.0"
-        self.screen_name = PigComboBox()
+        self.screen_name = VarComboBox()
         self.screen_info = Func.getScreenInfo()
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)

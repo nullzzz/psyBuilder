@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLa
     QCompleter
 
 from app.func import Func
-from lib import PigLineEdit, PigComboBox, TabItemWidget
+from lib import VarLineEdit, VarComboBox, TabItemWidget
 
 
 class StartR(TabItemWidget):
@@ -20,13 +20,13 @@ class StartR(TabItemWidget):
             "Sync to next event flip": "No",
             "EyeTracker Name": "",
         }
-        self.status_message = PigLineEdit()
-        self.sync_to_next_event_flip = PigComboBox()
+        self.status_message = VarLineEdit()
+        self.sync_to_next_event_flip = VarComboBox()
         self.sync_to_next_event_flip.addItems(("No", "Yes"))
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = PigComboBox()
+        self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.msg = ""

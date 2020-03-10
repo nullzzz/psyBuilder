@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QComboBox, QFrame, QHBoxLayout, QLabel, QCompleter
 
-from lib import PigComboBox, PigLineEdit, MessageBox
+from lib import VarComboBox, VarLineEdit, MessageBox
 from ..addDeleteButton import AddDeleteButton
 
 
@@ -23,21 +23,21 @@ class EachCondition(QFrame):
             "var value": ""
         }
 
-        self.op = PigComboBox()
+        self.op = VarComboBox()
         self.op.addItems(('and', 'or', 'xor', 'nor', 'nand', 'xnor'))
         self.op.setFixedWidth(EachCondition.placeholder_width)
 
-        self.var = PigComboBox()
+        self.var = VarComboBox()
         self.var.setEditable(True)
         self.var.setInsertPolicy(QComboBox.NoInsert)
         self.var.lineEdit().textChanged.connect(self.findVar)
         self.var.lineEdit().returnPressed.connect(self.finalCheck)
 
-        self.compare = PigComboBox()
+        self.compare = VarComboBox()
         self.compare.addItems(("=", ">", ">=", "<", "<=", "≠"))
         self.compare.setFixedWidth(EachCondition.placeholder_width)
 
-        self.var_value = PigLineEdit()
+        self.var_value = VarLineEdit()
         self.var_value.textChanged.connect(self.findVar)
         self.var_value.returnPressed.connect(self.finalCheck)
 

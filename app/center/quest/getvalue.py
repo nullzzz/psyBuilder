@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, Q
                              QCompleter)
 
 from app.func import Func
-from lib import PigLineEdit, MessageBox, TabItemWidget
+from lib import VarLineEdit, MessageBox, TabItemWidget
 
 
 class QuestGetValue(TabItemWidget):
@@ -21,9 +21,9 @@ class QuestGetValue(TabItemWidget):
             "Line2": "",
             "Experimental variable for test value": "quest test value",
         }
-        self.line1 = PigLineEdit()
-        self.line2 = PigLineEdit()
-        self.experimental = PigLineEdit()
+        self.line1 = VarLineEdit()
+        self.line2 = VarLineEdit()
+        self.experimental = VarLineEdit()
 
         self.line1.returnPressed.connect(self.finalCheck)
         self.line2.returnPressed.connect(self.finalCheck)

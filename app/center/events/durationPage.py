@@ -8,7 +8,7 @@ from app.menubar.deviceSelection.IODevice.duration.InputDeviceItem import Device
 from app.menubar.deviceSelection.IODevice.duration.OutputDeviceItem import DeviceOutItem
 from app.menubar.deviceSelection.IODevice.duration.deviceChooseDialog import DeviceInDialog, DeviceOutDialog
 from app.menubar.deviceSelection.IODevice.duration.deviceShowArea import ShowArea
-from lib import PigComboBox
+from lib import VarComboBox
 from .inDevicePro import InDeviceInfoAtDuration, InDeviceRespAtDuration, \
     InDeviceActionAtDuration
 from .outDevicePro import OutDeviceInfoAtDuration
@@ -25,7 +25,7 @@ class DurationPage(QWidget):
             "Output devices": {}
         }
         # top
-        self.duration = PigComboBox()
+        self.duration = VarComboBox()
         self.duration.setReg(r"\(Infinite\)|\d+|\d+~\d+")
 
         # output device
