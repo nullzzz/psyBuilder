@@ -3,12 +3,12 @@ from PyQt5.QtGui import QPen, QTransform, QKeyEvent
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem
 
 from app.info import Info
-from .item.diaItem import DiaItem
-from .item.lasso import Lasso
-from .item.linItem import LineItem
-from .item.otherItem import OtherItem
-from .item.pixItem import PixItem
-from .item.textItem import TextItem
+from ...events.newSlider.item.diaItem import DiaItem
+from ...events.newSlider.item.lasso import Lasso
+from ...events.newSlider.item.linItem import LineItem
+from ...events.newSlider.item.otherItem import OtherItem
+from ...events.newSlider.item.pixItem import PixItem
+from ...events.newSlider.item.textItem import TextItem
 
 
 class Scene(QGraphicsScene):

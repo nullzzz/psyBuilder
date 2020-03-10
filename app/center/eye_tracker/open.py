@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QLabel, QApplication, QPushButton, QLineEdit, QVBoxL
     QGridLayout, QCheckBox, QSpinBox, QCompleter
 
 from app.func import Func
-from lib import VarComboBox, VarLineEdit, MessageBox, TabItemWidget
+from lib import PigComboBox, PigLineEdit, TabItemWidget
 
 
 class Open(TabItemWidget):
@@ -28,33 +28,33 @@ class Open(TabItemWidget):
             "Force drift correction": 0,
             "Pupil size mode": "area",
             "SMI IP address": "127.0.0.1",
-            "SMI send port number": 0,
-            "SMI receive port number": 0,
+            "SMI send device_index number": 0,
+            "SMI receive device_index number": 0,
             "Tobii glasses Ipv4/Ipv6 address": "",
-            "Tobii glasses UDP port number": 0
+            "Tobii glasses UDP device_index number": 0
         }
         self.select_tracker_type_tip = QLabel("Select Tracker Type:")
-        self.select_tracker_type = VarComboBox()
+        self.select_tracker_type = PigComboBox()
 
         self.calibrate_tracker = QCheckBox("Calibrate Tracker")
         self.calibration_beep = QCheckBox("Calibration Beep")
         self.eye_tracker_datafile_tip = QLabel("Eye Tracker Datafile:")
-        self.eye_tracker_datafile = VarLineEdit()
+        self.eye_tracker_datafile = PigLineEdit()
         self.saccade_velocity_threshold_tip = QLabel("Saccade Velocity Threshold:")
         self.saccade_velocity_threshold = QSpinBox()
         self.saccade_acceleration_threshold_tip = QLabel("Saccade Acceleration Threshold:")
         self.saccade_acceleration_threshold = QSpinBox()
         self.force_drift_correction = QCheckBox("Force Drift Correction (For EyeLink 1000)")
         self.pupil_size_mode_tip = QLabel("Pupil Size Mode:")
-        self.pupil_size_mode = VarComboBox()
+        self.pupil_size_mode = PigComboBox()
         self.SMI_IP_address_tip = QLabel("IP Address:")
-        self.SMI_IP_address = VarLineEdit()
+        self.SMI_IP_address = PigLineEdit()
         self.SMI_send_port_number_tip = QLabel("Send Port Number:")
         self.SMI_send_port_number = QSpinBox()
         self.SMI_receive_port_number_tip = QLabel("Receive Port Number:")
         self.SMI_receive_port_number = QSpinBox()
         self.tobii_glasses_ipv46_address_tip = QLabel("Tobii Glasses Ipv4/Ipv6_Address:")
-        self.tobii_glasses_ipv46_address = VarLineEdit()
+        self.tobii_glasses_ipv46_address = PigLineEdit()
         self.tobii_glasses_UDP_port_number_tip = QLabel("Tobii Glasses UDP Port Number:")
         self.tobii_glasses_UDP_port_number = QSpinBox()
 
@@ -166,13 +166,13 @@ class Open(TabItemWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.tabClosed.emit(self.widget_id)
+        self.tabClose.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
 
     def apply(self):
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.getInfo())
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
@@ -238,23 +238,6 @@ class Open(TabItemWidget):
         self.tobii_glasses_UDP_port_number_tip.hide()
         self.tobii_glasses_UDP_port_number.hide()
 
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color:black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                MessageBox.warning(self, "Warning", "Invalid Attribute!", MessageBox.Ok)
-                temp.clear()
-
     def setAttributes(self, attributes):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
         self.eye_tracker_datafile.setCompleter(QCompleter(self.attributes))
@@ -286,15 +269,12 @@ class Open(TabItemWidget):
         self.default_properties["Force drift correction"] = self.force_drift_correction.checkState()
         self.default_properties["Pupil size mode"] = self.pupil_size_mode.currentText()
         self.default_properties["SMI IP address"] = self.SMI_IP_address.text()
-        self.default_properties["SMI send port number"] = self.SMI_send_port_number.value()
-        self.default_properties["SMI receive port number"] = self.SMI_receive_port_number.value()
+        self.default_properties["SMI send device_index number"] = self.SMI_send_port_number.value()
+        self.default_properties["SMI receive device_index number"] = self.SMI_receive_port_number.value()
         self.default_properties["Tobii glasses Ipv4/Ipv6 address"] = self.tobii_glasses_ipv46_address.text()
-        self.default_properties["Tobii glasses UDP port number"] = self.tobii_glasses_UDP_port_number.value()
+        self.default_properties["Tobii glasses UDP device_index number"] = self.tobii_glasses_UDP_port_number.value()
 
         return self.default_properties
-
-    def getProperties(self):
-        return self.getInfo()
 
     def setProperties(self, properties: dict):
         if properties:
@@ -302,11 +282,6 @@ class Open(TabItemWidget):
             self.loadSetting()
         else:
             print(f"此乱诏也，{self.__class__}不奉命")
-
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
 
     def loadSetting(self):
         self.select_tracker_type.setCurrentText(self.default_properties["Select tracker type"])
@@ -318,15 +293,10 @@ class Open(TabItemWidget):
         self.force_drift_correction.setCheckState(self.default_properties["Force drift correction"])
         self.pupil_size_mode.setCurrentText(self.default_properties["Pupil size mode"])
         self.SMI_IP_address.setText(self.default_properties["SMI IP address"])
-        self.SMI_send_port_number.setValue(self.default_properties["SMI send port number"])
-        self.SMI_receive_port_number.setValue(self.default_properties["SMI receive port number"])
+        self.SMI_send_port_number.setValue(self.default_properties["SMI send device_index number"])
+        self.SMI_receive_port_number.setValue(self.default_properties["SMI receive device_index number"])
         self.tobii_glasses_ipv46_address.setText(self.default_properties["Tobii glasses Ipv4/Ipv6 address"])
-        self.tobii_glasses_UDP_port_number.setValue(self.default_properties["Tobii glasses UDP port number"])
-
-    def clone(self, new_id: str):
-        clone_widget = Open(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
+        self.tobii_glasses_UDP_port_number.setValue(self.default_properties["Tobii glasses UDP device_index number"])
 
     def getHiddenAttribute(self):
         """
@@ -335,9 +305,6 @@ class Open(TabItemWidget):
         hidden_attr = {
         }
         return hidden_attr
-
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
 
     def getSelectTrackerType(self) -> str:
         return self.select_tracker_type.currentText()
@@ -361,7 +328,7 @@ class Open(TabItemWidget):
         return bool(self.force_drift_correction.checkState())
 
     def getPupilSizeMode(self) -> str:
-        return self.pupil_size_mode.text()
+        return self.pupil_size_mode.currentText()
 
     def getSMIIPAddress(self) -> str:
         return self.SMI_IP_address.text()
@@ -380,6 +347,39 @@ class Open(TabItemWidget):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = Open(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget
 
 
 if __name__ == '__main__':

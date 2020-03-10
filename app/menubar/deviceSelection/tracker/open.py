@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel, QWidget, QVBoxLayout, QHBoxLayout, \
     QGridLayout, QCheckBox, QSpinBox
 
-from lib import VarComboBox, VarLineEdit
+from lib import PigComboBox, PigLineEdit
 
 
 class Open(QWidget):
@@ -11,28 +11,28 @@ class Open(QWidget):
         super(Open, self).__init__(parent)
 
         self.select_tracker_type_tip = QLabel("Select Tracker Type:")
-        self.select_tracker_type = VarComboBox()
+        self.select_tracker_type = PigComboBox()
 
         self.calibrate_tracker = QCheckBox("Calibrate Tracker")
         self.calibration_beep = QCheckBox("Calibration Beep")
 
         self.eye_tracker_datafile_tip = QLabel("Eye Tracker Datafile:")
-        self.eye_tracker_datafile = VarLineEdit()
+        self.eye_tracker_datafile = PigLineEdit()
         self.saccade_velocity_threshold_tip = QLabel("Saccade Velocity Threshold:")
         self.saccade_velocity_threshold = QSpinBox()
         self.saccade_acceleration_threshold_tip = QLabel("Saccade Acceleration Threshold:")
         self.saccade_acceleration_threshold = QSpinBox()
         self.force_drift_correction = QCheckBox("Force Drift Correction (For EyeLink 1000)")
         self.pupil_size_mode_tip = QLabel("Pupil Size Mode:")
-        self.pupil_size_mode = VarComboBox()
+        self.pupil_size_mode = PigComboBox()
         self.SMI_IP_address_tip = QLabel("IP Address:")
-        self.SMI_IP_address = VarLineEdit()
+        self.SMI_IP_address = PigLineEdit()
         self.SMI_send_port_number_tip = QLabel("Send Port Number:")
         self.SMI_send_port_number = QSpinBox()
         self.SMI_receive_port_number_tip = QLabel("Receive Port Number:")
         self.SMI_receive_port_number = QSpinBox()
         self.tobii_glasses_ipv46_address_tip = QLabel("Tobii Glasses Ipv4/Ipv6_Address:")
-        self.tobii_glasses_ipv46_address = VarLineEdit()
+        self.tobii_glasses_ipv46_address = PigLineEdit()
         self.tobii_glasses_UDP_port_number_tip = QLabel("Tobii Glasses UDP Port Number:")
         self.tobii_glasses_UDP_port_number = QSpinBox()
 

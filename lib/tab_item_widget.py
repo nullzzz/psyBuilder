@@ -1,6 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget
 
+from app.func import Func
+
 
 class TabItemWidget(QWidget):
     """
@@ -40,6 +42,16 @@ class TabItemWidget(QWidget):
         """
         return {}
 
+    def getUsingDeviceCount(self) -> int:
+        """
+        You should finish the job.
+
+        return count of using device
+        :return:
+        :rtype:
+        """
+        return 0
+
     def getHiddenAttributes(self) -> list:
         """
         You should finish the job.
@@ -47,9 +59,14 @@ class TabItemWidget(QWidget):
         every widget has global attributes and own attributes,
         we get global attributes through common function Func.getAttributes(widget_id) and
         we get widget's own attributes through this function.
-        :return: dict of attributes
+        Its values are also depended on device whether used.
+        used:
+        not used:
+        :return: list of attributes
         """
-        return []
+        if self.getUsingDeviceCount():
+            return ["respOnSettingTime", "acc""resp", "rt"]
+        return ["OnSettingTime"]
 
     """
     about widget
@@ -73,7 +90,7 @@ class TabItemWidget(QWidget):
         :return:
         """
 
-    def copy(self, widget_id: str, widget_name: str):
+    def clone(self, new_widget_id: str, new_widget_name: str):
         """
         You should finish the job.
 
@@ -95,3 +112,6 @@ class TabItemWidget(QWidget):
     """
     other function may be needed to all, but I forget those.
     """
+
+    def __repr__(self):
+        return f"{Func.getWidgetType(self.widget_id)} [{self.widget_id}: {self.widget_name}]"

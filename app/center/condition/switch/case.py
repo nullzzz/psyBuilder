@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QComboBox, QGridLayout, QLabel, QGroupBox, QCompleter
 
-from lib import VarComboBox
+from lib import PigComboBox
 from ..addDeleteButton import AddDeleteButton
 from ..iconChoose import IconChoose
 
@@ -34,7 +34,7 @@ class Case(QGroupBox):
         self.attributes: list = []
 
         # case
-        self.values = VarComboBox()
+        self.values = PigComboBox()
         self.values.setEditable(True)
         self.values.setInsertPolicy(QComboBox.NoInsert)
         self.values.currentTextChanged.connect(self.changeValue)

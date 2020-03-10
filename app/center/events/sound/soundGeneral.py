@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
     QFileDialog, QCompleter, QSizePolicy
 
 from app.func import Func
-from lib import VarLineEdit, VarComboBox
+from lib import PigLineEdit, PigComboBox
 
 
 # sound event专属页面
@@ -29,7 +29,7 @@ class SoundTab1(QWidget):
             "Clear after": "clear_0",
             "Screen name": "screen.0"
         }
-        self.file_name = VarLineEdit()
+        self.file_name = PigLineEdit()
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
@@ -38,7 +38,7 @@ class SoundTab1(QWidget):
 
         self.volume_control.stateChanged.connect(self.volumeChecked)
 
-        self.volume = VarLineEdit()
+        self.volume = PigLineEdit()
         self.volume.setText("1")
 
         self.latency_bias = QCheckBox("Latency Bias (ms):")  # Latency Bias
@@ -46,29 +46,29 @@ class SoundTab1(QWidget):
 
         self.latency_bias.stateChanged.connect(self.latencyBiasChecked)
 
-        self.bias_time = VarLineEdit()
+        self.bias_time = PigLineEdit()
         self.bias_time.setText("0")
 
-        self.buffer_size = VarLineEdit()
-        self.stream_refill = VarComboBox()
+        self.buffer_size = PigLineEdit()
+        self.stream_refill = PigComboBox()
 
-        self.start_offset = VarLineEdit("0")
+        self.start_offset = PigLineEdit("0")
         # self.start_offset.setInputMask("00:00:00.000")
-        self.stop_offset = VarLineEdit("0")
+        self.stop_offset = PigLineEdit("0")
         # self.stop_offset.setInputMask("00:00:00.000")
-        self.repetitions = VarLineEdit("1")
+        self.repetitions = PigLineEdit("1")
 
-        self.sound = VarComboBox()
+        self.sound = PigComboBox()
         self.sound.currentTextChanged.connect(self.changeDevice)
         self.using_device_id = ""
 
         self.using_sound_id: str = ""
-        self.sound = VarComboBox()
+        self.sound = PigComboBox()
         self.sound_info = Func.getSoundInfo()
         self.sound.addItems(self.sound_info.values())
         self.sound.currentTextChanged.connect(self.changeSound)
 
-        self.wait_for_start = VarComboBox()
+        self.wait_for_start = PigComboBox()
         self.wait_for_start.addItems(("No", "Yes"))
         self.wait_for_start.setEnabled(False)
 
@@ -79,12 +79,12 @@ class SoundTab1(QWidget):
 
         self.sync_to_vbl.stateChanged.connect(self.syncToVblChecked)
 
-        self.clear_after = VarComboBox()
+        self.clear_after = PigComboBox()
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
         self.clear_after.setEnabled(self.sync_to_vbl.checkState())
 
         self.using_screen_id: str = ""
-        self.screen_name = VarComboBox()
+        self.screen_name = PigComboBox()
         self.screen_info = Func.getScreenInfo()
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)

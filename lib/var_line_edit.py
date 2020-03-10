@@ -7,11 +7,11 @@ from PyQt5.QtWidgets import QLineEdit
 from .message_box import MessageBox
 
 
-class VarLineEdit(QLineEdit):
+class PigLineEdit(QLineEdit):
     focusLost = pyqtSignal()
 
     def __init__(self, *__args):
-        super(VarLineEdit, self).__init__(*__args)
+        super(PigLineEdit, self).__init__(*__args)
         self.setAcceptDrops(True)
         self.textChanged.connect(self.findVar)
         self.editingFinished.connect(self.checkValidity)

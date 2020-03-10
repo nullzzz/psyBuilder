@@ -3,12 +3,12 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
     QPushButton, QInputDialog, QLineEdit
 
+from app.func import Func
+from app.info import Info
+from lib import MessageBox
 from .describer import Describer
 from .device import Tracker
 from .selectionList import SelectArea
-from app.func import Func
-from app.info import Info
-from lib.message_box import MessageBox as QMessageBox
 
 
 class TrackerInit(QWidget):
@@ -19,7 +19,7 @@ class TrackerInit(QWidget):
         super(TrackerInit, self).__init__(parent)
 
         self.setWindowTitle("Tracker")
-        self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
 
         # 上方待选择设备
         self.tracker_list = QListWidget()
@@ -145,8 +145,8 @@ class TrackerInit(QWidget):
         if ok and text != '':
             text: str
             if text.lower() in self.selected_devices.tracker_name and item_name != text.lower():
-                QMessageBox.warning(self, f"{text} is invalid!", "Tracker name must be unique",
-                                    QMessageBox.Ok)
+                MessageBox.warning(self, f"{text} is invalid!", "Tracker name must be unique",
+                                   MessageBox.Ok)
             else:
                 self.selected_devices.changeCurrentName(text)
                 self.describer.changeName(text)
@@ -156,11 +156,11 @@ class TrackerInit(QWidget):
     # 参数导出, 记录到Info
     def getInfo(self):
         tracker_info: dict = self.selected_devices.getInfo()
-        Info.TRACKER_INFO = tracker_info.copy()
+        Info.TRACKER_DEVICE_INFO = tracker_info.copy()
 
     # 参数导入
     def setProperties(self, properties: dict):
         self.selected_devices.clearAll()
         self.selected_devices.setProperties(properties)
         # 更新全局信息
-        Info.TRACKER_INFO = properties.copy()
+        Info.TRACKER_DEVICE_INFO = properties.copy()

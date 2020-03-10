@@ -3,12 +3,12 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
     QPushButton, QInputDialog, QLineEdit
 
-from .describer import Describer
-from .device import Quest
-from .selectionList import SelectArea
 from app.func import Func
 from app.info import Info
 from lib import MessageBox
+from .describer import Describer
+from .device import Quest
+from .selectionList import SelectArea
 
 
 class QuestInit(QWidget):
@@ -19,7 +19,7 @@ class QuestInit(QWidget):
         super(QuestInit, self).__init__(parent)
 
         self.setWindowTitle("Quest")
-        self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
 
         # 上方待选择设备
         self.quest_list = QListWidget()
@@ -134,7 +134,7 @@ class QuestInit(QWidget):
             text: str
             if text.lower() in self.selected_devices.quest_name and item_name != text.lower():
                 MessageBox.warning(self, f"{text} is invalid!", "Quest name must be unique",
-                                    MessageBox.Ok)
+                                   MessageBox.Ok)
             else:
                 self.selected_devices.changeCurrentName(text)
                 self.describer.changeName(text)
@@ -144,11 +144,11 @@ class QuestInit(QWidget):
     # 参数导出, 记录到Info
     def getInfo(self):
         quest_info: dict = self.selected_devices.getInfo()
-        Info.QUEST_INFO = quest_info.copy()
+        Info.QUEST_DEVICE_INFO = quest_info.copy()
 
     # 参数导入
     def setProperties(self, properties: dict):
         self.selected_devices.clearAll()
         self.selected_devices.setProperties(properties)
         # 更新全局信息
-        Info.QUEST_INFO = properties.copy()
+        Info.QUEST_DEVICE_INFO = properties.copy()

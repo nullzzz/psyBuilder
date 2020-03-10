@@ -1,7 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 
 from app.info import Info
-from app.kernel import Kernel
 from lib import DockWidget
 from .structure_tree import StructureTree
 
@@ -38,9 +37,9 @@ class Structure(DockWidget):
         self.structure_tree.itemNameChanged.connect(
             lambda widget_id, widget_name: self.itemNameChanged.emit(Info.StructureSend, widget_id, widget_name))
 
-    def addNode(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int):
+    def addNode(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int, show=True):
         """
-        add node in structure and Kernel.Nodes
+        add node in structure and Info.Nodes
         @param parent_widget_id:
         @param widget_id:
         @param widget_name:
@@ -48,9 +47,9 @@ class Structure(DockWidget):
         @return:
         """
         # add node in tree
-        node = self.structure_tree.addNode(parent_widget_id, widget_id, widget_name, index)
-        # change Kernel.Nodes
-        Kernel.Nodes[widget_id] = node
+        node = self.structure_tree.addNode(parent_widget_id, widget_id, widget_name, index,show)
+        # change Info.Nodes
+        Info.Nodes[widget_id] = node
 
     def changeNodeName(self, widget_id: int, widget_name: str):
         """
@@ -59,7 +58,7 @@ class Structure(DockWidget):
         @param widget_name:
         @return:
         """
-        Kernel.Nodes[widget_id].setText(0, widget_name)
+        Info.Nodes[widget_id].setText(0, widget_name)
 
     def moveNode(self, widget_id: str, origin_index: int, new_index: int):
         """
@@ -77,5 +76,5 @@ class Structure(DockWidget):
         @param widget_id:
         @return:
         """
-        node = Kernel.Nodes[widget_id]
+        node = Info.Nodes[widget_id]
         self.structure_tree.deleteNode(node)

@@ -49,6 +49,6 @@ class SelectionDialog(QDialog):
 
             item = QListWidgetItem(device_name)
             item.setData(3, properties)
-            item.setIcon(QIcon(Func.getImagePath(f"{device_type}_device")))
+            item.setIcon(QIcon(Func.getImage(f"{device_type}_device")))
             self.devices_list.addItem(item)
             self.tip.hide()

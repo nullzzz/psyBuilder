@@ -6,26 +6,45 @@ from PyQt5.QtGui import QPixmap, QIcon, QPainter, QColor
 from PyQt5.QtWidgets import QDesktopWidget
 
 from app.info import Info
-from app.kernel import Kernel
 
 
 class Func(object):
     """
-    存放一些通用函数
+    This class stores some common functions
     """
 
+    ###########################################
+    #           old version func              #
+    ###########################################
     @staticmethod
-    def getImagePath(image_name: str) -> str:
+    def getWidgetImage(widget_type: str, image_type: str = 'icon') -> QPixmap or QIcon:
+        """
+        返回widget_type对应的图片
+        :param widget_type: widget类型
+        :param image_type: 返回图片类型
+        :return:
+        """
+        # 得到图片路径
+        if widget_type in Info.WIDGET_TYPE_IMAGE_PATH:
+            path = Info.WIDGET_TYPE_IMAGE_PATH[widget_type]
+            if image_type == "icon":
+                return QIcon(path)
+            else:
+                return QPixmap(path)
+        raise Exception("unknown widget type.")
+
+    @staticmethod
+    def getImage(image_name: str) -> str:
         """
         返回指定name的图片路径
         :param image_name:
         :return:
         """
-        return os.path.join(Info.ImageSourcePath, image_name)
+        return os.path.join(Info.IMAGE_SOURCE_PATH, image_name)
 
     @staticmethod
     def getPsyIconPath() -> str:
-        return os.path.join(Info.ImageSourcePath, "psy.ico")
+        return os.path.join(Info.IMAGE_SOURCE_PATH, "psy.ico")
 
     @staticmethod
     def getIOType(device_type: str) -> int:
@@ -51,72 +70,13 @@ class Func(object):
                     widget.apply()
 
     @staticmethod
-    def getProperties(widget_id, is_show: bool = False) -> dict:
+    def getProperties(widget_id) -> dict:
         """
-        # todo This function is abandoned, It's better to use getWidgetProperties
         按widget_id得到对应widget的属性
         :param widget_id:
-        :param is_show: 是否呈现在properties界面
         :return:
         """
-        widget = Info.WID_WIDGET[widget_id]
-        if widget_id not in Info.WID_NODE.keys():
-            return widget.getInfo()
-        if hasattr(widget, "refresh"):
-            widget.refresh()
-        if is_show and hasattr(widget, "getShowProperties"):
-            return widget.getShowProperties()
-        return widget.getInfo()
-
-    @staticmethod
-    def getNameCount(widget_type: str) -> int:
-        """
-        某个widget type的name的已有count
-        :param widget_type:
-        :return:
-        """
-        count = -1
-        if widget_type in Kernel.WidgetNameCount:
-            count = Kernel.WidgetNameCount[widget_type]
-            Kernel.WidgetNameCount[widget_type] += 1
-        return count
-
-    @staticmethod
-    def generateValidName(widget_id: str) -> str:
-        """
-        根据widget_id, 生成一个非重复的name
-        :param widget_id: 已经生成的widget_id
-        :return: 生产的name
-        """
-        widget_type = widget_id.split('.')[0]
-        while True:
-            count = Func.getNameCount(widget_type)
-            if count == -1:
-                raise Exception("fail to generate a valid name, because unknown widget type.")
-            name = f"{widget_type}_{count}"
-            if name not in Info.NAME_WID:
-                break
-        return name
-
-    @staticmethod
-    def checkNameValidity(name: str) -> (bool, str):
-        """
-        检查某个name的合法性，首字符为字母且不重复
-        :param name: 需要检测的name
-        :return: 是否合法
-        """
-        if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-            return False, "Name must start with a letter and contain only letters, numbers and _"
-        return not (name in Info.NAME_WID), 'Name has already existed.'
-
-    @staticmethod
-    def isReferName(name: str) -> bool:
-        """
-        检测name是否对应的widget是否存在引用
-        :param name: 需要检测的name
-        :return: 是否存在引用
-        """
-        return len(Info.NAME_WID[name]) > 1
+        return Func.getWidgetProperties(widget_id)
 
     @staticmethod
     def delWidget(widget_id: str) -> None:
@@ -135,88 +95,27 @@ class Func(object):
             pass
 
     @staticmethod
-    def getAttributes(widget_id) -> dict or list:
-        """
-        get widget's attributes through its widget id
-        """
-        # global attributes
-        attributes = ["subName", "subNum", "sessionNum", "subSex", "subHandness", "subAge"]
-        # attributes about quest
-        for key, value in Kernel.QuestInfo.items():
-            attributes.append(f"{value.get('Quest Name')}.cValue")
-        # get widget's attributes: 1. the attributes of the items in front of it in timeline (exclude cycle).
-        #                          2. parents' attributes. (only cycle)
-        #                          3. first parent cycle's hidden attribute
-        # get level of this widget, namely depth. It can be simplified by using DFS.
-        node = Kernel.Nodes[widget_id]
-        # do 1.
-        parent = node.parent()
-        if parent and Func.isWidgetType(parent.widget_id, Info.TIMELINE):
-            for i in range(parent.childCount()):
-                child_node = parent.child(i)
-                # until it self
-                if child_node.widget_id == widget_id:
-                    break
-                # ignore cycle before item
-                if not Func.isWidgetType(child_node.widget_id, Info.CYCLE):
-                    for attribute in Kernel.Widgets[child_node.widget_id].getHiddenAttribute():
-                        attributes.append(f"{child_node.text(0)}.{attribute}")
-        # do 2. 3.
-        first = True
-        node = node.parent()
-        while node:
-            # we just need cycle
-            if Func.isWidgetType(node.widget_id, Info.CYCLE):
-                cycle = Kernel.Widgets[node.widget_id]
-                cycle_name = node.text(0)
-                col_attributes = cycle.getColumnAttributes()
-                for attribute in col_attributes:
-                    attributes.append(f"{cycle_name}.attr.{attribute}")
-                # we need first cycle's hidden attribute
-                if first:
-                    first_cycle_hidden_attributes = Kernel.Widgets[node.widget_id].getHiddenAttributes()
-                    for attribute in first_cycle_hidden_attributes:
-                        attributes.append(f"{cycle_name}.{attribute}")
-                    first = False
-            node = node.parent()
-        # return
-        return attributes
+    def createWidget(widget_id: str, visible: bool = True):
+        raise Exception("Deprecated functions")
+
+    @staticmethod
+    def getAttributes(widget_id, detail=False) -> dict or list:
+        return Func.getWidgetAttributes(widget_id, detail)
 
     @staticmethod
     def getWidgetPosition(widget_id: str) -> int:
-        """
-        返回一个widget在timeline中的位置索引，从0开始
-        如果查询的widget_id不存在位置信息，返回-1
-        :param widget_id: 要查询的widget的id
-        :return: 位置信息
-        """
-        # 如果是widget是timeline，不存在位置信息
-        if widget_id.startswith(Info.TIMELINE):
-            return -1
-        #
-        try:
-            node = Info.WID_NODE[widget_id]
-            parent_node = node.parent()
-            # if node is if/switch's child node
-            if Func.isWidgetType(parent_node.widget_id, Info.IF) or Func.isWidgetType(parent_node.widget_id,
-                                                                                      Info.SWITCH):
-                node = parent_node
-                parent_node = node.parent()
-            return parent_node.indexOfChild(node)
-        except:
-            print(f"error: widget not founded.")
-            return -1
+        return Func.getWidgetIndex(widget_id)
 
     @staticmethod
-    def getNextWidgetId(widget_id: str) -> str or None:
+    def getNextWidgetId(widget_id: str) -> str:
         """
         得到附近下一个widget的wid, 如果要查询的widget_id是末尾或者不存在，返回None
         :param widget_id:
         :return:
         """
         # 如果是widget是timeline，不存在位置信息
-        if widget_id.startswith(Info.TIMELINE):
-            return None
+        if Func.isWidgetType(widget_id, Info.TIMELINE):
+            return Info.ERROR_WIDGET_ID
         #
         try:
             node = Info.WID_NODE[widget_id]
@@ -230,21 +129,20 @@ class Func(object):
             try:
                 return parent_node.child(index + 1).widget_id
             except:
-                return None
+                return Info.ERROR_WIDGET_ID
         except:
-            print(f"error: widget not founded.")
-            return None
+            return Info.ERROR_WIDGET_ID
 
     @staticmethod
-    def getPreviousWidgetId(widget_id: str) -> str or None:
+    def getPreviousWidgetId(widget_id: str) -> str:
         """
         得到附近前一个widget的wid, 如果要查询的widget_id是末尾或者不存在，返回None
         :param widget_id:
         :return:
         """
         # 如果是widget是timeline，不存在位置信息
-        if widget_id.startswith(Info.TIMELINE):
-            return None
+        if Func.isWidgetType(widget_id, Info.TIMELINE):
+            return Info.ERROR_WIDGET_ID
         #
         try:
             node = Info.WID_NODE[widget_id]
@@ -258,25 +156,18 @@ class Func(object):
             try:
                 return parent_node.child(index - 1).widget_id
             except:
-                return None
+                return Info.ERROR_WIDGET_ID
         except:
-            print(f"error: widget not founded.")
-            return None
+            return Info.ERROR_WIDGET_ID
 
     @staticmethod
-    def getWidgetIDInTimeline(timeline_widget_id: str) -> list:
+    def getWidgetIDInTimeline(widget_id: str) -> list:
         """
-        todo update it
         得到一个timeline中所有的widget的widget_id的list，按顺序放置
-        :param timeline_widget_id: timeline的widget_id
+        :param widget_id: timeline的widget_id
         :return:
         """
-        try:
-            timeline_node = Info.WID_NODE[timeline_widget_id]
-            return [timeline_node.child(i).widget_id for i in range(timeline_node.childCount())]
-        except:
-            print("error: timeline not founded.")
-            return []
+        return Func.getWidgetChildren(widget_id)
 
     @staticmethod
     def isCitingValue(value: str) -> bool:
@@ -365,12 +256,12 @@ class Func(object):
         return info
 
     @staticmethod
-    def getSound() -> list:
-        sounds = []
+    def getDeviceInfo(device_type: str) -> list:
+        devices = []
         for k, v in Info.OUTPUT_DEVICE_INFO.items():
-            if k.startswith("sound"):
-                sounds.append(v["Device Name"])
-        return sounds
+            if k.startswith(device_type):
+                k.append(v["Device Name"])
+        return devices
 
     @staticmethod
     def getDeviceInfoByName(device_name: str) -> dict or None:
@@ -403,38 +294,34 @@ class Func(object):
     @staticmethod
     def getQuestInfo():
         info: dict = {}
-        for k, v in Info.QUEST_INFO.items():
-            info[k] = v.get("Quest Name")
+        for k, v in Info.QUEST_DEVICE_INFO.items():
+            info[k] = v.get("Device Name")
         return info
 
     @staticmethod
     def getTrackerInfo():
         info: dict = {}
-        for k, v in Info.TRACKER_INFO.items():
-            info[k] = v.get("Tracker Name")
+        for k, v in Info.TRACKER_DEVICE_INFO.items():
+            info[k] = v.get("Device Name")
         return info
 
     @staticmethod
-    def getParentWid(wid: str) -> str:
-        """
-        根据输入的wid参数，得到他的父节点的wid
-        :param wid: 输入的参数
-        :return: 父节点的wid， 如果没有父节点返回“”
-        """
-        try:
-            return Info.WID_NODE[wid].parent().widget_id
-        except:
-            return ""
+    def log(text, error=False, timer=True):
+        Func.print(text)
 
     @staticmethod
-    def getWidLevel(wid: str) -> int:
+    def getParentWid(widget_id: str) -> str:
+        return Func.getWidgetParent(widget_id)
+
+    @staticmethod
+    def getWidLevel(widget_id: str) -> int:
         """
         通过输入的wid得到该widget所在层级，从0开始累加，即最初始的timeline为0，往后递增
-        :param wid: 输入的wid
+        :param widget_id: 输入的wid
         :return: 如果wid不存在，返回-1
         """
         try:
-            node = Info.WID_NODE[wid]
+            node = Info.WID_NODE[widget_id]
         except:
             return -1
         # 不断迭代，直至父结点为空
@@ -446,12 +333,12 @@ class Func(object):
         return level
 
     @staticmethod
-    def getWidgetsTotalLayer(wid: str = f"{Info.TIMELINE}.0") -> int:
+    def getWidgetsTotalLayer(widget_id: str = f"{Info.TIMELINE}.0") -> int:
         """
         返回最大level，深度优先遍历
         :return:
         """
-        node = Info.WID_NODE[wid]
+        node = Info.WID_NODE[widget_id]
         max_child_count = 0
         for i in range(node.childCount()):
             temp_count = Func.getWidgetsTotalLayer(node.widget_id)
@@ -459,32 +346,31 @@ class Func(object):
                 max_child_count = temp_count
         return 1 + max_child_count
 
-    ###############################
-    #         new version         #
-    ###############################
-
+    ###########################################
+    #           new version func              #
+    ###########################################
     @staticmethod
     def getWidget(widget_id: str):
         """
         get widget through its widget id
         """
-        return Kernel.Widgets[widget_id]
+        return Info.Widgets[widget_id]
 
     @staticmethod
     def getNode(widget_id: str):
         """
         get node through its widget id
         """
-        return Kernel.Nodes[widget_id]
+        return Info.Nodes[widget_id]
 
     @staticmethod
     def generateWidgetId(widget_type: str) -> str:
         """
         generate a valid widget id
         """
-        count = Kernel.WidgetTypeCount[widget_type]
+        count = Info.WidgetTypeCount[widget_type]
         widget_id = f"{widget_type}.{count}"
-        Kernel.WidgetTypeCount[widget_type] += 1
+        Info.WidgetTypeCount[widget_type] += 1
         return widget_id
 
     @staticmethod
@@ -494,11 +380,11 @@ class Func(object):
         """
         while True:
             # widget name = 'widget_type' _ 'count'
-            widget_name = f"{widget_type}_{Kernel.WidgetNameCount[widget_type]}"
+            widget_name = f"{widget_type}_{Info.WidgetNameCount[widget_type]}"
             # inc count of this widget type
-            Kernel.WidgetNameCount[widget_type] += 1
+            Info.WidgetNameCount[widget_type] += 1
             # check name's validity
-            if widget_name not in Kernel.Names:
+            if widget_name not in Info.Names:
                 return widget_name
 
     @staticmethod
@@ -509,7 +395,7 @@ class Func(object):
         """
         if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", widget_name):
             return False, "Name must start with a letter and contain only letters, numbers and _."
-        if widget_name in Kernel.Names:
+        if widget_name in Info.Names:
             return False, "Name already exists."
         return True, ""
 
@@ -525,14 +411,14 @@ class Func(object):
         """
         get widget's name
         """
-        return Kernel.Widgets[widget_id].widget_name
+        return Info.Widgets[widget_id].widget_name
 
     @staticmethod
     def checkWidgetNameExisted(widget_name: str) -> bool:
         """
         check widget name whether existed
         """
-        return widget_name in Kernel.Names
+        return widget_name in Info.Names
 
     @staticmethod
     def getWidgetReference(widget_id: str) -> list:
@@ -542,7 +428,7 @@ class Func(object):
         @return:
         """
         widget_name = Func.getWidgetName(widget_id)
-        return Kernel.Names[widget_name]
+        return Info.Names[widget_name]
 
     @staticmethod
     def getWidgetParent(widget_id: str) -> str:
@@ -551,7 +437,7 @@ class Func(object):
         @param widget_id:
         @return:
         """
-        return Kernel.Nodes[widget_id].parent().widget_id
+        return Info.Nodes[widget_id].parent().widget_id
 
     @staticmethod
     def getWidgetChild(widget_id: str, index: int) -> (str, str):
@@ -561,17 +447,17 @@ class Func(object):
         @param index:
         @return: child's widget id and widget name
         """
-        child = Kernel.Nodes[widget_id].child(index)
+        child = Info.Nodes[widget_id].child(index)
         return child.widget_id, child.text(0)
 
     @staticmethod
     def getWidgetChildren(widget_id: str) -> list:
         """
-
+        get its children
         @param widget_id:
         @return: list of children's widget id and widget name
         """
-        root = Kernel.Nodes[widget_id]
+        root = Info.Nodes[widget_id]
         children = []
         for i in range(root.childCount()):
             child = root.child(i)
@@ -586,10 +472,17 @@ class Func(object):
         @return:
         """
         if Func.isWidgetType(widget_id, Info.TIMELINE):
+            # we ignore timeline'pos
             return -1
-        node = Kernel.Nodes[widget_id]
-        if node.parent():
-            return node.parent().indexOfChild(node)
+        node = Info.Nodes[widget_id]
+        parent_node = node.parent()
+        if parent_node:
+            if Func.isWidgetType(parent_node.widget_id, Info.IF) or Func.isWidgetType(parent_node.widget_id,
+                                                                                      Info.SWITCH):
+                # if widget is child of if/switch, its pos is its parent's pos
+                node = parent_node
+                parent_node = node.parent()
+            return parent_node.indexOfChild(node)
         else:
             return -1
 
@@ -598,25 +491,36 @@ class Func(object):
         """
         get widget's properties through its widget id
         """
-        widget = Kernel.Widgets[widget_id]
+        widget = Info.Widgets[widget_id]
         return widget.getProperties()
 
     @staticmethod
-    def getWidgetAttributes(widget_id: str):
+    def getWidgetAttributes(widget_id: str, detail: bool = False):
         """
         get widget's attributes through its widget id
+
         """
-        # global attributes
-        attributes = ["subName", "subNum", "sessionNum", "subSex", "subHandness", "subAge"]
-        # attributes about quest
-        for key, value in Kernel.QuestInfo.items():
-            attributes.append(f"{value.get('Quest Name')}.cValue")
+        attributes = {"subName": 0, "subNum": 0, "sessionNum": 0, "subSex": 0, "subHandness": 0, "subAge": 0}
+
+        # 添加quest设备全局参数
+        if len(Info.QUEST_DEVICE_INFO.items()) > 1:
+            attributes["questRandValue"] = ""
+        for k, v in Info.QUEST_DEVICE_INFO.items():
+            v: dict
+            quest_name = v.get("Device Name")
+            attributes[f"{quest_name}.cValue"] = ""
+
         # get widget's attributes: 1. the attributes of the items in front of it in timeline (exclude cycle).
         #                          2. parents' attributes. (only cycle)
         #                          3. first parent cycle's hidden attribute
         # get level of this widget, namely depth. It can be simplified by using DFS.
-        node = Kernel.Nodes[widget_id]
+        node = Info.Nodes[widget_id]
+        depth = -1
+        while node:
+            depth += 1
+            node = node.parent()
         # do 1.
+        node = Info.Nodes[widget_id]
         parent = node.parent()
         if parent and Func.isWidgetType(parent.widget_id, Info.TIMELINE):
             for i in range(parent.childCount()):
@@ -626,31 +530,35 @@ class Func(object):
                     break
                 # ignore cycle before item
                 if not Func.isWidgetType(child_node.widget_id, Info.CYCLE):
-                    for attribute in Kernel.Widgets[child_node.widget_id].getHiddenAttribute():
-                        attributes.append(f"{child_node.text(0)}.{attribute}")
+                    for attribute in Info.Widgets[child_node.widget_id].getHiddenAttributes():
+                        attributes[f"{child_node.text(0)}.{attribute}"] = depth
         # do 2. 3.
         first = True
         node = node.parent()
+        depth -= 1
         while node:
             # we just need cycle
             if Func.isWidgetType(node.widget_id, Info.CYCLE):
-                cycle = Kernel.Widgets[node.widget_id]
+                cycle = Info.Widgets[node.widget_id]
                 cycle_name = node.text(0)
                 col_attributes = cycle.getColumnAttributes()
                 for attribute in col_attributes:
-                    attributes.append(f"{cycle_name}.attr.{attribute}")
+                    attributes[f"{cycle_name}.attr.{attribute}"] = depth
                 # we need first cycle's hidden attribute
                 if first:
-                    first_cycle_hidden_attributes = Kernel.Widgets[node.widget_id].getHiddenAttributes()
+                    first_cycle_hidden_attributes = Info.Widgets[node.widget_id].getHiddenAttributes()
                     for attribute in first_cycle_hidden_attributes:
-                        attributes.append(f"{cycle_name}.{attribute}")
+                        attributes[f"{cycle_name}.{attribute}"] = depth
                     first = False
             node = node.parent()
-        # return
-        return attributes
+            depth -= 1
+
+        # ********* untested ************
+        # 是否需要详细信息
+        return attributes if detail else attributes.keys()
 
     @staticmethod
-    def getImage(image_path: str, type: int = 0, size: QSize = None) -> QPixmap or QIcon:
+    def getImageObject(image_path: str, type: int = 0, size: QSize = None) -> QPixmap or QIcon:
         """
         get image from its relative path, return qt image object, include QPixmap or QIcon.
         @param image_path: its relative path
@@ -670,14 +578,14 @@ class Func(object):
         """
         show loading window
         """
-        Kernel.Psy.startWait()
+        Info.Psy.startWait()
 
     @staticmethod
     def endWait():
         """
         close loading window
         """
-        Kernel.Psy.endWait()
+        Info.Psy.endWait()
 
     @staticmethod
     def print(information: str, information_type: int = 0):
@@ -687,4 +595,4 @@ class Func(object):
                           1 success
                           2 fail
         """
-        Kernel.Psy.output.print(information, information_type)
+        Info.Psy.output.print(information, information_type)

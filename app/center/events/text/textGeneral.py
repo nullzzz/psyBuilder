@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
     QFontComboBox, QCompleter
 
 from app.func import Func
-from lib import VarComboBox, VarLineEdit, ColorListEditor
+from lib import PigComboBox, PigLineEdit, ColorListEditor
 
 
 class TextTab1(QWidget):
@@ -29,10 +29,10 @@ class TextTab1(QWidget):
         self.html = ""
         self.align_mode = "center"
 
-        self.align_x = VarComboBox()
+        self.align_x = PigComboBox()
         self.align_x.setEditable(True)
         self.align_x.currentTextChanged.connect(self.alignChange)
-        self.align_y = VarComboBox()
+        self.align_y = PigComboBox()
         self.align_y.setEditable(True)
         self.align_y.currentTextChanged.connect(self.alignChange)
 
@@ -44,27 +44,27 @@ class TextTab1(QWidget):
         self.fore_color.colorChanged.connect(self.colorChange)
         self.back_color.colorChanged.connect(self.colorChange)
 
-        self.clear_after = VarComboBox()
-        self.transparent = VarLineEdit("100%")
+        self.clear_after = PigComboBox()
+        self.transparent = PigLineEdit("100%")
         self.transparent.setReg(r"0%|[1-9]\d%|100%")
-        self.word_wrap = VarLineEdit("80")
+        self.word_wrap = PigLineEdit("80")
         self.word_wrap.setReg(r"\d+")
         self.word_wrap.textChanged.connect(self.wrapChange)
         self.text_edit.setLineWrapColumnOrWidth(80)
 
-        self.flip_horizontal = VarComboBox()
+        self.flip_horizontal = PigComboBox()
         self.flip_horizontal.addItems(("No", "Yes"))
-        self.flip_vertical = VarComboBox()
+        self.flip_vertical = PigComboBox()
         self.flip_vertical.addItems(("No", "Yes"))
 
         self.font_box = QFontComboBox()
         self.font_box.currentFontChanged.connect(self.fontChange)
-        self.style_box = VarComboBox()
+        self.style_box = PigComboBox()
         self.style_box.setEditable(True)
         self.style_box.addItems(
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
         self.style_box.currentTextChanged.connect(self.fontChange)
-        self.font_size_box = VarComboBox()
+        self.font_size_box = PigComboBox()
         self.font_size_box.setReg(r"\d+")
         self.font_size_box.setEditable(True)
         for i in range(12, 72, 2):
@@ -72,11 +72,11 @@ class TextTab1(QWidget):
 
         self.font_size_box.currentIndexChanged.connect(self.fontChange)
 
-        self.right_to_left = VarComboBox()
+        self.right_to_left = PigComboBox()
         self.right_to_left.addItems(("No", "Yes"))
 
         self.using_screen_id: str = "screen.0"
-        self.screen = VarComboBox()
+        self.screen = PigComboBox()
         self.screen_info = Func.getScreenInfo()
         self.screen.addItems(self.screen_info.values())
         self.screen.currentTextChanged.connect(self.changeScreen)

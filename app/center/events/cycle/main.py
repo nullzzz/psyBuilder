@@ -47,16 +47,17 @@ class Cycle(TabItemMainWindow):
         tool_bar.setMovable(False)
         tool_bar.setFloatable(False)
         # add action
-        tool_bar.addAction(Func.getImage("tool_bar/setting.png", 1), "Setting", self.properties.exec)
-        tool_bar.addAction(Func.getImage("tool_bar/add_row.png", 1), "Add Row", self.addRow)
-        tool_bar.addAction(Func.getImage("tool_bar/add_rows.png", 1), "Add Rows", self.cycle_table.addRowsActionFunc)
-        tool_bar.addAction(Func.getImage("tool_bar/delete_row.png", 1), "Delete Rows",
+        tool_bar.addAction(Func.getImageObject("tool_bar/setting.png", 1), "Setting", self.properties.exec)
+        tool_bar.addAction(Func.getImageObject("tool_bar/add_row.png", 1), "Add Row", self.addRow)
+        tool_bar.addAction(Func.getImageObject("tool_bar/add_rows.png", 1), "Add Rows",
+                           self.cycle_table.addRowsActionFunc)
+        tool_bar.addAction(Func.getImageObject("tool_bar/delete_row.png", 1), "Delete Rows",
                            self.cycle_table.deleteRowsActionFunc)
-        tool_bar.addAction(Func.getImage("tool_bar/add_column.png", 1), "Add Attribute",
+        tool_bar.addAction(Func.getImageObject("tool_bar/add_column.png", 1), "Add Attribute",
                            self.cycle_table.addAttributeActionFunc)
-        tool_bar.addAction(Func.getImage("tool_bar/add_columns.png", 1), "Add Attributes",
+        tool_bar.addAction(Func.getImageObject("tool_bar/add_columns.png", 1), "Add Attributes",
                            self.cycle_table.addAttributesActionFunc)
-        tool_bar.addAction(Func.getImage("tool_bar/delete_column.png", 1), "Delete Attributes",
+        tool_bar.addAction(Func.getImageObject("tool_bar/delete_column.png", 1), "Delete Attributes",
                            self.cycle_table.deleteAttributesActionFunc)
 
     def getColumnAttributes(self) -> list:
@@ -95,7 +96,89 @@ class Cycle(TabItemMainWindow):
         self.cycle_table.deleteAttribute(col)
 
     """
-    functions that must be override
+    API
+    """
+
+    def rowCount(self) -> int:
+        """
+        返回table共有多少行
+        :return:
+        """
+        return self.cycle_table.rowCount()
+
+    def columnCount(self) -> int:
+        """
+        返回table共有多少列
+        :return:
+        """
+        return self.cycle_table.columnCount()
+
+    def getTimelines(self) -> list:
+        """
+        按顺序进行返回所有设置的timeline
+        格式为 [ [timeline_name, timeline_widget_id], [], ... ]
+        如果某行为空则改行对应的数据为[ '', '']
+        :return:
+        """
+        timelines = []
+        for row in range(0, self.cycle_table.rowCount()):
+            timeline_name = self.item(row, 1).text()
+            timelines.append([timeline_name, self.cycle_table.timelines.setdefault(timeline_name, "")[0]])
+        return timelines
+
+    def getAttributes(self, row: int) -> dict:
+        """
+        按行索引返回该行的数据的一个字典
+        格式为{ attribute_name : attribute_value }
+        如果属性值未填写则为 ''
+        :param row: 行索引
+        :return:
+        """
+        attributes = {}
+        for col in range(0, self.cycle_table.columnCount()):
+            attribute_name = self.cycle_table.attributes[col]
+            attributes[attribute_name] = self.item(row, col).text()
+        return attributes
+
+    def getAttributeValues(self, col: int) -> list:
+        """
+        通过输入的列索引，返回该列对应的attribute的所有value的一个列表
+        :param col: 列缩影s
+        :return: value的list
+        """
+        # col有效
+        if col < 0 or col >= self.cycle_table.columnCount():
+            raise Exception("invalid col index.")
+        #
+        values = []
+        # 遍历每行，将值取出
+        for row in range(self.timeline_table.rowCount()):
+            values.append(self.timeline_table.item(row, col).text())
+        return values
+
+    def getOrder(self) -> str:
+        """
+        得到设置界面中order的值
+        :return:
+        """
+        return self.getProperties()["order_combo"]
+
+    def getNoRepeatAfter(self) -> str:
+        """
+        如上类推
+        :return:
+        """
+        return self.getProperties()["no_repeat_after"]
+
+    def getOrderBy(self):
+        """
+        如上类推
+        :return:
+        """
+        return self.getProperties()["order_by_combo"]
+
+    """
+    Functions that must be complete in new version
     """
 
     def getProperties(self) -> dict:
@@ -116,8 +199,6 @@ class Cycle(TabItemMainWindow):
 
     def store(self):
         """
-        todo You should finish the job.
-
         return necessary data for restoring this widget.
         @return:
         """
@@ -125,8 +206,6 @@ class Cycle(TabItemMainWindow):
 
     def restore(self, data):
         """
-        todo You should finish the job.
-
         restore this widget according to data.
         @param data: necessary data for restoring this widget
         @return:

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLa
     QGridLayout, QCheckBox, QTextEdit, QListWidget, QAbstractItemView
 
 from app.func import Func
-from lib import VarLineEdit, VarComboBox, TabItemWidget
+from lib import PigLineEdit, PigComboBox, TabItemWidget
 
 
 class Close(TabItemWidget):
@@ -17,11 +17,11 @@ class Close(TabItemWidget):
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
 
-        self.pause_between_msg = VarLineEdit("1")
+        self.pause_between_msg = PigLineEdit("1")
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = VarComboBox()
+        self.tracker_name = PigComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.default_properties = {
@@ -159,13 +159,13 @@ class Close(TabItemWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.tabClosed.emit(self.widget_id)
+        self.tabClose.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
 
     def apply(self):
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.getInfo())
 
     def setProperties(self, properties: dict):
         if properties:
@@ -173,11 +173,6 @@ class Close(TabItemWidget):
             self.loadSetting()
         else:
             print("此乱诏也，恕不奉命")
-
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
 
     def getInfo(self):
         self.default_properties.clear()
@@ -194,9 +189,6 @@ class Close(TabItemWidget):
         self.default_properties["Not used attributes"] = nua
         return self.default_properties
 
-    def getProperties(self):
-        return self.getInfo()
-
     def loadSetting(self):
         self.pause_between_msg.setText(self.default_properties["Pause between messages"])
         self.automatically_log_all_variables.setCheckState(self.default_properties["Automatically log all variables"])
@@ -205,11 +197,6 @@ class Close(TabItemWidget):
         self.select_attr.addItems(self.default_properties["Used attributes"])
         self.all_attr.clear()
         self.all_attr.addItems(self.default_properties["Not used attributes"])
-
-    def clone(self, new_id: str):
-        clone_widget = Close(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
 
     def setAttributes(self, attributes):
         pass
@@ -227,9 +214,6 @@ class Close(TabItemWidget):
         }
         return hidden_attr
 
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
-
     def getPauseBetweenMessages(self) -> str:
         return self.pause_between_msg.text()
 
@@ -241,3 +225,36 @@ class Close(TabItemWidget):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = Close(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

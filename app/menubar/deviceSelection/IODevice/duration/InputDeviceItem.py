@@ -11,7 +11,7 @@ class DeviceInItem(QListWidgetItem):
         self.device_name = device_name
         self.device_id = device_id
         self.device_type = device_id.split(".")[0]
-        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.device_type))))
+        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
 
         self.default_properties = {
             "Device Id": self.device_id,
@@ -24,7 +24,11 @@ class DeviceInItem(QListWidgetItem):
             "Right": "",
             "Wrong": "",
             "No Resp": "",
-            "Output Device": ""
+            "Output Device": "",
+            "Start": "",
+            "End": "",
+            "Mean": "",
+            "Is Oval": "No",
         }
 
         self.allowable = ""
@@ -35,6 +39,10 @@ class DeviceInItem(QListWidgetItem):
         self.wrong = ""
         self.no_resp = ""
         self.output_device = ""
+        self.start = ""
+        self.end = ""
+        self.mean = ""
+        self.is_oval = "No"
 
     def getInfo(self) -> dict:
         self.default_properties["Allowable"] = self.allowable
@@ -47,20 +55,14 @@ class DeviceInItem(QListWidgetItem):
         self.default_properties["Wrong"] = self.wrong
         self.default_properties["No Resp"] = self.no_resp
         self.default_properties["Output Device"] = self.output_device
+
+        self.default_properties["Start"] = self.start
+        self.default_properties["End"] = self.end
+        self.default_properties["Is Oval"] = self.is_oval
         return self.default_properties
 
     def getInProperties(self) -> dict:
-        self.default_properties["Allowable"] = self.allowable
-        self.default_properties["Correct"] = self.correct
-        self.default_properties["RT Window"] = self.rt_window
-        self.default_properties["End Action"] = self.end_action
-
-        self.default_properties["Device Name"] = self.device_name
-        self.default_properties["Right"] = self.right
-        self.default_properties["Wrong"] = self.wrong
-        self.default_properties["No Resp"] = self.no_resp
-        self.default_properties["Output Device"] = self.output_device
-        return self.default_properties
+        return self.getInfo()
 
     def setProperties(self, device_info: dict):
         self.default_properties = device_info.copy()
@@ -78,6 +80,11 @@ class DeviceInItem(QListWidgetItem):
         self.wrong = self.default_properties["Wrong"]
         self.no_resp = self.default_properties["No Resp"]
         self.output_device = self.default_properties["Output Device"]
+
+        self.start = self.default_properties["Start"]
+        self.end = self.default_properties["End"]
+        self.mean = self.default_properties["Mean"]
+        self.is_oval = self.default_properties["Is Oval"]
 
     def changeAllowable(self, allowable: str):
         self.allowable = allowable
@@ -103,6 +110,18 @@ class DeviceInItem(QListWidgetItem):
     def changeOutput(self, output_device_name: str):
         self.output_device = output_device_name
 
+    def changeStart(self, start: str):
+        self.start = start
+
+    def changeEnd(self, end: str):
+        self.end = end
+
+    def changeMean(self, mean: str):
+        self.mean = mean
+
+    def changeIsOval(self, is_oval: str):
+        self.is_oval = is_oval
+
     def getType(self):
         return self.device_type
 
@@ -117,6 +136,21 @@ class DeviceInItem(QListWidgetItem):
 
     def getDeviceName(self) -> str:
         return self.device_name
+
+    def getStart(self) -> str:
+        return self.start
+
+    def getEnd(self) -> str:
+        return self.end
+
+    def getMean(self) -> str:
+        return self.mean
+
+    def getIsOval(self) -> str:
+        return self.is_oval
+
+    def getAction(self) -> tuple:
+        return self.start, self.end, self.mean, self.is_oval
 
     def changeDeviceName(self, new_name: str):
         self.device_name = new_name

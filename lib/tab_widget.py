@@ -44,7 +44,7 @@ class TabWidget(QTabWidget):
         if index != -1:
             self.setCurrentIndex(index)
         else:
-            index = self.addTab(widget, Func.getImage(f"widgets/{widget_type}", 1), name)
+            index = self.addTab(widget, Func.getImageObject(f"widgets/{widget_type}", 1), name)
             self.setCurrentIndex(index)
 
     def closeTab(self, widget: QWidget) -> None:

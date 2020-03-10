@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout)
 
-from app.center.events.durationPage import DurationPage
-from app.center.events.framePage import FramePage
 from .imageGeneral import ImageTab1
+from ..durationPage import DurationPage
+from ..framePage import FramePage
 
 
 class ImageProperty(QWidget):

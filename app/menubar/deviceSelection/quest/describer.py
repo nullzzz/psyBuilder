@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QFormLayout, QLabel,QLineEdit, QComboBox
+from PyQt5.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QComboBox
+
 
 class Describer(QWidget):
     estimatedThresholdChanged = pyqtSignal(str)

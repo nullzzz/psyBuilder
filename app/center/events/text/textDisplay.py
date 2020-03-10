@@ -3,10 +3,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QToolBar, QAction, QTextEdit
 
-from app.center.events.text.textProperty import TextProperty
-from app.center.events.text.view import Preview
 from app.func import Func
 from lib import MessageBox, TabItemMainWindow
+from .textProperty import TextProperty
+from .view import Preview
 
 
 class TextDisplay(TabItemMainWindow):
@@ -46,9 +46,9 @@ class TextDisplay(TabItemMainWindow):
         self.setCentralWidget(self.text_label)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(Func.getImagePath("setting")), "setting", self)
+        open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
         open_pro.triggered.connect(self.openPro)
-        pre_view = QAction(QIcon(Func.getImagePath("preview")), "preview", self)
+        pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
         pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
         # tool.addAction(pre_view)
@@ -105,7 +105,7 @@ class TextDisplay(TabItemMainWindow):
         self.getInfo()
         self.parseProperties()
         # 发送信号
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.default_properties)
 
     # 获取参数
     def parseProperties(self):
@@ -133,23 +133,12 @@ class TextDisplay(TabItemMainWindow):
         self.default_properties = self.pro_window.getInfo()
         return self.default_properties
 
-    def getProperties(self):
-        self.html = self.pro_window.html
-        self.default_properties = self.pro_window.getInfo()
-        return self.default_properties
-
     def getShowProperties(self):
         info = self.default_properties.copy()
         info.pop("Html")
         info.pop("Input devices")
         info.pop("Output devices")
         return info
-
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
 
     def changeDisplayText(self):
         self.html = self.text_label.toHtml()
@@ -183,27 +172,6 @@ class TextDisplay(TabItemMainWindow):
     def loadSetting(self):
         self.pro_window.setOther(self.html)
         self.pro_window.setProperties(self.default_properties)
-
-    def clone(self, new_id):
-        clone_widget = TextDisplay(widget_id=new_id)
-        clone_widget.setPro(self.pro_window.clone())
-        clone_widget.apply()
-        return clone_widget
-
-    def getHiddenAttribute(self):
-        """
-        :return:
-        """
-        hidden_attr = {
-            "onsettime": 0,
-            "acc": 0,
-            "resp": 0,
-            "rt": 0
-        }
-        return hidden_attr
-
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
 
     # 返回各项参数
     # 大部分以字符串返回，少数点击选择按钮返回布尔值
@@ -380,16 +348,39 @@ class TextDisplay(TabItemMainWindow):
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
 
+    """
+    Functions that must be complete in new version
+    """
 
-if __name__ == "__main__":
-    import sys
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        self.html = self.pro_window.html
+        self.default_properties = self.pro_window.getInfo()
+        return self.default_properties
 
-    from PyQt5.Qt import QApplication
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
 
-    app = QApplication(sys.argv)
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+            self.apply()
 
-    t = TextDisplay()
-
-    t.show()
-
-    sys.exit(app.exec())
+    def clone(self, new_widget_id, new_widget_name):
+        clone_widget = TextDisplay(new_widget_id, new_widget_name)
+        clone_widget.setPro(self.pro_window.clone())
+        clone_widget.apply()
+        return clone_widget

@@ -2,7 +2,7 @@ from PyQt5.QtCore import QRegExp, Qt, QObject, QEvent, pyqtSignal
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QCompleter
 
-from lib import VarLineEdit, VarComboBox, MessageBox
+from lib import PigLineEdit, PigComboBox, MessageBox
 
 
 class OutDeviceInfoAtDuration(QWidget):
@@ -14,9 +14,9 @@ class OutDeviceInfoAtDuration(QWidget):
 
         self.attributes = []
 
-        self.value = VarLineEdit()
+        self.value = PigLineEdit()
         self.value.textChanged.connect(lambda x: self.valueOrMessageChanged.emit(x))
-        self.pulse_dur = VarComboBox()
+        self.pulse_dur = PigComboBox()
         self.pulse_dur.setEditable(True)
         self.pulse_dur.setInsertPolicy(QComboBox.NoInsert)
         self.pulse_dur.addItems(["End of Duration", "10", "20", "30", "40", "50"])

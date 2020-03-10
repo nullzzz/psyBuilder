@@ -13,13 +13,11 @@ from .attributes import Attributes
 from .center import Center
 from .center.condition import IfBranch, Switch
 from .center.events import Cycle, ImageDisplay, Slider, SoundDisplay, TextDisplay, VideoDisplay
-from .center.events.durationPage import DurationPage
 from .center.eye_tracker import EyeAction, EyeCalibrate, EyeDC, EndR, Close, StartR, Open
 from .center.quest import QuestGetValue, QuestUpdate, QuestInit
 from .center.timeline import Timeline
 from .func import Func
 from .info import Info
-from .kernel import Kernel
 from .menubar.compile_PTB import compilePTB
 from .menubar.deviceSelection.IODevice.globalDevices import GlobalDevice
 from .menubar.deviceSelection.progressBar import LoadingTip
@@ -36,7 +34,7 @@ class Psy(QMainWindow):
         super(Psy, self).__init__(parent=None)
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
-        self.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
         # init menu bar
         self.initMenubar()
 
@@ -51,10 +49,10 @@ class Psy(QMainWindow):
             # init initial timeline
             widget_id = Func.generateWidgetId(Info.TIMELINE)
             widget_name = Func.generateWidgetName(Info.TIMELINE)
-            # create timeline widget
-            self.createWidget(widget_id, widget_name)
             # add node in structure
             self.structure.addNode(Info.ERROR_WIDGET_ID, widget_id, widget_name, 0)
+            # create timeline widget
+            self.createWidget(widget_id, widget_name)
             # set timeline as a tab
             self.center.openTab(widget_id)
 
@@ -135,7 +133,7 @@ class Psy(QMainWindow):
         self.windows_action = QAction("&Windows", self)
         self.mac_action = QAction("&Mac", self)
 
-        icon = QIcon(Func.getImagePath("dock_visible.png"))
+        icon = QIcon(Func.getImage("dock_visible.png"))
 
         self.linux_action.setIcon(icon)
 
@@ -288,8 +286,8 @@ class Psy(QMainWindow):
             exit()
         # change data set in Kernel
         QApplication.processEvents()
-        Kernel.Widgets[widget_id] = widget
-        Kernel.Names[widget_name] = [widget_id]
+        Info.Widgets[widget_id] = widget
+        Info.Names[widget_name] = [widget_id]
         # link necessary signals
         QApplication.processEvents()
         self.linkWidgetSignals(widget_id, widget)
@@ -300,8 +298,8 @@ class Psy(QMainWindow):
         copy widget, link its signals and store it into some data
         """
         # copy widget
-        new_widget = Kernel.Widgets[origin_widget_id].copy(new_widget_id, new_widget_name)
-        Kernel.Widgets[new_widget_id] = new_widget
+        new_widget = Info.Widgets[origin_widget_id].copy(new_widget_id, new_widget_name)
+        Info.Widgets[new_widget_id] = new_widget
         # link signals
         self.linkWidgetSignals(new_widget_id, new_widget)
         return new_widget
@@ -317,8 +315,8 @@ class Psy(QMainWindow):
         if widget_id == Info.ERROR_WIDGET_ID:
             widget_id = Func.generateWidgetId(widget_type)
         # refer widget by mapping widget id to same widget (Kernel.Widgets, Kernel.Names)
-        Kernel.Widgets[widget_id] = Kernel.Widgets[origin_widget_id]
-        Kernel.Names[widget_name].append(widget_id)
+        Info.Widgets[widget_id] = Info.Widgets[origin_widget_id]
+        Info.Names[widget_name].append(widget_id)
         return widget_id
 
     def linkWidgetSignals(self, widget_id: str, widget):
@@ -346,8 +344,10 @@ class Psy(QMainWindow):
             # cycle
             widget.itemAdded.connect(self.handleItemAdded)
             widget.itemDeleted.connect(self.handleItemDeleted)
-        elif widget_type == Info.IF or Info.SWITCH:
-            pass
+        elif widget_type == Info.IF or widget_type == Info.SWITCH:
+            widget.itemAdded.connect(self.handleItemAdded)
+            widget.itemDeleted.connect(self.handleItemDeleted)
+            widget.itemNameChanged.connect(self.handleItemNameChanged)
 
     def handleItemAdded(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int):
         """
@@ -356,12 +356,15 @@ class Psy(QMainWindow):
         # start wait
         self.startWait()
         # do job
-        # create widget firstly
+        # add node in origin parent node firstly
+        show = True
+        if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
+            show = False
+        self.structure.addNode(parent_widget_id, widget_id, widget_name, index, show)
+        # create widget secondly
         self.createWidget(widget_id, widget_name)
         # we should consider a lot of things here because of reference.
         # we also need add node in those reference parents
-        # add node in origin parent node
-        self.structure.addNode(parent_widget_id, widget_id, widget_name, index)
         # add node in refer parent node
         refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
         for refer_parent_widget_id in refer_parent_widget_ids:
@@ -370,7 +373,7 @@ class Psy(QMainWindow):
                 # refer widget
                 refer_widget_id = self.referWidget(widget_id)
                 # add refer node in refer parent
-                self.structure.addNode(refer_parent_widget_id, refer_widget_id, widget_name, index)
+                self.structure.addNode(refer_parent_widget_id, refer_widget_id, widget_name, index, show)
         # end wait
         self.endWait()
 
@@ -436,7 +439,7 @@ class Psy(QMainWindow):
             # move in its parent
             reference_parents = Func.getWidgetReference(origin_parent_widget_id)
             for reference_parent in reference_parents:
-                parent_node = Kernel.Nodes[reference_parent]
+                parent_node = Info.Nodes[reference_parent]
                 for i in range(parent_node.childCount()):
                     child = parent_node.child(i)
                     if child.text(0) == widget_name:
@@ -447,7 +450,7 @@ class Psy(QMainWindow):
             delete_children = []
             reference_parents = Func.getWidgetReference(origin_parent_widget_id)
             for reference_parent in reference_parents:
-                parent_node = Kernel.Nodes[reference_parent]
+                parent_node = Info.Nodes[reference_parent]
                 for i in range(parent_node.childCount()):
                     child = parent_node.child(i)
                     if child.text(0) == widget_name:
@@ -466,8 +469,8 @@ class Psy(QMainWindow):
                     count += 1
                 # delete some children's widget id, (Kernel.Nodes, Kernel.Names)
                 while count < len(delete_children):
-                    Kernel.Names[widget_name].remove(delete_children[count])
-                    del Kernel.Nodes[delete_children[count]]
+                    Info.Names[widget_name].remove(delete_children[count])
+                    del Info.Nodes[delete_children[count]]
                     count += 1
             else:
                 # we need add some children's widget id
@@ -496,11 +499,11 @@ class Psy(QMainWindow):
             # delete item in timeline or timeline in cycle
             if Func.isWidgetType(widget_id, Info.TIMELINE):
                 # delete timeline in cycle
-                cycle: Cycle = Kernel.Widgets[Func.getWidgetParent(widget_id)]
+                cycle: Cycle = Info.Widgets[Func.getWidgetParent(widget_id)]
                 cycle.deleteTimeline(widget_name)
             else:
                 # delete item in timeline
-                timeline: Timeline = Kernel.Widgets[Func.getWidgetParent(widget_id)]
+                timeline: Timeline = Info.Widgets[Func.getWidgetParent(widget_id)]
                 timeline.deleteItem(widget_name)
         # delete node and reference nodes in reference parent nodes
         reference_parents = Func.getWidgetReference(Func.getWidgetParent(widget_id))
@@ -513,7 +516,6 @@ class Psy(QMainWindow):
 
     def deleteNodeRecursive(self, widget_id: str, widget_name: str):
         """
-
         @param widget_id: root node's widget id
         @param widget_name: root node's widget name
         @return:
@@ -523,24 +525,23 @@ class Psy(QMainWindow):
                 self.deleteNodeRecursive(child_widget_id, child_widget_name)
         # delete data (Kernel.Nodes, Kernel.Widgets, Kernel.Name)
         self.structure.deleteNode(widget_id)
-        del Kernel.Nodes[widget_id]
-        reference: list = Kernel.Names[widget_name]
+        del Info.Nodes[widget_id]
+        reference: list = Info.Names[widget_name]
         if len(reference) == 1:
-            del Kernel.Names[widget_name]
+            del Info.Names[widget_name]
         else:
             if reference[0] == widget_id:
                 # if widget is origin widget, we should change widget's widget id
-                Kernel.Widgets[widget_id].changeWidgetId(reference[1])
+                Info.Widgets[widget_id].changeWidgetId(reference[1])
             reference.remove(widget_id)
-        del Kernel.Widgets[widget_id]
+        del Info.Widgets[widget_id]
 
     def handleItemNameChanged(self, sender_widget: int, widget_id: str, new_widget_name: str):
         """
         When item'name is changed, handle related affairs
         """
         # change widget's name
-
-        widget = Kernel.Widgets[widget_id]
+        widget = Info.Widgets[widget_id]
         old_widget_name = Func.getWidgetName(widget_id)
         widget.widget_name = new_widget_name
         # change tab's name
@@ -549,7 +550,7 @@ class Psy(QMainWindow):
         parent_widget_id = Func.getWidgetParent(widget_id)
         if sender_widget == Info.StructureSend:
             # we need change item's name if signal comes from structure
-            timeline = Kernel.Widgets[parent_widget_id]
+            timeline = Info.Widgets[parent_widget_id]
             timeline.renameItem(old_widget_name, new_widget_name)
         # change node's name in structure and reference parent's child
         # get it's old name to get its reference
@@ -566,34 +567,34 @@ class Psy(QMainWindow):
                     break
         # change data (Kernel.Names, [Kernel.Widget])
         # if reference widget change its name, we should change it to a copy widget
-        if len(change_widget_ids) == len(Kernel.Names[old_widget_name]):
+        if len(change_widget_ids) == len(Info.Names[old_widget_name]):
             # if we change all, we just need to change key in Kernel.Names
-            Kernel.Names[new_widget_name] = Kernel.Names[old_widget_name]
-            del Kernel.Names[old_widget_name]
+            Info.Names[new_widget_name] = Info.Names[old_widget_name]
+            del Info.Names[old_widget_name]
         else:
             # we need change
-            origin_widget_id = Kernel.Names[old_widget_name][0]
+            origin_widget_id = Info.Names[old_widget_name][0]
             # save new name
-            Kernel.Names[new_widget_name] = change_widget_ids
+            Info.Names[new_widget_name] = change_widget_ids
             # copy widget and map widget id to widget
             # remove change widget id from Kernel.Names[old_widget_name]
             for change_widget_id in change_widget_ids:
-                Kernel.Names[new_widget_name].remove(change_widget_id)
+                Info.Names[new_widget_name].remove(change_widget_id)
             if origin_widget_id in change_widget_ids:
                 # copy new widget and widget's widget id is now Kernel.Names[old_widget_name][0]
                 # and change it map
                 # change origin widget's widget id
-                Kernel.Widgets[widget_id].changeWidgetId(Kernel.Names[old_widget_name][0])
+                Info.Widgets[widget_id].changeWidgetId(Info.Names[old_widget_name][0])
                 # copy this widget
-                copy_widget = self.copyWidget(Kernel.Names[old_widget_name][0], widget_id, new_widget_name)
+                copy_widget = self.copyWidget(Info.Names[old_widget_name][0], widget_id, new_widget_name)
                 # map
                 for change_widget_id in change_widget_ids:
-                    Kernel.Widgets[change_widget_id] = copy_widget
+                    Info.Widgets[change_widget_id] = copy_widget
             else:
                 # copy widget and widget's widget id is change_widget_id[0], and map it to all
                 copy_widget = self.copyWidget(origin_widget_id, widget_id, new_widget_name)
                 for change_widget_id in change_widget_ids:
-                    Kernel.Widgets[change_widget_id] = copy_widget
+                    Info.Widgets[change_widget_id] = copy_widget
 
     def handleItemClicked(self, widget_id: str):
         """
@@ -691,9 +692,6 @@ class Psy(QMainWindow):
         todo store data to file
         """
         try:
-            # compatible
-            Kernel.FileName = Info.FILE_NAME
-            Kernel.Platform = Info.PLATFORM
             # data in kernel
 
             # structure
@@ -731,7 +729,7 @@ class Psy(QMainWindow):
         """
         dock = self.sender().windowTitle()
         if is_visible:
-            icon = QIcon(Func.getImagePath("dock_visible.png"))
+            icon = QIcon(Func.getImage("dock_visible.png"))
         else:
             icon = QIcon("")
         if dock == "Attributes":
@@ -758,11 +756,12 @@ class Psy(QMainWindow):
 
     @staticmethod
     def changeDevices(device_type, devices):
-        # output device
-        if device_type:
-            DurationPage.OUTPUT_DEVICES = devices
-        else:
-            DurationPage.INPUT_DEVICES = devices
+        # todo output device
+        pass
+        # if device_type:
+        #     DurationPage.OUTPUT_DEVICES = devices
+        # else:
+        #     DurationPage.INPUT_DEVICES = devices
 
     def changePlatform(self, c):
         if isinstance(c, bool):
@@ -781,7 +780,7 @@ class Psy(QMainWindow):
             self.before_event_action.setIconVisibleInMenu(self.sender() is self.before_event_action)
             self.before_trial_action.setIconVisibleInMenu(self.sender() is self.before_trial_action)
             self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
-            Kernel.ImageLoadMode = self.sender().text().lstrip("&").lower()
+            Info.ImageLoadMode = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
             imageLoadMode = c if c else "before_event"
             self.before_event_action.setIconVisibleInMenu(imageLoadMode == "before_event")
@@ -815,7 +814,7 @@ class Psy(QMainWindow):
         self.aboutWidget = QWidget()
         self.aboutWidget.setWindowTitle("About developers of PTB Builder 0.1")
         self.aboutWidget.setWindowModality(2)
-        self.aboutWidget.setWindowIcon(QIcon(Func.getImagePath("icon.png")))
+        self.aboutWidget.setWindowIcon(QIcon(Func.getImage("icon.png")))
         self.aboutWidget.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
 
         self.aboutWidget.setAutoFillBackground(True)
@@ -873,7 +872,7 @@ class Psy(QMainWindow):
 
         img00.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab01.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        img00.setPixmap(QPixmap(Func.getImagePath("authorInfo01.png")))
+        img00.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))
         lab01.setTextFormat(Qt.RichText)
         lab01.setTextInteractionFlags(Qt.TextBrowserInteraction)
         lab01.setOpenExternalLinks(True)
@@ -883,12 +882,12 @@ class Psy(QMainWindow):
         img10.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab11.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab11.setText("Zhe Yang, Ph.D, Associate Prof. \n Department of computer science, Soochow University")
-        img10.setPixmap(QPixmap(Func.getImagePath("authorInfo02.png")))
+        img10.setPixmap(QPixmap(Func.getImage("authorInfo02.png")))
 
         img20.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab21.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         lab21.setText("ChenZhi Feng, Ph.D, Prof. \n Department of Psychology, Soochow University")
-        img20.setPixmap(QPixmap(Func.getImagePath("authorInfo03.png")))
+        img20.setPixmap(QPixmap(Func.getImage("authorInfo03.png")))
 
         layout0 = QVBoxLayout()
         layout0.addWidget(te01)

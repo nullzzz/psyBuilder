@@ -1,11 +1,12 @@
-from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, \
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QCompleter
 
 from app.func import Func
-from lib import VarLineEdit, VarComboBox
+from lib import PigLineEdit, PigComboBox, TabItemWidget
 
 
-class StartR(QWidget):
+class StartR(TabItemWidget):
     def __init__(self, widget_id: str, widget_name: str):
         super(StartR, self).__init__(widget_id, widget_name)
         self.tip1 = QLineEdit()
@@ -19,13 +20,13 @@ class StartR(QWidget):
             "Sync to next event flip": "No",
             "EyeTracker Name": "",
         }
-        self.status_message = VarLineEdit()
-        self.sync_to_next_event_flip = VarComboBox()
+        self.status_message = PigLineEdit()
+        self.sync_to_next_event_flip = PigComboBox()
         self.sync_to_next_event_flip.addItems(("No", "Yes"))
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = VarComboBox()
+        self.tracker_name = PigComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.msg = ""
@@ -96,14 +97,14 @@ class StartR(QWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.tabClosed.emit(self.widget_id)
+        self.tabClose.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
 
     def apply(self):
         self.msg = self.status_message.text()
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.getInfo())
 
     def setAttributes(self, attributes):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
@@ -130,9 +131,6 @@ class StartR(QWidget):
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
         return self.default_properties
 
-    def getProperties(self):
-        return self.getInfo()
-
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
@@ -140,21 +138,11 @@ class StartR(QWidget):
         else:
             print(f"此乱诏也，{self.__class__}不奉命")
 
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
     def loadSetting(self):
         self.status_message.setText(self.default_properties["Statue message"])
         self.sync_to_next_event_flip.setCurrentText(self.default_properties["Sync to next event flip"])
 
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
-
-    def clone(self, new_id: str):
-        clone_widget = StartR(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
 
     def getHiddenAttribute(self):
         """
@@ -163,9 +151,6 @@ class StartR(QWidget):
         hidden_attr = {
         }
         return hidden_attr
-
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
 
     def getStatusMessage(self) -> str:
         return self.status_message.text()
@@ -178,3 +163,36 @@ class StartR(QWidget):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = StartR(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

@@ -23,7 +23,7 @@ class Quest(QListWidgetItem):
         self.is_log10_transform = "Yes"
 
         # 设置图标
-        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.quest_type))))
+        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.quest_type))))
 
         self.default_properties = {
             "Quest Type": self.quest_type,

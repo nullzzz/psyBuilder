@@ -49,11 +49,11 @@ class VideoDisplay(TabItemMainWindow):
         self.setCentralWidget(self.label)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(Func.getImagePath("setting")), "setting", self)
+        open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
         open_pro.triggered.connect(self.openPro)
         tool.addAction(open_pro)
 
-        self.play_video = QAction(QIcon(Func.getImagePath("start_video")), "start", self)
+        self.play_video = QAction(QIcon(Func.getImage("start_video")), "start", self)
         self.play_video.triggered.connect(self.playVideo)
         tool.addAction(self.play_video)
         self.video_widget.play_and_pause.connect(lambda: self.play_video.trigger())
@@ -110,7 +110,7 @@ class VideoDisplay(TabItemMainWindow):
             else:
                 MessageBox.warning(self, "Warning", "The file path is invalid!")
         # 发送信号
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.getInfo())
 
     def parseProperties(self):
         self.start_pos = self.getStartTime(self.default_properties.get("Start position", "00:00:00.000"))
@@ -209,10 +209,10 @@ class VideoDisplay(TabItemMainWindow):
 
     def changeIcon(self, statue):
         if statue == QMediaPlayer.PlayingState:
-            self.play_video.setIcon(QIcon(Func.getImagePath("pause_video")))
+            self.play_video.setIcon(QIcon(Func.getImage("pause_video")))
             self.play_video.setText("pause")
         else:
-            self.play_video.setIcon(QIcon(Func.getImagePath("start_video")))
+            self.play_video.setIcon(QIcon(Func.getImage("start_video")))
             self.play_video.setText("start")
 
     def keyPressEvent(self, event: QKeyEvent):
@@ -244,39 +244,14 @@ class VideoDisplay(TabItemMainWindow):
         self.default_properties = self.pro_window.getInfo()
         return self.default_properties
 
-    def getProperties(self):
-        return self.getInfo()
-
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
             self.pro_window.setProperties(self.default_properties)
             self.apply()
 
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
-
     def loadSetting(self):
         self.pro_window.setProperties(self.default_properties)
-
-    def clone(self, new_id: str):
-        clone_widget = VideoDisplay(widget_id=new_id)
-        clone_widget.setPro(self.pro_window.clone())
-        clone_widget.apply()
-        return clone_widget
-
-    def getHiddenAttribute(self):
-        """
-        :return:
-        """
-        hidden_attr = {"onsettime": 0, "acc": 0, "resp": 0, "rt": 0}
-        return hidden_attr
-
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
 
     # 返回各项参数
     # 大部分以字符串返回，少数点击选择按钮返回布尔值
@@ -413,6 +388,41 @@ class VideoDisplay(TabItemMainWindow):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+            self.apply()
+
+    def clone(self, new_widget_id: str, new_widget_name):
+        clone_widget = VideoDisplay(new_widget_id, new_widget_name)
+        clone_widget.setPro(self.pro_window.clone())
+        clone_widget.apply()
+        return clone_widget
 
 
 # 支持全屏显示

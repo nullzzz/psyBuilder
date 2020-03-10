@@ -55,7 +55,7 @@ class Item(QListWidgetItem):
     def __init__(self, text: str = "", parent=None):
         super(Item, self).__init__(parent=parent)
         self.setText(text)
-        fp = Func.getImagePath(f"{text}.png")
+        fp = Func.getImage(f"{text}.png")
         # fp = f"D:\\PsyDemo\\image\\{text}.png"
         print(f"{fp}")
         self.setIcon(QIcon(fp))

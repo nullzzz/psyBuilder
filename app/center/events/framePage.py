@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QWidget, QLabel, \
     QCompleter
 
-from lib import VarComboBox, VarLineEdit, ColorListEditor
+from lib import PigComboBox, PigLineEdit, ColorListEditor
 
 
 class FramePage(QWidget):
@@ -21,22 +21,22 @@ class FramePage(QWidget):
             "Frame transparent": "100%"
         }
         # up
-        self.x_pos = VarComboBox()
+        self.x_pos = PigComboBox()
         self.x_pos.setReg(r"\d+%?")
-        self.y_pos = VarComboBox()
+        self.y_pos = PigComboBox()
         self.y_pos.setReg(r"\d+%?")
-        self.width = VarComboBox()
+        self.width = PigComboBox()
         self.width.setReg(r"\d+%?")
-        self.height = VarComboBox()
+        self.height = PigComboBox()
         self.height.setReg(r"\d+%?")
         # down
-        self.enable = VarComboBox()
+        self.enable = PigComboBox()
         self.enable.currentTextChanged.connect(self.operationAble)
         self.border_color = ColorListEditor()
-        self.border_width = VarLineEdit("0")
+        self.border_width = PigLineEdit("0")
         self.border_width.setReg(r"\d+")
         self.back_color = ColorListEditor()
-        self.transparent = VarLineEdit("100%")
+        self.transparent = PigLineEdit("100%")
         self.transparent.setReg(r"[0-9]%|[1-9]\d%|100%")
         self.enable.addItems(("No", "Yes"))
         self.setUI()

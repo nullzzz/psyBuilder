@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QMainWindow
 
 from app.func import Func
 from app.info import Info
-from app.kernel import Kernel
 from lib import TabWidget
 
 
@@ -35,7 +34,7 @@ class Center(QMainWindow):
         # open widget as a tab in tab widget
         # this widget may have been opened in tab widget
         widget_type = Func.getWidgetType(widget_id)
-        widget = Kernel.Widgets[widget_id]
+        widget = Info.Widgets[widget_id]
         self.tab_widget.openTab(widget, widget_type, widget.widget_name)
 
     def closeTab(self, widget_id: str) -> None:
@@ -44,7 +43,7 @@ class Center(QMainWindow):
         @param widget_id:
         @return:
         """
-        widget = Kernel.Widgets[widget_id]
+        widget = Info.Widgets[widget_id]
         self.tab_widget.closeTab(widget)
 
     def changeTabName(self, widget_id:str, widget_name: str) -> None:
@@ -54,7 +53,7 @@ class Center(QMainWindow):
         @param widget_name: new widget's name
         @return:
         """
-        widget = Kernel.Widgets[widget_id]
+        widget = Info.Widgets[widget_id]
         self.tab_widget.changeTabName(widget, widget_name)
 
     def handleTabChange(self, index: int):

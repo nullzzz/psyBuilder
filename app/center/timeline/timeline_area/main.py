@@ -165,21 +165,9 @@ class TimelineArea(QFrame):
             e.accept()
         elif data_format == Info.StructureMoveToTimeline:
             # move item in different timeline
-            if self.move_col != -1:
-                # if item exist in this timeline, it just move item in timeline
-                pass
-            else:
-                # we add item in this timeline and delete it in other timeline
-                pass
             # accept
             e.accept()
         elif data_format == Info.StructureReferToTimeline:
-            if self.move_col != -1:
-                # if item exist in timeline, it just move item in timeline
-                pass
-            else:
-                # we refer item in this timeline
-                pass
             # accept
             e.accept()
         else:

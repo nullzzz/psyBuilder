@@ -154,10 +154,10 @@ class Describer(QWidget):
         self.force_drift_correction.setCheckState((info.get("Force drift correction", "") == "Yes") * 2)
         self.pupil_size_mode.setCurrentText(info.get("Pupil size mode", "area"))
         self.IP_address.setText(info.get("IP address", "127.0.0.0"))
-        self.send_port.setValue(int(info.get("Send port", "0")))
-        self.receive_port.setValue(int(info.get("Receive port", "0")))
+        self.send_port.setValue(int(info.get("Send device_index", "0")))
+        self.receive_port.setValue(int(info.get("Receive device_index", "0")))
         self.ipv46_address.setText(info.get("Ipv4/Ipv6 address", "192.168.71.50"))
-        self.UDP_port.setValue(int(info.get("UDP port", "0")))
+        self.UDP_port.setValue(int(info.get("UDP device_index", "0")))
 
     def changeName(self, name: str):
         self.tracker_name.setText(name)

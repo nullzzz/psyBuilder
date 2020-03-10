@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPixmapItem
 
 from app.func import Func
 from app.info import Info
-from .gabor import GaborProperty
-from .snow import SnowProperty
+from ..item.gabor import GaborProperty
+from ..item.snow import SnowProperty
 
 
 class OtherItem(QGraphicsPixmapItem):
@@ -18,7 +18,7 @@ class OtherItem(QGraphicsPixmapItem):
     }
 
     def __init__(self, item_type, item_name: str = "", parent=None):
-        super(OtherItem, self).__init__()
+        super(OtherItem, self).__init__(parent=parent)
 
         self.item_type = item_type
         self.item_name = item_name if item_name else self.generateItemName()
@@ -27,10 +27,10 @@ class OtherItem(QGraphicsPixmapItem):
 
         if self.item_type == self.Snow:
             self.pro_window = SnowProperty()
-            self.setPixmap(QPixmap(Func.getImagePath("snow.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImage("snow.png")).scaled(100, 100))
         elif self.item_type == self.Gabor:
             self.pro_window = GaborProperty()
-            self.setPixmap(QPixmap(Func.getImagePath("gabor.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImage("gabor.png")).scaled(100, 100))
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)

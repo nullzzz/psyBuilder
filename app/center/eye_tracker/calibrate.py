@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QApplication, QPushButton, QLineEdit, QVBoxL
     QGridLayout
 
 from app.func import Func
-from lib import VarComboBox, ColorListEditor, MessageBox, TabItemWidget
+from lib import PigComboBox, ColorListEditor, TabItemWidget
 
 
 class EyeCalibrate(TabItemWidget):
@@ -22,27 +22,27 @@ class EyeCalibrate(TabItemWidget):
             "Target color": "(foreground)",
             "Target style": "default",
             "EyeTracker Name": "",
-            "Screen": "screen.0",
+            # "Screen": "screen.0",
         }
 
-        self.calibration_type = VarComboBox()
-        self.calibration_beep = VarComboBox()
+        self.calibration_type = PigComboBox()
+        self.calibration_beep = PigComboBox()
         self.target_color = ColorListEditor()
         self.target_color.setCurrentText("gray")
 
-        self.target_style = VarComboBox()
+        self.target_style = PigComboBox()
 
         self.using_tracker_id: str = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = VarComboBox()
+        self.tracker_name = PigComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
 
-        self.using_screen_id: str = ""
-        self.screen = VarComboBox()
-        self.screen_info = Func.getScreenInfo()
-        self.screen.addItems(self.screen_info.values())
-        self.screen.currentTextChanged.connect(self.changeScreen)
+        # self.using_screen_id: str = ""
+        # self.screen = PigComboBox()
+        # self.simple_info = Func.getScreenInfo()
+        # self.screen.addItems(self.simple_info.values())
+        # self.screen.currentTextChanged.connect(self.changeScreen)
 
         self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
@@ -74,14 +74,14 @@ class EyeCalibrate(TabItemWidget):
         l3 = QLabel("Target Color:")
         l4 = QLabel("Target Style:")
         l5 = QLabel("EyeTracker Name:")
-        l6 = QLabel("Screen Name:")
+        # l6 = QLabel("Screen Name:")
 
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
@@ -96,8 +96,8 @@ class EyeCalibrate(TabItemWidget):
         layout1.addWidget(self.target_style, 5, 1, 1, 1)
         layout1.addWidget(l5, 6, 0, 1, 1)
         layout1.addWidget(self.tracker_name, 6, 1, 1, 1)
-        layout1.addWidget(l6, 7, 0, 1, 1)
-        layout1.addWidget(self.screen, 7, 1, 1, 1)
+        # layout1.addWidget(l6, 7, 0, 1, 1)
+        # layout1.addWidget(self.screen, 7, 1, 1, 1)
 
         layout2 = QHBoxLayout()
         layout2.addStretch(10)
@@ -117,11 +117,11 @@ class EyeCalibrate(TabItemWidget):
                 self.using_tracker_id = k
                 break
 
-    def changeScreen(self, screen):
-        for k, v in self.screen_info.items():
-            if v == screen:
-                self.using_screen_id = k
-                break
+    # def changeScreen(self, screen):
+    #     for k, v in self.simple_info.items():
+    #         if v == screen:
+    #             self.using_screen_id = k
+    #             break
 
     def refresh(self):
         self.tracker_info = Func.getTrackerInfo()
@@ -132,14 +132,16 @@ class EyeCalibrate(TabItemWidget):
         if tracker_name:
             self.tracker_name.setCurrentText(tracker_name)
             self.using_tracker_id = tracker_id
-        self.screen_info = Func.getScreenInfo()
-        screen_id = self.using_screen_id
-        self.screen.clear()
-        self.screen.addItems(self.screen_info.values())
-        screen_name = self.screen_info.get(screen_id)
-        if screen_name:
-            self.screen.setCurrentText(screen_name)
-            self.using_screen_id = screen_id
+
+        # self.simple_info = Func.getScreenInfo()
+        # screen_id = self.using_screen_id
+        # self.screen.clear()
+        # self.screen.addItems(self.simple_info.values())
+        # screen_name = self.simple_info.get(screen_id)
+        # if screen_name:
+        #     self.screen.setCurrentText(screen_name)
+        #     self.using_screen_id = screen_id
+
         # 更新attributes
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
@@ -149,30 +151,13 @@ class EyeCalibrate(TabItemWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.tabClosed.emit(self.widget_id)
+        self.tabClose.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
 
     def apply(self):
-        self.propertiesChanged.emit(self.widget_id)
-
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color:black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                MessageBox.warning(self, "Warning", "Invalid Attribute!", MessageBox.Ok)
-                temp.clear()
+        self.propertiesChange.emit(self.getInfo())
 
     def setAttributes(self, attributes):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
@@ -199,11 +184,8 @@ class EyeCalibrate(TabItemWidget):
         self.default_properties["Target color"] = self.target_color.getColor()
         self.default_properties["Target style"] = self.target_style.currentText()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
-        self.default_properties["Screen Name"] = self.screen.currentText()
+        # self.default_properties["Screen Name"] = self.screen.currentText()
         return self.default_properties
-
-    def getProperties(self):
-        return self.getInfo()
 
     def setProperties(self, properties: dict):
         if properties:
@@ -212,23 +194,13 @@ class EyeCalibrate(TabItemWidget):
         else:
             print("此乱诏也，恕不奉命")
 
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
     def loadSetting(self):
         self.calibration_type.setCurrentText(self.default_properties["Calibration type"])
         self.calibration_beep.setCurrentText(self.default_properties["Calibration beep"])
         self.target_color.setCurrentText(self.default_properties["Target color"])
         self.target_style.setCurrentText(self.default_properties["Target style"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
-        self.screen.setCurrentText(self.default_properties["Screen Name"])
-
-    def clone(self, new_id: str):
-        clone_widget = EyeCalibrate(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
+        # self.screen.setCurrentText(self.default_properties["Screen Name"])
 
     def getHiddenAttribute(self):
         """
@@ -238,9 +210,6 @@ class EyeCalibrate(TabItemWidget):
         }
         return hidden_attr
 
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
-
     def getCalibrationType(self) -> str:
         return self.calibration_type.currentText()
 
@@ -248,16 +217,49 @@ class EyeCalibrate(TabItemWidget):
         return self.calibration_beep.currentText()
 
     def getTargetColor(self) -> str:
-        return self.target_color.text()
+        return self.target_color.getColor()
 
     def getTargetStyle(self) -> str:
-        return self.target_style.text()
+        return self.target_style.currentText()
 
     def getTrackerName(self) -> str:
         return self.tracker_name.currentText()
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = EyeCalibrate(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget
 
 
 if __name__ == '__main__':

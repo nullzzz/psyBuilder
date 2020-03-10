@@ -38,7 +38,7 @@ class Preview(QDialog):
     def paintEvent(self, e):
         painter = QPainter(self)
         pix = QPixmap()
-        pix.load(Func.getImagePath("preview_tip"))
+        pix.load(Func.getImage("preview_tip"))
         painter.drawPixmap(
             self.start_x,
             self.start_y,

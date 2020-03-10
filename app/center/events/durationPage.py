@@ -2,15 +2,16 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGroupBox, \
     QHBoxLayout, QGridLayout, QVBoxLayout, QCompleter, QListWidgetItem
 
-from app.center.events.inDevicePro import InDeviceInfoAtDuration, InDeviceRespAtDuration
-from app.center.events.outDevicePro import OutDeviceInfoAtDuration
+from app.func import Func
+from app.info import Info
 from app.menubar.deviceSelection.IODevice.duration.InputDeviceItem import DeviceInItem
 from app.menubar.deviceSelection.IODevice.duration.OutputDeviceItem import DeviceOutItem
 from app.menubar.deviceSelection.IODevice.duration.deviceChooseDialog import DeviceInDialog, DeviceOutDialog
 from app.menubar.deviceSelection.IODevice.duration.deviceShowArea import ShowArea
-from app.func import Func
-from app.info import Info
-from lib import VarComboBox
+from lib import PigComboBox
+from .inDevicePro import InDeviceInfoAtDuration, InDeviceRespAtDuration, \
+    InDeviceActionAtDuration
+from .outDevicePro import OutDeviceInfoAtDuration
 
 
 class DurationPage(QWidget):
@@ -24,10 +25,9 @@ class DurationPage(QWidget):
             "Output devices": {}
         }
         # top
-        self.duration = VarComboBox()
-
+        self.duration = PigComboBox()
         self.duration.setReg(r"\(Infinite\)|\d+|\d+~\d+")
-        # self.duration.installEventFilter(self)
+
         # output device
         # 输出设备
         self.out_devices = ShowArea()
@@ -50,11 +50,14 @@ class DurationPage(QWidget):
         # input device
         self.in_info = InDeviceInfoAtDuration()
         self.in_resp = InDeviceRespAtDuration()
+        self.in_action = InDeviceActionAtDuration()
         self.out_devices.usingOutputDeviceUpdate.connect(self.in_resp.changeOutputDevice)
         self.in_tip1 = QLabel("Add input device(s) first")
         self.in_tip2 = QLabel("Resp Trigger:")
+        self.in_tip3 = QLabel("Eye Action Correct:")
         self.in_tip1.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.in_tip2.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.in_tip3.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
         # self.selected_in_devices = []
         self.in_devices = ShowArea(device_type=Info.INPUT_DEVICE)
@@ -67,10 +70,16 @@ class DurationPage(QWidget):
         self.in_resp.wrongChanged.connect(self.in_devices.changeWrong)
         self.in_resp.ignoreChanged.connect(self.in_devices.changeIgnore)
         self.in_resp.outputChanged.connect(self.in_devices.changeOutput)
+        self.in_action.startChanged.connect(self.in_devices.changeStart)
+        self.in_action.endChanged.connect(self.in_devices.changeEnd)
+        self.in_action.meanChanged.connect(self.in_devices.changeMean)
+        self.in_action.isOvalChanged.connect(self.in_devices.changeIsOval)
         self.in_info.hide()
         self.in_resp.hide()
+        self.in_action.hide()
         self.in_devices.infoChanged.connect(self.in_info.showInfo)
         self.in_devices.respChanged.connect(self.in_resp.showResp)
+        self.in_devices.actionChanged.connect(self.in_action.showAction)
         self.in_devices.areaStatus.connect(self.controlInDevice)
         self.in_add_bt = QPushButton("&Add...")
         self.in_del_bt = QPushButton("&Remove...")
@@ -115,6 +124,8 @@ class DurationPage(QWidget):
         layout2.addWidget(self.in_info, 0, 2, 5, 2)
         layout2.addWidget(self.in_tip2, 5, 0, 2, 4)
         layout2.addWidget(self.in_resp, 5, 0, 2, 4)
+        layout2.addWidget(self.in_tip3, 7, 0, 2, 4)
+        layout2.addWidget(self.in_action, 7, 0, 2, 4)
         layout2.setVerticalSpacing(0)
         group2.setLayout(layout2)
 
@@ -196,8 +207,10 @@ class DurationPage(QWidget):
             self.in_del_bt.setEnabled(False)
             self.in_tip1.show()
             self.in_tip2.show()
+            self.in_tip3.show()
             self.in_info.hide()
             self.in_resp.hide()
+            self.in_action.hide()
         elif status == -1:
             self.in_add_bt.setEnabled(False)
         else:
@@ -205,8 +218,13 @@ class DurationPage(QWidget):
             self.in_del_bt.setEnabled(True)
             self.in_info.show()
             self.in_resp.show()
+            self.in_action.show()
+
             self.in_tip1.hide()
             self.in_tip2.hide()
+            self.in_tip3.hide()
+
+        self.in_action.setEnabled(status == 3)
 
     def setAttributes(self, attributes: list):
         self.attributes = attributes

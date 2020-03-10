@@ -15,4 +15,30 @@
 > none
 
 ## api
-> none
+> rowCount(self) -> int
+>> 返回table共有多少行
+>
+> columnCount(self) -> int
+>> 返回table共有多少列
+>
+> getTimelines(self) -> list
+>> 按顺序进行返回所有设置的timeline  
+>> 格式为 [ [timeline_name, timeline_widget_id], [], ... ]  
+>> 如果某行为空则改行对应的数据为[ '', '']
+>
+> getAttributes(self, row: int) -> dict
+>> 按行索引返回该行的数据的一个字典  
+>> 格式为{ attribute_name : attribute_value }  
+>> 如果属性值未填写则为 ''  
+>
+> getAttributeValues(self, col: int) -> list
+>> 通过输入的列索引，返回该列对应的attribute的所有value的一个列表
+>
+> getOrder(self) -> str
+>> 得到设置界面中order的值
+>
+> getNoRepeatAfter(self) -> str
+>> 如上类推
+>
+> getOrderBy
+>> 如上类推

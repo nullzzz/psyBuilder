@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QFontComboBox, QCompleter
 
-from lib import VarComboBox, VarLineEdit, ColorListEditor
+from lib import PigComboBox, PigLineEdit, ColorListEditor
 
 
 class TextGeneral(QWidget):
@@ -19,11 +19,11 @@ class TextGeneral(QWidget):
             "Transparent": "100%",
         }
 
-        self.cx_pos = VarComboBox()
+        self.cx_pos = PigComboBox()
         self.cx_pos.setEditable(True)
         self.cx_pos.addItem('100')
 
-        self.cy_pos = VarComboBox()
+        self.cy_pos = PigComboBox()
         self.cy_pos.setEditable(True)
         self.cy_pos.addItem('100')
 
@@ -34,29 +34,29 @@ class TextGeneral(QWidget):
         # self.fore_color_name = "black"
         # self.back_color_name = "white"
 
-        self.transparent = VarLineEdit("100%")
+        self.transparent = PigLineEdit("100%")
         self.transparent.setReg(r"0%|[1-9]\d%|100%")
 
-        self.flip_horizontal = VarComboBox()
+        self.flip_horizontal = PigComboBox()
         self.flip_horizontal.addItems(("No", "Yes"))
-        self.flip_vertical = VarComboBox()
+        self.flip_vertical = PigComboBox()
         self.flip_vertical.addItems(("No", "Yes"))
 
         self.font_box = QFontComboBox()
 
-        self.style_box = VarComboBox()
+        self.style_box = PigComboBox()
         self.style_box.setEditable(True)
         self.style_box.addItems(
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
         # self.style_box.currentTextChanged.connect(self.fontChange)
-        self.font_size_box = VarComboBox()
+        self.font_size_box = PigComboBox()
         self.font_size_box.setReg(r"\d+")
         self.font_size_box.setEditable(True)
         for i in range(12, 72, 2):
             self.font_size_box.addItem(str(i))
             self.font_size_box.setCurrentText('20')
 
-        self.right_to_left = VarComboBox()
+        self.right_to_left = PigComboBox()
         self.right_to_left.addItems(("No", "Yes"))
 
         self.setUI()

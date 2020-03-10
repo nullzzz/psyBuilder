@@ -21,13 +21,13 @@ class Device(QListWidgetItem):
         elif device_type == "parallel_port":
             self.port = "D010"
         elif device_type == "serial_port":
-            self.port = "com1"
+            self.port = "COM1"
         elif device_type == "screen":
             self.port = "0"
         elif device_type == "sound":
             self.port = "1"
         elif device_type in ("keyboard","mouse","game pad"):
-            self.port = "0"
+            self.port = "auto"
         else:
             self.port = "null"
 
@@ -49,7 +49,7 @@ class Device(QListWidgetItem):
         self.device_id: str = device_id
 
         # 设置图标
-        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.device_type))))
+        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
 
         self.default_properties = {
             "Device Type": self.device_type,
@@ -97,9 +97,11 @@ class Device(QListWidgetItem):
         if port.startswith("screen") or port.startswith("sound"):
             self.port = port.split(".")[-1]
         elif port.startswith("serial_port"):
-            self.port = f"com{port.split('.')[-1]}"
+            self.port = f"COM{port.split('.')[-1]}"
         elif port.startswith("keyboard") or port.startswith("mouse") or port.startswith("game pad"):
-            self.port = port.split(".")[-1]
+            self.port = 'auto'
+            # only works for the old input devices
+            # self.port = port.split(".")[-1]
         elif port.startswith(self.device_type):
             pass
         else:

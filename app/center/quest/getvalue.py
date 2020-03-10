@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, Q
                              QCompleter)
 
 from app.func import Func
-from lib import VarLineEdit, MessageBox, TabItemWidget
+from lib import PigLineEdit, MessageBox, TabItemWidget
 
 
 class QuestGetValue(TabItemWidget):
@@ -21,9 +21,9 @@ class QuestGetValue(TabItemWidget):
             "Line2": "",
             "Experimental variable for test value": "quest test value",
         }
-        self.line1 = VarLineEdit()
-        self.line2 = VarLineEdit()
-        self.experimental = VarLineEdit()
+        self.line1 = PigLineEdit()
+        self.line2 = PigLineEdit()
+        self.experimental = PigLineEdit()
 
         self.line1.returnPressed.connect(self.finalCheck)
         self.line2.returnPressed.connect(self.finalCheck)
@@ -80,13 +80,13 @@ class QuestGetValue(TabItemWidget):
         self.apply()
         self.close()
         # 关闭信号
-        self.tabClosed.emit(self.widget_id)
+        self.tabClose.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
 
     def apply(self):
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.getInfo())
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
@@ -133,9 +133,6 @@ class QuestGetValue(TabItemWidget):
         self.default_properties["Experimental variable for test value"] = self.experimental.text()
         return self.default_properties
 
-    def getProperties(self):
-        return self.getInfo()
-
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
@@ -143,20 +140,10 @@ class QuestGetValue(TabItemWidget):
         else:
             print(f"此乱诏也，{self.__class__}不奉命")
 
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
     def loadSetting(self):
         self.line1.setText(self.default_properties["Line1"])
         self.line2.setText(self.default_properties["Line2"])
         self.experimental.setText(self.default_properties["Experimental variable for test value"])
-
-    def clone(self, new_id: str):
-        clone_widget = QuestGetValue(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
 
     def getHiddenAttribute(self):
         """
@@ -166,8 +153,38 @@ class QuestGetValue(TabItemWidget):
         }
         return hidden_attr
 
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
-
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = QuestGetValue(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

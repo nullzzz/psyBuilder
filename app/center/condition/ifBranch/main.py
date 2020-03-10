@@ -1,7 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QGroupBox, QPushButton, QVBoxLayout, QHBoxLayout, QApplication
+from PyQt5.QtWidgets import QGroupBox, QPushButton, QVBoxLayout, QHBoxLayout
 
 from app.func import Func
+from app.info import Info
 from lib import TabItemWidget
 from .condition import ConditionArea
 from ..iconChoose import IconChoose
@@ -14,16 +15,13 @@ class IfBranch(TabItemWidget):
         "Yes": "",
         "No": ""
     }
-
     """
-
-    itemAdded = pyqtSignal(str, str, str)
+    itemAdded = pyqtSignal(str, str, str, int)
     itemDeleted = pyqtSignal(str)
-    itemNameChanged = pyqtSignal(str, str)
+    itemNameChanged = pyqtSignal(int, str, str)
 
     def __init__(self, widget_id: str, widget_name: str):
         super(IfBranch, self).__init__(widget_id, widget_name)
-
         self.attributes: list = []
         self.using_attributes: list = []
 
@@ -32,14 +30,14 @@ class IfBranch(TabItemWidget):
         # 事件
 
         self.true_icon_choose = IconChoose()
-        self.true_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b))
+        self.true_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b, 0))
         self.true_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(a))
-        self.true_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
+        self.true_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(Info.IfSend, a, b))
 
         self.false_icon_choose = IconChoose()
-        self.false_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b))
+        self.false_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b, 0))
         self.false_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(a))
-        self.false_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
+        self.false_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(Info.IfSend, a, b))
 
         self.default_properties = {
             "Condition": self.condition_area.getInfo(),
@@ -97,9 +95,6 @@ class IfBranch(TabItemWidget):
         self.default_properties["No"] = self.false_icon_choose.getInfo()
         return self.default_properties
 
-    def getProperties(self):
-        return self.getInfo()
-
     def ok(self):
         self.apply()
         self.close()
@@ -110,7 +105,7 @@ class IfBranch(TabItemWidget):
 
     def apply(self):
         self.getInfo()
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.default_properties)
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
@@ -124,20 +119,10 @@ class IfBranch(TabItemWidget):
             self.default_properties = properties.copy()
             self.loadSetting()
 
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
     def loadSetting(self):
         self.condition_area.setProperties(self.default_properties.get("Condition", {}))
         self.true_icon_choose.setProperties(self.default_properties.get("Yes", {}))
         self.false_icon_choose.setProperties(self.default_properties.get("No", {}))
-
-    def clone(self, new_id: str):
-        clone_widget = IfBranch(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
 
     # 设置可选参数
     def setAttributes(self, attributes):
@@ -145,13 +130,6 @@ class IfBranch(TabItemWidget):
         self.condition_area.setAttributes(format_attributes)
         self.true_icon_choose.setAttributes(format_attributes)
         self.false_icon_choose.setAttributes(format_attributes)
-
-    def getHiddenAttribute(self):
-        """
-        :return:
-        """
-        hidden_attr = {"onsettime": 0, "acc": 0, "resp": 0, "rt": 0}
-        return hidden_attr
 
     # 返回当前选择attributes
     def getUsingAttributes(self):
@@ -166,9 +144,6 @@ class IfBranch(TabItemWidget):
             elif isinstance(v, str):
                 if v.startswith("[") and v.endswith("]"):
                     using_attributes.append(v[1:-1])
-
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
 
     def getCondition(self) -> str:
         """
@@ -196,14 +171,35 @@ class IfBranch(TabItemWidget):
     def getSubWidgetId(self):
         return self.true_icon_choose.widget_id, self.false_icon_choose.widget_id
 
+    """
+    Functions that must be complete in new version
+    """
 
-if __name__ == "__main__":
-    import sys
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
 
-    app = QApplication(sys.argv)
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
 
-    pro = IfBranch()
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
 
-    pro.show()
-
-    sys.exit(app.exec())
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = IfBranch(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

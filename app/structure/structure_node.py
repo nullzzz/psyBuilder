@@ -15,7 +15,7 @@ class StructureNode(QTreeWidgetItem):
         self.old_text = ""
         # set its icon
         widget_type = Func.getWidgetType(widget_id)
-        self.setIcon(0, Func.getImage(f"widgets/{widget_type}", 1))
+        self.setIcon(0, Func.getImageObject(f"widgets/{widget_type}", 1))
         self.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
 
     def moveChild(self, index: int, node: QTreeWidgetItem):
@@ -58,3 +58,6 @@ class StructureNode(QTreeWidgetItem):
         @return:
         """
         return self.old_text != self.text(0)
+
+    def __repr__(self):
+        return f"Structure Node [{self.widget_id}: {self.text(0)}]"

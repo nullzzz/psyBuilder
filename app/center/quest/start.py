@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, Q
                              QCompleter)
 
 from app.func import Func
-from lib import VarLineEdit, VarComboBox, MessageBox, TabItemWidget
+from lib import PigLineEdit, PigComboBox, MessageBox, TabItemWidget
 
 
 class QuestInit(TabItemWidget):
@@ -29,16 +29,16 @@ class QuestInit(TabItemWidget):
             "Is log10 transform": "quest test value",
         }
 
-        self.estimated_threshold = VarLineEdit()
-        self.std_dev = VarLineEdit()
-        self.desired_proportion = VarLineEdit()
-        self.steepness = VarLineEdit()
-        self.proportion = VarLineEdit()
-        self.chance_level = VarLineEdit()
-        self.method = VarComboBox()
-        self.minimum = VarLineEdit()
-        self.maximum = VarLineEdit()
-        self.is_log10_transform = VarLineEdit()
+        self.estimated_threshold = PigLineEdit()
+        self.std_dev = PigLineEdit()
+        self.desired_proportion = PigLineEdit()
+        self.steepness = PigLineEdit()
+        self.proportion = PigLineEdit()
+        self.chance_level = PigLineEdit()
+        self.method = PigComboBox()
+        self.minimum = PigLineEdit()
+        self.maximum = PigLineEdit()
+        self.is_log10_transform = PigLineEdit()
 
         self.estimated_threshold.textChanged.connect(self.findVar)
         self.std_dev.textChanged.connect(self.findVar)
@@ -122,13 +122,13 @@ class QuestInit(TabItemWidget):
         self.apply()
         self.close()
         # 关闭信号
-        self.tabClosed.emit(self.widget_id)
+        self.tabClose.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
 
     def apply(self):
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.getInfo())
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
@@ -189,20 +189,12 @@ class QuestInit(TabItemWidget):
         self.default_properties["Is log10 transform"] = self.is_log10_transform.text()
         return self.default_properties
 
-    def getProperties(self):
-        return self.getInfo()
-
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
             self.loadSetting()
         else:
             print(f"此乱诏也，{self.__class__}不奉命")
-
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
 
     def loadSetting(self):
         self.estimated_threshold.setText(self.default_properties["Estimated threshold"])
@@ -217,11 +209,6 @@ class QuestInit(TabItemWidget):
         self.maximum.setText(self.default_properties["Maximum test value"])
         self.is_log10_transform.setText(self.default_properties["Is log10 transform"])
 
-    def clone(self, new_id: str):
-        clone_widget = QuestInit(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
-
     def getHiddenAttribute(self):
         """
         :return:
@@ -231,8 +218,38 @@ class QuestInit(TabItemWidget):
         }
         return hidden_attr
 
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
-
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = QuestInit(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

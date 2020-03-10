@@ -51,9 +51,9 @@ class ImageDisplay(TabItemMainWindow):
         self.setCentralWidget(self.label)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(Func.getImagePath("setting")), "setting", self)
+        open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
         open_pro.triggered.connect(self.openPro)
-        pre_view = QAction(QIcon(Func.getImagePath("preview")), "preview", self)
+        pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
         pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
         tool.addAction(pre_view)
@@ -114,7 +114,7 @@ class ImageDisplay(TabItemMainWindow):
         else:
             self.label.clear()
         # 发送信号
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.default_properties)
 
     # 从pro获取参数
     def parseProperties(self):
@@ -166,20 +166,11 @@ class ImageDisplay(TabItemMainWindow):
         self.default_properties = self.pro_window.getInfo()
         return self.default_properties
 
-    def getProperties(self):
-        return self.getInfo()
-
     def getShowProperties(self):
         info = self.default_properties.copy()
         info.pop("Input devices")
         info.pop("Output devices")
         return info
-
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
 
     def setPro(self, pro: ImageProperty):
         del self.pro_window
@@ -215,24 +206,6 @@ class ImageDisplay(TabItemMainWindow):
 
     def loadSetting(self):
         self.pro_window.setProperties(self.default_properties)
-
-    # copy当前image对象
-    def clone(self, new_id: str):
-        clone_widget = ImageDisplay(widget_id=new_id)
-        clone_widget.setPro(self.pro_window.clone())
-        clone_widget.apply()
-        return clone_widget
-
-    # todo 弄啥嘞
-    def getHiddenAttribute(self):
-        """
-        :return:
-        """
-        hidden_attr = {"onsettime": 0, "acc": 0, "resp": 0, "rt": 0}
-        return hidden_attr
-
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
 
     # 返回各项参数
     # 大部分以字符串返回，少数点击选择按钮返回布尔值
@@ -389,3 +362,37 @@ class ImageDisplay(TabItemMainWindow):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+            self.apply()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = ImageDisplay(new_widget_id, new_widget_name)
+        clone_widget.setPro(self.pro_window.clone())
+        clone_widget.apply()
+        return clone_widget

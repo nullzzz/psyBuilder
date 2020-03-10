@@ -60,17 +60,17 @@ class CycleTable(QTableWidget):
         # menu
         self.menu = QMenu()
         # copy action
-        self.copy_action = self.menu.addAction(Func.getImage("menu/copy.png", 1), "Copy",
+        self.copy_action = self.menu.addAction(Func.getImageObject("menu/copy.png", 1), "Copy",
                                                self.copyActionFunc, QKeySequence())
-        self.paste_action = self.menu.addAction(Func.getImage("menu/paste.png", 1), "Paste",
+        self.paste_action = self.menu.addAction(Func.getImageObject("menu/paste.png", 1), "Paste",
                                                 self.pasteActionFunc, QKeySequence())
-        self.insert_row_action = self.menu.addAction(Func.getImage("menu/insert_row.png", 1), "Insert Row",
+        self.insert_row_action = self.menu.addAction(Func.getImageObject("menu/insert_row.png", 1), "Insert Row",
                                                      self.insertRowsActionFunc, QKeySequence())
-        self.insert_col_action = self.menu.addAction(Func.getImage("menu/insert_col.png", 1), "Insert Attribute",
+        self.insert_col_action = self.menu.addAction(Func.getImageObject("menu/insert_col.png", 1), "Insert Attribute",
                                                      self.insertAttributesActionFunc, QKeySequence())
-        self.delete_rows_action = self.menu.addAction(Func.getImage("menu/delete_row.png", 1), "Delete Rows",
+        self.delete_rows_action = self.menu.addAction(Func.getImageObject("menu/delete_row.png", 1), "Delete Rows",
                                                       self.deleteRowsActionFunc, QKeySequence())
-        self.delete_cols_action = self.menu.addAction(Func.getImage("menu/delete_col.png", 1), "Delete Attributes",
+        self.delete_cols_action = self.menu.addAction(Func.getImageObject("menu/delete_col.png", 1), "Delete Attributes",
                                                       self.deleteAttributesActionFunc, QKeySequence())
         # shortcut
         self.copy_shortcut = QShortcut(QKeySequence(QKeySequence.Copy), self)

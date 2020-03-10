@@ -1,8 +1,8 @@
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QCompleter
+from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QCompleter
 
 from app.func import Func
-from lib import VarLineEdit, VarComboBox, MessageBox,TabItemWidget
+from lib import PigLineEdit, PigComboBox, TabItemWidget
 
 
 class EndR(TabItemWidget):
@@ -16,15 +16,13 @@ class EndR(TabItemWidget):
         self.default_properties = {"Statue message": "",
                                    "EyeTracker Name": "", }
 
-        self.status_message = VarLineEdit()
-        self.status_message.textChanged.connect(self.findVar)
-        self.status_message.returnPressed.connect(self.finalCheck)
+        self.status_message = PigLineEdit()
 
         self.msg = ""
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = VarComboBox()
+        self.tracker_name = PigComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.bt_ok = QPushButton("OK")
@@ -96,31 +94,14 @@ class EndR(TabItemWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.tabClosed.emit(self.widget_id)
+        self.tabClose.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
 
     def apply(self):
         self.msg = self.status_message.text()
-        self.propertiesChanged.emit(self.widget_id)
-
-    # 检查变量
-    def findVar(self, text):
-        if text in self.attributes:
-            self.sender().setStyleSheet("color: blue")
-            self.sender().setFont(QFont("Timers", 9, QFont.Bold))
-        else:
-            self.sender().setStyleSheet("color:black")
-            self.sender().setFont(QFont("宋体", 9, QFont.Normal))
-
-    def finalCheck(self):
-        temp = self.sender()
-        text = temp.text()
-        if text not in self.attributes:
-            if text and text[0] == "[":
-                MessageBox.warning(self, "Warning", "Invalid Attribute!", MessageBox.Ok)
-                temp.clear()
+        self.propertiesChange.emit(self.getInfo())
 
     def setAttributes(self, attributes):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
@@ -145,9 +126,6 @@ class EndR(TabItemWidget):
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
         return self.default_properties
 
-    def getProperties(self):
-        return self.getInfo()
-
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
@@ -155,19 +133,9 @@ class EndR(TabItemWidget):
         else:
             print("此乱诏也，恕不奉命")
 
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
     def loadSetting(self):
         self.status_message.setText(self.default_properties["Statue message"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
-
-    def clone(self, new_id: str):
-        clone_widget = EndR(widget_id=new_id)
-        clone_widget.setInfo(self.default_properties)
-        return clone_widget
 
     def getHiddenAttribute(self):
         """
@@ -175,9 +143,6 @@ class EndR(TabItemWidget):
         """
         hidden_attr = {}
         return hidden_attr
-
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
 
     def getStatusMessage(self) -> str:
         return self.status_message.text()
@@ -187,3 +152,36 @@ class EndR(TabItemWidget):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = EndR(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

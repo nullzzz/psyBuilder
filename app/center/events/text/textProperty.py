@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout)
 
-from app.center.events.durationPage import DurationPage
-from app.center.events.framePage import FramePage
-from app.center.events.text.textGeneral import TextTab1
+from .textGeneral import TextTab1
+from ..durationPage import DurationPage
+from ..framePage import FramePage
 
 
 class TextProperty(QWidget):

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QLabel, QApplication, QPushButton, QLineEdit, QVBoxL
     QGridLayout
 
 from app.func import Func
-from lib import VarComboBox, TabItemWidget
+from lib import PigComboBox, TabItemWidget
 
 
 class EyeAction(TabItemWidget):
@@ -14,11 +14,11 @@ class EyeAction(TabItemWidget):
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
-        self.status_message = VarComboBox()
+        self.status_message = PigComboBox()
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getTrackerInfo()
-        self.tracker_name = VarComboBox()
+        self.tracker_name = PigComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
 
@@ -94,22 +94,19 @@ class EyeAction(TabItemWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.tabClosed.emit(self.widget_id)
+        self.tabClose.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
 
     def apply(self):
         self.msg = self.status_message.currentText()
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.getInfo())
 
     def getInfo(self):
         self.default_properties["Status Message"] = self.status_message.currentText()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
         return self.default_properties
-
-    def getProperties(self):
-        return self.getInfo()
 
     def setProperties(self, properties: dict):
         if properties:
@@ -118,19 +115,9 @@ class EyeAction(TabItemWidget):
         else:
             print("此乱诏也，恕不奉命")
 
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
     def loadSetting(self):
         self.status_message.setCurrentText(self.default_properties["Status Message"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
-
-    def clone(self, new_id: str):
-        clone_widget = EyeAction(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
 
     def setAttributes(self, attributes):
         pass
@@ -148,9 +135,6 @@ class EyeAction(TabItemWidget):
         }
         return hidden_attr
 
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
-
     def getStatusMessage(self) -> str:
         return self.status_message.currentText()
 
@@ -159,6 +143,39 @@ class EyeAction(TabItemWidget):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = EyeAction(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget
 
 
 if __name__ == '__main__':

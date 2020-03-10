@@ -27,7 +27,7 @@ class Tracker(QListWidgetItem):
         self.tobii_glasses_UDP_port_number = "0"
 
         # 设置图标
-        self.setIcon(QIcon(Func.getImagePath("{}_device.png".format(self.tracker_type))))
+        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.tracker_type))))
 
         self.default_properties = {
             "Tracker Type": self.tracker_type,
@@ -140,10 +140,10 @@ class Tracker(QListWidgetItem):
         self.force_drift_correction = self.default_properties["Force drift correction"]
         self.pupil_size_mode = self.default_properties["Pupil size mode"]
         self.IP_address = self.default_properties["IP address"]
-        self.send_port_number = self.default_properties["Send port"]
-        self.receive_port_number = self.default_properties["Receive port"]
+        self.send_port_number = self.default_properties["Send device_index"]
+        self.receive_port_number = self.default_properties["Receive device_index"]
         self.tobii_glasses_ipv46_address = self.default_properties["Ipv4/Ipv6 address"]
-        self.tobii_glasses_UDP_port_number = self.default_properties["UDP port"]
+        self.tobii_glasses_UDP_port_number = self.default_properties["UDP device_index"]
 
     def getInfo(self):
         self.default_properties.clear()
@@ -158,8 +158,8 @@ class Tracker(QListWidgetItem):
         self.default_properties["Force drift correction"] = self.force_drift_correction
         self.default_properties["Pupil size mode"] = self.pupil_size_mode
         self.default_properties["IP address"] = self.IP_address
-        self.default_properties["Send port"] = self.send_port_number
-        self.default_properties["Receive port"] = self.receive_port_number
+        self.default_properties["Send device_index"] = self.send_port_number
+        self.default_properties["Receive device_index"] = self.receive_port_number
         self.default_properties["Ipv4/Ipv6 address"] = self.tobii_glasses_ipv46_address
-        self.default_properties["UDP port"] = self.tobii_glasses_UDP_port_number
+        self.default_properties["UDP device_index"] = self.tobii_glasses_UDP_port_number
         return self.default_properties

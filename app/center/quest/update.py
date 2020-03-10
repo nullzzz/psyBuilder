@@ -2,23 +2,24 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout
 
 from app.func import Func
-from lib import VarComboBox, MessageBox, TabItemWidget
+from lib import PigComboBox, TabItemWidget
 
 
 class QuestUpdate(TabItemWidget):
     def __init__(self, widget_id: str, widget_name: str):
         super(QuestUpdate, self).__init__(widget_id, widget_name)
+
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
         self.attributes = []
         self.default_properties = {"Is correct": "1"}
-        self.response_variable = VarComboBox()
+        self.response_variable = PigComboBox()
         self.response_variable.addItems(["1", "0"])
 
         self.quest_info = Func.getQuestInfo()
-        self.quest_name = VarComboBox()
+        self.quest_name = PigComboBox()
         self.quest_name.currentTextChanged.connect(self.changeQuestId)
 
         self.using_quest_id = ""
@@ -72,7 +73,7 @@ class QuestUpdate(TabItemWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.tabClosed.emit(self.widget_id)
+        self.tabClose.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
@@ -95,7 +96,7 @@ class QuestUpdate(TabItemWidget):
 
     def apply(self):
         self.resp = self.response_variable.currentText()
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.getInfo())
 
     # 检查变量
     def findVar(self, text):
@@ -111,7 +112,7 @@ class QuestUpdate(TabItemWidget):
         text = temp.text()
         if text not in self.attributes:
             if text and text[0] == "[":
-                MessageBox.warning(self, "Warning", "Invalid Attribute!", MessageBox.Ok)
+                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
                 temp.clear()
 
     def setAttributes(self, attributes):
@@ -138,9 +139,6 @@ class QuestUpdate(TabItemWidget):
         self.default_properties["Quest name"] = self.quest_name.currentText()
         return self.default_properties
 
-    def getProperties(self):
-        return self.getInfo()
-
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
@@ -148,19 +146,9 @@ class QuestUpdate(TabItemWidget):
         else:
             print(f"此乱诏也，{self.__class__}不奉命")
 
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
     def loadSetting(self):
         self.response_variable.setCurrentText(self.default_properties["Is correct"])
         self.quest_name.setCurrentText(self.default_properties["Quest name"])
-
-    def clone(self, new_id: str):
-        clone_widget = QuestUpdate(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
 
     def getHiddenAttribute(self):
         """
@@ -169,11 +157,41 @@ class QuestUpdate(TabItemWidget):
         hidden_attr = {}
         return hidden_attr
 
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
-
     def getResponseVariable(self) -> str:
         return self.response_variable.currentText()
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
+
+    """
+    Functions that must be complete in new version
+    """
+
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def clone(self, new_widget_id: str, new_widget_name):
+        clone_widget = QuestUpdate(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget

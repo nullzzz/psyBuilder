@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton, QGridLayout, QLabel, QFileDialog, QCompleter, QWidget, QGroupBox, \
     QVBoxLayout
 
-from lib import VarComboBox, VarLineEdit
+from lib import PigComboBox, PigLineEdit
 
 
 class VideoGeneral(QWidget):
@@ -22,27 +22,27 @@ class VideoGeneral(QWidget):
             "Height": "100%",
         }
         # general
-        self.file_name = VarLineEdit()
+        self.file_name = PigLineEdit()
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
-        self.start_pos = VarLineEdit()
-        self.end_pos = VarLineEdit()
+        self.start_pos = PigLineEdit()
+        self.end_pos = PigLineEdit()
 
         # 倍速
-        self.playback_rate = VarComboBox()
+        self.playback_rate = PigComboBox()
         self.playback_rate_tip = QLabel()
         # self.transparent = QSpinBox()
-        self.aspect_ratio = VarComboBox()
+        self.aspect_ratio = PigComboBox()
 
         # transparent
-        self.transparent = VarComboBox()
+        self.transparent = PigComboBox()
 
         # x y and maximum width and height
-        self.x_pos = VarComboBox()
-        self.y_pos = VarComboBox()
-        self._width = VarComboBox()
-        self._height = VarComboBox()
+        self.x_pos = PigComboBox()
+        self.y_pos = PigComboBox()
+        self._width = PigComboBox()
+        self._height = PigComboBox()
 
         self.setUI()
 

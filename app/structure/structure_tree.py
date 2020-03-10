@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut
 
 from app.func import Func
 from app.info import Info
-from app.kernel import Kernel
 from lib import MessageBox
 from .structure_node import StructureNode
 
@@ -48,9 +47,11 @@ class StructureTree(QTreeWidget):
         """
         # menu
         self.menu = QMenu()
-        self.delete_action = self.menu.addAction(Func.getImage("menu/delete.png", 1), "Delete", self.deleteActionFunc,
+        self.delete_action = self.menu.addAction(Func.getImageObject("menu/delete.png", 1), "Delete",
+                                                 self.deleteActionFunc,
                                                  QKeySequence(QKeySequence.Delete))
-        self.rename_action = self.menu.addAction(Func.getImage("menu/rename.png", 1), "Rename", self.renameActionFunc,
+        self.rename_action = self.menu.addAction(Func.getImageObject("menu/rename.png", 1), "Rename",
+                                                 self.renameActionFunc,
                                                  QKeySequence("F2"))
         # shortcut
         self.rename_shortcut = QShortcut(QKeySequence('F2'), self)
@@ -79,7 +80,7 @@ class StructureTree(QTreeWidget):
                     self.rename_action.setEnabled(True)
             self.menu.exec(self.mapToGlobal(e.pos()))
 
-    def addNode(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int):
+    def addNode(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int, show):
         """
         add node to its self
         @param parent_widget_id:
@@ -90,8 +91,9 @@ class StructureTree(QTreeWidget):
         """
         # if it has parent node
         if parent_widget_id != Info.ERROR_WIDGET_ID:
-            parent_node: StructureNode = Kernel.Nodes[parent_widget_id]
+            parent_node: StructureNode = Info.Nodes[parent_widget_id]
             node = StructureNode(parent=parent_node, widget_id=widget_id)
+            node.setHidden(not show)
             node.setText(0, widget_name)
             # add node
             parent_node.moveChild(index, node)
@@ -100,6 +102,7 @@ class StructureTree(QTreeWidget):
         else:
             # create root node
             node: StructureNode = StructureNode(self, widget_id=widget_id)
+            node.setHidden(not show)
             node.setText(0, widget_name)
             self.addTopLevelItem(node)
             self.collapseItem(node)
@@ -112,7 +115,7 @@ class StructureTree(QTreeWidget):
         @param index:
         @return:
         """
-        node = Kernel.Nodes[widget_id]
+        node = Info.Nodes[widget_id]
         parent = node.parent()
         parent.moveChild(index, node)
 

@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsItem
 from app.func import Func
 from app.info import Info
 # 画图
-from .itemMenu import ItemMenu
-from .text import TextProperty
+from ..item.itemMenu import ItemMenu
+from ..item.text import TextProperty
 
 
 class TextItem(QGraphicsTextItem):

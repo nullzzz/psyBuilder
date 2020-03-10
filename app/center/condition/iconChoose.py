@@ -1,12 +1,12 @@
 import time
 
-from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
-from app.center.events.newSlider.slider import Slider
 from app.func import Func
 from app.info import Info
-from lib import VarComboBox, VarLineEdit
+from lib import PigComboBox, PigLineEdit
+from ..events import Slider
 
 
 class IconChoose(QWidget):
@@ -28,7 +28,7 @@ class IconChoose(QWidget):
 
         self.attributes: list = []
 
-        self.event_types = VarComboBox()
+        self.event_types = PigComboBox()
         self.event_types.addItem("None")
         self.event_types.addItem(Info.IMAGE)
         self.event_types.addItem(Info.VIDEO)
@@ -36,7 +36,7 @@ class IconChoose(QWidget):
         self.event_types.addItem(Info.SOUND)
         self.event_types.addItem(Info.SLIDER)
         self.event_types.currentTextChanged.connect(self.changeIcon)
-        self.name_line = VarLineEdit()
+        self.name_line = PigLineEdit()
         self.name_line.setEnabled(False)
         self.name_line.textChanged.connect(self.changeName)
         self.icon_label = IconLabel()
@@ -71,26 +71,34 @@ class IconChoose(QWidget):
 
     def changeIcon(self, current_type):
         self.event_type = current_type
-        # 删除原来的widget
-        Func.delWidget(self.widget_id)
-        self.itemDeleted.emit(self.widget_id)
+
+        if self.widget_id != "":
+            # 删除原来的widget
+            Func.delWidget(self.widget_id)
+            self.itemDeleted.emit(self.widget_id)
 
         # 空
         if current_type == "None":
             self.icon_label.clear()
             self.name_line.clear()
             self.name_line.setEnabled(False)
+            self.widget_id = ""
             self.widget = None
             self.pro_window = None
             return
 
-        self.icon_label.setPixmap(Func.getImage(f"widgets/{self.event_type}", size=QSize(100, 100)))
+        self.createSubWidget()
 
-        # 创建widget
-        self.widget_id = Func.generateWidgetId(current_type)
-        self.widget = Func.createWidget(self.widget_id, visible=True)
-        assert self.widget is not None
+    def createSubWidget(self, widget_id: str = ""):
+        pix_map = Func.getWidgetImage(self.event_type, "pixmap")
+        self.icon_label.setPixmap(pix_map.scaled(100, 100))
+        if widget_id == "":
+            # 创建widget
+            self.widget_id = Func.generateWidgetId(self.event_type)
+        else:
+            self.widget_id = widget_id
         self.itemAdded.emit(self.widget_id, self.event_name)
+        self.widget = Func.getWidget(self.widget_id)
 
         # slider
         if self.event_type == Info.SLIDER:
@@ -148,7 +156,10 @@ class IconChoose(QWidget):
 
     # 加载当前属性
     def loadSetting(self):
+        # todo bug
+        # self.event_types.currentTextChanged.disconnect()
         self.event_types.setCurrentText(self.default_properties.get("Stim type", "None"))
+        # self.event_types.currentTextChanged.connect(self.changeIcon)
         self.name_line.setText(self.default_properties.get("Event name", ""))
 
         if self.pro_window is not None:

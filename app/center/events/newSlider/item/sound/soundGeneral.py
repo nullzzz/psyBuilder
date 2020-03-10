@@ -1,9 +1,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QFileDialog, QCompleter, QSizePolicy
+    QFileDialog, QCompleter, QSpacerItem, QSizePolicy
 
 from app.func import Func
-from lib import VarLineEdit, VarComboBox
+from lib import PigLineEdit, PigComboBox
 
 
 # sound event专属页面
@@ -26,7 +26,7 @@ class SoundGeneral(QWidget):
             "Sound Device": "",
             "Wait for start": "No"
         }
-        self.file_name = VarLineEdit()
+        self.file_name = PigLineEdit()
         self.open_bt = QPushButton("open file")
         self.open_bt.clicked.connect(self.openFile)
 
@@ -34,32 +34,32 @@ class SoundGeneral(QWidget):
         self.volume_control.setLayoutDirection(Qt.RightToLeft)
 
         self.volume_control.stateChanged.connect(self.volumeChecked)
-        self.volume = VarLineEdit()
+        self.volume = PigLineEdit()
         self.volume.setText("1")
 
         self.latency_bias = QCheckBox("Latency Bias (ms):")  # Latency Bias
         self.latency_bias.setLayoutDirection(Qt.RightToLeft)
 
         self.latency_bias.stateChanged.connect(self.latencyBiasChecked)
-        self.bias_time = VarLineEdit()
+        self.bias_time = PigLineEdit()
         self.bias_time.setText("0")
 
-        self.buffer_size = VarLineEdit()
-        self.stream_refill = VarComboBox()
+        self.buffer_size = PigLineEdit()
+        self.stream_refill = PigComboBox()
 
-        self.start_offset = VarLineEdit("0")
-        self.stop_offset = VarLineEdit("0")
-        self.repetitions = VarLineEdit("1")
+        self.start_offset = PigLineEdit("0")
+        self.stop_offset = PigLineEdit("0")
+        self.repetitions = PigLineEdit("1")
 
-        self.sound = VarComboBox()
+        self.sound = PigComboBox()
 
         self.using_sound_id: str = ""
-        self.sound = VarComboBox()
+        self.sound = PigComboBox()
         self.sound_info = Func.getSoundInfo()
         self.sound.addItems(self.sound_info.values())
         self.sound.currentTextChanged.connect(self.changeSound)
 
-        self.wait_for_start = VarComboBox()
+        self.wait_for_start = PigComboBox()
         self.wait_for_start.addItems(("No", "Yes"))
 
         self.setUI()
@@ -121,8 +121,8 @@ class SoundGeneral(QWidget):
 
         layout2.addWidget(self.latency_bias, 1, 0)
         layout2.addWidget(self.bias_time, 1, 1)
-        self.bias_time.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
-        self.volume.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.bias_time.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
+        self.volume.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
         layout2.addWidget(l7, 1, 2)
         layout2.addWidget(self.wait_for_start, 1, 3)
 
@@ -202,7 +202,7 @@ class SoundGeneral(QWidget):
             self.loadSetting()
 
     def setPosition(self, x, y):
-        pass  # do nothing here
+        pass # do nothing here
 
     def loadSetting(self):
         self.file_name.setText(self.default_properties["File name"])

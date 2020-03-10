@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QUrl, Qt, QFileInfo
 from PyQt5.QtGui import QIcon
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaPlaylist
-from PyQt5.QtWidgets import QApplication, QAction, QToolBar, QPushButton, QSlider, QWidget, \
+from PyQt5.QtWidgets import QAction, QToolBar, QPushButton, QSlider, QWidget, \
     QGridLayout, QLabel, QVBoxLayout
 
 from app.func import Func
@@ -27,7 +27,7 @@ class SoundDisplay(TabItemMainWindow):
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
         self.play_bt = QPushButton("")
-        self.play_bt.setIcon(QIcon(Func.getImagePath("start_video")))
+        self.play_bt.setIcon(QIcon(Func.getImage("start_video")))
         self.player = QMediaPlayer()
         self.player.stateChanged.connect(self.changeIcon)
         self.player.durationChanged.connect(self.changeTip)
@@ -78,7 +78,7 @@ class SoundDisplay(TabItemMainWindow):
         self.setCentralWidget(center)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(Func.getImagePath("setting")), "setting", self)
+        open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
         open_pro.triggered.connect(self.openPro)
 
         tool.addAction(open_pro)
@@ -140,7 +140,7 @@ class SoundDisplay(TabItemMainWindow):
             self.play_bt.setEnabled(False)
             self.tip.setText("Load your audio first!")
 
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.getInfo())
 
     def parseProperties(self):
         if self.pro_window.general.repetitions.text() != "0":
@@ -196,28 +196,19 @@ class SoundDisplay(TabItemMainWindow):
 
     def changeIcon(self, statue):
         if statue == QMediaPlayer.PlayingState:
-            self.play_bt.setIcon(QIcon(Func.getImagePath("pause_video")))
+            self.play_bt.setIcon(QIcon(Func.getImage("pause_video")))
         else:
-            self.play_bt.setIcon(QIcon(Func.getImagePath("pause_video")))
+            self.play_bt.setIcon(QIcon(Func.getImage("pause_video")))
 
     def getInfo(self):
         self.default_properties = self.pro_window.getInfo()
         return self.default_properties
-
-    def getProperties(self):
-        return self.getInfo()
 
     def getShowProperties(self):
         info = self.default_properties.copy()
         info.pop("Input devices")
         info.pop("Output devices")
         return info
-
-    def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
 
     # 设置可选参数
     def setAttributes(self, attributes):
@@ -257,22 +248,6 @@ class SoundDisplay(TabItemMainWindow):
             elif isinstance(v, str):
                 if v.startswith("[") and v.endswith("]"):
                     using_attributes.append(v[1:-1])
-
-    def clone(self, new_id: str):
-        clone_widget = SoundDisplay(widget_id=new_id)
-        clone_widget.setPro(self.pro_window.clone())
-        clone_widget.apply()
-        return clone_widget
-
-    def getHiddenAttribute(self):
-        """
-        :return:
-        """
-        hidden_attr = {"onsettime": 0, "acc": 0, "resp": 0, "rt": 0}
-        return hidden_attr
-
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
 
     # 返回各项参数
     # 大部分以字符串返回，少数点击选择按钮返回布尔值
@@ -406,14 +381,37 @@ class SoundDisplay(TabItemMainWindow):
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
 
+    """
+    Functions that must be complete in new version
+    """
 
-if __name__ == "__main__":
-    import sys
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        return self.getInfo()
 
-    app = QApplication(sys.argv)
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getInfo()
 
-    t = SoundDisplay()
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+            self.apply()
 
-    t.show()
-
-    sys.exit(app.exec())
+    def clone(self, new_widget_id: str, new_widget_name):
+        clone_widget = SoundDisplay(new_widget_id, new_widget_name)
+        clone_widget.setPro(self.pro_window.clone())
+        clone_widget.apply()
+        return clone_widget

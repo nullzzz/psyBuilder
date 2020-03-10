@@ -1,14 +1,15 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QListWidget
 
-from app.menubar.deviceSelection.IODevice.duration.InputDeviceItem import DeviceInItem
-from app.menubar.deviceSelection.IODevice.duration.OutputDeviceItem import DeviceOutItem
 from app.info import Info
+from .InputDeviceItem import DeviceInItem
+from .OutputDeviceItem import DeviceOutItem
 
 
 class ShowArea(QListWidget):
     infoChanged = pyqtSignal(tuple, str)
     respChanged = pyqtSignal(tuple)
+    actionChanged = pyqtSignal(tuple)
     outputDeletedOrChanged = pyqtSignal(str)
     areaStatus = pyqtSignal(int)
     usingOutputDeviceUpdate = pyqtSignal(dict)
@@ -39,6 +40,9 @@ class ShowArea(QListWidget):
             self.infoChanged.emit(item.getValue(), item.getType())
             if self.device_type == Info.INPUT_DEVICE:
                 self.respChanged.emit(item.getResp())
+                self.actionChanged.emit(item.getAction())
+                if item.getType() == "action":
+                    self.areaStatus.emit(3)
 
     # 返回选择设备
     def getInfo(self):
@@ -109,6 +113,7 @@ class ShowArea(QListWidget):
             self.infoChanged.emit(item.getValue(), item.getType())
             if self.device_type == Info.INPUT_DEVICE:
                 self.respChanged.emit(item.getResp())
+                self.actionChanged.emit(item.getAction())
 
     def addDevice(self, item, record=True):
         device_name = item.text()
@@ -159,7 +164,6 @@ class ShowArea(QListWidget):
         for i in range(self.count()):
             item = self.item(i)
             if item.getDeviceId() == d_id:
-
                 item.setText(name)
                 item.getInfo()
                 self.setCurrentItem(item)
@@ -168,7 +172,6 @@ class ShowArea(QListWidget):
                 self.device_id_name[d_id] = name
                 self.device_name = [value for value in self.device_id_name.values()]
                 self.usingOutputDeviceUpdate.emit(self.device_id_name)
-
 
     def changeAllowable(self, x):
         if self.currentItem():
@@ -209,3 +212,19 @@ class ShowArea(QListWidget):
     def changePulseDuration(self, x):
         if self.currentItem():
             self.currentItem().changePulseDuration(x)
+
+    def changeStart(self, x):
+        if self.currentItem():
+            self.currentItem().changeStart(x)
+
+    def changeEnd(self, x):
+        if self.currentItem():
+            self.currentItem().changeEnd(x)
+
+    def changeMean(self, x):
+        if self.currentItem():
+            self.currentItem().changeMean(x)
+
+    def changeIsOval(self, x):
+        if self.currentItem():
+            self.currentItem().changeIsOval(x)

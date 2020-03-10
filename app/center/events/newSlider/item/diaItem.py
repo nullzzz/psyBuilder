@@ -4,10 +4,10 @@ from PyQt5.QtGui import QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPolygonItem
 
 from app.info import Info
-from .arc import ArcProperty
-from .circle import CircleProperty
-from .polygon import PolygonProperty
-from .rect import RectProperty
+from ..item.arc import ArcProperty
+from ..item.circle import CircleProperty
+from ..item.polygon import PolygonProperty
+from ..item.rect import RectProperty
 
 
 class DiaItem(QGraphicsPolygonItem):

@@ -2,8 +2,8 @@ from PyQt5.QtCore import Qt, QLineF, pyqtSignal
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsItem
 
+from ..item.line.lineProperty import LineProperty
 from app.info import Info
-from .line.lineProperty import LineProperty
 
 
 class LineItem(QGraphicsLineItem):

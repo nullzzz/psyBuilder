@@ -68,7 +68,7 @@ class TimelineTable(TableWidget):
         """
         self.menu = QMenu()
         # copy action
-        self.delete_action = self.menu.addAction(Func.getImage("menu/delete.png", 1), "Delete", self.deleteActionFunc,
+        self.delete_action = self.menu.addAction(Func.getImageObject("menu/delete.png", 1), "Delete", self.deleteActionFunc,
                                                  QKeySequence(QKeySequence.Delete))
         # shortcut
         self.delete_shortcut = QShortcut(QKeySequence(QKeySequence("Delete")), self)
@@ -146,7 +146,7 @@ class TimelineTable(TableWidget):
         self.setColumnWidth(col, width)
         # set pixmap
         label = QLabel()
-        label.setPixmap(Func.getImage(image_path))
+        label.setPixmap(Func.getImageObject(image_path))
         label.setFocusPolicy(Qt.NoFocus)
         self.setCellWidget(self.arrow_row, col, label)
 

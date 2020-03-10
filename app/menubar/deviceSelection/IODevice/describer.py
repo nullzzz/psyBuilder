@@ -77,7 +77,7 @@ class Shower(QWidget):
             else:
                 flag = False
         elif device_type == "serial_port":
-            if port.startswith("com") and port[3:].isdigit():
+            if port.startswith("COM") and port[3:].isdigit():
                 pass
             else:
                 flag = False

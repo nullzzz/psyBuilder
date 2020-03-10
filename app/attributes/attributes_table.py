@@ -49,7 +49,7 @@ class AttributesTable(TableWidget):
         if not self.sort_order:
             image_path = "attributes/desc.png"
         for i in range(0, self.rowCount()):
-            self.item(i, col).setIcon(Func.getImage(image_path, 1))
+            self.item(i, col).setIcon(Func.getImageObject(image_path, 1))
 
     def addAttribute(self, attribute: str):
         """

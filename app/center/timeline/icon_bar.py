@@ -13,7 +13,7 @@ class WidgetIconItem(QListWidgetItem):
 
     def __init__(self, widget_type: str):
         self.widget_type = widget_type
-        icon = Func.getImage(f"widgets/{widget_type}", 1)
+        icon = Func.getImageObject(f"widgets/{widget_type}", 1)
         super(WidgetIconItem, self).__init__(icon, widget_type)
 
 
