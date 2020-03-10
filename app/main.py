@@ -293,12 +293,12 @@ class Psy(QMainWindow):
         self.linkWidgetSignals(widget_id, widget)
         QApplication.processEvents()
 
-    def copyWidget(self, origin_widget_id: str, new_widget_id: str, new_widget_name: str):
+    def cloneWidget(self, origin_widget_id: str, new_widget_id: str, new_widget_name: str):
         """
         copy widget, link its signals and store it into some data
         """
         # copy widget
-        new_widget = Info.Widgets[origin_widget_id].copy(new_widget_id, new_widget_name)
+        new_widget = Info.Widgets[origin_widget_id].clone(new_widget_id, new_widget_name)
         Info.Widgets[new_widget_id] = new_widget
         # link signals
         self.linkWidgetSignals(new_widget_id, new_widget)
@@ -386,7 +386,7 @@ class Psy(QMainWindow):
         self.startWait()
         # do job
         # copy widget firstly
-        self.copyWidget(origin_widget_id, new_widget_id, new_widget_name)
+        self.cloneWidget(origin_widget_id, new_widget_id, new_widget_name)
         # we should consider a lot of things here because of reference.
         # we also need add node in those reference parents
         # add node in origin parent node
@@ -486,6 +486,9 @@ class Psy(QMainWindow):
                     child_widget_id = self.referWidget(widget_id)
                     self.structure.addNode(reference_parent, child_widget_id, widget_name, dest_index)
                     count += 1
+            # delete item in origin timeline (not graceful)
+            timeline: Timeline = Info.Widgets[origin_parent_widget_id]
+            timeline.deleteItemByWidgetName(widget_name)
 
     def handleItemDeleted(self, sender_widget: int, widget_id: str):
         """
@@ -504,7 +507,7 @@ class Psy(QMainWindow):
             else:
                 # delete item in timeline
                 timeline: Timeline = Info.Widgets[Func.getWidgetParent(widget_id)]
-                timeline.deleteItem(widget_name)
+                timeline.deleteItemByWidgetName(widget_name)
         # delete node and reference nodes in reference parent nodes
         reference_parents = Func.getWidgetReference(Func.getWidgetParent(widget_id))
         for reference_parent in reference_parents:
@@ -586,13 +589,13 @@ class Psy(QMainWindow):
                 # change origin widget's widget id
                 Info.Widgets[widget_id].changeWidgetId(Info.Names[old_widget_name][0])
                 # copy this widget
-                copy_widget = self.copyWidget(Info.Names[old_widget_name][0], widget_id, new_widget_name)
+                copy_widget = self.cloneWidget(Info.Names[old_widget_name][0], widget_id, new_widget_name)
                 # map
                 for change_widget_id in change_widget_ids:
                     Info.Widgets[change_widget_id] = copy_widget
             else:
                 # copy widget and widget's widget id is change_widget_id[0], and map it to all
-                copy_widget = self.copyWidget(origin_widget_id, widget_id, new_widget_name)
+                copy_widget = self.cloneWidget(origin_widget_id, widget_id, new_widget_name)
                 for change_widget_id in change_widget_ids:
                     Info.Widgets[change_widget_id] = copy_widget
 

@@ -69,3 +69,4 @@ class Center(QMainWindow):
             self.currentWidgetChanged.emit(widget.widget_id)
         else:
             self.currentWidgetChanged.emit(Info.ERROR_WIDGET_ID)
+

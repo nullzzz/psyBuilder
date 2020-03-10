@@ -155,7 +155,7 @@ class TimelineArea(QFrame):
             e.accept()
         elif data_format == Info.MoveInTimeline:
             # move item in timeline, we have deleted item above, now we add item.
-            self.handleMoveDrag(data, dest_index)
+            self.handleMoveLocalDrag(data, dest_index)
             # accept
             e.accept()
         elif data_format == Info.CopyInTimeline:
@@ -165,10 +165,12 @@ class TimelineArea(QFrame):
             e.accept()
         elif data_format == Info.StructureMoveToTimeline:
             # move item in different timeline
+            self.handleMoveGlobalDrag(data, dest_index)
             # accept
             e.accept()
         elif data_format == Info.StructureReferToTimeline:
             # accept
+            self.handleReferDrag(data, dest_index)
             e.accept()
         else:
             e.ignore()
@@ -187,17 +189,33 @@ class TimelineArea(QFrame):
         # emit signal
         self.itemAdded.emit(widget_id, widget_name, index)
 
-    def handleMoveDrag(self, data: QByteArray, dest_index: int):
+    def handleMoveLocalDrag(self, data: QByteArray, dest_index: int):
         """
         when move drag drop.
         """
-        # emit signal
         stream = QDataStream(data, QIODevice.ReadOnly)
         origin_index = stream.readInt()
         if dest_index != origin_index:
             # move item
             widget_id, dest_index = self.moveItem(origin_index, dest_index)
             self.itemMoved.emit(self.parent().widget_id, widget_id, origin_index, dest_index)
+
+    def handleMoveGlobalDrag(self, data: QByteArray, dest_index: int):
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        # check this widget existed in this timeline or not
+        widget_id = stream.readQString()
+        widget_name = Func.getWidgetName(widget_id)
+        origin_index = self.timeline_table.itemIndexByWidgetName(widget_name)
+        if origin_index != -1:
+            # if existed, this drag becomes local drag
+            if dest_index != origin_index:
+                # move item
+                widget_id, dest_index = self.moveItem(origin_index, dest_index)
+                self.itemMoved.emit(self.parent().widget_id, widget_id, origin_index, dest_index)
+        else:
+            # we need add item in this timeline and delete in origin timeline (Psy will delete item in other timeline).
+            self.addItem(widget_id=widget_id, widget_name=widget_name, index=dest_index)
+            self.itemMoved.emit(Func.getWidgetParent(widget_id), widget_id, origin_index, dest_index)
 
     def handleCopyDrag(self, data: QByteArray, index: int):
         """
@@ -214,13 +232,27 @@ class TimelineArea(QFrame):
         # emit signal
         self.itemCopied.emit(origin_widget_id, new_widget_id, new_widget_name, index)
 
-    def handleReferDrag(self, data: QByteArray, index: int):
+    def handleReferDrag(self, data: QByteArray, dest_index: int):
         """
 
         @param data:
-        @param index:
+        @param dest_index:
         @return:
         """
         # if exist in this timeline, we need to change as move drag
-
-
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        origin_widget_id = stream.readQString()
+        widget_name = Func.getWidgetName(origin_widget_id)
+        origin_index = self.timeline_table.itemIndexByWidgetName(widget_name)
+        if origin_index != -1:
+            # if existed, this drag becomes local drag
+            if dest_index != origin_index:
+                # move item
+                origin_widget_id, dest_index = self.moveItem(origin_index, dest_index)
+                self.itemMoved.emit(self.parent().widget_id, origin_widget_id, origin_index, dest_index)
+        else:
+            # we need add item in this timeline
+            new_widget_id, _, index = self.addItem(widget_type=Func.getWidgetType(origin_widget_id),
+                                                   widget_name=widget_name,
+                                                   index=dest_index)
+            self.itemReferenced.emit(origin_widget_id, new_widget_id, index)
