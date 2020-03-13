@@ -48,10 +48,14 @@ QTabWidget::tab-bar {
 QTabBar::tab {
     background: rgb(246,246,246);
     border: 1px solid rgb(201,201,201);
-    border-left: 0.5px solid rgb(201,201,201);
-    min-height: 26px;
+    min-height: 30px;
     min-width: 100px;
     text-align: center;
+}
+
+QTabBar::tab#TabWidget {
+    border-left: 10px solid rgb(201,201,201);
+    border-right: 5px solid rgb(201,201,201);
 }
 
 QTabBar::tab:selected{
