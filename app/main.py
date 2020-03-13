@@ -322,7 +322,7 @@ class Psy(QMainWindow):
 
     def linkWidgetSignals(self, widget_id: str, widget):
         """
-        todo link widget's signals
+        link widget's signals
         """
         widget_type = Func.getWidgetType(widget_id)
         # link common signals

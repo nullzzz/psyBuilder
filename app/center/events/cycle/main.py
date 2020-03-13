@@ -65,8 +65,8 @@ class Cycle(TabItemMainWindow):
         return [attr1, attr2]
         @return:
         """
-        # todo get column attributes
-        return []
+        # get column attributes
+        return self.cycle_table.attributes[2:]
 
     def deleteTimeline(self, timeline: str):
         """
