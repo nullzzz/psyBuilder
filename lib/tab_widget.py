@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QTabWidget, QWidget, QShortcut,QTabBar
+from PyQt5.QtWidgets import QTabWidget, QWidget, QShortcut, QTabBar
 
 from app.func import Func
 
@@ -86,3 +86,24 @@ class TabWidget(QTabWidget):
             if index < 0:
                 index = self.count() - 1
         self.setCurrentIndex(index)
+
+    def store(self) -> list:
+        """
+        store some opening widgets' widget_id
+        :return:
+        """
+        return [self.widget(i).widget_id for i in range(self.count())]
+
+    def restore(self, data: list):
+        """
+        restore some opening widgets
+        :param data:
+        :return:
+        """
+        for widget_id in data:
+            widget = Func.getWidget(widget_id)
+            widget_type = Func.getWidgetType(widget_id)
+            widget_name = Func.getWidgetName(widget_id)
+            self.openTab(widget, widget_type, widget_name)
+        if self.count():
+            self.setCurrentIndex(0)

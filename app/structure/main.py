@@ -47,9 +47,7 @@ class Structure(DockWidget):
         @return:
         """
         # add node in tree
-        node = self.structure_tree.addNode(parent_widget_id, widget_id, widget_name, index, show)
-        # change Info.Nodes
-        Info.Nodes[widget_id] = node
+        self.structure_tree.addNode(parent_widget_id, widget_id, widget_name, index, show)
 
     def changeNodeName(self, widget_id: int, widget_name: str):
         """

@@ -46,7 +46,7 @@ class Center(QMainWindow):
         widget = Info.Widgets[widget_id]
         self.tab_widget.closeTab(widget)
 
-    def changeTabName(self, widget_id:str, widget_name: str) -> None:
+    def changeTabName(self, widget_id: str, widget_name: str) -> None:
         """
         if widget's was changed, its tab name should be changed as well.
         @param widget_id:
@@ -70,3 +70,16 @@ class Center(QMainWindow):
         else:
             self.currentWidgetChanged.emit(Info.ERROR_WIDGET_ID)
 
+    def store(self) -> list:
+        """
+        store some opening widgets' widget_id
+        :return:
+        """
+        return self.tab_widget.store()
+
+    def restore(self, data: list):
+        """
+        restore some opening widgets
+        :return:
+        """
+        self.tab_widget.restore(data)

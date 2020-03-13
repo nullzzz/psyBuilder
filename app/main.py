@@ -719,6 +719,9 @@ class Psy(QMainWindow):
             # structure
             structure = self.structure.store()
             setting.setValue("Structure", structure)
+            # tabs
+            tabs = self.center.store()
+            setting.setValue("Tabs", tabs)
             Func.print("File successfully saved.", 1)
         except Exception as e:
             Func.print(f"{e}. File saving failed.", 2)
@@ -728,6 +731,7 @@ class Psy(QMainWindow):
         restore data from file
         """
         try:
+            Info.FILE_NAME = file_name
             setting = QSettings(file_name, QSettings.IniFormat)
         except:
             self.restoreFailed.emit()
@@ -741,8 +745,9 @@ class Psy(QMainWindow):
         Info.QUEST_DEVICE_INFO = setting.value("QuestDeviceInfo", -1)
         Info.TRACKER_DEVICE_INFO = setting.value("TrackerDeviceInfo", -1)
         Info.SLIDER_COUNT = setting.value("SliderCount", -1)
-        widgets_data = setting.value("SliderCount", -1)
+        widgets_data = setting.value("Widgets", -1)
         structure = setting.value("Structure", -1)
+        tabs = setting.value("Tabs", -1)
         # any one equal -1, fail
         if Info.Names == -1 or \
                 Info.WidgetTypeCount == -1 or \
@@ -753,7 +758,8 @@ class Psy(QMainWindow):
                 Info.TRACKER_DEVICE_INFO == -1 or \
                 Info.SLIDER_COUNT == -1 or \
                 widgets_data == -1 or \
-                structure == -1:
+                structure == -1 or \
+                tabs == -1:
             self.restoreFailed.emit()
             return
         # restore widgets: create origin widget and map to right widget ids
@@ -770,6 +776,9 @@ class Psy(QMainWindow):
                     Info.Widgets[widget_id] = widget
             # restore structure
             self.structure.restore(structure)
+            # restore tabs
+            self.center.restore(tabs)
+            self.restoreFinished.emit()
         except:
             self.restoreFailed.emit()
             return

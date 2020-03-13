@@ -80,7 +80,7 @@ class StructureTree(QTreeWidget):
                     self.rename_action.setEnabled(True)
             self.menu.exec(self.mapToGlobal(e.pos()))
 
-    def addNode(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int, show):
+    def addNode(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int, show=True):
         """
         add node to its self
         @param parent_widget_id:
@@ -96,7 +96,8 @@ class StructureTree(QTreeWidget):
             node.setHidden(not show)
             node.setText(0, widget_name)
             # add node
-            parent_node.moveChild(index, node)
+            if index != -1:
+                parent_node.moveChild(index, node)
             # expand node to show its children
             parent_node.setExpanded(True)
         else:
@@ -106,7 +107,8 @@ class StructureTree(QTreeWidget):
             node.setText(0, widget_name)
             self.addTopLevelItem(node)
             self.collapseItem(node)
-        return node
+        # change Info.Nodes
+        Info.Nodes[widget_id] = node
 
     def moveNode(self, widget_id: str, index: int):
         """
@@ -265,4 +267,27 @@ class StructureTree(QTreeWidget):
         @param data: necessary data for restoring this widget
         @return:
         """
-        print(data)
+        # add root node Timeline_0
+        root_widget_id, root_widget_name, children = data
+        self.addNode(Info.ERROR_WIDGET_ID, root_widget_id, root_widget_name, -1)
+        # add children nodes
+        for child_widget_id, child_widget_name, child_children in children:
+            self.restoreNode(root_widget_id, child_widget_id, child_widget_name, child_children)
+
+    def restoreNode(self, parent_widget_id: str, widget_id: str, widget_name: str, children: list):
+        """
+        restore node
+        :param parent_widget_id:
+        :param widget_id:
+        :param widget_name:
+        :param children:
+        :return:
+        """
+        show = True
+        if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
+            show = False
+        # add node
+        self.addNode(parent_widget_id, widget_id, widget_name, -1, show)
+        # add children
+        for child_widget_id, child_widget_name, child_children in children:
+            self.restoreNode(widget_id, child_widget_id, child_widget_name, child_children)
