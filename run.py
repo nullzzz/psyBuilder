@@ -263,12 +263,14 @@ class FileWindow(QWidget):
         """
         MessageBox.information(self, "Error", f"File failed to load.")
 
-    def handleRestoreFinished(self):
+    def handleRestoreFinished(self,file_path:str):
         """
 
         :return:
         """
         Info.Psy.showMaximized()
+        # change config
+        self.handleFileOpened(file_path)
         self.close()
 
 

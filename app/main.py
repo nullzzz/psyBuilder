@@ -31,7 +31,7 @@ from .structure import Structure
 
 class Psy(QMainWindow):
     # emit signal when restore finished/failed
-    restoreFinished = pyqtSignal()
+    restoreFinished = pyqtSignal(str)
     restoreFailed = pyqtSignal()
 
     def __init__(self):
@@ -778,7 +778,7 @@ class Psy(QMainWindow):
             self.structure.restore(structure)
             # restore tabs
             self.center.restore(tabs)
-            self.restoreFinished.emit()
+            self.restoreFinished.emit(file_name)
         except:
             self.restoreFailed.emit()
             return
