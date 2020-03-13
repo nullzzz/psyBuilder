@@ -54,8 +54,8 @@ QTabBar::tab {
 }
 
 QTabBar::tab#TabWidget {
-    border-left: 10px solid rgb(201,201,201);
-    border-right: 5px solid rgb(201,201,201);
+    border-left: 10px solid transparent;
+    border-right: 5px solid transparent;
 }
 
 QTabBar::tab:selected{
