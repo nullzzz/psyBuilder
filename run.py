@@ -68,7 +68,7 @@ class FileTable(TableWidget):
         self.verticalHeader().setVisible(False)
         # one column
         self.setColumnCount(2)
-        self.setColumnWidth(0, 300)
+        self.setColumnWidth(0, 298)
         self.setColumnWidth(1, 20)
 
     def addFile(self, index: int, file_path: str):
@@ -142,7 +142,8 @@ class FileFrame(QWidget):
         :return:
         """
         dir = QFileDialog.getExistingDirectory(self, "Choose Directory", os.getcwd(), QFileDialog.ShowDirsOnly)
-        self.fileCreated.emit(dir)
+        if dir:
+            self.fileCreated.emit(dir)
 
     def handleOpenButtonClicked(self, checked):
         """
