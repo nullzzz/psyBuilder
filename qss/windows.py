@@ -11,7 +11,10 @@ QLabel#TimelineItem:hover{
 
 icon_bar = """
 QTabWidget#IconBar{
-    max-height:90px;
+    max-height:98px;
+}
+QTabWidget#IconBar::pane{
+    border:1px solid rgb(201,201,201);
 }
 """
 
