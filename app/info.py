@@ -37,11 +37,9 @@ class Info(object):
     TRACKER_DEVICE = 3
 
     # 当前导入导出文件名
-    FILE_NAME: str = ""
-
-    CONFIG = QSettings("./config.ini", QSettings.IniFormat)
-    FILE_DIRECTORY: str = CONFIG.value("directory")
-    IS_REGISTER: str = CONFIG.value("register")
+    FILE_NAME = ""
+    FILE_DIRECTORY = ""
+    IS_REGISTER = QSettings("config.ini", QSettings.IniFormat).value("register")
 
     # 限制输入的正则表达式
     RE_NUMBER = r"\[\w+\]|\d+"

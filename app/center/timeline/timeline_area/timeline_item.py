@@ -118,7 +118,8 @@ class TimelineItem(QLabel):
         """
         if e.modifiers() == Qt.ControlModifier:
             # copy timeline item
-            self.copyDrag()
+            if self.widget_type != Info.CYCLE:
+                self.copyDrag()
         else:
             # move timeline item
             self.moveDrag()
@@ -146,7 +147,7 @@ class TimelineItem(QLabel):
         """
         data = QByteArray()
         stream = QDataStream(data, QIODevice.WriteOnly)
-        stream.writeInt(self.widget_id)
+        stream.writeQString(self.widget_id)
         mime_data = QMimeData()
         mime_data.setData(Info.CopyInTimeline, data)
         drag = QDrag(self)

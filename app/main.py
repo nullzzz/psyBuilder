@@ -3,7 +3,7 @@ import re
 import sys
 import traceback
 
-from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSignal, QPropertyAnimation
 from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette, QFontMetrics
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLabel, QGridLayout, \
     QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame
@@ -31,11 +31,11 @@ from .structure import Structure
 
 class Psy(QMainWindow):
     # emit signal when restore finished/failed
-    restoreFinished = pyqtSignal(str)
+    restoreFinished = pyqtSignal()
     restoreFailed = pyqtSignal()
 
     def __init__(self):
-        super(Psy, self).__init__(parent=None)
+        super(Psy, self).__init__(None)
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(Func.getImageObject("common/con.png", type=1))
@@ -45,6 +45,16 @@ class Psy(QMainWindow):
         self.initDockWidget()
         # wait dialog
         self.wait_dialog = WaitDialog()
+        # load config
+        Info.Psy = self
+        Info.FILE_NAME = QSettings("config.ini", QSettings.IniFormat).value("file_path")
+        Info.FILE_DIRECTORY = QSettings("config.ini", QSettings.IniFormat).value("file_directory")
+        # if file name not none, we restore data from this file
+        if Info.FILE_NAME:
+            self.restore(Info.FILE_NAME)
+        else:
+            # we init initial timeline => Timeline_0
+            self.initInitialTimeline()
 
     def initMenubar(self):
         """
@@ -650,56 +660,101 @@ class Psy(QMainWindow):
         """
         restart software
         """
-        python = sys.executable
-        os.execl(python, python, *sys.argv)
+        # choose directory
+        file_directory = Info.FILE_DIRECTORY
+        if not file_directory:
+            file_directory = os.getcwd()
+        # get new file's directory
+        file_directory = QFileDialog().getExistingDirectory(None, "Choose Directory", file_directory,
+                                                            QFileDialog.ShowDirsOnly)
+        if file_directory:
+            # change config
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
+            # restart Psy
+            python = sys.executable
+            os.execl(python, python, sys.argv[0], "restart")
 
     def saveFile(self):
         """
         get file name and store data
         """
-        if Info.FILE_NAME == "":
-            if self.getFileName():
-                self.store()
+        if Info.FILE_NAME:
+            self.store(Info.FILE_NAME)
         else:
-            self.store()
-        # config
-        Info.CONFIG.setValue("directory", Info.FILE_DIRECTORY)
-
-    def getFileName(self) -> bool:
-        """
-        获取文件名
-        :return:
-        """
-        save_file_name, _ = QFileDialog.getSaveFileName(self, "Save file", Info.FILE_DIRECTORY, "Psy Files (*.psy);")
-        if save_file_name:
-            # mac os下不会提供默认文件名称
-            if not re.search(r"(\.psy|\.ini)$", save_file_name):
-                save_file_name = save_file_name + ".psy"
-            Info.FILE_NAME = save_file_name
-            Info.FILE_DIRECTORY = os.path.dirname(save_file_name)
-            return True
-        return False
+            file_directory = Info.FILE_DIRECTORY
+            if not file_directory:
+                file_directory = os.getcwd()
+            file_path, _ = QFileDialog().getSaveFileName(self, "Save file", file_directory, "Psy Files (*.psy);")
+            if file_path:
+                # store data to file
+                self.store(file_path)
+                # change config
+                QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
+                QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+                Info.FILE_NAME = file_path
+                Info.FILE_DIRECTORY = os.path.dirname(file_path)
+                # add file_path into file_paths
+                file_paths = QSettings("config.ini", QSettings.IniFormat).value("files", [])
+                if file_path not in file_paths:
+                    file_paths.insert(0, file_path)
+                else:
+                    # move it to first
+                    file_paths.remove(file_path)
+                    file_paths.insert(0, file_path)
+                QSettings("config.ini", QSettings.IniFormat).setValue("files", file_paths)
 
     def saveAsFile(self):
-        self.getFileName()
-        if Info.FILE_NAME:
-            self.store()
-            Info.CONFIG.setValue("directory", Info.FILE_DIRECTORY)
+        """
+        save as other file, but we don't change current file.
+        :return:
+        :rtype:
+        """
+        directory = Info.FILE_DIRECTORY
+        if not directory:
+            directory = os.getcwd()
+        file_path, _ = QFileDialog().getSaveFileName(self, "Save As file", directory, "Psy Files (*.psy);")
+        if file_path:
+            # just store
+            self.store(file_path)
+            # add file_path into file_paths
+            file_paths = QSettings("config.ini", QSettings.IniFormat).value("files", [])
+            if file_path not in file_paths:
+                file_paths.insert(0, file_path)
+            else:
+                # move it to first
+                file_paths.remove(file_path)
+                file_paths.insert(0, file_path)
+            QSettings("config.ini", QSettings.IniFormat).setValue("files", file_paths)
 
     def openFile(self):
         """
-        open file
+        open file through restart software
         """
-        file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)")
-        if file_name:
-            self.restore(file_name)
+        file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.getcwd(), "Psy File (*.psy)")
+        if file_path:
+            # change config
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+            # add file_path into file_paths
+            file_paths = QSettings("config.ini", QSettings.IniFormat).value("files", [])
+            if file_path not in file_paths:
+                file_paths.insert(0, file_path)
+            else:
+                # move it to first
+                file_paths.remove(file_path)
+                file_paths.insert(0, file_path)
+            QSettings("config.ini", QSettings.IniFormat).setValue("files", file_paths)
+            # restart software
+            python = sys.executable
+            os.execl(python, python, sys.argv[0], "restart")
 
-    def store(self):
+    def store(self, file_path: str):
         """
         store data to file
         """
         try:
-            setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
+            setting = QSettings(file_path, QSettings.IniFormat)
             # some data in Info save to file directly
             setting.setValue("Names", Info.Names)
             setting.setValue("WidgetTypeCount", Info.WidgetTypeCount)
@@ -726,16 +781,14 @@ class Psy(QMainWindow):
         except Exception as e:
             Func.print(f"{e}. File saving failed.", 2)
 
-    def restore(self, file_name):
+    def restore(self, file_path):
         """
-        restore data from file
+        restore data from file(it changes Info.FileName and Info.FILE_DIRECTORY
         """
         try:
-            Info.FILE_NAME = file_name
-            setting = QSettings(file_name, QSettings.IniFormat)
+            setting = QSettings(file_path, QSettings.IniFormat)
         except:
-            self.restoreFailed.emit()
-            return
+            return False
         # restore data firstly
         Info.Names = setting.value("Names", -1)
         Info.WidgetTypeCount = setting.value("WidgetTypeCount", -1)
@@ -760,8 +813,7 @@ class Psy(QMainWindow):
                 widgets_data == -1 or \
                 structure == -1 or \
                 tabs == -1:
-            self.restoreFailed.emit()
-            return
+            return False
         # restore widgets: create origin widget and map to right widget ids
         try:
             for widget_data in widgets_data:
@@ -778,10 +830,9 @@ class Psy(QMainWindow):
             self.structure.restore(structure)
             # restore tabs
             self.center.restore(tabs)
-            self.restoreFinished.emit(file_name)
+            Func.print("", 1)
         except:
-            self.restoreFailed.emit()
-            return
+            Func.print("", 2)
 
     def setDockView(self, checked):
         """
@@ -1040,3 +1091,21 @@ class Psy(QMainWindow):
         close loading window
         """
         self.wait_dialog.close()
+
+    def restart(self):
+        """
+        restart this software
+        :return:
+        """
+
+    def showMaximized(self):
+        """
+
+        :return:
+        """
+        super(Psy, self).showMaximized()
+        self.animation = QPropertyAnimation(self, b"windowOpacity")
+        self.animation.setDuration(1000)
+        self.animation.setStartValue(0)
+        self.animation.setEndValue(1)
+        self.animation.start()

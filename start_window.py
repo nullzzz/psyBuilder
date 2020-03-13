@@ -1,6 +1,4 @@
 import os
-import platform
-import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize, QSettings
 from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QVBoxLayout, QLabel
@@ -9,7 +7,6 @@ from app import Psy
 from app.func import Func
 from app.info import Info
 from lib import MessageBox, TableWidget, HoverButton
-from qss import mac_qss, windows_qss
 
 
 class FileText(QTextEdit):
@@ -252,18 +249,3 @@ class FileWindow(QWidget):
             self.startPsy()
         else:
             MessageBox.information(self, "Error", f"The path '{file_path}' does not exist.'")
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    file_window = FileWindow()
-    if len(sys.argv) == 1:
-        file_window.show()
-    else:
-        file_window.startPsy()
-    # choose qss
-    if platform.system() == "Windows":
-        app.setStyleSheet(windows_qss)
-    else:
-        app.setStyleSheet(mac_qss)
-    sys.exit(app.exec_())
