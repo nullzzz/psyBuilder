@@ -672,8 +672,7 @@ class Psy(QMainWindow):
             QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
             QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
             # restart Psy
-            python = sys.executable
-            os.execl(python, python, sys.argv[0], "restart")
+            self.restart()
 
     def saveFile(self):
         """
@@ -746,8 +745,7 @@ class Psy(QMainWindow):
                 file_paths.insert(0, file_path)
             QSettings("config.ini", QSettings.IniFormat).setValue("files", file_paths)
             # restart software
-            python = sys.executable
-            os.execl(python, python, sys.argv[0], "restart")
+            self.restart()
 
     def store(self, file_path: str):
         """
@@ -1094,7 +1092,7 @@ class Psy(QMainWindow):
 
     def restart(self):
         """
-        restart this software
+        todo restart this software
         :return:
         """
 
