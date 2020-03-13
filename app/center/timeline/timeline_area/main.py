@@ -3,8 +3,9 @@ from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
 from app.func import Func
 from app.info import Info
-from .timeline_table import TimelineTable
 from lib import MessageBox
+from .timeline_table import TimelineTable
+
 
 class TimelineArea(QFrame):
     """
@@ -260,3 +261,18 @@ class TimelineArea(QFrame):
                 self.itemReferenced.emit(origin_widget_id, new_widget_id, index)
             else:
                 MessageBox.information(self, 'Warning', 'Incompatible attributes.')
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.timeline_table.store()
+
+    def restore(self, data: dict):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        self.timeline_table.restore(data)

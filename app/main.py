@@ -3,7 +3,7 @@ import re
 import sys
 import traceback
 
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSignal
 from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette, QFontMetrics
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLabel, QGridLayout, \
     QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame
@@ -30,31 +30,21 @@ from .structure import Structure
 
 
 class Psy(QMainWindow):
-    def __init__(self, file_name: str = ""):
+    # emit signal when restore finished/failed
+    restoreFinished = pyqtSignal()
+    restoreFailed = pyqtSignal()
+
+    def __init__(self):
         super(Psy, self).__init__(parent=None)
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(Func.getImageObject("common/con.png", type=1))
         # init menu bar
         self.initMenubar()
-
         # init dock widget
         self.initDockWidget()
         # wait dialog
         self.wait_dialog = WaitDialog()
-        # if file name is not none, we need to restore file
-        if file_name:
-            self.restore(file_name)
-        else:
-            # init initial timeline
-            widget_id = Func.generateWidgetId(Info.TIMELINE)
-            widget_name = Func.generateWidgetName(Info.TIMELINE)
-            # add node in structure
-            self.structure.addNode(Info.ERROR_WIDGET_ID, widget_id, widget_name, 0)
-            # create timeline widget
-            self.createWidget(widget_id, widget_name)
-            # set timeline as a tab
-            self.center.openTab(widget_id)
 
     def initMenubar(self):
         """
@@ -292,6 +282,7 @@ class Psy(QMainWindow):
         QApplication.processEvents()
         self.linkWidgetSignals(widget_id, widget)
         QApplication.processEvents()
+        return widget
 
     def cloneWidget(self, origin_widget_id: str, new_widget_id: str, new_widget_name: str):
         """
@@ -348,6 +339,21 @@ class Psy(QMainWindow):
             widget.itemAdded.connect(self.handleItemAdded)
             widget.itemDeleted.connect(self.handleItemDeleted)
             widget.itemNameChanged.connect(self.handleItemNameChanged)
+
+    def initInitialTimeline(self):
+        """
+        init initial timeline => Timeline_0
+        :return:
+        """
+        # init initial timeline
+        widget_id = Func.generateWidgetId(Info.TIMELINE)
+        widget_name = Func.generateWidgetName(Info.TIMELINE)
+        # add node in structure
+        self.structure.addNode(Info.ERROR_WIDGET_ID, widget_id, widget_name, 0)
+        # create timeline widget
+        self.createWidget(widget_id, widget_name)
+        # set timeline as a tab
+        self.center.openTab(widget_id)
 
     def handleItemAdded(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int):
         """
@@ -684,29 +690,89 @@ class Psy(QMainWindow):
         """
         open file
         """
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)",
-                                                   options=options)
+        file_name, _ = QFileDialog.getOpenFileName(self, "Choose file", Info.FILE_DIRECTORY, "Psy File (*.psy)")
         if file_name:
             self.restore(file_name)
 
     def store(self):
         """
-        todo store data to file
+        store data to file
         """
         try:
-            # data in kernel
-
+            setting = QSettings(Info.FILE_NAME, QSettings.IniFormat)
+            # some data in Info save to file directly
+            setting.setValue("Names", Info.Names)
+            setting.setValue("WidgetTypeCount", Info.WidgetTypeCount)
+            setting.setValue("WidgetNameCount", Info.WidgetNameCount)
+            setting.setValue("InputDeviceInfo", Info.INPUT_DEVICE_INFO)
+            setting.setValue("OutputDeviceInfo", Info.OUTPUT_DEVICE_INFO)
+            setting.setValue("QuestDeviceInfo", Info.QUEST_DEVICE_INFO)
+            setting.setValue("TrackerDeviceInfo", Info.TRACKER_DEVICE_INFO)
+            setting.setValue("SliderCount", Info.SLIDER_COUNT)
+            # Info.Widgets: we just need to save origin widget
+            widgets_data = {}
+            for name in Info.Names:
+                widget_id = Info.Names[name][0]
+                widget = Info.Widgets[widget_id]
+                widgets_data[f"{widget_id}&{name}"] = widget.store()
+            setting.setValue("Widgets", widgets_data)
             # structure
+            structure = self.structure.store()
+            setting.setValue("Structure", structure)
             Func.print("File successfully saved.", 1)
-        except:
-            Func.print("File saving failed.", 2)
+        except Exception as e:
+            Func.print(f"{e}. File saving failed.", 2)
 
     def restore(self, file_name):
         """
-        todo restore data from file
+        restore data from file
         """
-        print(file_name)
+        try:
+            setting = QSettings(file_name, QSettings.IniFormat)
+        except:
+            self.restoreFailed.emit()
+            return
+        # restore data firstly
+        Info.Names = setting.value("Names", -1)
+        Info.WidgetTypeCount = setting.value("WidgetTypeCount", -1)
+        Info.WidgetNameCount = setting.value("WidgetNameCount", -1)
+        Info.INPUT_DEVICE_INFO = setting.value("InputDeviceInfo", -1)
+        Info.OUTPUT_DEVICE_INFO = setting.value("OutputDeviceInfo", -1)
+        Info.QUEST_DEVICE_INFO = setting.value("QuestDeviceInfo", -1)
+        Info.TRACKER_DEVICE_INFO = setting.value("TrackerDeviceInfo", -1)
+        Info.SLIDER_COUNT = setting.value("SliderCount", -1)
+        widgets_data = setting.value("SliderCount", -1)
+        structure = setting.value("Structure", -1)
+        # any one equal -1, fail
+        if Info.Names == -1 or \
+                Info.WidgetTypeCount == -1 or \
+                Info.WidgetNameCount == -1 or \
+                Info.INPUT_DEVICE_INFO == -1 or \
+                Info.OUTPUT_DEVICE_INFO == -1 or \
+                Info.QUEST_DEVICE_INFO == -1 or \
+                Info.TRACKER_DEVICE_INFO == -1 or \
+                Info.SLIDER_COUNT == -1 or \
+                widgets_data == -1 or \
+                structure == -1:
+            self.restoreFailed.emit()
+            return
+        # restore widgets: create origin widget and map to right widget ids
+        try:
+            for widget_data in widgets_data:
+                widget_id, widget_name = re.split("&", widget_data)
+                data = widgets_data[widget_data]
+                # create widget
+                widget = self.createWidget(widget_id, widget_name)
+                # restore widget
+                Info.Widgets[widget_id].restore(data)
+                # map widget
+                for widget_id in Info.Names[widget_name]:
+                    Info.Widgets[widget_id] = widget
+            # restore structure
+            self.structure.restore(structure)
+        except:
+            self.restoreFailed.emit()
+            return
 
     def setDockView(self, checked):
         """

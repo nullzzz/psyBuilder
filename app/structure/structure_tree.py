@@ -150,10 +150,8 @@ class StructureTree(QTreeWidget):
                 if not Func.isWidgetType(widget_id, Info.CYCLE):
                     self.copyDrag(widget_id)
             elif e.modifiers() == Qt.ShiftModifier:
-                # todo move to timeline (shift -> move)
                 if not Func.isWidgetType(widget_id, Info.CYCLE):
                     self.moveDrag(widget_id)
-                pass
             else:
                 # none -> refer
                 self.referDrag(widget_id)
@@ -241,3 +239,30 @@ class StructureTree(QTreeWidget):
         item = self.currentItem()
         if type(item) == StructureNode and not Func.isWidgetType(item.widget_id, Info.TIMELINE):
             self.editItem(item, 0)
+
+    def getStructure(self, widget_id: str, widget_name: str):
+        """
+        get tree's structure (dfs)
+        :param root:
+        :return:
+        """
+        children = Func.getWidgetChildren(widget_id)
+        children_tree = []
+        for child_id, child_name in children:
+            children_tree.append(self.getStructure(child_id, child_name))
+        return [widget_id, widget_name, children_tree]
+
+    def store(self) -> list:
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.getStructure(f"{Info.TIMELINE}.0", f"{Info.TIMELINE}_0")
+
+    def restore(self, data: dict):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        print(data)

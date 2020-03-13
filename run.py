@@ -190,6 +190,25 @@ class FileWindow(QWidget):
         for file_path in file_paths:
             self.file_table.addFile(-1, file_path)
 
+    def startPsy(self, file_path: str = ""):
+        """
+        start app
+        :param file_path:
+        :return:
+        """
+        if not file_path:
+            psy = Psy()
+            psy.initInitialTimeline()
+            Info.Psy = psy
+            psy.showMaximized()
+        else:
+            Info.FILE_DIRECTORY = os.path.dirname(file_path)
+            psy = Psy()
+            Info.Psy = psy
+            psy.restoreFailed.connect(self.handleRestoreFailed)
+            psy.restoreFinished.connect(self.handleRestoreFinished)
+            psy.restore(file_path)
+
     def handleFileCreated(self, dir: str):
         """
 
@@ -198,9 +217,7 @@ class FileWindow(QWidget):
         """
         # start psy and change Info.FILE_DIRECTORY
         Info.FILE_DIRECTORY = dir
-        psy = Psy()
-        Info.Psy = psy
-        psy.showMaximized()
+        self.startPsy()
         self.close()
 
     def handleFileOpened(self, file_path: str):
@@ -215,12 +232,8 @@ class FileWindow(QWidget):
             file_paths.remove(file_path)
             file_paths.insert(0, file_path)
             Info.CONFIG.setValue("files", "$^$".join(file_paths))
-        Info.FILE_DIRECTORY = os.path.dirname(file_path)
-        MessageBox.information(self, "Error", "Sorry for it isn't completed")
-        # psy = Psy(file_path)
-        # Info.Psy = psy
-        # psy.showMaximized()
-        self.close()
+        # start psy
+        self.startPsy()
 
     def handleFileDeleted(self, file_path: str):
         """
@@ -239,9 +252,24 @@ class FileWindow(QWidget):
         :return:
         """
         if os.path.exists(file_path):
-            print("ok")
+            self.startPsy(file_path)
         else:
-            MessageBox.information(self, "Error", "File not founded!")
+            MessageBox.information(self, "Error", f"The path '{file_path}' does not exist.'")
+
+    def handleRestoreFailed(self):
+        """
+
+        :return:
+        """
+        MessageBox.information(self, "Error", f"File failed to load.")
+
+    def handleRestoreFinished(self):
+        """
+
+        :return:
+        """
+        Info.Psy.showMaximized()
+        self.close()
 
 
 if __name__ == '__main__':

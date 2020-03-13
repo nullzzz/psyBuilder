@@ -401,3 +401,26 @@ class TimelineTable(TableWidget):
                 else:
                     MessageBox.information(self, "warning", tip)
                     item.redo()
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        table_data = []
+        for col in range(self.item_count):
+            widget_id = self.cellWidget(self.item_row, col).widget_id
+            widget_name = self.item(self.name_row, col).text()
+            table_data.append([widget_id, widget_name])
+        return {"item_count": self.item_count, "table_data": table_data}
+
+    def restore(self, data: dict):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        self.item_count = data["item_count"]
+        table_data = data["table_data"]
+        for widget_id, widget_name in table_data:
+            self.addItem(widget_id=widget_id, widget_name=widget_name, index=-1)

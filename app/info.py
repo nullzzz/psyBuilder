@@ -185,7 +185,7 @@ class Info(object):
         QUEST_GET_VALUE: 0,
         IF: 0,
         SWITCH: 0,
-        TIMELINE: 1,
+        TIMELINE: 0,
     }
 
     # widget不同类型id对应数
@@ -209,7 +209,7 @@ class Info(object):
         QUEST_GET_VALUE: 0,
         IF: 0,
         SWITCH: 0,
-        TIMELINE: 1,
+        TIMELINE: 0,
     }
 
     # drag

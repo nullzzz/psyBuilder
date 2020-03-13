@@ -47,7 +47,7 @@ class Structure(DockWidget):
         @return:
         """
         # add node in tree
-        node = self.structure_tree.addNode(parent_widget_id, widget_id, widget_name, index,show)
+        node = self.structure_tree.addNode(parent_widget_id, widget_id, widget_name, index, show)
         # change Info.Nodes
         Info.Nodes[widget_id] = node
 
@@ -78,3 +78,18 @@ class Structure(DockWidget):
         """
         node = Info.Nodes[widget_id]
         self.structure_tree.deleteNode(node)
+
+    def store(self) -> list:
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.structure_tree.store()
+
+    def restore(self, data: dict):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        self.structure_tree.restore(data)

@@ -11,7 +11,7 @@ QLabel#TimelineItem:hover{
 
 icon_bar = """
 QTabWidget#IconBar{
-    max-height:88px;
+    max-height:90px;
 }
 """
 
