@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QDialog
 
+from app.func import Func
+
 
 class Dialog(QDialog):
     """
@@ -8,4 +10,5 @@ class Dialog(QDialog):
 
     def __init__(self, parent=None):
         super(Dialog, self).__init__(parent)
-        # set its widget_type
+        # set its icon
+        self.setWindowIcon(Func.getImageObject("common/con.png", type=1))

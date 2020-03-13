@@ -34,7 +34,7 @@ class Psy(QMainWindow):
         super(Psy, self).__init__(parent=None)
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
-        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.setWindowIcon(Func.getImageObject("common/con.png", type=1))
         # init menu bar
         self.initMenubar()
 

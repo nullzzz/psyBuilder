@@ -10,3 +10,4 @@ from .table_widget_item import TableWidgetItem
 from .var_combo_box import VarComboBox
 from .var_line_edit import VarLineEdit
 from .wait_dialog import WaitDialog
+from .hover_button import HoverButton

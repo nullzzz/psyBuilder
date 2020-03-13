@@ -39,7 +39,7 @@ class Info(object):
     # 当前导入导出文件名
     FILE_NAME: str = ""
 
-    CONFIG = QSettings("./operation.ini", QSettings.IniFormat)
+    CONFIG = QSettings("./config.ini", QSettings.IniFormat)
     FILE_DIRECTORY: str = CONFIG.value("directory")
     IS_REGISTER: str = CONFIG.value("register")
 
