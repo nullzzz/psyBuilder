@@ -83,3 +83,10 @@ class Center(QMainWindow):
         :return:
         """
         self.tab_widget.restore(data)
+
+    def clear(self):
+        """
+        close all tabs
+        :return:
+        """
+        self.tab_widget.clear()

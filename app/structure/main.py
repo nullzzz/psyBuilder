@@ -91,3 +91,10 @@ class Structure(DockWidget):
         @return:
         """
         self.structure_tree.restore(data)
+
+    def clear(self):
+        """
+        clear all nodes
+        :return:
+        """
+        self.structure_tree.clear()

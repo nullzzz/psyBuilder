@@ -44,3 +44,12 @@ class Output(DockWidget):
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
         # to the bottom
         self.scroll_bar.setSliderPosition(self.scroll_bar.maximum())
+
+    def clear(self):
+        """
+        clear text
+        :return:
+        """
+        self.text_edit.clear()
+        self.text_edit.setHtml(f"<b>{QDir().currentPath()}</b>")
+        self.text_edit.append('<p style="font:5px;color:white">none</p>')

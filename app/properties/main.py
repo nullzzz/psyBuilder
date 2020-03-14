@@ -27,7 +27,7 @@ class Properties(DockWidget):
         """
         if self.current_widget_id != widget_id:
             # we should clear firstly
-            self.clearProperties()
+            self.clear()
             # add
             self.current_widget_id = widget_id
             properties = Func.getWidgetProperties(widget_id)
@@ -35,7 +35,7 @@ class Properties(DockWidget):
             for key, value in sorted_properties:
                 self.properties_table.addProperty(key, str(value))
 
-    def clearProperties(self):
+    def clear(self):
         """
         show widget's properties
         :return:

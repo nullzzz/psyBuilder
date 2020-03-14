@@ -175,7 +175,7 @@ class FileWindow(QWidget):
         load file list from config
         :return:
         """
-        file_paths = QSettings("./config.ini", QSettings.IniFormat).value("file_paths", [])
+        file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
         for file_path in file_paths:
             self.file_path_table.addFilePath(-1, file_path)
 
@@ -196,8 +196,8 @@ class FileWindow(QWidget):
         :return:
         """
         # change config
-        QSettings("./config.ini", QSettings.IniFormat).setValue("file_path", "")
-        QSettings("./config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
+        QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
+        QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
         # start psy application
         self.startPsy()
 
@@ -208,17 +208,17 @@ class FileWindow(QWidget):
         :return:
         """
         # change file_paths
-        file_paths = QSettings("./config.ini", QSettings.IniFormat).value("file_paths", [])
+        file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
         if file_path not in file_paths:
             file_paths.insert(0, file_path)
         else:
             # move it to first
             file_paths.remove(file_path)
             file_paths.insert(0, file_path)
-        QSettings("./config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+        QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
         # change file_path and file_directory
-        QSettings("./config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-        QSettings("./config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+        QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
+        QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
         # start psy
         self.startPsy()
 
@@ -228,10 +228,10 @@ class FileWindow(QWidget):
         :param file_path:
         :return:
         """
-        file_paths = self.value("file_paths", [])
+        file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
         if file_path in file_paths:
             file_paths.remove(file_path)
-            QSettings("./config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
 
     def handleFileClicked(self, file_path: str):
         """
@@ -240,8 +240,8 @@ class FileWindow(QWidget):
         :return:
         """
         if os.path.exists(file_path):
-            QSettings("./config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-            QSettings("./config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
             self.startPsy()
         else:
             MessageBox.information(self, "Error", f"The path '{file_path}' does not exist.'")
@@ -250,10 +250,7 @@ class FileWindow(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     file_window = FileWindow()
-    if len(sys.argv) == 1:
-        file_window.show()
-    else:
-        file_window.startPsy()
+    file_window.show()
     # choose qss
     if platform.system() == "Windows":
         app.setStyleSheet(windows_qss)

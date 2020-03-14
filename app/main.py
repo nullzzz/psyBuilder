@@ -1,6 +1,5 @@
 import os
 import re
-import sys
 import traceback
 
 from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSignal, QPropertyAnimation
@@ -643,8 +642,8 @@ class Psy(QMainWindow):
         if widget_id == Info.ERROR_WIDGET_ID:
             # it means that user close all tab and we should clear attributes and properties
             # change attributes and properties
-            self.attributes.clearAttributes()
-            self.properties.clearProperties()
+            self.attributes.clear()
+            self.properties.clear()
         else:
             # change attributes and properties
             self.attributes.showAttributes(widget_id)
@@ -672,7 +671,11 @@ class Psy(QMainWindow):
             QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
             QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
             # restart Psy
-            self.restart()
+            self.clear()
+            Info.FILE_NAME = ""
+            Info.FILE_DIRECTORY = file_directory
+            #
+            self.initInitialTimeline()
 
     def saveFile(self):
         """
@@ -694,14 +697,14 @@ class Psy(QMainWindow):
                 Info.FILE_NAME = file_path
                 Info.FILE_DIRECTORY = os.path.dirname(file_path)
                 # add file_path into file_paths
-                file_paths = QSettings("config.ini", QSettings.IniFormat).value("files", [])
+                file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
                 if file_path not in file_paths:
                     file_paths.insert(0, file_path)
                 else:
                     # move it to first
                     file_paths.remove(file_path)
                     file_paths.insert(0, file_path)
-                QSettings("config.ini", QSettings.IniFormat).setValue("files", file_paths)
+                QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
 
     def saveAsFile(self):
         """
@@ -717,14 +720,14 @@ class Psy(QMainWindow):
             # just store
             self.store(file_path)
             # add file_path into file_paths
-            file_paths = QSettings("config.ini", QSettings.IniFormat).value("files", [])
+            file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
             if file_path not in file_paths:
                 file_paths.insert(0, file_path)
             else:
                 # move it to first
                 file_paths.remove(file_path)
                 file_paths.insert(0, file_path)
-            QSettings("config.ini", QSettings.IniFormat).setValue("files", file_paths)
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
 
     def openFile(self):
         """
@@ -735,17 +738,28 @@ class Psy(QMainWindow):
             # change config
             QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
             QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
-            # add file_path into file_paths
-            file_paths = QSettings("config.ini", QSettings.IniFormat).value("files", [])
+            file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
             if file_path not in file_paths:
                 file_paths.insert(0, file_path)
             else:
                 # move it to first
                 file_paths.remove(file_path)
                 file_paths.insert(0, file_path)
-            QSettings("config.ini", QSettings.IniFormat).setValue("files", file_paths)
-            # restart software
-            self.restart()
+            # add file_path into file_paths
+            file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+            if file_path not in file_paths:
+                file_paths.insert(0, file_path)
+            else:
+                # move it to first
+                file_paths.remove(file_path)
+                file_paths.insert(0, file_path)
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+            # clear software firstly
+            self.clear()
+            # restore data from opening file
+            self.restore(file_path)
+            Info.FILE_NAME = file_path
+            Info.FILE_DIRECTORY = os.path.dirname(file_path)
 
     def store(self, file_path: str):
         """
@@ -1090,13 +1104,37 @@ class Psy(QMainWindow):
         """
         self.wait_dialog.close()
 
-    def restart(self):
+    def clear(self):
         """
-        todo restart this software
+        clear this software
         :return:
         """
-        python = sys.executable
-        os.execl(python, python, *sys.argv)
+        # center
+        self.center.clear()
+        # structure
+        self.structure.clear()
+        # properties
+        self.properties.clear()
+        # attributes
+        self.attributes.clear()
+        # output
+        self.output.clear()
+        # Info's data
+        Info.PLATFORM = "linux"
+        Info.IMAGE_LOAD_MODE = "before_event"
+        Info.INPUT_DEVICE_INFO.clear()
+        Info.OUTPUT_DEVICE_INFO.clear()
+        Info.QUEST_DEVICE_INFO.clear()
+        Info.TRACKER_DEVICE_INFO.clear()
+        Info.FILE_NAME = ""
+        Info.FILE_DIRECTORY = ""
+        Info.device_count = {key: 0 for key in Info.device_count}
+        Info.SLIDER_COUNT = {key: 0 for key in Info.SLIDER_COUNT}
+        Info.Widgets.clear()
+        Info.Names.clear()
+        Info.Nodes.clear()
+        Info.WidgetTypeCount = {key: 0 for key in Info.WidgetTypeCount}
+        Info.WidgetNameCount = {key: 0 for key in Info.WidgetNameCount}
 
     def showMaximized(self):
         """

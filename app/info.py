@@ -49,18 +49,6 @@ class Info(object):
     # possible useful in the future
     REF_VALUE_SEPERATOR = "@"
 
-    # 区分不同的添加情况
-    WidgetAdd = 0
-    WidgetCopy = 1
-    WidgetRefer = 2
-    WidgetMove = 3
-    # Timeline name
-    TimelineNameError = 0
-    TimelineTypeError = 1
-    TimelineParentError = 2
-    TimelineNameRight = 3
-    TimelineNameExist = 4
-
     # widget type
     CYCLE = "Cycle"
     SOUND = "Sound"
@@ -162,64 +150,6 @@ class Info(object):
         TIMELINE: os.path.join(IMAGE_SOURCE_PATH, "timeline.png"),
     }
 
-    # widget不同类型名称的对应数
-    WIDGET_TYPE_NAME_COUNT = {
-        CYCLE: 0,
-        SOUND: 0,
-        TEXT: 0,
-        IMAGE: 0,
-        VIDEO: 0,
-        SLIDER: 0,
-        BUG: 0,
-        OPEN: 0,
-        DC: 0,
-        CALIBRATION: 0,
-        ACTION: 0,
-        STARTR: 0,
-        ENDR: 0,
-        LOG: 0,
-        QUEST_INIT: 0,
-        QUEST_UPDATE: 0,
-        QUEST_GET_VALUE: 0,
-        IF: 0,
-        SWITCH: 0,
-        TIMELINE: 0,
-    }
-
-    # widget不同类型id对应数
-    WIDGET_TYPE_ID_COUNT = {
-        CYCLE: 0,
-        SOUND: 0,
-        TEXT: 0,
-        IMAGE: 0,
-        VIDEO: 0,
-        SLIDER: 0,
-        BUG: 0,
-        OPEN: 0,
-        DC: 0,
-        CALIBRATION: 0,
-        ACTION: 0,
-        STARTR: 0,
-        ENDR: 0,
-        LOG: 0,
-        QUEST_INIT: 0,
-        QUEST_UPDATE: 0,
-        QUEST_GET_VALUE: 0,
-        IF: 0,
-        SWITCH: 0,
-        TIMELINE: 0,
-    }
-
-    # drag
-    DragFromAttributeToLineEdit = "attributes/move-attribute"
-    DragFromWidgetIconBarToWidgetIconArea = "widget_icon_bar/widget_icon_type"
-
-    # focus
-    NotFocused = 0
-    TimelineFocused = 1
-    CycleFocused = 2
-    StructureFocused = 3
-
     ###########################################
     #           new version info              #
     ###########################################
@@ -265,7 +195,49 @@ class Info(object):
     Nodes = WID_NODE
 
     # wid num of different add_type of widget
-    WidgetTypeCount = WIDGET_TYPE_ID_COUNT
+    WidgetTypeCount = {
+        CYCLE: 0,
+        SOUND: 0,
+        TEXT: 0,
+        IMAGE: 0,
+        VIDEO: 0,
+        SLIDER: 0,
+        BUG: 0,
+        OPEN: 0,
+        DC: 0,
+        CALIBRATION: 0,
+        ACTION: 0,
+        STARTR: 0,
+        ENDR: 0,
+        LOG: 0,
+        QUEST_INIT: 0,
+        QUEST_UPDATE: 0,
+        QUEST_GET_VALUE: 0,
+        IF: 0,
+        SWITCH: 0,
+        TIMELINE: 0,
+    }
 
     # it's used to counter the count of widget name should go.
-    WidgetNameCount = WIDGET_TYPE_NAME_COUNT
+    WidgetNameCount = {
+        CYCLE: 0,
+        SOUND: 0,
+        TEXT: 0,
+        IMAGE: 0,
+        VIDEO: 0,
+        SLIDER: 0,
+        BUG: 0,
+        OPEN: 0,
+        DC: 0,
+        CALIBRATION: 0,
+        ACTION: 0,
+        STARTR: 0,
+        ENDR: 0,
+        LOG: 0,
+        QUEST_INIT: 0,
+        QUEST_UPDATE: 0,
+        QUEST_GET_VALUE: 0,
+        IF: 0,
+        SWITCH: 0,
+        TIMELINE: 0,
+    }
