@@ -55,7 +55,6 @@ class Psy(QMainWindow):
         else:
             # we init initial timeline => Timeline_0
             self.initInitialTimeline()
-        print(Info.OUTPUT_DEVICE_INFO)
 
     def initMenubar(self):
         """
