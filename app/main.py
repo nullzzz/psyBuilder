@@ -776,7 +776,7 @@ class Psy(QMainWindow):
             setting.setValue("Tabs", tabs)
             Func.print("File successfully saved.", 1)
         except Exception as e:
-            Func.print(f"{e}. File saving failed.", 2)
+            Func.print(f"Due to error '{e}'. File saving failed.", 2)
 
     def restore(self, file_path):
         """
@@ -827,9 +827,9 @@ class Psy(QMainWindow):
             self.structure.restore(structure)
             # restore tabs
             self.center.restore(tabs)
-            Func.print("", 1)
-        except:
-            Func.print("", 2)
+            Func.print("File loaded successfully.", 1)
+        except Exception as e:
+            Func.print(f"Due to error '{e}', the file failed to load.", 2)
 
     def setDockView(self, checked):
         """
