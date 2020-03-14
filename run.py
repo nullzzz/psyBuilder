@@ -7,17 +7,16 @@ from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFile
 
 from app import Psy
 from app.func import Func
-from app.info import Info
 from lib import MessageBox, TableWidget, HoverButton
 from qss import mac_qss, windows_qss
 
 
-class FileText(QTextEdit):
+class FilePath(QTextEdit):
     clicked = pyqtSignal()
 
     def __init__(self, file_path: str):
         # style
-        super(FileText, self).__init__()
+        super(FilePath, self).__init__()
         self.setStyleSheet("""
         QTextEdit{
             border:none;
@@ -38,28 +37,28 @@ class FileText(QTextEdit):
         self.setTextInteractionFlags(Qt.NoTextInteraction)
 
     def mousePressEvent(self, QMouseEvent):
-        super(FileText, self).mousePressEvent(QMouseEvent)
+        super(FilePath, self).mousePressEvent(QMouseEvent)
         self.clicked.emit()
 
     def enterEvent(self, QEvent):
-        super(FileText, self).enterEvent(QEvent)
+        super(FilePath, self).enterEvent(QEvent)
         QApplication.setOverrideCursor(Qt.PointingHandCursor)
 
     def leaveEvent(self, QEvent):
-        super(FileText, self).leaveEvent(QEvent)
+        super(FilePath, self).leaveEvent(QEvent)
         QApplication.setOverrideCursor(Qt.ArrowCursor)
 
 
-class FileTable(TableWidget):
+class FilePathTable(TableWidget):
     """
     show some recent files
     """
     # emit file path
-    fileClicked = pyqtSignal(str)
-    fileDeleted = pyqtSignal(str)
+    filePathClicked = pyqtSignal(str)
+    filePathDeleted = pyqtSignal(str)
 
     def __init__(self):
-        super(FileTable, self).__init__()
+        super(FilePathTable, self).__init__()
         self.setShowGrid(False)
         self.setStyleSheet("border:none;border-right:1px solid rgb(236,236,236);background:white;")
         # hide headers
@@ -84,9 +83,9 @@ class FileTable(TableWidget):
         self.insertRow(index)
         self.setRowHeight(index, 48)
         # insert line edit into table
-        file = FileText(file_path)
+        file = FilePath(file_path)
         self.setCellWidget(index, 0, file)
-        file.clicked.connect(lambda: self.fileClicked.emit(file_path))
+        file.clicked.connect(lambda: self.filePathClicked.emit(file_path))
         # button
         delete_button = HoverButton("menu/close")
         self.setCellWidget(index, 1, delete_button)
@@ -98,19 +97,19 @@ class FileTable(TableWidget):
         :param checked:
         :return:
         """
-        self.fileDeleted.emit(file_path)
+        self.filePathDeleted.emit(file_path)
         for row in range(self.rowCount()):
             if self.cellWidget(row, 0).file_path == file_path:
                 self.removeRow(row)
                 break
 
 
-class FileFrame(QWidget):
+class FileButtonArea(QWidget):
     fileCreated = pyqtSignal(str)
     fileOpened = pyqtSignal(str)
 
     def __init__(self):
-        super(FileFrame, self).__init__()
+        super(FileButtonArea, self).__init__()
         # widget
         icon = QLabel()
         icon.setPixmap(Func.getImageObject("common/icon.png", type=0, size=QSize(180, 180)))
@@ -132,22 +131,23 @@ class FileFrame(QWidget):
 
         :return:
         """
-        directory = QFileDialog.getExistingDirectory(self, "Choose Directory", os.getcwd(), QFileDialog.ShowDirsOnly)
-        if directory:
-            self.fileCreated.emit(directory)
+        file_directory = QFileDialog.getExistingDirectory(self, "Choose Directory", os.getcwd(),
+                                                          QFileDialog.ShowDirsOnly)
+        if file_directory:
+            self.fileCreated.emit(file_directory)
 
     def handleOpenButtonClicked(self, checked):
         """
 
         :return:
         """
-        file, _ = QFileDialog.getOpenFileName(self, "Choose File", os.getcwd(), "Psy File (*.psy)")
-        if file:
-            self.fileOpened.emit(file)
+        file_path, _ = QFileDialog.getOpenFileName(self, "Choose File", os.getcwd(), "Psy File (*.psy)")
+        if file_path:
+            self.fileOpened.emit(file_path)
 
 
 class FileWindow(QWidget):
-    def __init__(self, file_path: str = "", directory: str = ""):
+    def __init__(self):
         super(FileWindow, self).__init__()
         # title
         self.setWindowTitle("Welcome to Psy Builder")
@@ -155,37 +155,29 @@ class FileWindow(QWidget):
         self.setStyleSheet("background:rgb(247,247,247)")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         # widget file_table and file frame
-        self.file_table = FileTable()
-        self.file_table.fileClicked.connect(self.handleFileClicked)
-        self.file_table.fileDeleted.connect(self.handleFileDeleted)
-        self.file_frame = FileFrame()
-        self.file_frame.fileCreated.connect(self.handleFileCreated)
-        self.file_frame.fileOpened.connect(self.handleFileOpened)
+        self.file_path_table = FilePathTable()
+        self.file_path_table.filePathClicked.connect(self.handleFileClicked)
+        self.file_path_table.filePathDeleted.connect(self.handleFileDeleted)
+        self.file_button_area = FileButtonArea()
+        self.file_button_area.fileCreated.connect(self.handleFileCreated)
+        self.file_button_area.fileOpened.connect(self.handleFileOpened)
         # layout
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self.file_table, 2)
-        layout.addWidget(self.file_frame, 3, Qt.AlignHCenter)
+        layout.addWidget(self.file_path_table, 2)
+        layout.addWidget(self.file_button_area, 3, Qt.AlignHCenter)
         self.setLayout(layout)
-        # load files from config
-        self.config = QSettings("./config.ini", QSettings.IniFormat)
-        self.loadFiles()
-        #
-        if file_path and os.path.exists(file_path):
-            self.startPsy(file_path)
-        if directory:
-            Info.FILE_DIRECTORY = directory
-            Info.FILE_NAME = ""
-            self.startPsy()
+        # load file paths from config
+        self.loadFilePaths()
 
-    def loadFiles(self):
+    def loadFilePaths(self):
         """
         load file list from config
         :return:
         """
-        file_paths = self.config.value("file_paths", [])
+        file_paths = QSettings("./config.ini", QSettings.IniFormat).value("file_paths", [])
         for file_path in file_paths:
-            self.file_table.addFilePath(-1, file_path)
+            self.file_path_table.addFilePath(-1, file_path)
 
     def startPsy(self):
         """
@@ -204,7 +196,8 @@ class FileWindow(QWidget):
         :return:
         """
         # change config
-        self.config.setValue("file_directory", file_directory)
+        QSettings("./config.ini", QSettings.IniFormat).setValue("file_path", "")
+        QSettings("./config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
         # start psy application
         self.startPsy()
 
@@ -222,10 +215,10 @@ class FileWindow(QWidget):
             # move it to first
             file_paths.remove(file_path)
             file_paths.insert(0, file_path)
-        self.config.setValue("file_paths", file_paths)
+        QSettings("./config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
         # change file_path and file_directory
-        self.config.setValue("file_path", file_path)
-        self.config.setValue("file_directory", os.path.dirname(file_path))
+        QSettings("./config.ini", QSettings.IniFormat).setValue("file_path", file_path)
+        QSettings("./config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
         # start psy
         self.startPsy()
 
@@ -238,7 +231,7 @@ class FileWindow(QWidget):
         file_paths = self.value("file_paths", [])
         if file_path in file_paths:
             file_paths.remove(file_path)
-            self.config.setValue("file_paths", file_paths)
+            QSettings("./config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
 
     def handleFileClicked(self, file_path: str):
         """
@@ -247,8 +240,8 @@ class FileWindow(QWidget):
         :return:
         """
         if os.path.exists(file_path):
-            self.config.setValue("file_path", file_path)
-            self.config.setValue("file_directory", os.path.dirname(file_path))
+            QSettings("./config.ini", QSettings.IniFormat).setValue("file_path", file_path)
+            QSettings("./config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
             self.startPsy()
         else:
             MessageBox.information(self, "Error", f"The path '{file_path}' does not exist.'")

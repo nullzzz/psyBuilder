@@ -1,6 +1,5 @@
 import os
 import re
-import sys
 import traceback
 
 from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSignal, QPropertyAnimation
