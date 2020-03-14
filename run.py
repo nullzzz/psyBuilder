@@ -208,7 +208,7 @@ class FileWindow(QWidget):
         :return:
         """
         # change file_paths
-        file_paths = self.value("file_paths", [])
+        file_paths = QSettings("./config.ini", QSettings.IniFormat).value("file_paths", [])
         if file_path not in file_paths:
             file_paths.insert(0, file_path)
         else:

@@ -211,7 +211,6 @@ class CycleTable(QTableWidget):
                                 self.timelineAdded.emit(widget_id, text, len(self.timelines))
                                 self.timelines[text] = [widget_id, 1]
                                 item.save()
-
                         else:
                             self.timelines[text][1] += 1
                             item.save()

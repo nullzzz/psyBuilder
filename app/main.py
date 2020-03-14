@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import traceback
 
 from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSignal, QPropertyAnimation
@@ -543,16 +544,16 @@ class Psy(QMainWindow):
                 self.deleteNodeRecursive(child_widget_id, child_widget_name)
         # delete data (Kernel.Nodes, Kernel.Widgets, Kernel.Name)
         self.structure.deleteNode(widget_id)
-        del Info.Nodes[widget_id]
+        Info.Nodes.pop(widget_id)
         reference: list = Info.Names[widget_name]
         if len(reference) == 1:
-            del Info.Names[widget_name]
+            Info.Names.pop(widget_name)
         else:
             if reference[0] == widget_id:
                 # if widget is origin widget, we should change widget's widget id
                 Info.Widgets[widget_id].changeWidgetId(reference[1])
             reference.remove(widget_id)
-        del Info.Widgets[widget_id]
+        Info.Widgets.pop(widget_id)
 
     def handleItemNameChanged(self, sender_widget: int, widget_id: str, new_widget_name: str):
         """
@@ -1094,6 +1095,8 @@ class Psy(QMainWindow):
         todo restart this software
         :return:
         """
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
 
     def showMaximized(self):
         """
