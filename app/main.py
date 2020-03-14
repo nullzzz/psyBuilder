@@ -676,8 +676,8 @@ class Psy(QMainWindow):
             self.clear()
             Info.FILE_NAME = ""
             Info.FILE_DIRECTORY = file_directory
-            #
-            self.initInitialTimeline()
+            # restore from init state
+            self.restore("init_state.ini")
 
     def saveFile(self):
         """
@@ -691,7 +691,7 @@ class Psy(QMainWindow):
                 file_directory = os.getcwd()
             file_path, _ = QFileDialog().getSaveFileName(self, "Save file", file_directory, "Psy Files (*.psy);")
             if file_path:
-                if not re.search(r"(\.psy|\.ini)$", file_path):
+                if not re.search(r"\.psy$", file_path):
                     file_path = file_path + ".psy"
                 # store data to file
                 if self.store(file_path):
