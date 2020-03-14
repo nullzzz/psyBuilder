@@ -44,6 +44,9 @@ class Psy(QMainWindow):
         self.initDockWidget()
         # wait dialog
         self.wait_dialog = WaitDialog()
+        # save init state
+        if not os.path.exists("init_state.ini"):
+            self.store("init_state.ini")
         # load config
         Info.Psy = self
         Info.FILE_NAME = QSettings("config.ini", QSettings.IniFormat).value("file_path")
