@@ -105,7 +105,7 @@ class IfBranch(TabItemWidget):
 
     def apply(self):
         self.getInfo()
-        self.propertiesChange.emit(self.default_properties)
+        self.propertiesChanged.emit(self.widget_id)
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
@@ -180,7 +180,7 @@ class IfBranch(TabItemWidget):
         get this widget's properties to show it in Properties Window.
         @return: a dict of properties
         """
-        return self.getInfo()
+        return self.default_properties
 
     def store(self):
         """

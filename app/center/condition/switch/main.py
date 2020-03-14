@@ -73,7 +73,7 @@ class Switch(TabItemWidget):
 
     def apply(self):
         self.getProperties()
-        self.propertiesChange.emit(self.default_properties)
+        self.propertiesChanged.emit(self.widget_id)
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 

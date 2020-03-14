@@ -101,7 +101,7 @@ class EyeAction(TabItemWidget):
 
     def apply(self):
         self.msg = self.status_message.currentText()
-        self.propertiesChange.emit(self.getInfo())
+        self.propertiesChanged.emit(self.widget_id)
 
     def getInfo(self):
         self.default_properties["Status Message"] = self.status_message.currentText()

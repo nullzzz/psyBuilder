@@ -426,7 +426,7 @@ class Slider(TabItemMainWindow):
     def apply(self):
         self.getInfo()
         # 发送信号
-        self.propertiesChange.emit(self.pro_window.default_properties)
+        self.propertiesChanged.emit(self.widget_id)
 
     def getDuration(self) -> str:
         """

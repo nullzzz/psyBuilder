@@ -172,7 +172,7 @@ class Open(TabItemWidget):
         self.loadSetting()
 
     def apply(self):
-        self.propertiesChange.emit(self.getInfo())
+        self.propertiesChanged.emit(self.widget_id)
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 

@@ -104,7 +104,7 @@ class StartR(TabItemWidget):
 
     def apply(self):
         self.msg = self.status_message.text()
-        self.propertiesChange.emit(self.getInfo())
+        self.propertiesChanged.emit(self.widget_id)
 
     def setAttributes(self, attributes):
         self.attributes = [f"[{attribute}]" for attribute in attributes]

@@ -2,7 +2,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout
 
 from app.func import Func
-from lib import VarComboBox, TabItemWidget
+from lib import VarComboBox, TabItemWidget, MessageBox
 
 
 class QuestUpdate(TabItemWidget):
@@ -96,7 +96,7 @@ class QuestUpdate(TabItemWidget):
 
     def apply(self):
         self.resp = self.response_variable.currentText()
-        self.propertiesChange.emit(self.getInfo())
+        self.propertiesChanged.emit(self.widget_id)
 
     # 检查变量
     def findVar(self, text):
@@ -112,7 +112,7 @@ class QuestUpdate(TabItemWidget):
         text = temp.text()
         if text not in self.attributes:
             if text and text[0] == "[":
-                QMessageBox.warning(self, "Warning", "Invalid Attribute!", QMessageBox.Ok)
+                MessageBox.warning(self, "Warning", "Invalid Attribute!", MessageBox.Ok)
                 temp.clear()
 
     def setAttributes(self, attributes):

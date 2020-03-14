@@ -165,7 +165,7 @@ class Close(TabItemWidget):
         self.loadSetting()
 
     def apply(self):
-        self.propertiesChange.emit(self.getInfo())
+        self.propertiesChanged.emit(self.widget_id)
 
     def setProperties(self, properties: dict):
         if properties:

@@ -110,7 +110,7 @@ class VideoDisplay(TabItemMainWindow):
             else:
                 MessageBox.warning(self, "Warning", "The file path is invalid!")
         # 发送信号
-        self.propertiesChange.emit(self.getInfo())
+        self.propertiesChanged.emit(self.widget_id)
 
     def parseProperties(self):
         self.start_pos = self.getStartTime(self.default_properties.get("Start position", "00:00:00.000"))

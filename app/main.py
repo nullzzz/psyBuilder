@@ -50,10 +50,12 @@ class Psy(QMainWindow):
         Info.FILE_DIRECTORY = QSettings("config.ini", QSettings.IniFormat).value("file_directory")
         # if file name not none, we restore data from this file
         if Info.FILE_NAME:
-            self.restore(Info.FILE_NAME)
+            if not self.restore(Info.FILE_NAME):
+                self.clear()
         else:
             # we init initial timeline => Timeline_0
             self.initInitialTimeline()
+        print(Info.OUTPUT_DEVICE_INFO)
 
     def initMenubar(self):
         """
@@ -689,22 +691,24 @@ class Psy(QMainWindow):
                 file_directory = os.getcwd()
             file_path, _ = QFileDialog().getSaveFileName(self, "Save file", file_directory, "Psy Files (*.psy);")
             if file_path:
+                if not re.search(r"(\.psy|\.ini)$", file_path):
+                    file_path = file_path + ".psy"
                 # store data to file
-                self.store(file_path)
-                # change config
-                QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-                QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
-                Info.FILE_NAME = file_path
-                Info.FILE_DIRECTORY = os.path.dirname(file_path)
-                # add file_path into file_paths
-                file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
-                if file_path not in file_paths:
-                    file_paths.insert(0, file_path)
-                else:
-                    # move it to first
-                    file_paths.remove(file_path)
-                    file_paths.insert(0, file_path)
-                QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+                if self.store(file_path):
+                    # change config
+                    QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
+                    QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+                    Info.FILE_NAME = file_path
+                    Info.FILE_DIRECTORY = os.path.dirname(file_path)
+                    # add file_path into file_paths
+                    file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+                    if file_path not in file_paths:
+                        file_paths.insert(0, file_path)
+                    else:
+                        # move it to first
+                        file_paths.remove(file_path)
+                        file_paths.insert(0, file_path)
+                    QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
 
     def saveAsFile(self):
         """
@@ -717,17 +721,19 @@ class Psy(QMainWindow):
             directory = os.getcwd()
         file_path, _ = QFileDialog().getSaveFileName(self, "Save As file", directory, "Psy Files (*.psy);")
         if file_path:
+            if not re.search(r"(\.psy|\.ini)$", file_path):
+                file_path = file_path + ".psy"
             # just store
-            self.store(file_path)
-            # add file_path into file_paths
-            file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
-            if file_path not in file_paths:
-                file_paths.insert(0, file_path)
-            else:
-                # move it to first
-                file_paths.remove(file_path)
-                file_paths.insert(0, file_path)
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+            if self.store(file_path):
+                # add file_path into file_paths
+                file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+                if file_path not in file_paths:
+                    file_paths.insert(0, file_path)
+                else:
+                    # move it to first
+                    file_paths.remove(file_path)
+                    file_paths.insert(0, file_path)
+                QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
 
     def openFile(self):
         """
@@ -754,14 +760,18 @@ class Psy(QMainWindow):
                 file_paths.remove(file_path)
                 file_paths.insert(0, file_path)
             QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
-            # clear software firstly
+            # store current state
+            self.store("temp.ini")
+            # clear software
             self.clear()
             # restore data from opening file
-            self.restore(file_path)
+            if not self.restore(file_path):
+                # if store failed, restore to latest state
+                self.restore("temp.ini")
             Info.FILE_NAME = file_path
             Info.FILE_DIRECTORY = os.path.dirname(file_path)
 
-    def store(self, file_path: str):
+    def store(self, file_path: str) -> bool:
         """
         store data to file
         """
@@ -790,10 +800,12 @@ class Psy(QMainWindow):
             tabs = self.center.store()
             setting.setValue("Tabs", tabs)
             Func.print("File successfully saved.", 1)
+            return True
         except Exception as e:
             Func.print(f"Due to error '{e}'. File saving failed.", 2)
+            return False
 
-    def restore(self, file_path):
+    def restore(self, file_path) -> bool:
         """
         restore data from file(it changes Info.FileName and Info.FILE_DIRECTORY
         """
@@ -843,8 +855,10 @@ class Psy(QMainWindow):
             # restore tabs
             self.center.restore(tabs)
             Func.print("File loaded successfully.", 1)
+            return True
         except Exception as e:
             Func.print(f"Due to error '{e}', the file failed to load.", 2)
+            return False
 
     def setDockView(self, checked):
         """

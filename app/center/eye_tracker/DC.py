@@ -188,7 +188,7 @@ class EyeDC(TabItemWidget):
         self.loadSetting()
 
     def apply(self):
-        self.propertiesChange.emit(self.getInfo())
+        self.propertiesChanged.emit(self.widget_id)
 
     def setAttributes(self, attributes):
         self.attributes = [f"[{attribute}]" for attribute in attributes]
