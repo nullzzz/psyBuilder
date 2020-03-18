@@ -33,6 +33,7 @@ class TimelineItem(QLabel):
         # set data
         self.widget_id = widget_id
         self.widget_type = widget_type
+        self.direction = 0
         # frame_animation
         self.frame_animation = QPropertyAnimation(self, b"frame_rect")
         self.geometry_animation = QPropertyAnimation(self, b"geometry")
@@ -57,17 +58,20 @@ class TimelineItem(QLabel):
         @param frame_rect:
         @return:
         """
+        # save direct
         self.setFrameRect(frame_rect)
 
     frame_rect = pyqtProperty(QRect, fset=_set_frame_rect)
 
-    def startFrameAnimation(self, end: QRect):
+    def startFrameAnimation(self, end: QRect, direction: int = -1):
         """
-
-        @param start:
-        @param end:
+        give end point and its direction
+        0: left
+        1: right
         @return:
         """
+        if direction != -1:
+            self.direction = direction
         self.frame_animation.setDuration(1000)
         self.frame_animation.setStartValue(self.frameRect())
         self.frame_animation.setEndValue(end)

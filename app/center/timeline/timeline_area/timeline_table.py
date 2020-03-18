@@ -324,7 +324,7 @@ class TimelineTable(TableWidget):
             x = 0
             y = (TimelineTable.Height - TimelineItem.IconSize) / 2
         frame_rect = QRect(x, y, TimelineItem.IconSize, TimelineItem.IconSize)
-        widget.startFrameAnimation(frame_rect)
+        widget.startFrameAnimation(frame_rect, direction)
 
     def resetAlignmentAnimation(self):
         """
@@ -376,12 +376,16 @@ class TimelineTable(TableWidget):
         get the index pointed by the mouse according to the x coordinate
         """
         col = self.columnAt(x)
-        if col > self.item_count or col == -1:
+        if col >= self.item_count or col == -1:
             return self.item_count
-        boundary = (col + 1 / 2) * self.Width
-        if x < boundary:
+        # if col == 0
+        direction = self.cellWidget(self.item_row, col).direction
+        if direction == 0:
+            # left
+            return col + 1
+        else:
+            # right
             return col
-        return col + 1
 
     def handleItemChanged(self, item):
         """

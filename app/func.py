@@ -595,7 +595,7 @@ class Func(object):
                           1 success
                           2 fail
         """
-        Info.Psy.output.print(information, information_type)
+        Info.Psy.output.print(str(information), information_type)
 
     @staticmethod
     def checkReferValidity(target_timeline_widget_id: str, widget_id: str) -> bool:
