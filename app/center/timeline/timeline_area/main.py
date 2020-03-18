@@ -95,7 +95,7 @@ class TimelineArea(QFrame):
         @param widget_name:
         @return:
         """
-        return self.timeline_table.itemWidgetId(widget_name)
+        return self.timeline_table.itemWidgetIdByWidgetName(widget_name)
 
     def dragEnterEvent(self, e):
         """
@@ -148,60 +148,62 @@ class TimelineArea(QFrame):
         # data format
         data_format = e.mimeData().formats()[0]
         data = e.mimeData().data(data_format)
-        dest_index = self.timeline_table.mouseDestIndex(e.pos().x())
         if data_format == Info.IconBarToTimeline:
             # add item in timeline simply
-            self.handleAddDrag(data, dest_index)
+            self.handleAddDrag(data, e.pos().x())
             # accept
             e.accept()
         elif data_format == Info.MoveInTimeline:
             # move item in timeline, we have deleted item above, now we add item.
-            self.handleMoveLocalDrag(data, dest_index)
+            self.handleMoveLocalDrag(data, e.pos().x())
             # accept
             e.accept()
         elif data_format == Info.CopyInTimeline:
             # copy item in timeline
-            self.handleCopyDrag(data, dest_index)
+            self.handleCopyDrag(data, e.pos().x())
             # accept
             e.accept()
         elif data_format == Info.StructureMoveToTimeline:
             # move item in different timeline
-            self.handleMoveGlobalDrag(data, dest_index)
+            self.handleMoveGlobalDrag(data, e.pos().x())
             # accept
             e.accept()
         elif data_format == Info.StructureReferToTimeline:
             # accept
-            self.handleReferDrag(data, dest_index)
+            self.handleReferDrag(data, e.pos().x())
             e.accept()
         else:
             e.ignore()
 
-    def handleAddDrag(self, data: QByteArray, index: int):
+    def handleAddDrag(self, data: QByteArray, x: int):
         """
 
         @param data:
-        @param index:
+        @param x:
         @return:
         """
         # simply add a item in timeline
         stream = QDataStream(data, QIODevice.ReadOnly)
         widget_type = stream.readQString()
+        index = self.timeline_table.mouseDestIndex(x)
         widget_id, widget_name, index = self.addItem(widget_type=widget_type, index=index)
         # emit signal
         self.itemAdded.emit(widget_id, widget_name, index)
 
-    def handleMoveLocalDrag(self, data: QByteArray, dest_index: int):
+    def handleMoveLocalDrag(self, data: QByteArray, x: int):
         """
         when move drag drop.
         """
         stream = QDataStream(data, QIODevice.ReadOnly)
         origin_index = stream.readInt()
+        widget_name = self.timeline_table.itemWidgetNameByIndex(origin_index)
+        dest_index = self.timeline_table.mouseDestIndex(x, widget_name)
         if dest_index != origin_index:
             # move item
             widget_id, dest_index = self.moveItem(origin_index, dest_index)
             self.itemMoved.emit(self.parent().widget_id, widget_id, origin_index, dest_index)
 
-    def handleMoveGlobalDrag(self, data: QByteArray, dest_index: int):
+    def handleMoveGlobalDrag(self, data: QByteArray, x: int):
         stream = QDataStream(data, QIODevice.ReadOnly)
         # check this widget existed in this timeline or not
         widget_id = stream.readQString()
@@ -209,35 +211,38 @@ class TimelineArea(QFrame):
         origin_index = self.timeline_table.itemIndexByWidgetName(widget_name)
         if origin_index != -1:
             # if existed, this drag becomes local drag
+            dest_index = self.timeline_table.mouseDestIndex(x, widget_name)
             if dest_index != origin_index:
                 # move item
                 widget_id, dest_index = self.moveItem(origin_index, dest_index)
                 self.itemMoved.emit(self.parent().widget_id, widget_id, origin_index, dest_index)
         else:
             # we need add item in this timeline and delete in origin timeline (Psy will delete item in other timeline).
+            dest_index = self.timeline_table.mouseDestIndex(x)
             self.addItem(widget_id=widget_id, widget_name=widget_name, index=dest_index)
             self.itemMoved.emit(Func.getWidgetParent(widget_id), widget_id, origin_index, dest_index)
 
-    def handleCopyDrag(self, data: QByteArray, index: int):
+    def handleCopyDrag(self, data: QByteArray, x: int):
         """
         when copy drag drop.
         @param data:
-        @param index:
+        @param x:
         @return:
         """
         # simply add a item in timeline
         stream = QDataStream(data, QIODevice.ReadOnly)
         origin_widget_id = stream.readQString()
         widget_type = Func.getWidgetType(origin_widget_id)
+        index = self.timeline_table.mouseDestIndex(x)
         new_widget_id, new_widget_name, index = self.addItem(widget_type=widget_type, index=index)
         # emit signal
         self.itemCopied.emit(origin_widget_id, new_widget_id, new_widget_name, index)
 
-    def handleReferDrag(self, data: QByteArray, dest_index: int):
+    def handleReferDrag(self, data: QByteArray, x: int):
         """
 
         @param data:
-        @param dest_index:
+        @param x:
         @return:
         """
         # if exist in this timeline, we need to change as move drag
@@ -247,6 +252,7 @@ class TimelineArea(QFrame):
         origin_index = self.timeline_table.itemIndexByWidgetName(widget_name)
         if origin_index != -1:
             # if existed, this drag becomes local drag
+            dest_index = self.timeline_table.mouseDestIndex(x, widget_name)
             if dest_index != origin_index:
                 # move item
                 origin_widget_id, dest_index = self.moveItem(origin_index, dest_index)
@@ -255,6 +261,7 @@ class TimelineArea(QFrame):
             # we need to check refer validity
             if Func.checkReferValidity(self.parent().widget_id, origin_widget_id):
                 # we need add item in this timeline
+                dest_index = self.timeline_table.mouseDestIndex(x)
                 new_widget_id, _, index = self.addItem(widget_type=Func.getWidgetType(origin_widget_id),
                                                        widget_name=widget_name,
                                                        index=dest_index)

@@ -3,6 +3,7 @@ from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu, QShortcut
 
 from app.func import Func
+from app.info import Info
 from lib import TableWidget, MessageBox
 from .timeline_item import TimelineItem
 from .timeline_name_item import TimelineNameItem
@@ -264,7 +265,7 @@ class TimelineTable(TableWidget):
                 return col
         return -1
 
-    def itemWidgetId(self, widget_name: str):
+    def itemWidgetIdByWidgetName(self, widget_name: str):
         """
 
         @param widget_name:
@@ -275,6 +276,23 @@ class TimelineTable(TableWidget):
             if widget_name == widget.text():
                 return widget.widget_id
         return -1
+
+    def itemWidgetIdByIndex(self, index: int):
+        """
+
+        @param index:
+        @return:
+        """
+        try:
+            return self.cellWidget(self.item_row, index).widget_id
+        except:
+            return Info.ERROR_WIDGET_ID
+
+    def itemWidgetNameByIndex(self, index: int):
+        try:
+            return self.item(self.name_row, index).text()
+        except:
+            return ""
 
     def startItemAnimation(self, x: int):
         """
@@ -371,21 +389,27 @@ class TimelineTable(TableWidget):
             rect = QRect(x, y, width, height)
             widget.startGeometryAnimation(rect)
 
-    def mouseDestIndex(self, x: int):
+    def mouseDestIndex(self, x: int, widget_name: str = ""):
         """
         get the index pointed by the mouse according to the x coordinate
         """
         col = self.columnAt(x)
         if col >= self.item_count or col == -1:
             return self.item_count
-        # if col == 0
         direction = self.cellWidget(self.item_row, col).direction
         if direction == 0:
             # left
+            if widget_name == self.item(self.name_row, col).text():
+                return col
             return col + 1
         else:
             # right
-            return col
+            if col == 0:
+                return col
+            else:
+                if widget_name == self.item(self.name_row, col - 1).text():
+                    return col - 1
+                return col
 
     def handleItemChanged(self, item):
         """
