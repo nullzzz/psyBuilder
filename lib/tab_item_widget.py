@@ -28,7 +28,6 @@ class TabItemWidget(QWidget):
         # widget_id is used to distinguish different widgets
         self.widget_id = widget_id
         self.widget_name = widget_name
-
     """
     about properties and attributes
     """

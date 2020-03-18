@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QGridLayout
+from PyQt5.QtWidgets import QGridLayout,QVBoxLayout
 
 from app.info import Info
 from lib import TabItemWidget
@@ -38,10 +38,10 @@ class Timeline(TabItemWidget):
         self.icon_bar = IconBar()
         self.timeline_area = TimelineArea(self)
         # set its layout
-        grid = QGridLayout(self)
-        grid.addWidget(self.icon_bar, 0, 0, 1, 1)
-        grid.addWidget(self.timeline_area, 1, 0, 1, 1)
-        self.setLayout(grid)
+        layout = QVBoxLayout()
+        layout.addWidget(self.icon_bar, 1)
+        layout.addWidget(self.timeline_area, 5)
+        self.setLayout(layout)
 
         # link signals
         self.linkSignals()

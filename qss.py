@@ -3,45 +3,36 @@ QLabel#TimelineItem{
     background-color: transparent;
 }
 QLabel#TimelineItem:hover{
-    border: 2px solid rgb(186, 215, 251);
-    border-radius: 4px;
-    padding: 4px;
+    border: 1px solid rgb(110,110,110);
+    border-radius: 2px;
+    padding: 2px;
 }
 """
 
 icon_bar = """
-QTabWidget#IconBar{
-    max-height:98px;
-}
-QTabWidget#IconBar::pane{
-    border:1px solid rgb(201,201,201);
+QTabWidget::pane#IconBar {
+    border-left: 1px solid rgb(201,201,201);
+    border-right: 1px solid rgb(201,201,201);
+    border-bottom: 1px solid rgb(201,201,201);
 }
 """
 
 timeline_table = """
-QTableView#TimelineTable{
-    selection-background-color: rgb(204,233,255);
-}
-QTableView#TimelineTable::Item{
-    background-color:transparent;
-    border: 0px solid white;
-}
-QTableView#TimelineTable::Item:selected{
-    color: black;
-    background-color: rgb(204,233,255);
-    border: 2px solid rgb(186, 215, 251);
+QTableWidget#TimelineTable {
+    selection-background-color:rgb(186,215,251);
 }
 """
 
 timeline_area = """
-QFrame#TimelineArea{
+QFrame#TimelineArea {
     background:white;
 }
 """
 
 tab_bar = """
 QTabWidget::pane {
-    background-color: rgb(236,236,236);
+    background-color: rgb(240,240,240);
+    border: 0px solid red;
 }
 
 QTabWidget::tab-bar {
@@ -51,49 +42,47 @@ QTabWidget::tab-bar {
 QTabBar::tab {
     background: rgb(246,246,246);
     border: 1px solid rgb(201,201,201);
-    min-height: 30px;
+    min-height: 28px;
+    max-height: 28px;
     min-width: 100px;
     text-align: center;
 }
 
 QTabBar::tab#TabWidget {
     border-left: 10px solid transparent;
-    border-right: 5px solid transparent;
 }
 
 QTabBar::tab:selected{
-    background: rgb(246,246,246);
+    background: white;
     border-bottom:0px;
 }
 
 QTabBar::tab:!selected {
-    background: rgb(221,221,221);
+    background: rgb(236,236,236);
 }
 
 QTabBar::tab:hover {
-    background: rgb(198,198,198);
+    background: rgb(225,225,225);
 }
 
 QTabBar::close-button {
-    image: url(images/tab_bar/close.ico);
+    image: url(images/tab_bar/close.png);
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+    position: absolute;
+    icon-size: 2px;;
 }
 
 QTabBar::close-button:hover {
-    background: rgb(211,211,211);
+    image: url(images/tab_bar/close_pressed.png);
 }
 
-QTabBar::close-button:pressed {
-    background: rgb(201,201,201);
-}
 """
 
 icon_list = """
 QListView#IconList{
-    border: 1px solid rgb(204, 204, 204);
-    border-radius: 4px;
     show-decoration-selected: 1;
     font-size: 12px;
-    min-height:66px;
 }
 
 QListView#IconList::Item{
@@ -103,32 +92,25 @@ QListView#IconList::Item{
 
 QListView#IconList::Item:hover{
     background: transparent;
-    border-radius:4px;
-    border: 2px solid rgb(186, 215, 251);
+    border-radius:2px;
+    border: 1px solid rgb(110, 110, 110);
 }
 
 QListView#IconList::Item:selected{
-    background: rgb(204,233,255);
-    border-radius:4px;
-    border: 2px solid rgb(186, 215, 251);
-}
-"""
-
-dock_widget = """
-QDockWidget::title {
-    text-align: left;
-    padding: 6px;
+    background: rgb(186,215,251);
+    border-radius:2px;
+    border: 1px solid rgb(110, 110, 110);
 }
 """
 
 structure_tree = """
 QTreeView::item:selected {
-    border: 1px solid rgb(186, 215, 251);
+    border: 0px solid rgb(186, 215, 251);
     background: rgb(186, 215, 251);
 }
 
 QTreeView::item:hover {
-    border:1px solid rgb(186, 215, 251);
+    border:1px solid rgb(110,110,110);
 }
 
 QTreeView::branch:selected {
@@ -160,4 +142,28 @@ QTreeView::branch:open:has-children:has-siblings {
 }
 """
 
-windows_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + dock_widget + structure_tree
+dock_widget = """
+QDockWidget {
+    border: 1px solid rgb(206,206,206);
+    titlebar-close-icon: url(images/tab_bar/close.png);
+}
+
+QDockWidget::title {
+    background: rgb(237,237,237);
+    text-align: center;
+}
+
+QDockWidget::close-button {
+    subcontrol-position: right;
+    border: 1px solid transparent;
+    background: transparent;
+    margin-right: 2px;
+    icon-size: 16px;
+}
+
+QDockWidget::close-button:hover {
+    background: rgb(221,221,221);
+}
+"""
+
+qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree + dock_widget

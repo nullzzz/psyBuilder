@@ -1,5 +1,4 @@
 import os
-import platform
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize, QSettings
@@ -8,7 +7,7 @@ from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFile
 from app import Psy
 from app.func import Func
 from lib import MessageBox, TableWidget, HoverButton
-from qss import mac_qss, windows_qss
+from qss import qss
 
 
 class FilePath(QTextEdit):
@@ -22,8 +21,8 @@ class FilePath(QTextEdit):
             border:none;
         }
         QTextEdit:hover{
-            border-radius:4px;
-            border: 2px solid rgb(186, 215, 251);
+            border-radius:2px;
+            border: 1px solid rgb(110, 110, 110);
         }
         """)
         self.file_path = file_path
@@ -46,7 +45,7 @@ class FilePath(QTextEdit):
 
     def leaveEvent(self, QEvent):
         super(FilePath, self).leaveEvent(QEvent)
-        QApplication.setOverrideCursor(Qt.ArrowCursor)
+        QApplication.restoreOverrideCursor()
 
 
 class FilePathTable(TableWidget):
@@ -187,6 +186,7 @@ class FileWindow(QWidget):
         """
         psy = Psy()
         psy.showMaximized()
+        QApplication.restoreOverrideCursor()
         self.close()
 
     def handleFileCreated(self, file_directory: str):
@@ -251,9 +251,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     file_window = FileWindow()
     file_window.show()
-    # choose qss
-    if platform.system() == "Windows":
-        app.setStyleSheet(windows_qss)
-    else:
-        app.setStyleSheet(mac_qss)
+    # set qss
+    app.setStyleSheet(qss)
     sys.exit(app.exec_())

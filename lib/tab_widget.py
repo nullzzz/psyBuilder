@@ -18,7 +18,6 @@ class TabWidget(QTabWidget):
         self.setTabsClosable(True)
         self.tabBar().setObjectName("TabWidget")
         self.tabCloseRequested.connect(self.removeTab)
-        self.tabBar().setShape(QTabBar.TriangularNorth)
         # set short and menu
         self.setMenuAndShortcut()
 
