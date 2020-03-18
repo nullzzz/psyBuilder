@@ -49,8 +49,8 @@ class Psy(QMainWindow):
             self.store("init_state.ini")
         # load config
         Info.Psy = self
-        Info.FILE_NAME = QSettings("config.ini", QSettings.IniFormat).value("file_path")
-        Info.FILE_DIRECTORY = QSettings("config.ini", QSettings.IniFormat).value("file_directory")
+        Info.FILE_NAME = QSettings("config.ini", QSettings.IniFormat).value("file_path", "")
+        Info.FILE_DIRECTORY = QSettings("config.ini", QSettings.IniFormat).value("file_directory", "")
         # if file name not none, we restore data from this file
         if Info.FILE_NAME:
             if not self.restore(Info.FILE_NAME):

@@ -39,7 +39,7 @@ class Info(object):
     # 当前导入导出文件名
     FILE_NAME = ""
     FILE_DIRECTORY = ""
-    IS_REGISTER = QSettings("config.ini", QSettings.IniFormat).value("register")
+    IS_REGISTER = QSettings("config.ini", QSettings.IniFormat).value("register", "No")
 
     # 限制输入的正则表达式
     RE_NUMBER = r"\[\w+\]|\d+"
