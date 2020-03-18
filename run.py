@@ -10,6 +10,34 @@ from lib import MessageBox, TableWidget, HoverButton
 from qss import qss
 
 
+class Version(QTextEdit):
+    def __init__(self, name: str, version: str):
+        super(Version, self).__init__()
+        self.setReadOnly(True)
+        self.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.setStyleSheet("""
+                QTextEdit{
+                    border:none;
+                }
+                """)
+        # set text
+        self.setAlignment(Qt.AlignHCenter)
+        self.setText(f"""
+        <div style="text-align: center;">
+            <b style="font:36px;vertical-align: middle;">{name}</b><br />
+            <b style="color:rgb(157,157,157); font:20px;vertical-align: middle;">{version}</b>
+        </div>
+        """)
+
+    def enterEvent(self, QEvent):
+        super(Version, self).enterEvent(QEvent)
+        QApplication.setOverrideCursor(Qt.ArrowCursor)
+
+    def leaveEvent(self, QEvent):
+        super(Version, self).leaveEvent(QEvent)
+        QApplication.restoreOverrideCursor()
+
+
 class FilePath(QTextEdit):
     clicked = pyqtSignal()
 
@@ -19,6 +47,7 @@ class FilePath(QTextEdit):
         self.setStyleSheet("""
         QTextEdit{
             border:none;
+            padding-left:10px;
         }
         QTextEdit:hover{
             border-radius:2px;
@@ -111,17 +140,18 @@ class FileButtonArea(QWidget):
         super(FileButtonArea, self).__init__()
         # widget
         icon = QLabel()
-        icon.setPixmap(Func.getImageObject("common/icon.png", type=0, size=QSize(180, 180)))
+        icon.setPixmap(Func.getImageObject("common/icon.png", type=0, size=QSize(80, 80)))
         # buttons
         create_button = HoverButton("menu/add", "Create New File")
         create_button.clicked.connect(self.handleCreateButtonClicked)
-        open_button = HoverButton("menu/open", "Open")
+        open_button = HoverButton("menu/open", "Open Local File")
         open_button.clicked.connect(self.handleOpenButtonClicked)
         # layout
         layout = QVBoxLayout()
-        layout.addWidget(icon, 50, Qt.AlignVCenter | Qt.AlignLeft)
-        layout.addWidget(create_button, 1, Qt.AlignVCenter | Qt.AlignLeft)
-        layout.addWidget(open_button, 1, Qt.AlignVCenter | Qt.AlignLeft)
+        layout.addWidget(icon, 18, Qt.AlignCenter)
+        layout.addWidget(Version("Psy Builder", "Version 2020.3"), 13)
+        layout.addWidget(create_button, 1, Qt.AlignHCenter)
+        layout.addWidget(open_button, 1, Qt.AlignHCenter)
         layout.addStretch(20)
         self.setLayout(layout)
 

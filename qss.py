@@ -25,6 +25,7 @@ QTableWidget#TimelineTable {
 timeline_area = """
 QFrame#TimelineArea {
     background:white;
+    border: 1px solid rgb(201,201,201);
 }
 """
 
