@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QDataStream, QByteArray, QIODevice, QMimeData, QPoint, QSize, Qt
+from PyQt5.QtCore import QDataStream, QByteArray, QIODevice, QMimeData, QPoint, QSize
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListView, QListWidget, QListWidgetItem, QTabWidget, QFrame
 
@@ -15,7 +15,6 @@ class WidgetIconItem(QListWidgetItem):
         self.widget_type = widget_type
         icon = Func.getImageObject(f"widgets/{widget_type}", 1)
         super(WidgetIconItem, self).__init__(icon, widget_type)
-        self.setTextAlignment(Qt.AlignHCenter | Qt.AlignBottom)
 
 
 class IconList(QListWidget):

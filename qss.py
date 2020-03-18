@@ -11,9 +11,8 @@ QLabel#TimelineItem:hover{
 
 icon_bar = """
 QTabWidget::pane#IconBar {
-    border-left: 1px solid rgb(201,201,201);
-    border-right: 1px solid rgb(201,201,201);
-    border-bottom: 1px solid rgb(201,201,201);
+    min-height:75px;
+    max-height:75px;
 }
 """
 
@@ -83,10 +82,13 @@ icon_list = """
 QListView#IconList{
     show-decoration-selected: 1;
     font-size: 12px;
+    min-height:75px;
+    max-height:75px;
 }
 
 QListView#IconList::Item{
-    min-height: 60px;
+    min-height:75px;
+    max-height:75px;
     min-width: 100px;
 }
 
