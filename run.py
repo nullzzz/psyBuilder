@@ -29,9 +29,9 @@ class FilePath(QTextEdit):
         file_name = os.path.basename(file_path)
         self.setText(f"""<b style="color:rgb(31,31,31)">{file_name}</b>""")
         if os.path.exists(file_path):
-            self.append(f"""<p style="color:rgb(157,157,157)">{file_path}</p>""")
+            self.append(f"""<p style="color:rgb(157,157,157); font:12px">{file_path}</p>""")
         else:
-            self.append(f"""<p style="color:rgb(142,15,15)">{file_path}</p>""")
+            self.append(f"""<p style="color:rgb(142,15,15); font-size:12px">{file_path}</p>""")
         self.setReadOnly(True)
         self.setTextInteractionFlags(Qt.NoTextInteraction)
 

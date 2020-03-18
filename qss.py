@@ -80,6 +80,8 @@ QTabBar::close-button:hover {
 
 icon_list = """
 QListView#IconList{
+    border: 1px solid rgb(201,201,201);
+    border-top: none;
     show-decoration-selected: 1;
     font-size: 12px;
     min-height:75px;
