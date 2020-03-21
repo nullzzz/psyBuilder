@@ -18,6 +18,7 @@ class TabWidget(QTabWidget):
         self.setTabsClosable(True)
         self.tabBar().setObjectName("TabWidget")
         self.tabCloseRequested.connect(self.removeTab)
+        self.tabBar().setMovable(True)
         # set short and menu
         self.setMenuAndShortcut()
 
@@ -26,6 +27,8 @@ class TabWidget(QTabWidget):
 
         :return:
         """
+        # tab bar's menu
+        menu = self.tabBar()
         # close current tab
         QShortcut(QKeySequence(QKeySequence.Close), self).activated.connect(lambda: self.removeTab(self.currentIndex()))
         # switch different tab

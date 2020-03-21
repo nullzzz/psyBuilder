@@ -37,7 +37,7 @@ class Psy(QMainWindow):
         super(Psy, self).__init__(None)
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
-        self.setWindowIcon(Func.getImageObject("common/con.png", type=1))
+        self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         # init menu bar
         self.initMenubar()
         # init dock widget
@@ -679,7 +679,7 @@ class Psy(QMainWindow):
             Info.FILE_NAME = ""
             Info.FILE_DIRECTORY = file_directory
             # restore from init state
-            self.restore("init_state.ini")
+            self.restore("init_state.ini", False)
 
     def saveFile(self):
         """
@@ -763,17 +763,17 @@ class Psy(QMainWindow):
                 file_paths.insert(0, file_path)
             QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
             # store current state
-            self.store("temp.ini")
+            self.store("temp.ini", False)
             # clear software
             self.clear()
             # restore data from opening file
             if not self.restore(file_path):
                 # if store failed, restore to latest state
-                self.restore("temp.ini")
+                self.restore("temp.ini", False)
             Info.FILE_NAME = file_path
             Info.FILE_DIRECTORY = os.path.dirname(file_path)
 
-    def store(self, file_path: str) -> bool:
+    def store(self, file_path: str, show=True) -> bool:
         """
         store data to file
         """
@@ -801,13 +801,14 @@ class Psy(QMainWindow):
             # tabs
             tabs = self.center.store()
             setting.setValue("Tabs", tabs)
-            Func.print("File successfully saved.", 1)
+            if show:
+                Func.print("File successfully saved.", 1)
             return True
         except Exception as e:
             Func.print(f"Due to error '{e}'. File saving failed.", 2)
             return False
 
-    def restore(self, file_path) -> bool:
+    def restore(self, file_path: str, show=True) -> bool:
         """
         restore data from file(it changes Info.FileName and Info.FILE_DIRECTORY
         """
@@ -856,7 +857,8 @@ class Psy(QMainWindow):
             self.structure.restore(structure)
             # restore tabs
             self.center.restore(tabs)
-            Func.print("File loaded successfully.", 1)
+            if show:
+                Func.print("File loaded successfully.", 1)
             return True
         except Exception as e:
             Func.print(f"Due to error '{e}', the file failed to load.", 2)
@@ -1122,7 +1124,7 @@ class Psy(QMainWindow):
 
     def clear(self):
         """
-        clear this software
+        clear this software at all
         :return:
         """
         # center
@@ -1144,13 +1146,13 @@ class Psy(QMainWindow):
         Info.TRACKER_DEVICE_INFO.clear()
         Info.FILE_NAME = ""
         Info.FILE_DIRECTORY = ""
-        Info.device_count = {key: 0 for key in Info.device_count}
-        Info.SLIDER_COUNT = {key: 0 for key in Info.SLIDER_COUNT}
+        Info.device_count.clear()
+        Info.SLIDER_COUNT.clear()
         Info.Widgets.clear()
         Info.Names.clear()
         Info.Nodes.clear()
-        Info.WidgetTypeCount = {key: 0 for key in Info.WidgetTypeCount}
-        Info.WidgetNameCount = {key: 0 for key in Info.WidgetNameCount}
+        Info.WidgetTypeCount.clear()
+        Info.WidgetNameCount.clear()
 
     def showMaximized(self):
         """

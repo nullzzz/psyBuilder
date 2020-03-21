@@ -140,7 +140,7 @@ class FileButtonArea(QWidget):
         super(FileButtonArea, self).__init__()
         # widget
         icon = QLabel()
-        icon.setPixmap(Func.getImageObject("common/icon.png", type=0, size=QSize(80, 80)))
+        icon.setPixmap(Func.getImageObject("common/icon.png", type=0, size=QSize(60, 60)))
         # buttons
         create_button = HoverButton("menu/add", "Create New File")
         create_button.clicked.connect(self.handleCreateButtonClicked)
@@ -149,7 +149,7 @@ class FileButtonArea(QWidget):
         # layout
         layout = QVBoxLayout()
         layout.addWidget(icon, 18, Qt.AlignCenter)
-        layout.addWidget(Version("Psy Builder", "Version 2020.3"), 13)
+        layout.addWidget(Version("Psy Builder", "Version 2020.3"), 20)
         layout.addWidget(create_button, 1, Qt.AlignHCenter)
         layout.addWidget(open_button, 1, Qt.AlignHCenter)
         layout.addStretch(20)

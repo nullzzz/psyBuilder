@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMimeData, QPoint
+from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMimeData, QPoint, QSize
 from PyQt5.QtGui import QDrag, QKeySequence
 from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut
 
@@ -32,6 +32,8 @@ class StructureTree(QTreeWidget):
         self.linkSignals()
         # set menu and shortcut
         self.setMenuAndShortcut()
+        # set icon size
+        self.setIconSize(QSize(12, 12))
 
     def linkSignals(self):
         """

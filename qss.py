@@ -150,7 +150,7 @@ QTreeView::branch:open:has-children:has-siblings {
 dock_widget = """
 QDockWidget {
     border: 1px solid rgb(206,206,206);
-    titlebar-close-icon: url(images/tab_bar/close.png);
+    titlebar-close-icon: url(images/dock_widget/hide.png);
 }
 
 QDockWidget::title {
@@ -160,7 +160,7 @@ QDockWidget::title {
 
 QDockWidget::close-button {
     subcontrol-position: right;
-    border: 1px solid transparent;
+    border: 0.5px solid transparent;
     background: transparent;
     margin-right: 2px;
     icon-size: 16px;
