@@ -15,6 +15,7 @@ class Center(QMainWindow):
 
     def __init__(self):
         super(Center, self).__init__()
+        self.setObjectName("Center")
         # set tab widget as its main widget
         self.tab_widget = TabWidget()
         self.setCentralWidget(self.tab_widget)

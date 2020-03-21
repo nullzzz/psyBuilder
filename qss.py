@@ -171,4 +171,12 @@ QDockWidget::close-button:hover {
 }
 """
 
-qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree + dock_widget
+center = """
+QMainWindow::separator {
+    background: rgb(110,110,110);
+    width: 1px;
+    height: 1px;
+}
+"""
+
+qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree + dock_widget + center
