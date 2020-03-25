@@ -1,12 +1,11 @@
 import time
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QComboBox
 
 from app.func import Func
 from app.info import Info
-from lib import VarComboBox, VarLineEdit
-from ..events import Slider
+from lib import VarLineEdit
 
 
 class IconChoose(QWidget):
@@ -17,8 +16,6 @@ class IconChoose(QWidget):
         "Pro window": {}
     }
     """
-    # 发送到上一层, 由上一层再转至properties (properties)
-    propertiesShow = pyqtSignal(dict)
     itemAdded = pyqtSignal(str, str)
     itemDeleted = pyqtSignal(str)
     itemNameChanged = pyqtSignal(str, str)
@@ -28,34 +25,48 @@ class IconChoose(QWidget):
 
         self.attributes: list = []
 
-        self.event_types = VarComboBox()
-        self.event_types.addItem("None")
-        self.event_types.addItem(Info.IMAGE)
-        self.event_types.addItem(Info.VIDEO)
-        self.event_types.addItem(Info.TEXT)
-        self.event_types.addItem(Info.SOUND)
-        self.event_types.addItem(Info.SLIDER)
-        self.event_types.currentTextChanged.connect(self.changeIcon)
+        self.event_types = QComboBox()
+        self.event_types.addItems(("None", Info.IMAGE, Info.VIDEO, Info.TEXT, Info.SOUND, Info.SLIDER))
+
         self.name_line = VarLineEdit()
         self.name_line.setEnabled(False)
-        self.name_line.textChanged.connect(self.changeName)
+        self.linkSignal()
+
         self.icon_label = IconLabel()
         self.icon_label.setAlignment(Qt.AlignCenter)
         self.icon_label.doubleClick.connect(self.openProWindow)
 
-        self.widget_id = ""
+        self.current_sub_wid = ""
+
+        self.pool = {
+            "Image": "",
+            "Video": "",
+            "Text": "",
+            "Sound": "",
+            "Slider": "",
+        }
 
         self.default_properties: dict = {
-            "Stim type": "None",
-            "Event name": "",
-            "Pro window": None
+            "Stim Type": "None",
+            "Event Name": "",
+            "Sub Wid": "",
         }
 
         self.event_type = "None"
         self.event_name = ""
         self.widget = None
         self.pro_window = None
+        self.setUI()
 
+    def linkSignal(self, b=True):
+        if b:
+            self.event_types.currentTextChanged.connect(self.changeIcon)
+            self.name_line.textChanged.connect(self.changeName)
+        else:
+            self.event_types.currentTextChanged.disconnect(self.changeIcon)
+            self.name_line.textChanged.disconnect(self.changeName)
+
+    def setUI(self):
         grid_layout = QGridLayout()
         event_tip = QLabel("Stim Type:")
         event_tip.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
@@ -72,35 +83,34 @@ class IconChoose(QWidget):
     def changeIcon(self, current_type):
         self.event_type = current_type
 
-        if self.widget_id != "":
-            # 删除原来的widget
-            Func.delWidget(self.widget_id)
-            self.itemDeleted.emit(self.widget_id)
+        sub_id = self.pool.get(self.event_type)
+        if sub_id == "":
+            sub_id = Func.generateWidgetId(self.event_type)
+            self.pool[self.event_type] = sub_id
 
-        # 空
-        if current_type == "None":
-            self.icon_label.clear()
-            self.name_line.clear()
-            self.name_line.setEnabled(False)
-            self.widget_id = ""
+        if self.current_sub_wid != "":
+            self.itemDeleted.emit(self.current_sub_wid)
+
+        self.current_sub_wid = sub_id
+
+        self.icon_label.setIcon(current_type)
+        name = self.generateName()
+
+        self.itemNameChanged.block(True)
+        self.name_line.setText(name)
+        self.itemNameChanged.block(False)
+
+    def createSubWidget(self):
+        if self.current_sub_wid is None:
+            self.current_sub_wid = ""
             self.widget = None
-            self.pro_window = None
             return
+        self.widget = Func.createWidget(self.current_sub_wid)
+        self.itemAdded.emit(self.current_sub_wid, self.event_name)
+        self.linkWidgetSignal()
+        self.setAttributes(self.attributes)
 
-        self.createSubWidget()
-
-    def createSubWidget(self, widget_id: str = ""):
-        pix_map = Func.getWidgetImage(self.event_type, "pixmap")
-        self.icon_label.setPixmap(pix_map.scaled(100, 100))
-        if widget_id == "":
-            # 创建widget
-            self.widget_id = Func.generateWidgetId(self.event_type)
-        else:
-            self.widget_id = widget_id
-        self.itemAdded.emit(self.widget_id, self.event_name)
-        self.widget = Func.getWidget(self.widget_id)
-
-        # slider
+    def linkWidgetSignal(self):
         if self.event_type == Info.SLIDER:
             self.pro_window = self.widget
         else:
@@ -108,13 +118,28 @@ class IconChoose(QWidget):
             self.pro_window.ok_bt.clicked.connect(self.ok)
             self.pro_window.cancel_bt.clicked.connect(self.cancel)
             self.pro_window.apply_bt.clicked.connect(self.apply)
-        self.setAttributes(self.attributes)
-        self.name_line.setText(f"Untitled_{self.event_type}{int(time.time() % 10000)}")
+
+    def generateName(self):
+        """
+        定义event name的命名方式
+        :return:
+        """
+        if self.event_type == "None":
+            self.name_line.setEnabled(False)
+            return ""
         self.name_line.setEnabled(True)
+        while (name := f"U_{self.event_type}_{int(time.time() % 10000)}") in Info.NAME_WID.keys():
+            pass
+        return name
 
     def changeName(self, new_name: str):
-        self.event_name = new_name
-        self.itemNameChanged.emit(self.widget_id, new_name)
+        if new_name in Info.NAME_WID.keys() and new_name != self.event_name:
+            self.name_line.setColor("red")
+        else:
+            self.name_line.setColor("white")
+            if new_name != self.event_name:
+                self.event_name = new_name
+                self.itemNameChanged.emit(self.current_sub_wid, new_name)
 
     def ok(self):
         self.apply()
@@ -127,22 +152,23 @@ class IconChoose(QWidget):
         self.pro_window.close()
 
     def openProWindow(self):
-        if self.widget:
+        if self.current_sub_wid != "":
+            if self.widget is None:
+                self.widget = Func.createWidget(self.current_sub_wid)
+                self.linkWidgetSignal()
             if self.event_type == Info.SLIDER:
-                self.pro_window.pro_window.refresh()
+                self.widget.setWindowFlag(Qt.WindowStaysOnTopHint)
+                self.widget.show()
             else:
-                self.pro_window.refresh()
-            self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
-            self.pro_window.show()
+                self.widget.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
+                self.widget.pro_window.show()
 
     def getInfo(self):
         self.default_properties.clear()
-        if self.pro_window is not None:
-            self.default_properties["Pro window"] = self.pro_window.getInfo().copy()
-        else:
-            self.default_properties["Pro window"] = {}
-        self.default_properties["Stim type"] = self.event_type
-        self.default_properties["Event name"] = self.event_name
+        self.default_properties["Id Pool"] = self.pool
+        self.default_properties["Sub Wid"] = self.current_sub_wid
+        self.default_properties["Stim Type"] = self.event_type
+        self.default_properties["Event Name"] = self.event_name
         return self.default_properties
 
     def getProperties(self):
@@ -150,30 +176,23 @@ class IconChoose(QWidget):
 
     # 加载外部属性
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
+        self.linkSignal(False)
+        self.default_properties = properties.copy()
+        self.loadSetting()
+        self.linkSignal()
 
     # 加载当前属性
     def loadSetting(self):
-        # todo bug
-        # self.event_types.currentTextChanged.disconnect()
-        self.event_types.setCurrentText(self.default_properties.get("Stim type", "None"))
-        # self.event_types.currentTextChanged.connect(self.changeIcon)
-        self.name_line.setText(self.default_properties.get("Event name", ""))
+        self.pool = self.default_properties.get("Id Pool")
+        self.current_sub_wid = self.default_properties.get("Sub Wid", "")
 
-        if self.pro_window is not None:
-            if isinstance(self.pro_window, Slider):
-                self.pro_window.restore(self.default_properties.get("Pro window", {}))
-            else:
-                self.pro_window.setProperties(self.default_properties.get("Pro window", {}))
+        self.event_type = self.default_properties.get("Stim Type", "None")
+        self.event_types.setCurrentText(self.event_type)
+        self.icon_label.setIcon(self.event_type)
 
-    def setProWindow(self, pro):
-        del self.pro_window
-        self.pro_window = pro
-        self.pro_window.ok_bt.clicked.connect(self.ok)
-        self.pro_window.cancel_bt.clicked.connect(self.cancel)
-        self.pro_window.apply_bt.clicked.connect(self.apply)
+        self.event_name = self.default_properties.get("Event Name", "")
+        self.name_line.setText(self.event_name)
+        self.name_line.setEnabled(self.current_sub_wid != "")
 
     def setAttributes(self, attributes: list):
         self.attributes = attributes
@@ -210,7 +229,7 @@ class IconChoose(QWidget):
         return self.widget
 
     def getWidgetId(self) -> str:
-        return self.widget_id
+        return self.current_sub_wid
 
 
 class IconLabel(QLabel):
@@ -222,3 +241,10 @@ class IconLabel(QLabel):
     def mouseDoubleClickEvent(self, *args, **kwargs):
         self.doubleClick.emit()
         QLabel.mouseDoubleClickEvent(self, *args, **kwargs)
+
+    def setIcon(self, event_type):
+        if event_type == "None":
+            self.clear()
+        else:
+            pix_map = Func.getWidgetImage(event_type, "pixmap")
+            self.setPixmap(pix_map.scaled(100, 100))

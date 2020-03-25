@@ -817,26 +817,26 @@ class Psy(QMainWindow):
         except:
             return False
         # restore data firstly
-        Info.Names = setting.value("Names", -1)
-        Info.WidgetTypeCount = setting.value("WidgetTypeCount", -1)
-        Info.WidgetNameCount = setting.value("WidgetNameCount", -1)
-        Info.INPUT_DEVICE_INFO = setting.value("InputDeviceInfo", -1)
-        Info.OUTPUT_DEVICE_INFO = setting.value("OutputDeviceInfo", -1)
-        Info.QUEST_DEVICE_INFO = setting.value("QuestDeviceInfo", -1)
-        Info.TRACKER_DEVICE_INFO = setting.value("TrackerDeviceInfo", -1)
-        Info.SLIDER_COUNT = setting.value("SliderCount", -1)
+        Info.Names = setting.value("Names", {})
+        Info.WidgetTypeCount = setting.value("WidgetTypeCount", {})
+        Info.WidgetNameCount = setting.value("WidgetNameCount", {})
+        Info.INPUT_DEVICE_INFO = setting.value("InputDeviceInfo", {})
+        Info.OUTPUT_DEVICE_INFO = setting.value("OutputDeviceInfo", {})
+        Info.QUEST_DEVICE_INFO = setting.value("QuestDeviceInfo", {})
+        Info.TRACKER_DEVICE_INFO = setting.value("TrackerDeviceInfo", {})
+        Info.SLIDER_COUNT = setting.value("SliderCount", {})
         widgets_data = setting.value("Widgets", -1)
         structure = setting.value("Structure", -1)
         tabs = setting.value("Tabs", -1)
         # any one equal -1, fail
-        if Info.Names == -1 or \
-                Info.WidgetTypeCount == -1 or \
-                Info.WidgetNameCount == -1 or \
-                Info.INPUT_DEVICE_INFO == -1 or \
-                Info.OUTPUT_DEVICE_INFO == -1 or \
-                Info.QUEST_DEVICE_INFO == -1 or \
-                Info.TRACKER_DEVICE_INFO == -1 or \
-                Info.SLIDER_COUNT == -1 or \
+        if Info.Names == {} or \
+                Info.WidgetTypeCount == {} or \
+                Info.WidgetNameCount == {} or \
+                Info.INPUT_DEVICE_INFO == {} or \
+                Info.OUTPUT_DEVICE_INFO == {} or \
+                Info.QUEST_DEVICE_INFO == {} or \
+                Info.TRACKER_DEVICE_INFO == {} or \
+                Info.SLIDER_COUNT == {} or \
                 widgets_data == -1 or \
                 structure == -1 or \
                 tabs == -1:
@@ -969,7 +969,7 @@ class Psy(QMainWindow):
         self.aboutWidget.close()
 
     def aboutUs(self):
-
+        # todo: you'd better build this widget in a single python file
         self.aboutWidget = QWidget()
         self.aboutWidget.setWindowTitle("About developers of PTB Builder 0.1")
         self.aboutWidget.setWindowModality(2)

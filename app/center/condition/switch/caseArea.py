@@ -1,8 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QGridLayout, QWidget, QScrollArea
 
+from app.center.condition.switch.case import Case
 from app.func import Func
-from .case import Case
 
 
 class CaseArea(QScrollArea):
@@ -39,6 +39,10 @@ class CaseArea(QScrollArea):
             "Case 1": self.case_list[0].getProperties(),
             "Case 2": self.case_list[1].getProperties()
         }
+        for c in self.case_list:
+            c.icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(a, b))
+            c.icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(a))
+            c.icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
 
         self.setUI()
 

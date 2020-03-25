@@ -28,17 +28,28 @@ class TabItemMainWindow(QMainWindow):
         # widget_id is used to distinguish different widgets
         self.widget_id = widget_id
         self.widget_name = widget_name
+        self.default_properties: dict = {}
 
-    """
-    about properties and attributes
-    """
-
-    def getProperties(self) -> dict:
+    def refresh(self):
         """
-        You should finish the job.
+        update some things such as device information
+        :return:
+        """
 
+    def setAttributes(self, attributes: list):
+        """
+        set completer.
+        :param attributes:
+        :return:
+        """
+
+    def getProperties(self, display: bool = True) -> dict:
+        """
+        You should finish the job
         get this widget's properties to show it in Properties Window.
+        :param display: whether or not to display these properties in main window.
         :return: a dict of properties
+        :rtype: dict
         """
         return {}
 
@@ -48,9 +59,11 @@ class TabItemMainWindow(QMainWindow):
 
         return count of using device
         :return:
-        :rtype:
+        :rtype: int
         """
-        return 0
+        input_device: dict = self.default_properties.get("Input Devices", {})
+
+        return len(input_device)
 
     def getHiddenAttributes(self) -> list:
         """
@@ -65,7 +78,7 @@ class TabItemMainWindow(QMainWindow):
         :return: list of attributes
         """
         if self.getUsingDeviceCount():
-            return ["respOnSettingTime", "acc""resp", "rt"]
+            return ["respOnSettingTime", "acc", "resp", "rt"]
         return ["OnSettingTime"]
 
     """
@@ -88,7 +101,6 @@ class TabItemMainWindow(QMainWindow):
         return necessary data for restoring this widget.
         :return:
         """
-        return {}
 
     def restore(self, data) -> None:
         """
@@ -104,10 +116,10 @@ class TabItemMainWindow(QMainWindow):
         You should finish the job.
 
         return a copy of this widget, and set the widget id and name of the copy.
-        :param widget_id:
-        :return:
+        :param new_widget_id:
+        :param new_widget_name:
+        :return: a new widget with new name and id.
         """
-        return None
 
     """
     other function may be needed to all, but I forget those.
