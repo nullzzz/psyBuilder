@@ -153,6 +153,8 @@ class Info(object):
     ###########################################
     #           new version info              #
     ###########################################
+    # init file
+    Init_File = "init.ini"
 
     # image path
     Image_Path = "images"

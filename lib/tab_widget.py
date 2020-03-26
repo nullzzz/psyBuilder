@@ -102,10 +102,11 @@ class TabWidget(QTabWidget):
         :param data:
         :return:
         """
-        for widget_id in data:
-            widget = Func.getWidget(widget_id)
-            widget_type = Func.getWidgetType(widget_id)
-            widget_name = Func.getWidgetName(widget_id)
-            self.openTab(widget, widget_type, widget_name)
-        if self.count():
-            self.setCurrentIndex(0)
+        if data:
+            for widget_id in data:
+                widget = Func.getWidget(widget_id)
+                widget_type = Func.getWidgetType(widget_id)
+                widget_name = Func.getWidgetName(widget_id)
+                self.openTab(widget, widget_type, widget_name)
+            if self.count():
+                self.setCurrentIndex(0)

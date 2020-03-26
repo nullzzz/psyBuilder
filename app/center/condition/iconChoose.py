@@ -128,7 +128,8 @@ class IconChoose(QWidget):
             self.name_line.setEnabled(False)
             return ""
         self.name_line.setEnabled(True)
-        while (name := f"U_{self.event_type}_{int(time.time() % 10000)}") in Info.NAME_WID.keys():
+        name = f"U_{self.event_type}_{int(time.time() % 10000)}"
+        while name in Info.NAME_WID.keys():
             pass
         return name
 

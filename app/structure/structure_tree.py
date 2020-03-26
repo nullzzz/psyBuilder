@@ -261,20 +261,25 @@ class StructureTree(QTreeWidget):
         return necessary data for restoring this widget.
         @return:
         """
-        return self.getStructure(f"{Info.TIMELINE}.0", f"{Info.TIMELINE}_0")
+        if self.topLevelItemCount():
+            widget_id = self.topLevelItem(0).widget_id
+            widget_name = self.topLevelItem(0).text(0)
+            return self.getStructure(widget_id, widget_name)
+        return []
 
-    def restore(self, data: dict):
+    def restore(self, data: list):
         """
         restore this widget according to data.
         @param data: necessary data for restoring this widget
         @return:
         """
-        # add root node Timeline_0
-        root_widget_id, root_widget_name, children = data
-        self.addNode(Info.ERROR_WIDGET_ID, root_widget_id, root_widget_name, -1)
-        # add children nodes
-        for child_widget_id, child_widget_name, child_children in children:
-            self.restoreNode(root_widget_id, child_widget_id, child_widget_name, child_children)
+        if data:
+            # add root node Timeline_0
+            root_widget_id, root_widget_name, children = data
+            self.addNode(Info.ERROR_WIDGET_ID, root_widget_id, root_widget_name, -1)
+            # add children nodes
+            for child_widget_id, child_widget_name, child_children in children:
+                self.restoreNode(root_widget_id, child_widget_id, child_widget_name, child_children)
 
     def restoreNode(self, parent_widget_id: str, widget_id: str, widget_name: str, children: list):
         """

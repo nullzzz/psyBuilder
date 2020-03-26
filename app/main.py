@@ -2,7 +2,7 @@ import os
 import re
 import traceback
 
-from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSignal, QPropertyAnimation
+from PyQt5.QtCore import Qt, QTimer, QSettings, QPropertyAnimation
 from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette, QFontMetrics
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLabel, QGridLayout, \
     QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame
@@ -29,10 +29,6 @@ from .structure import Structure
 
 
 class Psy(QMainWindow):
-    # emit signal when restore finished/failed
-    restoreFinished = pyqtSignal()
-    restoreFailed = pyqtSignal()
-
     def __init__(self):
         super(Psy, self).__init__(None)
         # title and icon
@@ -44,9 +40,10 @@ class Psy(QMainWindow):
         self.initDockWidget()
         # wait dialog
         self.wait_dialog = WaitDialog()
-        # save init state
-        if not os.path.exists("init_state.ini"):
-            self.store("init_state.ini")
+        # save init state to restore the variable environment to its initial state
+        # without any widgets even Timeline_0
+        if not os.path.exists(Info.Init_File):
+            self.store(Info.Init_File, False)
         # load config
         Info.Psy = self
         Info.FILE_NAME = QSettings("config.ini", QSettings.IniFormat).value("file_path", "")
@@ -55,6 +52,7 @@ class Psy(QMainWindow):
         if Info.FILE_NAME:
             if not self.restore(Info.FILE_NAME):
                 self.clear()
+                Func.print("The file you selected may be damaged, please try to restart the software.", 2)
         else:
             # we init initial timeline => Timeline_0
             self.initInitialTimeline()
@@ -674,12 +672,10 @@ class Psy(QMainWindow):
             # change config
             QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
             QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
-            # restart Psy
-            self.clear()
+            # reset this software
+            self.reset()
             Info.FILE_NAME = ""
             Info.FILE_DIRECTORY = file_directory
-            # restore from init state
-            self.restore("init_state.ini", False)
 
     def saveFile(self):
         """
@@ -770,8 +766,9 @@ class Psy(QMainWindow):
             if not self.restore(file_path):
                 # if store failed, restore to latest state
                 self.restore("temp.ini", False)
-            Info.FILE_NAME = file_path
-            Info.FILE_DIRECTORY = os.path.dirname(file_path)
+            else:
+                Info.FILE_NAME = file_path
+                Info.FILE_DIRECTORY = os.path.dirname(file_path)
 
     def store(self, file_path: str, show=True) -> bool:
         """
@@ -805,7 +802,7 @@ class Psy(QMainWindow):
                 Func.print("File successfully saved.", 1)
             return True
         except Exception as e:
-            Func.print(f"Due to error '{e}'. File saving failed.", 2)
+            Func.print(f"Due to error {e}. File saving failed.", 2)
             return False
 
     def restore(self, file_path: str, show=True) -> bool:
@@ -817,26 +814,26 @@ class Psy(QMainWindow):
         except:
             return False
         # restore data firstly
-        Info.Names = setting.value("Names", {})
-        Info.WidgetTypeCount = setting.value("WidgetTypeCount", {})
-        Info.WidgetNameCount = setting.value("WidgetNameCount", {})
-        Info.INPUT_DEVICE_INFO = setting.value("InputDeviceInfo", {})
-        Info.OUTPUT_DEVICE_INFO = setting.value("OutputDeviceInfo", {})
-        Info.QUEST_DEVICE_INFO = setting.value("QuestDeviceInfo", {})
-        Info.TRACKER_DEVICE_INFO = setting.value("TrackerDeviceInfo", {})
-        Info.SLIDER_COUNT = setting.value("SliderCount", {})
+        Info.Names = setting.value("Names", -1)
+        Info.WidgetTypeCount = setting.value("WidgetTypeCount", -1)
+        Info.WidgetNameCount = setting.value("WidgetNameCount", -1)
+        Info.INPUT_DEVICE_INFO = setting.value("InputDeviceInfo", -1)
+        Info.OUTPUT_DEVICE_INFO = setting.value("OutputDeviceInfo", -1)
+        Info.QUEST_DEVICE_INFO = setting.value("QuestDeviceInfo", -1)
+        Info.TRACKER_DEVICE_INFO = setting.value("TrackerDeviceInfo", -1)
+        Info.SLIDER_COUNT = setting.value("SliderCount", -1)
         widgets_data = setting.value("Widgets", -1)
         structure = setting.value("Structure", -1)
         tabs = setting.value("Tabs", -1)
         # any one equal -1, fail
-        if Info.Names == {} or \
-                Info.WidgetTypeCount == {} or \
-                Info.WidgetNameCount == {} or \
-                Info.INPUT_DEVICE_INFO == {} or \
-                Info.OUTPUT_DEVICE_INFO == {} or \
-                Info.QUEST_DEVICE_INFO == {} or \
-                Info.TRACKER_DEVICE_INFO == {} or \
-                Info.SLIDER_COUNT == {} or \
+        if Info.Names == -1 or \
+                Info.WidgetTypeCount == -1 or \
+                Info.WidgetNameCount == -1 or \
+                Info.INPUT_DEVICE_INFO == -1 or \
+                Info.OUTPUT_DEVICE_INFO == -1 or \
+                Info.QUEST_DEVICE_INFO == -1 or \
+                Info.TRACKER_DEVICE_INFO == -1 or \
+                Info.SLIDER_COUNT == -1 or \
                 widgets_data == -1 or \
                 structure == -1 or \
                 tabs == -1:
@@ -863,6 +860,15 @@ class Psy(QMainWindow):
         except Exception as e:
             Func.print(f"Due to error '{e}', the file failed to load.", 2)
             return False
+
+    def reset(self):
+        """
+        reset this software to initial Timeline_0
+        :return:
+        """
+        self.clear()
+        self.restore(Info.Init_File, False)
+        self.initInitialTimeline()
 
     def setDockView(self, checked):
         """
@@ -1124,7 +1130,8 @@ class Psy(QMainWindow):
 
     def clear(self):
         """
-        clear this software at all
+        clear this software at all.
+        if you want to reset this software, you should use reset function.
         :return:
         """
         # center
