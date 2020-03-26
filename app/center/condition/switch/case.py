@@ -40,7 +40,7 @@ class Case(QGroupBox):
         self.values.currentTextChanged.connect(self.changeValue)
         # icon choose
         self.icon_choose = IconChoose(self)
-        self.widget_id = self.icon_choose.widget_id
+        self.widget_id = self.icon_choose.current_sub_wid
 
         self.default_properties: dict = self.icon_choose.getInfo().copy()
         self.default_properties["Case value"] = self.value
@@ -74,8 +74,8 @@ class Case(QGroupBox):
 
     def getProperties(self):
         self.default_properties.clear()
-        self.default_properties = self.icon_choose.getProperties().copy()
-        self.default_properties["Case value"] = self.value
+        self.default_properties.update(self.icon_choose.getProperties())
+        self.default_properties["Case Value"] = self.value
         return self.default_properties
 
     def changeValue(self, new_value):
@@ -118,9 +118,6 @@ class Case(QGroupBox):
 
     def getCase(self) -> dict:
         return {
-            "Case value": self.default_properties.get("Case value", ""),
-            "Stim type": self.default_properties.get("Stim type", "None"),
-            "Event name": self.default_properties.get("Event name", ""),
-            "Widget": self.icon_choose.getWidget(),
-            "Widget id": self.icon_choose.getWidgetId()
+            "Case Value": self.default_properties.get("Case value", ""),
+            **self.icon_choose.getInfo(),
         }

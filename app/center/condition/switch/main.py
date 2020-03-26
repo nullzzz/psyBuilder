@@ -2,7 +2,6 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout
 
 from app.func import Func
-from app.info import Info
 from lib import TabItemWidget
 from .caseArea import CaseArea
 from .condition import SwitchCondition
@@ -17,21 +16,21 @@ class Switch(TabItemWidget):
     tabClose = pyqtSignal(str)
     propertiesChange = pyqtSignal(dict)
 
-    itemAdded = pyqtSignal(str, str, str, int)
+    itemAdded = pyqtSignal(str, str, str)
     itemDeleted = pyqtSignal(str)
-    itemNameChanged = pyqtSignal(int, str, str)
+    itemNameChanged = pyqtSignal(str, str)
 
-    def __init__(self, widget_id: str, widget_name: str):
+    def __init__(self, widget_id: str, widget_name):
         super(Switch, self).__init__(widget_id, widget_name)
-        #
+
         self.using_attributes: list = []
         #
         self.switch_area = SwitchCondition()
         self.case_area = CaseArea(self)
 
-        self.case_area.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b, 0))
+        self.case_area.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b))
         self.case_area.itemDeleted.connect(lambda a: self.itemDeleted.emit(a))
-        self.case_area.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(Info.SwitchSend, a, b))
+        self.case_area.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
 
         self.default_properties: dict = {
             "Switch": self.switch_area.getProperties(),
@@ -73,7 +72,7 @@ class Switch(TabItemWidget):
 
     def apply(self):
         self.getProperties()
-        self.propertiesChanged.emit(self.widget_id)
+        self.propertiesChange.emit(self.default_properties)
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
@@ -85,7 +84,17 @@ class Switch(TabItemWidget):
     def getInfo(self):
         return self.getProperties()
 
+    def getProperties(self):
+        self.default_properties["Switch"] = self.switch_area.getProperties()
+        self.default_properties["Case"] = self.case_area.getProperties()
+        return self.default_properties
+
     def setProperties(self, properties: dict):
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+
+    def restore(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
             self.loadSetting()
@@ -93,6 +102,20 @@ class Switch(TabItemWidget):
     def loadSetting(self):
         self.switch_area.setProperties(self.default_properties.get("Switch", ""))
         self.case_area.setProperties(self.default_properties.get("Case", {}))
+
+    def clone(self, new_id: str):
+        clone_widget = Switch(widget_id=new_id)
+        clone_widget.setProperties(self.default_properties)
+        return clone_widget
+
+    def getHiddenAttribute(self):
+        """
+        :return:
+        """
+        hidden_attr = {}
+        if self.default_properties.get("Input devices"):
+            hidden_attr = {"onsettime": 0, "acc": 0, "resp": 0, "rt": 0}
+        return hidden_attr
 
     # 返回当前选择attributes
     def getUsingAttributes(self):
@@ -114,6 +137,9 @@ class Switch(TabItemWidget):
         self.switch_area.setAttributes(format_attributes)
         self.case_area.setAttributes(format_attributes)
 
+    def changeWidgetId(self, new_id: str):
+        self.widget_id = new_id
+
     def getSwitch(self) -> str:
         return self.default_properties.get("Switch", "")
 
@@ -132,38 +158,3 @@ class Switch(TabItemWidget):
         for c in self.case_area.case_list:
             sub_wid.append(c.widget_id)
         return sub_wid
-
-    """
-    Functions that must be complete in new version
-    """
-
-    def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        self.default_properties["Switch"] = self.switch_area.getProperties()
-        self.default_properties["Case"] = self.case_area.getProperties()
-        return self.default_properties
-
-    def store(self):
-        """
-        return necessary data for restoring this widget.
-        @return:
-        """
-        return self.getInfo()
-
-    def restore(self, properties):
-        """
-        restore this widget according to data.
-        @param data: necessary data for restoring this widget
-        @return:
-        """
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
-    def clone(self, new_widget_id: str, new_widget_name):
-        clone_widget = Switch(new_widget_id, widget_name)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget

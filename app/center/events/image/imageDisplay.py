@@ -26,7 +26,7 @@ class ImageDisplay(TabItemMainWindow):
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
         # 属性字典
-        self.default_properties = self.pro_window.getInfo()
+        self.default_properties.update(self.pro_window.getInfo())
 
         # 相关可使用属性
         self.file = ""
