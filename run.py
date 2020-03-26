@@ -198,6 +198,8 @@ class FileWindow(QWidget):
         self.setLayout(layout)
         # load file paths from config
         self.loadFilePaths()
+        # data
+        self.opening = False
 
     def loadFilePaths(self):
         """
@@ -214,10 +216,14 @@ class FileWindow(QWidget):
         :param file_path:
         :return:
         """
+        if self.opening:
+            return
+        self.opening = True
         psy = Psy()
         psy.showMaximized()
         QApplication.restoreOverrideCursor()
         self.close()
+        self.opening = False
 
     def handleFileCreated(self, file_directory: str):
         """

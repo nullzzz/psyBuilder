@@ -147,7 +147,7 @@ class StructureTree(QTreeWidget):
         @return:
         """
         item = self.itemAt(e.pos())
-        if item and item.widget_id:
+        if item and not Func.isWidgetType(item.widget_id, Info.TIMELINE):
             widget_id = item.widget_id
             if e.modifiers() == Qt.ControlModifier:
                 # ctrl -> copy
