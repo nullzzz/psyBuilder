@@ -60,10 +60,10 @@ class IconChoose(QWidget):
 
     def linkSignal(self, b=True):
         if b:
-            self.event_types.currentTextChanged.connect(self.changeIcon)
+            self.event_types.currentTextChanged.connect(self.changeEventType)
             self.name_line.textChanged.connect(self.changeName)
         else:
-            self.event_types.currentTextChanged.disconnect(self.changeIcon)
+            self.event_types.currentTextChanged.disconnect(self.changeEventType)
             self.name_line.textChanged.disconnect(self.changeName)
 
     def setUI(self):
@@ -80,35 +80,42 @@ class IconChoose(QWidget):
 
         self.setLayout(grid_layout)
 
-    def changeIcon(self, current_type):
-        self.event_type = current_type
-
-        sub_id = self.pool.get(self.event_type)
-        if sub_id == "":
-            sub_id = Func.generateWidgetId(self.event_type)
-            self.pool[self.event_type] = sub_id
-
-        if self.current_sub_wid != "":
+    def changeEventType(self, current_type):
+        """
+        1、none->type Add
+        2、type->type Del Add
+        3、type->none Del
+        :param current_type:
+        :return:
+        """
+        if self.event_type == "None" and current_type != "None":
+            self.current_sub_wid = self.getSubId(current_type)
+            sub_name = self.generateName(current_type)
+            self.itemAdded.emit(self.current_sub_wid, sub_name)
+        elif self.event_type != "None" and current_type != "None":
             self.itemDeleted.emit(self.current_sub_wid)
-
-        self.current_sub_wid = sub_id
-
-        self.icon_label.setIcon(current_type)
-        name = self.generateName()
-
-        self.itemNameChanged.block(True)
-        self.name_line.setText(name)
-        self.itemNameChanged.block(False)
-
-    def createSubWidget(self):
-        if self.current_sub_wid is None:
+            self.current_sub_wid = self.getSubId(current_type)
+            sub_name = self.generateName(current_type)
+            self.itemAdded.emit(self.current_sub_wid, sub_name)
+        elif self.event_type != "None" and current_type == "None":
+            self.itemDeleted.emit(self.current_sub_wid)
             self.current_sub_wid = ""
-            self.widget = None
-            return
-        self.widget = Func.createWidget(self.current_sub_wid)
-        self.itemAdded.emit(self.current_sub_wid, self.event_name)
-        self.linkWidgetSignal()
-        self.setAttributes(self.attributes)
+        self.event_type = current_type
+        self.icon_label.setIcon(current_type)
+
+    def getSubId(self, event_type: str = ""):
+        """
+        获取、更新子控件id
+        :param event_type:
+        :return:
+        """
+        if event_type == "":
+            event_type = self.event_type
+        sub_id = self.pool.get(event_type)
+        if sub_id == "":
+            sub_id = Func.generateWidgetId(event_type)
+            self.pool[event_type] = sub_id
+        return sub_id
 
     def linkWidgetSignal(self):
         if self.event_type == Info.SLIDER:
@@ -119,18 +126,14 @@ class IconChoose(QWidget):
             self.pro_window.cancel_bt.clicked.connect(self.cancel)
             self.pro_window.apply_bt.clicked.connect(self.apply)
 
-    def generateName(self):
+    def generateName(self, event_type: str = ""):
         """
         定义event name的命名方式
         :return:
         """
-        if self.event_type == "None":
-            self.name_line.setEnabled(False)
-            return ""
-        self.name_line.setEnabled(True)
-        name = f"U_{self.event_type}_{int(time.time() % 10000)}"
-        while name in Info.NAME_WID.keys():
-            pass
+        if event_type == "":
+            event_type = self.event_type
+        name = f"U_{event_type}_{int(time.time() % 10007)}"
         return name
 
     def changeName(self, new_name: str):
