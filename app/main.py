@@ -18,11 +18,8 @@ from .center.timeline import Timeline
 from .func import Func
 from .info import Info
 from .menubar.compile_PTB import compilePTB
-from .menubar.deviceSelection.IODevice.globalDevices import GlobalDevice
-from .menubar.deviceSelection.progressBar import LoadingTip
-from .menubar.deviceSelection.quest.questinit import QuestInit
-from .menubar.deviceSelection.tracker.trackerinit import TrackerInit
 from .menubar.registry import writeToRegistry
+from .newDevice.Yun import TianBianYiDuoYun
 from .output import Output
 from .properties import Properties
 from .structure import Structure
@@ -92,35 +89,21 @@ class Psy(QMainWindow):
         view_menu.addAction(self.output_action)
 
         # devices menu
-        self.input_devices = GlobalDevice(io_type=Info.INPUT_DEVICE)
-        self.input_devices.setWindowModality(Qt.ApplicationModal)
-        self.input_devices.ok()
-        self.output_devices = GlobalDevice(io_type=Info.OUTPUT_DEVICE)
-        self.output_devices.setWindowModality(Qt.ApplicationModal)
-        self.output_devices.ok()
-        self.quest_init = QuestInit()
-        self.quest_init.setWindowModality(Qt.ApplicationModal)
-        self.tracker_init = TrackerInit()
-        self.tracker_init.setWindowModality(Qt.ApplicationModal)
-
-        self.input_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
-        self.output_devices.deviceNameChanged.connect(Func.changeCertainDeviceNameWhileUsing)
-
+        self.device_cloud = TianBianYiDuoYun()
         devices_menu = menubar.addMenu("&Devices")
+        t1_action = QAction("&Input", self)
+        t1_action.triggered.connect(self.device_cloud.input.show)
+        t2_action = QAction("&Output", self)
+        t2_action.triggered.connect(self.device_cloud.output.show)
+        t3_action = QAction("&Quest", self)
+        t3_action.triggered.connect(self.device_cloud.quest.show)
+        t4_action = QAction("&Tracker", self)
+        t4_action.triggered.connect(self.device_cloud.tracker.show)
 
-        output_devices_action = QAction("&Output Devices", self)
-        input_devices_action = QAction("&Input Devices", self)
-        output_devices_action.triggered.connect(lambda: self.showDevices(1))
-        input_devices_action.triggered.connect(lambda: self.showDevices(0))
-        quest_init_action = QAction("&Quest", self)
-        quest_init_action.triggered.connect(self.quest_init.show)
-        tracker_init_action = QAction("&Tracker", self)
-        tracker_init_action.triggered.connect(self.tracker_init.show)
-
-        devices_menu.addAction(output_devices_action)
-        devices_menu.addAction(input_devices_action)
-        devices_menu.addAction(quest_init_action)
-        devices_menu.addAction(tracker_init_action)
+        devices_menu.addAction(t1_action)
+        devices_menu.addAction(t2_action)
+        devices_menu.addAction(t3_action)
+        devices_menu.addAction(t4_action)
 
         # build menu
         build_menu = menubar.addMenu("&Building")
@@ -907,26 +890,6 @@ class Psy(QMainWindow):
             self.property_action.setIcon(icon)
         elif dock == "Output":
             self.output_action.setIcon(icon)
-
-    def showDevices(self, device_type):
-        """
-        显示设备选择框
-        :param device_type:
-        :return:
-        """
-        if device_type:
-            self.output_devices.show()
-        else:
-            self.input_devices.show()
-
-    @staticmethod
-    def changeDevices(device_type, devices):
-        # todo output device
-        pass
-        # if device_type:
-        #     DurationPage.OUTPUT_DEVICES = devices
-        # else:
-        #     DurationPage.INPUT_DEVICES = devices
 
     def changePlatform(self, c):
         if isinstance(c, bool):

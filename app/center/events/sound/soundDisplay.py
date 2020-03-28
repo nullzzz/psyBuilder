@@ -385,7 +385,7 @@ class SoundDisplay(TabItemMainWindow):
     Functions that must be complete in new version
     """
 
-    def getProperties(self) -> dict:
+    def getProperties(self, display=True) -> dict:
         """
         get this widget's properties to show it in Properties Window.
         @return: a dict of properties
@@ -404,6 +404,7 @@ class SoundDisplay(TabItemMainWindow):
         restore this widget according to data.
         @param data: necessary data for restoring this widget
         @return:
+        :param properties:
         """
         if properties:
             self.default_properties = properties.copy()

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout)
 
 from .imageGeneral import ImageTab1
-from ..durationPage import DurationPage
+from ..duration import DurationPage
 from ..framePage import FramePage
 
 

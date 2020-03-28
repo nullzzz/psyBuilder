@@ -33,19 +33,49 @@ class TabItemMainWindow(QMainWindow):
     def refresh(self):
         """
         update some things such as device information
+        and completer.
+        :return:
+        """
+
+    def openSettingWindow(self):
+        """
+        open setting Window
         :return:
         """
 
     def setAttributes(self, attributes: list):
         """
         set completer.
+        a child function of refresh()
         :param attributes:
         :return:
         """
 
-    def getProperties(self, display: bool = True) -> dict:
+    def getUsingAttributes(self) -> list:
         """
-        You should finish the job
+        return using attributes.
+        :return:
+        """
+        using_attributes: list = []
+        self.findAttributes(self.default_properties, using_attributes)
+        return using_attributes
+
+    def findAttributes(self, properties: dict, using_attributes: list):
+        """
+        child function of getUsingAttributes()
+        :param properties:
+        :param using_attributes:
+        :return:
+        """
+        for v in properties.values():
+            if isinstance(v, dict):
+                self.findAttributes(v, using_attributes)
+            elif isinstance(v, str):
+                if v.startswith("[") and v.endswith("]"):
+                    using_attributes.append(v[1:-1])
+
+    def getProperties(self) -> dict:
+        """
         get this widget's properties to show it in Properties Window.
         :param display: whether or not to display these properties in main window.
         :return: a dict of properties
@@ -55,8 +85,7 @@ class TabItemMainWindow(QMainWindow):
 
     def getUsingDeviceCount(self) -> int:
         """
-        You should finish the job.
-
+        # todo condition
         return count of using device
         :return:
         :rtype: int

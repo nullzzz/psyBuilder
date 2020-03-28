@@ -1,22 +1,15 @@
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt, QFileInfo
-from PyQt5.QtGui import QIcon, QPixmap, QImage
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QToolBar, QAction, QLabel
 
 from app.func import Func
-from lib import MessageBox, TabItemMainWindow
+from lib import TabItemMainWindow
 from .imageProperty import ImageProperty
-from .view import Preview
 
 
 class ImageDisplay(TabItemMainWindow):
     def __init__(self, widget_id: str, widget_name: str):
         super(ImageDisplay, self).__init__(widget_id, widget_name)
-        # 当前widget可引用属性
-        self.attributes: list = []
-        # 当前widget正引用属性
-        self.using_attributes: list = []
-
         # 图片展示框
         self.label = QLabel()
         # 属性设置窗口
@@ -29,18 +22,18 @@ class ImageDisplay(TabItemMainWindow):
         self.default_properties.update(self.pro_window.getInfo())
 
         # 相关可使用属性
-        self.file = ""
-        self.isStretch = False
-        self.isUD = False
-        self.isLR = False
-        self.stretch_mode = "Both"
-        self.frame_fill_color = "255,255,255"
-        self.transparent_value = "0"
-
-        self.x_pos = "50%"
-        self.y_pos = "50%"
-        self.w_size = "100%"
-        self.h_size = "100%"
+        # self.file = ""
+        # self.isStretch = False
+        # self.isUD = False
+        # self.isLR = False
+        # self.stretch_mode = "Both"
+        # self.frame_fill_color = "255,255,255"
+        # self.transparent_value = "0"
+        #
+        # self.x_pos = "50%"
+        # self.y_pos = "50%"
+        # self.w_size = "100%"
+        # self.h_size = "100%"
         self.setUI()
 
     def setUI(self):
@@ -52,47 +45,45 @@ class ImageDisplay(TabItemMainWindow):
 
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
-        open_pro.triggered.connect(self.openPro)
+        open_pro.triggered.connect(self.openSettingWindow)
         pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
-        pre_view.triggered.connect(self.preView)
+        # pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
-        tool.addAction(pre_view)
+        # tool.addAction(pre_view)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
-    def openPro(self):
+    def openSettingWindow(self):
         self.refresh()
         # 阻塞原窗口
-        # self.pro_window.setWindowModality(Qt.ApplicationModal)
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
 
     def refresh(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
+        attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(attributes)
         self.pro_window.refresh()
-        self.getInfo()
 
     # 预览图片
-    def preView(self):
-        if self.file:
-            try:
-                self.preview = Preview(self.file, self.pix, self.x_pos, self.y_pos, self.w_size, self.h_size)
-                self.preview.setStyleSheet("background-color:{}".format(self.frame_fill_color))
-                self.preview.setTransparent(int(self.transparent_value))
-                self.preview.setWindowModality(Qt.ApplicationModal)
-                self.preview.showFullScreen()
-                self.timer = QtCore.QTimer()
-                self.timer.timeout.connect(self.preview.close)
-                self.timer.start(10000)
-                self.timer.setSingleShot(True)
-            except AttributeError:
-                MessageBox.warning(self, "No Image Error", "Please load image first!", MessageBox.Ok)
-            except Exception as e:
-                print(e)
-                print(type(e))
-        else:
-            MessageBox.warning(self, "No Image Error", "Please load image first!", MessageBox.Ok)
+    # def preView(self):
+    #     if self.file:
+    #         try:
+    #             self.preview = Preview(self.file, self.pix, self.x_pos, self.y_pos, self.w_size, self.h_size)
+    #             self.preview.setStyleSheet("background-color:{}".format(self.frame_fill_color))
+    #             self.preview.setTransparent(int(self.transparent_value))
+    #             self.preview.setWindowModality(Qt.ApplicationModal)
+    #             self.preview.showFullScreen()
+    #             self.timer = QtCore.QTimer()
+    #             self.timer.timeout.connect(self.preview.close)
+    #             self.timer.start(10000)
+    #             self.timer.setSingleShot(True)
+    #         except AttributeError:
+    #             MessageBox.warning(self, "No Image Error", "Please load image first!", MessageBox.Ok)
+    #         except Exception as e:
+    #             print(e)
+    #             print(type(e))
+    #     else:
+    #         MessageBox.warning(self, "No Image Error", "Please load image first!", MessageBox.Ok)
 
     def ok(self):
         self.apply()
@@ -103,63 +94,53 @@ class ImageDisplay(TabItemMainWindow):
 
     def apply(self):
         self.getInfo()
-        self.parseProperties()
-        self.label.setStyleSheet(f"background-color:{self.frame_fill_color}")
-        # 加载图片文件
-        if self.file:
-            if QFileInfo(self.file).isFile():
-                self.setImage()
-            else:
-                MessageBox.warning(self, "Warning", "The file path is invalid!", MessageBox.Ok)
-        else:
-            self.label.clear()
         # 发送信号
         self.propertiesChanged.emit(self.widget_id)
 
     # 从pro获取参数
-    def parseProperties(self):
-        self.file = self.default_properties.get("File name", "")
-        if self.file.startswith("[") and self.file.endswith("]"):
-            self.file = ""
-        self.isUD = self.pro_window.general.mirrorUD.checkState()
-        self.isLR = self.pro_window.general.mirrorLR.checkState()
-        self.isStretch = self.pro_window.general.stretch.checkState()
-        self.stretch_mode = self.pro_window.general.stretch_mode.currentText()
-        self.frame_fill_color = self.pro_window.frame.back_color.getColor()
-        self.transparent_value = self.pro_window.general.transparent.text()
-        self.x_pos = self.default_properties.get("Center X", "50%")
-        self.y_pos = self.default_properties.get("Center Y", "50%")
-        self.w_size = self.default_properties.get("Width", "100%")
-        self.h_size = self.default_properties.get("Height", "100%")
-        if self.x_pos.startswith("[") and self.x_pos.endswith("]"):
-            self.x_pos = "50%"
-        if self.y_pos.startswith("[") and self.y_pos.endswith("]"):
-            self.y_pos = "50%"
-        if self.w_size.startswith("[") and self.w_size.endswith("]"):
-            self.w_size = "100%"
-        if self.h_size.startswith("[") and self.h_size.endswith("]"):
-            self.h_size = "100%"
+    # def parseProperties(self):
+    #     self.file = self.default_properties.get("File name", "")
+    #     if self.file.startswith("[") and self.file.endswith("]"):
+    #         self.file = ""
+    #     self.isUD = self.pro_window.general.mirrorUD.checkState()
+    #     self.isLR = self.pro_window.general.mirrorLR.checkState()
+    #     self.isStretch = self.pro_window.general.stretch.checkState()
+    #     self.stretch_mode = self.pro_window.general.stretch_mode.currentText()
+    #     self.frame_fill_color = self.pro_window.frame.back_color.getColor()
+    #     self.transparent_value = self.pro_window.general.transparent.text()
+    #     self.x_pos = self.default_properties.get("Center X", "50%")
+    #     self.y_pos = self.default_properties.get("Center Y", "50%")
+    #     self.w_size = self.default_properties.get("Width", "100%")
+    #     self.h_size = self.default_properties.get("Height", "100%")
+    #     if self.x_pos.startswith("[") and self.x_pos.endswith("]"):
+    #         self.x_pos = "50%"
+    #     if self.y_pos.startswith("[") and self.y_pos.endswith("]"):
+    #         self.y_pos = "50%"
+    #     if self.w_size.startswith("[") and self.w_size.endswith("]"):
+    #         self.w_size = "100%"
+    #     if self.h_size.startswith("[") and self.h_size.endswith("]"):
+    #         self.h_size = "100%"
 
     # 设置主面板的图片
-    def setImage(self):
-        img = QImage(self.file)
-        image = img.mirrored(self.isLR, self.isUD)
-        pix = QPixmap.fromImage(image)
-        self.pix = pix
-        # 图片反转
-        if self.isStretch:
-            mode = self.pro_window.general.stretch_mode.currentText()
-            w = self.label.size().width()
-            h = self.label.size().height()
-            if mode == "Both":
-                new_pix = pix.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-            elif mode == "LeftRight":
-                new_pix = pix.scaledToWidth(w, Qt.FastTransformation)
-            else:
-                new_pix = pix.scaledToHeight(h, Qt.FastTransformation)
-            self.label.setPixmap(new_pix)
-        else:
-            self.label.setPixmap(pix)
+    # def setImage(self):
+    #     img = QImage(self.file)
+    #     image = img.mirrored(self.isLR, self.isUD)
+    #     pix = QPixmap.fromImage(image)
+    #     self.pix = pix
+    #     # 图片反转
+    #     if self.isStretch:
+    #         mode = self.pro_window.general.stretch_mode.currentText()
+    #         w = self.label.size().width()
+    #         h = self.label.size().height()
+    #         if mode == "Both":
+    #             new_pix = pix.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+    #         elif mode == "LeftRight":
+    #             new_pix = pix.scaledToWidth(w, Qt.FastTransformation)
+    #         else:
+    #             new_pix = pix.scaledToHeight(h, Qt.FastTransformation)
+    #         self.label.setPixmap(new_pix)
+    #     else:
+    #         self.label.setPixmap(pix)
 
     # 返回设置参数
     def getInfo(self):
@@ -168,8 +149,8 @@ class ImageDisplay(TabItemMainWindow):
 
     def getShowProperties(self):
         info = self.default_properties.copy()
-        info.pop("Input devices")
-        info.pop("Output devices")
+        info.pop("Input Devices")
+        info.pop("Output Devices")
         return info
 
     def setPro(self, pro: ImageProperty):
@@ -190,14 +171,6 @@ class ImageDisplay(TabItemMainWindow):
         self.findAttributes(self.default_properties, using_attributes)
         return using_attributes
 
-    def findAttributes(self, properties: dict, using_attributes: list):
-        for v in properties.values():
-            if isinstance(v, dict):
-                self.findAttributes(v, using_attributes)
-            elif isinstance(v, str):
-                if v.startswith("[") and v.endswith("]"):
-                    using_attributes.append(v[1:-1])
-
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
@@ -207,9 +180,45 @@ class ImageDisplay(TabItemMainWindow):
     def loadSetting(self):
         self.pro_window.setProperties(self.default_properties)
 
-    # 返回各项参数
-    # 大部分以字符串返回，少数点击选择按钮返回布尔值
-    # 因为有些地方引用Attribute
+    def getProperties(self) -> dict:
+        """
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
+        """
+        properties = self.default_properties.copy()
+        for k, v in properties.items():
+            if isinstance(v, dict):
+                properties.pop(k)
+        return properties
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+
+    def restore(self, properties: dict):
+        """
+        restore this widget according to data.
+        @return:
+        :param properties:
+        """
+        if properties:
+            self.default_properties = properties.copy()
+            self.loadSetting()
+            self.apply()
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = ImageDisplay(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        clone_widget.apply()
+        return clone_widget
+
+    ##########################################
+    # return single attribute
+    # most of them are string
+    # you can see this as a document。
+    ##########################################
     def getFilename(self) -> str:
         """
         返回图片文件名（绝对路径）
@@ -243,13 +252,6 @@ class ImageDisplay(TabItemMainWindow):
         if self.isStretch:
             return self.stretch_mode
         return ""
-
-    # def getBackColor(self) -> str:
-    #     """
-    #     返回背景颜色
-    #     :return:
-    #     """
-    #     return self.back_color
 
     def getTransparent(self) -> str:
         """
@@ -362,37 +364,3 @@ class ImageDisplay(TabItemMainWindow):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
-
-    """
-    Functions that must be complete in new version
-    """
-
-    def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        return self.getInfo()
-
-    def store(self):
-        """
-        return necessary data for restoring this widget.
-        @return:
-        """
-
-    def restore(self, properties):
-        """
-        restore this widget according to data.
-        @param data: necessary data for restoring this widget
-        @return:
-        """
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
-
-    def clone(self, new_widget_id: str, new_widget_name: str):
-        clone_widget = ImageDisplay(new_widget_id, new_widget_name)
-        clone_widget.setPro(self.pro_window.clone())
-        clone_widget.apply()
-        return clone_widget

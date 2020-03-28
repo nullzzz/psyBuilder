@@ -8,3 +8,4 @@
 
 # bugs reported by yu
 > [main.clear] 默认timeline.0未保留 => clear是清空, 新增reset是重置, 在restore的读取中, 因为有些变量就是{}, 所以不能用来判定是否读取出错  
+> 您能不能把智障的启动页面去掉，或者判断一下有效的文件才显示上去，再或者不让他报错闪退ok???

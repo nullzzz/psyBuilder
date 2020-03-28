@@ -22,7 +22,6 @@ class EyeCalibrate(TabItemWidget):
             "Target color": "(foreground)",
             "Target style": "default",
             "EyeTracker Name": "",
-            # "Screen": "screen.0",
         }
 
         self.calibration_type = VarComboBox()
@@ -37,12 +36,6 @@ class EyeCalibrate(TabItemWidget):
         self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
-
-        # self.using_screen_id: str = ""
-        # self.screen = PigComboBox()
-        # self.simple_info = Func.getScreenInfo()
-        # self.screen.addItems(self.simple_info.values())
-        # self.screen.currentTextChanged.connect(self.changeScreen)
 
         self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
@@ -117,12 +110,6 @@ class EyeCalibrate(TabItemWidget):
                 self.using_tracker_id = k
                 break
 
-    # def changeScreen(self, screen):
-    #     for k, v in self.simple_info.items():
-    #         if v == screen:
-    #             self.using_screen_id = k
-    #             break
-
     def refresh(self):
         self.tracker_info = Func.getTrackerInfo()
         tracker_id = self.using_tracker_id
@@ -132,15 +119,6 @@ class EyeCalibrate(TabItemWidget):
         if tracker_name:
             self.tracker_name.setCurrentText(tracker_name)
             self.using_tracker_id = tracker_id
-
-        # self.simple_info = Func.getScreenInfo()
-        # screen_id = self.using_screen_id
-        # self.screen.clear()
-        # self.screen.addItems(self.simple_info.values())
-        # screen_name = self.simple_info.get(screen_id)
-        # if screen_name:
-        #     self.screen.setCurrentText(screen_name)
-        #     self.using_screen_id = screen_id
 
         # 更新attributes
         self.attributes = Func.getAttributes(self.widget_id)

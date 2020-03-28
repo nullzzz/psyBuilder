@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication)
 
 from .soundGeneral import SoundTab1
-from ..durationPage import DurationPage
+from ..duration import DurationPage
 
 
 class SoundProperty(QWidget):

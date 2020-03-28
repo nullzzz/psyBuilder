@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
 from .videoGeneral import VideoTab1
-from ..durationPage import DurationPage
+from ..duration import DurationPage
 from ..framePage import FramePage
 
 
