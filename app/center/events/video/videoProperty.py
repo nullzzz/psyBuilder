@@ -56,7 +56,7 @@ class VideoProperty(QWidget):
 
     def getInfo(self):
         self.default_properties.clear()
-        self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        self.default_properties = {**self.general.getInfo(), **self.frame.updateInfo(), **self.duration.updateInfo()}
         return self.default_properties
 
     def setProperties(self, properties: dict):

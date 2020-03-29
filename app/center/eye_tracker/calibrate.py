@@ -162,7 +162,7 @@ class EyeCalibrate(TabItemWidget):
         self.default_properties["Target color"] = self.target_color.getColor()
         self.default_properties["Target style"] = self.target_style.currentText()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
-        # self.default_properties["Screen Name"] = self.screen.currentText()
+        # self.info["Screen Name"] = self.screen.currentText()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -178,7 +178,7 @@ class EyeCalibrate(TabItemWidget):
         self.target_color.setCurrentText(self.default_properties["Target color"])
         self.target_style.setCurrentText(self.default_properties["Target style"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
-        # self.screen.setCurrentText(self.default_properties["Screen Name"])
+        # self.screen.setCurrentText(self.info["Screen Name"])
 
     def getHiddenAttribute(self):
         """

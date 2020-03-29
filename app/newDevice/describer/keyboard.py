@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QRegExp
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QLineEdit, QFormLayout, QCheckBox, QVBoxLayout
 
-from app.newDevice.describer import Shower
+from app.newDevice.describer.basis import Shower
 
 
 class Keyboard(Shower):

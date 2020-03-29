@@ -41,6 +41,9 @@ class BiggerUP(QGroupBox):
         layout.setVerticalSpacing(0)
         self.setLayout(layout)
 
+    def refresh(self):
+        self.home.refresh()
+
     def add(self, device_id, device_name):
         self.home.createDevice(device_id, device_name)
         self.del_bt.setEnabled(self.home.count() > 0)
@@ -51,10 +54,9 @@ class BiggerUP(QGroupBox):
         self.del_bt.setEnabled(self.home.count() > 0)
         self.deviceChanged.emit(self.home.getDeviceInfo())
 
-    def getInfo(self):
+    def updateInfo(self):
         self.describer.updateInfo()
         self.home.updateDeviceInfo()
-        return self.default_properties.copy()
 
 
 class BiggerDown(QGroupBox):
@@ -107,7 +109,7 @@ class BiggerDown(QGroupBox):
     def updateExternalInfo(self, output_device: dict):
         self.resp_trigger.updateSimpleInfo(output_device)
 
-    def getInfo(self):
+    def updateInfo(self):
         info1 = self.resp_info.getInfo()
         info2 = self.resp_trigger.getInfo()
         info3 = self.eye_action.getInfo()
@@ -116,4 +118,6 @@ class BiggerDown(QGroupBox):
         for k in info1.keys():
             self.default_properties[k] = {**info1[k], **info2[k], **info3[k]}
         self.home.updateDeviceInfo()
-        return self.default_properties.copy()
+
+    def refresh(self):
+        self.home.refresh()

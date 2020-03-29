@@ -256,11 +256,16 @@ class Func(object):
         return info
 
     @staticmethod
-    def getDeviceInfo(device_type: str) -> list:
-        devices = []
+    def getDeviceInfo(device_type: str) -> dict:
+        """
+        for each widget which has device information such as screen or sound.
+        :param device_type: screen or sound, and maybe more in the future.
+        :return:
+        """
+        devices = {}
         for k, v in Info.OUTPUT_DEVICE_INFO.items():
             if k.startswith(device_type):
-                k.append(v["Device Name"])
+                devices[k] = v["Device Name"]
         return devices
 
     @staticmethod
@@ -279,8 +284,6 @@ class Func(object):
     def getDeviceNameById(device_id: str):
         for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
             if device_id == k:
-                # print(627)
-                # print(v.get("Device Name"))
                 return v.get("Device Name")
         return ""
 
@@ -487,7 +490,7 @@ class Func(object):
             return -1
 
     @staticmethod
-    def getWidgetProperties(widget_id: str):
+    def getWidgetProperties(widget_id: str) -> dict:
         """
         get widget's properties through its widget id
         """

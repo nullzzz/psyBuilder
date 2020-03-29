@@ -53,7 +53,7 @@ class SliderProperty(QWidget):
         self.below.setLayout(below_layout)
 
     def getInfo(self):
-        self.default_properties = {**self.duration.getInfo(), **self.frame.getInfo(), **self.general.getInfo()}
+        self.default_properties = {**self.duration.updateInfo(), **self.frame.updateInfo(), **self.general.getInfo()}
         return self.default_properties
 
     def setAttributes(self, attributes):

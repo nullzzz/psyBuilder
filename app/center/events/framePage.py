@@ -7,18 +7,17 @@ from lib import VarComboBox, VarLineEdit, ColorListEditor
 
 class FramePage(QWidget):
     def __init__(self, parent=None):
-        super(FramePage, self).__init__(parent)
-        self.attributes = []
+        super(FramePage, self).__init__(parent=parent)
         self.default_properties = {
             "Center X": "50%",
             "Center Y": "50%",
             "Width": "100%",
             "Height": "100%",
             "Enable": "Yes",
-            "Border color": "255,255,255",
-            "Border width": "0",
-            "Frame fill color": "255,255,255",
-            "Frame transparent": "100%"
+            "Border Color": "255,255,255",
+            "Border Width": "0",
+            "Frame Fill Color": "255,255,255",
+            "Frame Transparent": "100%"
         }
         # up
         self.x_pos = VarComboBox()
@@ -40,12 +39,6 @@ class FramePage(QWidget):
         self.transparent.setReg(r"[0-9]%|[1-9]\d%|100%")
         self.enable.addItems(("No", "Yes"))
         self.setUI()
-
-    def operationAble(self, signal):
-        self.border_color.setEnabled(signal == "Yes")
-        self.border_width.setEnabled(signal == "Yes")
-        self.back_color.setEnabled(signal == "Yes")
-        self.transparent.setEnabled(signal == "Yes")
 
     # 生成frame页面
     def setUI(self):
@@ -111,23 +104,24 @@ class FramePage(QWidget):
         layout.addWidget(group2)
         self.setLayout(layout)
 
+    def operationAble(self, signal):
+        self.border_color.setEnabled(signal == "Yes")
+        self.border_width.setEnabled(signal == "Yes")
+        self.back_color.setEnabled(signal == "Yes")
+        self.transparent.setEnabled(signal == "Yes")
+
     # 设置可选属性
     def setAttributes(self, attributes):
-        self.attributes = attributes
-        self.x_pos.setCompleter(QCompleter(self.attributes))
-        self.y_pos.setCompleter(QCompleter(self.attributes))
-        self.width.setCompleter(QCompleter(self.attributes))
-        self.height.setCompleter(QCompleter(self.attributes))
-        self.transparent.setCompleter(QCompleter(self.attributes))
-        self.back_color.setCompleter(QCompleter(self.attributes))
-        self.border_color.setCompleter(QCompleter(self.attributes))
-        self.border_width.setCompleter(QCompleter(self.attributes))
+        self.x_pos.setCompleter(QCompleter(attributes))
+        self.y_pos.setCompleter(QCompleter(attributes))
+        self.width.setCompleter(QCompleter(attributes))
+        self.height.setCompleter(QCompleter(attributes))
+        self.transparent.setCompleter(QCompleter(attributes))
+        self.back_color.setCompleter(QCompleter(attributes))
+        self.border_color.setCompleter(QCompleter(attributes))
+        self.border_width.setCompleter(QCompleter(attributes))
 
-    def getInfo(self):
-        """
-        :return:
-        """
-        self.default_properties.clear()
+    def updateInfo(self):
         x_pos = self.x_pos.currentText()
         y_pos = self.y_pos.currentText()
         width = self.width.currentText()
@@ -154,42 +148,29 @@ class FramePage(QWidget):
             self.height.setCurrentText("100%")
 
         self.default_properties["Enable"] = self.enable.currentText()
-        self.default_properties["Border color"] = self.border_color.getColor()
-        self.default_properties["Border width"] = self.border_width.text()
-        self.default_properties["Frame fill color"] = self.back_color.getColor()
-        self.default_properties["Frame transparent"] = self.transparent.text()
+        self.default_properties["Border Color"] = self.border_color.getColor()
+        self.default_properties["Border Width"] = self.border_width.text()
+        self.default_properties["Frame Fill Color"] = self.back_color.getColor()
+        self.default_properties["Frame Transparent"] = self.transparent.text()
         return self.default_properties
 
     def getProperties(self):
-        self.default_properties.clear()
-        self.default_properties["Center X"] = self.x_pos.currentText()
-        self.default_properties["Center Y"] = self.y_pos.currentText()
-        self.default_properties["Width"] = self.width.currentText()
-        self.default_properties["Height"] = self.height.currentText()
-        self.default_properties["Enable"] = self.enable.currentText()
-        self.default_properties["Border color"] = self.border_color.getColor()
-        self.default_properties["Border width"] = self.border_width.text()
-        self.default_properties["Frame fill color"] = self.back_color.getColor()
-        self.default_properties["Frame transparent"] = self.transparent.text()
+        self.updateInfo()
         return self.default_properties
 
     def setProperties(self, properties: dict):
-        self.default_properties = properties.copy()
-        self.loadSetting()
+        self.default_properties.clear()
+        self.default_properties.update(properties)
+        self.loadInfo()
 
     # 加载参数设置
-    def loadSetting(self):
+    def loadInfo(self):
         self.x_pos.setCurrentText(self.default_properties["Center X"])
         self.y_pos.setCurrentText(self.default_properties["Center Y"])
         self.width.setCurrentText(self.default_properties["Width"])
         self.height.setCurrentText(self.default_properties["Height"])
         self.enable.setCurrentText(self.default_properties["Enable"])
-        self.border_color.setCurrentText(self.default_properties["Border color"])
-        self.border_width.setText(self.default_properties["Border width"])
-        self.back_color.setCurrentText(self.default_properties["Frame fill color"])
-        self.transparent.setText(self.default_properties["Frame transparent"])
-
-    def clone(self):
-        clone_page = FramePage()
-        clone_page.setProperties(self.default_properties)
-        return clone_page
+        self.border_color.setCurrentText(self.default_properties["Border Color"])
+        self.border_width.setText(self.default_properties["Border Width"])
+        self.back_color.setCurrentText(self.default_properties["Frame Fill Color"])
+        self.transparent.setText(self.default_properties["Frame Transparent"])

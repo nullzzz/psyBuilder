@@ -57,7 +57,7 @@ class TabItemMainWindow(QMainWindow):
         :return:
         """
         using_attributes: list = []
-        self.findAttributes(self.default_properties, using_attributes)
+        self.findAttributes(self.info, using_attributes)
         return using_attributes
 
     def findAttributes(self, properties: dict, using_attributes: list):
@@ -76,12 +76,10 @@ class TabItemMainWindow(QMainWindow):
 
     def getProperties(self) -> dict:
         """
-        get this widget's properties to show it in Properties Window.
-        :param display: whether or not to display these properties in main window.
+        just far displaying in Properties Window.
         :return: a dict of properties
         :rtype: dict
         """
-        return {}
 
     def getUsingDeviceCount(self) -> int:
         """
@@ -90,7 +88,7 @@ class TabItemMainWindow(QMainWindow):
         :return:
         :rtype: int
         """
-        input_device: dict = self.default_properties.get("Input Devices", {})
+        input_device: dict = self.info.get("Input Devices", {})
 
         return len(input_device)
 

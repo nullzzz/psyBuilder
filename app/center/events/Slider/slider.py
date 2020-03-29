@@ -328,11 +328,11 @@ class Slider(TabItemMainWindow):
 
     def fillButtonTriggered(self):
         self.scene.setItemColor(QColor(self.fillAction.data()))
-        # self.getInfo()# after changed the color, updating the default_properties
+        # self.getInfo()# after changed the color, updating the info
 
     def lineButtonTriggered(self):
         self.scene.setLineColor(QColor(self.lineAction.data()))
-        # self.getInfo()  # after changed the color, updating the default_properties
+        # self.getInfo()  # after changed the color, updating the info
 
     def openPro(self):
         self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)

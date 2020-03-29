@@ -31,8 +31,11 @@ class Properties(DockWidget):
             # add
             self.current_widget_id = widget_id
             properties = Func.getWidgetProperties(widget_id)
-            sorted_properties = sorted(properties.items(), key=lambda x: x[0])
-            for key, value in sorted_properties:
+            # sorted_properties = sorted(properties.items(), key=lambda x: x[0])
+            # for key, value in sorted_properties:
+            #     self.properties_table.addProperty(key, str(value))
+            # no sorting!!!
+            for key, value in properties.items():
                 self.properties_table.addProperty(key, str(value))
 
     def clear(self):

@@ -155,7 +155,7 @@ class PixItem(QGraphicsPixmapItem):
 
     def setPosition(self):
         """
-        :get icon properties in scene and send it to default_properties :
+        :get icon properties in scene and send it to info :
         """
         width = self.boundingRect().width()
         height = self.boundingRect().height()

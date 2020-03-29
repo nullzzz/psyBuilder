@@ -18,9 +18,6 @@ class ImageDisplay(TabItemMainWindow):
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
-        # 属性字典
-        self.default_properties.update(self.pro_window.getInfo())
-
         # 相关可使用属性
         # self.file = ""
         # self.isStretch = False
@@ -37,6 +34,10 @@ class ImageDisplay(TabItemMainWindow):
         self.setUI()
 
     def setUI(self):
+        """
+        UI part, necessary
+        :return:
+        """
         self.setWindowTitle("Image")
 
         self.label.setText("Your image will show here")
@@ -55,13 +56,12 @@ class ImageDisplay(TabItemMainWindow):
 
     def openSettingWindow(self):
         self.refresh()
-        # 阻塞原窗口
-        self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
+
+        attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(attributes)
         self.pro_window.show()
 
     def refresh(self):
-        attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(attributes)
         self.pro_window.refresh()
 
     # 预览图片
@@ -93,13 +93,13 @@ class ImageDisplay(TabItemMainWindow):
         self.pro_window.loadSetting()
 
     def apply(self):
-        self.getInfo()
         # 发送信号
+        self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
 
     # 从pro获取参数
     # def parseProperties(self):
-    #     self.file = self.default_properties.get("File name", "")
+    #     self.file = self.info.get("File name", "")
     #     if self.file.startswith("[") and self.file.endswith("]"):
     #         self.file = ""
     #     self.isUD = self.pro_window.general.mirrorUD.checkState()
@@ -108,10 +108,10 @@ class ImageDisplay(TabItemMainWindow):
     #     self.stretch_mode = self.pro_window.general.stretch_mode.currentText()
     #     self.frame_fill_color = self.pro_window.frame.back_color.getColor()
     #     self.transparent_value = self.pro_window.general.transparent.text()
-    #     self.x_pos = self.default_properties.get("Center X", "50%")
-    #     self.y_pos = self.default_properties.get("Center Y", "50%")
-    #     self.w_size = self.default_properties.get("Width", "100%")
-    #     self.h_size = self.default_properties.get("Height", "100%")
+    #     self.x_pos = self.info.get("Center X", "50%")
+    #     self.y_pos = self.info.get("Center Y", "50%")
+    #     self.w_size = self.info.get("Width", "100%")
+    #     self.h_size = self.info.get("Height", "100%")
     #     if self.x_pos.startswith("[") and self.x_pos.endswith("]"):
     #         self.x_pos = "50%"
     #     if self.y_pos.startswith("[") and self.y_pos.endswith("]"):
@@ -143,25 +143,18 @@ class ImageDisplay(TabItemMainWindow):
     #         self.label.setPixmap(pix)
 
     # 返回设置参数
-    def getInfo(self):
-        self.default_properties = self.pro_window.getInfo()
-        return self.default_properties
-
-    def getShowProperties(self):
-        info = self.default_properties.copy()
-        info.pop("Input Devices")
-        info.pop("Output Devices")
-        return info
-
-    def setPro(self, pro: ImageProperty):
-        del self.pro_window
-        self.pro_window = pro
-        self.pro_window.ok_bt.clicked.connect(self.ok)
-        self.pro_window.cancel_bt.clicked.connect(self.cancel)
-        self.pro_window.apply_bt.clicked.connect(self.apply)
 
     # 设置可选参数
+
+    def updateInfo(self):
+        self.pro_window.updateInfo()
+
     def setAttributes(self, attributes):
+        """
+        completer for the whole widget
+        :param attributes:
+        :return:
+        """
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
 
@@ -185,10 +178,10 @@ class ImageDisplay(TabItemMainWindow):
         get this widget's properties to show it in Properties Window.
         @return: a dict of properties
         """
-        properties = self.default_properties.copy()
-        for k, v in properties.items():
-            if isinstance(v, dict):
-                properties.pop(k)
+        properties = {}
+        for k, v in self.pro_window.getProperties().items():
+            if not isinstance(v, dict):
+                properties[k] = v
         return properties
 
     def store(self):
@@ -203,10 +196,7 @@ class ImageDisplay(TabItemMainWindow):
         @return:
         :param properties:
         """
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
+        pass
 
     def clone(self, new_widget_id: str, new_widget_name: str):
         clone_widget = ImageDisplay(new_widget_id, new_widget_name)

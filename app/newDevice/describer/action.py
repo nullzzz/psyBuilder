@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFormLayout, QVBoxLayout, QComboBox
 
-from app.newDevice.describer import Shower
+from app.newDevice.describer.basis import Shower
 
 
 class Action(Shower):

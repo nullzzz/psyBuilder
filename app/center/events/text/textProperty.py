@@ -19,7 +19,7 @@ class TextProperty(QWidget):
 
         self.html = self.general.html
 
-        self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        self.default_properties = {**self.general.getInfo(), **self.frame.updateInfo(), **self.duration.updateInfo()}
 
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.frame, "frame")
@@ -60,7 +60,7 @@ class TextProperty(QWidget):
     def getInfo(self):
         self.general.apply()
         self.html = self.general.html
-        self.default_properties = {**self.general.getInfo(), **self.frame.getInfo(), **self.duration.getInfo()}
+        self.default_properties = {**self.general.getInfo(), **self.frame.updateInfo(), **self.duration.updateInfo()}
         return self.default_properties
 
     def setAttributes(self, attributes):

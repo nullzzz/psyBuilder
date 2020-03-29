@@ -1,5 +1,4 @@
 from .action import Action
-from .basis import Shower
 from .gamePad import GamePad
 from .keyboard import Keyboard
 from .mouse import Mouse

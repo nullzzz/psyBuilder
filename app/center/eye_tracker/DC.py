@@ -220,7 +220,7 @@ class EyeDC(TabItemWidget):
             "Show display with drift correction"] = self.show_display_with_drift_correction_target.checkState()
         self.default_properties["Fixation triggered"] = self.fixation_triggered.checkState()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
-        # self.default_properties["Screen Name"] = self.screen.currentText()
+        # self.info["Screen Name"] = self.screen.currentText()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -239,7 +239,7 @@ class EyeDC(TabItemWidget):
             self.default_properties["Show display with drift correction"])
         self.fixation_triggered.setCheckState(self.default_properties["Fixation triggered"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
-        # self.screen.setCurrentText(self.default_properties["Screen Name"])
+        # self.screen.setCurrentText(self.info["Screen Name"])
 
     def eventFilter(self, obj: QObject, e):
         if obj == self.x_pos or obj == self.y_pos:

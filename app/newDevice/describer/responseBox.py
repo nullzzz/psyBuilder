@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLineEdit, QFormLayout, QVBoxLayout
 
-from app.newDevice.describer import Shower
+from app.newDevice.describer.basis import Shower
 
 
 class ResponseBox(Shower):

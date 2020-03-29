@@ -163,8 +163,11 @@ class ColorListEditor(VarComboBox):
                 break
         return QComboBox.setCurrentText(self, text)
 
-    # 返回当前颜色R,G,B
     def getColor(self):
+        """
+        返回当前颜色R,G,B
+        :return:
+        """
         color_name = self.currentText()
         if color_name.startswith("["):
             return color_name

@@ -211,7 +211,7 @@ class OtherItem(QGraphicsPixmapItem):
         return unRotatedScenePos
 
     def getInfo(self):
-        # self.default_properties.clear()
+        # self.info.clear()
         # 上面这一行是多余的，意思是将item的属性清空
         # 下面是新建了一个属性字典
         # 之前获取到的cSliderPorperties

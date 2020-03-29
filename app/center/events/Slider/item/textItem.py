@@ -194,9 +194,9 @@ class TextItem(QGraphicsTextItem):
         self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def loadSetting(self):
-        # x = self.default_properties.get("x", 0)
-        # y = self.default_properties.get("y", 0)
-        # z = self.default_properties.get("z", 0)
+        # x = self.info.get("x", 0)
+        # y = self.info.get("y", 0)
+        # z = self.info.get("z", 0)
         # self.setPos(x, y)
         # self.setZValue(z)
 

@@ -65,10 +65,19 @@ class DeviceDialog(QDialog):
             self.deviceAdd.emit(device_id, device_name)
         self.close()
 
-    def show(self):
+    def refresh(self):
         if self.io_type == 0:
             self.addDevices(Info.OUTPUT_DEVICE_INFO)
         else:
             self.addDevices(Info.INPUT_DEVICE_INFO)
 
+    def show(self):
+        self.refresh()
         return super().show()
+
+    def getDeviceInfo(self):
+        self.refresh()
+        info = {}
+        for i in self.devices_list.count():
+            info[self.devices_list.item(i).data(3)] = self.devices_list.item(i).text()
+        return info
