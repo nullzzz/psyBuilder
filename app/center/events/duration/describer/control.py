@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QStackedWidget, QGridLayout
 
 from app.center.events.duration.describer.response import RespTrigger, EyeAction, RespInfo
 from app.center.events.duration.describer.trigger import TriggerInfo
+from app.func import Func
 
 
 class DefaultShow(QWidget):
@@ -59,7 +60,8 @@ class Describer(QStackedWidget):
     def updateInfo(self):
         self.default_properties.clear()
         for k, v in self.id_widget.items():
-            self.default_properties[k] = v.updateInfo()
+            self.default_properties[k] = v.getInfo()
+            self.default_properties[k]["Device Id"] = k
 
     def getInfo(self):
         self.updateInfo()
@@ -69,3 +71,13 @@ class Describer(QStackedWidget):
         RespTrigger.OUTPUT_DEVICE = info
         for k, v in self.id_widget.items():
             v.updateExternalDeviceInformation(info)
+
+    def refresh(self):
+        for w, d in self.id_widget.items():
+            if isinstance(d, RespInfo):
+                if (new_name := Func.getDeviceNameById(w)) != "":
+                    d.changeName(new_name)
+
+    def setAttributes(self, attributes: list):
+        for d in self.id_widget.values():
+            d.setAttributes(attributes)

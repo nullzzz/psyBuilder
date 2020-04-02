@@ -50,6 +50,10 @@ class InputDevice(QListWidgetItem):
     def getDeviceName(self):
         return self.device_name
 
+    def setDeviceName(self, new_name: str):
+        self.device_name = new_name
+        self.setText(new_name)
+
     def getInfo(self) -> dict:
         self.default_properties["Allowable"] = self.allowable
         self.default_properties["Correct"] = self.correct
@@ -91,3 +95,6 @@ class InputDevice(QListWidgetItem):
         self.end = self.default_properties["End"]
         self.mean = self.default_properties["Mean"]
         self.is_oval = self.default_properties["Is Oval"]
+
+    def __str__(self):
+        return f"{self.device_name}, {self.device_id}"

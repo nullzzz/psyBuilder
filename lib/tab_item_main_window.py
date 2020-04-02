@@ -88,7 +88,7 @@ class TabItemMainWindow(QMainWindow):
         :return:
         :rtype: int
         """
-        input_device: dict = self.info.get("Input Devices", {})
+        input_device: dict = self.default_properties.get("Input Devices", {})
 
         return len(input_device)
 

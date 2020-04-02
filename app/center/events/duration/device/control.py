@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QListWidget
 
 from app.center.events.duration.device.input import InputDevice
 from app.center.events.duration.device.output import OutputDevice
+from app.func import Func
 
 
 class DeviceHome(QListWidget):
@@ -105,4 +106,7 @@ class DeviceHome(QListWidget):
 
     def refresh(self):
         for i in range(self.count()):
-            pass
+            device = self.item(i)
+            device_id = device.getDeviceId()
+            if (new_name := Func.getDeviceNameById(device_id)) != "":
+                device.setDeviceName(new_name)

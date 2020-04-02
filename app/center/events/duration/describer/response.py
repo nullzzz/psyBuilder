@@ -157,8 +157,8 @@ class RespInfo(QWidget):
         layout.addRow("Response:", self.device_label)
         layout.addRow("Allowable:", self.allowable)
         layout.addRow("Correct:", self.correct)
-        layout.addRow("RT window:", self.RT_window)
-        layout.addRow("End action:", self.end_action)
+        layout.addRow("RT Window:", self.RT_window)
+        layout.addRow("End Action:", self.end_action)
         layout.setLabelAlignment(Qt.AlignRight | Qt.AlignVCenter)
         layout.setVerticalSpacing(20)
         layout.setContentsMargins(10, 0, 0, 0)
@@ -176,6 +176,9 @@ class RespInfo(QWidget):
         self.correct.setText(correct)
         self.RT_window.setCurrentText(rt_window)
         self.end_action.setCurrentText(end_action)
+
+    def changeName(self, new_name: str):
+        self.device_label.setText(new_name)
 
     def setAttributes(self, attributes):
         self.allowable.setCompleter(QCompleter(attributes))

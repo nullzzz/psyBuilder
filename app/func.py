@@ -281,7 +281,7 @@ class Func(object):
         return
 
     @staticmethod
-    def getDeviceNameById(device_id: str):
+    def getDeviceNameById(device_id: str) -> str:
         for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
             if device_id == k:
                 return v.get("Device Name")

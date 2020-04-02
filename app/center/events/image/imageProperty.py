@@ -54,6 +54,7 @@ class ImageProperty(QWidget):
 
     def refresh(self):
         self.general.refresh()
+        self.duration.refresh()
 
     def getProperties(self):
         properties = {

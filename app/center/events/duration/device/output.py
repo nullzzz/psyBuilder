@@ -31,6 +31,10 @@ class OutputDevice(QListWidgetItem):
     def getDeviceName(self):
         return self.device_name
 
+    def setDeviceName(self, new_name: str):
+        self.device_name = new_name
+        self.setText(new_name)
+
     def getInfo(self) -> dict:
         self.default_properties["Device Id"] = self.device_id
         self.default_properties["Device Name"] = self.device_name

@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QToolBar, QAction, QLabel
+from PyQt5.QtWidgets import QToolBar, QAction, QLabel, QMessageBox
 
 from app.func import Func
 from lib import TabItemMainWindow
@@ -47,10 +47,10 @@ class ImageDisplay(TabItemMainWindow):
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
-        pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
-        # pre_view.triggered.connect(self.preView)
+        preview = QAction(QIcon(Func.getImage("preview")), "preview", self)
+        preview.triggered.connect(self.preview)
         tool.addAction(open_pro)
-        # tool.addAction(pre_view)
+        tool.addAction(preview)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
@@ -61,7 +61,15 @@ class ImageDisplay(TabItemMainWindow):
         self.setAttributes(attributes)
         self.pro_window.show()
 
+    def preview(self):
+        QMessageBox.warning(self, "undo", "refactoring")
+
     def refresh(self):
+        """
+        refresh some information that may change such device name.
+        this function will be called when the properties window opened or getting the properties.
+        :return:
+        """
         self.pro_window.refresh()
 
     # 预览图片
@@ -178,6 +186,7 @@ class ImageDisplay(TabItemMainWindow):
         get this widget's properties to show it in Properties Window.
         @return: a dict of properties
         """
+        self.refresh()
         properties = {}
         for k, v in self.pro_window.getProperties().items():
             if not isinstance(v, dict):
@@ -206,7 +215,7 @@ class ImageDisplay(TabItemMainWindow):
 
     ##########################################
     # return single attribute
-    # most of them are string
+    # most of them return string
     # you can see this as a document。
     ##########################################
     def getFilename(self) -> str:

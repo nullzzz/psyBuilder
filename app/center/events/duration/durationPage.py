@@ -37,6 +37,8 @@ class DurationPage(QWidget):
 
     def setAttributes(self, attributes: list):
         self.duration.setCompleter(QCompleter(attributes))
+        self.up.setAttributes(QCompleter(attributes))
+        self.down.setAttributes(QCompleter(attributes))
 
     def updateInfo(self):
         """
