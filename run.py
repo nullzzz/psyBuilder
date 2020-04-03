@@ -2,7 +2,8 @@ import os
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize, QSettings
-from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QVBoxLayout, QLabel, QMenu, \
+    QAction
 
 from app import Psy
 from app.func import Func
@@ -141,18 +142,32 @@ class FileButtonArea(QWidget):
         # widget
         icon = QLabel()
         icon.setPixmap(Func.getImageObject("common/icon.png", type=0, size=QSize(60, 60)))
+        # menu
+        self.menu = QMenu()
+        self.default_mode_action = self.menu.addAction(Func.getImageObject("menu/checked", 1), "Default Mode",
+                                                            lambda : self.changeOpenMode("default mode"))
+        self.open_blank_file_action = self.menu.addAction(Func.getImageObject("menu/checked", 1),
+                                                               "Open Blank File",
+                                                               lambda : self.changeOpenMode("open blank file"))
+        open_mode = QSettings("config.ini", QSettings.IniFormat).value("open_mode", "default mode")
+        self.changeOpenMode(open_mode)
         # buttons
         create_button = HoverButton("menu/add", "Create New File")
         create_button.clicked.connect(self.handleCreateButtonClicked)
-        open_button = HoverButton("menu/open", "Open Local File")
+        open_button = HoverButton("menu/open", "Open                 ")
         open_button.clicked.connect(self.handleOpenButtonClicked)
+        setting_button = HoverButton("menu/setting", "Open Mode       ")
+        setting_button.clicked.connect(
+            lambda checked: self.menu.exec(self.mapToGlobal(setting_button.pos())))
         # layout
         layout = QVBoxLayout()
         layout.addWidget(icon, 18, Qt.AlignCenter)
         layout.addWidget(Version("Psy Builder", "Version 2020.3"), 20)
         layout.addWidget(create_button, 1, Qt.AlignHCenter)
         layout.addWidget(open_button, 1, Qt.AlignHCenter)
+        layout.addWidget(setting_button, 1, Qt.AlignHCenter)
         layout.addStretch(20)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
     def handleCreateButtonClicked(self, checked):
@@ -173,6 +188,17 @@ class FileButtonArea(QWidget):
         file_path, _ = QFileDialog.getOpenFileName(self, "Choose File", os.getcwd(), "Psy File (*.psy)")
         if file_path:
             self.fileOpened.emit(file_path)
+
+    def changeOpenMode(self, mode: str):
+        """
+        change open mode in config and menu
+        """
+        # config
+        QSettings("config.ini", QSettings.IniFormat).setValue("open_mode", mode)
+        # menu
+        mode = ("default mode" == mode)
+        self.default_mode_action.setIconVisibleInMenu(mode)
+        self.open_blank_file_action.setIconVisibleInMenu(not mode)
 
 
 class FileWindow(QWidget):
@@ -285,19 +311,28 @@ class FileWindow(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # get last file
-    last_file_path = QSettings("config.ini", QSettings.IniFormat).value("last_file_path", "")
-    if last_file_path:
-        # if last file exists, open this file directly
-        file_directory = os.path.basename(last_file_path)
-        QSettings("config.ini", QSettings.IniFormat).setValue("file_path", last_file_path)
-        QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
+    open_mode = QSettings("config.ini", QSettings.IniFormat).value("open_mode", "default mode")
+    if open_mode == "default mode":
+        # default open mode
+        # get last file
+        last_file_path = QSettings("config.ini", QSettings.IniFormat).value("last_file_path", "")
+        if last_file_path:
+            # if last file exists, open this file directly
+            file_directory = os.path.basename(last_file_path)
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_path", last_file_path)
+            QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
+            psy = Psy()
+            psy.showMaximized()
+        else:
+            # show file window to choose file
+            file_window = FileWindow()
+            file_window.show()
+    else:
+        # open a blank file directly
+        QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
+        QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", "")
         psy = Psy()
         psy.showMaximized()
-    else:
-        # show file window to choose file
-        file_window = FileWindow()
-        file_window.show()
     # set qss
     app.setStyleSheet(qss)
     sys.exit(app.exec_())

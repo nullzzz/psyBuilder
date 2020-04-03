@@ -32,10 +32,10 @@ class TableWidget(QTableWidget):
         # set header's background color
         self.setStyleSheet("""
             QHeaderView::section {
-                background:rgb(251,251,251);
+                background:rgb(236,236,236);
                 border: 1px solid rgb(189,189,189);
             }
             QHeaderView::section:hover {
-                background:rgb(225,225,225);
+                background:rgb(191,191,191);
             }
         """)

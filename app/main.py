@@ -5,7 +5,7 @@ import traceback
 from PyQt5.QtCore import Qt, QTimer, QSettings, QPropertyAnimation
 from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette, QFontMetrics
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLabel, QGridLayout, \
-    QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame
+    QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame, QMenu
 
 from lib import MessageBox, WaitDialog
 from .attributes import Attributes
@@ -65,12 +65,18 @@ class Psy(QMainWindow):
         """
         menubar = self.menuBar()
         # file menu
-        file_menu = menubar.addMenu("File")
+        file_menu: QMenu = menubar.addMenu("File")
         file_menu.addAction("New", self.newFile, QKeySequence(QKeySequence.New))
         file_menu.addAction("Open", self.openFile, QKeySequence(QKeySequence.Open))
         file_menu.addAction("Save", self.saveFile, QKeySequence(QKeySequence.Save))
         file_menu.addAction("Save As", self.saveAsFile, QKeySequence(QKeySequence.SaveAs))
-
+        file_menu.addSeparator()
+        open_mode_menu: QMenu = file_menu.addMenu("Open Mode")
+        self.default_mode_action = open_mode_menu.addAction("Default Mode", lambda: self.changeOpenMode("default mode"))
+        self.open_blank_file_action = open_mode_menu.addAction("Open Blank File",
+                                                               lambda: self.changeOpenMode("open blank file"))
+        open_mode = QSettings("config.ini", QSettings.IniFormat).value("open_mode", "default mode")
+        self.changeOpenMode(open_mode)
         # view menu
         view_menu = menubar.addMenu("&View")
         self.attribute_action = QAction("&Attribute", self)
@@ -877,6 +883,22 @@ class Psy(QMainWindow):
             self.properties.setVisible(self.properties.isHidden())
         elif dock == "output":
             self.output.setVisible(self.output.isHidden())
+
+    def changeOpenMode(self, mode: str):
+        """
+        change open mode in config and menu
+        """
+        # config
+        QSettings("config.ini", QSettings.IniFormat).setValue("open_mode", mode)
+        # menu
+        mode = ("default mode" == mode)
+        checked_icon = Func.getImageObject("menu/checked", 1)
+        if mode:
+            self.default_mode_action.setIcon(checked_icon)
+            self.open_blank_file_action.setIcon(QIcon(""))
+        else:
+            self.default_mode_action.setIcon(QIcon(""))
+            self.open_blank_file_action.setIcon(checked_icon)
 
     def checkVisible(self, is_visible):
         """

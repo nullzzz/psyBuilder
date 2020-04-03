@@ -42,9 +42,9 @@ class TabWidget(QTabWidget):
         if tab_index != -1:
             menu = QMenu()
             # actions
-            menu.addAction(QIcon(), "Close", lambda: self.removeTab(tab_index), QKeySequence())
-            menu.addAction(QIcon(), "Close All", self.closeAllTabs, QKeySequence())
-            menu.addAction(QIcon(), "Close Others", lambda: self.closeOtherTabs(tab_index), QKeySequence())
+            menu.addAction("Close", lambda: self.removeTab(tab_index))
+            menu.addAction("Close All", self.closeAllTabs)
+            menu.addAction("Close Others", lambda: self.closeOtherTabs(tab_index))
             # show
             menu.exec(self.mapToGlobal(e.pos()))
 
