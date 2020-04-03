@@ -29,7 +29,6 @@ class Psy(QMainWindow):
     def __init__(self):
         super(Psy, self).__init__(None)
         # title and icon
-        QApplication.restoreOverrideCursor()
         self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         # init menu bar
@@ -40,8 +39,8 @@ class Psy(QMainWindow):
         self.wait_dialog = WaitDialog()
         # save init state to restore the variable environment to its initial state
         # without any widgets even Timeline_0
-        if not os.path.exists(Info.Init_File):
-            self.store(Info.Init_File, False)
+        if not os.path.exists(Info.InitFile):
+            self.store(Info.InitFile, False)
         # load config
         Info.Psy = self
         Info.FILE_NAME = QSettings("config.ini", QSettings.IniFormat).value("file_path", "")
@@ -50,7 +49,12 @@ class Psy(QMainWindow):
         if Info.FILE_NAME:
             if not self.restore(Info.FILE_NAME):
                 self.clear()
-                Func.print("The file you selected may be damaged, please try to restart the software.", 2)
+                Func.print(
+                    f"The file {Info.FILE_NAME} you selected may be damaged, please check whether the file is correct.",
+                    2)
+            else:
+                # change last file
+                QSettings("config.ini", QSettings.IniFormat).setValue("last_file_path", Info.FILE_NAME)
         else:
             # we init initial timeline => Timeline_0
             self.initInitialTimeline()
@@ -691,6 +695,8 @@ class Psy(QMainWindow):
                         file_paths.remove(file_path)
                         file_paths.insert(0, file_path)
                     QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+                    # change last file
+                    QSettings("config.ini", QSettings.IniFormat).setValue("last_file_path", file_path)
 
     def saveAsFile(self):
         """
@@ -723,34 +729,29 @@ class Psy(QMainWindow):
         """
         file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.getcwd(), "Psy File (*.psy)")
         if file_path:
-            # change config
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
-            file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
-            if file_path not in file_paths:
-                file_paths.insert(0, file_path)
-            else:
-                # move it to first
-                file_paths.remove(file_path)
-                file_paths.insert(0, file_path)
-            # add file_path into file_paths
-            file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
-            if file_path not in file_paths:
-                file_paths.insert(0, file_path)
-            else:
-                # move it to first
-                file_paths.remove(file_path)
-                file_paths.insert(0, file_path)
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
             # store current state
-            self.store("temp.ini", False)
+            self.store(Info.TempFile, False)
             # clear software
             self.clear()
             # restore data from opening file
             if not self.restore(file_path):
                 # if store failed, restore to latest state
-                self.restore("temp.ini", False)
+                self.restore(Info.TempFile, False)
             else:
+                # change config
+                QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
+                QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+                # change last file
+                QSettings("config.ini", QSettings.IniFormat).setValue("last_file_path", file_path)
+                # add file_path into file_paths
+                file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+                if file_path not in file_paths:
+                    file_paths.insert(0, file_path)
+                else:
+                    # move it to first
+                    file_paths.remove(file_path)
+                    file_paths.insert(0, file_path)
+                QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
                 Info.FILE_NAME = file_path
                 Info.FILE_DIRECTORY = os.path.dirname(file_path)
 
@@ -786,7 +787,7 @@ class Psy(QMainWindow):
                 Func.print(f"File '{file_path}' saved successfully.", 1)
             return True
         except Exception as e:
-            Func.print(f"Due to error {e}. File saving failed.", 2)
+            Func.print(f"Due to error {e}. File {file_path} saving failed.", 2)
             return False
 
     def restore(self, file_path: str, show=True) -> bool:
@@ -821,6 +822,10 @@ class Psy(QMainWindow):
                 widgets_data == -1 or \
                 structure == -1 or \
                 tabs == -1:
+            if show:
+                Func.print(
+                    f"The file '{file_path}' you selected may be damaged, please check whether the file is correct.",
+                    2)
             return False
         # restore widgets: create origin widget and map to right widget ids
         try:
@@ -842,7 +847,10 @@ class Psy(QMainWindow):
                 Func.print(f"File '{file_path}' loaded successfully.", 1)
             return True
         except Exception as e:
-            Func.print(f"Due to error '{e}', the file failed to load.", 2)
+            Func.print(f"Due to error '{e}', the file {file_path} failed to load.", 2)
+            # clear last file
+            if file_path != Info.TempFile and file_path != Info.InitFile:
+                QSettings("config.ini", QSettings.IniFormat).setValue("last_file_path", "")
             return False
 
     def reset(self):
@@ -851,7 +859,7 @@ class Psy(QMainWindow):
         :return:
         """
         self.clear()
-        self.restore(Info.Init_File, False)
+        self.restore(Info.InitFile, False)
         self.initInitialTimeline()
 
     def setDockView(self, checked):

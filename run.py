@@ -219,9 +219,9 @@ class FileWindow(QWidget):
         if self.opening:
             return
         self.opening = True
+        QApplication.restoreOverrideCursor()
         psy = Psy()
         psy.showMaximized()
-        QApplication.restoreOverrideCursor()
         self.close()
         self.opening = False
 
@@ -285,8 +285,19 @@ class FileWindow(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    file_window = FileWindow()
-    file_window.show()
+    # get last file
+    last_file_path = QSettings("config.ini", QSettings.IniFormat).value("last_file_path", "")
+    if last_file_path:
+        # if last file exists, open this file directly
+        file_directory = os.path.basename(last_file_path)
+        QSettings("config.ini", QSettings.IniFormat).setValue("file_path", last_file_path)
+        QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
+        psy = Psy()
+        psy.showMaximized()
+    else:
+        # show file window to choose file
+        file_window = FileWindow()
+        file_window.show()
     # set qss
     app.setStyleSheet(qss)
     sys.exit(app.exec_())

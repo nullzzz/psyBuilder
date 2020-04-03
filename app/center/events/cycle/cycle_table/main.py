@@ -2,19 +2,19 @@ import re
 
 from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice
 from PyQt5.QtGui import QKeySequence, QBrush, QColor
-from PyQt5.QtWidgets import QTableWidget, QShortcut, QTableWidgetItem, QMenu, QInputDialog, QApplication, \
+from PyQt5.QtWidgets import QShortcut, QTableWidgetItem, QMenu, QInputDialog, QApplication, \
     QAbstractItemView
 
 from app.func import Func
 from app.info import Info
-from lib import MessageBox
+from lib import MessageBox, TableWidget
 from .attribute_dialog import AttributeDialog
 from .attribute_item import AttributeItem
 from .timeline_item import TimelineItem
 from .weight_item import WeightItem
 
 
-class CycleTable(QTableWidget):
+class CycleTable(TableWidget):
     """
 
     """
@@ -42,6 +42,8 @@ class CycleTable(QTableWidget):
         self.linkSignals()
         # set menu and shortcut
         self.setMenuAndShortcut()
+        # I can't do anything about this bug.
+        self.setEditTriggers(QAbstractItemView.DoubleClicked)
 
     def linkSignals(self):
         """
@@ -181,6 +183,7 @@ class CycleTable(QTableWidget):
         """
         when cell changed, we need to make some judgement
         """
+        old_edit_triggers = self.editTriggers()
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         # if text isn't changed, we ignore it
         if item.changed():
@@ -263,7 +266,7 @@ class CycleTable(QTableWidget):
                     item.setForeground(QBrush(QColor(0, 0, 255)))
                 else:
                     item.setForeground(QBrush(QColor(0, 0, 0)))
-        self.setEditTriggers(QAbstractItemView.AnyKeyPressed)
+        self.setEditTriggers(old_edit_triggers)
 
     def handleHeaderDoubleClicked(self, col: int):
         """
