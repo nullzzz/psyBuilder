@@ -14,6 +14,7 @@ class TabWidget(QTabWidget):
 
     def __init__(self, parent=None):
         super(TabWidget, self).__init__(parent)
+        self.setUsesScrollButtons(True)
         # set tab can be closed, it makes me concerned.
         self.setTabsClosable(True)
         self.tabBar().setObjectName("TabWidget")

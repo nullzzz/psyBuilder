@@ -2,7 +2,8 @@ import re
 
 from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice
 from PyQt5.QtGui import QKeySequence, QBrush, QColor
-from PyQt5.QtWidgets import QTableWidget, QShortcut, QTableWidgetItem, QMenu, QInputDialog, QApplication
+from PyQt5.QtWidgets import QTableWidget, QShortcut, QTableWidgetItem, QMenu, QInputDialog, QApplication, \
+    QAbstractItemView
 
 from app.func import Func
 from app.info import Info
@@ -70,8 +71,9 @@ class CycleTable(QTableWidget):
                                                      self.insertAttributesActionFunc, QKeySequence())
         self.delete_rows_action = self.menu.addAction(Func.getImageObject("menu/delete_row.png", 1), "Delete Rows",
                                                       self.deleteRowsActionFunc, QKeySequence())
-        self.delete_cols_action = self.menu.addAction(Func.getImageObject("menu/delete_col.png", 1), "Delete Attributes",
-                                                      self.deleteAttributesActionFunc, QKeySequence())
+        self.delete_cols_action = self.menu.addAction(Func.getImageObject("menu/delete_col.png", 1),
+                                                      "Delete Attributes", self.deleteAttributesActionFunc,
+                                                      QKeySequence())
         # shortcut
         self.copy_shortcut = QShortcut(QKeySequence(QKeySequence.Copy), self)
         self.copy_shortcut.setContext(Qt.WidgetWithChildrenShortcut)
@@ -179,6 +181,7 @@ class CycleTable(QTableWidget):
         """
         when cell changed, we need to make some judgement
         """
+        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         # if text isn't changed, we ignore it
         if item.changed():
             text = item.text()
@@ -190,7 +193,6 @@ class CycleTable(QTableWidget):
                 else:
                     item.save()
             elif type(item) == TimelineItem:
-                item: TimelineItem
                 # empty => something: maybe add a timeline
                 # something => another something: maybe add a timeline, maybe delete a timeline
                 # something => empty: maybe delete a timeline
@@ -261,6 +263,7 @@ class CycleTable(QTableWidget):
                     item.setForeground(QBrush(QColor(0, 0, 255)))
                 else:
                     item.setForeground(QBrush(QColor(0, 0, 0)))
+        self.setEditTriggers(QAbstractItemView.AnyKeyPressed)
 
     def handleHeaderDoubleClicked(self, col: int):
         """
@@ -299,6 +302,9 @@ class CycleTable(QTableWidget):
                     self.drag_copy_row_col = [row, col]
                     self.alt_key = True
                     self.setCursor(Qt.CrossCursor)
+        elif e.modifiers() == Qt.AltModifier | Qt.ControlModifier:
+            self.alt_key = False
+            self.unsetCursor()
 
     def mouseReleaseEvent(self, e):
         """
@@ -308,23 +314,36 @@ class CycleTable(QTableWidget):
         if self.alt_key:
             self.alt_key = False
             self.unsetCursor()
-            # copy data in selected col
-            end_row = self.rowAt(e.pos().y())
-            if end_row == -1:
-                # if user drag to the last row
-                end_row = self.rowCount() - 1
-            # copy
+            # get range
             start_row, col = self.drag_copy_row_col
+            end_row = start_row
+            # copy data in selected col
+            if self.selectedRanges():
+                select_range = self.selectedRanges()[0]
+                end_row = select_range.topRow()
+                if end_row == start_row:
+                    end_row = select_range.bottomRow()
+            # copy
             text = self.item(start_row, col).text()
             deleted_texts = []
-            for row in range(self.drag_copy_row_col[0] + 1, end_row + 1):
-                item = self.item(row, col)
-                if col == 1 and item.text():
-                    deleted_texts.append(item.text())
-                item.setText(text)
-            # change data
-            self.timelines[text][1] += end_row - start_row
+            if start_row < end_row:
+                # drag down
+                for row in range(start_row + 1, end_row + 1):
+                    item = self.item(row, col)
+                    if col == 1 and item.text():
+                        deleted_texts.append(item.text())
+                    item.setText(text)
+            elif start_row > end_row:
+                # drag up
+                for row in range(end_row, start_row):
+                    item = self.item(row, col)
+                    if col == 1 and item.text():
+                        deleted_texts.append(item.text())
+                    item.setText(text)
             # if col == 1, namely user change timeline, we need to check and update data
+            # change data
+            if col == 1 and text:
+                self.timelines[text][1] += abs(end_row - start_row)
             for deleted_text in deleted_texts:
                 self.timelines[deleted_text][1] -= 1
                 if not self.timelines[deleted_text][1]:

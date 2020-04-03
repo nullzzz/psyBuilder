@@ -70,15 +70,21 @@ class AttributeDialog(QDialog):
         """
         if not self.change:
             # add attribute
+            new_attributes = set()
             for attribute_area in self.attribute_areas:
                 name = attribute_area.name()
-                if name in self.exist_attribute:
-                    MessageBox.information(self, "warning", "Attribute already existed")
-                    return
-                elif name and not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-                    MessageBox.information(self, "warning",
-                                           "Name must start with a letter and contain only letters, numbers and _.")
-                    return
+                if name:
+                    if name in self.exist_attribute:
+                        MessageBox.information(self, "warning", f"Attribute {name} already exists.")
+                        return
+                    elif name in new_attributes:
+                        MessageBox.information(self, "warning", f"Duplicate attribute {name}.")
+                        return
+                    elif not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
+                        MessageBox.information(self, "warning",
+                                               "Name must start with a letter and contain only letters, numbers and _.")
+                        return
+                    new_attributes.add(name)
             self.attributesAdded.emit(self.col)
         else:
             # change attribute

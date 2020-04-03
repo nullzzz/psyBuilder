@@ -29,6 +29,7 @@ class Psy(QMainWindow):
     def __init__(self):
         super(Psy, self).__init__(None)
         # title and icon
+        QApplication.restoreOverrideCursor()
         self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         # init menu bar
@@ -782,7 +783,7 @@ class Psy(QMainWindow):
             tabs = self.center.store()
             setting.setValue("Tabs", tabs)
             if show:
-                Func.print("File successfully saved.", 1)
+                Func.print(f"File '{file_path}' saved successfully.", 1)
             return True
         except Exception as e:
             Func.print(f"Due to error {e}. File saving failed.", 2)
@@ -838,7 +839,7 @@ class Psy(QMainWindow):
             # restore tabs
             self.center.restore(tabs)
             if show:
-                Func.print("File loaded successfully.", 1)
+                Func.print(f"File '{file_path}' loaded successfully.", 1)
             return True
         except Exception as e:
             Func.print(f"Due to error '{e}', the file failed to load.", 2)
