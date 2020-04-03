@@ -52,9 +52,6 @@ class Psy(QMainWindow):
                 Func.print(
                     f"The file {Info.FILE_NAME} you selected may be damaged, please check whether the file is correct.",
                     2)
-            else:
-                # change last file
-                QSettings("config.ini", QSettings.IniFormat).setValue("last_file_path", Info.FILE_NAME)
         else:
             # we init initial timeline => Timeline_0
             self.initInitialTimeline()
@@ -701,8 +698,6 @@ class Psy(QMainWindow):
                         file_paths.remove(file_path)
                         file_paths.insert(0, file_path)
                     QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
-                    # change last file
-                    QSettings("config.ini", QSettings.IniFormat).setValue("last_file_path", file_path)
 
     def saveAsFile(self):
         """
@@ -747,8 +742,6 @@ class Psy(QMainWindow):
                 # change config
                 QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
                 QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
-                # change last file
-                QSettings("config.ini", QSettings.IniFormat).setValue("last_file_path", file_path)
                 # add file_path into file_paths
                 file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
                 if file_path not in file_paths:
@@ -854,9 +847,6 @@ class Psy(QMainWindow):
             return True
         except Exception as e:
             Func.print(f"Due to error '{e}', the file {file_path} failed to load.", 2)
-            # clear last file
-            if file_path != Info.TempFile and file_path != Info.InitFile:
-                QSettings("config.ini", QSettings.IniFormat).setValue("last_file_path", "")
             return False
 
     def reset(self):
