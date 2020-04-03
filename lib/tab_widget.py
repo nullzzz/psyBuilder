@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QTabWidget, QWidget, QShortcut, QTabBar
+from PyQt5.QtGui import QKeySequence, QIcon
+from PyQt5.QtWidgets import QTabWidget, QWidget, QShortcut, QMenu
 
 from app.func import Func
 
@@ -27,13 +27,25 @@ class TabWidget(QTabWidget):
 
         :return:
         """
-        # tab bar's menu
-        menu = self.tabBar()
         # close current tab
         QShortcut(QKeySequence(QKeySequence.Close), self).activated.connect(lambda: self.removeTab(self.currentIndex()))
         # switch different tab
         QShortcut(QKeySequence("Ctrl+left"), self).activated.connect(lambda: self.switchTab(1))
         QShortcut(QKeySequence("Ctrl+right"), self).activated.connect(lambda: self.switchTab(0))
+
+    def contextMenuEvent(self, e):
+        """
+        right menu
+        """
+        tab_index = self.tabBar().tabAt(e.pos())
+        if tab_index != -1:
+            menu = QMenu()
+            # actions
+            menu.addAction(QIcon(), "Close", lambda: self.removeTab(tab_index), QKeySequence())
+            menu.addAction(QIcon(), "Close All", self.closeAllTabs, QKeySequence())
+            menu.addAction(QIcon(), "Close Others", lambda: self.closeOtherTabs(tab_index), QKeySequence())
+            # show
+            menu.exec(self.mapToGlobal(e.pos()))
 
     def openTab(self, widget: QWidget, widget_type: str, name: str) -> None:
         """
@@ -88,6 +100,27 @@ class TabWidget(QTabWidget):
             if index < 0:
                 index = self.count() - 1
         self.setCurrentIndex(index)
+
+    def closeAllTabs(self):
+        """
+        close all tabs
+        :return:
+        """
+        while self.count():
+            self.removeTab(0)
+
+    def closeOtherTabs(self, index):
+        """
+        close all tabs exclude index
+        :param index:
+        :return:
+        """
+        # close all tabs right
+        for i in range(index + 1, self.count()):
+            self.removeTab(i)
+        # close all tabs left
+        for i in range(index):
+            self.removeTab(0)
 
     def store(self) -> list:
         """
