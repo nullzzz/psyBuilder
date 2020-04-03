@@ -17,8 +17,8 @@ class OtherItem(QGraphicsPixmapItem):
         Gabor: Info.ITEM_GABOR,
     }
 
-    def __init__(self, item_type, item_name: str = "", parent=None):
-        super(OtherItem, self).__init__(parent=parent)
+    def __init__(self, item_type, item_name: str = ""):
+        super(OtherItem, self).__init__()
 
         self.item_type = item_type
         self.item_name = item_name if item_name else self.generateItemName()
@@ -40,10 +40,10 @@ class OtherItem(QGraphicsPixmapItem):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
         self.default_properties = {
-            'name': self.item_name,
-            'z': self.zValue(),
-            'x': 1,
-            'y': 1,
+            'Name': self.item_name,
+            'Z': self.zValue(),
+            'X': 1,
+            'Y': 1,
             **self.pro_window.getInfo(),
         }
 
@@ -115,7 +115,7 @@ class OtherItem(QGraphicsPixmapItem):
             __orientation = self.default_properties['Orientation']
             orientation = 0 if __orientation.startswith("[") else float(__orientation)
 
-            __back_color = self.default_properties['Back color']
+            __back_color = self.default_properties['Back Color']
             back_color = (128.0, 128.0, 128.0) if __back_color.startswith("[") else tuple(
                 float(x) for x in __back_color.split(","))
 
@@ -218,10 +218,10 @@ class OtherItem(QGraphicsPixmapItem):
         # 在isVideoRelatedWidget中由这一行代码清空了
         # 这个getInfo用的clear是其他widget的方法，和这里就冲突了
         self.default_properties = {
-            'name': self.item_name,
-            'z': self.zValue(),
-            'x': self.scenePos().x(),
-            'y': self.scenePos().y(),
+            'Name': self.item_name,
+            'Z': self.zValue(),
+            'X': self.scenePos().x(),
+            'Y': self.scenePos().y(),
             **self.pro_window.getInfo(),
         }
         return self.default_properties
@@ -234,9 +234,9 @@ class OtherItem(QGraphicsPixmapItem):
             self.getInfo()
 
     def loadSetting(self):
-        x = self.default_properties.get("x", 0)
-        y = self.default_properties.get("y", 0)
-        z = self.default_properties.get("z", 0)
+        x = self.default_properties.get("X", 0)
+        y = self.default_properties.get("Y", 0)
+        z = self.default_properties.get("Z", 0)
         self.setPos(x, y)
         self.setZValue(z)
 

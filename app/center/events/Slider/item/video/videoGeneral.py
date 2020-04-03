@@ -10,11 +10,11 @@ class VideoGeneral(QWidget):
         super(VideoGeneral, self).__init__(parent)
         self.attributes = []
         self.default_properties = {
-            "File name": "",
-            "Start position": "0",
-            "End position": "999999",
-            "Aspect ratio": "Default",
-            "Playback rate": "1",
+            "File Name": "",
+            "Start Position": "0",
+            "End Position": "999999",
+            "Aspect Ratio": "Default",
+            "Playback Rate": "1",
             "Transparent": "100",
             "Center X": "50%",
             "Center Y": "50%",
@@ -183,23 +183,20 @@ class VideoGeneral(QWidget):
         self._width.setCompleter(QCompleter(self.attributes))
         self._height.setCompleter(QCompleter(self.attributes))
 
-    def getInfo(self):
-        self.default_properties.clear()
-        self.default_properties["File name"] = self.file_name.text()
-        self.default_properties["Start position"] = self.start_pos.text()
-        self.default_properties["End position"] = self.end_pos.text()
-        self.default_properties["Aspect ratio"] = self.aspect_ratio.currentText()
-        self.default_properties["Playback rate"] = self.playback_rate.currentText()
+    def updateInfo(self):
+        self.default_properties["File Name"] = self.file_name.text()
+        self.default_properties["Start Position"] = self.start_pos.text()
+        self.default_properties["End Position"] = self.end_pos.text()
+        self.default_properties["Aspect Ratio"] = self.aspect_ratio.currentText()
+        self.default_properties["Playback Rate"] = self.playback_rate.currentText()
         self.default_properties["Transparent"] = self.transparent.currentText()
         self.default_properties["Center X"] = self.x_pos.currentText()
         self.default_properties["Center Y"] = self.y_pos.currentText()
         self.default_properties["Width"] = self._width.currentText()
         self.default_properties["Height"] = self._height.currentText()
 
-        return self.default_properties
-
     def setProperties(self, properties: dict):
-        self.default_properties = properties
+        self.default_properties.update(properties)
         self.loadSetting()
 
     def setPosition(self, x, y):
@@ -209,11 +206,11 @@ class VideoGeneral(QWidget):
             self.y_pos.setCurrentText(str(int(y)))
 
     def loadSetting(self):
-        self.file_name.setText(self.default_properties["File name"])
-        self.start_pos.setText(self.default_properties["Start position"])
-        self.end_pos.setText(self.default_properties["End position"])
-        self.aspect_ratio.setCurrentText(self.default_properties["Aspect ratio"])
-        self.playback_rate.setCurrentText(self.default_properties["Playback rate"])
+        self.file_name.setText(self.default_properties["File Name"])
+        self.start_pos.setText(self.default_properties["Start Position"])
+        self.end_pos.setText(self.default_properties["End Position"])
+        self.aspect_ratio.setCurrentText(self.default_properties["Aspect Ratio"])
+        self.playback_rate.setCurrentText(self.default_properties["Playback Rate"])
         self.transparent.setCurrentText(self.default_properties["Transparent"])
         self.x_pos.setCurrentText(self.default_properties["Center X"])
         self.y_pos.setCurrentText(self.default_properties["Center Y"])

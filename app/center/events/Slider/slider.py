@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
+from PyQt5.QtOpenGL import QGLFormat, QGLWidget, QGL
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMenu, QAction, \
     QComboBox, QColorDialog
 
@@ -19,7 +20,7 @@ class Slider(TabItemMainWindow):
     def __init__(self, widget_id: str, widget_name: str):
         super(Slider, self).__init__(widget_id, widget_name)
         self.current_wid = widget_id
-        self.attributes: list = []
+
         self.scene = Scene()
         self.scene.itemAdd.connect(self.addItem)
         self.scene.selectionChanged.connect(self.changeItemList)
@@ -136,10 +137,13 @@ class Slider(TabItemMainWindow):
 
         self.view = QGraphicsView(self.scene)
         self.view.setRenderHint(QPainter.Antialiasing)
+        opengl = QGLWidget(QGLFormat(QGL.SampleBuffers))
+        opengl.makeCurrent()
+        self.view.setViewport(opengl)
 
-        width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
-
-        self.view.setMaximumSize(width / 2, height / 2)
+        width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
+        #
+        self.view.setMaximumSize(width, height)
         self.scene.setSceneRect(0, 0, width, height)
         self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
@@ -148,8 +152,8 @@ class Slider(TabItemMainWindow):
         self.left_box = LeftBox()
 
         self.default_properties: dict = {
-            "items": {},
-            "pro": self.pro_window.getInfo()
+            "Items": {},
+            "Pro": self.pro_window.getInfo()
         }
         self.setUI()
 
@@ -221,30 +225,30 @@ class Slider(TabItemMainWindow):
         self.setCentralWidget(widget)
 
     def refresh(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
         self.pro_window.refresh()
         self.getInfo()
 
-        self.view = QGraphicsView(self.scene)
-        self.view.setRenderHint(QPainter.Antialiasing)
-        width, height = Func.getCurrentScreenRes(self.pro_window.general.using_screen_id)
-        self.view.setMaximumSize(width / 2, height / 2)
-        self.scene.setSceneRect(0, 0, width, height)
-        self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
+        # self.view = QGraphicsView(self.scene)
+        # self.view.setRenderHint(QPainter.Antialiasing)
+        # width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
+        # self.view.setMaximumSize(width / 2, height / 2)
+        # self.scene.setSceneRect(0, 0, width, height)
+        # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
+
+    def setAttributes(self, attributes):
+        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
+        self.pro_window.setAttributes(format_attributes)
+        self.scene.setAttributes(format_attributes)
 
     def getInfo(self):
         self.default_properties = {
-            "items": self.scene.getInfo(),
-            "pro": self.pro_window.getInfo()
+            "Items": self.scene.getInfo(),
+            "Pro": self.pro_window.getInfo()
         }
         return self.default_properties
 
-    def getShowProperties(self):
-        info = self.pro_window.default_properties.copy()
-        info.pop("Input devices")
-        info.pop("Output devices")
-        return info
+    def getProperties(self):
+        return {}
 
     def selectDiaItem(self, d):
         self.fill_color_bt.setIcon(
@@ -328,25 +332,17 @@ class Slider(TabItemMainWindow):
 
     def fillButtonTriggered(self):
         self.scene.setItemColor(QColor(self.fillAction.data()))
-        # self.getInfo()# after changed the color, updating the info
 
     def lineButtonTriggered(self):
         self.scene.setLineColor(QColor(self.lineAction.data()))
-        # self.getInfo()  # after changed the color, updating the info
 
     def openPro(self):
-        self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.pro_window.show()
 
     def openItem(self):
         items = self.scene.selectedItems()
         if items:
             items[0].openPro()
-
-    def setAttributes(self, attributes):
-        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
-        self.pro_window.setAttributes(format_attributes)
-        self.scene.setAttributes(format_attributes)
 
     def createMenus(self):
         self.itemMenu = QMenu()
@@ -428,54 +424,9 @@ class Slider(TabItemMainWindow):
         # 发送信号
         self.propertiesChanged.emit(self.widget_id)
 
-    def getDuration(self) -> str:
-        """
-        返回duration
-        :return:
-        """
-        return self.pro_window.duration.duration.currentText()
-
-    def getClearAfter(self) -> str:
-        """
-        返回是否clear after
-        :return:
-        """
-        return self.pro_window.general.clear_after.currentText()
-
-    def getScreenName(self) -> str:
-        """
-        返回Screen Name
-        :return:
-        """
-        return self.pro_window.general.screen_name.currentText()
-
-    def getOutputDevice(self) -> dict:
-        """
-        返回输出设备
-        :return:
-        """
-        return self.pro_window.duration.default_properties.get("Output devices", {})
-
-    def getInputDevice(self) -> dict:
-        """
-        返回输入设备
-        :return: 输入设备字典
-        """
-        return self.pro_window.duration.default_properties.get("Input devices", {})
-
-    def getPropertyByKey(self, key: str):
-        return self.default_properties.get(key)
-
     """
-    Functions that must be complete in new version
-    """
-
-    def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        return self.getInfo()
+     Functions that must be complete in new version
+     """
 
     def store(self):
         """
@@ -513,3 +464,44 @@ class Slider(TabItemMainWindow):
         clone_page.pro_window.setProperties(self.pro_window.getInfo())
         clone_page.scene.setProperties(self.scene.getInfo())
         return clone_page
+
+    ####################
+    # single property
+    ###################
+    def getDuration(self) -> str:
+        """
+        返回duration
+        :return:
+        """
+        return self.pro_window.duration.duration.currentText()
+
+    def getClearAfter(self) -> str:
+        """
+        返回是否clear after
+        :return:
+        """
+        return self.pro_window.general.clear_after.currentText()
+
+    def getScreenName(self) -> str:
+        """
+        返回Screen Name
+        :return:
+        """
+        return self.pro_window.general.screen_name.currentText()
+
+    def getOutputDevice(self) -> dict:
+        """
+        返回输出设备
+        :return:
+        """
+        return self.pro_window.duration.default_properties.get("Output devices", {})
+
+    def getInputDevice(self) -> dict:
+        """
+        返回输入设备
+        :return: 输入设备字典
+        """
+        return self.pro_window.duration.default_properties.get("Input devices", {})
+
+    def getPropertyByKey(self, key: str):
+        return self.default_properties.get(key)

@@ -18,7 +18,7 @@ class GaborGeneral(QWidget):
             "Contrast": "1",
             "Phase": "0",
             "Orientation": "0",
-            "Background color": "128,128,128",
+            "Back Color": "128,128,128",
             "SDx": "30",
             "SDy": "30",
             "Rotation": "0",
@@ -153,8 +153,7 @@ class GaborGeneral(QWidget):
         if not self.cy_pos.text().startswith("["):
             self.cy_pos.setText(str(int(y)))
 
-    def getInfo(self):
-        self.default_properties.clear()
+    def updateInfo(self):
         self.default_properties['Center X'] = self.cx_pos.text()
         self.default_properties['Center Y'] = self.cy_pos.text()
         self.default_properties['Width'] = self._width.currentText()
@@ -163,13 +162,11 @@ class GaborGeneral(QWidget):
         self.default_properties['Contrast'] = self.contrast.currentText()
         self.default_properties['Phase'] = self.phase.currentText()
         self.default_properties['Orientation'] = self.orientation.currentText()
-        self.default_properties['Back color'] = self.back_color.currentText()
+        self.default_properties['Back Color'] = self.back_color.currentText()
         self.default_properties['SDx'] = self.sdx.currentText()
         self.default_properties['SDy'] = self.sdy.currentText()
         self.default_properties['Rotation'] = self.rotation.currentText()
         self.default_properties['Transparency'] = self.transparency.currentText()
-
-        return self.default_properties
 
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
@@ -188,13 +185,8 @@ class GaborGeneral(QWidget):
         self.phase.setCurrentText(self.default_properties["Phase"])
         self.orientation.setCurrentText(self.default_properties["Orientation"])
 
-        self.back_color.setCurrentText(self.default_properties["Back color"])
+        self.back_color.setCurrentText(self.default_properties["Back Color"])
         self.sdx.setCurrentText(self.default_properties['SDx'])
         self.sdy.setCurrentText(self.default_properties['SDy'])
         self.rotation.setCurrentText(self.default_properties["Rotation"])
         self.transparency.setCurrentText(self.default_properties["Transparency"])
-
-    def clone(self):
-        clone_page = GaborGeneral()
-        clone_page.setProperties(self.default_properties)
-        return clone_page

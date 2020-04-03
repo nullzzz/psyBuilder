@@ -14,9 +14,13 @@ class TextGeneral(QWidget):
             "Text": "Hello World",
             "Center X": "0",
             "Center Y": "0",
-            "Fore color": "0,0,0",
-            "Back color": "255,255,255",
+            "Fore Color": "0,0,0",
+            "Back Color": "255,255,255",
             "Transparent": "100%",
+            "Right To Left": "",
+            "Font Family": "",
+            "Font Size": "12",
+            "Style": "normal_0",
         }
 
         self.cx_pos = VarComboBox()
@@ -30,9 +34,6 @@ class TextGeneral(QWidget):
         self.fore_color = ColorListEditor()
         self.back_color = ColorListEditor()
         self.fore_color.setCurrentText("black")
-
-        # self.fore_color_name = "black"
-        # self.back_color_name = "white"
 
         self.transparent = VarLineEdit("100%")
         self.transparent.setReg(r"0%|[1-9]\d%|100%")
@@ -48,7 +49,6 @@ class TextGeneral(QWidget):
         self.style_box.setEditable(True)
         self.style_box.addItems(
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
-        # self.style_box.currentTextChanged.connect(self.fontChange)
         self.font_size_box = VarComboBox()
         self.font_size_box.setReg(r"\d+")
         self.font_size_box.setEditable(True)
@@ -62,8 +62,6 @@ class TextGeneral(QWidget):
         self.setUI()
 
     def setUI(self):
-        # l00 = QLabel("Center X:")
-        # l10 = QLabel("Center Y:")
         l00 = QLabel("Left X:")
         l10 = QLabel("Top  Y:")
 
@@ -128,38 +126,28 @@ class TextGeneral(QWidget):
     """
 
     def setAttributes(self, attributes):
-        self.attributes = attributes
-        self.cx_pos.setCompleter(QCompleter(self.attributes))
-        self.cy_pos.setCompleter(QCompleter(self.attributes))
-        self.fore_color.setCompleter(QCompleter(self.attributes))
-        self.back_color.setCompleter(QCompleter(self.attributes))
-        self.transparent.setCompleter(QCompleter(self.attributes))
-        # self.right_to_left.setCompleter(QCompleter(self.attributes))
-        self.font_size_box.setCompleter(QCompleter(self.attributes))
-        self.style_box.setCompleter(QCompleter(self.attributes))
+        self.cx_pos.setCompleter(QCompleter(attributes))
+        self.cy_pos.setCompleter(QCompleter(attributes))
+        self.fore_color.setCompleter(QCompleter(attributes))
+        self.back_color.setCompleter(QCompleter(attributes))
+        self.transparent.setCompleter(QCompleter(attributes))
+        self.font_size_box.setCompleter(QCompleter(attributes))
+        self.style_box.setCompleter(QCompleter(attributes))
 
-    # def apply(self):
-    #     self.html = self.text_edit.toHtml()
-
-    def getInfo(self):
-        self.default_properties.clear()
-
+    def updateInfo(self):
         self.default_properties["Center X"] = self.cx_pos.currentText()
         self.default_properties["Center Y"] = self.cy_pos.currentText()
-        self.default_properties["Fore color"] = self.fore_color.getColor()
+        self.default_properties["Fore Color"] = self.fore_color.getColor()
 
-        self.default_properties["Back color"] = self.back_color.getColor()
+        self.default_properties["Back Color"] = self.back_color.getColor()
         self.default_properties["Transparent"] = self.transparent.text()
-        self.default_properties["Font family"] = self.font_box.currentText()
-        self.default_properties["Font size"] = self.font_size_box.currentText()
+        self.default_properties["Font Family"] = self.font_box.currentText()
+        self.default_properties["Font Size"] = self.font_size_box.currentText()
         self.default_properties["Style"] = self.style_box.currentText()
-        self.default_properties["Right to left"] = self.right_to_left.currentText()
-
-        return self.default_properties
+        self.default_properties["Right To Left"] = self.right_to_left.currentText()
 
     def setProperties(self, properties: dict):
-        self.default_properties = properties.copy()
-        # self.html = html
+        self.default_properties.update(properties)
         self.loadSetting()
 
     def setPosition(self, x, y):
@@ -171,16 +159,10 @@ class TextGeneral(QWidget):
     def loadSetting(self):
         self.cx_pos.setCurrentText(self.default_properties["Center X"])
         self.cy_pos.setCurrentText(self.default_properties["Center Y"])
-        self.fore_color.setCurrentText(self.default_properties["Fore color"])
-        self.back_color.setCurrentText(self.default_properties["Back color"])
+        self.fore_color.setCurrentText(self.default_properties["Fore Color"])
+        self.back_color.setCurrentText(self.default_properties["Back Color"])
         self.transparent.setText(self.default_properties["Transparent"])
-        self.right_to_left.setCurrentText(self.default_properties["Right to left"])
-        self.font_box.setCurrentText(self.default_properties["Font family"])
-        self.font_size_box.setCurrentText(self.default_properties["Font size"])
-
+        self.right_to_left.setCurrentText(self.default_properties["Right To Left"])
+        self.font_box.setCurrentText(self.default_properties["Font Family"])
+        self.font_size_box.setCurrentText(self.default_properties["Font Size"])
         self.style_box.setCurrentText(self.default_properties["Style"])
-
-    def clone(self):
-        clone_page = TextGeneral()
-        clone_page.setProperties(self.default_properties)
-        return clone_page

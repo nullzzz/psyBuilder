@@ -6,7 +6,7 @@ from lib import VarComboBox
 
 class DurationPage(QWidget):
     def __init__(self, parent=None):
-        super(DurationPage, self).__init__(parent)
+        super(DurationPage, self).__init__(parent=parent)
         self.duration = VarComboBox()
         self.duration.addItems(("1000", "2000", "3000", "4000", "100~500", "(Infinite)"))
         self.duration.setEditable(True)
@@ -62,3 +62,4 @@ class DurationPage(QWidget):
     # 加载参数设置
     def loadSetting(self):
         self.duration.setCurrentText(self.default_properties["Duration"])
+        # todo

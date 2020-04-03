@@ -3,12 +3,8 @@ from PyQt5.QtGui import QPen, QTransform, QKeyEvent
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem
 
 from app.info import Info
-from ...events.Slider.item.diaItem import DiaItem
-from ...events.Slider.item.lasso import Lasso
-from ...events.Slider.item.linItem import LineItem
-from ...events.Slider.item.otherItem import OtherItem
-from ...events.Slider.item.pixItem import PixItem
-from ...events.Slider.item.textItem import TextItem
+from .item.openglItem import GLItem
+from ...events.Slider.item import *
 
 
 class Scene(QGraphicsScene):
@@ -16,12 +12,11 @@ class Scene(QGraphicsScene):
 
     itemAdd = pyqtSignal(str)
     itemSelected = pyqtSignal()
-    propertyChanged = pyqtSignal(dict)
 
     def __init__(self, parent=None):
         super(Scene, self).__init__(parent)
 
-        self.my_mode = self.InsertItem
+        self.my_mode = Scene.InsertItem
 
         self.attributes = []
         self.line = None
@@ -38,7 +33,7 @@ class Scene(QGraphicsScene):
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         # print(event.key())
-        # todo 按键冲突
+        # todo delete and Ctrl+D
         if event.key() == Qt.Key_Delete and event.modifiers() == Qt.CTRL:
             print("del")
         super(Scene, self).keyPressEvent(event)
@@ -70,7 +65,7 @@ class Scene(QGraphicsScene):
             elif DiaItem.Polygon <= item_type <= DiaItem.Rect:
                 item = DiaItem(item_type)
             else:
-                return
+                item = GLItem(item_type)
             self.addItem(item)
             item.setPos(event.scenePos())  # move the item in the scene
 

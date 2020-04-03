@@ -13,9 +13,9 @@ class CircleGeneral(QWidget):
             "Center Y": "0",
             "Width": "200",
             "Height": "200",
-            "Border color": "black",
-            "Border width": '1',
-            "Fill color": "0,0,0,0"
+            "Border Color": "black",
+            "Border Width": '1',
+            "Fill Color": "0,0,0,0"
         }
 
         self.cx_pos = VarLineEdit("0")
@@ -90,22 +90,18 @@ class CircleGeneral(QWidget):
         self._height.setCompleter(QCompleter(self.attributes))
         self.border_width.setCompleter(QCompleter(self.attributes))
 
-    def getInfo(self):
-        self.default_properties.clear()
+    def updateInfo(self):
         self.default_properties['Center X'] = self.cx_pos.text()
         self.default_properties['Center Y'] = self.cy_pos.text()
         self.default_properties["Width"] = self._width.text()
         self.default_properties["Height"] = self._height.text()
-        self.default_properties['Border width'] = self.border_width.text()
-        self.default_properties['Border color'] = self.border_color.getColor()
-        self.default_properties['Fill color'] = self.fill_color.getColor()
-
-        return self.default_properties
+        self.default_properties['Border Width'] = self.border_width.text()
+        self.default_properties['Border Color'] = self.border_color.getColor()
+        self.default_properties['Fill Color'] = self.fill_color.getColor()
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def setPosition(self, x, y):
         if not self.cx_pos.text().startswith("["):
@@ -141,6 +137,6 @@ class CircleGeneral(QWidget):
         self._width.setText(self.default_properties["Width"])
         self._height.setText(self.default_properties["Height"])
 
-        self.border_color.setCurrentText(self.default_properties["Border color"])
-        self.border_width.setText(self.default_properties["Border width"])
-        self.fill_color.setCurrentText(self.default_properties["Fill color"])
+        self.border_color.setCurrentText(self.default_properties["Border Color"])
+        self.border_width.setText(self.default_properties["Border Width"])
+        self.fill_color.setCurrentText(self.default_properties["Fill Color"])

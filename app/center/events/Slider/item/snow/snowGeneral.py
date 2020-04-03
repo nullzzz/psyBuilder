@@ -81,14 +81,13 @@ class SnowGeneral(QWidget):
 
     # 设置可选属性
     def setAttributes(self, attributes):
-        self.attributes = attributes
-        self.cx_pos.setCompleter(QCompleter(self.attributes))
-        self.cy_pos.setCompleter(QCompleter(self.attributes))
-        self._width.setCompleter(QCompleter(self.attributes))
-        self._height.setCompleter(QCompleter(self.attributes))
-        self.scale.setCompleter(QCompleter(self.attributes))
-        self.rotation.setCompleter(QCompleter(self.attributes))
-        self.transparency.setCompleter(QCompleter(self.attributes))
+        self.cx_pos.setCompleter(QCompleter(attributes))
+        self.cy_pos.setCompleter(QCompleter(attributes))
+        self._width.setCompleter(QCompleter(attributes))
+        self._height.setCompleter(QCompleter(attributes))
+        self.scale.setCompleter(QCompleter(attributes))
+        self.rotation.setCompleter(QCompleter(attributes))
+        self.transparency.setCompleter(QCompleter(attributes))
 
     def setPosition(self, x, y):
         if not self.cx_pos.text().startswith("["):
@@ -96,7 +95,7 @@ class SnowGeneral(QWidget):
         if not self.cy_pos.text().startswith("["):
             self.cy_pos.setText(str(int(y)))
 
-    def getInfo(self):
+    def updateInfo(self):
         self.default_properties.clear()
         self.default_properties['Center X'] = self.cx_pos.text()
         self.default_properties['Center Y'] = self.cy_pos.text()
@@ -106,12 +105,9 @@ class SnowGeneral(QWidget):
         self.default_properties['Rotation'] = self.rotation.currentText()
         self.default_properties['Transparency'] = self.transparency.currentText()
 
-        return self.default_properties
-
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     # 加载参数设置
     def loadSetting(self):

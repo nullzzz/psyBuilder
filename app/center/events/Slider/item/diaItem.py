@@ -1,6 +1,7 @@
+import OpenGL.GL as gl
 import numpy as np
 from PyQt5.QtCore import QPointF, QRectF, QPoint, Qt
-from PyQt5.QtGui import QColor, QPainterPath
+from PyQt5.QtGui import QColor, QPainterPath, QPainter
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPolygonItem
 
 from app.info import Info
@@ -20,11 +21,10 @@ class DiaItem(QGraphicsPolygonItem):
         Rect: Info.ITEM_RECT,
     }
 
-    def __init__(self, item_type, item_name: str = "", parent=None):
-        super(DiaItem, self).__init__(parent=parent)
+    def __init__(self, item_type, item_name: str = ""):
+        super(DiaItem, self).__init__()
         self.item_type = item_type
         self.item_name = item_name if item_name else self.generateItemName()
-        self.attributes = []
 
         path = QPainterPath()
         # circle
@@ -78,10 +78,10 @@ class DiaItem(QGraphicsPolygonItem):
         self.border_width = 1
 
         self.default_properties = {
-            'name': self.item_name,
-            'z': self.zValue(),
-            'x': 1,
-            'y': 1,
+            'Name': self.item_name,
+            'Z': self.zValue(),
+            'X': 1,
+            'Y': 1,
             **self.pro_window.getInfo(),
         }
 
@@ -102,16 +102,6 @@ class DiaItem(QGraphicsPolygonItem):
     def setLineWidth(self, width):
         self.border_width = width
         self.pro_window.setLineWidth(width)
-
-    def noOutLineBoundingRect(self):
-        cBoundRect = self.polygon().boundingRect()
-        # print(f"line 109: {cBoundRect}")
-        # cBoundRect = cBoundRect.adjusted(self.pen().width()/2,
-        #                                               self.pen().width()/2,
-        #                                               -self.pen().width(),
-        #                                             -self.pen().width())
-        # print(f"line 114: {cBoundRect}")
-        return cBoundRect
 
     def mouseMoveEvent(self, mouseEvent):
         x = mouseEvent.pos().x()
@@ -159,9 +149,9 @@ class DiaItem(QGraphicsPolygonItem):
 
             elif self.item_type == self.Arc:
                 path.moveTo(new_rect.center())
-                __start_angle = self.default_properties["Angle start"]
+                __start_angle = self.default_properties["Angle Start"]
                 start_angle = 0 if __start_angle.startswith("[") else float(__start_angle)
-                __angle_length = self.default_properties["Angle length"]
+                __angle_length = self.default_properties["Angle Length"]
                 angle_length = 0 if __angle_length.startswith("[") else float(__angle_length)
 
                 path.arcTo(new_rect, start_angle, angle_length)
@@ -188,8 +178,6 @@ class DiaItem(QGraphicsPolygonItem):
                         path.moveTo(cX, cY)
                     else:
                         path.lineTo(cX, cY)
-
-
             else:
                 raise Exception("item_type should be of 'Arc','rectangle', or 'circle' !!")
 
@@ -249,12 +237,7 @@ class DiaItem(QGraphicsPolygonItem):
 
         self.pro_window.setVertex(points)
 
-    def setPoint(self):
-        # todo: 设置polygon顶点
-        pass
-
     def setAttributes(self, attributes):
-        self.attributes = attributes
         self.pro_window.setAttributes(attributes)
 
     def ok(self):
@@ -271,10 +254,10 @@ class DiaItem(QGraphicsPolygonItem):
 
     def getInfo(self):
         self.default_properties = {
-            'name': self.item_name,
-            'z': self.zValue(),
-            'x': self.scenePos().x(),
-            'y': self.scenePos().y(),
+            'Name': self.item_name,
+            'Z': self.zValue(),
+            'X': self.scenePos().x(),
+            'Y': self.scenePos().y(),
             **self.pro_window.getInfo(),
         }
         return self.default_properties
@@ -309,7 +292,7 @@ class DiaItem(QGraphicsPolygonItem):
         self.setPos(QPoint(cx, cy))
 
         # fill color
-        fill_color = self.default_properties["Fill color"]
+        fill_color = self.default_properties["Fill Color"]
         if not fill_color.startswith("["):
             self.fill_color = fill_color
         # todo
@@ -322,11 +305,11 @@ class DiaItem(QGraphicsPolygonItem):
 
         self.setBrush(QColor(r, g, b, a))
         # border color
-        border_color = self.default_properties["Border color"]
+        border_color = self.default_properties["Border Color"]
         if not border_color.startswith("["):
             self.border_color = border_color
 
-        border_width = self.default_properties["Border width"]
+        border_width = self.default_properties["Border Width"]
         if not border_width.startswith("["):
             self.border_width = int(border_width)
         pen = self.pen()
@@ -371,10 +354,10 @@ class DiaItem(QGraphicsPolygonItem):
 
             elif self.item_type == self.Arc:
                 rect = QRectF(-w / 2, -h / 2, w, h)
-                __start = self.default_properties["Angle start"]
+                __start = self.default_properties["Angle Start"]
                 start = 0 if __start.startswith("[") else float(__start)
 
-                __length = self.default_properties["Angle length"]
+                __length = self.default_properties["Angle Length"]
                 length = 360 if __length.startswith("[") else float(__length)
 
                 path.arcTo(rect, start, length)
@@ -395,11 +378,11 @@ class DiaItem(QGraphicsPolygonItem):
         self.setPen(pen)
         self.update()
 
-        old_width = self.default_properties["Border width"]
+        old_width = self.default_properties["Border Width"]
         if not old_width.startswith("["):
-            self.pro_window.default_properties["Border width"] = str(width)
-            self.pro_window.general.default_properties["Border width"] = str(width)
-            self.default_properties["Border width"] = str(width)
+            self.pro_window.default_properties["Border Width"] = str(width)
+            self.pro_window.general.default_properties["Border Width"] = str(width)
+            self.default_properties["Border Width"] = str(width)
             self.pro_window.general.border_width.setText(str(width))
 
     def setColor(self, color: QColor):
@@ -408,21 +391,33 @@ class DiaItem(QGraphicsPolygonItem):
         self.setPen(pen)
         self.update()
 
-        old_rgb = self.default_properties["Border color"]
+        old_rgb = self.default_properties["Border Color"]
         if not old_rgb.startswith("["):
             rgb = f"{color.red()},{color.green()},{color.blue()}"
-            self.pro_window.default_properties["Border color"] = rgb
-            self.pro_window.general.default_properties["Border color"] = rgb
-            self.default_properties["Border color"] = rgb
+            self.pro_window.default_properties["Border Color"] = rgb
+            self.pro_window.general.default_properties["Border Color"] = rgb
+            self.default_properties["Border Color"] = rgb
             self.pro_window.general.border_color.setCurrentText(rgb)
 
     def setItemColor(self, color):
         self.fill_color = color
 
-        old_rgb = self.default_properties["Fill color"]
+        old_rgb = self.default_properties["Fill Color"]
         if not old_rgb.startswith("["):
             rgb = f"{color.red()},{color.green()},{color.blue()}"
-            self.pro_window.default_properties["Fill color"] = rgb
-            self.pro_window.general.default_properties["Fill color"] = rgb
-            self.default_properties["Fill color"] = rgb
+            self.pro_window.default_properties["Fill Color"] = rgb
+            self.pro_window.general.default_properties["Fill Color"] = rgb
+            self.default_properties["Fill Color"] = rgb
             self.pro_window.general.fill_color.setCurrentText(rgb)
+
+    def paint(self, painter: QPainter, QStyleOptionGraphicsItem, widget=None):
+        painter.beginNativePainting()
+
+        gl.glColor3f(0.5, 1.0, 0.2)
+        gl.glBegin(gl.GL_TRIANGLES)
+        gl.glVertex3f(100.0, 100.0, -100.0)
+        gl.glVertex3f(150.0, 300.0, -500.0)
+        gl.glVertex3f(200.0, 700.0, -200.0)
+        gl.glEnd()
+        painter.endNativePainting()
+        return super().paint(painter, QStyleOptionGraphicsItem, widget)

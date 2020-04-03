@@ -43,23 +43,15 @@ class VideoProperty(QWidget):
         self.general.setAttributes(attributes)
 
     def getInfo(self):
-        self.default_properties.clear()
-        self.default_properties = self.general.getInfo()
+        self.general.updateInfo()
         return self.default_properties
 
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def setPosition(self, x, y):
         self.general.setPosition(x, y)
 
     def loadSetting(self):
-        self.general.setProperties(self.default_properties)
-
-    def clone(self):
-        properties = self.getInfo()
-        clone_page = VideoProperty()
-        clone_page.setProperties(properties)
-        return clone_page
+        self.general.loadSetting()

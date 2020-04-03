@@ -12,7 +12,7 @@ class TextProperty(QWidget):
 
         # self.html = self.general.html
 
-        self.default_properties = self.general.getInfo()
+        self.default_properties = self.general.default_properties
 
         self.tab.addTab(self.general, "general")
         # bottom
@@ -27,10 +27,8 @@ class TextProperty(QWidget):
     def setUI(self):
         self.setWindowTitle("Text property")
         self.resize(600, 800)
-        # self.setFixedSize(600, 800)
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.tab, 6)
-        # main_layout.addStretch(2)
         main_layout.addWidget(self.below, 1)
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
@@ -46,10 +44,7 @@ class TextProperty(QWidget):
         self.below.setLayout(below_layout)
 
     def getInfo(self):
-        # self.apply()
-        # self.html = self.general.html
-        self.default_properties.clear()
-        self.default_properties = self.general.getInfo()
+        self.general.updateInfo()
         return self.default_properties
 
     def setAttributes(self, attributes):
@@ -59,18 +54,11 @@ class TextProperty(QWidget):
         self.html = html
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties.copy()
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def setPosition(self, x, y):
         self.general.setPosition(x, y)
 
     def loadSetting(self):
-        self.general.setProperties(self.default_properties)
-
-    def clone(self):
-        clone_page = TextProperty()
-        # clone_page.setOther(self.html)
-        clone_page.setProperties(self.default_properties)
-        return clone_page
+        self.general.loadSetting()

@@ -38,9 +38,9 @@ class PolygonGeneral(QWidget):
             "Center X": "0",
             "Center Y": "0",
             "Points": [],
-            "Border color": "black",
-            "Border width": '1',
-            "Fill color": "0,0,0,0"
+            "Border Color": "black",
+            "Border Width": '1',
+            "Fill Color": "0,0,0,0"
         }
 
         self.cx_pos = VarLineEdit("0")
@@ -136,18 +136,6 @@ class PolygonGeneral(QWidget):
         group1 = QGroupBox("Geometry")
 
         self.point_layout = QGridLayout()
-        # self.point_layout.setAlignment(Qt.AlignVCenter)
-        # self.point_layout.addWidget(l00, 0, 0)
-        # self.point_layout.addWidget(self.cx_pos, 0, 1)
-        # self.point_layout.addWidget(l01, 0, 2)
-        # self.point_layout.addWidget(self.cy_pos, 0, 3)
-        # self.p1.x.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
-        # self.p2.x.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
-        # self.p3.x.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
-        #
-        # self.p1.y.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
-        # self.p2.y.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
-        # self.p3.y.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
         self.point_layout.addWidget(self.p1.x_label, 1, 0)
         self.point_layout.addWidget(self.p1.x, 1, 1)
         self.point_layout.addWidget(self.p1.y_label, 1, 2)
@@ -194,16 +182,16 @@ class PolygonGeneral(QWidget):
         self.setLayout(layout)
 
     # 设置可选属性
-    def setAttributes(self, attributes):
+    def setAttributes(self, attributes: list):
         self.attributes = attributes
-        self.cx_pos.setCompleter(QCompleter(self.attributes))
-        self.cy_pos.setCompleter(QCompleter(self.attributes))
-        self.p1.setAttributes(self.attributes)
-        self.p2.setAttributes(self.attributes)
-        self.p3.setAttributes(self.attributes)
-        self.border_width.setCompleter(QCompleter(self.attributes))
+        self.cx_pos.setCompleter(QCompleter(attributes))
+        self.cy_pos.setCompleter(QCompleter(attributes))
+        self.p1.setAttributes(attributes)
+        self.p2.setAttributes(attributes)
+        self.p3.setAttributes(attributes)
+        self.border_width.setCompleter(QCompleter(attributes))
 
-    def getInfo(self):
+    def updateInfo(self):
         self.default_properties['Center X'] = self.cx_pos.text()
         self.default_properties['Center Y'] = self.cy_pos.text()
 
@@ -213,11 +201,9 @@ class PolygonGeneral(QWidget):
 
         self.default_properties["Points"] = points
 
-        self.default_properties['Border width'] = self.border_width.text()
-        self.default_properties['Border color'] = self.border_color.getColor()
-        self.default_properties['Fill color'] = self.fill_color.getColor()
-
-        return self.default_properties
+        self.default_properties['Border Width'] = self.border_width.text()
+        self.default_properties['Border Color'] = self.border_color.getColor()
+        self.default_properties['Fill Color'] = self.fill_color.getColor()
 
     def setProperties(self, properties: dict):
         self.default_properties = properties
@@ -238,13 +224,13 @@ class PolygonGeneral(QWidget):
 
     def setItemColor(self, color):
         if not self.fill_color.currentText().startswith("["):
-            cRGBA = color.getRgb()
-            self.fill_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
+            r, g, b, a = color.getRgb()
+            self.fill_color.setCurrentText(f"{r},{g},{b}")
 
     def setLineColor(self, color):
         if not self.border_color.currentText().startswith("["):
-            cRGBA = color.getRgb()
-            self.border_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
+            r, g, b, a = color.getRgb()
+            self.border_color.setCurrentText(f"{r},{g},{b}")
 
     # 加载参数设置
     def loadSetting(self):
@@ -261,6 +247,6 @@ class PolygonGeneral(QWidget):
                 self.add_bt.click()
         for i, j in zip(self.points, self.default_properties["Points"]):
             i.set(j[0], j[1])
-        self.border_color.setCurrentText(self.default_properties["Border color"])
-        self.border_width.setText(self.default_properties["Border width"])
-        self.fill_color.setCurrentText(self.default_properties['Fill color'])
+        self.border_color.setCurrentText(self.default_properties["Border Color"])
+        self.border_width.setText(self.default_properties["Border Width"])
+        self.fill_color.setCurrentText(self.default_properties['Fill Color'])

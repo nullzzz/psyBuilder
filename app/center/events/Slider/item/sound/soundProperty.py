@@ -42,17 +42,15 @@ class SoundProperty(QWidget):
         self.below.setLayout(below_layout)
 
     def getInfo(self):
-        self.default_properties.clear()
-        self.default_properties = self.general.getInfo()
+        self.general.updateInfo()
         return self.default_properties
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
 
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def setPosition(self, x, y):
         self.general.setPosition(x, y)

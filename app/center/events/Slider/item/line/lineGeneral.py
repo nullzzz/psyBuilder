@@ -16,8 +16,8 @@ class LineGeneral(QWidget):
             "P1 Y": "0",
             "P2 X": "0",
             "P2 Y": "0",
-            "Back color": "black",
-            "Back width": '1',
+            "Back Color": "black",
+            "Back Width": '1',
         }
         # up
         self.x_pos1 = VarLineEdit()
@@ -75,12 +75,11 @@ class LineGeneral(QWidget):
 
     # 设置可选属性
     def setAttributes(self, attributes):
-        self.attributes = attributes
-        self.x_pos1.setCompleter(QCompleter(self.attributes))
-        self.y_pos1.setCompleter(QCompleter(self.attributes))
-        self.x_pos2.setCompleter(QCompleter(self.attributes))
-        self.y_pos2.setCompleter(QCompleter(self.attributes))
-        self.border_width.setCompleter(QCompleter(self.attributes))
+        self.x_pos1.setCompleter(QCompleter(attributes))
+        self.y_pos1.setCompleter(QCompleter(attributes))
+        self.x_pos2.setCompleter(QCompleter(attributes))
+        self.y_pos2.setCompleter(QCompleter(attributes))
+        self.border_width.setCompleter(QCompleter(attributes))
 
     def setPosition(self, x1, y1, x2, y2):
         if not self.x_pos1.text().startswith("["):
@@ -95,7 +94,7 @@ class LineGeneral(QWidget):
         if not self.y_pos2.text().startswith("["):
             self.y_pos2.setText(str(int(y2)))
 
-    def getInfo(self):
+    def updateInfo(self):
         self.default_properties.clear()
         self.default_properties['X1'] = self.x_pos1.text()
         self.default_properties['Y1'] = self.y_pos1.text()
@@ -103,15 +102,12 @@ class LineGeneral(QWidget):
         self.default_properties['X2'] = self.x_pos2.text()
         self.default_properties['Y2'] = self.y_pos2.text()
 
-        self.default_properties['Border color'] = self.border_color.getColor()
-        self.default_properties['Border width'] = self.border_width.text()
-
-        return self.default_properties
+        self.default_properties['Border Color'] = self.border_color.getColor()
+        self.default_properties['Border Width'] = self.border_width.text()
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def setLineColor(self, color):
         if not self.border_color.currentText().startswith("["):
@@ -126,10 +122,5 @@ class LineGeneral(QWidget):
         self.x_pos2.setText(self.default_properties["X2"])
         self.y_pos2.setText(self.default_properties["Y2"])
 
-        self.border_color.setCurrentText(self.default_properties["Border color"])
-        self.border_width.setText(self.default_properties["Border width"])
-
-    def clone(self):
-        clone_page = LineGeneral()
-        clone_page.setProperties(self.default_properties)
-        return clone_page
+        self.border_color.setCurrentText(self.default_properties["Border Color"])
+        self.border_width.setText(self.default_properties["Border Width"])

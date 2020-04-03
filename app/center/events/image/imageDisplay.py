@@ -56,7 +56,6 @@ class ImageDisplay(TabItemMainWindow):
 
     def openSettingWindow(self):
         self.refresh()
-
         attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(attributes)
         self.pro_window.show()

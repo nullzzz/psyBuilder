@@ -52,12 +52,10 @@ class LeftList(QListWidget):
 
 
 class Item(QListWidgetItem):
-    def __init__(self, text: str = "", parent=None):
-        super(Item, self).__init__(parent=parent)
+    def __init__(self, text: str = ""):
+        super(Item, self).__init__()
         self.setText(text)
         fp = Func.getImage(f"{text}.png")
-        # fp = f"D:\\PsyDemo\\image\\{text}.png"
-        print(f"{fp}")
         self.setIcon(QIcon(fp))
         self.setMouseTracking(True)
 

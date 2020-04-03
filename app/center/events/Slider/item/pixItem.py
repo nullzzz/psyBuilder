@@ -23,8 +23,8 @@ class PixItem(QGraphicsPixmapItem):
         Sound: Info.ITEM_SOUND,
     }
 
-    def __init__(self, item_type, item_name: str = "", parent=None):
-        super(PixItem, self).__init__(parent)
+    def __init__(self, item_type, item_name: str = ""):
+        super(PixItem, self).__init__()
 
         self.item_type = item_type
 
@@ -56,10 +56,10 @@ class PixItem(QGraphicsPixmapItem):
         # self.keep_resize = False
 
         self.default_properties = {
-            'name': self.item_name,
-            'z': self.zValue(),
-            'x': 1,
-            'y': 1,
+            'Name': self.item_name,
+            'Z': self.zValue(),
+            'X': 1,
+            'Y': 1,
             **self.pro_window.default_properties
         }
 
@@ -139,10 +139,10 @@ class PixItem(QGraphicsPixmapItem):
 
     def getInfo(self):
         self.default_properties = {
-            'name': self.item_name,
-            'z': self.zValue(),
-            'x': self.scenePos().x(),
-            'y': self.scenePos().y(),
+            'Name': self.item_name,
+            'Z': self.zValue(),
+            'X': self.scenePos().x(),
+            'Y': self.scenePos().y(),
             **self.pro_window.getInfo(),
         }
         return self.default_properties
@@ -163,9 +163,9 @@ class PixItem(QGraphicsPixmapItem):
         self.pro_window.setPosition(self.scenePos().x() + (width / 2), self.scenePos().y() + (height / 2))
 
     def loadSetting(self):
-        x = self.default_properties.get("x", 0)
-        y = self.default_properties.get("y", 0)
-        z = self.default_properties.get("z", 0)
+        x = self.default_properties.get("X", 0)
+        y = self.default_properties.get("Y", 0)
+        z = self.default_properties.get("Z", 0)
         self.setPos(x, y)
         self.setZValue(z)
 

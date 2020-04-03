@@ -13,18 +13,18 @@ class SoundGeneral(QWidget):
         self.attributes = []
 
         self.default_properties = {
-            "File name": "",
-            "Buffer size": "5000",
-            "Stream refill": "0",
-            "Start offset": "0",
-            "Stop offset": "0",
+            "File Name": "",
+            "Buffer Size": "5000",
+            "Stream Refill": "0",
+            "Start Offset": "0",
+            "Stop Offset": "0",
             "Repetitions": "1",
-            "Volume control": 0,
+            "Volume Control": 0,
             "Volume": "1",
             "Latency Bias": 0,
-            "Bias time": "0",
+            "Bias Time": "0",
             "Sound Device": "",
-            "Wait for start": "No"
+            "Wait For Start": "No"
         }
         self.file_name = VarLineEdit()
         self.open_bt = QPushButton("open file")
@@ -171,54 +171,44 @@ class SoundGeneral(QWidget):
             self.bias_time.setEnabled(False)
 
     def setAttributes(self, attributes: list):
-        self.attributes = attributes
-        self.file_name.setCompleter(QCompleter(self.attributes))
-        self.buffer_size.setCompleter(QCompleter(self.attributes))
-        self.start_offset.setCompleter(QCompleter(self.attributes))
-        self.stop_offset.setCompleter(QCompleter(self.attributes))
-        self.volume.setCompleter(QCompleter(self.attributes))
-        self.bias_time.setCompleter(QCompleter(self.attributes))
+        self.file_name.setCompleter(QCompleter(attributes))
+        self.buffer_size.setCompleter(QCompleter(attributes))
+        self.start_offset.setCompleter(QCompleter(attributes))
+        self.stop_offset.setCompleter(QCompleter(attributes))
+        self.volume.setCompleter(QCompleter(attributes))
+        self.bias_time.setCompleter(QCompleter(attributes))
 
-    def getInfo(self):
-        self.default_properties.clear()
-        self.default_properties["File name"] = self.file_name.text()
-        self.default_properties["Buffer size"] = self.buffer_size.text()
-        self.default_properties["Stream refill"] = self.stream_refill.currentText()
-        self.default_properties["Start offset"] = self.start_offset.text()
-        self.default_properties["Stop offset"] = self.stop_offset.text()
+    def updateInfo(self):
+        self.default_properties["File Name"] = self.file_name.text()
+        self.default_properties["Buffer Size"] = self.buffer_size.text()
+        self.default_properties["Stream Refill"] = self.stream_refill.currentText()
+        self.default_properties["Start Offset"] = self.start_offset.text()
+        self.default_properties["Stop Offset"] = self.stop_offset.text()
         self.default_properties["Repetitions"] = self.repetitions.text()
-        self.default_properties["Volume control"] = self.volume_control.checkState()
+        self.default_properties["Volume Control"] = self.volume_control.checkState()
         self.default_properties["Volume"] = self.volume.text()
-        self.default_properties["Latency bias"] = self.latency_bias.checkState()
-        self.default_properties["Bias time"] = self.bias_time.text()
-        self.default_properties["Sound device"] = self.sound.currentText()
-        self.default_properties["Wait for start"] = self.wait_for_start.currentText()
-
-        return self.default_properties
+        self.default_properties["Latency Bias"] = self.latency_bias.checkState()
+        self.default_properties["Bias Time"] = self.bias_time.text()
+        self.default_properties["Sound Device"] = self.sound.currentText()
+        self.default_properties["Wait For Start"] = self.wait_for_start.currentText()
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def setPosition(self, x, y):
         pass # do nothing here
 
     def loadSetting(self):
-        self.file_name.setText(self.default_properties["File name"])
-        self.buffer_size.setText(self.default_properties["Buffer size"])
-        self.stream_refill.setCurrentText(self.default_properties["Stream refill"])
-        self.start_offset.setText(self.default_properties["Start offset"])
-        self.stop_offset.setText(self.default_properties["Stop offset"])
+        self.file_name.setText(self.default_properties["File Name"])
+        self.buffer_size.setText(self.default_properties["Buffer Size"])
+        self.stream_refill.setCurrentText(self.default_properties["Stream Refill"])
+        self.start_offset.setText(self.default_properties["Start Offset"])
+        self.stop_offset.setText(self.default_properties["Stop Offset"])
         self.repetitions.setText(self.default_properties["Repetitions"])
-        self.volume_control.setCheckState(self.default_properties["Volume control"])
+        self.volume_control.setCheckState(self.default_properties["Volume Control"])
         self.volume.setText(self.default_properties["Volume"])
-        self.latency_bias.setCheckState(self.default_properties["Latency bias"])
-        self.bias_time.setText(self.default_properties["Bias time"])
-        self.sound.setCurrentText((self.default_properties["Sound device"]))
-        self.wait_for_start.setCurrentText(self.default_properties["Wait for start"])
-
-    def clone(self):
-        clone_page = SoundGeneral()
-        clone_page.setProperties(self.default_properties)
-        return clone_page
+        self.latency_bias.setCheckState(self.default_properties["Latency Bias"])
+        self.bias_time.setText(self.default_properties["Bias Time"])
+        self.sound.setCurrentText((self.default_properties["Sound Device"]))
+        self.wait_for_start.setCurrentText(self.default_properties["Wait For Start"])

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QRegExp, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton, QSpinBox, QGridLayout, QLabel, QFileDialog, QCompleter, QWidget
 
 from app.func import Func
@@ -8,15 +8,15 @@ from lib import VarComboBox, VarLineEdit
 class VideoTab1(QWidget):
     def __init__(self, parent=None):
         super(VideoTab1, self).__init__(parent)
-        self.attributes = []
+
         self.default_properties = {
-            "File name": "",
-            "Start position": "0",
-            "End position": "9999999",
-            "Aspect ratio": "Default",
-            "Playback rate": "1",
-            "Clear after": "clear_0",
-            "Screen name": "screen.0"
+            "File Name": "",
+            "Start Position": "0",
+            "End Position": "9999999",
+            "Aspect Ratio": "Default",
+            "Playback Rate": "1",
+            "Clear After": "clear_0",
+            "Screen Name": "screen.0"
         }
         # general
         self.file_name = VarLineEdit()
@@ -36,26 +36,21 @@ class VideoTab1(QWidget):
 
         self.using_screen_id: str = "screen.0"
         self.screen_name = VarComboBox()
-        self.screen_info = Func.getScreenInfo()
+        self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)
 
         self.setUI()
 
     def setUI(self):
-        valid_pos = QRegExp(r"(\d+\.\d{0, 3})|(\[\w+\])")
         self.start_pos.setText("00")
         self.start_pos.setMinimumWidth(120)
         self.end_pos.setText("9999999")
-        # todo
-        # self.start_pos.setReg("^([0-9]*\.?[0-9]+|[0-9]+\.?[0-9]*)$")
-        # self.end_pos.setValidator(QRegExpValidator(valid_pos, self))
 
-        self.playback_rate.addItems(["1.0", "1.25", "1.5", "1.75", "2.0", "-1.0"])
+        self.playback_rate.addItems(("1.0", "1.25", "1.5", "1.75", "2.0", "-1.0"))
         self.playback_rate.currentTextChanged.connect(self.pbTip)
-        self.aspect_ratio.addItems(["Default", "Ignore", "Keep", "KeepByExpanding"])
+        self.aspect_ratio.addItems(("Default", "Ignore", "Keep", "KeepByExpanding"))
 
-        self.screen_name.addItems(["screen_0"])
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
         l0 = QLabel("File Name:")
@@ -141,41 +136,29 @@ class VideoTab1(QWidget):
             self.stretch_mode.setEnabled(False)
 
     def setAttributes(self, attributes):
-        self.attributes = attributes
         self.file_name.setCompleter(QCompleter(self.attributes))
         self.start_pos.setCompleter(QCompleter(self.attributes))
         self.end_pos.setCompleter(QCompleter(self.attributes))
 
-    def setScreen(self, screen: list):
-        selected = self.screen_name.currentText()
-        self.screen_name.clear()
-        self.screen_name.addItems(screen)
-        if selected in screen:
-            self.screen_name.setCurrentText(selected)
-        else:
-            new_name = Func.getDeviceNameById(self.using_device_id)
-            if new_name:
-                self.screen_name.setCurrentText(new_name)
-
-    def getInfo(self):
-        self.default_properties["File name"] = self.file_name.text()
-        self.default_properties["Start position"] = self.start_pos.text()
-        self.default_properties["End position"] = self.end_pos.text()
-        self.default_properties["Aspect ratio"] = self.aspect_ratio.currentText()
-        self.default_properties["Playback rate"] = self.playback_rate.currentText()
-        self.default_properties["Clear after"] = self.clear_after.currentText()
-        self.default_properties["Screen name"] = self.screen_name.currentText()
+    def updateInfo(self):
+        self.default_properties["File Name"] = self.file_name.text()
+        self.default_properties["Start Position"] = self.start_pos.text()
+        self.default_properties["End Position"] = self.end_pos.text()
+        self.default_properties["Aspect Ratio"] = self.aspect_ratio.currentText()
+        self.default_properties["Playback Rate"] = self.playback_rate.currentText()
+        self.default_properties["Clear After"] = self.clear_after.currentText()
+        self.default_properties["Screen Name"] = self.screen_name.currentText()
         return self.default_properties
 
     def setProperties(self, properties: dict):
-        self.default_properties = properties
+        self.default_properties.update(properties)
         self.loadSetting()
 
     def loadSetting(self):
-        self.file_name.setText(self.default_properties["File name"])
-        self.start_pos.setText(self.default_properties["Start position"])
-        self.end_pos.setText(self.default_properties["End position"])
-        self.aspect_ratio.setCurrentText(self.default_properties["Aspect ratio"])
-        self.playback_rate.setCurrentText(self.default_properties["Playback rate"])
-        self.clear_after.setCurrentText(self.default_properties["Clear after"])
-        self.screen_name.setCurrentText(self.default_properties["Screen name"])
+        self.file_name.setText(self.default_properties["File Name"])
+        self.start_pos.setText(self.default_properties["Start Position"])
+        self.end_pos.setText(self.default_properties["End Position"])
+        self.aspect_ratio.setCurrentText(self.default_properties["Aspect Ratio"])
+        self.playback_rate.setCurrentText(self.default_properties["Playback Rate"])
+        self.clear_after.setCurrentText(self.default_properties["Clear After"])
+        self.screen_name.setCurrentText(self.default_properties["Screen Name"])

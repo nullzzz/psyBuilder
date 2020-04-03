@@ -2,11 +2,11 @@ import os
 import re
 import traceback
 
-from PyQt5.QtCore import Qt, QTimer, QSettings, QPropertyAnimation
-from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette, QFontMetrics
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLabel, QGridLayout, \
-    QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame
+from PyQt5.QtCore import Qt, QSettings, QPropertyAnimation
+from PyQt5.QtGui import QIcon, QKeySequence
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog
 
+from app.aboutUs import AboutUs
 from lib import MessageBox, WaitDialog
 from .attributes import Attributes
 from .center import Center
@@ -27,7 +27,7 @@ from .structure import Structure
 
 class Psy(QMainWindow):
     def __init__(self):
-        super(Psy, self).__init__(None)
+        super(Psy, self).__init__()
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
@@ -169,6 +169,7 @@ class Psy(QMainWindow):
         build_menu.addAction(compile_action)
 
         # help menu
+        self.about_us = AboutUs()
         help_menu = menubar.addMenu("&Help")
         reg_action = QAction("&Registry", self)
         about_action = QAction("&About Us", self)
@@ -176,7 +177,7 @@ class Psy(QMainWindow):
         check_for_update = QAction("&Check for updates", self)
 
         reg_action.triggered.connect(self.registry)
-        about_action.triggered.connect(self.aboutUs)
+        about_action.triggered.connect(self.about_us.show)
         about_Qt_action.triggered.connect(QApplication.instance().aboutQt)
         check_for_update.triggered.connect(self.checkUpdate)
 
@@ -245,8 +246,6 @@ class Psy(QMainWindow):
             widget = SoundDisplay(widget_id, widget_name)
         elif widget_type == Info.SLIDER:
             widget = Slider(widget_id, widget_name)
-        elif widget_type == Info.ACTION:
-            widget = EyeAction(widget_id, widget_name)
         elif widget_type == Info.CALIBRATION:
             widget = EyeCalibrate(widget_id, widget_name)
         elif widget_type == Info.ENDR:
@@ -259,15 +258,10 @@ class Psy(QMainWindow):
             widget = StartR(widget_id, widget_name)
         elif widget_type == Info.LOG:
             widget = Close(widget_id, widget_name)
-        elif widget_type == Info.QUEST_INIT:
-            widget = QuestInit(widget_id, widget_name)
         elif widget_type == Info.QUEST_UPDATE:
             widget = QuestUpdate(widget_id, widget_name)
-        elif widget_type == Info.QUEST_GET_VALUE:
-            widget = QuestGetValue(widget_id, widget_name)
         else:
-            # if fail to create widget, exit.
-            exit()
+            pass
         # change data set in Kernel
         QApplication.processEvents()
         Info.Widgets[widget_id] = widget
@@ -934,150 +928,8 @@ class Psy(QMainWindow):
             except Exception:
                 MessageBox.about(self, "Registry", "Registry Failed!")
 
-    def aboutWidget_ok(self):
-        self.aboutWidget.close()
-
-    def aboutUs(self):
-        # todo: you'd better build this widget in a single python file
-        self.aboutWidget = QWidget()
-        self.aboutWidget.setWindowTitle("About developers of PTB Builder 0.1")
-        self.aboutWidget.setWindowModality(2)
-        self.aboutWidget.setWindowIcon(QIcon(Func.getImage("icon.png")))
-        self.aboutWidget.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
-
-        self.aboutWidget.setAutoFillBackground(True)
-        p = self.palette()
-        p.setColor(QPalette.Background, Qt.white)
-        self.aboutWidget.setPalette(p)
-
-        # introLab = QLabel(self)
-        te01 = QTextEdit(self)
-
-        img00 = QLabel(self)
-        lab01 = QLabel(self)
-
-        img10 = QLabel(self)
-        lab11 = QLabel(self)
-
-        img20 = QLabel(self)
-        lab21 = QLabel(self)
-
-        closeButton = QPushButton('&Ok')
-
-        closeButton.clicked.connect(self.aboutWidget_ok)
-        closeButton.setAutoDefault(True)
-
-        te01.setReadOnly(True)
-        te01.setFrameShape(QFrame.NoFrame)
-        # te01.setAlignment(Union,)
-        te01.setHtml("<b>PTB Builder (ver 0.1)</b> for Psychtoolbox 3 under MATLAB "
-                     "was developed by the group leaded by Prof. "
-                     "<a style='color: blue;' href=\"http://web.suda.edu.cn/yzhangpsy/index.html\">Yang Zhang</a> "
-                     "at Attention and Perception lab at Soochow university, Suzhou, China. "
-                     "<br><br><b>PTB Builder 0.1</b> are provided as is, and no warranty for their "
-                     "correctness or usefulness for any purpose is made or implied by "
-                     "the authors of the software, or by anyone else. This software "
-                     "is designed for research purposes only and not allowed to be used "
-                     "for any business purpose (e.g., but not limited to, business training)."
-                     )
-
-        te01.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        te01.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        te01.setFixedHeight(QFontMetrics(te01.font()).lineSpacing() * 11)
-        # te01.setFixedHeight(te01.document().size().toSize().height())
-
-        '''
-        introLab.setAlignment(Qt.AlignCenter|Qt.AlignJustify)
-        introLab.setOpenExternalLinks(True)
-        # introLab.setWordWrap(True)
-        introLab.setText("<p style='margin:5px'><b>PTB Builder (ver 0.1)</b> for Psychtoolbox 3 under MATLAB</p>"
-                         "<p style='margin:5px'>was developed by the group leaded by Prof. "
-        "<a style='color: blue;' href=\"http://web.suda.edu.cn/yzhangpsy/index.html\">Yang Zhang</a></p>"
-                         "<p style='margin:8px'>at Attention and Perception lab at Soochow university</p>"
-                         )
-        # text - decoration: none;
-        '''
-
-        img00.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        lab01.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        img00.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))
-        lab01.setTextFormat(Qt.RichText)
-        lab01.setTextInteractionFlags(Qt.TextBrowserInteraction)
-        lab01.setOpenExternalLinks(True)
-        lab01.setText("Yang Zhang (张阳), Ph.D, Prof.<br>Department of Psychology, Soochow University"
-                      "<br><a href='mailto:yzhangpsy@suda.edu.cn?Subject= Inquire about the usage of PTB Builder 0.1'>yzhangpsy@suda.edu.cn</a>")
-
-        img10.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        lab11.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        lab11.setText("Zhe Yang, Ph.D, Associate Prof. \n Department of computer science, Soochow University")
-        img10.setPixmap(QPixmap(Func.getImage("authorInfo02.png")))
-
-        img20.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        lab21.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        lab21.setText("ChenZhi Feng, Ph.D, Prof. \n Department of Psychology, Soochow University")
-        img20.setPixmap(QPixmap(Func.getImage("authorInfo03.png")))
-
-        layout0 = QVBoxLayout()
-        layout0.addWidget(te01)
-        # layout0.addWidget(introLab)
-
-        layout1 = QGridLayout()
-        layout1.addWidget(img00, 0, 0)
-        layout1.addWidget(lab01, 0, 1)
-
-        layout1.addWidget(img10, 1, 0)
-        layout1.addWidget(lab11, 1, 1)
-
-        layout1.addWidget(img20, 2, 0)
-        layout1.addWidget(lab21, 2, 1)
-
-        layout2 = QVBoxLayout()
-        layout2.addWidget(closeButton)
-        layout2.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
-
-        layout = QVBoxLayout()
-
-        layout.addLayout(layout0)
-        layout.addSpacing(20)
-        # layout.addStretch(20)
-        layout.addLayout(layout1)
-        layout.addStretch(10)
-        layout.addLayout(layout2)
-
-        self.aboutWidget.setLayout(layout)
-        self.aboutWidget.setMinimumWidth(400)
-        self.aboutWidget.show()
-
-        # print(f"{te01.document().size().toSize().height()}****")
-
-        # te01.setFixedHeight(te01.document().size().toSize().height())
-        # print(f"{QFontMetrics(te01.font()).lineSpacing()}..")
-        # print(f"{te01.document().size().toSize().height()}")
-
-        # self.gridGroupBox.setLayout(aboutUsBox)
-        # self.gridGroupBox.setWindowIcon(QIcon(Func.getImage("icon.png")))
-        # self.gridGroupBox.setWindowTitle("About the authors")
-        # self.gridGroupBox.setWindowModality(2)
-        #
-        # self.gridGroupBox.show()
-
-        # MessageBox.about(self, "About PTB Builder 0.1",
-        #                   "A free GUI to generate experimental codes for PTB\nDepartment of Psychology,Soochow University ")
-
     def checkUpdate(self):
-        self.bar = LoadingTip()
-        self.bar.setWindowModality(Qt.ApplicationModal)
-        self.bar.show()
-        self.t = QTimer()
-        self.t.timeout.connect(self.re)
-        self.t.start(100)
-
-    def re(self):
-        self.bar.changeValue()
-        self.bar.update()
-        if self.bar.bar.value == 100:
-            self.t.stop()
-            self.bar.close()
+        pass
 
     def startWait(self):
         """

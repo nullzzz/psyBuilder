@@ -10,17 +10,15 @@ class ImageGeneral(QWidget):
     def __init__(self, parent=None):
         super(ImageGeneral, self).__init__(parent)
 
-        # 当前可使用attribute
-        self.attributes = []
         # 当前页面属性
         self.default_properties = {
-            "File name": "",
-            "Mirror up/down": False,
-            "Mirror left/right": False,
+            "File Name": "",
+            "Mirror Up/Down": False,
+            "Mirror Left/Right": False,
             "Rotate": "0",
             "Stretch": False,
-            "Stretch mode": "Both",
-            "Back color": "white",
+            "Stretch Mode": "Both",
+            "Back Color": "white",
             "Transparent": "100%",
             "Center X": "50%",
             "Center Y": "50%",
@@ -61,7 +59,7 @@ class ImageGeneral(QWidget):
         self.rotate.setEditable(True)
         self.rotate.setReg(r"\d+|\d+\.\d+")
 
-        self.transparent.addItems(("0%","25%", "50%", "75%", "100%"))
+        self.transparent.addItems(("0%", "25%", "50%", "75%", "100%"))
         self.transparent.setCurrentText("100%")
         self.transparent.setEditable(True)
         self.transparent.setReg(r"\d+%?|\d+\.\d+%?")
@@ -169,54 +167,34 @@ class ImageGeneral(QWidget):
             self.stretch_mode.setEnabled(False)
 
     def setAttributes(self, attributes):
-        self.attributes = attributes
-        self.file_name.setCompleter(QCompleter(self.attributes))
-        self.rotate.setCompleter(QCompleter(self.attributes))
-        self.transparent.setCompleter(QCompleter(self.attributes))
-        self.x_pos.setCompleter(QCompleter(self.attributes))
-        self.y_pos.setCompleter(QCompleter(self.attributes))
-        self._width.setCompleter(QCompleter(self.attributes))
-        self._height.setCompleter(QCompleter(self.attributes))
+        self.file_name.setCompleter(QCompleter(attributes))
+        self.rotate.setCompleter(QCompleter(attributes))
+        self.transparent.setCompleter(QCompleter(attributes))
+        self.x_pos.setCompleter(QCompleter(attributes))
+        self.y_pos.setCompleter(QCompleter(attributes))
+        self._width.setCompleter(QCompleter(attributes))
+        self._height.setCompleter(QCompleter(attributes))
 
-    def getInfo(self):
+    def updateInfo(self):
         """
         历史遗留函数
         :return:
         """
-        self.default_properties.clear()
-        self.default_properties["File name"] = self.file_name.text()
-        self.default_properties["Mirror up/down"] = bool(self.mirrorUD.checkState())
-        self.default_properties["Mirror left/right"] = bool(self.mirrorLR.checkState())
+        self.default_properties["File Name"] = self.file_name.text()
+        self.default_properties["Mirror Up/Down"] = bool(self.mirrorUD.checkState())
+        self.default_properties["Mirror Left/Right"] = bool(self.mirrorLR.checkState())
         self.default_properties["Rotate"] = self.rotate.currentText()
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
-        self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
+        self.default_properties["Stretch Mode"] = self.stretch_mode.currentText()
         self.default_properties["Transparent"] = self.transparent.currentText()
         self.default_properties["Center X"] = self.x_pos.currentText()
         self.default_properties["Center Y"] = self.y_pos.currentText()
         self.default_properties["Width"] = self._width.currentText()
         self.default_properties["Height"] = self._height.currentText()
-
-        return self.default_properties
-
-    def getProperties(self):
-        self.default_properties.clear()
-        self.default_properties["File name"] = self.file_name.text()
-        self.default_properties["Mirror up/down"] = bool(self.mirrorUD.checkState())
-        self.default_properties["Mirror left/right"] = bool(self.mirrorLR.checkState())
-        self.default_properties["Rotate"] = self.rotate.currentText()
-        self.default_properties["Stretch"] = bool(self.stretch.checkState())
-        self.default_properties["Stretch mode"] = self.stretch_mode.currentText()
-        self.default_properties["Transparent"] = self.transparent.currentText()
-        self.default_properties["Center X"] = self.x_pos.currentText()
-        self.default_properties["Center Y"] = self.y_pos.currentText()
-        self.default_properties["Width"] = self._width.currentText()
-        self.default_properties["Height"] = self._height.currentText()
-        return self.default_properties
 
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def setPosition(self, x, y):
         if not self.x_pos.currentText().startswith("["):
@@ -225,19 +203,14 @@ class ImageGeneral(QWidget):
             self.y_pos.setCurrentText(str(int(y)))
 
     def loadSetting(self):
-        self.file_name.setText(self.default_properties["File name"])
-        self.mirrorUD.setChecked(self.default_properties["Mirror up/down"])
-        self.mirrorLR.setChecked(self.default_properties["Mirror left/right"])
+        self.file_name.setText(self.default_properties["File Name"])
+        self.mirrorUD.setChecked(self.default_properties["Mirror Up/Down"])
+        self.mirrorLR.setChecked(self.default_properties["Mirror Left/Right"])
         self.rotate.setCurrentText(self.default_properties["Rotate"])
         self.stretch.setChecked(self.default_properties["Stretch"])
-        self.stretch_mode.setCurrentText(self.default_properties["Stretch mode"])
+        self.stretch_mode.setCurrentText(self.default_properties["Stretch Mode"])
         self.transparent.setCurrentText(self.default_properties["Transparent"])
         self.x_pos.setCurrentText(self.default_properties["Center X"])
         self.y_pos.setCurrentText(self.default_properties["Center Y"])
         self._width.setCurrentText(self.default_properties["Width"])
         self._height.setCurrentText(self.default_properties["Height"])
-
-    def clone(self):
-        clone_page = ImageGeneral()
-        clone_page.setProperties(self.default_properties)
-        return clone_page

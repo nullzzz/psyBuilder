@@ -13,8 +13,8 @@ class SliderGeneral(QWidget):
         self.attributes = []
         # 当前页面属性
         self.default_properties = {
-            "Clear after": "Yes",
-            "Screen name": "screen.0"
+            "Clear After": "Yes",
+            "Screen Name": "screen.0"
         }
 
         self.clear_after = VarComboBox()
@@ -22,13 +22,13 @@ class SliderGeneral(QWidget):
 
         self.using_screen_id: str = "screen.0"
         self.screen_name = VarComboBox()
-        self.screen_info = Func.getScreenInfo()
+        self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)
 
-        self.setGeneral()
+        self.setUI()
 
-    def setGeneral(self):
+    def setUI(self):
         layout = QFormLayout()
         layout.addRow("Screen Name:", self.screen_name)
         layout.addRow("Dont Clear After:", self.clear_after)
@@ -36,7 +36,7 @@ class SliderGeneral(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.screen_info = Func.getScreenInfo()
+        self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen_name.clear()
         self.screen_name.addItems(self.screen_info.values())
@@ -60,14 +60,14 @@ class SliderGeneral(QWidget):
         :return:
         """
         self.default_properties.clear()
-        self.default_properties["Clear after"] = self.clear_after.currentText()
-        self.default_properties["Screen name"] = self.screen_name.currentText()
+        self.default_properties["Clear After"] = self.clear_after.currentText()
+        self.default_properties["Screen Name"] = self.screen_name.currentText()
         return self.default_properties
 
     def getProperties(self):
         self.default_properties.clear()
-        self.default_properties["Clear after"] = self.clear_after.currentText()
-        self.default_properties["Screen name"] = self.screen_name.currentText()
+        self.default_properties["Clear After"] = self.clear_after.currentText()
+        self.default_properties["Screen Name"] = self.screen_name.currentText()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -76,10 +76,5 @@ class SliderGeneral(QWidget):
             self.loadSetting()
 
     def loadSetting(self):
-        self.clear_after.setCurrentText(self.default_properties["Clear after"])
-        self.screen_name.setCurrentText(self.default_properties["Screen name"])
-
-    def clone(self):
-        clone_page = SliderGeneral()
-        clone_page.setProperties(self.default_properties)
-        return clone_page
+        self.clear_after.setCurrentText(self.default_properties["Clear After"])
+        self.screen_name.setCurrentText(self.default_properties["Screen Name"])

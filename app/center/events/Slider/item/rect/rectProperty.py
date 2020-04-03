@@ -10,7 +10,7 @@ class RectProperty(QWidget):
         self.below = QWidget()
 
         self.general = RectGeneral()
-        self.default_properties = self.general.getInfo()
+        self.default_properties = self.general.default_properties
         self.tab.addTab(self.general, "general")
 
         self.ok_bt = QPushButton("OK")
@@ -41,7 +41,7 @@ class RectProperty(QWidget):
         self.below.setLayout(below_layout)
 
     def getInfo(self):
-        self.default_properties = self.general.getInfo()
+        self.general.updateInfo()
         return self.default_properties
 
     def setAttributes(self, attributes):
@@ -60,9 +60,8 @@ class RectProperty(QWidget):
         self.general.setLineColor(color)
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def loadSetting(self):
-        self.general.setProperties(self.default_properties)
+        self.general.loadSetting()

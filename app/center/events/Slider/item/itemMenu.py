@@ -8,8 +8,8 @@ class ItemMenu(QMenu):
     bacSignal = pyqtSignal()
     proSignal = pyqtSignal()
 
-    def __init__(self, parent=None):
-        super(ItemMenu, self).__init__(parent=parent)
+    def __init__(self):
+        super(ItemMenu, self).__init__()
         self.delete_action = QAction("Delete")
         self.front_action = QAction("toFront")
         self.back_action = QAction("toBack")

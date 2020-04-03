@@ -13,9 +13,11 @@ class ArcGeneral(QWidget):
             "Center Y": "0",
             "Width": "200",
             "Height": "200",
-            "Border color": "black",
-            "Border width": '1',
-            "Fill color": "0,0,0,0"
+            "Angle Start": "0",
+            "Angle Length": "270",
+            "Border Color": "black",
+            "Border Width": '1',
+            "Fill Color": "0,0,0,0"
         }
 
         self.cx_pos = VarLineEdit("0")
@@ -84,8 +86,8 @@ class ArcGeneral(QWidget):
         layout2.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
         layout2.setLabelAlignment(Qt.AlignLeft)
 
-        self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
-        self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
+        self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
         layout2.addRow(l2, self.border_color)
         layout2.addRow(l3, self.border_width)
@@ -100,32 +102,27 @@ class ArcGeneral(QWidget):
 
     # 设置可选属性
     def setAttributes(self, attributes):
-        self.attributes = attributes
-        self.cx_pos.setCompleter(QCompleter(self.attributes))
-        self.cy_pos.setCompleter(QCompleter(self.attributes))
-        self._width.setCompleter(QCompleter(self.attributes))
-        self._height.setCompleter(QCompleter(self.attributes))
-        self.border_width.setCompleter(QCompleter(self.attributes))
+        self.cx_pos.setCompleter(QCompleter(attributes))
+        self.cy_pos.setCompleter(QCompleter(attributes))
+        self._width.setCompleter(QCompleter(attributes))
+        self._height.setCompleter(QCompleter(attributes))
+        self.border_width.setCompleter(QCompleter(attributes))
 
-    def getInfo(self):
-        self.default_properties.clear()
+    def updateInfo(self):
         self.default_properties['Center X'] = self.cx_pos.text()
         self.default_properties['Center Y'] = self.cy_pos.text()
         self.default_properties["Width"] = self._width.text()
         self.default_properties["Height"] = self._height.text()
-        self.default_properties["Angle start"] = self.angle_start.currentText()
-        self.default_properties["Angle length"] = self.angle_length.currentText()
+        self.default_properties["Angle Start"] = self.angle_start.currentText()
+        self.default_properties["Angle Length"] = self.angle_length.currentText()
 
-        self.default_properties['Border width'] = self.border_width.text()
-        self.default_properties['Border color'] = self.border_color.getColor()
-        self.default_properties['Fill color'] = self.fill_color.getColor()
-
-        return self.default_properties
+        self.default_properties['Border Width'] = self.border_width.text()
+        self.default_properties['Border Color'] = self.border_color.getColor()
+        self.default_properties['Fill Color'] = self.fill_color.getColor()
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def setPosition(self, x, y):
         if not self.cx_pos.text().startswith("["):
@@ -139,24 +136,25 @@ class ArcGeneral(QWidget):
         if not self._height.text().startswith("["):
             self._height.setText(str(int(h)))
 
-    def setItemColor(self,color):
+    def setItemColor(self, color):
         if not self.fill_color.currentText().startswith("["):
             cRGBA = color.getRgb()
             self.fill_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
 
-    def setLineColor(self,color):
+    def setLineColor(self, color):
         if not self.border_color.currentText().startswith("["):
             cRGBA = color.getRgb()
             self.border_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
+
     # 加载参数设置
     def loadSetting(self):
         self.cx_pos.setText(self.default_properties["Center X"])
         self.cy_pos.setText(self.default_properties["Center Y"])
         self._width.setText(self.default_properties["Width"])
         self._height.setText(self.default_properties["Height"])
-        self.angle_start.setCurrentText(self.default_properties["Angle start"])
-        self.angle_length.setCurrentText(self.default_properties["Angle length"])
+        self.angle_start.setCurrentText(self.default_properties["Angle Start"])
+        self.angle_length.setCurrentText(self.default_properties["Angle Length"])
 
-        self.border_color.setCurrentText(self.default_properties["Border color"])
-        self.border_width.setText(self.default_properties["Border width"])
-        self.fill_color.setCurrentText(self.default_properties["Fill color"])
+        self.border_color.setCurrentText(self.default_properties["Border Color"])
+        self.border_width.setText(self.default_properties["Border Width"])
+        self.fill_color.setCurrentText(self.default_properties["Fill Color"])

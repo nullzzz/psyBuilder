@@ -12,7 +12,7 @@ class SnowProperty(QWidget):
 
         self.general = SnowGeneral()
         self.tab.addTab(self.general, "general")
-        self.default_properties = self.general.getInfo()
+        self.default_properties = self.general.default_properties
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")
@@ -42,8 +42,7 @@ class SnowProperty(QWidget):
         self.below.setLayout(below_layout)
 
     def getInfo(self):
-        self.default_properties.clear()
-        self.default_properties = self.general.getInfo()
+        self.general.updateInfo()
         return self.default_properties
 
     def setAttributes(self, attributes):
@@ -53,9 +52,8 @@ class SnowProperty(QWidget):
         self.general.setPosition(x, y)
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def loadSetting(self):
-        self.general.setProperties(self.default_properties)
+        self.general.loadSetting()

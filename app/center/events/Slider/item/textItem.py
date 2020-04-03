@@ -20,8 +20,8 @@ class TextItem(QGraphicsTextItem):
         Text: Info.ITEM_TEXT,
     }
 
-    def __init__(self, item_type, item_name: str = "", parent=None):
-        super(TextItem, self).__init__(parent)
+    def __init__(self, item_type, item_name: str = ""):
+        super(TextItem, self).__init__()
 
         self.item_type = item_type
 
@@ -49,12 +49,12 @@ class TextItem(QGraphicsTextItem):
 
         self.default_properties = {
             'Name': 'text',
-            'Font family': 'SimSun',
-            'Font size': '20',
+            'Font Family': 'SimSun',
+            'Font Size': '20',
             'Text': 'Hello World',
-            'z': self.zValue(),
-            'x': 1,
-            'y': 1,
+            'Z': self.zValue(),
+            'X': 1,
+            'Y': 1,
         }
         self.menu = ItemMenu()
 
@@ -97,13 +97,13 @@ class TextItem(QGraphicsTextItem):
 
         x = self.default_properties.get("Center X")
         y = self.default_properties.get("Center Y")
-        z = self.default_properties.get("z")
+        z = self.default_properties.get("Z")
 
         style = self.default_properties.get("Style")
-        foreColor = self.default_properties.get("Fore color")
-        backColor = self.default_properties.get("Back color")
-        family = self.default_properties.get("Font family")
-        size = self.default_properties.get("Font size")
+        foreColor = self.default_properties.get("Fore Color")
+        backColor = self.default_properties.get("Back Color")
+        family = self.default_properties.get("Font Family")
+        size = self.default_properties.get("Font Size")
         transparent = self.default_properties.get("Transparent")
 
         z = float(z)
@@ -172,9 +172,9 @@ class TextItem(QGraphicsTextItem):
         self.default_properties = {
             'Name': self.item_name,
             'Text': self.toPlainText(),
-            'z': self.zValue(),
-            'x': self.scenePos().x(),
-            'y': self.scenePos().y(),
+            'Z': self.zValue(),
+            'W': self.scenePos().x(),
+            'Y': self.scenePos().y(),
             'Text Width': str(boundRect.width()),
             'Text Height': str(boundRect.height()),
             **self.pro_window.getInfo(),

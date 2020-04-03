@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import QGraphicsPolygonItem
 
 class Lasso(QGraphicsPolygonItem):
 
-    def __init__(self, x, y, parent=None):
-        super(Lasso, self).__init__(parent=parent)
+    def __init__(self, x, y):
+        super(Lasso, self).__init__()
         self.path = QPainterPath()
         self.start_x = x
         self.start_y = y

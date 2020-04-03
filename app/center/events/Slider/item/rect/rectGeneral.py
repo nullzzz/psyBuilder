@@ -11,9 +11,9 @@ class RectGeneral(QWidget):
         self.default_properties = {
             "Center X": "0",
             "Center Y": "0",
-            "Border color": "black",
-            "Border width": '1',
-            "Fill color": "0,0,0,0"
+            "Border Color": "black",
+            "Border Width": '1',
+            "Fill Color": "0,0,0,0"
         }
 
         self.cx_pos = VarLineEdit("0")
@@ -62,7 +62,6 @@ class RectGeneral(QWidget):
 
         group1.setLayout(layout1)
 
-
         group2 = QGroupBox("Fill && Borderline")
         layout2 = QFormLayout()
 
@@ -85,25 +84,21 @@ class RectGeneral(QWidget):
 
     # 设置可选属性
     def setAttributes(self, attributes):
-        self.attributes = attributes
-        self.cx_pos.setCompleter(QCompleter(self.attributes))
-        self.cy_pos.setCompleter(QCompleter(self.attributes))
-        self._width.setCompleter(QCompleter(self.attributes))
-        self._height.setCompleter(QCompleter(self.attributes))
-        self.border_width.setCompleter(QCompleter(self.attributes))
+        self.cx_pos.setCompleter(QCompleter(attributes))
+        self.cy_pos.setCompleter(QCompleter(attributes))
+        self._width.setCompleter(QCompleter(attributes))
+        self._height.setCompleter(QCompleter(attributes))
+        self.border_width.setCompleter(QCompleter(attributes))
 
-    def getInfo(self):
-        self.default_properties.clear()
+    def updateInfo(self):
         self.default_properties['Center X'] = self.cx_pos.text()
         self.default_properties['Center Y'] = self.cy_pos.text()
         self.default_properties["Width"] = self._width.text()
         self.default_properties["Height"] = self._height.text()
 
-        self.default_properties['Border width'] = self.border_width.text()
-        self.default_properties['Border color'] = self.border_color.getColor()
-        self.default_properties['Fill color'] = self.fill_color.getColor()
-
-        return self.default_properties
+        self.default_properties['Border Width'] = self.border_width.text()
+        self.default_properties['Border Color'] = self.border_color.getColor()
+        self.default_properties['Fill Color'] = self.fill_color.getColor()
 
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
@@ -122,15 +117,16 @@ class RectGeneral(QWidget):
         if not self._height.text().startswith("["):
             self._height.setText(str(int(h)))
 
-    def setItemColor(self,color):
+    def setItemColor(self, color):
         if not self.fill_color.currentText().startswith("["):
             cRGBA = color.getRgb()
             self.fill_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
 
-    def setLineColor(self,color):
+    def setLineColor(self, color):
         if not self.border_color.currentText().startswith("["):
             cRGBA = color.getRgb()
             self.border_color.setCurrentText(f"{cRGBA[0]},{cRGBA[1]},{cRGBA[2]}")
+
     # 加载参数设置
     def loadSetting(self):
         self.cx_pos.setText(self.default_properties["Center X"])
@@ -138,6 +134,6 @@ class RectGeneral(QWidget):
         self._width.setText(self.default_properties["Width"])
         self._height.setText(self.default_properties["Height"])
 
-        self.border_color.setCurrentText(self.default_properties["Border color"])
-        self.border_width.setText(self.default_properties["Border width"])
-        self.fill_color.setCurrentText(self.default_properties["Fill color"])
+        self.border_color.setCurrentText(self.default_properties["Border Color"])
+        self.border_width.setText(self.default_properties["Border Width"])
+        self.fill_color.setCurrentText(self.default_properties["Fill Color"])

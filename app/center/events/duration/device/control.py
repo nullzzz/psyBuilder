@@ -36,7 +36,7 @@ class DeviceHome(QListWidget):
         :return:
         """
         if item is not None:
-            self.deviceChanged.emit(item.getDeviceId(), item.getInfo())
+            self.deviceChanged.emit(item.getDeviceId(), item.updateInfo())
 
     def updateDeviceInfo(self):
         for i in range(self.count()):

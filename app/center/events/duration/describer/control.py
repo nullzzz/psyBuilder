@@ -60,7 +60,7 @@ class Describer(QStackedWidget):
     def updateInfo(self):
         self.default_properties.clear()
         for k, v in self.id_widget.items():
-            self.default_properties[k] = v.getInfo()
+            self.default_properties[k] = v.updateInfo()
             self.default_properties[k]["Device Id"] = k
 
     def getInfo(self):

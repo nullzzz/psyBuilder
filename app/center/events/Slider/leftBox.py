@@ -7,7 +7,7 @@ from app.func import Func
 
 
 class LeftBox(QToolBox):
-    Line, Polygon, Circle, Arc, Rect, Image, Text, Video, Sound, Snow, Gabor = range(11)
+    Line, Polygon, Circle, Arc, Rect, Image, Text, Video, Sound, Snow, Gabor, Open = range(12)
 
     def __init__(self, parent=None):
         super(LeftBox, self).__init__(parent=parent)
@@ -25,6 +25,7 @@ class LeftBox(QToolBox):
         sound = Item("sound", self.Sound)
         snow = Item("snow", self.Snow)
         gabor = Item("gabor", self.Gabor)
+        open = Item("open", self.Open)
 
         self.addItem(self.basic, "Basic Geometries")
         self.addItem(self.stimuli, "Stimuli")
@@ -33,6 +34,8 @@ class LeftBox(QToolBox):
 
         basic_layout = QFormLayout()
         basic_layout.setAlignment(Qt.AlignCenter)
+
+        basic_layout.addWidget(open)
         basic_layout.addWidget(polygon)
         basic_layout.addWidget(circle)
         basic_layout.addWidget(arc)
@@ -71,9 +74,6 @@ class Item(QWidget):
         layout = QGridLayout()
         layout.addWidget(self.bt, 0, 0, Qt.AlignHCenter)
         layout.addWidget(QLabel(self.text), 1, 0, Qt.AlignCenter)
-        # layout.setRowStretch(0, 2)
-        # layout.setRowStretch(1, 0.2)
-        # layout.setRowMinimumHeight(1,20)
         self.setLayout(layout)
 
 
