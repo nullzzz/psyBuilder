@@ -235,47 +235,50 @@ class Psy(QMainWindow):
         QApplication.processEvents()
         widget = None
         QApplication.processEvents()
-        if widget_type == Info.TIMELINE:
-            widget = Timeline(widget_id, widget_name)
-        elif widget_type == Info.IF:
-            widget = IfBranch(widget_id, widget_name)
-        elif widget_type == Info.SWITCH:
-            widget = Switch(widget_id, widget_name)
-        elif widget_type == Info.CYCLE:
-            widget = Cycle(widget_id, widget_name)
-        elif widget_type == Info.IMAGE:
-            widget = ImageDisplay(widget_id, widget_name)
-        elif widget_type == Info.VIDEO:
-            widget = VideoDisplay(widget_id, widget_name)
-        elif widget_type == Info.TEXT:
-            widget = TextDisplay(widget_id, widget_name)
-        elif widget_type == Info.SOUND:
-            widget = SoundDisplay(widget_id, widget_name)
-        elif widget_type == Info.SLIDER:
-            widget = Slider(widget_id, widget_name)
-        elif widget_type == Info.ACTION:
-            widget = EyeAction(widget_id, widget_name)
-        elif widget_type == Info.CALIBRATION:
-            widget = EyeCalibrate(widget_id, widget_name)
-        elif widget_type == Info.ENDR:
-            widget = EndR(widget_id, widget_name)
-        elif widget_type == Info.OPEN:
-            widget = Open(widget_id, widget_name)
-        elif widget_type == Info.DC:
-            widget = EyeDC(widget_id, widget_name)
-        elif widget_type == Info.STARTR:
-            widget = StartR(widget_id, widget_name)
-        elif widget_type == Info.LOG:
-            widget = Close(widget_id, widget_name)
-        elif widget_type == Info.QUEST_INIT:
-            widget = QuestInit(widget_id, widget_name)
-        elif widget_type == Info.QUEST_UPDATE:
-            widget = QuestUpdate(widget_id, widget_name)
-        elif widget_type == Info.QUEST_GET_VALUE:
-            widget = QuestGetValue(widget_id, widget_name)
-        else:
-            # if fail to create widget, exit.
-            exit()
+        try:
+            if widget_type == Info.TIMELINE:
+                widget = Timeline(widget_id, widget_name)
+            elif widget_type == Info.IF:
+                widget = IfBranch(widget_id, widget_name)
+            elif widget_type == Info.SWITCH:
+                widget = Switch(widget_id, widget_name)
+            elif widget_type == Info.CYCLE:
+                widget = Cycle(widget_id, widget_name)
+            elif widget_type == Info.IMAGE:
+                widget = ImageDisplay(widget_id, widget_name)
+            elif widget_type == Info.VIDEO:
+                widget = VideoDisplay(widget_id, widget_name)
+            elif widget_type == Info.TEXT:
+                widget = TextDisplay(widget_id, widget_name)
+            elif widget_type == Info.SOUND:
+                widget = SoundDisplay(widget_id, widget_name)
+            elif widget_type == Info.SLIDER:
+                widget = Slider(widget_id, widget_name)
+            elif widget_type == Info.ACTION:
+                widget = EyeAction(widget_id, widget_name)
+            elif widget_type == Info.CALIBRATION:
+                widget = EyeCalibrate(widget_id, widget_name)
+            elif widget_type == Info.ENDR:
+                widget = EndR(widget_id, widget_name)
+            elif widget_type == Info.OPEN:
+                widget = Open(widget_id, widget_name)
+            elif widget_type == Info.DC:
+                widget = EyeDC(widget_id, widget_name)
+            elif widget_type == Info.STARTR:
+                widget = StartR(widget_id, widget_name)
+            elif widget_type == Info.LOG:
+                widget = Close(widget_id, widget_name)
+            elif widget_type == Info.QUEST_INIT:
+                widget = QuestInit(widget_id, widget_name)
+            elif widget_type == Info.QUEST_UPDATE:
+                widget = QuestUpdate(widget_id, widget_name)
+            elif widget_type == Info.QUEST_GET_VALUE:
+                widget = QuestGetValue(widget_id, widget_name)
+            else:
+                # if fail to create widget, exit.
+                exit()
+        except Exception as e:
+            raise Exception(f"create {widget_type} fail => widget_id: {widget_id}, widget_name: {widget_name}")
         # change data set in Kernel
         QApplication.processEvents()
         Info.Widgets[widget_id] = widget
@@ -364,7 +367,7 @@ class Psy(QMainWindow):
         # start wait
         self.startWait()
         # do job
-        # add node in origin parent node firstly
+        # add node in origin parent node firstly, because some widgets need to get attributes in __init__ function.
         show = True
         if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
             show = False
@@ -798,7 +801,7 @@ class Psy(QMainWindow):
         except:
             return False
         # restore data firstly
-        Info.Names = setting.value("Names", -1)
+        names = setting.value("Names", -1)
         Info.WidgetTypeCount = setting.value("WidgetTypeCount", -1)
         Info.WidgetNameCount = setting.value("WidgetNameCount", -1)
         Info.INPUT_DEVICE_INFO = setting.value("InputDeviceInfo", -1)
@@ -810,7 +813,7 @@ class Psy(QMainWindow):
         structure = setting.value("Structure", -1)
         tabs = setting.value("Tabs", -1)
         # any one equal -1, fail
-        if Info.Names == -1 or \
+        if names == -1 or \
                 Info.WidgetTypeCount == -1 or \
                 Info.WidgetNameCount == -1 or \
                 Info.INPUT_DEVICE_INFO == -1 or \
@@ -828,18 +831,14 @@ class Psy(QMainWindow):
             return False
         # restore widgets: create origin widget and map to right widget ids
         try:
-            for widget_data in widgets_data:
-                widget_id, widget_name = re.split("&", widget_data)
-                data = widgets_data[widget_data]
-                # create widget
-                widget = self.createWidget(widget_id, widget_name)
-                # restore widget
-                Info.Widgets[widget_id].restore(data)
-                # map widget
-                for widget_id in Info.Names[widget_name]:
-                    Info.Widgets[widget_id] = widget
             # restore structure
             self.structure.restore(structure)
+            # restore widgets according to structure, because some widget need to get attributes in __init__ function
+            root_widget_id, root_widget_name, children = structure
+            created_widgets = {}
+            self.restoreWidget(names, widgets_data, created_widgets, root_widget_id, root_widget_name, children)
+            # restore Info.Name
+            Info.Names = names
             # restore tabs
             self.center.restore(tabs)
             if show:
@@ -848,6 +847,31 @@ class Psy(QMainWindow):
         except Exception as e:
             Func.print(f"Due to error '{e}', the file {file_path} failed to load.", 2)
             return False
+
+    def restoreWidget(self, names: dict, widgets_data: dict, created_widgets: dict, widget_id: str, widget_name: str,
+                      children: list):
+        """
+        restore all widgets (dfs) according to structure, because some widget need to get attributes in __init__ function
+        """
+        # we just store origin widgets data.
+        # create or map widget firstly
+        if widget_name not in created_widgets:
+            # create widget
+            widget = self.createWidget(widget_id, widget_name)
+            # restore widget data
+            widget.restore(widgets_data[f"{names[widget_name][0]}&{widget_name}"])
+            # log in created widgets
+            created_widgets[widget_name] = widget
+        else:
+            # widget has been created, map firstly
+            widget = created_widgets[widget_name]
+            Info.Widgets[widget_id] = widget
+            if widget_id == names[widget_name][0]:
+                # if this is origin widget, change widget's widget id
+                widget.changeWidgetId(widget_id)
+        # handle its children
+        for child_widget_id, child_widget_name, child_children in children:
+            self.restoreWidget(names, widgets_data, created_widgets, child_widget_id, child_widget_name, child_children)
 
     def reset(self):
         """
@@ -1127,7 +1151,7 @@ class Psy(QMainWindow):
         # attributes
         self.attributes.clear()
         # output
-        self.output.clear()
+        # self.output.clear()
         # Info's data
         Info.PLATFORM = "linux"
         Info.IMAGE_LOAD_MODE = "before_event"

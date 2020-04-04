@@ -73,7 +73,7 @@ class QuestUpdate(TabItemWidget):
     def ok(self):
         self.apply()
         self.close()
-        self.tabClose.emit(self.widget_id)
+        self.tabClosed.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()

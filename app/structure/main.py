@@ -84,7 +84,7 @@ class Structure(DockWidget):
         """
         return self.structure_tree.store()
 
-    def restore(self, data: dict):
+    def restore(self, data: list):
         """
         restore this widget according to data.
         @param data: necessary data for restoring this widget
