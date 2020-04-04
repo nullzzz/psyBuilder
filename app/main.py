@@ -2,12 +2,12 @@ import os
 import re
 import traceback
 
-from PyQt5.QtCore import Qt, QTimer, QSettings, QPropertyAnimation
+from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation
 from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette, QFontMetrics
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLabel, QGridLayout, \
     QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame, QMenu
 
-from lib import MessageBox, WaitDialog
+from lib import MessageBox, WaitDialog, Settings
 from .attributes import Attributes
 from .center import Center
 from .center.condition import IfBranch, Switch
@@ -43,8 +43,8 @@ class Psy(QMainWindow):
             self.store(Info.InitFile, False)
         # load config
         Info.Psy = self
-        Info.FILE_NAME = QSettings("config.ini", QSettings.IniFormat).value("file_path", "")
-        Info.FILE_DIRECTORY = QSettings("config.ini", QSettings.IniFormat).value("file_directory", "")
+        Info.FILE_NAME = Settings("config.ini", Settings.IniFormat).value("file_path", "")
+        Info.FILE_DIRECTORY = Settings("config.ini", Settings.IniFormat).value("file_directory", "")
         # if file name not none, we restore data from this file
         if Info.FILE_NAME:
             if not self.restore(Info.FILE_NAME):
@@ -72,7 +72,7 @@ class Psy(QMainWindow):
         self.default_mode_action = open_mode_menu.addAction("Default Mode", lambda: self.changeOpenMode("default mode"))
         self.open_blank_file_action = open_mode_menu.addAction("Open Blank File",
                                                                lambda: self.changeOpenMode("open blank file"))
-        open_mode = QSettings("config.ini", QSettings.IniFormat).value("open_mode", "default mode")
+        open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
         self.changeOpenMode(open_mode)
         # view menu
         view_menu = menubar.addMenu("&View")
@@ -664,8 +664,8 @@ class Psy(QMainWindow):
                                                             QFileDialog.ShowDirsOnly)
         if file_directory:
             # change config
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
+            Settings("config.ini", Settings.IniFormat).setValue("file_path", "")
+            Settings("config.ini", Settings.IniFormat).setValue("file_directory", file_directory)
             # reset this software
             self.reset()
             Info.FILE_NAME = ""
@@ -688,19 +688,19 @@ class Psy(QMainWindow):
                 # store data to file
                 if self.store(file_path):
                     # change config
-                    QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-                    QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+                    Settings("config.ini", Settings.IniFormat).setValue("file_path", file_path)
+                    Settings("config.ini", Settings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
                     Info.FILE_NAME = file_path
                     Info.FILE_DIRECTORY = os.path.dirname(file_path)
                     # add file_path into file_paths
-                    file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+                    file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
                     if file_path not in file_paths:
                         file_paths.insert(0, file_path)
                     else:
                         # move it to first
                         file_paths.remove(file_path)
                         file_paths.insert(0, file_path)
-                    QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+                    Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
 
     def saveAsFile(self):
         """
@@ -718,14 +718,14 @@ class Psy(QMainWindow):
             # just store
             if self.store(file_path):
                 # add file_path into file_paths
-                file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+                file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
                 if file_path not in file_paths:
                     file_paths.insert(0, file_path)
                 else:
                     # move it to first
                     file_paths.remove(file_path)
                     file_paths.insert(0, file_path)
-                QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+                Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
 
     def openFile(self):
         """
@@ -743,17 +743,17 @@ class Psy(QMainWindow):
                 self.restore(Info.TempFile, False)
             else:
                 # change config
-                QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-                QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+                Settings("config.ini", Settings.IniFormat).setValue("file_path", file_path)
+                Settings("config.ini", Settings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
                 # add file_path into file_paths
-                file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+                file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
                 if file_path not in file_paths:
                     file_paths.insert(0, file_path)
                 else:
                     # move it to first
                     file_paths.remove(file_path)
                     file_paths.insert(0, file_path)
-                QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+                Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
                 Info.FILE_NAME = file_path
                 Info.FILE_DIRECTORY = os.path.dirname(file_path)
 
@@ -762,7 +762,7 @@ class Psy(QMainWindow):
         store data to file
         """
         try:
-            setting = QSettings(file_path, QSettings.IniFormat)
+            setting = Settings(file_path, Settings.IniFormat)
             # some data in Info save to file directly
             setting.setValue("Names", Info.Names)
             setting.setValue("WidgetTypeCount", Info.WidgetTypeCount)
@@ -783,8 +783,8 @@ class Psy(QMainWindow):
             structure = self.structure.store()
             setting.setValue("Structure", structure)
             # tabs
-            tabs = self.center.store()
-            setting.setValue("Tabs", tabs)
+            # tabs = self.center.store()
+            # setting.setValue("Tabs", tabs)
             if show:
                 Func.print(f"File '{file_path}' saved successfully.", 1)
             return True
@@ -797,7 +797,7 @@ class Psy(QMainWindow):
         restore data from file(it changes Info.FileName and Info.FILE_DIRECTORY
         """
         try:
-            setting = QSettings(file_path, QSettings.IniFormat)
+            setting = Settings(file_path, Settings.IniFormat)
         except:
             return False
         # restore data firstly
@@ -811,7 +811,7 @@ class Psy(QMainWindow):
         Info.SLIDER_COUNT = setting.value("SliderCount", -1)
         widgets_data = setting.value("Widgets", -1)
         structure = setting.value("Structure", -1)
-        tabs = setting.value("Tabs", -1)
+        # tabs = setting.value("Tabs", -1)
         # any one equal -1, fail
         if names == -1 or \
                 Info.WidgetTypeCount == -1 or \
@@ -822,8 +822,7 @@ class Psy(QMainWindow):
                 Info.TRACKER_DEVICE_INFO == -1 or \
                 Info.SLIDER_COUNT == -1 or \
                 widgets_data == -1 or \
-                structure == -1 or \
-                tabs == -1:
+                structure == -1:
             if show:
                 Func.print(
                     f"The file '{file_path}' you selected may be damaged, please check whether the file is correct.",
@@ -840,7 +839,8 @@ class Psy(QMainWindow):
             # restore Info.Name
             Info.Names = names
             # restore tabs
-            self.center.restore(tabs)
+            # self.center.restore(tabs)
+            self.center.openTab(f"{Info.TIMELINE}.0")
             if show:
                 Func.print(f"File '{file_path}' loaded successfully.", 1)
             return True
@@ -903,7 +903,7 @@ class Psy(QMainWindow):
         change open mode in config and menu
         """
         # config
-        QSettings("config.ini", QSettings.IniFormat).setValue("open_mode", mode)
+        Settings("config.ini", Settings.IniFormat).setValue("open_mode", mode)
         # menu
         mode = ("default mode" == mode)
         checked_icon = Func.getImageObject("menu/checked", 1)

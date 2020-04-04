@@ -1,12 +1,12 @@
 import os
 import sys
 
-from PyQt5.QtCore import Qt, pyqtSignal, QSize, QSettings
+from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QVBoxLayout, QLabel, QMenu
 
 from app import Psy
 from app.func import Func
-from lib import MessageBox, TableWidget, HoverButton
+from lib import MessageBox, TableWidget, HoverButton, Settings
 from qss import qss
 
 
@@ -148,7 +148,7 @@ class FileButtonArea(QWidget):
         self.open_blank_file_action = self.menu.addAction(Func.getImageObject("menu/checked", 1),
                                                           "Open Blank File",
                                                           lambda: self.changeOpenMode("open blank file"))
-        open_mode = QSettings("config.ini", QSettings.IniFormat).value("open_mode", "default mode")
+        open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
         self.changeOpenMode(open_mode)
         # buttons
         create_button = HoverButton("menu/add", "Create New File")
@@ -193,7 +193,7 @@ class FileButtonArea(QWidget):
         change open mode in config and menu
         """
         # config
-        QSettings("config.ini", QSettings.IniFormat).setValue("open_mode", mode)
+        Settings("config.ini", Settings.IniFormat).setValue("open_mode", mode)
         # menu
         mode = ("default mode" == mode)
         self.default_mode_action.setIconVisibleInMenu(mode)
@@ -212,17 +212,20 @@ class FileWindow(QWidget):
         self.file_path_table = FilePathTable()
         self.file_path_table.filePathClicked.connect(self.handleFileClicked)
         self.file_path_table.filePathDeleted.connect(self.handleFileDeleted)
+        # load file paths from config
+        self.loadFilePaths()
         self.file_button_area = FileButtonArea()
         self.file_button_area.fileCreated.connect(self.handleFileCreated)
         self.file_button_area.fileOpened.connect(self.handleFileOpened)
         # layout
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self.file_path_table, 2)
-        layout.addWidget(self.file_button_area, 3, Qt.AlignHCenter)
+        if self.file_path_table.rowCount():
+            layout.addWidget(self.file_path_table, 2)
+            layout.addWidget(self.file_button_area, 3, Qt.AlignHCenter)
+        else:
+            layout.addWidget(self.file_button_area, 1, Qt.AlignCenter)
         self.setLayout(layout)
-        # load file paths from config
-        self.loadFilePaths()
         # data
         self.opening = False
 
@@ -231,7 +234,7 @@ class FileWindow(QWidget):
         load file list from config
         :return:
         """
-        file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+        file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
         for file_path in file_paths:
             self.file_path_table.addFilePath(-1, file_path)
 
@@ -257,8 +260,8 @@ class FileWindow(QWidget):
         :return:
         """
         # change config
-        QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
-        QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
+        Settings("config.ini", Settings.IniFormat).setValue("file_path", "")
+        Settings("config.ini", Settings.IniFormat).setValue("file_directory", file_directory)
         # start psy application
         self.startPsy()
 
@@ -269,17 +272,17 @@ class FileWindow(QWidget):
         :return:
         """
         # change file_paths
-        file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+        file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
         if file_path not in file_paths:
             file_paths.insert(0, file_path)
         else:
             # move it to first
             file_paths.remove(file_path)
             file_paths.insert(0, file_path)
-        QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+        Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
         # change file_path and file_directory
-        QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-        QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+        Settings("config.ini", Settings.IniFormat).setValue("file_path", file_path)
+        Settings("config.ini", Settings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
         # start psy
         self.startPsy()
 
@@ -289,10 +292,10 @@ class FileWindow(QWidget):
         :param file_path:
         :return:
         """
-        file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+        file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
         if file_path in file_paths:
             file_paths.remove(file_path)
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+            Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
 
     def handleFileClicked(self, file_path: str):
         """
@@ -301,8 +304,8 @@ class FileWindow(QWidget):
         :return:
         """
         if os.path.exists(file_path):
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+            Settings("config.ini", Settings.IniFormat).setValue("file_path", file_path)
+            Settings("config.ini", Settings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
             self.startPsy()
         else:
             MessageBox.information(self, "Error", f"The path '{file_path}' does not exist.'")
@@ -310,15 +313,15 @@ class FileWindow(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    open_mode = QSettings("config.ini", QSettings.IniFormat).value("open_mode", "default mode")
+    open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
     if open_mode == "default mode":
         # default open mode
         file_window = FileWindow()
         file_window.show()
     else:
         # open a blank file directly
-        QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
-        QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", "")
+        Settings("config.ini", Settings.IniFormat).setValue("file_path", "")
+        Settings("config.ini", Settings.IniFormat).setValue("file_directory", "")
         psy = Psy()
         psy.showMaximized()
     # set qss
