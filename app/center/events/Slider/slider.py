@@ -153,7 +153,7 @@ class Slider(TabItemMainWindow):
 
         self.default_properties: dict = {
             "Items": {},
-            "Pro": self.pro_window.getInfo()
+            "Properties": self.pro_window.default_properties
         }
         self.setUI()
 
@@ -226,14 +226,11 @@ class Slider(TabItemMainWindow):
 
     def refresh(self):
         self.pro_window.refresh()
-        self.getInfo()
 
-        # self.view = QGraphicsView(self.scene)
-        # self.view.setRenderHint(QPainter.Antialiasing)
-        # width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
-        # self.view.setMaximumSize(width / 2, height / 2)
-        # self.scene.setSceneRect(0, 0, width, height)
-        # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
+        width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
+        self.view.setMaximumSize(width, height)
+        self.scene.setSceneRect(0, 0, width, height)
+        self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
@@ -241,14 +238,12 @@ class Slider(TabItemMainWindow):
         self.scene.setAttributes(format_attributes)
 
     def getInfo(self):
-        self.default_properties = {
-            "Items": self.scene.getInfo(),
-            "Pro": self.pro_window.getInfo()
-        }
+        self.default_properties["Items"] = self.scene.getInfo()
+        self.pro_window.updateInfo()
         return self.default_properties
 
     def getProperties(self):
-        return {}
+        return self.pro_window.getProperties()
 
     def selectDiaItem(self, d):
         self.fill_color_bt.setIcon(

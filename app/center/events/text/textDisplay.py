@@ -1,12 +1,11 @@
-from PyQt5 import QtCore
+from PyQt5.QtCore import Qt
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QToolBar, QAction, QTextEdit
 
 from app.func import Func
-from lib import MessageBox, TabItemMainWindow
+from lib import TabItemMainWindow
 from .textProperty import TextProperty
-from .view import Preview
 
 
 class TextDisplay(TabItemMainWindow):
@@ -19,7 +18,6 @@ class TextDisplay(TabItemMainWindow):
 
         self.html = self.pro_window.html
         self.font = self.pro_window.font
-        self.default_properties = self.pro_window.getInfo()
 
         self.pro_window.general.text_edit.setDocument(self.text_label.document())
         self.pro_window.ok_bt.clicked.connect(self.ok)
@@ -44,12 +42,11 @@ class TextDisplay(TabItemMainWindow):
         self.text_label.setText("Your text will show here")
         self.text_label.setAlignment(Qt.AlignCenter)
         self.setCentralWidget(self.text_label)
-
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
         pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
-        pre_view.triggered.connect(self.preView)
+        # pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
         # tool.addAction(pre_view)
 
@@ -62,32 +59,29 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window.show()
 
     def refresh(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
         self.pro_window.refresh()
-        self.getInfo()
 
     # 预览
-    def preView(self):
-        return
-        try:
-            self.preview = Preview(self.x_pos, self.y_pos, self.w_size, self.h_size)
-            # self.preview.text.setStyleSheet("background-color:{}".format(self.back_color))
-            self.preview.setWindowModality(Qt.ApplicationModal)
-            self.preview.setHtml(self.html)
-            self.preview.setFont(self.pro_window.general.text_edit.font())
-            self.preview.showFullScreen()
-            self.preview.moveText()
-            self.preview.setTransparent(self.transparent_value)
-            self.t = QtCore.QTimer()
-            self.t.timeout.connect(self.preview.close)
-            self.t.start(10000)
-            self.t.setSingleShot(True)
-        except AttributeError as ae:
-            MessageBox.warning(self, "Unknown Error", f"Please contact the developers!", MessageBox.Ok)
-        # except Exception as e:
-        #     print(e)
-        #     print(type(e))
+    # def preView(self):
+    #     return
+    #     try:
+    #         self.preview = Preview(self.x_pos, self.y_pos, self.w_size, self.h_size)
+    #         # self.preview.text.setStyleSheet("background-color:{}".format(self.back_color))
+    #         self.preview.setWindowModality(Qt.ApplicationModal)
+    #         self.preview.setHtml(self.html)
+    #         self.preview.setFont(self.pro_window.general.text_edit.font())
+    #         self.preview.showFullScreen()
+    #         self.preview.moveText()
+    #         self.preview.setTransparent(self.transparent_value)
+    #         self.t = QtCore.QTimer()
+    #         self.t.timeout.connect(self.preview.close)
+    #         self.t.start(10000)
+    #         self.t.setSingleShot(True)
+    #     except AttributeError as ae:
+    #         MessageBox.warning(self, "Unknown Error", f"Please contact the developers!", MessageBox.Ok)
+    #     # except Exception as e:
+    #     #     print(e)
+    #     #     print(type(e))
 
     def ok(self):
         self.apply()
@@ -97,9 +91,7 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window.loadSetting()
 
     def apply(self):
-        self.getInfo()
-        # self.parseProperties()
-        # 发送信号
+        self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
 
     # # 获取参数
@@ -123,10 +115,8 @@ class TextDisplay(TabItemMainWindow):
     #         self.h_size = "100%"
 
     # 返回设置参数
-    def getInfo(self):
-        self.html = self.pro_window.html
-        self.default_properties = self.pro_window.getInfo()
-        return self.default_properties
+    def updateInfo(self):
+        self.pro_window.updateInfo()
 
     def changeDisplayText(self):
         self.html = self.text_label.toHtml()
@@ -140,21 +130,7 @@ class TextDisplay(TabItemMainWindow):
     def setProperties(self, properties: dict):
         if properties:
             self.default_properties = properties.copy()
-            self.loadSetting()
             self.apply()
-
-    def loadSetting(self):
-        self.pro_window.setOther(self.html)
-        self.pro_window.setProperties(self.default_properties)
-
-    def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        self.html = self.pro_window.html
-        self.default_properties = self.pro_window.getInfo()
-        return self.default_properties
 
     def store(self):
         """

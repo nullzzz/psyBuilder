@@ -609,7 +609,7 @@ class CycleTable(QTableWidget):
         """
 
         """
-        if e.mimeData().hasFormat(Info.AttributesToLineEdit):
+        if e.mimeData().hasFormat(Info.AttributesToWidget):
             e.accept()
         else:
             e.ignore()
@@ -624,13 +624,13 @@ class CycleTable(QTableWidget):
         """
         drop in table
         """
-        if e.mimeData().hasFormat(Info.AttributesToLineEdit):
+        if e.mimeData().hasFormat(Info.AttributesToWidget):
             # get pos
             row = self.rowAt(e.pos().y())
             col = self.columnAt(e.pos().x())
             # can't be weight and timeline
             if row != -1 and col >= 2:
-                data = e.mimeData().data(Info.AttributesToLineEdit)
+                data = e.mimeData().data(Info.AttributesToWidget)
                 stream = QDataStream(data, QIODevice.ReadOnly)
                 text = f"[{stream.readQString()}]"
                 self.item(row, col).setText(text)

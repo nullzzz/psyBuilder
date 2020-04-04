@@ -44,9 +44,17 @@ class BiggerUP(QGroupBox):
     def refresh(self):
         self.home.refresh()
         self.describer.refresh()
+        self.updateInfo()
 
     def setAttributes(self, attributes: list):
         self.describer.setAttributes(attributes)
+
+    def setProperties(self, properties: dict):
+        self.default_properties.update(properties)
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.home.loadSetting()
 
     def add(self, device_id, device_name):
         self.home.createDevice(device_id, device_name)
@@ -133,3 +141,10 @@ class BiggerDown(QGroupBox):
         self.resp_info.setAttributes(attributes)
         self.resp_trigger.setAttributes(attributes)
         self.eye_action.setAttributes(attributes)
+
+    def setProperties(self, properties: dict):
+        self.default_properties.update(properties)
+        self.loadSetting()
+
+    def loadSetting(self):
+        self.home.loadSetting()

@@ -14,10 +14,7 @@ class ImageDisplay(TabItemMainWindow):
         self.label = QLabel()
         # 属性设置窗口
         self.pro_window = ImageProperty()
-        self.pro_window.ok_bt.clicked.connect(self.ok)
-        self.pro_window.cancel_bt.clicked.connect(self.cancel)
-        self.pro_window.apply_bt.clicked.connect(self.apply)
-
+        self.default_properties = self.pro_window.default_properties
         # 相关可使用属性
         # self.file = ""
         # self.isStretch = False
@@ -32,6 +29,7 @@ class ImageDisplay(TabItemMainWindow):
         # self.w_size = "100%"
         # self.h_size = "100%"
         self.setUI()
+        self.linkSignal()
 
     def setUI(self):
         """
@@ -54,11 +52,10 @@ class ImageDisplay(TabItemMainWindow):
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
-    def openSettingWindow(self):
-        self.refresh()
-        attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(attributes)
-        self.pro_window.show()
+    def linkSignal(self):
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
     def preview(self):
         QMessageBox.warning(self, "undo", "refactoring")
@@ -149,36 +146,21 @@ class ImageDisplay(TabItemMainWindow):
     #     else:
     #         self.label.setPixmap(pix)
 
-    # 返回设置参数
-
-    # 设置可选参数
-
     def updateInfo(self):
         self.pro_window.updateInfo()
 
-    def setAttributes(self, attributes):
+    def setProperties(self, properties: dict):
         """
-        completer for the whole widget
-        :param attributes:
+        {
+        "":{}
+        "":{}
+        }
+        :param properties:
         :return:
         """
-        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
-        self.pro_window.setAttributes(format_attributes)
-
-    # 返回当前选择attributes
-    def getUsingAttributes(self):
-        using_attributes: list = []
-        self.findAttributes(self.default_properties, using_attributes)
-        return using_attributes
-
-    def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.pro_window.setProperties(self.default_properties)
-            self.apply()
-
-    def loadSetting(self):
+        self.default_properties.update(properties)
         self.pro_window.setProperties(self.default_properties)
+        self.apply()
 
     def getProperties(self) -> dict:
         """
@@ -197,14 +179,10 @@ class ImageDisplay(TabItemMainWindow):
         return necessary data for restoring this widget.
         @return:
         """
+        return self.default_properties
 
     def restore(self, properties: dict):
-        """
-        restore this widget according to data.
-        @return:
-        :param properties:
-        """
-        pass
+        self.setProperties(properties)
 
     def clone(self, new_widget_id: str, new_widget_name: str):
         clone_widget = ImageDisplay(new_widget_id, new_widget_name)

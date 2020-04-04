@@ -21,13 +21,13 @@ class VarComboBox(QComboBox):
         self.reg_exp = ""
 
     def dragEnterEvent(self, e):
-        if e.mimeData().hasFormat(Info.AttributesToComboBox):
+        if e.mimeData().hasFormat(Info.AttributesToWidget):
             e.accept()
         else:
             e.ignore()
 
     def dropEvent(self, e):
-        data = e.mimeData().data(Info.AttributesToComboBox)
+        data = e.mimeData().data(Info.AttributesToWidget)
         stream = QDataStream(data, QIODevice.ReadOnly)
         text = f"[{stream.readQString()}]"
         index = self.findText(text, Qt.MatchExactly)

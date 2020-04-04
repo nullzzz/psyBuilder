@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFile
 from app import Psy
 from app.func import Func
 from lib import MessageBox, TableWidget, HoverButton
+from qss import qss
 
 
 class Version(QTextEdit):
@@ -284,8 +285,10 @@ class FileWindow(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    file_window = FileWindow()
-    file_window.show()
+    # file_window = FileWindow()
+    # file_window.show()
+    psy = Psy()
+    psy.showMaximized()
     # set qss
-    # app.setStyleSheet(qss)
+    app.setStyleSheet(qss)
     sys.exit(app.exec_())

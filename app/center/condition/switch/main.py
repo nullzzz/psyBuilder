@@ -117,28 +117,11 @@ class Switch(TabItemWidget):
             hidden_attr = {"onsettime": 0, "acc": 0, "resp": 0, "rt": 0}
         return hidden_attr
 
-    # 返回当前选择attributes
-    def getUsingAttributes(self):
-        using_attributes: list = []
-        self.findAttributes(self.default_properties, using_attributes)
-        return using_attributes
-
-    def findAttributes(self, properties: dict, using_attributes: list):
-        for v in properties.values():
-            if isinstance(v, dict):
-                self.findAttributes(v, using_attributes)
-            elif isinstance(v, str):
-                if v.startswith("[") and v.endswith("]"):
-                    using_attributes.append(v[1:-1])
-
     def setAttributes(self, attributes: list):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.attributes = attributes
         self.switch_area.setAttributes(format_attributes)
         self.case_area.setAttributes(format_attributes)
-
-    def changeWidgetId(self, new_id: str):
-        self.widget_id = new_id
 
     def getSwitch(self) -> str:
         return self.default_properties.get("Switch", "")

@@ -54,12 +54,15 @@ class GLWidget(QOpenGLWidget):
             self.update()
 
     def initializeGL(self):
+        print("init")
         lightPos = (5.0, 5.0, 10.0, 1.0)
         reflectance1 = (0.8, 0.1, 0.0, 1.0)
         reflectance2 = (0.0, 0.8, 0.2, 1.0)
         reflectance3 = (0.2, 0.2, 1.0, 1.0)
 
+        # 设置光源：光源编号、光源特性、数据
         gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, lightPos)
+        # 打开光源
         gl.glEnable(gl.GL_LIGHTING)
         gl.glEnable(gl.GL_LIGHT0)
         gl.glEnable(gl.GL_DEPTH_TEST)
@@ -72,6 +75,7 @@ class GLWidget(QOpenGLWidget):
         gl.glClearColor(0.0, 0.0, 0.0, 1.0)
 
     def paintGL(self):
+        print("paint")
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 
         gl.glPushMatrix()
@@ -90,6 +94,7 @@ class GLWidget(QOpenGLWidget):
         gl.glPopMatrix()
 
     def resizeGL(self, width, height):
+        print(width, height)
         side = min(width, height)
         if side < 0:
             return
@@ -133,6 +138,7 @@ class GLWidget(QOpenGLWidget):
         return self.zRot
 
     def makeGear(self, reflectance, innerRadius, outerRadius, thickness, toothSize, toothCount):
+        # 唯一地标识一个显示列表
         list = gl.glGenLists(1)
         gl.glNewList(list, gl.GL_COMPILE)
         gl.glMaterialfv(gl.GL_FRONT, gl.GL_AMBIENT_AND_DIFFUSE,
@@ -224,10 +230,10 @@ class GLWidget(QOpenGLWidget):
         gl.glPopMatrix()
 
     def normalizeAngle(self, angle):
-        while (angle < 0):
+        while angle < 0:
             angle += 360 * 16
 
-        while (angle > 360 * 16):
+        while angle > 360 * 16:
             angle -= 360 * 16
 
 

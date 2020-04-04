@@ -16,12 +16,12 @@ class TextTab1(QWidget):
         self.default_properties = {
             "Text": "",
             "Alignment": "center",
-            "Fore color": "0,0,0",
-            "Back color": "255,255,255",
-            "Screen name": "screen.0",
+            "Fore Color": "0,0,0",
+            "Back Color": "255,255,255",
+            "Screen Name": "screen_0",
             "Transparent": "100%",
-            "Word wrap": 0,
-            "Clear after": "Yes"
+            "Word Wrap": 0,
+            "Clear After": "Yes"
         }
 
         self.text_edit = QTextEdit()
@@ -77,7 +77,7 @@ class TextTab1(QWidget):
 
         self.using_screen_id: str = "screen.0"
         self.screen = VarComboBox()
-        self.screen_info = Func.getScreenInfo()
+        self.screen_info = Func.getDeviceInfo("screen")
         self.screen.addItems(self.screen_info.values())
         self.screen.currentTextChanged.connect(self.changeScreen)
 
@@ -177,7 +177,7 @@ class TextTab1(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.screen_info = Func.getScreenInfo()
+        self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen.clear()
         self.screen.addItems(self.screen_info.values())
@@ -185,6 +185,7 @@ class TextTab1(QWidget):
         if screen_name:
             self.screen.setCurrentText(screen_name)
             self.using_screen_id = screen_id
+        self.updateInfo()
 
     def changeScreen(self, screen):
         for k, v in self.screen_info.items():
@@ -258,21 +259,14 @@ class TextTab1(QWidget):
         self.text_edit.setFont(font)
 
     def setAttributes(self, attributes):
-        self.attributes = attributes
-        self.align_x.setCompleter(QCompleter(self.attributes))
-        self.align_y.setCompleter(QCompleter(self.attributes))
-        self.fore_color.setCompleter(QCompleter(self.attributes))
-        self.back_color.setCompleter(QCompleter(self.attributes))
-        # self.clear_after.setCompleter(QCompleter(self.attributes))
-        # self.screen_name.setCompleter(QCompleter(self.attributes))
-        self.transparent.setCompleter(QCompleter(self.attributes))
-        self.word_wrap.setCompleter(QCompleter(self.attributes))
-        # self.flip_vertical.setCompleter(QCompleter(self.attributes))
-        # self.flip_horizontal.setCompleter(QCompleter(self.attributes))
-        # self.font_box.setCompleter(QCompleter(self.attributes))
-        self.font_size_box.setCompleter(QCompleter(self.attributes))
-        self.style_box.setCompleter(QCompleter(self.attributes))
-        # self.right_to_left.setCompleter(QCompleter(self.attributes))
+        self.align_x.setCompleter(QCompleter(attributes))
+        self.align_y.setCompleter(QCompleter(attributes))
+        self.fore_color.setCompleter(QCompleter(attributes))
+        self.back_color.setCompleter(QCompleter(attributes))
+        self.transparent.setCompleter(QCompleter(attributes))
+        self.word_wrap.setCompleter(QCompleter(attributes))
+        self.font_size_box.setCompleter(QCompleter(attributes))
+        self.style_box.setCompleter(QCompleter(attributes))
 
     def setScreen(self, screen: list):
         selected = self.screen.currentText()
@@ -285,33 +279,29 @@ class TextTab1(QWidget):
             if new_name:
                 self.screen.setCurrentText(new_name)
 
-    def apply(self):
-        self.html = self.text_edit.toHtml()
-
-    def getInfo(self):
-        self.default_properties.clear()
+    def updateInfo(self):
         self.default_properties["Html"] = self.html
         self.default_properties["Text"] = self.text_edit.toPlainText()
         self.default_properties["Alignment X"] = self.align_x.currentText()
         self.default_properties["Alignment Y"] = self.align_y.currentText()
-        self.default_properties["Fore color"] = self.fore_color.getColor()
-        self.default_properties["Back color"] = self.back_color.getColor()
-        self.default_properties["Screen name"] = self.screen.currentText()
+        self.default_properties["Fore Color"] = self.fore_color.getColor()
+        self.default_properties["Back Color"] = self.back_color.getColor()
+        self.default_properties["Screen Name"] = self.screen.currentText()
         self.default_properties["Transparent"] = self.transparent.text()
-        self.default_properties["Clear after"] = self.clear_after.currentText()
-        self.default_properties["Font family"] = self.font_box.currentText()
-        self.default_properties["Font size"] = self.font_size_box.currentText()
-        self.default_properties["Wrapat chars"] = self.word_wrap.text()
+        self.default_properties["Clear After"] = self.clear_after.currentText()
+        self.default_properties["Font Family"] = self.font_box.currentText()
+        self.default_properties["Font Size"] = self.font_size_box.currentText()
+        self.default_properties["Wrapat Chars"] = self.word_wrap.text()
         self.default_properties["Style"] = self.style_box.currentText()
-        self.default_properties["Flip horizontal"] = self.flip_horizontal.currentText()
-        self.default_properties["Flip vertical"] = self.flip_vertical.currentText()
-        self.default_properties["Right to left"] = self.right_to_left.currentText()
+        self.default_properties["Flip Horizontal"] = self.flip_horizontal.currentText()
+        self.default_properties["Flip Vertical"] = self.flip_vertical.currentText()
+        self.default_properties["Right To Left"] = self.right_to_left.currentText()
 
+    def getProperties(self):
         return self.default_properties
 
-    def setProperties(self, properties: dict, html: str):
-        self.default_properties = properties.copy()
-        self.html = html
+    def setProperties(self, properties: dict):
+        self.default_properties.update(properties)
         self.loadSetting()
 
     def loadSetting(self):
@@ -319,21 +309,16 @@ class TextTab1(QWidget):
 
         self.align_x.setCurrentText(self.default_properties["Alignment X"])
         self.align_y.setCurrentText(self.default_properties["Alignment Y"])
-        self.fore_color.setCurrentText(self.default_properties["Fore color"])
-        self.back_color.setCurrentText(self.default_properties["Back color"])
-        self.screen.setCurrentText(self.default_properties["Screen name"])
+        self.fore_color.setCurrentText(self.default_properties["Fore Color"])
+        self.back_color.setCurrentText(self.default_properties["Back Color"])
+        self.screen.setCurrentText(self.default_properties["Screen Name"])
         self.transparent.setText(self.default_properties["Transparent"])
-        self.word_wrap.setText(self.default_properties["Wrapat chars"])
-        self.clear_after.setCurrentText(self.default_properties["Clear after"])
-        self.font_box.setCurrentText(self.default_properties["Font family"])
-        self.font_size_box.setCurrentText(self.default_properties["Font size"])
+        self.word_wrap.setText(self.default_properties["Wrapat Chars"])
+        self.clear_after.setCurrentText(self.default_properties["Clear After"])
+        self.font_box.setCurrentText(self.default_properties["Font Family"])
+        self.font_size_box.setCurrentText(self.default_properties["Font Size"])
         self.style_box.setCurrentText(self.default_properties["Style"])
 
-        self.flip_horizontal.setCurrentText(self.default_properties["Flip horizontal"])
-        self.flip_vertical.setCurrentText(self.default_properties["Flip vertical"])
-        self.right_to_left.setCurrentText(self.default_properties["Right to left"])
-
-    def clone(self):
-        clone_page = TextTab1()
-        clone_page.setProperties(self.default_properties, self.html)
-        return clone_page
+        self.flip_horizontal.setCurrentText(self.default_properties["Flip Horizontal"])
+        self.flip_vertical.setCurrentText(self.default_properties["Flip Vertical"])
+        self.right_to_left.setCurrentText(self.default_properties["Right To Left"])

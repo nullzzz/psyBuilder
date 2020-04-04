@@ -24,7 +24,7 @@ class TabItemWidget(QWidget):
     waitEnd = pyqtSignal()
 
     def __init__(self, widget_id: str, widget_name: str):
-        super(TabItemWidget, self).__init__(None)
+        super(TabItemWidget, self).__init__()
         # widget_id is used to distinguish different widgets
         self.widget_id = widget_id
         self.widget_name = widget_name
@@ -54,7 +54,6 @@ class TabItemWidget(QWidget):
     def getHiddenAttributes(self) -> list:
         """
         You should finish the job.
-
         every widget has global attributes and own attributes,
         we get global attributes through common function Func.getAttributes(widget_id) and
         we get widget's own attributes through this function.
@@ -66,6 +65,19 @@ class TabItemWidget(QWidget):
         if self.getUsingDeviceCount():
             return ["respOnSettingTime", "acc""resp", "rt"]
         return ["OnSettingTime"]
+
+    def getUsingAttributes(self):
+        using_attributes: list = []
+        self.findAttributes(self.default_properties, using_attributes)
+        return using_attributes
+
+    def findAttributes(self, properties: dict, using_attributes: list):
+        for v in properties.values():
+            if isinstance(v, dict):
+                self.findAttributes(v, using_attributes)
+            elif isinstance(v, str):
+                if v.startswith("[") and v.endswith("]"):
+                    using_attributes.append(v[1:-1])
 
     """
     about widget

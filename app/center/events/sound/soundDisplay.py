@@ -12,38 +12,30 @@ from .soundProperty import SoundProperty
 class SoundDisplay(TabItemMainWindow):
     def __init__(self, widget_id: str, widget_name: str):
         super(SoundDisplay, self).__init__(widget_id, widget_name)
-        self.attributes = []
-
         self.file: str = ""
         self.is_loop: bool = False
 
         self.volume: int = 100
         self.pro_window = SoundProperty()
 
-        self.default_properties = self.pro_window.getInfo()
-
-        self.pro_window.ok_bt.clicked.connect(self.ok)
-        self.pro_window.cancel_bt.clicked.connect(self.cancel)
-        self.pro_window.apply_bt.clicked.connect(self.apply)
+        self.default_properties = self.pro_window.default_properties
 
         self.play_bt = QPushButton("")
         self.play_bt.setIcon(QIcon(Func.getImage("start_video")))
         self.player = QMediaPlayer()
-        self.player.stateChanged.connect(self.changeIcon)
-        self.player.durationChanged.connect(self.changeTip)
+
         self.player_list = QMediaPlaylist()
 
         self.play_bt.setEnabled(False)
-        self.player.positionChanged.connect(self.positionChanged)
-        self.play_bt.clicked.connect(self.playSound)
         self.progress_bar = QSlider()
         self.progress_bar.setOrientation(Qt.Horizontal)
-        self.progress_bar.sliderMoved.connect(self.setPosition)
+
         self.tip = QLabel()
         self.tip1 = QLabel()
         self.tip2 = QLabel()
 
         self.setUI()
+        self.linkSignal()
 
     def setUI(self):
         self.setWindowTitle("SoundDisplay")
@@ -84,6 +76,17 @@ class SoundDisplay(TabItemMainWindow):
         tool.addAction(open_pro)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
+
+    def linkSignal(self):
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
+
+        self.player.stateChanged.connect(self.changeIcon)
+        self.player.durationChanged.connect(self.changeTip)
+        self.player.positionChanged.connect(self.positionChanged)
+        self.play_bt.clicked.connect(self.playSound)
+        self.progress_bar.sliderMoved.connect(self.setPosition)
 
     def openPro(self):
         self.refresh()

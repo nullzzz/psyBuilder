@@ -269,9 +269,9 @@ class DiaItem(QGraphicsPolygonItem):
             self.loadSetting()
 
     def loadSetting(self):
-        x = self.default_properties.get("x", 0)
-        y = self.default_properties.get("y", 0)
-        z = self.default_properties.get("z", 0)
+        x = self.default_properties.get("X", 0)
+        y = self.default_properties.get("Y", 0)
+        z = self.default_properties.get("Z", 0)
         self.setPos(x, y)
         self.setZValue(z)
 
@@ -415,9 +415,9 @@ class DiaItem(QGraphicsPolygonItem):
 
         gl.glColor3f(0.5, 1.0, 0.2)
         gl.glBegin(gl.GL_TRIANGLES)
-        gl.glVertex3f(100.0, 100.0, -100.0)
-        gl.glVertex3f(150.0, 300.0, -500.0)
-        gl.glVertex3f(200.0, 700.0, -200.0)
+        gl.glVertex3f(-100.0, 100.0, -100.0)
+        gl.glVertex3f(-150.0, 300.0, -500.0)
+        gl.glVertex3f(-200.0, 700.0, -200.0)
         gl.glEnd()
         painter.endNativePainting()
         return super().paint(painter, QStyleOptionGraphicsItem, widget)

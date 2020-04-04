@@ -168,7 +168,7 @@ class Scene(QGraphicsScene):
         item_info: dict = {}
         for item in self.items():
             item.setPosition()
-            item_info[item.getName()] = item.updateInfo()
+            item_info[item.getName()] = item.getInfo()
         return item_info
 
     def setProperties(self, properties: dict):

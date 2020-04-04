@@ -15,7 +15,6 @@ class VideoDisplay(TabItemMainWindow):
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.mediaStatusChanged.connect(self.loadStatue)
-        self.mediaPlayer.bufferStatusChanged.connect(self.bufferLoad)
         self.video_widget = VideoWidget()
 
         self.mediaPlayer.setVideoOutput(self.video_widget)
@@ -26,7 +25,7 @@ class VideoDisplay(TabItemMainWindow):
         self.label = QLabel()
         self.pro_window = VideoProperty()
 
-        self.default_properties = self.pro_window.getInfo()
+        self.default_properties = self.pro_window.default_properties
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
@@ -48,7 +47,7 @@ class VideoDisplay(TabItemMainWindow):
 
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
-        open_pro.triggered.connect(self.openPro)
+        open_pro.triggered.connect(self.openSettingWindow)
         tool.addAction(open_pro)
 
         self.play_video = QAction(QIcon(Func.getImage("start_video")), "start", self)
@@ -57,13 +56,6 @@ class VideoDisplay(TabItemMainWindow):
         self.video_widget.play_and_pause.connect(lambda: self.play_video.trigger())
 
         self.addToolBar(Qt.TopToolBarArea, tool)
-
-    def openPro(self):
-        self.refresh()
-        # 阻塞原窗口
-        # self.pro_window.setWindowModality(Qt.ApplicationModal)
-        self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
-        self.pro_window.show()
 
     def refresh(self):
         self.pro_window.refresh()
@@ -162,9 +154,6 @@ class VideoDisplay(TabItemMainWindow):
             self.play_video.setEnabled(False)
             self.play_video.setText("Invalid Media")
 
-    def bufferLoad(self, percentage: int):
-        print(percentage)
-
     @staticmethod
     def getStartTime(str_time):
         try:
@@ -207,10 +196,6 @@ class VideoDisplay(TabItemMainWindow):
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
-
-    def getInfo(self):
-        self.default_properties = self.pro_window.getInfo()
-        return self.default_properties
 
     def setProperties(self, properties: dict):
         if properties:
@@ -362,11 +347,12 @@ class VideoDisplay(TabItemMainWindow):
     """
 
     def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        return self.getInfo()
+        self.refresh()
+        properties = {}
+        for k, v in self.pro_window.getProperties().items():
+            if not isinstance(v, dict):
+                properties[k] = v
+        return properties
 
     def store(self):
         """
@@ -400,18 +386,13 @@ class VideoWidget(QVideoWidget):
     def __init__(self, parent=None):
         super(VideoWidget, self).__init__(parent)
 
-        self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
-        self.mediaPlayer.mediaStatusChanged.connect(self.loadStatue)
-        self.mediaPlayer.positionChanged.connect(self.stopPlaying)
-        self.mediaPlayer.stateChanged.connect(self.changeIcon)
-
         self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
 
         p = self.palette()
         p.setColor(QPalette.Window, Qt.black)
         self.setPalette(p)
 
-        self.setAttribute(Qt.WA_OpaquePaintEvent)
+        self.setAttribute(Qt.WA_OpaquePaintEvent, True)
 
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key_Space:
@@ -431,45 +412,3 @@ class VideoWidget(QVideoWidget):
     def mouseDoubleClickEvent(self, event):
         self.setFullScreen(not self.isFullScreen())
         event.accept()
-
-    def loadStatue(self, media_statue):
-        """
-        UnknownMediaStatus, NoMedia, LoadingMedia, LoadedMedia, StalledMedia,
-        BufferingMedia, BufferedMedia, EndOfMedia, InvalidMedia
-        :type media_statue: object
-        """
-        # 不识别状态
-        if media_statue == QMediaPlayer.UnknownMediaStatus:
-            self.play_and_pause.emit(0)
-            # self.play_video.setEnabled(False)
-            # self.play_video.setText("Unknown Media")  # self.statusBar().showMessage("Unknown Media", 5000)
-        # 没媒体
-        elif media_statue == QMediaPlayer.NoMedia:
-            self.play_and_pause.emit(0)
-            # self.play_video.setEnabled(False)
-            # self.play_video.setText("No Media")
-        # 加载中
-        elif media_statue == QMediaPlayer.LoadingMedia:
-            self.play_and_pause.emit(1)
-            # self.play_video.setEnabled(False)
-            # self.play_video.setText("Loading Media")
-        # 加载完成
-        elif media_statue == QMediaPlayer.LoadedMedia:
-            self.play_video.setEnabled(True)
-            self.play_video.setText("Start")
-        # 缓冲失败
-        elif media_statue == QMediaPlayer.StalledMedia:
-            pass
-        # 缓冲中
-        elif media_statue == QMediaPlayer.BufferingMedia:
-            pass
-        # 缓冲完成
-        elif media_statue == QMediaPlayer.BufferedMedia:
-            pass
-        # 播放完成
-        elif media_statue == QMediaPlayer.EndOfMedia:
-            pass
-        # 无法播放
-        elif media_statue == QMediaPlayer.InvalidMedia:
-            self.play_video.setEnabled(False)
-            self.play_video.setText("Invalid Media")

@@ -17,16 +17,16 @@ class VideoProperty(QWidget):
         self.frame = FramePage()
         self.duration = DurationPage()
 
-        self.default_properties = {**self.general.default_properties, **self.frame.default_properties,
-                                   **self.duration.default_properties}
+        self.default_properties = {
+            "General": self.general.default_properties,
+            "Frame": self.frame.default_properties,
+            "Duration": self.duration.default_properties
+        }
 
         self.tab.addTab(self.general, "general")
         self.tab.addTab(self.frame, "frame")
         self.tab.addTab(self.duration, "duration")
-        self.setButtons()
         self.setUI()
-
-        # 生成主界面
 
     def setUI(self):
         self.setWindowTitle("Video property")
@@ -53,12 +53,25 @@ class VideoProperty(QWidget):
         self.frame.setAttributes(attributes)
         self.duration.setAttributes(attributes)
 
-    def getInfo(self):
-        self.default_properties.clear()
-        self.default_properties = {**self.general.getInfo(), **self.frame.updateInfo(), **self.duration.updateInfo()}
-        return self.default_properties
+    def updateInfo(self):
+        self.general.updateInfo()
+        self.frame.updateInfo()
+        self.duration.updateInfo()
+
+    def getProperties(self):
+        properties = {
+            **self.general.getProperties(),
+            **self.frame.getProperties(),
+            **self.duration.getProperties()
+        }
+        return properties
 
     def setProperties(self, properties: dict):
         self.general.setProperties(properties.get("General"))
         self.frame.setProperties(properties.get("Frame"))
         self.duration.setProperties(properties.get("Duration"))
+
+    def loadSetting(self):
+        self.general.loadSetting()
+        self.frame.loadSetting()
+        self.duration.loadSetting()

@@ -94,7 +94,7 @@ class VideoTab1(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.screen_info = Func.getScreenInfo()
+        self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen_name.clear()
         self.screen_name.addItems(self.screen_info.values())
@@ -102,6 +102,8 @@ class VideoTab1(QWidget):
         if screen_name:
             self.screen_name.setCurrentText(screen_name)
             self.using_screen_id = screen_id
+
+        self.updateInfo()
 
     def changeScreen(self, screen):
         for k, v in self.screen_info.items():
@@ -148,6 +150,8 @@ class VideoTab1(QWidget):
         self.default_properties["Playback Rate"] = self.playback_rate.currentText()
         self.default_properties["Clear After"] = self.clear_after.currentText()
         self.default_properties["Screen Name"] = self.screen_name.currentText()
+
+    def getProperties(self):
         return self.default_properties
 
     def setProperties(self, properties: dict):

@@ -105,6 +105,7 @@ class ImageTab1(QWidget):
         if screen_name:
             self.screen_name.setCurrentText(screen_name)
             self.using_screen_id = screen_id
+        self.updateInfo()
 
     def changeScreen(self, screen):
         for k, v in self.screen_info.items():
@@ -132,10 +133,6 @@ class ImageTab1(QWidget):
         self.transparent.setCompleter(QCompleter(attributes))
 
     def updateInfo(self):
-        """
-        历史遗留函数
-        :return:
-        """
         self.default_properties["File Name"] = self.file_name.text()
         self.default_properties["Mirror Up/Down"] = bool(self.mirrorUD.checkState())
         self.default_properties["Mirror Left/Right"] = bool(self.mirrorLR.checkState())
@@ -144,21 +141,16 @@ class ImageTab1(QWidget):
         self.default_properties["Stretch Mode"] = self.stretch_mode.currentText()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear After"] = self.clear_after.currentText()
-        if Func.getDeviceNameById(self.using_screen_id):
-            self.default_properties["Screen Name"] = Func.getDeviceNameById(self.using_screen_id)
-        else:
-            self.default_properties["Screen Name"] = self.screen_name.currentText()
+        self.default_properties["Screen Name"] = self.screen_name.currentText()
 
     def getProperties(self):
-        self.updateInfo()
         return self.default_properties
 
     def setProperties(self, properties: dict):
-        self.default_properties.clear()
         self.default_properties.update(properties)
-        self.loadInfo()
+        self.loadSetting()
 
-    def loadInfo(self):
+    def loadSetting(self):
         self.file_name.setText(self.default_properties["File Name"])
         self.mirrorUD.setChecked(self.default_properties["Mirror Up/Down"])
         self.mirrorLR.setChecked(self.default_properties["Mirror Left/Right"])

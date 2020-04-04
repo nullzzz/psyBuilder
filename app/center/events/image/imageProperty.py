@@ -45,8 +45,8 @@ class ImageProperty(QWidget):
         tab.addTab(self.duration, "duration")
 
         main_layout = QVBoxLayout()
-        main_layout.addWidget(tab, 6)
-        main_layout.addLayout(below_layout, 1)
+        main_layout.addWidget(tab, 1)
+        main_layout.addLayout(below_layout, 0)
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
 
@@ -76,3 +76,8 @@ class ImageProperty(QWidget):
         self.general.updateInfo()
         self.frame.updateInfo()
         self.duration.updateInfo()
+
+    def loadSetting(self):
+        self.general.loadSetting()
+        self.frame.loadSetting()
+        self.duration.loadSetting()

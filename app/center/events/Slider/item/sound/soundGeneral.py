@@ -55,7 +55,7 @@ class SoundGeneral(QWidget):
 
         self.using_sound_id: str = ""
         self.sound = VarComboBox()
-        self.sound_info = Func.getSoundInfo()
+        self.sound_info = Func.getDeviceInfo("sound")
         self.sound.addItems(self.sound_info.values())
         self.sound.currentTextChanged.connect(self.changeSound)
 
@@ -135,7 +135,7 @@ class SoundGeneral(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.sound_info = Func.getSoundInfo()
+        self.sound_info = Func.getDeviceInfo("sound")
         sound_id = self.using_sound_id
         self.sound.clear()
         self.sound.addItems(self.sound_info.values())

@@ -51,10 +51,18 @@ class SliderProperty(QWidget):
         self.general.refresh()
         self.duration.refresh()
 
-    def getInfo(self):
-        self.default_properties = {
-            **self.duration.updateInfo(), **self.frame.updateInfo(), **self.general.getInfo()}
-        return self.default_properties
+    def updateInfo(self):
+        self.general.updateInfo()
+        self.frame.updateInfo()
+        self.duration.updateInfo()
+
+    def getProperties(self):
+        properties = {
+            **self.general.getProperties(),
+            **self.frame.getProperties(),
+            **self.duration.getProperties()
+        }
+        return properties
 
     def setAttributes(self, attributes):
         self.general.setAttributes(attributes)
@@ -62,14 +70,14 @@ class SliderProperty(QWidget):
         self.duration.setAttributes(attributes)
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.loadSetting()
+        self.general.setProperties(properties["General"])
+        self.frame.setProperties(properties["Frame"])
+        self.duration.setProperties(properties["Duration"])
 
     def loadSetting(self):
-        self.general.setProperties(self.default_properties)
-        self.frame.setProperties(self.default_properties)
-        self.duration.setProperties(self.default_properties)
+        self.general.loadSetting()
+        self.frame.loadSetting()
+        self.duration.loadSetting()
 
     def getScreenId(self) -> str:
         return self.general.using_screen_id

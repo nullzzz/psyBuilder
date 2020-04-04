@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QFormLayout
+from PyQt5.QtWidgets import QWidget, QFormLayout, QCompleter
 
 from app.func import Func
 from lib import VarComboBox
@@ -14,7 +14,7 @@ class SliderGeneral(QWidget):
         # 当前页面属性
         self.default_properties = {
             "Clear After": "Yes",
-            "Screen Name": "screen.0"
+            "Screen Name": "screen_0"
         }
 
         self.clear_after = VarComboBox()
@@ -46,7 +46,8 @@ class SliderGeneral(QWidget):
             self.using_screen_id = screen_id
 
     def setAttributes(self, attributes):
-        self.attributes = attributes
+        self.clear_after.setCompleter(QCompleter(attributes))
+        self.screen_name.setCompleter(QCompleter(attributes))
 
     def changeScreen(self, screen):
         for k, v in self.screen_info.items():
@@ -54,26 +55,17 @@ class SliderGeneral(QWidget):
                 self.using_screen_id = k
                 break
 
-    def getInfo(self):
-        """
-        历史遗留函数
-        :return:
-        """
-        self.default_properties.clear()
+    def updateInfo(self):
         self.default_properties["Clear After"] = self.clear_after.currentText()
         self.default_properties["Screen Name"] = self.screen_name.currentText()
-        return self.default_properties
 
     def getProperties(self):
-        self.default_properties.clear()
-        self.default_properties["Clear After"] = self.clear_after.currentText()
-        self.default_properties["Screen Name"] = self.screen_name.currentText()
+        self.updateInfo()
         return self.default_properties
 
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def loadSetting(self):
         self.clear_after.setCurrentText(self.default_properties["Clear After"])

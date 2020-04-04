@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QSize, QByteArray, QDataStream, QMimeData, QIODevice, QPoint
-from PyQt5.QtGui import QDrag
+from PyQt5.QtGui import QDrag, QPixmap, QColor, QPainter
 from PyQt5.QtWidgets import QTableWidgetItem
 
 from app.func import Func
@@ -73,14 +73,22 @@ class AttributesTable(TableWidget):
         item: QTableWidgetItem = self.itemAt(e.pos())
         if item:
             text: str = item.text()
-            pix = Func.getTrackingPix(text)
+            pix = self.getTrackingPix(text)
             data = QByteArray()
             stream = QDataStream(data, QIODevice.WriteOnly)
             stream.writeQString(text)
             mime_data = QMimeData()
-            mime_data.setData(Info.AttributesToLineEdit, data)
+            mime_data.setData(Info.AttributesToWidget, data)
             drag = QDrag(self)
             drag.setMimeData(mime_data)
             drag.setPixmap(pix)
             drag.setHotSpot(QPoint(12, 12))
             drag.exec()
+
+    @staticmethod
+    def getTrackingPix(text):
+        pix = QPixmap(200, 16)
+        pix.fill(QColor(0, 0, 0, 0))
+        painter = QPainter(pix)
+        painter.drawText(0, 0, 200, 16, Qt.TextSingleLine, text)
+        return pix

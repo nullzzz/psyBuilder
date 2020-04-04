@@ -37,7 +37,7 @@ class SoundProperty(QWidget):
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.tab, 6)
         # main_layout.addStretch(2)
-        main_layout.addWidget(below_layout, 1)
+        main_layout.addLayout(below_layout, 1)
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
 
@@ -57,10 +57,13 @@ class SoundProperty(QWidget):
         self.duration.setAttributes(attributes)
 
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
+        self.general.setProperties(properties.get("General"))
+        self.duration.setProperties(properties.get("Duration"))
+
+    def updateInfo(self):
+        self.general.updateInfo()
+        self.duration.updateInfo()
 
     def loadSetting(self):
-        self.general.setProperties(self.default_properties)
-        self.duration.setProperties(self.default_properties)
+        self.general.loadSetting()
+        self.duration.loadSetting()
