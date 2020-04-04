@@ -42,8 +42,6 @@ class CycleTable(TableWidget):
         self.linkSignals()
         # set menu and shortcut
         self.setMenuAndShortcut()
-        # I can't do anything about this bug.
-        self.setEditTriggers(QAbstractItemView.DoubleClicked)
 
     def linkSignals(self):
         """

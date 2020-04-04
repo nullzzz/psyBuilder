@@ -1,9 +1,9 @@
 from PyQt5.QtCore import QSize, pyqtProperty, QTimer, Qt
 from PyQt5.QtGui import QColor, QPainter
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QDialog
 
 
-class WaitDialog(QWidget):
+class WaitDialog(QDialog):
     Color = QColor(0, 0, 0)
     Clockwise = True
     Delta = 36
@@ -15,6 +15,7 @@ class WaitDialog(QWidget):
         self._timer.start(1)
         self.setStyleSheet("background:transparent")
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setModal(True)
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint | Qt.CustomizeWindowHint)
         self.setFixedHeight(36)
         self.setFixedWidth(36)
