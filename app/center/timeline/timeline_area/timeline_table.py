@@ -95,11 +95,14 @@ class TimelineTable(TableWidget):
         @return:
         """
         try:
-            widget_id = self.cellWidget(self.currentRow(), self.currentColumn()).widget_id
-            # emit signal
-            self.itemDeleted.emit(widget_id)
-            # delete column
-            self.deleteItem(widget_id)
+            if self.selectedIndexes():
+                row = self.selectedIndexes()[0].row()
+                col = self.selectedIndexes()[0].column()
+                widget_id = self.cellWidget(row, col).widget_id
+                # emit signal
+                self.itemDeleted.emit(widget_id)
+                # delete column
+                self.deleteItem(widget_id)
         except:
             pass
 
@@ -132,7 +135,7 @@ class TimelineTable(TableWidget):
         @return:
         """
         item = QTableWidgetItem("")
-        item.setFlags(Qt.ItemIsSelectable)
+        item.setFlags(Qt.ItemIsEnabled)
         self.setItem(row, col, item)
 
     def setArrow(self, col: int, image_path: str, width: int = Width):
@@ -147,6 +150,7 @@ class TimelineTable(TableWidget):
         label = QLabel()
         label.setPixmap(Func.getImageObject(image_path))
         label.setFocusPolicy(Qt.NoFocus)
+        label.setStyleSheet("background: white;")
         self.setCellWidget(self.arrow_row, col, label)
 
     def addItem(self, widget_type: str = None, widget_id: str = None, widget_name: str = None, index: int = 0) -> (
@@ -196,24 +200,14 @@ class TimelineTable(TableWidget):
         index = self.itemIndexByWidgetId(widget_id)
         # delete
         if index != -1:
-            # we need animation, you can cancel it.
-            # if index != self.item_count - 1:
-            #     self.startMoveToPreAnimation(index + 1)
-
             # if item count is greater than the initial length, we should delete arrow line
-            if self.item_count > TimelineTable.InitialArrowLength - 2:
-                self.removeColumn(index)
-            else:
+            if self.item_count <= TimelineTable.InitialArrowLength - 2:
                 self.insertColumn(TimelineTable.InitialArrowLength - 2)
-                self.setUnselectableItem(self.top_row, TimelineTable.InitialArrowLength - 1)
-                self.setUnselectableItem(self.item_row, TimelineTable.InitialArrowLength - 1)
+                self.setUnselectableItem(self.top_row, TimelineTable.InitialArrowLength - 2)
+                self.setUnselectableItem(self.item_row, TimelineTable.InitialArrowLength - 2)
                 self.setArrow(TimelineTable.InitialArrowLength - 2, "timeline/line.png")
                 self.setUnselectableItem(self.name_row, TimelineTable.InitialArrowLength - 2)
-                # self.takeItem(self.top_row, index)
-                # self.takeItem(self.item_row, index)
-                # self.takeItem(self.arrow_row, index)
-                # self.takeItem(self.name_row, index)
-                self.removeColumn(index)
+            self.removeColumn(index)
             # change data
             self.item_count -= 1
 
@@ -226,6 +220,8 @@ class TimelineTable(TableWidget):
         widget_name = self.item(self.name_row, origin_index).text()
         # delete old
         self.deleteItem(widget_id)
+        if origin_index < dest_index:
+            dest_index -= 1
         # add new
         _, _, dest_index = self.addItem(widget_id=widget_id, widget_name=widget_name, index=dest_index)
         return widget_id, dest_index

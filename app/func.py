@@ -542,6 +542,4 @@ class Func(object):
             return False
         cycle_2_wid = parent_timeline_node.parent().widget_id
         # 父cycle是否相同
-        if cycle_1_wid == cycle_2_wid:
-            return True
-        return False
+        return Func.getWidgetName(cycle_1_wid) == Func.getWidgetName(cycle_2_wid)

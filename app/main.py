@@ -2,12 +2,12 @@ import os
 import re
 import traceback
 
-from PyQt5.QtCore import Qt, QSettings, QPropertyAnimation
-from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog
+from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation
+from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPalette, QFontMetrics
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QLabel, QGridLayout, \
+    QVBoxLayout, QPushButton, QWidget, QTextEdit, QFrame, QMenu
 
-from app.menubar.aboutUs import AboutUs
-from lib import MessageBox, WaitDialog
+from lib import MessageBox, WaitDialog, Settings
 from .attributes import Attributes
 from .center import Center
 from .center.condition import IfBranch, Switch
@@ -27,7 +27,7 @@ from .structure import Structure
 
 class Psy(QMainWindow):
     def __init__(self):
-        super(Psy, self).__init__()
+        super(Psy, self).__init__(None)
         # title and icon
         self.setWindowTitle("Psy Builder 0.1")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
@@ -39,17 +39,19 @@ class Psy(QMainWindow):
         self.wait_dialog = WaitDialog()
         # save init state to restore the variable environment to its initial state
         # without any widgets even Timeline_0
-        if not os.path.exists(Info.Init_File):
-            self.store(Info.Init_File, False)
+        if not os.path.exists(Info.InitFile):
+            self.store(Info.InitFile, False)
         # load config
         Info.Psy = self
-        Info.FILE_NAME = QSettings("config.ini", QSettings.IniFormat).value("file_path", "")
-        Info.FILE_DIRECTORY = QSettings("config.ini", QSettings.IniFormat).value("file_directory", "")
+        Info.FILE_NAME = Settings("config.ini", Settings.IniFormat).value("file_path", "")
+        Info.FILE_DIRECTORY = Settings("config.ini", Settings.IniFormat).value("file_directory", "")
         # if file name not none, we restore data from this file
         if Info.FILE_NAME:
             if not self.restore(Info.FILE_NAME):
                 self.clear()
-                Func.print("The file you selected may be damaged, please try to restart the software.", 2)
+                Func.print(
+                    f"The file {Info.FILE_NAME} you selected may be damaged, please check whether the file is correct.",
+                    2)
         else:
             # we init initial timeline => Timeline_0
             self.initInitialTimeline()
@@ -60,12 +62,18 @@ class Psy(QMainWindow):
         """
         menubar = self.menuBar()
         # file menu
-        file_menu = menubar.addMenu("File")
+        file_menu: QMenu = menubar.addMenu("File")
         file_menu.addAction("New", self.newFile, QKeySequence(QKeySequence.New))
         file_menu.addAction("Open", self.openFile, QKeySequence(QKeySequence.Open))
         file_menu.addAction("Save", self.saveFile, QKeySequence(QKeySequence.Save))
         file_menu.addAction("Save As", self.saveAsFile, QKeySequence(QKeySequence.SaveAs))
-
+        file_menu.addSeparator()
+        open_mode_menu: QMenu = file_menu.addMenu("Open Mode")
+        self.default_mode_action = open_mode_menu.addAction("Default Mode", lambda: self.changeOpenMode("default mode"))
+        self.open_blank_file_action = open_mode_menu.addAction("Open Blank File",
+                                                               lambda: self.changeOpenMode("open blank file"))
+        open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
+        self.changeOpenMode(open_mode)
         # view menu
         view_menu = menubar.addMenu("&View")
         self.attribute_action = QAction("&Attribute", self)
@@ -169,7 +177,6 @@ class Psy(QMainWindow):
         build_menu.addAction(compile_action)
 
         # help menu
-        self.about_us = AboutUs()
         help_menu = menubar.addMenu("&Help")
         reg_action = QAction("&Registry", self)
         about_action = QAction("&About Us", self)
@@ -177,7 +184,7 @@ class Psy(QMainWindow):
         check_for_update = QAction("&Check for updates", self)
 
         reg_action.triggered.connect(self.registry)
-        about_action.triggered.connect(self.about_us.show)
+        about_action.triggered.connect(self.aboutUs)
         about_Qt_action.triggered.connect(QApplication.instance().aboutQt)
         check_for_update.triggered.connect(self.checkUpdate)
 
@@ -228,40 +235,50 @@ class Psy(QMainWindow):
         QApplication.processEvents()
         widget = None
         QApplication.processEvents()
-        if widget_type == Info.TIMELINE:
-            widget = Timeline(widget_id, widget_name)
-        elif widget_type == Info.IF:
-            widget = IfBranch(widget_id, widget_name)
-        elif widget_type == Info.SWITCH:
-            widget = Switch(widget_id, widget_name)
-        elif widget_type == Info.CYCLE:
-            widget = Cycle(widget_id, widget_name)
-        elif widget_type == Info.IMAGE:
-            widget = ImageDisplay(widget_id, widget_name)
-        elif widget_type == Info.VIDEO:
-            widget = VideoDisplay(widget_id, widget_name)
-        elif widget_type == Info.TEXT:
-            widget = TextDisplay(widget_id, widget_name)
-        elif widget_type == Info.SOUND:
-            widget = SoundDisplay(widget_id, widget_name)
-        elif widget_type == Info.SLIDER:
-            widget = Slider(widget_id, widget_name)
-        elif widget_type == Info.CALIBRATION:
-            widget = EyeCalibrate(widget_id, widget_name)
-        elif widget_type == Info.ENDR:
-            widget = EndR(widget_id, widget_name)
-        elif widget_type == Info.OPEN:
-            widget = Open(widget_id, widget_name)
-        elif widget_type == Info.DC:
-            widget = EyeDC(widget_id, widget_name)
-        elif widget_type == Info.STARTR:
-            widget = StartR(widget_id, widget_name)
-        elif widget_type == Info.LOG:
-            widget = Close(widget_id, widget_name)
-        elif widget_type == Info.QUEST_UPDATE:
-            widget = QuestUpdate(widget_id, widget_name)
-        else:
-            pass
+        try:
+            if widget_type == Info.TIMELINE:
+                widget = Timeline(widget_id, widget_name)
+            elif widget_type == Info.IF:
+                widget = IfBranch(widget_id, widget_name)
+            elif widget_type == Info.SWITCH:
+                widget = Switch(widget_id, widget_name)
+            elif widget_type == Info.CYCLE:
+                widget = Cycle(widget_id, widget_name)
+            elif widget_type == Info.IMAGE:
+                widget = ImageDisplay(widget_id, widget_name)
+            elif widget_type == Info.VIDEO:
+                widget = VideoDisplay(widget_id, widget_name)
+            elif widget_type == Info.TEXT:
+                widget = TextDisplay(widget_id, widget_name)
+            elif widget_type == Info.SOUND:
+                widget = SoundDisplay(widget_id, widget_name)
+            elif widget_type == Info.SLIDER:
+                widget = Slider(widget_id, widget_name)
+            elif widget_type == Info.ACTION:
+                widget = EyeAction(widget_id, widget_name)
+            elif widget_type == Info.CALIBRATION:
+                widget = EyeCalibrate(widget_id, widget_name)
+            elif widget_type == Info.ENDR:
+                widget = EndR(widget_id, widget_name)
+            elif widget_type == Info.OPEN:
+                widget = Open(widget_id, widget_name)
+            elif widget_type == Info.DC:
+                widget = EyeDC(widget_id, widget_name)
+            elif widget_type == Info.STARTR:
+                widget = StartR(widget_id, widget_name)
+            elif widget_type == Info.LOG:
+                widget = Close(widget_id, widget_name)
+            elif widget_type == Info.QUEST_INIT:
+                widget = QuestInit(widget_id, widget_name)
+            elif widget_type == Info.QUEST_UPDATE:
+                widget = QuestUpdate(widget_id, widget_name)
+            elif widget_type == Info.QUEST_GET_VALUE:
+                widget = QuestGetValue(widget_id, widget_name)
+            else:
+                # if fail to create widget, exit.
+                exit()
+        except Exception as e:
+            raise Exception(f"create {widget_type} fail => widget_id: {widget_id}, widget_name: {widget_name}")
         # change data set in Kernel
         QApplication.processEvents()
         Info.Widgets[widget_id] = widget
@@ -350,7 +367,7 @@ class Psy(QMainWindow):
         # start wait
         self.startWait()
         # do job
-        # add node in origin parent node firstly
+        # add node in origin parent node firstly, because some widgets need to get attributes in __init__ function.
         show = True
         if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
             show = False
@@ -647,8 +664,8 @@ class Psy(QMainWindow):
                                                             QFileDialog.ShowDirsOnly)
         if file_directory:
             # change config
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_path", "")
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", file_directory)
+            Settings("config.ini", Settings.IniFormat).setValue("file_path", "")
+            Settings("config.ini", Settings.IniFormat).setValue("file_directory", file_directory)
             # reset this software
             self.reset()
             Info.FILE_NAME = ""
@@ -671,19 +688,19 @@ class Psy(QMainWindow):
                 # store data to file
                 if self.store(file_path):
                     # change config
-                    QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-                    QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+                    Settings("config.ini", Settings.IniFormat).setValue("file_path", file_path)
+                    Settings("config.ini", Settings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
                     Info.FILE_NAME = file_path
                     Info.FILE_DIRECTORY = os.path.dirname(file_path)
                     # add file_path into file_paths
-                    file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+                    file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
                     if file_path not in file_paths:
                         file_paths.insert(0, file_path)
                     else:
                         # move it to first
                         file_paths.remove(file_path)
                         file_paths.insert(0, file_path)
-                    QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+                    Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
 
     def saveAsFile(self):
         """
@@ -701,14 +718,14 @@ class Psy(QMainWindow):
             # just store
             if self.store(file_path):
                 # add file_path into file_paths
-                file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
+                file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
                 if file_path not in file_paths:
                     file_paths.insert(0, file_path)
                 else:
                     # move it to first
                     file_paths.remove(file_path)
                     file_paths.insert(0, file_path)
-                QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
+                Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
 
     def openFile(self):
         """
@@ -716,34 +733,27 @@ class Psy(QMainWindow):
         """
         file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.getcwd(), "Psy File (*.psy)")
         if file_path:
-            # change config
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_path", file_path)
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
-            file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
-            if file_path not in file_paths:
-                file_paths.insert(0, file_path)
-            else:
-                # move it to first
-                file_paths.remove(file_path)
-                file_paths.insert(0, file_path)
-            # add file_path into file_paths
-            file_paths = QSettings("config.ini", QSettings.IniFormat).value("file_paths", [])
-            if file_path not in file_paths:
-                file_paths.insert(0, file_path)
-            else:
-                # move it to first
-                file_paths.remove(file_path)
-                file_paths.insert(0, file_path)
-            QSettings("config.ini", QSettings.IniFormat).setValue("file_paths", file_paths)
             # store current state
-            self.store("temp.ini", False)
+            self.store(Info.TempFile, False)
             # clear software
             self.clear()
             # restore data from opening file
             if not self.restore(file_path):
                 # if store failed, restore to latest state
-                self.restore("temp.ini", False)
+                self.restore(Info.TempFile, False)
             else:
+                # change config
+                Settings("config.ini", Settings.IniFormat).setValue("file_path", file_path)
+                Settings("config.ini", Settings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+                # add file_path into file_paths
+                file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
+                if file_path not in file_paths:
+                    file_paths.insert(0, file_path)
+                else:
+                    # move it to first
+                    file_paths.remove(file_path)
+                    file_paths.insert(0, file_path)
+                Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
                 Info.FILE_NAME = file_path
                 Info.FILE_DIRECTORY = os.path.dirname(file_path)
 
@@ -752,7 +762,7 @@ class Psy(QMainWindow):
         store data to file
         """
         try:
-            setting = QSettings(file_path, QSettings.IniFormat)
+            setting = Settings(file_path, Settings.IniFormat)
             # some data in Info save to file directly
             setting.setValue("Names", Info.Names)
             setting.setValue("WidgetTypeCount", Info.WidgetTypeCount)
@@ -773,13 +783,13 @@ class Psy(QMainWindow):
             structure = self.structure.store()
             setting.setValue("Structure", structure)
             # tabs
-            tabs = self.center.store()
-            setting.setValue("Tabs", tabs)
+            # tabs = self.center.store()
+            # setting.setValue("Tabs", tabs)
             if show:
-                Func.print("File successfully saved.", 1)
+                Func.print(f"File '{file_path}' saved successfully.", 1)
             return True
         except Exception as e:
-            Func.print(f"Due to error {e}. File saving failed.", 2)
+            Func.print(f"Due to error {e}. File {file_path} saving failed.", 2)
             return False
 
     def restore(self, file_path: str, show=True) -> bool:
@@ -787,11 +797,11 @@ class Psy(QMainWindow):
         restore data from file(it changes Info.FileName and Info.FILE_DIRECTORY
         """
         try:
-            setting = QSettings(file_path, QSettings.IniFormat)
+            setting = Settings(file_path, Settings.IniFormat)
         except:
             return False
         # restore data firstly
-        Info.Names = setting.value("Names", -1)
+        names = setting.value("Names", -1)
         Info.WidgetTypeCount = setting.value("WidgetTypeCount", -1)
         Info.WidgetNameCount = setting.value("WidgetNameCount", -1)
         Info.INPUT_DEVICE_INFO = setting.value("InputDeviceInfo", -1)
@@ -801,9 +811,9 @@ class Psy(QMainWindow):
         Info.SLIDER_COUNT = setting.value("SliderCount", -1)
         widgets_data = setting.value("Widgets", -1)
         structure = setting.value("Structure", -1)
-        tabs = setting.value("Tabs", -1)
+        # tabs = setting.value("Tabs", -1)
         # any one equal -1, fail
-        if Info.Names == -1 or \
+        if names == -1 or \
                 Info.WidgetTypeCount == -1 or \
                 Info.WidgetNameCount == -1 or \
                 Info.INPUT_DEVICE_INFO == -1 or \
@@ -812,31 +822,56 @@ class Psy(QMainWindow):
                 Info.TRACKER_DEVICE_INFO == -1 or \
                 Info.SLIDER_COUNT == -1 or \
                 widgets_data == -1 or \
-                structure == -1 or \
-                tabs == -1:
+                structure == -1:
+            if show:
+                Func.print(
+                    f"The file '{file_path}' you selected may be damaged, please check whether the file is correct.",
+                    2)
             return False
         # restore widgets: create origin widget and map to right widget ids
         try:
-            for widget_data in widgets_data:
-                widget_id, widget_name = re.split("&", widget_data)
-                data = widgets_data[widget_data]
-                # create widget
-                widget = self.createWidget(widget_id, widget_name)
-                # restore widget
-                Info.Widgets[widget_id].restore(data)
-                # map widget
-                for widget_id in Info.Names[widget_name]:
-                    Info.Widgets[widget_id] = widget
             # restore structure
             self.structure.restore(structure)
+            # restore widgets according to structure, because some widget need to get attributes in __init__ function
+            root_widget_id, root_widget_name, children = structure
+            created_widgets = {}
+            self.restoreWidget(names, widgets_data, created_widgets, root_widget_id, root_widget_name, children)
+            # restore Info.Name
+            Info.Names = names
             # restore tabs
-            self.center.restore(tabs)
+            # self.center.restore(tabs)
+            self.center.openTab(f"{Info.TIMELINE}.0")
             if show:
-                Func.print("File loaded successfully.", 1)
+                Func.print(f"File '{file_path}' loaded successfully.", 1)
             return True
         except Exception as e:
-            Func.print(f"Due to error '{e}', the file failed to load.", 2)
+            Func.print(f"Due to error '{e}', the file {file_path} failed to load.", 2)
             return False
+
+    def restoreWidget(self, names: dict, widgets_data: dict, created_widgets: dict, widget_id: str, widget_name: str,
+                      children: list):
+        """
+        restore all widgets (dfs) according to structure, because some widget need to get attributes in __init__ function
+        """
+        # we just store origin widgets data.
+        # create or map widget firstly
+        if widget_name not in created_widgets:
+            # create widget
+            widget = self.createWidget(widget_id, widget_name)
+            # restore widget data
+            widget.restore(widgets_data[f"{names[widget_name][0]}&{widget_name}"])
+            # log in created widgets
+            created_widgets[widget_name] = widget
+        else:
+            # widget has been created, map firstly
+            widget = created_widgets[widget_name]
+            Info.Widgets[widget_id] = widget
+            if widget_id == names[widget_name][0]:
+                # if this is origin widget, change widget's widget id
+                widget.changeWidgetId(widget_id)
+        # handle its children
+        for child_widget_id, child_widget_name, child_children in children:
+            self.restoreWidget(names, widgets_data, created_widgets, child_widget_id, child_widget_name, child_children)
 
     def reset(self):
         """
@@ -844,7 +879,7 @@ class Psy(QMainWindow):
         :return:
         """
         self.clear()
-        self.restore(Info.Init_File, False)
+        self.restore(Info.InitFile, False)
         self.initInitialTimeline()
 
     def setDockView(self, checked):
@@ -862,6 +897,22 @@ class Psy(QMainWindow):
             self.properties.setVisible(self.properties.isHidden())
         elif dock == "output":
             self.output.setVisible(self.output.isHidden())
+
+    def changeOpenMode(self, mode: str):
+        """
+        change open mode in config and menu
+        """
+        # config
+        Settings("config.ini", Settings.IniFormat).setValue("open_mode", mode)
+        # menu
+        mode = ("default mode" == mode)
+        checked_icon = Func.getImageObject("menu/checked", 1)
+        if mode:
+            self.default_mode_action.setIcon(checked_icon)
+            self.open_blank_file_action.setIcon(QIcon(""))
+        else:
+            self.default_mode_action.setIcon(QIcon(""))
+            self.open_blank_file_action.setIcon(checked_icon)
 
     def checkVisible(self, is_visible):
         """
@@ -928,8 +979,150 @@ class Psy(QMainWindow):
             except Exception:
                 MessageBox.about(self, "Registry", "Registry Failed!")
 
+    def aboutWidget_ok(self):
+        self.aboutWidget.close()
+
+    def aboutUs(self):
+        # todo: you'd better build this widget in a single python file
+        self.aboutWidget = QWidget()
+        self.aboutWidget.setWindowTitle("About developers of PTB Builder 0.1")
+        self.aboutWidget.setWindowModality(2)
+        self.aboutWidget.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.aboutWidget.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
+
+        self.aboutWidget.setAutoFillBackground(True)
+        p = self.palette()
+        p.setColor(QPalette.Background, Qt.white)
+        self.aboutWidget.setPalette(p)
+
+        # introLab = QLabel(self)
+        te01 = QTextEdit(self)
+
+        img00 = QLabel(self)
+        lab01 = QLabel(self)
+
+        img10 = QLabel(self)
+        lab11 = QLabel(self)
+
+        img20 = QLabel(self)
+        lab21 = QLabel(self)
+
+        closeButton = QPushButton('&Ok')
+
+        closeButton.clicked.connect(self.aboutWidget_ok)
+        closeButton.setAutoDefault(True)
+
+        te01.setReadOnly(True)
+        te01.setFrameShape(QFrame.NoFrame)
+        # te01.setAlignment(Union,)
+        te01.setHtml("<b>PTB Builder (ver 0.1)</b> for Psychtoolbox 3 under MATLAB "
+                     "was developed by the group leaded by Prof. "
+                     "<a style='color: blue;' href=\"http://web.suda.edu.cn/yzhangpsy/index.html\">Yang Zhang</a> "
+                     "at Attention and Perception lab at Soochow university, Suzhou, China. "
+                     "<br><br><b>PTB Builder 0.1</b> are provided as is, and no warranty for their "
+                     "correctness or usefulness for any purpose is made or implied by "
+                     "the authors of the software, or by anyone else. This software "
+                     "is designed for research purposes only and not allowed to be used "
+                     "for any business purpose (e.g., but not limited to, business training)."
+                     )
+
+        te01.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        te01.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        te01.setFixedHeight(QFontMetrics(te01.font()).lineSpacing() * 11)
+        # te01.setFixedHeight(te01.document().size().toSize().height())
+
+        '''
+        introLab.setAlignment(Qt.AlignCenter|Qt.AlignJustify)
+        introLab.setOpenExternalLinks(True)
+        # introLab.setWordWrap(True)
+        introLab.setText("<p style='margin:5px'><b>PTB Builder (ver 0.1)</b> for Psychtoolbox 3 under MATLAB</p>"
+                         "<p style='margin:5px'>was developed by the group leaded by Prof. "
+        "<a style='color: blue;' href=\"http://web.suda.edu.cn/yzhangpsy/index.html\">Yang Zhang</a></p>"
+                         "<p style='margin:8px'>at Attention and Perception lab at Soochow university</p>"
+                         )
+        # text - decoration: none;
+        '''
+
+        img00.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        lab01.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        img00.setPixmap(QPixmap(Func.getImage("authorInfo01.png")))
+        lab01.setTextFormat(Qt.RichText)
+        lab01.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        lab01.setOpenExternalLinks(True)
+        lab01.setText("Yang Zhang (张阳), Ph.D, Prof.<br>Department of Psychology, Soochow University"
+                      "<br><a href='mailto:yzhangpsy@suda.edu.cn?Subject= Inquire about the usage of PTB Builder 0.1'>yzhangpsy@suda.edu.cn</a>")
+
+        img10.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        lab11.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        lab11.setText("Zhe Yang, Ph.D, Associate Prof. \n Department of computer science, Soochow University")
+        img10.setPixmap(QPixmap(Func.getImage("authorInfo02.png")))
+
+        img20.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        lab21.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        lab21.setText("ChenZhi Feng, Ph.D, Prof. \n Department of Psychology, Soochow University")
+        img20.setPixmap(QPixmap(Func.getImage("authorInfo03.png")))
+
+        layout0 = QVBoxLayout()
+        layout0.addWidget(te01)
+        # layout0.addWidget(introLab)
+
+        layout1 = QGridLayout()
+        layout1.addWidget(img00, 0, 0)
+        layout1.addWidget(lab01, 0, 1)
+
+        layout1.addWidget(img10, 1, 0)
+        layout1.addWidget(lab11, 1, 1)
+
+        layout1.addWidget(img20, 2, 0)
+        layout1.addWidget(lab21, 2, 1)
+
+        layout2 = QVBoxLayout()
+        layout2.addWidget(closeButton)
+        layout2.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
+
+        layout = QVBoxLayout()
+
+        layout.addLayout(layout0)
+        layout.addSpacing(20)
+        # layout.addStretch(20)
+        layout.addLayout(layout1)
+        layout.addStretch(10)
+        layout.addLayout(layout2)
+
+        self.aboutWidget.setLayout(layout)
+        self.aboutWidget.setMinimumWidth(400)
+        self.aboutWidget.show()
+
+        # print(f"{te01.document().size().toSize().height()}****")
+
+        # te01.setFixedHeight(te01.document().size().toSize().height())
+        # print(f"{QFontMetrics(te01.font()).lineSpacing()}..")
+        # print(f"{te01.document().size().toSize().height()}")
+
+        # self.gridGroupBox.setLayout(aboutUsBox)
+        # self.gridGroupBox.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        # self.gridGroupBox.setWindowTitle("About the authors")
+        # self.gridGroupBox.setWindowModality(2)
+        #
+        # self.gridGroupBox.show()
+
+        # MessageBox.about(self, "About PTB Builder 0.1",
+        #                   "A free GUI to generate experimental codes for PTB\nDepartment of Psychology,Soochow University ")
+
     def checkUpdate(self):
-        pass
+        self.bar = LoadingTip()
+        self.bar.setWindowModality(Qt.ApplicationModal)
+        self.bar.show()
+        self.t = QTimer()
+        self.t.timeout.connect(self.re)
+        self.t.start(100)
+
+    def re(self):
+        self.bar.changeValue()
+        self.bar.update()
+        if self.bar.bar.value == 100:
+            self.t.stop()
+            self.bar.close()
 
     def startWait(self):
         """
@@ -958,7 +1151,7 @@ class Psy(QMainWindow):
         # attributes
         self.attributes.clear()
         # output
-        self.output.clear()
+        # self.output.clear()
         # Info's data
         Info.PLATFORM = "linux"
         Info.IMAGE_LOAD_MODE = "before_event"

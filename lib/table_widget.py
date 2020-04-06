@@ -29,3 +29,13 @@ class TableWidget(QTableWidget):
         super(TableWidget, self).__init__(parent)
         # clear dash
         self.setItemDelegate(NoDash())
+        # set header's background color
+        self.setStyleSheet("""
+            QHeaderView::section {
+                background:rgb(236,236,236);
+                border: 1px solid rgb(189,189,189);
+            }
+            QHeaderView::section:hover {
+                background:rgb(191,191,191);
+            }
+        """)
