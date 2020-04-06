@@ -381,7 +381,7 @@ class VideoDisplay(TabItemMainWindow):
 
 # 支持全屏显示
 class VideoWidget(QVideoWidget):
-    play_and_pause = pyqtSignal(int)
+    play_and_pause = pyqtSignal()
 
     def __init__(self, parent=None):
         super(VideoWidget, self).__init__(parent)

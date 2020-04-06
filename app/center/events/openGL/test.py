@@ -5,7 +5,7 @@ from PyQt5.QtGui import QPainter
 from PyQt5.QtOpenGL import QGLFormat, QGLWidget, QGL
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsView, QApplication
 
-from app.center.events.Slider.item.openglItem import GLItem
+from app.center.events.slider.item.openglItem import GLItem
 
 
 class Win(QMainWindow):

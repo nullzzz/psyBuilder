@@ -1,6 +1,8 @@
+import copy
+
 b = {
     "B1": 2,
-    "B2": 3,
+    "B2": (12, 23),
 }
 old = {
     "A": 1,
@@ -17,6 +19,10 @@ new = {
     "C": 5
 }
 
-old.update(new)
-print(old)
 print(b)
+c = copy.deepcopy(b)
+print(c)
+# c["B2"].append(231231)
+print(id(b["B2"]))
+print(id(c["B2"]))
+print(c)

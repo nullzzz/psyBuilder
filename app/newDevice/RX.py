@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QSize, pyqtSignal
+from PyQt5.QtCore import QSize, pyqtSignal, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
     QPushButton, QInputDialog, QLineEdit, QMessageBox
@@ -18,6 +18,7 @@ class RX(QWidget):
 
     def __init__(self, device_type: int = 0, parent=None):
         super(RX, self).__init__(parent)
+        self.setWindowModality(Qt.ApplicationModal)
 
         if True:
             # 上方待选择设备
@@ -54,11 +55,13 @@ class RX(QWidget):
 
         # device_list是写死的
         if device_type == Info.OUTPUT_DEVICE:
+            # default device
             self.selected_devices.createDevice("screen")
             Info.OUTPUT_DEVICE_INFO = self.default_properties
             self.devices = ("serial_port", "parallel_port", "network_port", "screen", "sound")
             self.setWindowTitle("Output Devices")
         elif device_type == Info.INPUT_DEVICE:
+            # default devices
             self.selected_devices.createDevice("mouse")
             self.selected_devices.createDevice("keyboard")
             Info.INPUT_DEVICE_INFO = self.default_properties

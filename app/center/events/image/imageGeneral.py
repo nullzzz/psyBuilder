@@ -22,7 +22,7 @@ class ImageTab1(QWidget):
             "Back Color": "white",
             "Transparent": "100%",
             "Clear After": "Yes",
-            "Screen Name": "screen.0"
+            "Screen Name": "screen_0"
         }
         # 打开文件
         self.file_name = VarLineEdit()
@@ -93,10 +93,6 @@ class ImageTab1(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        """
-        update completer and device information.
-        :return:
-        """
         self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen_name.clear()

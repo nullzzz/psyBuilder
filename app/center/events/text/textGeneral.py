@@ -98,8 +98,8 @@ class TextTab1(QWidget):
         l30 = QLabel("Transparent:")
         l32 = QLabel("Wrapat Chars:")
 
-        l40 = QLabel("flip Horizontal:")
-        l42 = QLabel("flip Vertical:")
+        l40 = QLabel("Flip Horizontal:")
+        l42 = QLabel("Flip Vertical:")
 
         l50 = QLabel("Font Family:")
         l52 = QLabel("Style:")
@@ -127,7 +127,7 @@ class TextTab1(QWidget):
 
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
-        self.screen.addItems(["screen.0"])
+        self.screen.addItems(["screen_0"])
 
         group1 = QGroupBox("Text")
         layout1 = QGridLayout()

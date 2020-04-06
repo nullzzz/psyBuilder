@@ -1,5 +1,3 @@
-from PyQt5.QtCore import Qt
-
 from app.newDevice.RX import RX
 from app.newDevice.describer import Tracker, Action
 
@@ -10,13 +8,6 @@ class TianBianYiDuoYun:
         self.output = RX(1)
         self.quest = RX(2)
         self.tracker = RX(3)
-
-        self.input.setWindowModality(Qt.ApplicationModal)
-        self.output.setWindowModality(Qt.ApplicationModal)
-        self.quest.setWindowModality(Qt.ApplicationModal)
-        self.tracker.setWindowModality(Qt.ApplicationModal)
-
-        # init
 
         # now we just handle this one.
         self.output.deviceOK.connect(self.updateSimpleInfo)

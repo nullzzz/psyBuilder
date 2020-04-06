@@ -51,7 +51,6 @@ class DurationPage(QWidget):
         return self.default_properties
 
     def getProperties(self):
-        self.updateInfo()
         return {"Duration": self.duration.currentText()}
 
     # 设置参数

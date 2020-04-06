@@ -56,10 +56,6 @@ class SoundTab1(QWidget):
         self.stop_offset = VarLineEdit("0")
         self.repetitions = VarLineEdit("1")
 
-        self.sound = VarComboBox()
-        self.sound.currentTextChanged.connect(self.changeDevice)
-        self.using_device_id = ""
-
         self.using_sound_id: str = ""
         self.sound = VarComboBox()
         self.sound_info = Func.getDeviceInfo("sound")
@@ -212,9 +208,6 @@ class SoundTab1(QWidget):
         if file_name:
             self.file_name.setText(file_name)
 
-    def changeDevice(self, device_name):
-        self.using_device_id = Func.getDeviceIdByName(device_name)
-
     def volumeChecked(self, e):
         if e == 2:
             self.volume.setEnabled(True)
@@ -234,17 +227,6 @@ class SoundTab1(QWidget):
         else:
             self.clear_after.setEnabled(False)
             self.screen_name.setEnabled(False)
-
-    def setSound(self, sound: list):
-        selected = self.sound.currentText()
-        self.sound.clear()
-        self.sound.addItems(sound)
-        if selected in sound:
-            self.sound.setCurrentText(selected)
-        else:
-            new_name = Func.getDeviceNameById(self.using_device_id)
-            if new_name:
-                self.sound.setCurrentText(new_name)
 
     def setAttributes(self, attributes: list):
         self.file_name.setCompleter(QCompleter(attributes))

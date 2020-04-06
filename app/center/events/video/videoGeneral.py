@@ -138,9 +138,9 @@ class VideoTab1(QWidget):
             self.stretch_mode.setEnabled(False)
 
     def setAttributes(self, attributes):
-        self.file_name.setCompleter(QCompleter(self.attributes))
-        self.start_pos.setCompleter(QCompleter(self.attributes))
-        self.end_pos.setCompleter(QCompleter(self.attributes))
+        self.file_name.setCompleter(QCompleter(attributes))
+        self.start_pos.setCompleter(QCompleter(attributes))
+        self.end_pos.setCompleter(QCompleter(attributes))
 
     def updateInfo(self):
         self.default_properties["File Name"] = self.file_name.text()

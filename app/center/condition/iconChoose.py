@@ -43,7 +43,7 @@ class IconChoose(QWidget):
             "Video": "",
             "Text": "",
             "Sound": "",
-            "Slider": "",
+            "slider": "",
         }
 
         self.default_properties: dict = {

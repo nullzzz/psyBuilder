@@ -55,7 +55,7 @@ class Info(object):
     TEXT = "Text"
     IMAGE = "Image"
     VIDEO = "Video"
-    SLIDER = "Slider"
+    SLIDER = "slider"
     BUG = "Bug"
 
     OPEN = "Open"

@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt, QSettings, QPropertyAnimation
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog
 
-from app.aboutUs import AboutUs
+from app.menubar.aboutUs import AboutUs
 from lib import MessageBox, WaitDialog
 from .attributes import Attributes
 from .center import Center
