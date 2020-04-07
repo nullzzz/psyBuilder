@@ -83,9 +83,7 @@ class Switch(TabItemWidget):
         self.default_properties["Switch"] = properties.get("Switch")
 
     def restore(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
+        self.setProperties(properties)
 
     def loadSetting(self):
         self.switch_area.setProperties(self.default_properties.get("Switch", ""))
