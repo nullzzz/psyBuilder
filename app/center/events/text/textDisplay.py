@@ -14,6 +14,7 @@ class TextDisplay(TabItemMainWindow):
         self.text_label = QTextEdit()
 
         self.pro_window = TextProperty()
+        self.default_properties = self.pro_window.default_properties
 
         self.html = self.pro_window.html
         self.font = self.pro_window.font

@@ -28,43 +28,35 @@ class Case(QGroupBox):
                 self.index = int(c)
                 break
 
-        # case的值
-        self.value: str = ""
-
-        self.attributes: list = []
-
         # case
         self.values = VarComboBox()
         self.values.setEditable(True)
         self.values.setInsertPolicy(QComboBox.NoInsert)
-        self.values.currentTextChanged.connect(self.changeValue)
-        # icon choose
-        self.icon_choose = IconChoose(self)
-        self.widget_id = self.icon_choose.current_sub_wid
 
-        self.default_properties: dict = self.icon_choose.getInfo().copy()
-        self.default_properties["Case value"] = self.value
+        # icon choose
+        self.icon_choose = IconChoose()
+
+        self.default_properties: dict = self.icon_choose.default_properties
+        self.default_properties["Case Value"] = ""
 
         self.add_bt = AddDeleteButton(self, "add")
         self.add_bt.clicked.connect(lambda: self.addCase.emit(self.index))
         self.del_bt = AddDeleteButton(self, "delete")
         self.del_bt.clicked.connect(lambda: self.delCase.emit(self.index))
+        self.setUI()
 
-        self.grid_layout = QGridLayout(self)
+    def setUI(self):
+        grid_layout = QGridLayout()
         tip = QLabel("Value:")
         tip.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.grid_layout.addWidget(tip, 0, 0, 1, 1)
-        self.grid_layout.addWidget(self.values, 0, 1, 1, 5)
-        self.grid_layout.addWidget(self.icon_choose, 1, 0, 3, 5)
-        self.grid_layout.addWidget(self.add_bt, 4, 1, 1, 1)
-        self.grid_layout.addWidget(self.del_bt, 4, 3, 1, 1)
-        self.setLayout(self.grid_layout)
+        grid_layout.addWidget(tip, 0, 0, 1, 1)
+        grid_layout.addWidget(self.values, 0, 1, 1, 5)
+        grid_layout.addWidget(self.icon_choose, 1, 0, 3, 5)
+        grid_layout.addWidget(self.add_bt, 4, 1, 1, 1)
+        grid_layout.addWidget(self.del_bt, 4, 3, 1, 1)
+        self.setLayout(grid_layout)
 
         self.setMaximumHeight(300)
-
-    # todo 现有布局略丑
-    def setUI(self):
-        pass
 
     def setNotAdd(self, no=True):
         self.add_bt.setEnabled(not no)
@@ -72,32 +64,24 @@ class Case(QGroupBox):
     def setNotDel(self, no=True):
         self.del_bt.setEnabled(not no)
 
-    def getProperties(self):
-        self.default_properties.clear()
-        self.default_properties.update(self.icon_choose.getProperties())
-        self.default_properties["Case Value"] = self.value
+    def updateInfo(self):
+        self.icon_choose.updateInfo()
+        self.default_properties["Case Value"] = self.values.currentText()
+
+    def getInfo(self):
         return self.default_properties
-
-    def changeValue(self, new_value):
-        self.value = new_value
-
-    def loadSetting(self):
-        self.icon_choose.loadSetting()
-        self.values.setCurrentText(self.default_properties.get("Case value", ""))
 
     # 导入参数
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.icon_choose.setProperties(self.default_properties)
-            self.values.setCurrentText(self.default_properties.get("Case value", ""))
-        else:
-            print("No properties")
+        case_value = properties.get("Case Value")
+        self.values.setCurrentText(case_value)
 
-    def clone(self):
-        clone_case = Case(self.title())
-        clone_case.setProperties(self.default_properties)
-        return clone_case
+        properties.pop("Case Value")
+        self.icon_choose.setProperties(properties)
+
+    def loadSetting(self):
+        self.values.setCurrentText(self.default_properties.get("Case Value"))
+        self.icon_choose.loadSetting()
 
     # 以便在其之前插入新的case
     def changeTitle(self, new_title: str):
@@ -112,7 +96,6 @@ class Case(QGroupBox):
         self.setTitle(f"Case {self.index}")
 
     def setAttributes(self, attributes: list):
-        self.attributes = attributes
         self.values.addItems(attributes)
         self.values.setCompleter(QCompleter(attributes))
 

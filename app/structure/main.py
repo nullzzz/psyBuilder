@@ -45,6 +45,8 @@ class Structure(DockWidget):
         @param widget_name:
         @param index:
         @return:
+        :param show:
+        :type show:
         """
         # add node in tree
         self.structure_tree.addNode(parent_widget_id, widget_id, widget_name, index, show)

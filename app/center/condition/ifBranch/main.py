@@ -16,34 +16,30 @@ class IfBranch(TabItemWidget):
     }
 
     """
-    itemAdded = pyqtSignal(str, str, str, int)
-    itemDeleted = pyqtSignal(str)
+    itemAdded = pyqtSignal(str, str, str)
+    itemDeleted = pyqtSignal(int, str)
     itemNameChanged = pyqtSignal(str, str)
 
     def __init__(self, widget_id: str, widget_name: str):
         super(IfBranch, self).__init__(widget_id, widget_name)
 
-        self.attributes: list = []
-        self.using_attributes: list = []
-
         # 条件
         self.condition_area = ConditionArea()
         # 事件
-
         self.true_icon_choose = IconChoose()
-        self.true_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b, -1))
-        self.true_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(a))
+        self.true_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b))
+        self.true_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(3, a))
         self.true_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
 
         self.false_icon_choose = IconChoose()
-        self.false_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b, -1))
-        self.false_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(a))
+        self.false_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b))
+        self.false_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(3, a))
         self.false_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
 
         self.default_properties = {
-            "Condition": self.condition_area.getInfo(),
-            "Yes": self.true_icon_choose.getInfo(),
-            "No": self.false_icon_choose.getInfo()
+            "Condition": self.condition_area.default_properties,
+            "Yes": self.true_icon_choose.default_properties,
+            "No": self.false_icon_choose.default_properties
         }
 
         self.ok_button = QPushButton("OK")
@@ -52,9 +48,6 @@ class IfBranch(TabItemWidget):
         self.cancel_button.clicked.connect(self.cancel)
         self.apply_button = QPushButton("Apply")
         self.apply_button.clicked.connect(self.apply)
-
-        self.setAttributes(Func.getAttributes(self.widget_id))
-
         self.setUI()
 
     def setUI(self):
@@ -90,17 +83,21 @@ class IfBranch(TabItemWidget):
         layout.addLayout(buttons_layout, 1)
         self.setLayout(layout)
 
-    def getInfo(self):
-        self.default_properties["Condition"] = self.condition_area.getInfo()
-        self.default_properties["Yes"] = self.true_icon_choose.getInfo()
-        self.default_properties["No"] = self.false_icon_choose.getInfo()
-        return self.default_properties
+    def refresh(self):
+        self.true_icon_choose.refresh()
+        self.false_icon_choose.refresh()
+        self.setAttributes(Func.getAttributes(self.widget_id))
+
+    def updateInfo(self):
+        self.condition_area.updateInfo()
+        self.true_icon_choose.updateInfo()
+        self.false_icon_choose.updateInfo()
 
     def getProperties(self):
-        return self.getInfo()
+        self.refresh()
+        return self.default_properties
 
     def ok(self):
-
         self.apply()
         self.close()
         self.tabClosed.emit(self.widget_id)
@@ -109,28 +106,28 @@ class IfBranch(TabItemWidget):
         self.loadSetting()
 
     def apply(self):
-        self.getInfo()
+        self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
-    def refresh(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
-        self.getInfo()
-
     def setProperties(self, properties: dict):
-        self.default_properties = properties.copy()
+        self.condition_area.setProperties(properties.get("Condition"))
+        self.true_icon_choose.setProperties(properties.get("Yes"))
+        self.false_icon_choose.setProperties(properties.get("No"))
         self.loadSetting()
 
     def restore(self, properties: dict):
-        self.default_properties = properties.copy()
-        self.loadSetting()
+        self.setProperties(properties)
+
+    def store(self):
+        self.updateInfo()
+        return self.default_properties
 
     def loadSetting(self):
-        self.condition_area.setProperties(self.default_properties.get("Condition", {}))
-        self.true_icon_choose.setProperties(self.default_properties.get("Yes", {}))
-        self.false_icon_choose.setProperties(self.default_properties.get("No", {}))
+        self.condition_area.loadSetting()
+        self.true_icon_choose.loadSetting()
+        self.false_icon_choose.loadSetting()
 
     def clone(self, new_widget_id: str, new_widget_name: str):
         clone_widget = IfBranch(new_widget_id, new_widget_name)
@@ -144,14 +141,6 @@ class IfBranch(TabItemWidget):
         self.true_icon_choose.setAttributes(format_attributes)
         self.false_icon_choose.setAttributes(format_attributes)
 
-    def getHiddenAttribute(self):
-        """
-        :return:
-        """
-        hidden_attr = {}
-        if self.default_properties.get("Input devices"):
-            hidden_attr = {"onsettime": 0, "acc": 0, "resp": 0, "rt": 0}
-        return hidden_attr
 
     def getCondition(self) -> str:
         """
