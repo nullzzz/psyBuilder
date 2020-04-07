@@ -198,10 +198,8 @@ class VideoDisplay(TabItemMainWindow):
         self.pro_window.setAttributes(format_attributes)
 
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.pro_window.setProperties(self.default_properties)
-            self.apply()
+        self.pro_window.setProperties(properties)
+        self.apply()
 
     def loadSetting(self):
         self.pro_window.setProperties(self.default_properties)
@@ -359,22 +357,14 @@ class VideoDisplay(TabItemMainWindow):
         return necessary data for restoring this widget.
         @return:
         """
-        return self.getInfo()
+        return self.default_properties
 
-    def restore(self, properties):
-        """
-        restore this widget according to data.
-        @param data: necessary data for restoring this widget
-        @return:
-        """
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
+    def restore(self, properties: dict):
+        self.setProperties(properties)
 
     def clone(self, new_widget_id: str, new_widget_name):
         clone_widget = VideoDisplay(new_widget_id, new_widget_name)
-        clone_widget.setPro(self.pro_window.clone())
+        clone_widget.setProperties(self.default_properties.copy())
         clone_widget.apply()
         return clone_widget
 

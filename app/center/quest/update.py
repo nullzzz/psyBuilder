@@ -27,7 +27,6 @@ class QuestUpdate(TabItemWidget):
 
         self.using_quest_id = ""
 
-        self.resp = ""
         self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
@@ -98,7 +97,7 @@ class QuestUpdate(TabItemWidget):
 
     def setAttributes(self, attributes):
         attributes = [f"[{attribute}]" for attribute in attributes]
-        self.response_variable.setCompleter(QCompleter(self.attributes))
+        self.response_variable.setCompleter(QCompleter(attributes))
 
     def updateInfo(self):
         self.default_properties["Is Correct"] = self.response_variable.currentText()
@@ -132,7 +131,7 @@ class QuestUpdate(TabItemWidget):
 
     def clone(self, new_widget_id: str, new_widget_name):
         clone_widget = QuestUpdate(new_widget_id, new_widget_name)
-        clone_widget.setProperties(self.default_properties)
+        clone_widget.setProperties(self.default_properties.copy())
         return clone_widget
 
     def getResponseVariable(self) -> str:

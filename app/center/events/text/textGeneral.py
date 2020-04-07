@@ -24,6 +24,7 @@ class TextTab1(QWidget):
             "Clear After": "Yes"
         }
 
+        # todo: highlight of variable
         self.text_edit = QTextEdit()
         self.text_edit.setLineWrapMode(QTextEdit.FixedColumnWidth)
         self.html = ""

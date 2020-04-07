@@ -1,8 +1,7 @@
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
-from PyQt5.QtOpenGL import QGLFormat, QGLWidget, QGL
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMenu, QAction, \
-    QComboBox, QColorDialog
+    QComboBox, QColorDialog, QToolBar
 
 from app.func import Func
 from lib import TabItemMainWindow
@@ -28,9 +27,9 @@ class Slider(TabItemMainWindow):
 
         self.view = QGraphicsView(self.scene)
         self.view.setRenderHint(QPainter.Antialiasing)
-        opengl = QGLWidget(QGLFormat(QGL.SampleBuffers))
-        opengl.makeCurrent()
-        self.view.setViewport(opengl)
+        # opengl = QGLWidget(QGLFormat(QGL.SampleBuffers))
+        # opengl.makeCurrent()
+        # self.view.setViewport(opengl)
 
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
         self.view.setMaximumSize(width, height)
@@ -46,29 +45,29 @@ class Slider(TabItemMainWindow):
         self.setUI()
 
     def initMenu(self):
-        self.open_action = QAction(QIcon(Func.getImage("setting")), "setting", self)
-        self.open_action.triggered.connect(self.openPro)
+        open_action = QAction(QIcon(Func.getImage("setting")), "setting", self)
+        open_action.triggered.connect(self.openPro)
 
-        self.front_action = QAction(QIcon(Func.getImage("sendtoback.png")), "Bring to Front", self)
-        self.front_action.setToolTip("Bring item to front")
-        self.front_action.triggered.connect(self.toFront)
+        front_action = QAction(QIcon(Func.getImage("sendtoback.png")), "Bring to Front", self)
+        front_action.setToolTip("Bring item to front")
+        front_action.triggered.connect(self.toFront)
 
-        self.back_action = QAction(QIcon(Func.getImage("bringtofront.png")), "Sendto & Back", self)
-        self.back_action.setToolTip("Send item to back")
-        self.back_action.triggered.connect(self.toBack)
+        back_action = QAction(QIcon(Func.getImage("bringtofront.png")), "Sendto & Back", self)
+        back_action.setToolTip("Send item to back")
+        back_action.triggered.connect(self.toBack)
 
-        self.open_item_action = QAction(QIcon(Func.getImage("setting.png")), "Properties", self)
-        self.open_item_action.triggered.connect(self.openItem)
+        open_item_action = QAction(QIcon(Func.getImage("setting.png")), "Properties", self)
+        open_item_action.triggered.connect(self.openItem)
 
-        self.delete_action = QAction(QIcon(Func.getImage("trash.png")), "Delete", self)
-        self.delete_action.setShortcut("Delete")
-        self.delete_action.setToolTip("Delete item from diagram")
-        self.delete_action.triggered.connect(self.deleteItem)
+        delete_action = QAction(QIcon(Func.getImage("trash.png")), "Delete", self)
+        delete_action.setShortcut("Delete")
+        delete_action.setToolTip("Delete item from diagram")
+        delete_action.triggered.connect(self.deleteItem)
 
-        self.copy_action = QAction(QIcon(Func.getImage("copy.png")), "Copy", self)
-        self.copy_action.setShortcut("Ctrl+D")
-        self.copy_action.setToolTip("copy item from diagram")
-        self.copy_action.triggered.connect(self.copyItem)
+        copy_action = QAction(QIcon(Func.getImage("copy.png")), "Copy", self)
+        copy_action.setShortcut("Ctrl+D")
+        copy_action.setToolTip("copy item from diagram")
+        copy_action.triggered.connect(self.copyItem)
 
         self.item_list = QComboBox()
         self.item_list.setMinimumWidth(100)
@@ -80,15 +79,15 @@ class Slider(TabItemMainWindow):
         self.item_pro_windows.triggered.connect(self.openItem)
         self.item_pro_windows.setEnabled(False)
 
-        self.setting = self.addToolBar('Setting')
-        self.setting.addAction(self.open_action)
-        self.setting.addAction(self.delete_action)
-        self.setting.addAction(self.copy_action)
-        self.setting.addAction(self.front_action)
-        self.setting.addAction(self.back_action)
-
-        self.setting.addWidget(self.item_list)
-        self.setting.addAction(self.item_pro_windows)
+        setting = QToolBar()
+        setting.addAction(open_action)
+        setting.addSeparator()
+        setting.addAction(delete_action)
+        setting.addAction(copy_action)
+        setting.addAction(front_action)
+        setting.addAction(back_action)
+        setting.addWidget(self.item_list)
+        setting.addAction(self.item_pro_windows)
 
         self.fill_color_bt = QToolButton()
         self.fill_color_bt.setPopupMode(QToolButton.MenuButtonPopup)
@@ -113,9 +112,9 @@ class Slider(TabItemMainWindow):
         validator = QIntValidator(0, 20, self)
         self.line_width_com.setValidator(validator)
         self.line_width_com.currentTextChanged.connect(self.changeLineWidth)
-        self.setting.addWidget(self.fill_color_bt)
-        self.setting.addWidget(self.line_color_bt)
-        self.setting.addWidget(self.line_width_com)
+        setting.addWidget(self.fill_color_bt)
+        setting.addWidget(self.line_color_bt)
+        setting.addWidget(self.line_width_com)
 
         self.pointer_bt = QToolButton()
         self.pointer_bt.setCheckable(True)
@@ -134,24 +133,26 @@ class Slider(TabItemMainWindow):
         self.pointer_group.addButton(lasso_bt, Scene.SelectItem)
         self.pointer_group.buttonClicked[int].connect(self.pointerGroupClicked)
 
-        self.setting.addWidget(self.pointer_bt)
-        self.setting.addWidget(line_bt)
-        self.setting.addWidget(lasso_bt)
+        setting.addWidget(self.pointer_bt)
+        setting.addWidget(line_bt)
+        setting.addWidget(lasso_bt)
         self.background_bt = QToolButton()
         self.background_bt.setPopupMode(QToolButton.MenuButtonPopup)
         self.background_bt.setMenu(
             self.createBackgroundMenu(self.changeBackground))
         self.background_bt.setIcon(QIcon(Func.getImage("background4.png")))
         # self.background_bt.clicked.connect(self.fillButtonTriggered)
-        self.setting.addWidget(self.background_bt)
+        setting.addWidget(self.background_bt)
+
+        self.addToolBar(Qt.TopToolBarArea, setting)
 
         self.itemMenu = QMenu()
-        self.itemMenu.addAction(self.delete_action)
-        self.itemMenu.addAction(self.copy_action)
+        self.itemMenu.addAction(delete_action)
+        self.itemMenu.addAction(copy_action)
         self.itemMenu.addSeparator()
-        self.itemMenu.addAction(self.front_action)
-        self.itemMenu.addAction(self.back_action)
-        self.itemMenu.addAction(self.open_item_action)
+        self.itemMenu.addAction(front_action)
+        self.itemMenu.addAction(back_action)
+        self.itemMenu.addAction(open_item_action)
         self.scene.menu = self.itemMenu
 
     def linkSignal(self):
@@ -352,13 +353,6 @@ class Slider(TabItemMainWindow):
         self.scene.update()
         self.view.update()
 
-    def createMenus(self):
-        self.itemMenu = QMenu()
-        self.itemMenu.addAction(self.delete_action)
-        self.itemMenu.addSeparator()
-        self.itemMenu.addAction(self.front_action)
-        self.itemMenu.addAction(self.back_action)
-
     def createBackgroundMenu(self, slot):
         back_menu = QMenu(self)
         action1 = QAction(QIcon(Func.getImage("background1.png")), 'Blue Grid', self)
@@ -447,7 +441,7 @@ class Slider(TabItemMainWindow):
         pro = properties.get("Properties")
         self.pro_window.setProperties(pro)
 
-        items: dict = self.default_properties.get("Items")
+        items: dict = properties.get("Items")
         self.scene.setProperties(items)
 
         self.item_list.clear()

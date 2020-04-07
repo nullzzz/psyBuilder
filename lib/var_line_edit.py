@@ -72,3 +72,6 @@ class VarLineEdit(QLineEdit):
             MessageBox.warning(self, "Invalid", f"Invalid Parameter {cur}\nformat must conform to\n {self.reg_exp}")
         else:
             self.valid_data = cur
+
+    def setColor(self, rgb):
+        self.setStyleSheet("background: {}".format(rgb))

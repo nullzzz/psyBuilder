@@ -28,7 +28,7 @@ class StartR(TabItemWidget):
         self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
-        self.msg = ""
+
         self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
@@ -145,7 +145,7 @@ class StartR(TabItemWidget):
 
     def clone(self, new_widget_id: str, new_widget_name: str):
         clone_widget = StartR(new_widget_id, new_widget_name)
-        clone_widget.setProperties(self.default_properties)
+        clone_widget.setProperties(self.default_properties.copy())
         return clone_widget
 
     def getStatusMessage(self) -> str:

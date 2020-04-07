@@ -47,13 +47,6 @@ class Func(object):
         return os.path.join(Info.IMAGE_SOURCE_PATH, "psy.ico")
 
     @staticmethod
-    def getIOType(device_type: str) -> int:
-        device_type = device_type.split(".")[0]
-        if device_type in ("network_port", "parallel_port", "serial_port", "screen", "sound"):
-            return Info.OUTPUT_DEVICE
-        return Info.INPUT_DEVICE
-
-    @staticmethod
     def getProperties(widget_id) -> dict:
         """
         按widget_id得到对应widget的属性

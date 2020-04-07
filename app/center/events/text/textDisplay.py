@@ -1,5 +1,4 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QToolBar, QAction, QTextEdit
 
@@ -128,27 +127,18 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window.setAttributes(format_attributes)
 
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.apply()
+        self.pro_window.setProperties(properties)
+        self.apply()
 
     def store(self):
         """
         return necessary data for restoring this widget.
         @return:
         """
-        return self.getInfo()
+        return self.default_properties
 
-    def restore(self, properties):
-        """
-        restore this widget according to data.
-        @param data: necessary data for restoring this widget
-        @return:
-        """
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
+    def restore(self, properties: dict):
+        self.setProperties(properties)
 
     # 返回各项参数
     # 大部分以字符串返回，少数点击选择按钮返回布尔值

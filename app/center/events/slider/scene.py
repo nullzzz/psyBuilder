@@ -164,45 +164,44 @@ class Scene(QGraphicsScene):
         return item_info
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.clear()
-            for k, v in properties.items():
-                k: str
-                if k.startswith(Info.ITEM_IMAGE):
-                    item = PixItem(PixItem.Image, k)
-                elif k.startswith(Info.ITEM_TEXT):
-                    item = TextItem(TextItem.Text, k)
-                elif k.startswith(Info.ITEM_VIDEO):
-                    item = PixItem(PixItem.Video, k)
-                elif k.startswith(Info.ITEM_SOUND):
-                    item = PixItem(PixItem.Sound, k)
-                elif k.startswith(Info.ITEM_SNOW):
-                    item = OtherItem(OtherItem.Snow, k)
-                elif k.startswith(Info.ITEM_GABOR):
-                    item = OtherItem(OtherItem.Gabor, k)
-                elif k.startswith(Info.ITEM_POLYGON):
-                    item = DiaItem(DiaItem.Polygon, k)
-                elif k.startswith(Info.ITEM_ARC):
-                    item = DiaItem(DiaItem.Arc, k)
-                elif k.startswith(Info.ITEM_RECT):
-                    item = DiaItem(DiaItem.Rect, k)
-                elif k.startswith(Info.ITEM_CIRCLE):
-                    item = DiaItem(DiaItem.Circle, k)
-                elif k.startswith(Info.ITEM_LINE):
-                    x1: str = v.get("X1")
-                    y1: str = v.get("Y1")
-                    x2: str = v.get("X2")
-                    y2: str = v.get("Y2")
-                    if x1.startswith("[") or x2.startswith("[") or y1.startswith("[") or y2.startswith("["):
-                        line = QLineF(100, 100, 200, 200)
-                    else:
-                        line = QLineF(float(x1), float(y1), float(x2), float(y2))
-                    item = LineItem(line, k)
-                    item.setLine(line)
+        self.clear()
+        for k, v in properties.items():
+            k: str
+            if k.startswith(Info.ITEM_IMAGE):
+                item = PixItem(PixItem.Image, k)
+            elif k.startswith(Info.ITEM_TEXT):
+                item = TextItem(TextItem.Text, k)
+            elif k.startswith(Info.ITEM_VIDEO):
+                item = PixItem(PixItem.Video, k)
+            elif k.startswith(Info.ITEM_SOUND):
+                item = PixItem(PixItem.Sound, k)
+            elif k.startswith(Info.ITEM_SNOW):
+                item = OtherItem(OtherItem.Snow, k)
+            elif k.startswith(Info.ITEM_GABOR):
+                item = OtherItem(OtherItem.Gabor, k)
+            elif k.startswith(Info.ITEM_POLYGON):
+                item = DiaItem(DiaItem.Polygon, k)
+            elif k.startswith(Info.ITEM_ARC):
+                item = DiaItem(DiaItem.Arc, k)
+            elif k.startswith(Info.ITEM_RECT):
+                item = DiaItem(DiaItem.Rect, k)
+            elif k.startswith(Info.ITEM_CIRCLE):
+                item = DiaItem(DiaItem.Circle, k)
+            elif k.startswith(Info.ITEM_LINE):
+                x1: str = v.get("X1")
+                y1: str = v.get("Y1")
+                x2: str = v.get("X2")
+                y2: str = v.get("Y2")
+                if x1.startswith("[") or x2.startswith("[") or y1.startswith("[") or y2.startswith("["):
+                    line = QLineF(100, 100, 200, 200)
+                else:
+                    line = QLineF(float(x1), float(y1), float(x2), float(y2))
+                item = LineItem(line, k)
+                item.setLine(line)
 
-                self.addItem(item)
-                item.setProperties(v)
-                item.apply()
+            self.addItem(item)
+            item.setProperties(v)
+            item.apply()
 
     def setAttributes(self, attributes: list):
         self.attributes = attributes
@@ -215,6 +214,7 @@ class Scene(QGraphicsScene):
         self.addItem(new_item)
         new_item.setPos(new_pos)
         new_item.setPosition()
+        new_item.updateInfo()
         new_item.setAttributes(self.attributes)
         self.update()
         self.itemAdd.emit(new_item.getName())

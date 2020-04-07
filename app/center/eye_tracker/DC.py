@@ -202,7 +202,7 @@ class EyeDC(TabItemWidget):
 
     def clone(self, new_widget_id: str, new_widget_name):
         clone_widget = EyeDC(new_widget_id, new_widget_name)
-        clone_widget.setProperties(self.default_properties)
+        clone_widget.setProperties(self.default_properties.copy())
         return clone_widget
 
     def getXPosition(self) -> str:

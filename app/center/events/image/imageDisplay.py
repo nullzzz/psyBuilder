@@ -46,6 +46,7 @@ class ImageDisplay(TabItemMainWindow):
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
     def preview(self):
+        # todo: preview of image
         QMessageBox.warning(self, "undo", "refactoring")
 
     def refresh(self):
@@ -96,7 +97,7 @@ class ImageDisplay(TabItemMainWindow):
         :param properties:
         :return:
         """
-        self.pro_window.setProperties(self.default_properties)
+        self.pro_window.setProperties(properties)
         self.apply()
 
     def getProperties(self) -> dict:

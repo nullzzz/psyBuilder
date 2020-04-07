@@ -89,9 +89,6 @@ class TabItemMainWindow(QMainWindow):
         """
         self.refresh()
         properties = {}
-        for k, v in self.pro_window.getProperties().items():
-            if not isinstance(v, dict):
-                properties[k] = v
         return properties
 
     def getUsingDeviceCount(self) -> int:

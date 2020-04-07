@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QComboBox
 
 from app.func import Func
 from app.info import Info
-from lib import VarLineEdit
 
 
 class IconChoose(QWidget):
@@ -23,13 +22,10 @@ class IconChoose(QWidget):
     def __init__(self, parent=None):
         super(IconChoose, self).__init__(parent)
 
-        self.attributes: list = []
-
         self.event_types = QComboBox()
         self.event_types.addItems(("None", Info.IMAGE, Info.VIDEO, Info.TEXT, Info.SOUND, Info.SLIDER))
 
-        self.name_line = VarLineEdit()
-        self.name_line.setEnabled(False)
+        self.name_line = QLabel()
         self.linkSignal()
 
         self.icon_label = IconLabel()
@@ -58,13 +54,9 @@ class IconChoose(QWidget):
         self.pro_window = None
         self.setUI()
 
-    def linkSignal(self, b=True):
-        if b:
-            self.event_types.currentTextChanged.connect(self.changeEventType)
-            self.name_line.textChanged.connect(self.changeName)
-        else:
-            self.event_types.currentTextChanged.disconnect(self.changeEventType)
-            self.name_line.textChanged.disconnect(self.changeName)
+    def linkSignal(self):
+        self.event_types.currentTextChanged.connect(self.changeEventType)
+        # self.name_line.textChanged.connect(self.changeName)
 
     def setUI(self):
         grid_layout = QGridLayout()
@@ -100,8 +92,10 @@ class IconChoose(QWidget):
         elif self.event_type != "None" and current_type == "None":
             self.itemDeleted.emit(self.current_sub_wid)
             self.current_sub_wid = ""
+            sub_name = ""
         self.event_type = current_type
         self.icon_label.setIcon(current_type)
+        self.name_line.setText(sub_name)
 
     def getSubId(self, event_type: str = ""):
         """
@@ -158,13 +152,11 @@ class IconChoose(QWidget):
     def openProWindow(self):
         if self.current_sub_wid != "":
             if self.widget is None:
-                self.widget = Func.createWidget(self.current_sub_wid)
+                self.widget = Func.getWidget(self.current_sub_wid)
                 self.linkWidgetSignal()
             if self.event_type == Info.SLIDER:
-                self.widget.setWindowFlag(Qt.WindowStaysOnTopHint)
                 self.widget.show()
             else:
-                self.widget.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
                 self.widget.pro_window.show()
 
     def getInfo(self):
@@ -180,10 +172,10 @@ class IconChoose(QWidget):
 
     # 加载外部属性
     def setProperties(self, properties: dict):
-        self.linkSignal(False)
+        self.blockSignals(True)
         self.default_properties = properties.copy()
         self.loadSetting()
-        self.linkSignal()
+        self.blockSignals(False)
 
     # 加载当前属性
     def loadSetting(self):
@@ -199,31 +191,11 @@ class IconChoose(QWidget):
         self.name_line.setEnabled(self.current_sub_wid != "")
 
     def setAttributes(self, attributes: list):
-        self.attributes = attributes
         if self.pro_window:
             if self.event_type == Info.SLIDER:
                 self.pro_window.setAttributes([i[1:-1] for i in attributes])
             else:
                 self.pro_window.setAttributes(attributes)
-
-    # 返回当前选择attributes
-    def getUsingAttributes(self):
-        using_attributes: list = []
-        self.findAttributes(self.default_properties, using_attributes)
-        return using_attributes
-
-    def findAttributes(self, properties: dict, using_attributes: list):
-        for v in properties.values():
-            if isinstance(v, dict):
-                self.findAttributes(v, using_attributes)
-            elif isinstance(v, str):
-                if v.startswith("[") and v.endswith("]"):
-                    using_attributes.append(v[1:-1])
-
-    def clone(self):
-        clone_icon = IconChoose()
-        clone_icon.setProperties(self.default_properties)
-        return clone_icon
 
     def getWidget(self):
         """

@@ -9,6 +9,7 @@ from ..item.itemMenu import ItemMenu
 from ..item.text import TextProperty
 
 
+# todo: unknown
 class TextItem(QGraphicsTextItem):
     """
     Text

@@ -51,16 +51,15 @@ class LineItem(QGraphicsLineItem):
         self.pro_window.show()
 
     def setPosition(self):
+
         x1 = self.line().x1() + self.scenePos().x()
         y1 = self.line().y1() + self.scenePos().y()
         x2 = self.line().x2() + self.scenePos().x()
         y2 = self.line().y2() + self.scenePos().y()
-        self.setPos(0, 0)
         self.setLine(x1, y1, x2, y2)
         self.pro_window.setPosition(x1, y1, x2, y2)
 
     def setWidth(self, width):
-        print(width, 11)
         if isinstance(width, str) and width.isdigit():
             width = int(width)
         pen = self.pen()
@@ -104,6 +103,9 @@ class LineItem(QGraphicsLineItem):
         self.default_properties["Y"] = self.scenePos().y()
         self.default_properties["Z"] = self.zValue()
 
+    def getInfo(self):
+        return self.default_properties
+
     def changeSomething(self):
         x1: str = self.properties.get("X1")
         y1: str = self.properties.get("Y1")
@@ -140,8 +142,10 @@ class LineItem(QGraphicsLineItem):
         self.setZValue(z)
 
     def clone(self):
-        new = LineItem(self.line())
-        new.pro_window.setProperties(self.default_properties.copy())
+        # todo position of item and it's line
+        line = QLineF(self.line().x1(), self.line().y1(), self.line().x2(), self.line().y2())
+        new = LineItem(line)
+        new.setProperties(self.default_properties.copy())
         new.changeSomething()
         return new
 

@@ -16,10 +16,7 @@ class IfBranch(TabItemWidget):
     }
 
     """
-    tabClose = pyqtSignal(str)
-    propertiesChange = pyqtSignal(dict)
-
-    itemAdded = pyqtSignal(str, str, str)
+    itemAdded = pyqtSignal(str, str, str, int)
     itemDeleted = pyqtSignal(str)
     itemNameChanged = pyqtSignal(str, str)
 
@@ -34,12 +31,12 @@ class IfBranch(TabItemWidget):
         # 事件
 
         self.true_icon_choose = IconChoose()
-        self.true_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b))
+        self.true_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b, -1))
         self.true_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(a))
         self.true_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
 
         self.false_icon_choose = IconChoose()
-        self.false_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b))
+        self.false_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b, -1))
         self.false_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(a))
         self.false_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
 
@@ -106,15 +103,14 @@ class IfBranch(TabItemWidget):
 
         self.apply()
         self.close()
-        self.tabClose.emit(self.widget_id)
+        self.tabClosed.emit(self.widget_id)
 
     def cancel(self):
         self.loadSetting()
 
     def apply(self):
-        print(self.true_icon_choose.current_sub_wid)
         self.getInfo()
-        self.propertiesChange.emit(self.default_properties)
+        self.propertiesChanged.emit(self.widget_id)
         self.attributes = Func.getAttributes(self.widget_id)
         self.setAttributes(self.attributes)
 
@@ -136,9 +132,9 @@ class IfBranch(TabItemWidget):
         self.true_icon_choose.setProperties(self.default_properties.get("Yes", {}))
         self.false_icon_choose.setProperties(self.default_properties.get("No", {}))
 
-    def clone(self, new_id: str):
-        clone_widget = IfBranch(widget_id=new_id)
-        clone_widget.setProperties(self.default_properties)
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = IfBranch(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties.copy())
         return clone_widget
 
     # 设置可选参数

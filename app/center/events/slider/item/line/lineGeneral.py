@@ -12,10 +12,10 @@ class LineGeneral(QWidget):
         self.pLabels = []
 
         self.default_properties = {
-            "P1 X": "0",
-            "P1 Y": "0",
-            "P2 X": "0",
-            "P2 Y": "0",
+            "X1": "0",
+            "Y1": "0",
+            "X2": "0",
+            "Y2": "0",
             "Border Color": "0,0,0",
             "Border Width": '1',
         }
@@ -107,6 +107,7 @@ class LineGeneral(QWidget):
 
     def setProperties(self, properties: dict):
         self.default_properties.update(properties)
+        print(properties)
         self.loadSetting()
 
     def setLineColor(self, rgb: str):

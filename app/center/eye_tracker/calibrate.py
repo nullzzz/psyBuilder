@@ -166,7 +166,7 @@ class EyeCalibrate(TabItemWidget):
 
     def clone(self, new_widget_id: str, new_widget_name: str):
         clone_widget = EyeCalibrate(new_widget_id, new_widget_name)
-        clone_widget.setProperties(self.default_properties)
+        clone_widget.setProperties(self.default_properties.copy())
         return clone_widget
 
     def getCalibrationType(self) -> str:

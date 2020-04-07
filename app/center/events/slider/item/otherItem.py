@@ -86,6 +86,9 @@ class OtherItem(QGraphicsPixmapItem):
         self.default_properties["Y"] = self.scenePos().y()
         self.default_properties["Z"] = self.zValue()
 
+    def getInfo(self):
+        return self.default_properties
+
     def changeSomething(self):
         __w = self.properties["Width"]
         w = int(__w) if __w.isdigit() else 100

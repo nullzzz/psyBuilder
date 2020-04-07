@@ -15,7 +15,7 @@ class Close(TabItemWidget):
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
-
+        self.attributes = []
         self.pause_between_msg = VarLineEdit("1")
 
         self.using_tracker_id = ""
@@ -122,10 +122,10 @@ class Close(TabItemWidget):
         self.updateInfo()
 
     def refreshAttr(self):
-        attributes = Func.getAttributes(self.widget_id)
+        self.attributes = Func.getAttributes(self.widget_id)
         self.all_attr.clear()
         self.select_attr.clear()
-        self.all_attr.addItems(attributes)
+        self.all_attr.addItems(self.attributes)
 
     def selectAll(self):
         self.all_attr.clear()
@@ -211,7 +211,7 @@ class Close(TabItemWidget):
 
     def clone(self, new_widget_id: str, new_widget_name: str):
         clone_widget = Close(new_widget_id, new_widget_name)
-        clone_widget.setProperties(self.default_properties)
+        clone_widget.setProperties(self.default_properties.copy())
         return clone_widget
 
     def getPauseBetweenMessages(self) -> str:
