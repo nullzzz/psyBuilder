@@ -55,7 +55,7 @@ class Info(object):
     TEXT = "Text"
     IMAGE = "Image"
     VIDEO = "Video"
-    SLIDER = "Slider"
+    SLIDER = "slider"
     BUG = "Bug"
 
     OPEN = "Open"
@@ -168,11 +168,10 @@ class Info(object):
     IconBarToTimeline = "0"
     CopyInTimeline = "1"
     MoveInTimeline = "2"
-    AttributesToLineEdit = "3"
-    AttributesToComboBox = "4"
-    StructureMoveToTimeline = "5"
-    StructureCopyToTimeline = "6"
-    StructureReferToTimeline = "7"
+    AttributesToWidget = "3"
+    StructureMoveToTimeline = "4"
+    StructureCopyToTimeline = "5"
+    StructureReferToTimeline = "6"
 
     # sender widget
     TimelineSend = 0

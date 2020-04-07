@@ -12,11 +12,9 @@ from .videoProperty import VideoProperty
 class VideoDisplay(TabItemMainWindow):
     def __init__(self, widget_id: str, widget_name: str):
         super(VideoDisplay, self).__init__(widget_id, widget_name)
-        self.attributes: set = ()
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.mediaStatusChanged.connect(self.loadStatue)
-        self.mediaPlayer.bufferStatusChanged.connect(self.bufferLoad)
         self.video_widget = VideoWidget()
 
         self.mediaPlayer.setVideoOutput(self.video_widget)
@@ -27,7 +25,7 @@ class VideoDisplay(TabItemMainWindow):
         self.label = QLabel()
         self.pro_window = VideoProperty()
 
-        self.default_properties = self.pro_window.getInfo()
+        self.default_properties = self.pro_window.default_properties
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
@@ -40,7 +38,6 @@ class VideoDisplay(TabItemMainWindow):
         self.aspect_ration_mode = -1
 
         self.setUI()
-        self.setAttributes(["test"])
 
     def setUI(self):
         self.setWindowTitle("Video")
@@ -50,7 +47,7 @@ class VideoDisplay(TabItemMainWindow):
 
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
-        open_pro.triggered.connect(self.openPro)
+        open_pro.triggered.connect(self.openSettingWindow)
         tool.addAction(open_pro)
 
         self.play_video = QAction(QIcon(Func.getImage("start_video")), "start", self)
@@ -60,18 +57,8 @@ class VideoDisplay(TabItemMainWindow):
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
-    def openPro(self):
-        self.refresh()
-        # 阻塞原窗口
-        # self.pro_window.setWindowModality(Qt.ApplicationModal)
-        self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
-        self.pro_window.show()
-
     def refresh(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
         self.pro_window.refresh()
-        self.getInfo()
 
     def playVideo(self):
         if self.file:
@@ -167,15 +154,6 @@ class VideoDisplay(TabItemMainWindow):
             self.play_video.setEnabled(False)
             self.play_video.setText("Invalid Media")
 
-    def bufferLoad(self, percentage: int):
-        print(percentage)
-
-    def getShowProperties(self):
-        info = self.default_properties.copy()
-        info.pop("Input devices")
-        info.pop("Output devices")
-        return info
-
     @staticmethod
     def getStartTime(str_time):
         try:
@@ -188,13 +166,6 @@ class VideoDisplay(TabItemMainWindow):
             return 0
         except Exception as e:
             return 0
-
-    def setPro(self, pro: VideoProperty):
-        del self.pro_window
-        self.pro_window = pro
-        self.pro_window.ok_bt.clicked.connect(self.ok)
-        self.pro_window.cancel_bt.clicked.connect(self.cancel)
-        self.pro_window.apply_bt.clicked.connect(self.apply)
 
     def setVideo(self):
         self.setCentralWidget(self.video_widget)
@@ -226,29 +197,9 @@ class VideoDisplay(TabItemMainWindow):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
 
-    # 返回当前选择attributes
-    def getUsingAttributes(self):
-        using_attributes: list = []
-        self.findAttributes(self.default_properties, using_attributes)
-        return using_attributes
-
-    def findAttributes(self, properties: dict, using_attributes: list):
-        for v in properties.values():
-            if isinstance(v, dict):
-                self.findAttributes(v, using_attributes)
-            elif isinstance(v, str):
-                if v.startswith("[") and v.endswith("]"):
-                    using_attributes.append(v[1:-1])
-
-    def getInfo(self):
-        self.default_properties = self.pro_window.getInfo()
-        return self.default_properties
-
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.pro_window.setProperties(self.default_properties)
-            self.apply()
+        self.pro_window.setProperties(properties)
+        self.apply()
 
     def loadSetting(self):
         self.pro_window.setProperties(self.default_properties)
@@ -394,33 +345,26 @@ class VideoDisplay(TabItemMainWindow):
     """
 
     def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        return self.getInfo()
+        self.refresh()
+        properties = {}
+        for k, v in self.pro_window.getProperties().items():
+            if not isinstance(v, dict):
+                properties[k] = v
+        return properties
 
     def store(self):
         """
         return necessary data for restoring this widget.
         @return:
         """
-        return self.getInfo()
+        return self.default_properties
 
-    def restore(self, properties):
-        """
-        restore this widget according to data.
-        @param data: necessary data for restoring this widget
-        @return:
-        """
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
+    def restore(self, properties: dict):
+        self.setProperties(properties)
 
     def clone(self, new_widget_id: str, new_widget_name):
         clone_widget = VideoDisplay(new_widget_id, new_widget_name)
-        clone_widget.setPro(self.pro_window.clone())
+        clone_widget.setProperties(self.default_properties.copy())
         clone_widget.apply()
         return clone_widget
 
@@ -438,7 +382,7 @@ class VideoWidget(QVideoWidget):
         p.setColor(QPalette.Window, Qt.black)
         self.setPalette(p)
 
-        self.setAttribute(Qt.WA_OpaquePaintEvent)
+        self.setAttribute(Qt.WA_OpaquePaintEvent, True)
 
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key_Space:

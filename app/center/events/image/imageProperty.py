@@ -33,22 +33,20 @@ class ImageProperty(QWidget):
         self.setWindowTitle("Image property")
         self.resize(600, 800)
 
-        below = QWidget()
         below_layout = QHBoxLayout()
         below_layout.addStretch(10)
         below_layout.addWidget(self.ok_bt, 1)
         below_layout.addWidget(self.cancel_bt, 1)
         below_layout.addWidget(self.apply_bt, 1)
         below_layout.setContentsMargins(0, 0, 0, 0)
-        below.setLayout(below_layout)
         tab = QTabWidget()
         tab.addTab(self.general, "general")
         tab.addTab(self.frame, "frame")
         tab.addTab(self.duration, "duration")
 
         main_layout = QVBoxLayout()
-        main_layout.addWidget(tab, 6)
-        main_layout.addWidget(below, 1)
+        main_layout.addWidget(tab, 1)
+        main_layout.addLayout(below_layout, 0)
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
 
@@ -78,3 +76,8 @@ class ImageProperty(QWidget):
         self.general.updateInfo()
         self.frame.updateInfo()
         self.duration.updateInfo()
+
+    def loadSetting(self):
+        self.general.loadSetting()
+        self.frame.loadSetting()
+        self.duration.loadSetting()

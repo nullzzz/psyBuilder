@@ -13,21 +13,21 @@ class SoundTab1(QWidget):
         self.attributes = []
 
         self.default_properties = {
-            "File name": "",
-            "Buffer size": "5000",
-            "Stream refill": "0",
-            "Start offset": "0",
-            "Stop offset": "0",
+            "File Name": "",
+            "Buffer Size": "5000",
+            "Stream Refill": "0",
+            "Start Offset": "0",
+            "Stop Offset": "0",
             "Repetitions": "1",
-            "Volume control": 0,
+            "Volume Control": 0,
             "Volume": "1",
-            "Latency bias": 0,
-            "Bias time": "0",
-            "Sound device": "",
-            "Wait for start": "No",
-            "Sync to vbl": 1,
-            "Clear after": "clear_0",
-            "Screen name": "screen.0"
+            "Latency Bias": 0,
+            "Bias Time": "0",
+            "Sound Device": "",
+            "Wait For Start": "No",
+            "Sync To Vbl": 1,
+            "Clear After": "clear_0",
+            "Screen Name": "screen_0"
         }
         self.file_name = VarLineEdit()
         self.open_bt = QPushButton("open file")
@@ -49,22 +49,16 @@ class SoundTab1(QWidget):
         self.bias_time = VarLineEdit()
         self.bias_time.setText("0")
 
-        self.buffer_size = VarLineEdit()
+        self.buffer_size = VarLineEdit("500")
         self.stream_refill = VarComboBox()
 
         self.start_offset = VarLineEdit("0")
-        # self.start_offset.setInputMask("00:00:00.000")
         self.stop_offset = VarLineEdit("0")
-        # self.stop_offset.setInputMask("00:00:00.000")
         self.repetitions = VarLineEdit("1")
-
-        self.sound = VarComboBox()
-        self.sound.currentTextChanged.connect(self.changeDevice)
-        self.using_device_id = ""
 
         self.using_sound_id: str = ""
         self.sound = VarComboBox()
-        self.sound_info = Func.getSoundInfo()
+        self.sound_info = Func.getDeviceInfo("sound")
         self.sound.addItems(self.sound_info.values())
         self.sound.currentTextChanged.connect(self.changeSound)
 
@@ -85,7 +79,7 @@ class SoundTab1(QWidget):
 
         self.using_screen_id: str = ""
         self.screen_name = VarComboBox()
-        self.screen_info = Func.getScreenInfo()
+        self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)
         self.screen_name.setEnabled(self.sync_to_vbl.checkState())
@@ -99,10 +93,6 @@ class SoundTab1(QWidget):
         self.repetitions.setReg(r"(\d+)|(\d*\.?\d{,2})")
 
         self.stream_refill.addItems(["0", "1", "2"])
-        self.repetitions.setText("1")
-        self.buffer_size.setText("5000")
-        # self.start_offset.setText("0")
-        # self.stop_offset.setText("0")
         self.volume.setEnabled(False)
         self.bias_time.setEnabled(False)
 
@@ -112,8 +102,6 @@ class SoundTab1(QWidget):
         l3 = QLabel("Start Offset (ms):")
         l4 = QLabel("Stop Offset (ms):")
         l5 = QLabel("Repetitions:")
-        # l16 = QLabel("Dont Clear After:")
-        # l17 = QLabel("Sync Screen Name:")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -127,9 +115,6 @@ class SoundTab1(QWidget):
         layout1.addWidget(self.file_name, 0, 1, 1, 2)
         layout1.addWidget(self.open_bt, 0, 3, 1, 1)
 
-        # layout1.addWidget(l1, 1, 0)
-        # layout1.addWidget(self.buffer_size, 1, 1)
-
         layout1.addWidget(l2, 2, 0)
         layout1.addWidget(self.stream_refill, 2, 1)
 
@@ -140,13 +125,6 @@ class SoundTab1(QWidget):
 
         layout1.addWidget(l5, 5, 0)
         layout1.addWidget(self.repetitions, 5, 1)
-
-        # sound are froce to sync with a VBL
-        # layout1.addWidget(l16, 6, 0)
-        # layout1.addWidget(self.clear_after, 6, 1)
-        #
-        # layout1.addWidget(l17, 7, 0)
-        # layout1.addWidget(self.screen_name, 7, 1)
 
         group1.setLayout(layout1)
 
@@ -163,19 +141,16 @@ class SoundTab1(QWidget):
 
         self.bias_time.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
         self.volume.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
-        # layout2.addWidget(l6, 0, 0, 1, 1)
         layout2.addWidget(self.sync_to_vbl, 0, 0, )
         layout2.addWidget(self.screen_name, 0, 1, )
         layout2.addWidget(l8, 0, 2)
         layout2.addWidget(self.clear_after, 0, 3)
 
-        # layout2.addWidget(l6, 0, 0, 1, 1)
         layout2.addWidget(self.volume_control, 1, 0, )
         layout2.addWidget(self.volume, 1, 1, )
         layout2.addWidget(l6, 1, 2)
         layout2.addWidget(self.sound, 1, 3)
 
-        # layout2.addWidget(l7, 1, 0, 1, 1)
         layout2.addWidget(self.latency_bias, 2, 0)
         layout2.addWidget(self.bias_time, 2, 1)
         layout2.addWidget(l7, 2, 2)
@@ -192,7 +167,7 @@ class SoundTab1(QWidget):
 
     def refresh(self):
         # refresh sound Dev
-        self.sound_info = Func.getSoundInfo()
+        self.sound_info = Func.getDeviceInfo("sound")
         sound_id = self.using_sound_id
         self.sound.clear()
         self.sound.addItems(self.sound_info.values())
@@ -202,7 +177,7 @@ class SoundTab1(QWidget):
             self.using_sound_id = sound_id
 
         # refresh screen
-        self.screen_info = Func.getScreenInfo()
+        self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen_name.clear()
         self.screen_name.addItems(self.screen_info.values())
@@ -210,6 +185,8 @@ class SoundTab1(QWidget):
         if screen_name:
             self.screen_name.setCurrentText(screen_name)
             self.using_screen_id = screen_id
+
+        self.updateInfo()
 
     def changeSound(self, sound):
         for k, v in self.sound_info.items():
@@ -231,9 +208,6 @@ class SoundTab1(QWidget):
         if file_name:
             self.file_name.setText(file_name)
 
-    def changeDevice(self, device_name):
-        self.using_device_id = Func.getDeviceIdByName(device_name)
-
     def volumeChecked(self, e):
         if e == 2:
             self.volume.setEnabled(True)
@@ -254,83 +228,52 @@ class SoundTab1(QWidget):
             self.clear_after.setEnabled(False)
             self.screen_name.setEnabled(False)
 
-    def setSound(self, sound: list):
-        selected = self.sound.currentText()
-        self.sound.clear()
-        self.sound.addItems(sound)
-        if selected in sound:
-            self.sound.setCurrentText(selected)
-        else:
-            new_name = Func.getDeviceNameById(self.using_device_id)
-            if new_name:
-                self.sound.setCurrentText(new_name)
-
     def setAttributes(self, attributes: list):
-        self.attributes = attributes
-        self.file_name.setCompleter(QCompleter(self.attributes))
-        self.buffer_size.setCompleter(QCompleter(self.attributes))
-        self.start_offset.setCompleter(QCompleter(self.attributes))
-        self.stop_offset.setCompleter(QCompleter(self.attributes))
-        self.repetitions.setCompleter(QCompleter(self.attributes))
-        self.volume.setCompleter(QCompleter(self.attributes))
-        self.bias_time.setCompleter(QCompleter(self.attributes))
-        # self.sound_device.setCompleter(QCompleter(self.attributes))
-        # self.wait_for_start.setCompleter(QCompleter(self.attributes))
+        self.file_name.setCompleter(QCompleter(attributes))
+        self.buffer_size.setCompleter(QCompleter(attributes))
+        self.start_offset.setCompleter(QCompleter(attributes))
+        self.stop_offset.setCompleter(QCompleter(attributes))
+        self.repetitions.setCompleter(QCompleter(attributes))
+        self.volume.setCompleter(QCompleter(attributes))
+        self.bias_time.setCompleter(QCompleter(attributes))
 
-    def getInfo(self):
-        """
-        历史遗留函数
-        :return:
-        """
-        self.default_properties.clear()
-        self.default_properties["File name"] = self.file_name.text()
-        self.default_properties["Buffer size"] = self.buffer_size.text()
-        self.default_properties["Stream refill"] = self.stream_refill.currentText()
-        self.default_properties["Start offset"] = self.start_offset.text()
-        self.default_properties["Stop offset"] = self.stop_offset.text()
+    def updateInfo(self):
+        self.default_properties["File Name"] = self.file_name.text()
+        self.default_properties["Buffer Size"] = self.buffer_size.text()
+        self.default_properties["Stream Refill"] = self.stream_refill.currentText()
+        self.default_properties["Start Offset"] = self.start_offset.text()
+        self.default_properties["Stop Offset"] = self.stop_offset.text()
         self.default_properties["Repetitions"] = self.repetitions.text()
-        self.default_properties["Volume control"] = self.volume_control.checkState()
+        self.default_properties["Volume Control"] = self.volume_control.checkState()
         self.default_properties["Volume"] = self.volume.text()
-        self.default_properties["Latency bias"] = self.latency_bias.checkState()
-        self.default_properties["Bias time"] = self.bias_time.text()
-        self.default_properties["Sound device"] = self.sound.currentText()
-        self.default_properties["Wait for start"] = self.wait_for_start.currentText()
-        self.default_properties["Sync to vbl"] = self.sync_to_vbl.checkState()
-        self.default_properties["Clear after"] = self.clear_after.currentText()
-
-        if Func.getDeviceNameById(self.using_screen_id):
-            self.default_properties["Screen name"] = Func.getDeviceNameById(self.using_screen_id)
-        else:
-            self.default_properties["Screen name"] = self.screen_name.currentText()
-
-        return self.default_properties
+        self.default_properties["Latency Bias"] = self.latency_bias.checkState()
+        self.default_properties["Bias Time"] = self.bias_time.text()
+        self.default_properties["Sound Device"] = self.sound.currentText()
+        self.default_properties["Wait For Start"] = self.wait_for_start.currentText()
+        self.default_properties["Sync To Vbl"] = self.sync_to_vbl.checkState()
+        self.default_properties["Clear After"] = self.clear_after.currentText()
+        self.default_properties["Screen name"] = self.screen_name.currentText()
 
     def getProperties(self):
-        self.getInfo()
         return self.default_properties
 
     def setProperties(self, properties: dict):
-        self.default_properties = properties
+        self.default_properties.update(properties)
         self.loadSetting()
 
     def loadSetting(self):
-        self.file_name.setText(self.default_properties["File name"])
-        self.buffer_size.setText(self.default_properties["Buffer size"])
-        self.stream_refill.setCurrentText(self.default_properties["Stream refill"])
-        self.start_offset.setText(self.default_properties["Start offset"])
-        self.stop_offset.setText(self.default_properties["Stop offset"])
+        self.file_name.setText(self.default_properties["File Name"])
+        self.buffer_size.setText(self.default_properties["Buffer Size"])
+        self.stream_refill.setCurrentText(self.default_properties["Stream Refill"])
+        self.start_offset.setText(self.default_properties["Start Offset"])
+        self.stop_offset.setText(self.default_properties["Stop Offset"])
         self.repetitions.setText(self.default_properties["Repetitions"])
-        self.volume_control.setCheckState(self.default_properties["Volume control"])
+        self.volume_control.setCheckState(self.default_properties["Volume Control"])
         self.volume.setText(self.default_properties["Volume"])
-        self.latency_bias.setCheckState(self.default_properties["Latency bias"])
-        self.bias_time.setText(self.default_properties["Bias time"])
-        self.sound.setCurrentText((self.default_properties["Sound device"]))
-        self.wait_for_start.setCurrentText(self.default_properties["Wait for start"])
-        self.sync_to_vbl.setCheckState(self.default_properties["Sync to vbl"])
-        self.clear_after.setCurrentText(self.default_properties["Clear after"])
-        self.screen_name.setCurrentText(self.default_properties["Screen name"])
-
-    def clone(self):
-        clone_page = SoundTab1()
-        clone_page.setProperties(self.default_properties)
-        return clone_page
+        self.latency_bias.setCheckState(self.default_properties["Latency Bias"])
+        self.bias_time.setText(self.default_properties["Bias Time"])
+        self.sound.setCurrentText((self.default_properties["Sound Device"]))
+        self.wait_for_start.setCurrentText(self.default_properties["Wait For Start"])
+        self.sync_to_vbl.setCheckState(self.default_properties["Sync To Vbl"])
+        self.clear_after.setCurrentText(self.default_properties["Clear After"])
+        self.screen_name.setCurrentText(self.default_properties["Screen Name"])

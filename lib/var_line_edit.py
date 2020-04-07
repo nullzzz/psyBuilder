@@ -4,8 +4,8 @@ from PyQt5.QtCore import QDataStream, QIODevice, QRegExp, pyqtSignal
 from PyQt5.QtGui import QFont, QRegExpValidator
 from PyQt5.QtWidgets import QLineEdit
 
-from .message_box import MessageBox
 from app.info import Info
+from .message_box import MessageBox
 
 
 class VarLineEdit(QLineEdit):
@@ -29,13 +29,13 @@ class VarLineEdit(QLineEdit):
         self.reg_exp: str = ""
 
     def dragEnterEvent(self, e):
-        if e.mimeData().hasFormat(Info.AttributesToLineEdit):
+        if e.mimeData().hasFormat(Info.AttributesToWidget):
             e.accept()
         else:
             e.ignore()
 
     def dropEvent(self, e):
-        data = e.mimeData().data(Info.AttributesToLineEdit)
+        data = e.mimeData().data(Info.AttributesToWidget)
         stream = QDataStream(data, QIODevice.ReadOnly)
         text = f"[{stream.readQString()}]"
         self.setText(text)
@@ -72,3 +72,6 @@ class VarLineEdit(QLineEdit):
             MessageBox.warning(self, "Invalid", f"Invalid Parameter {cur}\nformat must conform to\n {self.reg_exp}")
         else:
             self.valid_data = cur
+
+    def setColor(self, rgb):
+        self.setStyleSheet("background: {}".format(rgb))

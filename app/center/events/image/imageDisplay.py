@@ -14,24 +14,10 @@ class ImageDisplay(TabItemMainWindow):
         self.label = QLabel()
         # 属性设置窗口
         self.pro_window = ImageProperty()
-        self.pro_window.ok_bt.clicked.connect(self.ok)
-        self.pro_window.cancel_bt.clicked.connect(self.cancel)
-        self.pro_window.apply_bt.clicked.connect(self.apply)
+        self.default_properties = self.pro_window.default_properties
 
-        # 相关可使用属性
-        # self.file = ""
-        # self.isStretch = False
-        # self.isUD = False
-        # self.isLR = False
-        # self.stretch_mode = "Both"
-        # self.frame_fill_color = "255,255,255"
-        # self.transparent_value = "0"
-        #
-        # self.x_pos = "50%"
-        # self.y_pos = "50%"
-        # self.w_size = "100%"
-        # self.h_size = "100%"
         self.setUI()
+        self.linkSignal()
 
     def setUI(self):
         """
@@ -54,22 +40,16 @@ class ImageDisplay(TabItemMainWindow):
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
-    def openSettingWindow(self):
-        self.refresh()
-
-        attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(attributes)
-        self.pro_window.show()
+    def linkSignal(self):
+        self.pro_window.ok_bt.clicked.connect(self.ok)
+        self.pro_window.cancel_bt.clicked.connect(self.cancel)
+        self.pro_window.apply_bt.clicked.connect(self.apply)
 
     def preview(self):
+        # todo: preview of image
         QMessageBox.warning(self, "undo", "refactoring")
 
     def refresh(self):
-        """
-        refresh some information that may change such device name.
-        this function will be called when the properties window opened or getting the properties.
-        :return:
-        """
         self.pro_window.refresh()
 
     # 预览图片
@@ -105,107 +85,33 @@ class ImageDisplay(TabItemMainWindow):
         self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
 
-    # 从pro获取参数
-    # def parseProperties(self):
-    #     self.file = self.info.get("File name", "")
-    #     if self.file.startswith("[") and self.file.endswith("]"):
-    #         self.file = ""
-    #     self.isUD = self.pro_window.general.mirrorUD.checkState()
-    #     self.isLR = self.pro_window.general.mirrorLR.checkState()
-    #     self.isStretch = self.pro_window.general.stretch.checkState()
-    #     self.stretch_mode = self.pro_window.general.stretch_mode.currentText()
-    #     self.frame_fill_color = self.pro_window.frame.back_color.getColor()
-    #     self.transparent_value = self.pro_window.general.transparent.text()
-    #     self.x_pos = self.info.get("Center X", "50%")
-    #     self.y_pos = self.info.get("Center Y", "50%")
-    #     self.w_size = self.info.get("Width", "100%")
-    #     self.h_size = self.info.get("Height", "100%")
-    #     if self.x_pos.startswith("[") and self.x_pos.endswith("]"):
-    #         self.x_pos = "50%"
-    #     if self.y_pos.startswith("[") and self.y_pos.endswith("]"):
-    #         self.y_pos = "50%"
-    #     if self.w_size.startswith("[") and self.w_size.endswith("]"):
-    #         self.w_size = "100%"
-    #     if self.h_size.startswith("[") and self.h_size.endswith("]"):
-    #         self.h_size = "100%"
-
-    # 设置主面板的图片
-    # def setImage(self):
-    #     img = QImage(self.file)
-    #     image = img.mirrored(self.isLR, self.isUD)
-    #     pix = QPixmap.fromImage(image)
-    #     self.pix = pix
-    #     # 图片反转
-    #     if self.isStretch:
-    #         mode = self.pro_window.general.stretch_mode.currentText()
-    #         w = self.label.size().width()
-    #         h = self.label.size().height()
-    #         if mode == "Both":
-    #             new_pix = pix.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-    #         elif mode == "LeftRight":
-    #             new_pix = pix.scaledToWidth(w, Qt.FastTransformation)
-    #         else:
-    #             new_pix = pix.scaledToHeight(h, Qt.FastTransformation)
-    #         self.label.setPixmap(new_pix)
-    #     else:
-    #         self.label.setPixmap(pix)
-
-    # 返回设置参数
-
-    # 设置可选参数
-
     def updateInfo(self):
         self.pro_window.updateInfo()
 
-    def setAttributes(self, attributes):
+    def setProperties(self, properties: dict):
         """
-        completer for the whole widget
-        :param attributes:
+        {
+        "":{}
+        "":{}
+        }
+        :param properties:
         :return:
         """
-        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
-        self.pro_window.setAttributes(format_attributes)
-
-    # 返回当前选择attributes
-    def getUsingAttributes(self):
-        using_attributes: list = []
-        self.findAttributes(self.default_properties, using_attributes)
-        return using_attributes
-
-    def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.pro_window.setProperties(self.default_properties)
-            self.apply()
-
-    def loadSetting(self):
-        self.pro_window.setProperties(self.default_properties)
+        self.pro_window.setProperties(properties)
+        self.apply()
 
     def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        self.refresh()
-        properties = {}
-        for k, v in self.pro_window.getProperties().items():
-            if not isinstance(v, dict):
-                properties[k] = v
-        return properties
+        return self.pro_window.getProperties()
 
     def store(self):
         """
         return necessary data for restoring this widget.
         @return:
         """
+        return self.default_properties
 
     def restore(self, properties: dict):
-        """
-        restore this widget according to data.
-        @return:
-        :param properties:
-        """
-        pass
+        self.setProperties(properties)
 
     def clone(self, new_widget_id: str, new_widget_name: str):
         clone_widget = ImageDisplay(new_widget_id, new_widget_name)

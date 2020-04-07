@@ -1,16 +1,15 @@
-from PyQt5.QtCore import Qt, QEvent, QObject
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QWidget, QLabel, QLineEdit, QCheckBox, QPushButton, QHBoxLayout, \
+from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QLineEdit, QCheckBox, QPushButton, QHBoxLayout, \
     QCompleter
 
 from app.func import Func
-from lib import VarLineEdit, VarComboBox, ColorListEditor, TabItemWidget, MessageBox
+from lib import VarLineEdit, VarComboBox, ColorListEditor, TabItemWidget
 
 
 class EyeDC(TabItemWidget):
     def __init__(self, widget_id: str, widget_name: str):
         super(EyeDC, self).__init__(widget_id, widget_name)
-        self.attributes = []
 
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
@@ -19,12 +18,11 @@ class EyeDC(TabItemWidget):
         self.default_properties = {
             "Center X": "50%",
             "Center Y": "50%",
-            "Target color": "128,128,128",
-            "Target style": "default",
-            "Show display with drift correction target": 0,
-            "Fixation triggered": 0,
+            "Target Color": "128,128,128",
+            "Target Style": "default",
+            "Show Display With Drift Correction Target": 0,
+            "Fixation Triggered": 0,
             "EyeTracker Name": "",
-            # "Screen": "screen.0",
         }
         self.x_pos = VarLineEdit()
         self.x_pos.installEventFilter(self)
@@ -40,16 +38,10 @@ class EyeDC(TabItemWidget):
         self.fixation_triggered.stateChanged.connect(self.statueChanged)
 
         self.using_tracker_id = ""
-        self.tracker_info = Func.getTrackerInfo()
+        self.tracker_info = Func.getDeviceInfo("tracker")
         self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
-
-        # self.using_screen_id: str = ""
-        # self.screen = PigComboBox()
-        # self.simple_info = Func.getScreenInfo()
-        # self.screen.addItems(self.simple_info.values())
-        # self.screen.currentTextChanged.connect(self.changeScreen)
 
         self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
@@ -59,21 +51,14 @@ class EyeDC(TabItemWidget):
         self.bt_apply.clicked.connect(self.apply)
         self.setUI()
 
-        self.setAttributes(Func.getAttributes(self.widget_id))
-
-        self.x_pos.setFocus()
-
     def setUI(self):
         self.setWindowTitle("DC")
         self.resize(500, 750)
-        # self.setStyleSheet("background-color: white;")
         self.tip1.setStyleSheet("border-width:0; border-style:outset; background-color: transparent;")
         self.tip1.setText("Drift Correction")
-        # self.tip1.setFocusPolicy(Qt.NoFocus)
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0; border-style:outset; background-color: transparent;")
         self.tip2.setText("Perform drift correction")
-        # self.tip2.setFocusPolicy(Qt.NoFocus)
         self.target_style.addItems(
             ["default", "large filled", "small filled", "large open", "small open", "large cross", "small cross"])
         self.target_color.setEnabled(False)
@@ -87,13 +72,11 @@ class EyeDC(TabItemWidget):
         l3 = QLabel("Target Color:")
         l4 = QLabel("Target Style:")
         l5 = QLabel("EyeTracker Name:")
-        # l6 = QLabel("Screen Name:")
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
@@ -111,9 +94,6 @@ class EyeDC(TabItemWidget):
 
         layout1.addWidget(l5, 6, 0, 1, 1)
         layout1.addWidget(self.tracker_name, 6, 1, 1, 1)
-
-        # layout1.addWidget(l6, 7, 0, 1, 1)
-        # layout1.addWidget(self.screen, 7, 1, 1, 1)
 
         layout1.addWidget(self.show_display_with_drift_correction_target, 8, 1, 1, 1)
         layout1.addWidget(self.fixation_triggered, 9, 1, 1, 1)
@@ -137,15 +117,8 @@ class EyeDC(TabItemWidget):
                 self.using_tracker_id = k
                 break
 
-    #
-    # def changeScreen(self, screen):
-    #     for k, v in self.simple_info.items():
-    #         if v == screen:
-    #             self.using_screen_id = k
-    #             break
-
     def refresh(self):
-        self.tracker_info = Func.getTrackerInfo()
+        self.tracker_info = Func.getDeviceInfo("tracker")
         tracker_id = self.using_tracker_id
         self.tracker_name.clear()
         self.tracker_name.addItems(self.tracker_info.values())
@@ -154,20 +127,9 @@ class EyeDC(TabItemWidget):
             self.tracker_name.setCurrentText(tracker_name)
             self.using_tracker_id = tracker_id
 
-        # self.simple_info = Func.getScreenInfo()
-        # screen_id = self.using_screen_id
-        # self.screen.clear()
-        # self.screen.addItems(self.simple_info.values())
-        # screen_name = self.simple_info.get(screen_id)
-        # if screen_name:
-        #     self.screen.setCurrentText(screen_name)
-        #     self.using_screen_id = screen_id
-
-        # 更新attributes
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
-
-        self.getInfo()
+        attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(attributes)
+        self.updateInfo()
 
     def statueChanged(self):
         a = self.show_display_with_drift_correction_target.checkState()
@@ -188,78 +150,60 @@ class EyeDC(TabItemWidget):
         self.loadSetting()
 
     def apply(self):
+        self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
 
     def setAttributes(self, attributes):
-        self.attributes = [f"[{attribute}]" for attribute in attributes]
-        self.x_pos.setCompleter(QCompleter(self.attributes))
-        self.y_pos.setCompleter(QCompleter(self.attributes))
-        # self.target_color.setCompleter(QCompleter(self.attributes))
+        attributes = [f"[{attribute}]" for attribute in attributes]
+        self.x_pos.setCompleter(QCompleter(attributes))
+        self.y_pos.setCompleter(QCompleter(attributes))
 
-    # 返回当前选择attributes
-    def getUsingAttributes(self):
-        using_attributes: list = []
-        self.findAttributes(self.default_properties, using_attributes)
-        return using_attributes
-
-    def findAttributes(self, properties: dict, using_attributes: list):
-        for v in properties.values():
-            if isinstance(v, dict):
-                self.findAttributes(v, using_attributes)
-            elif isinstance(v, str):
-                if v.startswith("[") and v.endswith("]"):
-                    using_attributes.append(v[1:-1])
-
-    def getInfo(self):
-        self.default_properties.clear()
+    def updateInfo(self):
         self.default_properties["Center X"] = self.x_pos.text()
         self.default_properties["Center Y"] = self.y_pos.text()
-        self.default_properties["Target color"] = self.target_color.getColor()
-        self.default_properties["Target style"] = self.target_style.currentText()
+        self.default_properties["Target Color"] = self.target_color.getColor()
+        self.default_properties["Target Style"] = self.target_style.currentText()
         self.default_properties[
-            "Show display with drift correction"] = self.show_display_with_drift_correction_target.checkState()
-        self.default_properties["Fixation triggered"] = self.fixation_triggered.checkState()
+            "Show Display With Drift Correction"] = self.show_display_with_drift_correction_target.checkState()
+        self.default_properties["Fixation Triggered"] = self.fixation_triggered.checkState()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
-        # self.info["Screen Name"] = self.screen.currentText()
-        return self.default_properties
 
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-        else:
-            print("此乱诏也，恕不奉命")
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def loadSetting(self):
         self.x_pos.setText(self.default_properties["Center X"])
         self.y_pos.setText(self.default_properties["Center Y"])
-        self.target_color.setCurrentText(self.default_properties["Target color"])
-        self.target_style.setCurrentText(self.default_properties["Target style"])
+        self.target_color.setCurrentText(self.default_properties["Target Color"])
+        self.target_style.setCurrentText(self.default_properties["Target Style"])
         self.show_display_with_drift_correction_target.setCheckState(
-            self.default_properties["Show display with drift correction"])
-        self.fixation_triggered.setCheckState(self.default_properties["Fixation triggered"])
+            self.default_properties["Show Display With Drift Correction"])
+        self.fixation_triggered.setCheckState(self.default_properties["Fixation Triggered"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
-        # self.screen.setCurrentText(self.info["Screen Name"])
 
-    def eventFilter(self, obj: QObject, e):
-        if obj == self.x_pos or obj == self.y_pos:
-            if e.type() == QEvent.FocusOut:
-                text = obj.text()
-                if text not in self.attributes:
-                    if text and text[0] == "[":
-                        MessageBox.warning(self, "Warning", "Invalid Attribute!", MessageBox.Ok)
-                        obj.clear()
-                        obj.setFocus()
-
-        return QWidget.eventFilter(self, obj, e)
-
-    def getHiddenAttribute(self):
+    def getProperties(self) -> dict:
         """
-        :return:
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
         """
-        hidden_attr = {
-        }
-        return hidden_attr
+        self.refresh()
+        return self.default_properties
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.default_properties
+
+    def restore(self, properties):
+        self.setProperties(properties)
+
+    def clone(self, new_widget_id: str, new_widget_name):
+        clone_widget = EyeDC(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties.copy())
+        return clone_widget
 
     def getXPosition(self) -> str:
         return self.x_pos.text()
@@ -288,32 +232,3 @@ class EyeDC(TabItemWidget):
     """
     Functions that must be complete in new version
     """
-
-    def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        return self.getInfo()
-
-    def store(self):
-        """
-        return necessary data for restoring this widget.
-        @return:
-        """
-        return self.getInfo()
-
-    def restore(self, properties):
-        """
-        restore this widget according to data.
-        @param data: necessary data for restoring this widget
-        @return:
-        """
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
-    def clone(self, new_widget_id: str, new_widget_name):
-        clone_widget = EyeDC(new_widget_id, new_widget_name)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget

@@ -152,19 +152,16 @@ class FramePage(QWidget):
         self.default_properties["Border Width"] = self.border_width.text()
         self.default_properties["Frame Fill Color"] = self.back_color.getColor()
         self.default_properties["Frame Transparent"] = self.transparent.text()
-        return self.default_properties
 
     def getProperties(self):
-        self.updateInfo()
         return self.default_properties
 
     def setProperties(self, properties: dict):
-        self.default_properties.clear()
         self.default_properties.update(properties)
-        self.loadInfo()
+        self.loadSetting()
 
     # 加载参数设置
-    def loadInfo(self):
+    def loadSetting(self):
         self.x_pos.setCurrentText(self.default_properties["Center X"])
         self.y_pos.setCurrentText(self.default_properties["Center Y"])
         self.width.setCurrentText(self.default_properties["Width"])

@@ -45,7 +45,6 @@ class DeviceHome(QListWidget):
             item.setProperties(self.default_properties[device_id])
 
     def setProperties(self, properties: dict):
-        self.default_properties.clear()
         self.default_properties.update(properties)
         self.loadSetting()
 

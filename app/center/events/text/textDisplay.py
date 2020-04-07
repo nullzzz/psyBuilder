@@ -1,12 +1,10 @@
-from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QToolBar, QAction, QTextEdit
 
 from app.func import Func
-from lib import MessageBox, TabItemMainWindow
+from lib import TabItemMainWindow
 from .textProperty import TextProperty
-from .view import Preview
 
 
 class TextDisplay(TabItemMainWindow):
@@ -19,24 +17,23 @@ class TextDisplay(TabItemMainWindow):
 
         self.html = self.pro_window.html
         self.font = self.pro_window.font
-        self.default_properties = self.pro_window.getInfo()
 
         self.pro_window.general.text_edit.setDocument(self.text_label.document())
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
-        self.align = "Center"
-        self.A_v = "Center"
-
-        self.fore_color = "0,0,0"
-        self.back_color = "255,255,255"
-        self.transparent_value = "100%"
-
-        self.x_pos = "0"
-        self.y_pos = "0"
-        self.w_size = "100%"
-        self.h_size = "100%"
+        # self.align = "Center"
+        # self.A_v = "Center"
+        #
+        # self.fore_color = "0,0,0"
+        # self.back_color = "255,255,255"
+        # self.transparent_value = "100%"
+        #
+        # self.x_pos = "0"
+        # self.y_pos = "0"
+        # self.w_size = "100%"
+        # self.h_size = "100%"
         self.setUI()
 
     def setUI(self):
@@ -44,55 +41,46 @@ class TextDisplay(TabItemMainWindow):
         self.text_label.setText("Your text will show here")
         self.text_label.setAlignment(Qt.AlignCenter)
         self.setCentralWidget(self.text_label)
-
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
-        open_pro.triggered.connect(self.openPro)
+        open_pro.triggered.connect(self.openSettingWindow)
         pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
-        pre_view.triggered.connect(self.preView)
+        # pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
         # tool.addAction(pre_view)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
-    def openPro(self):
+    def openSettingWindow(self):
         self.refresh()
-        self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
+        attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(attributes)
         self.pro_window.show()
 
     def refresh(self):
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
         self.pro_window.refresh()
-        self.getInfo()
 
     # 预览
-    def preView(self):
-        try:
-            self.preview = Preview(self.x_pos, self.y_pos, self.w_size, self.h_size)
-            # self.preview.text.setStyleSheet("background-color:{}".format(self.back_color))
-            self.preview.setWindowModality(Qt.ApplicationModal)
-            self.preview.setHtml(self.html)
-            self.preview.setFont(self.pro_window.general.text_edit.font())
-            self.preview.showFullScreen()
-            self.preview.moveText()
-            self.preview.setTransparent(self.transparent_value)
-            self.t = QtCore.QTimer()
-            self.t.timeout.connect(self.preview.close)
-            self.t.start(10000)
-            self.t.setSingleShot(True)
-        except AttributeError as ae:
-            MessageBox.warning(self, "Unknown Error", f"Please contact the developers!", MessageBox.Ok)
-        # except Exception as e:
-        #     print(e)
-        #     print(type(e))
-
-    def setPro(self, pro: TextProperty):
-        del self.pro_window
-        self.pro_window = pro
-        self.pro_window.ok_bt.clicked.connect(self.ok)
-        self.pro_window.cancel_bt.clicked.connect(self.cancel)
-        self.pro_window.apply_bt.clicked.connect(self.apply)
+    # def preView(self):
+    #     return
+    #     try:
+    #         self.preview = Preview(self.x_pos, self.y_pos, self.w_size, self.h_size)
+    #         # self.preview.text.setStyleSheet("background-color:{}".format(self.back_color))
+    #         self.preview.setWindowModality(Qt.ApplicationModal)
+    #         self.preview.setHtml(self.html)
+    #         self.preview.setFont(self.pro_window.general.text_edit.font())
+    #         self.preview.showFullScreen()
+    #         self.preview.moveText()
+    #         self.preview.setTransparent(self.transparent_value)
+    #         self.t = QtCore.QTimer()
+    #         self.t.timeout.connect(self.preview.close)
+    #         self.t.start(10000)
+    #         self.t.setSingleShot(True)
+    #     except AttributeError as ae:
+    #         MessageBox.warning(self, "Unknown Error", f"Please contact the developers!", MessageBox.Ok)
+    #     # except Exception as e:
+    #     #     print(e)
+    #     #     print(type(e))
 
     def ok(self):
         self.apply()
@@ -102,43 +90,32 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window.loadSetting()
 
     def apply(self):
-        self.getInfo()
-        self.parseProperties()
-        # 发送信号
+        self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
 
-    # 获取参数
-    def parseProperties(self):
-        self.html = self.pro_window.html
-        self.fore_color = self.pro_window.general.fore_color.getColor()
-        self.back_color = self.pro_window.general.back_color.getColor()
-        self.transparent_value = self.pro_window.general.transparent.text()
-
-        self.x_pos = self.default_properties.get("Center X", "0")
-        self.y_pos = self.default_properties.get("Center Y", "0")
-        self.w_size = self.default_properties.get("Width", "100%")
-        self.h_size = self.default_properties.get("Height", "100%")
-        if self.x_pos.startswith("[") and self.x_pos.endswith("]"):
-            self.x_pos = "0"
-        if self.y_pos.startswith("[") and self.y_pos.endswith("]"):
-            self.y_pos = "0"
-        if self.w_size.startswith("[") and self.w_size.endswith("]"):
-            self.w_size = "100%"
-        if self.h_size.startswith("[") and self.h_size.endswith("]"):
-            self.h_size = "100%"
+    # # 获取参数
+    # def parseProperties(self):
+    #     self.html = self.pro_window.html
+    #     self.fore_color = self.pro_window.general.fore_color.getColor()
+    #     self.back_color = self.pro_window.general.back_color.getColor()
+    #     self.transparent_value = self.pro_window.general.transparent.text()
+    #
+    #     self.x_pos = self.default_properties.get("Center X", "0")
+    #     self.y_pos = self.default_properties.get("Center Y", "0")
+    #     self.w_size = self.default_properties.get("Width", "100%")
+    #     self.h_size = self.default_properties.get("Height", "100%")
+    #     if self.x_pos.startswith("[") and self.x_pos.endswith("]"):
+    #         self.x_pos = "0"
+    #     if self.y_pos.startswith("[") and self.y_pos.endswith("]"):
+    #         self.y_pos = "0"
+    #     if self.w_size.startswith("[") and self.w_size.endswith("]"):
+    #         self.w_size = "100%"
+    #     if self.h_size.startswith("[") and self.h_size.endswith("]"):
+    #         self.h_size = "100%"
 
     # 返回设置参数
-    def getInfo(self):
-        self.html = self.pro_window.html
-        self.default_properties = self.pro_window.getInfo()
-        return self.default_properties
-
-    def getShowProperties(self):
-        info = self.default_properties.copy()
-        info.pop("Html")
-        info.pop("Input devices")
-        info.pop("Output devices")
-        return info
+    def updateInfo(self):
+        self.pro_window.updateInfo()
 
     def changeDisplayText(self):
         self.html = self.text_label.toHtml()
@@ -149,29 +126,19 @@ class TextDisplay(TabItemMainWindow):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
 
-    # 返回当前选择attributes
-    def getUsingAttributes(self):
-        using_attributes: list = []
-        self.findAttributes(self.default_properties, using_attributes)
-        return using_attributes
-
-    def findAttributes(self, properties: dict, using_attributes: list):
-        for v in properties.values():
-            if isinstance(v, dict):
-                self.findAttributes(v, using_attributes)
-            elif isinstance(v, str):
-                if v.startswith("[") and v.endswith("]"):
-                    using_attributes.append(v[1:-1])
-
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
+        self.pro_window.setProperties(properties)
+        self.apply()
 
-    def loadSetting(self):
-        self.pro_window.setOther(self.html)
-        self.pro_window.setProperties(self.default_properties)
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.default_properties
+
+    def restore(self, properties: dict):
+        self.setProperties(properties)
 
     # 返回各项参数
     # 大部分以字符串返回，少数点击选择按钮返回布尔值
@@ -351,36 +318,3 @@ class TextDisplay(TabItemMainWindow):
     """
     Functions that must be complete in new version
     """
-
-    def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        self.html = self.pro_window.html
-        self.default_properties = self.pro_window.getInfo()
-        return self.default_properties
-
-    def store(self):
-        """
-        return necessary data for restoring this widget.
-        @return:
-        """
-        return self.getInfo()
-
-    def restore(self, properties):
-        """
-        restore this widget according to data.
-        @param data: necessary data for restoring this widget
-        @return:
-        """
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-            self.apply()
-
-    def clone(self, new_widget_id, new_widget_name):
-        clone_widget = TextDisplay(new_widget_id, new_widget_name)
-        clone_widget.setPro(self.pro_window.clone())
-        clone_widget.apply()
-        return clone_widget

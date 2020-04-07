@@ -36,12 +36,17 @@ class TabItemMainWindow(QMainWindow):
         and completer.
         :return:
         """
+        self.pro_window.refresh()
 
     def openSettingWindow(self):
         """
         open setting Window
         :return:
         """
+        self.refresh()
+        attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(attributes)
+        self.pro_window.show()
 
     def setAttributes(self, attributes: list):
         """
@@ -50,6 +55,8 @@ class TabItemMainWindow(QMainWindow):
         :param attributes:
         :return:
         """
+        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
+        self.pro_window.setAttributes(format_attributes)
 
     def getUsingAttributes(self) -> list:
         """
@@ -80,6 +87,9 @@ class TabItemMainWindow(QMainWindow):
         :return: a dict of properties
         :rtype: dict
         """
+        self.refresh()
+        properties = {}
+        return properties
 
     def getUsingDeviceCount(self) -> int:
         """

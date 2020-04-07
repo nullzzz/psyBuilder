@@ -13,11 +13,10 @@ class StartR(TabItemWidget):
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
-        self.attributes = []
 
         self.default_properties = {
-            "Status message": "",
-            "Sync to next event flip": "No",
+            "Status Message": "",
+            "Sync To Next Event Flip": "No",
             "EyeTracker Name": "",
         }
         self.status_message = VarLineEdit()
@@ -25,11 +24,11 @@ class StartR(TabItemWidget):
         self.sync_to_next_event_flip.addItems(("No", "Yes"))
 
         self.using_tracker_id = ""
-        self.tracker_info = Func.getTrackerInfo()
+        self.tracker_info = Func.getDeviceInfo("tracker")
         self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
-        self.msg = ""
+
         self.bt_ok = QPushButton("OK")
         self.bt_ok.clicked.connect(self.ok)
         self.bt_cancel = QPushButton("Cancel")
@@ -37,10 +36,6 @@ class StartR(TabItemWidget):
         self.bt_apply = QPushButton("Apply")
         self.bt_apply.clicked.connect(self.apply)
         self.setUI()
-
-        self.setAttributes(Func.getAttributes(self.widget_id))
-
-        self.status_message.setFocus()
 
     def setUI(self):
         self.setWindowTitle("StartR")
@@ -80,7 +75,7 @@ class StartR(TabItemWidget):
                 break
 
     def refresh(self):
-        self.tracker_info = Func.getTrackerInfo()
+        self.tracker_info = Func.getDeviceInfo("tracker")
         tracker_id = self.using_tracker_id
         self.tracker_name.clear()
         self.tracker_name.addItems(self.tracker_info.values())
@@ -90,9 +85,9 @@ class StartR(TabItemWidget):
             self.using_tracker_id = tracker_id
 
         # 更新attributes
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
-        self.getInfo()
+        attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(attributes)
+        self.updateInfo()
 
     def ok(self):
         self.apply()
@@ -103,54 +98,55 @@ class StartR(TabItemWidget):
         self.loadSetting()
 
     def apply(self):
-        self.msg = self.status_message.text()
+        self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
 
     def setAttributes(self, attributes):
-        self.attributes = [f"[{attribute}]" for attribute in attributes]
-        self.status_message.setCompleter(QCompleter(self.attributes))
+        attributes = [f"[{attribute}]" for attribute in attributes]
+        self.status_message.setCompleter(QCompleter(attributes))
 
-    # 返回当前选择attributes
-    def getUsingAttributes(self):
-        using_attributes: list = []
-        self.findAttributes(self.default_properties, using_attributes)
-        return using_attributes
-
-    def findAttributes(self, properties: dict, using_attributes: list):
-        for v in properties.values():
-            if isinstance(v, dict):
-                self.findAttributes(v, using_attributes)
-            elif isinstance(v, str):
-                if v.startswith("[") and v.endswith("]"):
-                    using_attributes.append(v[1:-1])
-
-    def getInfo(self):
+    def updateInfo(self):
         self.default_properties.clear()
-        self.default_properties["Statue message"] = self.status_message.text()
-        self.default_properties["Sync to next event flip"] = self.sync_to_next_event_flip.currentText()
+        self.default_properties["Statue Message"] = self.status_message.text()
+        self.default_properties["Sync To Next Event Flip"] = self.sync_to_next_event_flip.currentText()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
-        return self.default_properties
 
     def setProperties(self, properties: dict):
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-        else:
-            print(f"此乱诏也，{self.__class__}不奉命")
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def loadSetting(self):
-        self.status_message.setText(self.default_properties["Statue message"])
-        self.sync_to_next_event_flip.setCurrentText(self.default_properties["Sync to next event flip"])
-
+        self.status_message.setText(self.default_properties["Statue Message"])
+        self.sync_to_next_event_flip.setCurrentText(self.default_properties["Sync To Next Event Flip"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
 
-    def getHiddenAttribute(self):
+    def getProperties(self) -> dict:
         """
-        :return:
+        get this widget's properties to show it in Properties Window.
+        @return: a dict of properties
         """
-        hidden_attr = {
-        }
-        return hidden_attr
+        self.refresh()
+        return self.default_properties
+
+    def store(self):
+        """
+        return necessary data for restoring this widget.
+        @return:
+        """
+        return self.default_properties
+
+    def restore(self, properties):
+        """
+        restore this widget according to data.
+        @param data: necessary data for restoring this widget
+        @return:
+        """
+        self.setProperties(properties)
+
+    def clone(self, new_widget_id: str, new_widget_name: str):
+        clone_widget = StartR(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties.copy())
+        return clone_widget
 
     def getStatusMessage(self) -> str:
         return self.status_message.text()
@@ -167,32 +163,3 @@ class StartR(TabItemWidget):
     """
     Functions that must be complete in new version
     """
-
-    def getProperties(self) -> dict:
-        """
-        get this widget's properties to show it in Properties Window.
-        @return: a dict of properties
-        """
-        return self.getInfo()
-
-    def store(self):
-        """
-        return necessary data for restoring this widget.
-        @return:
-        """
-        return self.getInfo()
-
-    def restore(self, properties):
-        """
-        restore this widget according to data.
-        @param data: necessary data for restoring this widget
-        @return:
-        """
-        if properties:
-            self.default_properties = properties.copy()
-            self.loadSetting()
-
-    def clone(self, new_widget_id: str, new_widget_name: str):
-        clone_widget = StartR(new_widget_id, new_widget_name)
-        clone_widget.setProperties(self.default_properties)
-        return clone_widget
