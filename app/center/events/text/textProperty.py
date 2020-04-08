@@ -73,7 +73,6 @@ class TextProperty(QWidget):
         self.html = html
 
     def setProperties(self, properties: dict):
-        print(properties)
         self.general.setProperties(properties["General"])
         self.frame.setProperties(properties["Frame"])
         self.duration.setProperties(properties["Duration"])
@@ -87,3 +86,7 @@ class TextProperty(QWidget):
         self.general.loadSetting()
         self.frame.loadSetting()
         self.duration.loadSetting()
+
+    def testHtml(self):
+        html = self.general.text_edit.toHtml()
+        self.general.text_edit.setHtml(html)

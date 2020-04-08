@@ -64,7 +64,7 @@ class TabItemMainWindow(QMainWindow):
         :return:
         """
         using_attributes: list = []
-        self.findAttributes(self.info, using_attributes)
+        self.findAttributes(self.default_properties, using_attributes)
         return using_attributes
 
     def findAttributes(self, properties: dict, using_attributes: list):

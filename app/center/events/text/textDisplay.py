@@ -3,6 +3,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QToolBar, QAction, QTextEdit
 
 from app.func import Func
+from example.highlightOfTextEdit import AttributeHighlighter
 from lib import TabItemMainWindow
 from .textProperty import TextProperty
 
@@ -10,7 +11,7 @@ from .textProperty import TextProperty
 class TextDisplay(TabItemMainWindow):
     def __init__(self, widget_id: str, widget_name: str):
         super(TextDisplay, self).__init__(widget_id, widget_name)
-        self.attributes: list = []
+
         self.text_label = QTextEdit()
 
         self.pro_window = TextProperty()
@@ -20,6 +21,8 @@ class TextDisplay(TabItemMainWindow):
         self.font = self.pro_window.font
 
         self.pro_window.general.text_edit.setDocument(self.text_label.document())
+
+        self.lighter = AttributeHighlighter(self.text_label.document())
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
@@ -51,12 +54,6 @@ class TextDisplay(TabItemMainWindow):
         # tool.addAction(pre_view)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
-
-    def openSettingWindow(self):
-        self.refresh()
-        attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(attributes)
-        self.pro_window.show()
 
     def refresh(self):
         self.pro_window.refresh()
@@ -91,8 +88,10 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window.loadSetting()
 
     def apply(self):
-        self.updateInfo()
-        self.propertiesChanged.emit(self.widget_id)
+        self.pro_window.testHtml()
+
+        # self.updateInfo()
+        # self.propertiesChanged.emit(self.widget_id)
 
     # # 获取参数
     # def parseProperties(self):
@@ -124,6 +123,7 @@ class TextDisplay(TabItemMainWindow):
 
     # 设置可选参数
     def setAttributes(self, attributes):
+        self.lighter.updateRule(attributes)
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
 
