@@ -3,6 +3,7 @@ from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMenu, QAction, \
     QComboBox, QColorDialog, QToolBar
 
+from app.center.events.slider.left.leftBox import LeftBox
 from app.func import Func
 from lib import TabItemMainWindow
 from ...events.slider.item.diaItem import DiaItem
@@ -10,7 +11,6 @@ from ...events.slider.item.linItem import LineItem
 from ...events.slider.item.otherItem import OtherItem
 from ...events.slider.item.pixItem import PixItem
 from ...events.slider.item.textItem import TextItem
-from ...events.slider.leftBox import LeftBox
 from ...events.slider.property import SliderProperty
 from ...events.slider.scene import Scene
 
@@ -34,7 +34,7 @@ class Slider(TabItemMainWindow):
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
         self.view.setMaximumSize(width, height)
         self.scene.setSceneRect(0, 0, width, height)
-        self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
+        # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
         self.default_properties: dict = {
             "Items": {},
@@ -295,9 +295,9 @@ class Slider(TabItemMainWindow):
         self.pro_window.refresh()
 
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
-        self.view.setMaximumSize(width, height)
+        self.setMaximumSize(width, height)
         self.scene.setSceneRect(0, 0, width, height)
-        self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
+        # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]

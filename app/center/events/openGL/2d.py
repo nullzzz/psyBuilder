@@ -4,6 +4,7 @@ from PyQt5.QtOpenGL import QGLFormat, QGLWidget, QGL
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMenu, QAction, \
     QComboBox, QColorDialog, QToolBar
 
+from app.center.events.slider.left.leftBox import LeftBox
 from app.func import Func
 from lib import TabItemMainWindow
 from ...events.slider.item.diaItem import DiaItem
@@ -11,7 +12,6 @@ from ...events.slider.item.linItem import LineItem
 from ...events.slider.item.otherItem import OtherItem
 from ...events.slider.item.pixItem import PixItem
 from ...events.slider.item.textItem import TextItem
-from ...events.slider.leftBox import LeftBox
 from ...events.slider.property import SliderProperty
 from ...events.slider.scene import Scene
 

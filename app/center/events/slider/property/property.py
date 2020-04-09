@@ -1,9 +1,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout)
 
-from ...events.duration import DurationPage
-from ...events.framePage import FramePage
-from ...events.slider.general import SliderGeneral
+from app.center.events.duration import DurationPage
+from app.center.events.framePage import FramePage
+from app.center.events.slider.property.general import SliderGeneral
 
 
 class SliderProperty(QWidget):

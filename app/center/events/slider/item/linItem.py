@@ -1,19 +1,20 @@
-from PyQt5.QtCore import Qt, QLineF, pyqtSignal
+from PyQt5.QtCore import QLineF
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsItem
 
 from app.info import Info
-from ..item.line.lineProperty import LineProperty
+from ..item.line import LineProperty
 
 
 class LineItem(QGraphicsLineItem):
-    propertyChanged = pyqtSignal(dict)
+    Line = 0
 
-    def __init__(self, line: QLineF, item_name: str = ""):
+    def __init__(self, item_type: int = 0, item_name: str = ""):
         super(LineItem, self).__init__()
-        self.item_type = 0
+        self.item_type = item_type
         self.item_name = item_name if item_name else self.generateItemName()
 
+        line = QLineF(100, 100, 200, 200)
         self.setLine(line)
 
         self.pro_window = LineProperty()
@@ -30,6 +31,8 @@ class LineItem(QGraphicsLineItem):
             'X': 1,
             'Y': 1,
             "Properties": self.properties,
+            "P1": (0, 0),
+            "P2": (100, 100)
         }
 
     def generateItemName(self) -> str:
@@ -46,17 +49,14 @@ class LineItem(QGraphicsLineItem):
         self.openPro()
 
     def openPro(self):
-        self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setPosition()
         self.pro_window.show()
 
     def setPosition(self):
-
         x1 = self.line().x1() + self.scenePos().x()
         y1 = self.line().y1() + self.scenePos().y()
         x2 = self.line().x2() + self.scenePos().x()
         y2 = self.line().y2() + self.scenePos().y()
-        self.setLine(x1, y1, x2, y2)
         self.pro_window.setPosition(x1, y1, x2, y2)
 
     def setWidth(self, width):
@@ -102,6 +102,8 @@ class LineItem(QGraphicsLineItem):
         self.default_properties["X"] = self.scenePos().x()
         self.default_properties["Y"] = self.scenePos().y()
         self.default_properties["Z"] = self.zValue()
+        self.default_properties["P1"] = (self.line().x1() + self.scenePos().x(), self.line().y1() + self.scenePos().y())
+        self.default_properties["P2"] = (self.line().x2() + self.scenePos().x(), self.line().y2() + self.scenePos().y())
 
     def getInfo(self):
         return self.default_properties
@@ -114,7 +116,9 @@ class LineItem(QGraphicsLineItem):
         if x1.startswith("[") or x2.startswith("[") or y1.startswith("[") or y2.startswith("["):
             pass
         else:
-            line = QLineF(float(x1), float(y1), float(x2), float(y2))
+            cx, cy = (float(x1) + float(x2)) / 2, (float(y1) + float(y2)) / 2
+            self.setPos(cx, cy)
+            line = QLineF(float(x1) - cx, float(y1) - cy, float(x2) - cx, float(y2) - cy)
             self.setLine(line)
         __color = self.properties.get("Border Color")
         color = "0,0,0" if __color.startswith("[") else __color
@@ -132,6 +136,8 @@ class LineItem(QGraphicsLineItem):
         self.default_properties["X"] = properties["X"]
         self.default_properties["Y"] = properties["Y"]
         self.default_properties["Z"] = properties["Z"]
+        self.default_properties["P1"] = properties["P1"]
+        self.default_properties["P2"] = properties["P2"]
         self.loadSetting()
 
     def loadSetting(self):
@@ -142,9 +148,8 @@ class LineItem(QGraphicsLineItem):
         self.setZValue(z)
 
     def clone(self):
-        # todo position of item and it's line
-        line = QLineF(self.line().x1(), self.line().y1(), self.line().x2(), self.line().y2())
-        new = LineItem(line)
+        new = LineItem()
+        self.updateInfo()
         new.setProperties(self.default_properties.copy())
         new.changeSomething()
         return new
