@@ -167,13 +167,13 @@ class DiaItem(QGraphicsPolygonItem):
                         h_ratio = v_ratio
 
                 for iVertex in range(len(self.polygon())):
-                    cX = self.polygon().value(iVertex).x() * h_ratio
-                    cY = self.polygon().value(iVertex).y() * v_ratio
+                    c_x = self.polygon().value(iVertex).x() * h_ratio
+                    c_y = self.polygon().value(iVertex).y() * v_ratio
 
                     if iVertex == 0:
-                        path.moveTo(cX, cY)
+                        path.moveTo(c_x, c_y)
                     else:
-                        path.lineTo(cX, cY)
+                        path.lineTo(c_x, c_y)
             else:
                 raise Exception("item_type should be of 'Arc','rectangle', or 'circle' !!")
 

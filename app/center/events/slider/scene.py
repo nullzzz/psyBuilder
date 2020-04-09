@@ -126,7 +126,17 @@ class Scene(QGraphicsScene):
 
     def mouseMoveEvent(self, event):
         if self.my_mode == self.InsertLine and self.line:
-            new_line = QLineF(self.line.line().p1(), event.scenePos())
+            line = self.line.line()
+            p2 = event.scenePos()
+            # straight line
+            if event.modifiers() == Qt.ControlModifier:
+                dx = p2.x() - line.x1()
+                dy = p2.y() - line.y1()
+                if dx < 10:
+                    p2.setX(line.x1())
+                if dy < 10:
+                    p2.setY(line.y1())
+            new_line = QLineF(line.p1(), p2)
             self.line.setLine(new_line)
         elif self.my_mode == self.MoveItem or self.my_mode == self.InsertItem:
             self.update()
