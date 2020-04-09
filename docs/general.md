@@ -46,4 +46,16 @@
 > 因此在作出某些数据初始时的数据修改时, 我们需要重新保存初始状态, 将现有的文件手动删除后, 程序会自动保存
 
 # 环境配置
-> 详见Requirement.txt, 务必保证PyQt5为5.14.1及以上, 否则会出现段错误
+> PyQt5: 5.14.2 or later.
+> Python: 3.8 or later.
+> upgrade them on time!
+> 详见Requirement.txt, 务必保证PyQt5为5.14.2及以上, 否则会出现段错误
+
+
+# Advice for compile
++ separate logic form UI
+> This means no dialog. Just display your information in the output window by certain function.
++ less is more
+> simplify unnecessary steps: such as the validation of file name, we do it in the UI part.
+> more code file instead of only one. Besides, maintain a compile_func.py like func.py. we are simplifying func.py
+> ...

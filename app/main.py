@@ -236,42 +236,42 @@ class Psy(QMainWindow):
         QApplication.processEvents()
         widget = None
         QApplication.processEvents()
-        try:
-            if widget_type == Info.TIMELINE:
-                widget = Timeline(widget_id, widget_name)
-            elif widget_type == Info.IF:
-                widget = IfBranch(widget_id, widget_name)
-            elif widget_type == Info.SWITCH:
-                widget = Switch(widget_id, widget_name)
-            elif widget_type == Info.CYCLE:
-                widget = Cycle(widget_id, widget_name)
-            elif widget_type == Info.IMAGE:
-                widget = ImageDisplay(widget_id, widget_name)
-            elif widget_type == Info.VIDEO:
-                widget = VideoDisplay(widget_id, widget_name)
-            elif widget_type == Info.TEXT:
-                widget = TextDisplay(widget_id, widget_name)
-            elif widget_type == Info.SOUND:
-                widget = SoundDisplay(widget_id, widget_name)
-            elif widget_type == Info.SLIDER:
-                widget = Slider(widget_id, widget_name)
-            elif widget_type == Info.CALIBRATION:
-                widget = EyeCalibrate(widget_id, widget_name)
-            elif widget_type == Info.ENDR:
-                widget = EndR(widget_id, widget_name)
-            elif widget_type == Info.DC:
-                widget = EyeDC(widget_id, widget_name)
-            elif widget_type == Info.STARTR:
-                widget = StartR(widget_id, widget_name)
-            elif widget_type == Info.LOG:
-                widget = Close(widget_id, widget_name)
-            elif widget_type == Info.QUEST_UPDATE:
-                widget = QuestUpdate(widget_id, widget_name)
-            else:
-                # if fail to create widget, exit.
-                exit()
-        except Exception as e:
-            raise Exception(f"create {widget_type} fail => widget_id: {widget_id}, widget_name: {widget_name}")
+        # try:
+        if widget_type == Info.TIMELINE:
+            widget = Timeline(widget_id, widget_name)
+        elif widget_type == Info.IF:
+            widget = IfBranch(widget_id, widget_name)
+        elif widget_type == Info.SWITCH:
+            widget = Switch(widget_id, widget_name)
+        elif widget_type == Info.CYCLE:
+            widget = Cycle(widget_id, widget_name)
+        elif widget_type == Info.IMAGE:
+            widget = ImageDisplay(widget_id, widget_name)
+        elif widget_type == Info.VIDEO:
+            widget = VideoDisplay(widget_id, widget_name)
+        elif widget_type == Info.TEXT:
+            widget = TextDisplay(widget_id, widget_name)
+        elif widget_type == Info.SOUND:
+            widget = SoundDisplay(widget_id, widget_name)
+        elif widget_type == Info.SLIDER:
+            widget = Slider(widget_id, widget_name)
+        elif widget_type == Info.CALIBRATION:
+            widget = EyeCalibrate(widget_id, widget_name)
+        elif widget_type == Info.ENDR:
+            widget = EndR(widget_id, widget_name)
+        elif widget_type == Info.DC:
+            widget = EyeDC(widget_id, widget_name)
+        elif widget_type == Info.STARTR:
+            widget = StartR(widget_id, widget_name)
+        elif widget_type == Info.LOG:
+            widget = Close(widget_id, widget_name)
+        elif widget_type == Info.QUEST_UPDATE:
+            widget = QuestUpdate(widget_id, widget_name)
+        else:
+            # if fail to create widget, exit.
+            exit()
+        # except Exception as e:
+        #     raise Exception(f"create {widget_type} fail => widget_id: {widget_id}, widget_name: {widget_name}")
         # change data set in Kernel
         QApplication.processEvents()
         Info.Widgets[widget_id] = widget
@@ -334,7 +334,6 @@ class Psy(QMainWindow):
             widget.itemAdded.connect(self.handleItemAdded)
             widget.itemDeleted.connect(self.handleItemDeleted)
         elif widget_type == Info.IF or widget_type == Info.SWITCH:
-            # todo condition widgets' signal "itemAdd" has no variable "index"
             widget.itemAdded.connect(self.handleItemAdded)
             widget.itemDeleted.connect(self.handleItemDeleted)
             widget.itemNameChanged.connect(self.handleItemNameChanged)
@@ -354,7 +353,7 @@ class Psy(QMainWindow):
         # set timeline as a tab
         self.center.openTab(widget_id)
 
-    def handleItemAdded(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int):
+    def handleItemAdded(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int = -1):
         """
         When item is added, handle related affairs
         """
@@ -363,8 +362,8 @@ class Psy(QMainWindow):
         # do job
         # add node in origin parent node firstly, because some widgets need to get attributes in __init__ function.
         show = True
-        if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
-            show = False
+        # if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
+        #     show = False
         self.structure.addNode(parent_widget_id, widget_id, widget_name, index, show)
         # create widget secondly
         self.createWidget(widget_id, widget_name)
@@ -823,24 +822,24 @@ class Psy(QMainWindow):
                     2)
             return False
         # restore widgets: create origin widget and map to right widget ids
-        try:
-            # restore structure
-            self.structure.restore(structure)
-            # restore widgets according to structure, because some widget need to get attributes in __init__ function
-            root_widget_id, root_widget_name, children = structure
-            created_widgets = {}
-            self.restoreWidget(names, widgets_data, created_widgets, root_widget_id, root_widget_name, children)
-            # restore Info.Name
-            Info.Names = names
-            # restore tabs
-            # self.center.restore(tabs)
-            self.center.openTab(f"{Info.TIMELINE}.0")
-            if show:
-                Func.print(f"File '{file_path}' loaded successfully.", 1)
-            return True
-        except Exception as e:
-            Func.print(f"Due to error '{e}', the file {file_path} failed to load.", 2)
-            return False
+        # try:
+        # restore structure
+        self.structure.restore(structure)
+        # restore widgets according to structure, because some widget need to get attributes in __init__ function
+        root_widget_id, root_widget_name, children = structure
+        created_widgets = {}
+        self.restoreWidget(names, widgets_data, created_widgets, root_widget_id, root_widget_name, children)
+        # restore Info.Name
+        Info.Names = names
+        # restore tabs
+        # self.center.restore(tabs)
+        self.center.openTab(f"{Info.TIMELINE}.0")
+        if show:
+            Func.print(f"File '{file_path}' loaded successfully.", 1)
+        return True
+        # except Exception as e:
+        #     Func.print(f"Due to error '{e}', the file {file_path} failed to load.", 2)
+        #     return False
 
     def restoreWidget(self, names: dict, widgets_data: dict, created_widgets: dict, widget_id: str, widget_name: str,
                       children: list):

@@ -25,6 +25,7 @@ class TabItemWidget(QWidget):
 
     def __init__(self, widget_id: str, widget_name: str):
         super(TabItemWidget, self).__init__()
+        self.setWindowIcon(Func.getImageObject("common/con.png", type=1))
         # widget_id is used to distinguish different widgets
         self.widget_id = widget_id
         self.widget_name = widget_name

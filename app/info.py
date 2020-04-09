@@ -55,7 +55,7 @@ class Info(object):
     TEXT = "Text"
     IMAGE = "Image"
     VIDEO = "Video"
-    SLIDER = "slider"
+    SLIDER = "Slider"
     BUG = "Bug"
 
     OPEN = "Open"
@@ -177,8 +177,7 @@ class Info(object):
     TimelineSend = 0
     CycleSend = 1
     StructureSend = 2
-    IfSend = 3
-    SwitchSend = 4
+    ConditionSend = 3
 
     # name pattern
     WidgetPattern = [r"^[a-zA-Z][a-zA-Z0-9_]*$",

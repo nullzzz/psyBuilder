@@ -62,7 +62,7 @@ class IconChoose(QWidget):
         grid_layout = QGridLayout()
         event_tip = QLabel("Stim Type:")
         event_tip.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
-        name_tip = QLabel("Object Name:")
+        name_tip = QLabel("Event Name:")
         name_tip.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
         grid_layout.addWidget(event_tip, 0, 0, 1, 1)
         grid_layout.addWidget(self.event_types, 0, 1, 1, 3)
@@ -71,6 +71,10 @@ class IconChoose(QWidget):
         grid_layout.addWidget(self.name_line, 4, 1, 1, 3)
 
         self.setLayout(grid_layout)
+
+    def refresh(self):
+        if self.widget is not None:
+            self.widget.refresh()
 
     def changeEventType(self, current_type):
         """
@@ -96,6 +100,10 @@ class IconChoose(QWidget):
         self.event_type = current_type
         self.icon_label.setIcon(current_type)
         self.name_line.setText(sub_name)
+
+        if self.current_sub_wid != "":
+            self.widget = Func.getWidget(self.current_sub_wid)
+            self.linkWidgetSignal()
 
     def getSubId(self, event_type: str = ""):
         """
@@ -130,50 +138,44 @@ class IconChoose(QWidget):
         name = f"U_{event_type}_{int(time.time() % 10007)}"
         return name
 
-    def changeName(self, new_name: str):
-        if new_name in Info.NAME_WID.keys() and new_name != self.event_name:
-            self.name_line.setColor("red")
-        else:
-            self.name_line.setColor("white")
-            if new_name != self.event_name:
-                self.event_name = new_name
-                self.itemNameChanged.emit(self.current_sub_wid, new_name)
+    # def changeName(self, new_name: str):
+    #     if new_name in Info.NAME_WID.keys() and new_name != self.event_name:
+    #         self.name_line.setColor("red")
+    #     else:
+    #         self.name_line.setColor("white")
+    #         if new_name != self.event_name:
+    #             self.event_name = new_name
+    #             self.itemNameChanged.emit(self.current_sub_wid, new_name)
 
     def ok(self):
         self.apply()
         self.pro_window.close()
 
     def apply(self):
-        self.getInfo()
+        self.updateInfo()
 
     def cancel(self):
         self.pro_window.close()
 
     def openProWindow(self):
-        if self.current_sub_wid != "":
-            if self.widget is None:
-                self.widget = Func.getWidget(self.current_sub_wid)
-                self.linkWidgetSignal()
-            if self.event_type == Info.SLIDER:
-                self.widget.show()
-            else:
-                self.widget.pro_window.show()
+        if self.event_type == Info.SLIDER:
+            self.widget.show()
+        else:
+            self.widget.pro_window.show()
 
-    def getInfo(self):
-        self.default_properties.clear()
+    def updateInfo(self):
         self.default_properties["Id Pool"] = self.pool
         self.default_properties["Sub Wid"] = self.current_sub_wid
         self.default_properties["Stim Type"] = self.event_type
         self.default_properties["Event Name"] = self.event_name
-        return self.default_properties
 
     def getProperties(self):
-        return self.getInfo()
+        return self.default_properties
 
     # 加载外部属性
     def setProperties(self, properties: dict):
         self.blockSignals(True)
-        self.default_properties = properties.copy()
+        self.default_properties.update(properties)
         self.loadSetting()
         self.blockSignals(False)
 

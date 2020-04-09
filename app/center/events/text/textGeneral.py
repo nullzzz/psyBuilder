@@ -1,17 +1,16 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QTextEdit, \
     QFontComboBox, QCompleter
 
 from app.func import Func
+from example import SmartTextEdit
 from lib import VarComboBox, VarLineEdit, ColorListEditor
 
 
 class TextTab1(QWidget):
     def __init__(self, parent=None):
         super(TextTab1, self).__init__(parent)
-
-        self.attributes: list = []
 
         self.default_properties = {
             "Text": "",
@@ -25,32 +24,32 @@ class TextTab1(QWidget):
         }
 
         # todo: highlight of variable
-        self.text_edit = QTextEdit()
+        self.text_edit = SmartTextEdit()
         self.text_edit.setLineWrapMode(QTextEdit.FixedColumnWidth)
         self.html = ""
         self.align_mode = "center"
 
         self.align_x = VarComboBox()
         self.align_x.setEditable(True)
-        self.align_x.currentTextChanged.connect(self.alignChange)
+        self.align_x.currentTextChanged.connect(self.changeAlign)
         self.align_y = VarComboBox()
         self.align_y.setEditable(True)
-        self.align_y.currentTextChanged.connect(self.alignChange)
+        self.align_y.currentTextChanged.connect(self.changeAlign)
 
         self.fore_color = ColorListEditor()
         self.back_color = ColorListEditor()
         self.fore_color.setCurrentText("black")
         self.fore_color_name = "black"
         self.back_color_name = "white"
-        self.fore_color.colorChanged.connect(self.colorChange)
-        self.back_color.colorChanged.connect(self.colorChange)
+        self.fore_color.colorChanged.connect(self.changeColor)
+        self.back_color.colorChanged.connect(self.changeColor)
 
         self.clear_after = VarComboBox()
         self.transparent = VarLineEdit("100%")
         self.transparent.setReg(r"0%|[1-9]\d%|100%")
         self.word_wrap = VarLineEdit("80")
         self.word_wrap.setReg(r"\d+")
-        self.word_wrap.textChanged.connect(self.wrapChange)
+        self.word_wrap.textChanged.connect(self.changeWrap)
         self.text_edit.setLineWrapColumnOrWidth(80)
 
         self.flip_horizontal = VarComboBox()
@@ -59,19 +58,19 @@ class TextTab1(QWidget):
         self.flip_vertical.addItems(("No", "Yes"))
 
         self.font_box = QFontComboBox()
-        self.font_box.currentFontChanged.connect(self.fontChange)
+        self.font_box.currentFontChanged.connect(self.changeFont)
         self.style_box = VarComboBox()
         self.style_box.setEditable(True)
         self.style_box.addItems(
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
-        self.style_box.currentTextChanged.connect(self.fontChange)
+        self.style_box.currentTextChanged.connect(self.changeFont)
         self.font_size_box = VarComboBox()
         self.font_size_box.setReg(r"\d+")
         self.font_size_box.setEditable(True)
         for i in range(12, 72, 2):
             self.font_size_box.addItem(str(i))
 
-        self.font_size_box.currentIndexChanged.connect(self.fontChange)
+        self.font_size_box.currentIndexChanged.connect(self.changeFont)
 
         self.right_to_left = VarComboBox()
         self.right_to_left.addItems(("No", "Yes"))
@@ -128,7 +127,7 @@ class TextTab1(QWidget):
 
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
-        self.screen.addItems(["screen_0"])
+        self.screen.addItem("screen_0")
 
         group1 = QGroupBox("Text")
         layout1 = QGridLayout()
@@ -194,7 +193,7 @@ class TextTab1(QWidget):
                 self.using_screen_id = k
                 break
 
-    def colorChange(self, color: str):
+    def changeColor(self, color: str):
         r, g, b = 255, 255, 255
         if "," in color:
             r, g, b = [int(x) for x in color.split(",")]
@@ -205,7 +204,7 @@ class TextTab1(QWidget):
             self.back_color_name = color
             self.text_edit.setTextBackgroundColor(QColor(r, g, b))
 
-    def alignChange(self, align_mode: str):
+    def changeAlign(self, align_mode: str):
         # html中要小写
         self.align_mode = align_mode.lower()
         if align_mode == "center":
@@ -217,19 +216,20 @@ class TextTab1(QWidget):
         elif align_mode == "justifytomax":
             self.text_edit.setAlignment(Qt.AlignJustify)
 
-    def wrapChange(self, chars: str):
+    def changeWrap(self, chars: str):
         if chars.isdigit():
             self.text_edit.setLineWrapColumnOrWidth(int(chars))
         else:
             self.text_edit.setLineWrapColumnOrWidth(80)
 
-    def fontChange(self):
-        f = self.font_box.currentFont().family()
+    def changeFont(self):
+        family = self.font_box.currentFont().family()
 
         size = self.font_size_box.currentText()
         size = int(size) if size.isdigit() else 8
-        font = self.text_edit.currentFont()
-        font.setFamily(f)
+        # font = self.text_edit.currentFont()
+        font = QFont()
+        font.setFamily(family)
         font.setPointSize(size)
 
         style = self.style_box.currentText()
@@ -257,7 +257,7 @@ class TextTab1(QWidget):
         font.setStrikeOut(style & 8)
         font.setOverline(style & 16)
 
-        self.text_edit.setFont(font)
+        self.text_edit.setCurrentFont(font)
 
     def setAttributes(self, attributes):
         self.align_x.setCompleter(QCompleter(attributes))
@@ -268,17 +268,6 @@ class TextTab1(QWidget):
         self.word_wrap.setCompleter(QCompleter(attributes))
         self.font_size_box.setCompleter(QCompleter(attributes))
         self.style_box.setCompleter(QCompleter(attributes))
-
-    def setScreen(self, screen: list):
-        selected = self.screen.currentText()
-        self.screen.clear()
-        self.screen.addItems(screen)
-        if selected in screen:
-            self.screen.setCurrentText(selected)
-        else:
-            new_name = Func.getDeviceNameById(self.using_device_id)
-            if new_name:
-                self.screen.setCurrentText(new_name)
 
     def updateInfo(self):
         self.default_properties["Html"] = self.html
@@ -306,8 +295,6 @@ class TextTab1(QWidget):
         self.loadSetting()
 
     def loadSetting(self):
-        self.text_edit.setHtml(self.default_properties["Html"])
-
         self.align_x.setCurrentText(self.default_properties["Alignment X"])
         self.align_y.setCurrentText(self.default_properties["Alignment Y"])
         self.fore_color.setCurrentText(self.default_properties["Fore Color"])
@@ -319,7 +306,7 @@ class TextTab1(QWidget):
         self.font_box.setCurrentText(self.default_properties["Font Family"])
         self.font_size_box.setCurrentText(self.default_properties["Font Size"])
         self.style_box.setCurrentText(self.default_properties["Style"])
-
         self.flip_horizontal.setCurrentText(self.default_properties["Flip Horizontal"])
         self.flip_vertical.setCurrentText(self.default_properties["Flip Vertical"])
         self.right_to_left.setCurrentText(self.default_properties["Right To Left"])
+        self.text_edit.setHtml(self.default_properties["Html"])

@@ -30,3 +30,39 @@
 ## api
 > getProperties(none) -> dict
 >> 返回widget的properties
+
+
+# widget的基本情况
+## refresh mechanism
++ What
+> some device information such as screen, sound and so on.
++ Time
+> when the icon clicked in the timeline, we call function getProperties() to display properties.
+## default_properties
+> each object has a default_properties, here's some function about it:
++ updateInfo()
+> save the UI information to default_properties.
++ getInfo()
+> return it.
++ setProperties(dict)
+> update it from another dictionary, <b>attention</b>: we just change the object instead of replacing it.
++ loadSetting()
+> update UI information from it.
++ getProperties()
+> return properties to display, For the sake of beauty, we only show a part of properties.
+# device的基本情况
+## global devices
+> We have a class named TianBianYiDuoYun control different types of device: Input, Output, Quest and Tracker.
+> The cloud contains a parameter: simple info, which stores simple information: device id and device name.
+> When we open the device window, we refresh it.
+## duration devices
+## detail
+> Every device selection window has three parts: device bar, device home and describer.
+> It also has a default_properties. When we click button ok or apply after choosing devices, we update information from describer(UI) and load them in device home.
++ device bar
+> you know it.
++ device home
+> Inherit from itemList. It controls all devices we selected.
++ describer
+> Inherit from stackWidget. It is used to display and modify parameters. 
+> One to one correspondence between device and describer.
