@@ -148,8 +148,8 @@ class LineItem(QGraphicsLineItem):
         self.setZValue(z)
 
     def clone(self):
-        new = LineItem()
         self.updateInfo()
+        new = LineItem()
         new.setProperties(self.default_properties.copy())
         new.changeSomething()
         return new

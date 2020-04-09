@@ -139,6 +139,9 @@ class Scene(QGraphicsScene):
             new_line = QLineF(line.p1(), p2)
             self.line.setLine(new_line)
         elif self.my_mode == self.MoveItem or self.my_mode == self.InsertItem:
+            item = self.mouseGrabberItem()
+            if hasattr(item, "setPosition"):
+                item.setPosition()
             self.update()
             super(Scene, self).mouseMoveEvent(event)
         # 套索模式

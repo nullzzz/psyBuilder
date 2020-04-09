@@ -202,23 +202,22 @@ class OtherItem(QGraphicsPixmapItem):
         return gabor
 
     def setPosition(self):
-        unRotatedScenePos = self.getUnRotatedScenePos()
+        un_rotated_scene_pos = self.getUnRotatedScenePos()
 
         width = self.boundingRect().width()
         height = self.boundingRect().height()
 
-        self.pro_window.setPosition(unRotatedScenePos.x() + (width / 2), unRotatedScenePos.y() + (height / 2))
+        self.pro_window.setPosition(un_rotated_scene_pos.x() + (width / 2), un_rotated_scene_pos.y() + (height / 2))
 
     def getUnRotatedScenePos(self):
         rotate = self.rotation()
-
         if rotate != 0:
             self.setRotation(0)
-            unRotatedScenePos = self.scenePos()
+            un_rotated_scene_pos = self.scenePos()
             self.setRotation(rotate)
         else:
-            unRotatedScenePos = self.scenePos()
-        return unRotatedScenePos
+            un_rotated_scene_pos = self.scenePos()
+        return un_rotated_scene_pos
 
     def setProperties(self, properties: dict):
         self.pro_window.setProperties(properties.get("Properties"))
@@ -235,6 +234,7 @@ class OtherItem(QGraphicsPixmapItem):
         self.setZValue(z)
 
     def clone(self):
+        self.updateInfo()
         new = OtherItem(self.item_type)
         new.setProperties(self.default_properties.copy())
         new.changeSomething()

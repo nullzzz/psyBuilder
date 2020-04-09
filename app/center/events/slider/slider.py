@@ -141,19 +141,18 @@ class Slider(TabItemMainWindow):
         self.background_bt.setMenu(
             self.createBackgroundMenu(self.changeBackground))
         self.background_bt.setIcon(QIcon(Func.getImage("background4.png")))
-        # self.background_bt.clicked.connect(self.fillButtonTriggered)
         setting.addWidget(self.background_bt)
 
         self.addToolBar(Qt.TopToolBarArea, setting)
 
-        self.itemMenu = QMenu()
-        self.itemMenu.addAction(delete_action)
-        self.itemMenu.addAction(copy_action)
-        self.itemMenu.addSeparator()
-        self.itemMenu.addAction(front_action)
-        self.itemMenu.addAction(back_action)
-        self.itemMenu.addAction(open_item_action)
-        self.scene.menu = self.itemMenu
+        self.item_menu = QMenu()
+        self.item_menu.addAction(delete_action)
+        self.item_menu.addAction(copy_action)
+        self.item_menu.addSeparator()
+        self.item_menu.addAction(front_action)
+        self.item_menu.addAction(back_action)
+        self.item_menu.addAction(open_item_action)
+        self.scene.menu = self.item_menu
 
     def linkSignal(self):
         self.scene.itemAdd.connect(self.addItem)
@@ -227,6 +226,7 @@ class Slider(TabItemMainWindow):
                 item.setSelected(item_name == item.getName())
                 if item_name == item.getName():
                     self.changeTool(item)
+                    # self.view.centerOn(item)
         self.blockSignals(False)
 
     def openItem(self):
@@ -242,24 +242,24 @@ class Slider(TabItemMainWindow):
         """
         self.pointer_bt.setChecked(True)
         self.scene.setMode(Scene.InsertItem)
-        if item_name:
-            self.item_list.addItem(item_name)
+        self.item_list.addItem(item_name)
 
     def changeItemList(self):
+        self.blockSignals(True)
         items = self.scene.selectedItems()
         if items:
             if items[0].getName() != self.item_list.currentText():
                 self.item_list.setCurrentText(items[0].getName())
         else:
             self.item_list.setCurrentIndex(0)
+        self.blockSignals(False)
 
     def changeTool(self, item):
         """
         show item information such as color when selected.
-        :param item:
+        :param item: selected item
         :return:
         """
-        self.blockSignals(True)
         border_width = item.properties.get("Border Width", "1")
         if not border_width.startswith("["):
             self.line_width_com.setCurrentText(border_width)
@@ -289,7 +289,6 @@ class Slider(TabItemMainWindow):
                 r, g, b, a = color
         color = QColor(r, g, b, a)
         self.fill_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("floodfill.png"), color))
-        self.blockSignals(False)
 
     def refresh(self):
         self.pro_window.refresh()
@@ -456,6 +455,7 @@ class Slider(TabItemMainWindow):
         :return:
         """
         clone_page = Slider(new_widget_id, new_widget_name)
+        self.getInfo()
         clone_page.pro_window.setProperties(self.pro_window.default_properties.copy())
         clone_page.scene.setProperties(self.scene.getInfo())
         return clone_page

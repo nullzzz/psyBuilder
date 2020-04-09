@@ -4,16 +4,16 @@ from PyQt5.QtOpenGL import QGLFormat, QGLWidget, QGL
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMenu, QAction, \
     QComboBox, QColorDialog, QToolBar
 
+from app.center.events.slider.item.diaItem import DiaItem
+from app.center.events.slider.item.linItem import LineItem
+from app.center.events.slider.item.otherItem import OtherItem
+from app.center.events.slider.item.pixItem import PixItem
+from app.center.events.slider.item.textItem import TextItem
 from app.center.events.slider.left.leftBox import LeftBox
+from app.center.events.slider.property import SliderProperty
+from app.center.events.slider.scene import Scene
 from app.func import Func
 from lib import TabItemMainWindow
-from ...events.slider.item.diaItem import DiaItem
-from ...events.slider.item.linItem import LineItem
-from ...events.slider.item.otherItem import OtherItem
-from ...events.slider.item.pixItem import PixItem
-from ...events.slider.item.textItem import TextItem
-from ...events.slider.property import SliderProperty
-from ...events.slider.scene import Scene
 
 
 class Slider(TabItemMainWindow):
@@ -151,14 +151,14 @@ class Slider(TabItemMainWindow):
 
         self.addToolBar(Qt.TopToolBarArea, setting)
 
-        # self.itemMenu = QMenu()
-        # self.itemMenu.addAction(delete_action)
-        # self.itemMenu.addAction(copy_action)
-        # self.itemMenu.addSeparator()
-        # self.itemMenu.addAction(front_action)
-        # self.itemMenu.addAction(back_action)
-        # self.itemMenu.addAction(open_item_action)
-        # self.scene.menu = self.itemMenu
+        # self.item_menu = QMenu()
+        # self.item_menu.addAction(delete_action)
+        # self.item_menu.addAction(copy_action)
+        # self.item_menu.addSeparator()
+        # self.item_menu.addAction(front_action)
+        # self.item_menu.addAction(back_action)
+        # self.item_menu.addAction(open_item_action)
+        # self.scene.menu = self.item_menu
 
     def linkSignal(self):
         self.scene.itemAdd.connect(self.addItem)
