@@ -58,6 +58,9 @@ class Case(QGroupBox):
 
         self.setMaximumHeight(300)
 
+    def refresh(self):
+        self.icon_choose.refresh()
+
     def setNotAdd(self, no=True):
         self.add_bt.setEnabled(not no)
 

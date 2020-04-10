@@ -43,14 +43,13 @@ class DeviceHome(QListWidget):
 
         self.currentItemChanged.connect(self.changeDevice)
 
-        if True:
-            # 拖动的图标
-            self.dragItem = None
-            # self.setViewMode(QListView.IconMode)
-            self.setAcceptDrops(True)
-            self.setSortingEnabled(True)
-            self.setWrapping(False)
-            self.createContextMenu()
+        # 拖动的图标
+        self.dragItem = None
+        # self.setViewMode(QListView.IconMode)
+        self.setAcceptDrops(True)
+        self.setSortingEnabled(True)
+        self.setWrapping(False)
+        self.createContextMenu()
 
     def dropEvent(self, e):
         source = e.source()

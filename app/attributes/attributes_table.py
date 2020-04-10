@@ -8,10 +8,6 @@ from lib import TableWidget
 
 
 class AttributesTable(TableWidget):
-    """
-
-    """
-
     def __init__(self):
         super(AttributesTable, self).__init__(None)
         # about its ui
