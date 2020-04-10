@@ -832,6 +832,37 @@ def getAllEventWidgetNamesList(includedType: int = 1) -> list:
     return cAllEventWidgetNameList
 
 
+def getHaveOutputDevs(cWidget) -> bool:
+    haveOPDev = False
+    cWidgetType = getWidgetType(cWidget)
+
+    if cWidgetType in stimWidgetTypesList:
+        if cWidgetType == Info.SWITCH:
+            for cCaseDict in cWidget.getCases():
+                # {'Case Value': '',
+                #  'Id Pool': {'Image': 'Image.0', 'Video': '', 'Text': '', 'Sound': '', 'Slider': ''},
+                #  'Sub Wid': 'Image.0', 'Stim Type': 'Image', 'Event Name': 'U_Image_6574'}
+                if cCaseDict['Sub Wid']:
+                    if Info.WID_WIDGET.get(cCaseDict['Sub Wid']).getOutputDevice():
+                        haveOPDev = True
+                        break
+
+        elif cWidgetType == Info.IF:
+            cTrueWidget = cWidget.getTrueWidget()
+            cFalseWidget = cWidget.getFalseWidget()
+
+            if cTrueWidget is not None:
+                nTrueOutputDev = len(cTrueWidget.getOutputDevice())
+            if cFalseWidget is not None:
+                nFalseOutputDev = len(cFalseWidget.getOutputDevice())
+
+            haveOPDev = (nTrueOutputDev+nFalseOutputDev)> 0
+        else:
+            haveOPDev = len(cWidget.getOutputDevice()) > 0
+
+    return haveOPDev
+
+
 def getWidLevel(cWid: str) -> int:
     if isSubWidgetOfIfOrSwitch(cWid):
         cWid = Func.getParentWid(cWid)
@@ -4137,57 +4168,9 @@ def compileCode(globalSelf, isDummyCompile):
                 cWidgetName = getWidgetName(cWidget.widget_id)
                 cWidgetLoopLevel = getWidLevel(cWidget.widget_id)
 
-                if cWidgetType in [Info.SOUND, Info.IMAGE, Info.TEXT, Info.VIDEO, Info.SLIDER]:
+                if cWidgetType in stimWidgetTypesList:
                     output_device = cWidget.getOutputDevice()
-
-                    if len(output_devices) > 0:
-                        cFrameVarNameStr = 'cFrame'
-                    else:
-                        cFrameVarNameStr = 'cFrameNoResp'
-
-                    if cWidgetLoopLevel == 1:
-                        printAutoInd(f, "{0} = {1};", cWidgetName, cFrameVarNameStr)
-                    else:
-                        printAutoInd(f, "{0} = repmat({1},{2},1);", cWidgetName, cFrameVarNameStr, maximumOpDataRows)
-
-                    if len(output_device) > 0:
-                        printAutoInd(f, "{0}(end).msgEndTime = [];", cWidgetName)
-
-                elif cWidgetType == Info.IF:
-                    cTrueWidget = cWidget.getTrueWidget()
-                    cFalseWidget = cWidget.getFalseWidget()
-                    nTrueOutputDev = 0
-                    nFalseOutputDev = 0
-
-                    if cTrueWidget is not None:
-                        nTrueOutputDev = len(cTrueWidget.getOutputDevice())
-                    if cFalseWidget is not None:
-                        nFalseOutputDev = len(cFalseWidget.getOutputDevice())
-
-                    if (nTrueOutputDev + nFalseOutputDev) > 0:
-                        cFrameVarNameStr = 'cFrame'
-                    else:
-                        cFrameVarNameStr = 'cFrameNoResp'
-
-                    if cWidgetLoopLevel == 1:
-                        printAutoInd(f, "{0} = {1};", cWidgetName, cFrameVarNameStr)
-                    else:
-                        printAutoInd(f, "{0} = repmat({1},{2},1);", cWidgetName, cFrameVarNameStr, maximumOpDataRows)
-
-                    if (nTrueOutputDev + nFalseOutputDev) > 0:
-                        printAutoInd(f, "{0}(end).msgEndTime = [];", cWidgetName)
-
-                elif cWidgetType == Info.SWITCH:
-                    haveRespDev = True
-
-                    for cCaseDict in cWidget.getCases():
-                        # {'Case Value': '',
-                        #  'Id Pool': {'Image': 'Image.0', 'Video': '', 'Text': '', 'Sound': '', 'Slider': ''},
-                        #  'Sub Wid': 'Image.0', 'Stim Type': 'Image', 'Event Name': 'U_Image_6574'}
-                        if cCaseDict['Sub Wid']:
-                            if Info.WID_WIDGET.get(cCaseDict['Widget Id']).getOutputDevice():
-                                haveRespDev = False
-                                break
+                    haveRespDev = cWidget.getUsingDeviceCount()>0
 
                     if haveRespDev:
                         cFrameVarNameStr = 'cFrame'
@@ -4199,8 +4182,9 @@ def compileCode(globalSelf, isDummyCompile):
                     else:
                         printAutoInd(f, "{0} = repmat({1},{2},1);", cWidgetName, cFrameVarNameStr, maximumOpDataRows)
 
-                    if haveRespDev:
+                    if getHaveOutputDevs(cWidget):
                         printAutoInd(f, "{0}(end).msgEndTime = [];", cWidgetName)
+
 
                 elif cWidgetType == Info.CYCLE:
 
