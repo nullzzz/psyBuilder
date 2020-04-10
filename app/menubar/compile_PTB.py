@@ -173,7 +173,7 @@ def removeSingleQuotes(inputStr: str) -> str:
 
 def removeSquBrackets(inputStr: str) -> str:
     if isinstance(inputStr, str):
-        if re.fullmatch("\[.+\]", inputStr):  # any character except a new line
+        if re.fullmatch(r"\[.+\]", inputStr):  # any character except a new line
             inputStr = inputStr[1:-1]
     return inputStr
 
@@ -237,49 +237,49 @@ def isSingleQuotedStr(inputStr):
 
 
 def isRgbStr(inputStr):
-    isRgbFormat = re.fullmatch("^\d+,\d+,\d+$", inputStr)
+    isRgbFormat = re.fullmatch(r"^\d+,\d+,\d+$", inputStr)
     return isRgbFormat
 
 
 def isRgbaStr(inputStr):
-    isRgbaFormat = re.fullmatch("^\d+,\d+,\d+,\d+$", inputStr)
+    isRgbaFormat = re.fullmatch(r"^\d+,\d+,\d+,\d+$", inputStr)
     return isRgbaFormat
 
 
 def isRgbaWithBracketsStr(inputStr):
-    isRgbaFormat = re.fullmatch("^\[\d+,\d+,\d+,\d+\]$", inputStr)
+    isRgbaFormat = re.fullmatch(r"^\[\d+,\d+,\d+,\d+\]$", inputStr)
     return isRgbaFormat
 
 
 def isRgbWithBracketsStr(inputStr):
-    isRgbFormat = re.fullmatch('^\[\d+,\d+,\d+\]$', inputStr)
+    isRgbFormat = re.fullmatch(r'^\[\d+,\d+,\d+\]$', inputStr)
     return isRgbFormat
 
 
 def isNumStr(inputStr):
     if isinstance(inputStr, str):
-        return re.fullmatch("([\d]*\.[\d$]+)|\d*", inputStr)
+        return re.fullmatch(r"([\d]*\.[\d$]+)|\d*", inputStr)
 
     return False
 
 
 def isIntStr(inputStr):
     if isinstance(inputStr, str):
-        return re.fullmatch("\d*", inputStr)
+        return re.fullmatch(r"\d*", inputStr)
 
     return False
 
 
 def isFloatStr(inputStr):
     if isinstance(inputStr, str):
-        return re.fullmatch("([\d]*\.[\d$]+)", inputStr)
+        return re.fullmatch(r"([\d]*\.[\d$]+)", inputStr)
 
     return False
 
 
 def isPercentStr(inputStr):
     if isinstance(inputStr, str):
-        return re.fullmatch("([\d]*\.[\d]+%$)|(\d*%$)", inputStr)
+        return re.fullmatch(r"([\d]*\.[\d]+%$)|(\d*%$)", inputStr)
 
     return False
 
@@ -289,7 +289,7 @@ def isRefStr(inputStr):
 
         if isRgbWithBracketsStr(inputStr):
             return False
-        # special chars lose their sepcial meaning inside sets [], so . inside [] just means the char '.'
+        # special chars lose their special meaning inside sets [], so . inside [] just means the char '.'
         if re.fullmatch(r'\[[A-Za-z]+[a-zA-Z._0-9]*\]', inputStr):
             return True
 
@@ -451,7 +451,7 @@ def copyYanglabFiles(filename: str or list):
     cPyFullFile = os.path.abspath(__file__)
 
     for iLevel in range(3):
-        cPyFullFile, noused = os.path.split(cPyFullFile)
+        cPyFullFile, _ = os.path.split(cPyFullFile)
 
     sourceFile = os.path.join(cPyFullFile, 'yanglabMFuns', filename)
 
@@ -533,8 +533,8 @@ def parseDurationStr(inputStr):
         inputStr = removeSingleQuotes(inputStr)
 
         if inputStr == "(Infinite)":
-            inputStr = "999000"  # an extremely impossible value maximium of 1000 second
-        elif re.fullmatch("\d+~\d+", inputStr):
+            inputStr = "999000"  # an extremely impossible value maximum of 1000 second
+        elif re.fullmatch(r"\d+~\d+", inputStr):
             cDurRange = inputStr.split('~')
             inputStr = f"{cDurRange[0]},{cDurRange[1]}"
 
@@ -879,7 +879,7 @@ def getWidgetEventPos(widget_id: str) -> int or None:
         node = Info.WID_NODE[widget_id]
         parent_node = node.parent()
 
-        # for subWidgets under IF or SWITCH, try to extrate pos based on IF or SWITCH widget
+        # for subWidgets under IF or SWITCH, try to extract pos based on IF or SWITCH widget
         if isSubWidgetOfIfOrSwitch(parent_node):
             parent_node = parent_node.parent()
 
@@ -1090,7 +1090,7 @@ def getRefValueSet(cWidget, inputStr, attributesSetDict):
         isRefValue = isRefStr(inputStr)
 
         if isRefValue:
-            inputStr = re.sub("[\[\]]", '', inputStr)
+            inputStr = re.sub(r"[\[\]]", '', inputStr)
 
             if inputStr in attributesSetDict:
                 valueSet = attributesSetDict[inputStr][2]
@@ -1163,7 +1163,7 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
             updateSpFormatVarDict(cProperties['Clear After'], 'clearAfter', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Flip Horizontal'], 'flipHorizontal', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Flip Vertical'], 'flipVertical', cSpecialFormatVarDict)
-            updateSpFormatVarDict(cProperties['Right to left'], 'rightToLeft', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Right To Left'], 'rightToLeft', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', cSpecialFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Text'], 'textContent', cSpecialFormatVarDict)
@@ -1198,16 +1198,16 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
             updateSpFormatVarDict(cProperties['Center Y'], 'percent', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Clear After'], 'clearAfter', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', cSpecialFormatVarDict)
-            updateSpFormatVarDict(cProperties['Stretch mode'], 'stretchMode', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Stretch Mode'], 'stretchMode', cSpecialFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
 
             getSpecialRespsFormatAtts(cWidget.getInputDevice(), cSpecialFormatVarDict)
 
         elif Func.isWidgetType(widgetId, Info.SLIDER):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
-            updateSpFormatVarDict(cProperties['pro']['Clear After'], 'clearAfter', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Properties']['Clear After'], 'clearAfter', cSpecialFormatVarDict)
 
-            cItems = cProperties['items']
+            cItems = cProperties['Items']
             itemIds = getSliderItemIds(cWidget)
             itemIds.reverse()  # reverse the key id order
 
@@ -1221,7 +1221,7 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
                     updateSpFormatVarDict(cItemProperties['Height'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Center X'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Center Y'], 'percent', cSpecialFormatVarDict)
-                    updateSpFormatVarDict(cItemProperties['Stretch mode'], 'stretchMode', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Stretch Mode'], 'stretchMode', cSpecialFormatVarDict)
                 elif cItemType == Info.ITEM_SOUND:
                     updateSpFormatVarDict(cItemProperties['Wait For Start'], 'waitForStart', cSpecialFormatVarDict)
                 elif cItemType == Info.ITEM_VIDEO:
@@ -1334,7 +1334,7 @@ def getClearAfterInfo(cWidget, attributesSetDict) -> str:
     """
 
     if Info.SLIDER == getWidgetType(cWidget):
-        cProperties = Func.getProperties(cWidget.widget_id)['pro']
+        cProperties = Func.getProperties(cWidget.widget_id)['Properties']
     else:
         cProperties = Func.getProperties(cWidget.widget_id)
 
@@ -1371,9 +1371,9 @@ def getSliderItemIds(cWidget, itemType='') -> list:
         properties = Func.getProperties(cWidget.widget_id)
 
         if len(itemType) == 0:
-            itemIds = [key for key in properties['items'].keys()]
+            itemIds = [key for key in properties['Items'].keys()]
         else:
-            itemIds = [key for key in properties['items'].keys() if getItemType(key) == itemType]
+            itemIds = [key for key in properties['Items'].keys() if getItemType(key) == itemType]
 
     return itemIds
 
@@ -1423,7 +1423,7 @@ def getMaxSlaveSoundDevs() -> dict:
 
                 for cItemId in itemIds:
                     if getItemType(cItemId) == Info.ITEM_SOUND:
-                        cItemPro = cProperties['items'][cItemId]
+                        cItemPro = cProperties['Items'][cItemId]
                         cSoundDevName = cItemPro['Sound Device']
                         cSoundDevNum = cSoundNumList.get(cSoundDevName, 0)
                         cSoundNumList.update({cSoundDevName: cSoundDevNum + 1})
@@ -1829,7 +1829,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         # print response check section
         printAutoInd(f, "end % while")
 
-        printAutoInd(cRespCodes, "% close openned movie prts and visual textures")
+        printAutoInd(cRespCodes, "% close opened movie prts and visual textures")
         if cVideoItemNums <= 1:
             printAutoInd(cRespCodes, "Screen('CloseMovie', {0}_mPtr);", cWidgetName)
             printAutoInd(cRespCodes, "Screen('Close',{0}_tPtr); % close the last video frame", cWidgetName)
@@ -2101,8 +2101,8 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
     cWidgetType = getWidgetType(cWidget)
 
     if isSubWidgetOfIfOrSwitch(cWidget) is False:
-        #  update the attributresSetDict only for the main widgets
-        cWidgetAddedAttrsList = ['rt', 'resp', 'acc', 'onsettime']
+        #  update the attributesSetDict only for the main widgets
+        cWidgetAddedAttrsList = ['rt', 'resp', 'acc', 'onsettime','respOnsettime']
         for cAddedAttr in cWidgetAddedAttrsList:
             attributesSetDict.update({
                 f"{cWidgetName}.{cAddedAttr}":
@@ -2345,12 +2345,12 @@ def genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, nextEventF
     printAutoInd(f, "% get cDur and the next event flip time")
     # printAutoInd(f, "%%%")
     if Func.isWidgetType(cWidget.widget_id, Info.SOUND):
-        if re.fullmatch("\d+,\d+", durStr):
+        if re.fullmatch(r"\d+,\d+", durStr):
             printAutoInd(f, "cDurs(:)          = getDurValue([{0}],winIFIs({1}), true);", durStr, cWinIdx)
         else:
             printAutoInd(f, "cDurs(:)          = getDurValue({0},winIFIs({1}), true);", durStr, cWinIdx)
     else:
-        if re.fullmatch("\d+,\d+", durStr):
+        if re.fullmatch(r"\d+,\d+", durStr):
             printAutoInd(f, "cDurs({0})          = getDurValue([{1}],winIFIs({0}));", cWinIdx, durStr)
         else:
             printAutoInd(f, "cDurs({0})          = getDurValue({1},winIFIs({0}));", cWinIdx, durStr)
@@ -2397,7 +2397,7 @@ def genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     cOutDeviceDict = dict()
 
     for device, properties in output_device.items():
-        msgValue = dataStrConvert(*getRefValue(cWidget, properties['Value or Msg'], attributesSetDict), True)
+        msgValue = dataStrConvert(*getRefValue(cWidget, properties['Value Or Msg'], attributesSetDict), True)
         pulseDur = dataStrConvert(*getRefValue(cWidget, properties['Pulse Duration'], attributesSetDict), False)
 
         cDevName = properties.get("Device Name", "")
@@ -2437,7 +2437,7 @@ def genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         printAutoInd(f, "% ----------------------------------\\\n")
 
     # print out event onset marker for eyelink
-    if allWidgetCodes.get('isEyeLinkSartRecord'):
+    if allWidgetCodes.get('isEyeLinkStartRecord'):
         printAutoInd(f, "Eyelink('Message', '{0}_onsettime');", cWidgetName)
 
     # updated the screen flip times in matlab
@@ -2551,7 +2551,7 @@ def printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes):
 def printETDcCorrectWidget(cWidget, f, allWidgetCodes):
     # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     # cProperties = Func.getProperties(cWidget.widget_id)
-    allWidgetCodes.update({"isEyeLinkSartRecord": True})
+    allWidgetCodes.update({"isEyeLinkStartRecord": True})
     # print previous widget's response code
     preStimWid = getPreStimWID(cWidget.widget_id)
     allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
@@ -2574,7 +2574,7 @@ def printETCalibWidget(cWidget, f, allWidgetCodes):
     # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     # cProperties = Func.getProperties(cWidget.widget_id)
 
-    allWidgetCodes.update({"isEyeLinkSartRecord": True})
+    allWidgetCodes.update({"isEyeLinkStartRecord": True})
     # print previous widget's response code
     preStimWid = getPreStimWID(cWidget.widget_id)
     allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
@@ -2585,10 +2585,10 @@ def printETCalibWidget(cWidget, f, allWidgetCodes):
 
 
 def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
-    cProperties = Func.getProperties(cWidget.widget_id)
+    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
+    # cProperties = Func.getProperties(cWidget.widget_id)
 
-    allWidgetCodes.update({"isEyeLinkSartRecord": True})
+    allWidgetCodes.update({"isEyeLinkStartRecord": True})
     cCodesForResp = allWidgetCodes.get('respCodes', [])
 
     if len(cCodesForResp) > 0:
@@ -2634,7 +2634,7 @@ def printETEndRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     cProperties = Func.getProperties(cWidget.widget_id)
 
-    allWidgetCodes.update({"isEyeLinkSartRecord": False})
+    allWidgetCodes.update({"isEyeLinkStartRecord": False})
 
     # print previous widget's response code
     preStimWid = getPreStimWID(cWidget.widget_id)
@@ -2672,7 +2672,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
     # ------------------------------------------------
     # Step 2: draw eachItem
     # -------------------------------------------------
-    cItems = cSliderProperties['items']
+    cItems = cSliderProperties['Items']
 
     cCloseIdxesStr = ""
     # zVlaues = [value['z'] for value in cItems.values()]
@@ -2769,8 +2769,8 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
             cHeight = dataStrConvert(*getRefValue(cWidget, cItemProperties['Height'], attributesSetDict))
             lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Width'], attributesSetDict))
 
-            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
-            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
+            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill Color'], attributesSetDict))
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Color'], attributesSetDict))
 
             if fillColor == "[0,0,0,0]":
                 printAutoInd(cVSLCodes,
@@ -2790,8 +2790,8 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
         elif cItemType == Info.ITEM_POLYGON:
             lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Width'], attributesSetDict))
 
-            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
-            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
+            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill Color'], attributesSetDict))
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Color'], attributesSetDict))
 
             points = cItemProperties['Points']
             parsedPoints = []
@@ -2822,11 +2822,11 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
             cHeight = dataStrConvert(*getRefValue(cWidget, cItemProperties['Height'], attributesSetDict))
             lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Width'], attributesSetDict))
 
-            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
-            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
+            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill Color'], attributesSetDict))
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Color'], attributesSetDict))
 
-            angleStart = dataStrConvert(*getRefValue(cWidget, cItemProperties['Angle start'], attributesSetDict))
-            angleLength = dataStrConvert(*getRefValue(cWidget, cItemProperties['Angle length'], attributesSetDict))
+            angleStart = dataStrConvert(*getRefValue(cWidget, cItemProperties['Angle Start'], attributesSetDict))
+            angleLength = dataStrConvert(*getRefValue(cWidget, cItemProperties['Angle Length'], attributesSetDict))
 
             if fillColor == "[0,0,0,0]":
                 printAutoInd(cVSLCodes,
@@ -2959,9 +2959,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
                          cTransparency)
 
         elif Info.ITEM_TEXT == cItemType:
-            cVSLCodes = drawTextForSlider(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes,
-                                          cItemProperties,
-                                          cVSLCodes)
+            cVSLCodes = drawTextForSlider(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, cItemProperties, cVSLCodes)
         elif cItemType == Info.ITEM_VIDEO:
             allWidgetCodes, cVSLCodes = drawVideoWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel,
                                                         allWidgetCodes,
@@ -3002,8 +3000,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
     return allWidgetCodes
 
 
-def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes, cProperties=None,
-                    iSlave=1):
+def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes, cProperties=None, iSlave=1):
     global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
 
     if cProperties is None:
@@ -3021,7 +3018,7 @@ def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allW
     if isNotInSlide:
         cPrefixStr = getWidgetName(cWidget.widget_id)
     else:
-        cPrefixStr = getWidgetName(cWidget.widget_id) + '_' + cProperties['name']
+        cPrefixStr = getWidgetName(cWidget.widget_id) + '_' + cProperties['Name']
 
     if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide:
         # Step 2: print out help info for the current widget
@@ -3042,26 +3039,26 @@ def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allW
     # # 3) check the Buffer Size parameter:
     # bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
 
-    # 3) check the Stream refill parameter:
-    streamRefillStr, isRef = getRefValue(cWidget, cProperties['Stream refill'], attributesSetDict)
+    # 3) check the Stream Refill parameter:
+    streamRefillStr, isRef = getRefValue(cWidget, cProperties['Stream Refill'], attributesSetDict)
 
     # 4) check the start offset in ms parameter:
-    startOffsetStr, isRef = getRefValue(cWidget, cProperties['Start offset'], attributesSetDict)
+    startOffsetStr, isRef = getRefValue(cWidget, cProperties['Start Offset'], attributesSetDict)
 
     # 5) check the stop offset in ms parameter:
-    StopOffsetStr, isRef = getRefValue(cWidget, cProperties['Stop offset'], attributesSetDict)
+    StopOffsetStr, isRef = getRefValue(cWidget, cProperties['Stop Offset'], attributesSetDict)
 
     # # 6) check the repetitions parameter:
     # repetitionsStr, isRef = getRefValue(cWidget, cWidget.getRepetitions(), attributesSetDict)
 
     # 7) check the volume control parameter:
-    isVolumeControl, isRef = getRefValue(cWidget, cProperties['Volume control'], attributesSetDict)
+    isVolumeControl, isRef = getRefValue(cWidget, cProperties['Volume Control'], attributesSetDict)
 
     # 8) check the volume parameter:
     volumeStr, isRef = getRefValue(cWidget, cProperties['Volume'], attributesSetDict)
 
     # 9) check the latencyBias control parameter:
-    isLantencyBiasControl, isRef = getRefValue(cWidget, cProperties['Latency Bias'], attributesSetDict)
+    isLatencyBiasControl, isRef = getRefValue(cWidget, cProperties['Latency Bias'], attributesSetDict)
 
     # 10) check the volume parameter:
     latencyBiasStr, isRef = getRefValue(cWidget, cProperties['Bias Time'], attributesSetDict)
@@ -3092,13 +3089,12 @@ def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allW
     #  draw buffer to  hw
     # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, {1}_idx, {2});",cSoundIdxStr,cPrefixStr, streamRefillStr)
 
-    printAutoInd(soundStimCodes, "PsychPortAudio('FillBuffer', {0}, {1}_Dat, {2});", cSoundIdxStr, cPrefixStr,
-                 streamRefillStr)
+    printAutoInd(soundStimCodes, "PsychPortAudio('FillBuffer', {0}, {1}_Dat, {2});", cSoundIdxStr, cPrefixStr, streamRefillStr)
 
     if isVolumeControl:
         printAutoInd(soundStimCodes, "PsychPortAudio('Volume', {0}, {1});\n", cSoundIdxStr, volumeStr)
 
-    if isLantencyBiasControl:
+    if isLatencyBiasControl:
         printAutoInd(soundStimCodes, "PsychPortAudio('LatencyBias', {0}, {1}/1000);\n", cSoundIdxStr, latencyBiasStr)
 
     if isNotInSlide:
@@ -3134,7 +3130,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     if isNotInSlide:
         cPrefixStr = getWidgetName(cWidget.widget_id)
     else:
-        cPrefixStr = getWidgetName(cWidget.widget_id) + '_' + cProperties['name']
+        cPrefixStr = getWidgetName(cWidget.widget_id) + '_' + cProperties['Name']
 
     cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_respCodes", [])
     beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
@@ -3157,10 +3153,10 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr, isFileNameRef)
 
     # 3) check the mirror up/down parameter:
-    isMirrorUpDownStr = parseBooleanStr(cProperties['Mirror up/down'])
+    isMirrorUpDownStr = parseBooleanStr(cProperties['Mirror Up/Down'])
 
     # 3) check the mirror left/right parameter:
-    isMirrorLeftRightStr = parseBooleanStr(cProperties['Mirror left/right'])
+    isMirrorLeftRightStr = parseBooleanStr(cProperties['Mirror Left/Right'])
 
     # 4) check the rotate parameter:
     rotateStr, isRef = getRefValue(cWidget, cProperties['Rotate'], attributesSetDict)
@@ -3168,7 +3164,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     # 5) check the stretch mode parameter:
     if cProperties['Stretch']:
         # ""、Both、LeftRight、UpDown、[attr]
-        stretchModeStr = parseStretchModeStr(*getRefValue(cWidget, cProperties['Stretch mode'], attributesSetDict))
+        stretchModeStr = parseStretchModeStr(*getRefValue(cWidget, cProperties['Stretch Mode'], attributesSetDict))
     else:
         stretchModeStr = "0"
 
@@ -3187,10 +3183,10 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
 
     if isNotInSlide:
         # before we draw the image， we draw the frame rect first:
-        borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border color'], attributesSetDict))
+        borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border Color'], attributesSetDict))
         borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
         frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Fill Color'], attributesSetDict))
-        frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame transparent'], attributesSetDict))
+        frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Transparent'], attributesSetDict))
 
         # get enable parameter
         cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
@@ -3351,7 +3347,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     if isNotInSlide:
         cItemOrWidgetNameStr = cWidgetName
     else:
-        cItemOrWidgetNameStr = cProperties['name']
+        cItemOrWidgetNameStr = cProperties['Name']
 
     cVideoItemNums = getSliderItemTypeNums(cWidget, Info.ITEM_VIDEO)
 
@@ -3426,7 +3422,8 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
         printAutoInd(f, "% preload movie for widget: {0}", cItemOrWidgetNameStr)
 
     if Info.PLATFORM == 'linux':
-        printAutoInd(f, "% For linux, to use movie playback and PsychPortAudio at the same time, set specialFlags1 to 2")
+        printAutoInd(f,
+                     "% For linux, to use movie playback and PsychPortAudio at the same time, set specialFlags1 to 2")
         printAutoInd(f,
                      "Screen('OpenMovie', {0}, fullfile(cFolder,{1}), 1, [], 2); % Preloading the movie in background...\n",
                      cWinStr, addSingleQuotes(cFilenameStr))
@@ -3532,7 +3529,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     return allWidgetCodes, cVSLCodes
 
 
-def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, cProperties, cVSLCodes):
+def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, cProperties, cVSLCodes):
     global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
@@ -3906,15 +3903,15 @@ def compileCode(globalSelf, isDummyCompile):
 
                 printAutoInd(f, "quest({0}) = QuestCreate({1},{2},{3},{4},{5},{6});",
                              iQuest,
-                             quest['Estimated threshold'],
-                             quest['Std dev'],
-                             quest['Desired proportion'],
+                             quest['Estimated Threshold'],
+                             quest['Std Dev'],
+                             quest['Desired Proportion'],
                              quest['Steepness'],
                              quest['Proportion'],
-                             quest['Chance level'])
+                             quest['Chance Level'])
 
                 if quest['Is log10 transform'] == 'yes':
-                    printAutoInd(f, "quest({0}).isLog10Trans     = true;", iQuest)
+                    printAutoInd(f, "quest({0}).isLog10Trans = true;", iQuest)
                 else:
                     printAutoInd(f, "quest({0}).isLog10Trans = false;", iQuest)
 
@@ -4188,7 +4185,7 @@ def compileCode(globalSelf, isDummyCompile):
                         #  'Id Pool': {'Image': 'Image.0', 'Video': '', 'Text': '', 'Sound': '', 'Slider': ''},
                         #  'Sub Wid': 'Image.0', 'Stim Type': 'Image', 'Event Name': 'U_Image_6574'}
                         if cCaseDict['Sub Wid']:
-                            if Info.WID_WIDGET.get(cCaseDict['Widget id']).getOutputDevice():
+                            if Info.WID_WIDGET.get(cCaseDict['Widget Id']).getOutputDevice():
                                 haveRespDev = False
                                 break
 
@@ -4204,7 +4201,6 @@ def compileCode(globalSelf, isDummyCompile):
 
                     if haveRespDev:
                         printAutoInd(f, "{0}(end).msgEndTime = [];", cWidgetName)
-
 
                 elif cWidgetType == Info.CYCLE:
 
@@ -4477,8 +4473,7 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f, "end % main function \n\n\n\n\n\n\n")
 
         outDevCountsDict = getOutputDevCountsDict()
-        nOutPortsNums = outDevCountsDict[Info.DEV_PARALLEL_PORT] + outDevCountsDict[Info.DEV_NETWORK_PORT] + \
-                        outDevCountsDict[Info.DEV_SERIAL_PORT]
+        nOutPortsNums = outDevCountsDict[Info.DEV_PARALLEL_PORT] + outDevCountsDict[Info.DEV_NETWORK_PORT] + outDevCountsDict[Info.DEV_SERIAL_PORT]
 
         iSubFunNum = 1
 
@@ -4610,7 +4605,7 @@ def compileCode(globalSelf, isDummyCompile):
                          "sendTriggerOrMsg(cRespDevs(iRespDev).respCodeDevType, cRespDevs(iRespDev).respCodeDevIdx, cRespDevs(iRespDev).wrong);")
             printAutoInd(f, "end \n")
 
-        printAutoInd(f, "evalc([cRespDevs(iRespDev).beUpatedVar,' = cFrame;']); \n")
+        printAutoInd(f, "evalc([cRespDevs(iRespDev).beUpdatedVar,' = cFrame;']); \n")
 
         printAutoInd(f, "cRespDevs(iRespDev).isOn = false;")
         printAutoInd(f, "if cRespDevs(iRespDev).endAction")
@@ -4714,7 +4709,7 @@ def compileCode(globalSelf, isDummyCompile):
         #     printAutoInd(f,"sendTriggerOrMsg(beCheckedRespDevs(iRespDev).respCodeDevType, beCheckedRespDevs(iRespDev).respCodeDevIdx, beCheckedRespDevs(iRespDev).wrong);")
         #     printAutoInd(f, "end \n")
         #
-        # printAutoInd(f, "evalc([beCheckedRespDevs(iRespDev).beUpatedVar,' = cFrame;']);\n")
+        # printAutoInd(f, "evalc([beCheckedRespDevs(iRespDev).beUpdatedVar,' = cFrame;']);\n")
         # printAutoInd(f, "beCheckedRespDevs(iRespDev).isOn = false;")
         #
         # printAutoInd(f, "if beCheckedRespDevs(iRespDev).endAction")
@@ -5020,8 +5015,8 @@ def compileCode(globalSelf, isDummyCompile):
         # printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         # printAutoInd(f, "% subfun {0}: makeRespDevStruct", iSubFunNum)
         # printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        # printAutoInd(f, "function  cRespDev = makeRespDevStruct(beUpatedVar, allowAble,corResp,rtWindow,endAction,devType,devIndex,respDevIndexes,startTime,isOn)")
-        # printAutoInd(f, "cRespDev.beUpatedVar = beUpatedVar;")
+        # printAutoInd(f, "function  cRespDev = makeRespDevStruct(beUpdatedVar, allowAble,corResp,rtWindow,endAction,devType,devIndex,respDevIndexes,startTime,isOn)")
+        # printAutoInd(f, "cRespDev.beUpdatedVar = beUpdatedVar;")
         # printAutoInd(f, "cRespDev.allowAble   = allowAble;")
         # printAutoInd(f, "cRespDev.corResp     = corResp;")
         # printAutoInd(f, "cRespDev.rtWindow    = rtWindow;")
