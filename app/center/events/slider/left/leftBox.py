@@ -25,7 +25,8 @@ class LeftBox(QToolBox):
         sound = Item("sound", self.Sound)
         snow = Item("snow", self.Snow)
         gabor = Item("gabor", self.Gabor)
-        open = Item("open", self.Open)
+        open = Item("3D", self.Open)
+        open.setEnabled(False)
 
         self.addItem(self.basic, "Basic Geometries")
         self.addItem(self.stimuli, "Stimuli")
@@ -84,6 +85,8 @@ class Button(QPushButton):
         self.item_type = item_type
         if text == "text":
             text = "textpointer"
+        elif text == "3D":
+            text = "open"
 
         fp = QPixmap(Func.getImage(f"{text}.png")).scaled(50, 50)
         self.setIcon(QIcon(fp))
