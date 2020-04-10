@@ -267,5 +267,3 @@ class TextDisplay(TabItemMainWindow):
         """
         return self.pro_window.duration.default_properties.get("Input Devices", {})
 
-    def getPropertyByKey(self, key: str):
-        return self.default_properties.get(key)

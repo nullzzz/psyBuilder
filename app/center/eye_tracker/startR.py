@@ -156,6 +156,3 @@ class StartR(TabItemWidget):
 
     def getTrackerName(self) -> str:
         return self.tracker_name.currentText()
-
-    def getPropertyByKey(self, key: str):
-        return self.default_properties.get(key)
