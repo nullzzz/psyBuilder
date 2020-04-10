@@ -992,7 +992,7 @@ def getCycleRealRows(widgetId: str) -> int:
 
 
 def getCycleAttVarNamesList(cWidget) -> list:
-    allAttVarNameList = []
+    # allAttVarNameList = []
 
     cRowDict = cWidget.getAttributes(0)
     #
@@ -2143,7 +2143,7 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
 
     # Step 1: generate codes to draw stim
     if Info.TEXT == cWidgetType:
-        drawTextWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
+        drawTextWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel)
     elif Info.IMAGE == cWidgetType:
         allWidgetCodes, *_ = drawImageWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
     elif Info.SOUND == cWidgetType:
@@ -5043,7 +5043,7 @@ def compileCode(globalSelf, isDummyCompile):
 
         printAutoInd(f, "cDataType = Eyelink('GetNextDataType');")
         printAutoInd(f,
-                     "% 3:9 for startBlink, endBlink, startSacc, end Sacc, startFix, endFix, and fixUpate respectively")
+                     "% 3:9 for startBlink, endBlink, startSacc, end Sacc, startFix, endFix, and fixUpdate respectively")
         printAutoInd(f, "if ismember(cDataType, 3:9)")
         printAutoInd(f, "fEventOrFirstPress = Eyelink('GetFloatData', cDataType);")
         printAutoInd(f, "keyCode = bitget(cDataType,1:9);")
