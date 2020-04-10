@@ -90,8 +90,10 @@ QListView#IconList{
 }
 
 QListView#IconList::Item{
-    min-height:75px;
-    max-height:75px;
+    border-top: 10px solid transparent;
+    border-bottom: 1px solid transparent;
+    min-height:64px;
+    max-height:64px;
     min-width: 100px;
 }
 

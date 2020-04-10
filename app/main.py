@@ -725,7 +725,7 @@ class Psy(QMainWindow):
         open file through restart software
         """
         file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.getcwd(), "Psy File (*.psy)")
-        if file_path:
+        if file_path and file_path != Info.FILE_NAME:
             # store current state
             self.store(Info.TempFile, False)
             # clear software
@@ -770,7 +770,8 @@ class Psy(QMainWindow):
             for name in Info.Names:
                 widget_id = Info.Names[name][0]
                 widget = Info.Widgets[widget_id]
-                widgets_data[f"{widget_id}&{name}"] = widget.store()
+                widget_data = widget.store()
+                widgets_data[f"{widget_id}&{name}"] = widget_data
             setting.setValue("Widgets", widgets_data)
             # structure
             structure = self.structure.store()
@@ -850,9 +851,11 @@ class Psy(QMainWindow):
         # create or map widget firstly
         if widget_name not in created_widgets:
             # create widget
+
             widget = self.createWidget(widget_id, widget_name)
             # restore widget data
-            widget.restore(widgets_data[f"{names[widget_name][0]}&{widget_name}"])
+            widget_data = widgets_data[f"{names[widget_name][0]}&{widget_name}"]
+            widget.restore(widget_data)
             # log in created widgets
             created_widgets[widget_name] = widget
         else:
