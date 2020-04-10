@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QIcon, QFontMetrics, QPixmap
+from PyQt5.QtGui import QIcon, QFontMetrics, QPixmap, QPalette
 from PyQt5.QtWidgets import QWidget, QTextEdit, QLabel, QFrame, QVBoxLayout, QHBoxLayout
 
 from app.func import Func
@@ -15,6 +15,9 @@ class AboutUs(QWidget):
         self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
 
         self.setAutoFillBackground(True)
+        p = self.palette()
+        p.setColor(QPalette.Background, Qt.white)
+        self.setPalette(p)
 
         info = QTextEdit(self)
         info.setReadOnly(True)
@@ -38,10 +41,10 @@ class AboutUs(QWidget):
                                "Yang Zhang (张阳), Ph.D, Prof.<br>Department of Psychology, Soochow University"
                                "<br><a href='mailto:yzhangpsy@suda.edu.cn?Subject= Inquire about the usage of PTB Builder 0.1'>yzhangpsy@suda.edu.cn</a>")
         author2 = self.getInfo("authorInfo02",
-                               "Zhe Yang, Ph.D, Associate Prof. \n Department of computer science, Soochow University")
+                               "Zhe Yang, Ph.D, Associate Prof. <br> Department of computer science, Soochow University")
 
         author3 = self.getInfo("authorInfo03",
-                               "ChenZhi Feng, Ph.D, Prof. \n Department of Psychology, Soochow University")
+                               "ChenZhi Feng, Ph.D, Prof. <br> Department of Psychology, Soochow University")
         layout = QVBoxLayout()
         layout.addWidget(info, 2)
         layout.addLayout(author1, 1)
