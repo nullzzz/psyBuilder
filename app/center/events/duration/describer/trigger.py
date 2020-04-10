@@ -30,7 +30,7 @@ class TriggerInfo(QWidget):
         self.setLayout(layout)
 
     def describe(self, info: dict):
-        value = info.get("Value or Msg")
+        value = info.get("Value Or Msg")
         self.value.setText(value)
 
         device_type = info.get("Device Type")
@@ -45,7 +45,7 @@ class TriggerInfo(QWidget):
 
     def getInfo(self):
         info = {
-            "Value or Msg": self.value.text(),
+            "Value Or Msg": self.value.text(),
             "Pulse Duration": self.pulse_dur.currentText()
         }
         return info

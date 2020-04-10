@@ -151,3 +151,9 @@ class CaseArea(QScrollArea):
         self.attributes = attributes
         for case in self.case_list:
             case.setAttributes(self.attributes)
+
+    def getUsingDeviceCount(self):
+        cnt = 0
+        for case in self.case_list:
+            cnt += case.icon_choose.getUsingDeviceCount()
+        return cnt

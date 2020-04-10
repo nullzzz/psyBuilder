@@ -52,27 +52,6 @@ class ImageDisplay(TabItemMainWindow):
     def refresh(self):
         self.pro_window.refresh()
 
-    # 预览图片
-    # def preView(self):
-    #     if self.file:
-    #         try:
-    #             self.preview = Preview(self.file, self.pix, self.x_pos, self.y_pos, self.w_size, self.h_size)
-    #             self.preview.setStyleSheet("background-color:{}".format(self.frame_fill_color))
-    #             self.preview.setTransparent(int(self.transparent_value))
-    #             self.preview.setWindowModality(Qt.ApplicationModal)
-    #             self.preview.showFullScreen()
-    #             self.timer = QtCore.QTimer()
-    #             self.timer.timeout.connect(self.preview.close)
-    #             self.timer.start(10000)
-    #             self.timer.setSingleShot(True)
-    #         except AttributeError:
-    #             MessageBox.warning(self, "No Image Error", "Please load image first!", MessageBox.Ok)
-    #         except Exception as e:
-    #             print(e)
-    #             print(type(e))
-    #     else:
-    #         MessageBox.warning(self, "No Image Error", "Please load image first!", MessageBox.Ok)
-
     def ok(self):
         self.apply()
         self.pro_window.close()
@@ -87,6 +66,10 @@ class ImageDisplay(TabItemMainWindow):
 
     def updateInfo(self):
         self.pro_window.updateInfo()
+
+    def setAttributes(self, attributes: list):
+        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
+        self.pro_window.setAttributes(format_attributes)
 
     def setProperties(self, properties: dict):
         """
@@ -129,21 +112,28 @@ class ImageDisplay(TabItemMainWindow):
         返回图片文件名（绝对路径）
         :return:
         """
-        return self.file
+        return self.default_properties.get("General").get("File Name")
 
     def getIsMirrorUpAndDown(self) -> bool:
         """
         返回图片是否上下镜像
         :return:
         """
-        return self.isUD
+        return self.default_properties.get("General").get("Mirror Up/Down")
 
     def getIsMirrorLeftAndRight(self) -> bool:
         """
         返回图片是否左右镜像
         :return:
         """
-        return self.isLR
+        return self.default_properties.get("General").get("Mirror Left/Aright")
+
+    def getRotate(self) -> str:
+        """
+        返回Rotate
+        :return:
+        """
+        return self.default_properties.get("General").get("Rotate")
 
     def getStretchMode(self) -> str:
         """
@@ -154,8 +144,8 @@ class ImageDisplay(TabItemMainWindow):
         全拉伸返回3
         :return: ""、Both、LeftRight、UpDown、[attr]
         """
-        if self.isStretch:
-            return self.stretch_mode
+        if self.default_properties.get("General").get("Stretch"):
+            return self.default_properties.get("General").get("Stretch Mode")
         return ""
 
     def getTransparent(self) -> str:
@@ -163,28 +153,49 @@ class ImageDisplay(TabItemMainWindow):
         返回图像透明度
         :return:
         """
-        return self.transparent_value
+        return self.default_properties.get("General").get("Transparent")
 
     def getClearAfter(self) -> str:
         """
         返回是否clear after
         :return:
         """
-        return self.pro_window.general.clear_after.currentText()
+        return self.default_properties.get("General").get("Clear After")
 
     def getScreenName(self) -> str:
         """
         返回Screen Name
         :return:
         """
-        return self.pro_window.general.screen_name.currentText()
+        return self.default_properties.get("General").get("Screen Name")
 
-    def getRotate(self) -> str:
+    def getXAxisCoordinates(self) -> str:
         """
-        返回Rotate
+        返回x坐标值
         :return:
         """
-        return self.pro_window.general.rotate.text()
+        return self.default_properties.get("Frame").get("Center X")
+
+    def getYAxisCoordinates(self) -> str:
+        """
+        返回y坐标值
+        :return:
+        """
+        return self.default_properties.get("Frame").get("Center Y")
+
+    def getWidth(self) -> str:
+        """
+        返回宽度
+        :return:
+        """
+        return self.default_properties.get("Frame").get("Width")
+
+    def getHeight(self) -> str:
+        """
+        返回高度
+        :return:
+        """
+        return self.default_properties.get("Frame").get("Height")
 
     def getEnable(self) -> str:
         """
@@ -196,34 +207,6 @@ class ImageDisplay(TabItemMainWindow):
     def getFrameTransparent(self) -> str:
         """返回frame transparent"""
         return self.pro_window.frame.transparent.text()
-
-    def getXAxisCoordinates(self) -> str:
-        """
-        返回x坐标值
-        :return:
-        """
-        return self.x_pos
-
-    def getYAxisCoordinates(self) -> str:
-        """
-        返回y坐标值
-        :return:
-        """
-        return self.y_pos
-
-    def getWidth(self) -> str:
-        """
-        返回宽度
-        :return:
-        """
-        return self.w_size
-
-    def getHeight(self) -> str:
-        """
-        返回高度
-        :return:
-        """
-        return self.h_size
 
     def getBorderColor(self) -> str:
         """
@@ -258,14 +241,14 @@ class ImageDisplay(TabItemMainWindow):
         返回输出设备
         :return:
         """
-        return self.pro_window.duration.default_properties.get("Output devices", {})
+        return self.pro_window.duration.default_properties.get("Output Devices", {})
 
     def getInputDevice(self) -> dict:
         """
         返回输入设备
         :return: 输入设备字典
         """
-        return self.pro_window.duration.default_properties.get("Input devices", {})
+        return self.pro_window.duration.default_properties.get("Input Devices", {})
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)

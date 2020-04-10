@@ -12,7 +12,7 @@ https://stackoverflow.com/questions/58251763/how-to-construct-custom-auto-comple
 
 
 class SmartCompleter(QCompleter):
-    def __init__(self, words: tuple = ("@mean", "@standard", "@random"), parent=None):
+    def __init__(self, words: tuple = ("@mean", "@mode", "@median"), parent=None):
         super().__init__(words, parent)
         self.setCompletionMode(QCompleter.PopupCompletion)
         self.setCaseSensitivity(Qt.CaseSensitive)

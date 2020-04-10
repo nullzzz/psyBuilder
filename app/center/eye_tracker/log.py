@@ -166,7 +166,6 @@ class Close(TabItemWidget):
         self.loadSetting()
 
     def updateInfo(self):
-        self.default_properties.clear()
         self.default_properties["Pause Between Messages"] = self.pause_between_msg.text()
         self.default_properties["Automatically Log All Variables"] = self.automatically_log_all_variables.checkState()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()

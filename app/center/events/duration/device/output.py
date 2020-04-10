@@ -18,7 +18,7 @@ class OutputDevice(QListWidgetItem):
             "Device Id": self.device_id,
             "Device Name": self.device_name,
             "Device Type": self.device_type,
-            "Value or Msg": "",
+            "Value Or Msg": "",
             "Pulse Duration": ""
         }
 
@@ -39,7 +39,7 @@ class OutputDevice(QListWidgetItem):
         self.default_properties["Device Id"] = self.device_id
         self.default_properties["Device Name"] = self.device_name
         self.default_properties["Device Type"] = self.device_type
-        self.default_properties["Value or Msg"] = self.value_or_msg
+        self.default_properties["Value Or Msg"] = self.value_or_msg
         self.default_properties["Pulse Duration"] = self.pulse_duration
         return self.default_properties
 
@@ -51,5 +51,5 @@ class OutputDevice(QListWidgetItem):
         self.device_id = self.default_properties.get("Device Id")
         self.device_name = self.default_properties.get("Device Name")
         self.device_type = self.default_properties.get("Device Type")
-        self.value_or_msg = self.default_properties["Value or Msg"]
+        self.value_or_msg = self.default_properties["Value Or Msg"]
         self.pulse_duration = self.default_properties["Pulse Duration"]

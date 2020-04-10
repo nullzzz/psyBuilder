@@ -30,13 +30,14 @@ class TabItemMainWindow(QMainWindow):
         self.widget_id = widget_id
         self.widget_name = widget_name
 
+        self.default_properties: dict = {}
+
     def refresh(self):
         """
         update some things such as device information
         and completer.
         :return:
         """
-        self.pro_window.refresh()
 
     def openSettingWindow(self):
         """
@@ -55,8 +56,6 @@ class TabItemMainWindow(QMainWindow):
         :param attributes:
         :return:
         """
-        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
-        self.pro_window.setAttributes(format_attributes)
 
     def getUsingAttributes(self) -> list:
         """
@@ -93,14 +92,15 @@ class TabItemMainWindow(QMainWindow):
 
     def getUsingDeviceCount(self) -> int:
         """
-        # todo condition
         return count of using device
         :return:
         :rtype: int
         """
-        input_device: dict = self.default_properties.get("Input Devices", {})
-
-        return len(input_device)
+        if duration := self.default_properties.get("Duration"):
+            return len(duration.get("Input Devices", {}))
+        elif properties := self.default_properties.get("Properties"):
+            return len(properties.get("Duration").get("Input Devices", {}))
+        return 0
 
     def getHiddenAttributes(self) -> list:
         """
@@ -115,8 +115,8 @@ class TabItemMainWindow(QMainWindow):
         :return: list of attributes
         """
         if self.getUsingDeviceCount():
-            return ["respOnSettingTime", "acc", "resp", "rt"]
-        return ["OnSettingTime"]
+            return ["onsettime", "acc", "resp", "rt", "respOnsettime"]
+        return ["onsettime"]
 
     """
     about widget
