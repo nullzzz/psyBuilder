@@ -1,3 +1,4 @@
+import copy
 import os
 import re
 
@@ -408,7 +409,19 @@ class Func(object):
         get widget's properties through its widget id
         """
         widget = Info.Widgets[widget_id]
-        return widget.getProperties()
+        dp: dict = copy.deepcopy(widget.default_properties)
+
+        # slider
+        if pro := dp.get("Properties"):
+            g = pro.get("General")
+            f = pro.get("Frame")
+            d = pro.get("Duration")
+            dp["Properties"] = {**g, **f, **d}
+        elif g := dp.get("General"):
+            f = dp.get("Frame", {})
+            d = dp.get("Duration")
+            dp = {**g, **f, **d}
+        return dp
 
     @staticmethod
     def getWidgetAttributes(widget_id: str, detail: bool = False):

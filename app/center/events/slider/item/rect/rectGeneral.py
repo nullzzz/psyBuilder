@@ -7,11 +7,13 @@ from lib import ColorListEditor, VarLineEdit
 class RectGeneral(QWidget):
     def __init__(self, parent=None):
         super(RectGeneral, self).__init__(parent)
-        self.attributes = []
+
         self.default_properties = {
             "Center X": "0",
             "Center Y": "0",
-            "Border Color": "black",
+            "Width": "100",
+            "Height": "100",
+            "Border Color": "0,0,0",
             "Border Width": '1',
             "Fill Color": "0,0,0,0"
         }
@@ -101,9 +103,8 @@ class RectGeneral(QWidget):
         self.default_properties['Fill Color'] = self.fill_color.getColor()
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.loadSetting()
+        self.default_properties.update(properties)
+        self.loadSetting()
 
     def setPosition(self, x, y):
         if not self.cx_pos.text().startswith("["):

@@ -91,12 +91,14 @@ class ImageDisplay(TabItemMainWindow):
         return necessary data for restoring this widget.
         @return:
         """
+        self.updateInfo()
         return self.default_properties
 
     def restore(self, properties: dict):
         self.setProperties(properties)
 
     def clone(self, new_widget_id: str, new_widget_name: str):
+        self.updateInfo()
         clone_widget = ImageDisplay(new_widget_id, new_widget_name)
         clone_widget.setProperties(self.default_properties)
         clone_widget.apply()
@@ -213,7 +215,7 @@ class ImageDisplay(TabItemMainWindow):
         返回边框颜色
         :return:
         """
-        return self.pro_window.frame.border_color.getColor()
+        return self.pro_window.frame.dot_color.getColor()
 
     def getBorderWidth(self) -> str:
         """

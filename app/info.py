@@ -109,6 +109,7 @@ class Info(object):
     ITEM_SNOW = "snow"
     ITEM_GABOR = "gabor"
     ITEM_LINE = "line"
+    ITEM_DOT = "dot"
 
     SLIDER_COUNT: dict = {
         ITEM_POLYGON: 0,

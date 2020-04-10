@@ -130,6 +130,7 @@ class IfBranch(TabItemWidget):
         self.false_icon_choose.loadSetting()
 
     def clone(self, new_widget_id: str, new_widget_name: str):
+        self.updateInfo()
         clone_widget = IfBranch(new_widget_id, new_widget_name)
         clone_widget.setProperties(self.default_properties.copy())
         return clone_widget

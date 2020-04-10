@@ -65,7 +65,7 @@ class TimelineItem(QLabel):
 
     def startFrameAnimation(self, end: QRect, direction: int = -1):
         """
-        give end point and its direction
+        give end dot and its direction
         0: left
         1: right
         @return:

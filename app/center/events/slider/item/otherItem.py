@@ -48,6 +48,10 @@ class OtherItem(QGraphicsPixmapItem):
             "Properties": self.properties
         }
 
+        # self.timer = QTimer()
+        # self.timer.timeout.connect(self.changeSomething)
+        # self.timer.start(1)
+
     def mouseDoubleClickEvent(self, event):
         self.openPro()
 

@@ -26,18 +26,6 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
-
-        # self.align = "Center"
-        # self.A_v = "Center"
-        #
-        # self.fore_color = "0,0,0"
-        # self.back_color = "255,255,255"
-        # self.transparent_value = "100%"
-        #
-        # self.x_pos = "0"
-        # self.y_pos = "0"
-        # self.w_size = "100%"
-        # self.h_size = "100%"
         self.setUI()
 
     def setUI(self):
@@ -58,28 +46,6 @@ class TextDisplay(TabItemMainWindow):
     def refresh(self):
         self.pro_window.refresh()
 
-    # 预览
-    # def preView(self):
-    #     return
-    #     try:
-    #         self.preview = Preview(self.x_pos, self.y_pos, self.w_size, self.h_size)
-    #         # self.preview.text.setStyleSheet("background-color:{}".format(self.back_color))
-    #         self.preview.setWindowModality(Qt.ApplicationModal)
-    #         self.preview.setHtml(self.html)
-    #         self.preview.setFont(self.pro_window.general.text_edit.font())
-    #         self.preview.showFullScreen()
-    #         self.preview.moveText()
-    #         self.preview.setTransparent(self.transparent_value)
-    #         self.t = QtCore.QTimer()
-    #         self.t.timeout.connect(self.preview.close)
-    #         self.t.start(10000)
-    #         self.t.setSingleShot(True)
-    #     except AttributeError as ae:
-    #         MessageBox.warning(self, "Unknown Error", f"Please contact the developers!", MessageBox.Ok)
-    #     # except Exception as e:
-    #     #     print(e)
-    #     #     print(type(e))
-
     def ok(self):
         self.apply()
         self.pro_window.close()
@@ -88,32 +54,8 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window.loadSetting()
 
     def apply(self):
-        self.pro_window.testHtml()
+        self.updateInfo()
 
-        # self.updateInfo()
-        # self.propertiesChanged.emit(self.widget_id)
-
-    # # 获取参数
-    # def parseProperties(self):
-    #     self.html = self.pro_window.html
-    #     self.fore_color = self.pro_window.general.fore_color.getColor()
-    #     self.back_color = self.pro_window.general.back_color.getColor()
-    #     self.transparent_value = self.pro_window.general.transparent.text()
-    #
-    #     self.x_pos = self.default_properties.get("Center X", "0")
-    #     self.y_pos = self.default_properties.get("Center Y", "0")
-    #     self.w_size = self.default_properties.get("Width", "100%")
-    #     self.h_size = self.default_properties.get("Height", "100%")
-    #     if self.x_pos.startswith("[") and self.x_pos.endswith("]"):
-    #         self.x_pos = "0"
-    #     if self.y_pos.startswith("[") and self.y_pos.endswith("]"):
-    #         self.y_pos = "0"
-    #     if self.w_size.startswith("[") and self.w_size.endswith("]"):
-    #         self.w_size = "100%"
-    #     if self.h_size.startswith("[") and self.h_size.endswith("]"):
-    #         self.h_size = "100%"
-
-    # 返回设置参数
     def updateInfo(self):
         self.pro_window.updateInfo()
 
@@ -140,10 +82,18 @@ class TextDisplay(TabItemMainWindow):
         return necessary data for restoring this widget.
         @return:
         """
+        self.updateInfo()
         return self.default_properties
 
     def restore(self, properties: dict):
         self.setProperties(properties)
+
+    def clone(self, new_widget_id: str, new_widget_name):
+        self.updateInfo()
+        clone_widget = TextDisplay(new_widget_id, new_widget_name)
+        clone_widget.setProperties(self.default_properties)
+        clone_widget.apply()
+        return clone_widget
 
     # 返回各项参数
     # 大部分以字符串返回，少数点击选择按钮返回布尔值
@@ -280,7 +230,7 @@ class TextDisplay(TabItemMainWindow):
         返回边框颜色
         :return:
         """
-        return self.pro_window.frame.border_color.getColor()
+        return self.pro_window.frame.dot_color.getColor()
 
     def getBorderWidth(self) -> str:
         """
@@ -319,6 +269,3 @@ class TextDisplay(TabItemMainWindow):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
-
-    def get(self):
-        self.property()

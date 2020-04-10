@@ -31,7 +31,7 @@ class TextItem(QGraphicsTextItem):
         self.setPlainText('Hello World')
 
         font = QFont()
-        font.setPointSize(20)  # set the inital font size to 20 pt (point)
+        font.setPointSize(20)  # set the inital font size to 20 pt (dot)
         self.setFont(font)
 
         self.setTextInteractionFlags(Qt.TextEditorInteraction)

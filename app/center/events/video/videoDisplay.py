@@ -201,6 +201,9 @@ class VideoDisplay(TabItemMainWindow):
         self.pro_window.setProperties(properties)
         self.apply()
 
+    def updateInfo(self):
+        self.pro_window.updateInfo()
+
     def loadSetting(self):
         self.pro_window.setProperties(self.default_properties)
 
@@ -300,7 +303,7 @@ class VideoDisplay(TabItemMainWindow):
         返回边框颜色
         :return:
         """
-        return self.pro_window.frame.border_color.currentText()
+        return self.pro_window.frame.dot_color.currentText()
 
     def getBorderWidth(self) -> str:
         """
@@ -346,23 +349,21 @@ class VideoDisplay(TabItemMainWindow):
 
     def getProperties(self) -> dict:
         self.refresh()
-        properties = {}
-        for k, v in self.pro_window.getProperties().items():
-            if not isinstance(v, dict):
-                properties[k] = v
-        return properties
+        return self.pro_window.getProperties()
 
     def store(self):
         """
         return necessary data for restoring this widget.
         @return:
         """
+        self.updateInfo()
         return self.default_properties
 
     def restore(self, properties: dict):
         self.setProperties(properties)
 
     def clone(self, new_widget_id: str, new_widget_name):
+        self.updateInfo()
         clone_widget = VideoDisplay(new_widget_id, new_widget_name)
         clone_widget.setProperties(self.default_properties.copy())
         clone_widget.apply()

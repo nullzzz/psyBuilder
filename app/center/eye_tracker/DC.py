@@ -178,7 +178,7 @@ class EyeDC(TabItemWidget):
         self.target_color.setCurrentText(self.default_properties["Target Color"])
         self.target_style.setCurrentText(self.default_properties["Target Style"])
         self.show_display_with_drift_correction_target.setCheckState(
-            self.default_properties["Show Display With Drift Correction"])
+            self.default_properties["Show Display With Drift Correction Target"])
         self.fixation_triggered.setCheckState(self.default_properties["Fixation Triggered"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
 
@@ -228,7 +228,3 @@ class EyeDC(TabItemWidget):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
-
-    """
-    Functions that must be complete in new version
-    """

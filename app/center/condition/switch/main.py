@@ -64,7 +64,7 @@ class Switch(TabItemWidget):
         self.loadSetting()
 
     def apply(self):
-        self.getProperties()
+        self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
 
     def refresh(self):
@@ -72,8 +72,9 @@ class Switch(TabItemWidget):
         self.setAttributes(attributes)
         self.case_area.refresh()
 
-    def getInfo(self):
-        return self.getProperties()
+    def updateInfo(self):
+        self.case_area.updateInfo()
+        self.default_properties["Switch"] = self.switch_area.getProperties()
 
     def getUsingDeviceCount(self) -> int:
         return self.case_area.getUsingDeviceCount()
@@ -94,6 +95,7 @@ class Switch(TabItemWidget):
         self.case_area.loadSetting()
 
     def clone(self, new_widget_id: str, new_widget_name: str):
+        self.updateInfo()
         clone_widget = Switch(new_widget_id, new_widget_name)
         clone_widget.setProperties(self.default_properties.copy())
         return clone_widget

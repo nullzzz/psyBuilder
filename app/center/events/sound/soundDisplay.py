@@ -213,6 +213,7 @@ class SoundDisplay(TabItemMainWindow):
         get this widget's properties to show it in Properties Window.
         @return: a dict of properties
         """
+        self.refresh()
         return self.pro_window.getProperties()
 
     def store(self):
@@ -220,12 +221,14 @@ class SoundDisplay(TabItemMainWindow):
         return necessary data for restoring this widget.
         @return:
         """
+        self.updateInfo()
         return self.default_properties
 
     def restore(self, properties: dict):
         self.setProperties(properties)
 
     def clone(self, new_widget_id: str, new_widget_name):
+        self.updateInfo()
         clone_widget = SoundDisplay(new_widget_id, new_widget_name)
         clone_widget.setProperties(self.default_properties)
         clone_widget.apply()

@@ -15,7 +15,7 @@ class Close(TabItemWidget):
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
-        self.attributes = []
+
         self.pause_between_msg = VarLineEdit("1")
 
         self.using_tracker_id = ""
@@ -185,7 +185,7 @@ class Close(TabItemWidget):
         self.select_attr.clear()
         self.select_attr.addItems(self.default_properties["Used Attributes"])
         self.all_attr.clear()
-        self.all_attr.addItems(self.default_properties["Not used Attributes"])
+        self.all_attr.addItems(self.default_properties["Not Used Attributes"])
 
     def setAttributes(self, attributes):
         pass
