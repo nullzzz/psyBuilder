@@ -251,6 +251,3 @@ class ImageDisplay(TabItemMainWindow):
         :return: 输入设备字典
         """
         return self.pro_window.duration.default_properties.get("Input Devices", {})
-
-    def getPropertyByKey(self, key: str):
-        return self.default_properties.get(key)
