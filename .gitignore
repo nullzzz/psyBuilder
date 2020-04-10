@@ -136,3 +136,4 @@ dmypy.json
 .pyre/
 
 !/config.ini
+/var_env.ini

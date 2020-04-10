@@ -303,7 +303,7 @@ class VideoDisplay(TabItemMainWindow):
         返回边框颜色
         :return:
         """
-        return self.pro_window.frame.dot_color.currentText()
+        return self.pro_window.frame.border_color.currentText()
 
     def getBorderWidth(self) -> str:
         """

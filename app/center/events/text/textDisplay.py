@@ -230,7 +230,7 @@ class TextDisplay(TabItemMainWindow):
         返回边框颜色
         :return:
         """
-        return self.pro_window.frame.dot_color.getColor()
+        return self.pro_window.frame.border_color.getColor()
 
     def getBorderWidth(self) -> str:
         """
