@@ -92,18 +92,20 @@ QListView#IconList{
 QListView#IconList::Item{
     border-top: 10px solid transparent;
     border-bottom: 1px solid transparent;
-    min-height:64px;
-    max-height:64px;
+    min-height: 64px;
+    max-height: 64px;
     min-width: 100px;
 }
 
 QListView#IconList::Item:hover{
+    padding-top: 9px;
     background: transparent;
     border-radius:2px;
     border: 1px solid rgb(110, 110, 110);
 }
 
 QListView#IconList::Item:selected{
+    padding-top: 9px;
     background: rgb(186,215,251);
     border-radius:2px;
     border: 1px solid rgb(110, 110, 110);

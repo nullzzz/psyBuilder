@@ -17,6 +17,8 @@ class TimelineItem(QLabel):
     doubleClicked = pyqtSignal(str)
 
     IconSize = 48
+    # 500ms
+    MoveSpeed = 500
 
     def __init__(self, widget_type: str = "", widget_id: str = ""):
         """
@@ -72,7 +74,7 @@ class TimelineItem(QLabel):
         """
         if direction != -1:
             self.direction = direction
-        self.frame_animation.setDuration(1000)
+        self.frame_animation.setDuration(self.MoveSpeed)
         self.frame_animation.setStartValue(self.frameRect())
         self.frame_animation.setEndValue(end)
         self.frame_animation.start()
@@ -83,7 +85,7 @@ class TimelineItem(QLabel):
         @param end:
         @return:
         """
-        self.geometry_animation.setDuration(1000)
+        self.geometry_animation.setDuration(self.MoveSpeed)
         self.geometry_animation.setStartValue(self.geometry())
         self.geometry_animation.setEndValue(end)
         self.geometry_animation.start()

@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
@@ -161,7 +162,7 @@ class FileButtonArea(QWidget):
         # layout
         layout = QVBoxLayout()
         layout.addWidget(icon, 18, Qt.AlignCenter)
-        layout.addWidget(Version("Psy Builder", "Version 2020.3"), 20)
+        layout.addWidget(Version("Psy Builder", "Version 0.1"), 20)
         layout.addWidget(create_button, 1, Qt.AlignHCenter)
         layout.addWidget(open_button, 1, Qt.AlignHCenter)
         layout.addWidget(setting_button, 1, Qt.AlignHCenter)
@@ -174,10 +175,11 @@ class FileButtonArea(QWidget):
 
         :return:
         """
-        file_directory = QFileDialog.getExistingDirectory(self, "Choose Directory", os.getcwd(),
-                                                          QFileDialog.ShowDirsOnly)
-        if file_directory:
-            self.fileCreated.emit(file_directory)
+        file_path, _ = QFileDialog().getSaveFileName(self, "Create file", os.getcwd(), "Psy Files (*.psy);")
+        if file_path:
+            if not re.search(r"\.psy$", file_path):
+                file_path = file_path + ".psy"
+            self.fileCreated.emit(file_path)
 
     def handleOpenButtonClicked(self, checked):
         """
@@ -253,15 +255,26 @@ class FileWindow(QWidget):
         self.close()
         self.opening = False
 
-    def handleFileCreated(self, file_directory: str):
+    def handleFileCreated(self, file_path: str):
         """
         change config and start software
         :param dir:
         :return:
         """
         # change config
-        Settings("config.ini", Settings.IniFormat).setValue("file_path", "")
+        file_directory = os.path.dirname(file_path)
+        Settings("config.ini", Settings.IniFormat).setValue("file_path", file_path)
+        Settings("config.ini", Settings.IniFormat).setValue("new", True)
         Settings("config.ini", Settings.IniFormat).setValue("file_directory", file_directory)
+        # change file_paths
+        file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
+        if file_path not in file_paths:
+            file_paths.insert(0, file_path)
+        else:
+            # move it to first
+            file_paths.remove(file_path)
+            file_paths.insert(0, file_path)
+        Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
         # start psy application
         self.startPsy()
 

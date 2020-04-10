@@ -155,7 +155,7 @@ class Info(object):
     #           new version info              #
     ###########################################
     # init file
-    InitFile = "init.ini"
+    VarEnvFile = "var_env.ini"
     TempFile = "temp.ini"
 
     # image path
