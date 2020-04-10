@@ -156,7 +156,7 @@ class FileButtonArea(QWidget):
         create_button.clicked.connect(self.handleCreateButtonClicked)
         open_button = HoverButton("menu/open", "Open Local File")
         open_button.clicked.connect(self.handleOpenButtonClicked)
-        setting_button = HoverButton("menu/setting", "Alter Open Mode")
+        setting_button = HoverButton("menu/setting", "Set Open Mode..")
         setting_button.clicked.connect(
             lambda checked: self.menu.exec(self.mapToGlobal(setting_button.pos())))
         # layout

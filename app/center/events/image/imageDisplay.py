@@ -215,7 +215,7 @@ class ImageDisplay(TabItemMainWindow):
         返回边框颜色
         :return:
         """
-        return self.pro_window.frame.dot_color.getColor()
+        return self.pro_window.frame.border_color.getColor()
 
     def getBorderWidth(self) -> str:
         """
@@ -251,6 +251,3 @@ class ImageDisplay(TabItemMainWindow):
         :return: 输入设备字典
         """
         return self.pro_window.duration.default_properties.get("Input Devices", {})
-
-    def getPropertyByKey(self, key: str):
-        return self.default_properties.get(key)
