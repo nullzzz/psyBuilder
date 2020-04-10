@@ -409,7 +409,7 @@ class Func(object):
         get widget's properties through its widget id
         """
         widget = Info.Widgets[widget_id]
-        dp: dict = copy.deepcopy(widget.default_properties)
+        dp: dict = copy.deepcopy(widget.store())
 
         # slider
         if pro := dp.get("Properties"):
