@@ -1,13 +1,14 @@
+import copy
 import datetime
 import os
 import re
 import shutil
 
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMessageBox
 
 from app.func import Func
 from app.info import Info
-from lib import MessageBox as QMessageBox
 
 cIndents = 0
 isPreLineSwitch = 0
@@ -37,6 +38,7 @@ def throwCompileErrorInfo(inputStr):
     # msg.setDetailedText("The details are as follows:")
     # msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
     # msg.buttonClicked.connect(msgbtn)
+    # nomodal show
     msg.exec_()
     raise Exception(inputStr)
 
@@ -250,7 +252,7 @@ def isRgbaWithBracketsStr(inputStr):
 
 
 def isRgbWithBracketsStr(inputStr):
-    isRgbFormat = re.fullmatch("^\[\d+,\d+,\d+\]$", inputStr)
+    isRgbFormat = re.fullmatch('^\[\d+,\d+,\d+\]$', inputStr)
     return isRgbFormat
 
 
@@ -331,14 +333,14 @@ def isFirstStimWidgetInTL(widget_id: str) -> bool:
 
     isFirstEvent = True
 
-    preWidgetId = getPreiousWID(widget_id)
+    preWidgetId = getPreWID(widget_id)
 
     while preWidgetId:
         if getWidgetIdType(preWidgetId) in stimWidgetTypesList:
             isFirstEvent = False
             break
         else:
-            preWidgetId = getPreiousWID(widget_id)
+            preWidgetId = getPreWID(widget_id)
 
     return isFirstEvent
 
@@ -396,7 +398,7 @@ def replaceDot(screenNameStr, newSplitStr="_") -> str:
     return newSplitStr.join(screenNameStr.split('.'))
 
 
-def makeInputDevIndexValueStr(devType: str, indexStr: str, isOrderNum=True) -> list:
+def makeInputDevIndexValueStr(devType: str, indexStr: str, isOrderNum=True) -> [str, int]:
     if Info.DEV_KEYBOARD == devType:
         devIndexesVarName = "kbIndices"
         cDevType = 1
@@ -561,6 +563,10 @@ def parseFilenameStr(inputStr, isRef=False):
     return inputStr, toBeSavedDir
 
 
+def parsePhysicSize(inputStr: str) -> list:
+    return re.split(r'[,xX\s]\s*', inputStr)
+
+
 def parseStartEndTimeStr(inputStr, isRef=False) -> str:
     if not isRef:
         inputStr = inputStr
@@ -681,9 +687,24 @@ def parseStretchModeStr(inputStr, isRef=False):
     return inputStr
 
 
+def parseTextContentStrNew(inputStr) -> str:
+    """
+    new fun to support citation within text
+    :param inputStr:
+    :return:
+    """
+    inputStr = pyStr2MatlabStr(inputStr)
+
+    if isContainChStr(inputStr):
+        inputStr = "double(" + inputStr + ")"
+
+    return inputStr
+
+
 def parseTextContentStr(inputStr, isRef=False) -> str:
     if not isRef:
         if isContainChStr(inputStr):
+            # inputStr = "double(" + inputStr + ")"
             inputStr = "[" + "".join(f"{ord(value)} " for value in inputStr) + "]"
         else:
             # cinputStr = '\\n'.join(inputStr.split('\n')) have down in pyStr2MatlabStr
@@ -697,6 +718,7 @@ def printAutoInd(f, inputStr, *argins):
     global cIndents, isPreLineSwitch, isDummyPrint
 
     if isDummyPrint:
+        # DO nothing
         return
 
     if isinstance(f, list):
@@ -768,12 +790,18 @@ def printAutoInd(f, inputStr, *argins):
 
 
 def getAllEventWidgetsList(includedType: int = 1) -> list:
+    """
+    :param includedType: 1 none CYCLE, 2 CYCLE, 3 all eventTypes
+    :return: a list for event widget
+    """
     allEventWidgets = []
-    if includedType > 0:
-        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
 
-    if includedType >= 2:
-        allEventWidgetTypes.append(Info.CYCLE)
+    if includedType == 3:
+        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH,Info.CYCLE]
+    elif includedType == 2:
+        allEventWidgetTypes = [Info.CYCLE]
+    else:
+        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
 
     for cWidgetId, cWidget in Info.WID_WIDGET.items():
         if not isSubWidgetOfIfOrSwitch(cWidgetId) and getWidgetType(cWidgetId) in allEventWidgetTypes:
@@ -788,16 +816,26 @@ def getAllEventWidgetNamesList(includedType: int = 1) -> list:
     """
     cAllEventWidgetNameList = []
 
-    if includedType > 0:
+    if includedType == 3:
+        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH,Info.CYCLE]
+    elif includedType == 2:
+        allEventWidgetTypes = [Info.CYCLE]
+    else:
         allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
 
-    if includedType >= 2:
-        allEventWidgetTypes.append(Info.CYCLE)
 
     for cWidgetId, cWidget in Info.WID_NODE.items():
         if not isSubWidgetOfIfOrSwitch(cWidgetId) and getWidgetType(cWidgetId) in allEventWidgetTypes:
             cAllEventWidgetNameList.append(getWidgetName(cWidgetId))
+
     return cAllEventWidgetNameList
+
+
+def getWidLevel(cWid:str) -> int:
+    if isSubWidgetOfIfOrSwitch(cWid):
+        cWid = Func.getParentWid(cWid)
+
+    return Func.getWidLevel(cWid)
 
 
 def getWidgetName(widgetOrId, isNameInTL=True) -> str:
@@ -858,6 +896,15 @@ def getWidgetEventPos(widget_id: str) -> int or None:
         return None
 
 
+def getNextStimWID(WID: str) -> None or str:
+    nextStimWID = getNextWID(WID)
+
+    while nextStimWID and getNextWID(WID) not in stimWidgetTypesList:
+        nextStimWID = getNextWID(WID)
+
+    return nextStimWID
+
+
 def getNextWID(WID: str) -> None or str:
     if isSubWidgetOfIfOrSwitch(WID):
         return Func.getNextWidgetId(Func.getParentWid(WID))
@@ -865,7 +912,16 @@ def getNextWID(WID: str) -> None or str:
         return Func.getNextWidgetId(WID)
 
 
-def getPreiousWID(WID: str) -> None or str:
+def getPreStimWID(WID: str) -> None or str:
+    preWID = getPreWID(WID)
+
+    while preWID and getWidgetType(WID) not in stimWidgetTypesList:
+        preWID = getPreWID(WID)
+
+    return preWID
+
+
+def getPreWID(WID: str) -> None or str:
     if isSubWidgetOfIfOrSwitch(WID):
         return Func.getPreviousWidgetId(Func.getParentWid(WID))
     else:
@@ -903,6 +959,39 @@ def getCycleRealRows(widgetId: str) -> int:
     return sumValue
 
 
+def getCycleAttVarNamesList(cWidget) -> list:
+    allAttVarNameList = []
+
+    cRowDict = cWidget.getAttributes(0)
+    #
+    allAttVarNameList = [f"{Func.getWidgetName(cWidget.widget_id)}_{cVar}" for cVar in cRowDict.keys()]
+
+    return allAttVarNameList
+
+
+def getAllCycleAttVarNameList() -> list:
+    allAttrVarNameList = []
+    # 2 for cycle widget only
+    allEventWidgets = getAllEventWidgetsList(2)
+
+    for cWidget in allEventWidgets:
+        cCycleAttVarNameList = getCycleAttVarNamesList(cWidget)
+
+        allAttrVarNameList.extend(cCycleAttVarNameList)
+
+    return allAttrVarNameList
+
+
+def getDevPropertyValue(devList: dict, devName: str, searchedKey: str) -> str or float or int or None:
+    keyValue = None
+    for cDevId, cDevPro in devList.items():
+        if devName == cDevPro['Device Name']:
+            keyValue = cDevPro[searchedKey]
+            break
+
+    return keyValue
+
+
 def getMaxLoopLevel() -> int:
     maxLoopLevel = -1
 
@@ -911,7 +1000,66 @@ def getMaxLoopLevel() -> int:
     return maxLoopLevel
 
 
-def getRefValue(cWidget, inputStr, attributesSetDict) -> list:
+def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False, transformStrDict=None):
+    if transformStrDict is None:
+        transformStrDict = {'≠': '~=', '≥': '>=', '≤': '<='}
+
+    refPat = r'(\[[A-Za-z]+[a-zA-Z._0-9]*?\])'
+    meanPat = r'\[([A-Za-z]+[a-zA-Z._0-9]*?)\]@mean'
+    medianPat = r'\[([A-Za-z]+[a-zA-Z._0-9]*?)\]@median'
+    modePat = r'\[([A-Za-z]+[a-zA-Z._0-9]*?)\]@mode'
+
+    refedObList = list()
+    isContainRef = 0
+
+    for key, value in transformStrDict.items():
+        inputStr = inputStr.replace(key, value)
+
+    isMatlabStr = inputStr.startwith("'") and inputStr.endswith("'")
+
+    if isOutStr and isMatlabStr is False:
+        inputStr = addSingleQuotes(inputStr)
+
+    if isMatlabStr or isOutStr:
+
+        rawInputStr = inputStr
+
+        inputStr = re.sub(meanPat, r"',num2str(mean(\1)),'", inputStr)
+        inputStr = re.sub(medianPat, r"',num2str(median(\1)),'", inputStr)
+        inputStr = re.sub(modePat, r"',num2str(mode(\1)),'", inputStr)
+
+        # in case the citation located in the begin or the end of inputStr
+        if rawInputStr != inputStr:
+            if inputStr.startswith("'',num2str(m"):
+                inputStr = "'" + inputStr[3:]
+            if inputStr.endswith(")),''"):
+                inputStr = inputStr[0:-3] + "'"
+    else:
+        inputStr = re.sub(meanPat, r'mean(\1)', inputStr)
+        inputStr = re.sub(medianPat, r'median(\1)', inputStr)
+        inputStr = re.sub(modePat, r'mode(\1)', inputStr)
+
+    allRefs = re.findall(refPat, inputStr)
+
+    if len(allRefs) > 1:
+        for cRefs in allRefs:
+            cRefsValue, isRefValue = getRefValue(cWidget, cRefs, attributesSetDict)
+
+            refedObList.append("".join(cItem + '.' for cItem in cRefs.split('.')[0:-1])[0:-1])
+
+            inputStr = inputStr.replace(cRefs, cRefsValue)
+
+            isContainRef = isContainRef + isRefValue
+
+    isContainRef = isContainRef != 0
+
+    if isMatlabStr or isOutStr:
+        inputStr = addSquBrackets(inputStr)
+
+    return inputStr, isContainRef, refedObList
+
+
+def getRefValue(cWidget, inputStr, attributesSetDict, allowUnlistedAttr=False) -> list:
     isRefValue = False
 
     if isinstance(inputStr, str):
@@ -920,13 +1068,14 @@ def getRefValue(cWidget, inputStr, attributesSetDict) -> list:
 
         if isRefValue:
             # remove the brackets for refValue
-            inputStr = re.sub("[\[\]]", '', inputStr)
+            inputStr = re.sub('[\[\]]', '', inputStr)
 
             if inputStr in attributesSetDict:
                 inputStr = attributesSetDict[inputStr][1]
             else:
-                throwCompileErrorInfo(
-                    f"The cited attribute '{inputStr}' \nis not available for {getWidgetName(cWidget.widget_id)}")
+                if allowUnlistedAttr is False:
+                    throwCompileErrorInfo(
+                        f"The cited attribute '{inputStr}' \nis not available for {getWidgetName(cWidget.widget_id)}")
 
     return [inputStr, isRefValue]
 
@@ -1170,6 +1319,51 @@ def getItemType(itemId: str) -> str:
     return itemId.split('_')[0]
 
 
+def getClearAfterInfo(cWidget, attributesSetDict) -> str:
+    """
+    :param cWidget:
+    :param attributesSetDict:
+    :return:
+    : "clear_0"     -> "0"
+    : "notClear_1"  -> "1"
+    : "doNothing_2" -> "2"
+    : "0" -> "0"
+    : "1" -> "1"
+    : "2" -> "2"
+    """
+
+    if Info.SLIDER == getWidgetType(cWidget):
+        cProperties = Func.getProperties(cWidget.widget_id)['pro']
+    else:
+        cProperties = Func.getProperties(cWidget.widget_id)
+
+    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
+    clearAfter = parseDontClearAfterStr(clearAfter)
+
+    return clearAfter
+
+
+def getScreenInfo(cWidget, attributesSetDict):
+    """
+    :param cWidget:
+    :param attributesSetDict:
+    :return:
+    :cScreenName:
+    :cWinIdx: index of the current screen
+    :cWinStr: winIdx(index) in matlab
+    """
+    global outputDevNameIdxDict
+    shouldNotBeCitationCheck('Screen Name', cWidget.getScreenName())
+
+    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
+
+    # currently we just used the nearest previous flipped screen info
+    cWinIdx = outputDevNameIdxDict.get(cScreenName)
+    cWinStr = f"winIds({cWinIdx})"
+
+    return cScreenName, cWinIdx, cWinStr
+
+
 def getSliderItemIds(cWidget, itemType='') -> list:
     itemIds = []
     if Func.isWidgetType(cWidget.widget_id, Info.SLIDER):
@@ -1244,11 +1438,11 @@ def getMaxSlaveSoundDevs() -> dict:
     return maxSlaveSoundDevs
 
 
-def getWidgetType(cWidget) -> str:
-    if isinstance(cWidget, str):
-        return cWidget.split('.')[0]
+def getWidgetType(cWidgetOrId) -> str:
+    if isinstance(cWidgetOrId, str):
+        return cWidgetOrId.split('.')[0]
     else:
-        return cWidget.widget_id.split('.')[0]
+        return cWidgetOrId.widget_id.split('.')[0]
 
 
 def getWidgetIdType(widget_id: str) -> str:
@@ -1292,12 +1486,14 @@ def updateCycleOpDataRows(cCyleWdiget, opDataRowsInPy: int) -> int:
     return opDataRowsInPy
 
 
-def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     global spFormatVarDict, cInfoDict
     # start from 1 to compatible with MATLAB
     cLoopLevel += 1
     # cOpDataRowNum = cInfoDict.get('maximumRows')
-    attributesSetDict = attributesSetDict.copy()
+    # maybe we need to change copy to deepcopy
+    attributesSetDict = copy.deepcopy(attributesSetDict)
+    # attributesSetDict = attributesSetDict.copy()
     cWidgetName = getWidgetName(cWidget.widget_id)
 
     attributesSetDict.setdefault(f"{cWidgetName}.cLoop", [cLoopLevel, f"iLoop_{cLoopLevel}", {f"iLoop_{cLoopLevel}"}])
@@ -1440,14 +1636,13 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
 
     # cycling
     printAutoInd(f, '% looping across each row of the {0}.attr:{1}', cWidgetName, cLoopIterStr)
-    printAutoInd(f, 'for {0} = size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
+    printAutoInd(f, 'for {0} =1:size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
 
     cLoopOpIdxStr = cLoopIterStr + "_cOpR"
 
-    # printAutoInd(f, "opRowIdx     = opRowIdx + 1; % set the output variables row num")
-    printAutoInd(f, "{0} = opRowIdx; % output var row num for loop level {1}\n", cLoopOpIdxStr, cLoopLevel)
+    printAutoInd(f, "{0} = opRowIdx; % simple_info var row num for loop level {1}\n", cLoopOpIdxStr, cLoopLevel)
 
-    printAutoInd(f, "% copy attr var values into output vars for row {0}", cLoopOpIdxStr)
+    printAutoInd(f, "% copy attr var values into simple_info vars for row {0}", cLoopOpIdxStr)
 
     cRowDict = cWidget.getAttributes(0)
     otVarStr = ''.join(cWidgetName + '_' + key + f"{{{cLoopOpIdxStr}}}," for key in cRowDict.keys())
@@ -1472,8 +1667,8 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
         else:
             printAutoInd(f, 'case {0}', f"{addSingleQuotes(getWidgetName(iTimeline_id))}")
 
-            delayedPrintCodes = printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel,
-                                                    delayedPrintCodes)
+            allWidgetCodes = printTimelineWidget(Info.WID_WIDGET[iTimeline_id], f, attributesSetDict, cLoopLevel,
+                                                    allWidgetCodes)
 
     printAutoInd(f, 'otherwise ')
     printAutoInd(f, '% do nothing ')
@@ -1485,7 +1680,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
 
     # print close possible textures and maybe audio buffers
     # close possible visual textures
-    beClosedTxList = delayedPrintCodes.get(f"beClosedTextures_{cLoopLevel}", [])
+    beClosedTxList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
     if len(beClosedTxList) > 0:
         bePrintStr = "".join(f"{cTx}," for cTx in beClosedTxList)
         bePrintStr = "Screen('Close',[" + bePrintStr[0:-1] + "]);\n"
@@ -1494,86 +1689,66 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
         printAutoInd(f, '% close visual textures')
         printAutoInd(f, bePrintStr)
     # after print clean up the list
-    delayedPrintCodes.update({f"beClosedTextures_{cLoopLevel}": []})
+    allWidgetCodes.update({f"beClosedTextures_{cLoopLevel}": []})
 
     # close possible audio buffers
 
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
 # noinspection PyStringFormat
-def printToDelayedCodes(delayedPrintCodes, keyName, inputStr, *argins):
+def printToDelayedCodes(allWidgetCodes, keyName, inputStr, *argins):
     global isDummyPrint
 
     if not isDummyPrint:
-        delayedPrintCodes[keyName].append = f"{inputStr}".format(*argins)
+        allWidgetCodes[keyName].append = f"{inputStr}".format(*argins)
 
 
-def printKeyValueInDelayedCodes(f, delayedPrintCodes, key='respCodes') -> dict:
-    cKeyValueList = delayedPrintCodes.get(key, [])
+def printInAllWidgetCodesByKey(f, bePrintedCodes:dict, key='respCodes') -> dict:
+    cKeyValueList = bePrintedCodes.get(key, [])
 
     for cRowStr in cKeyValueList:
         cRowStr = "{{".join(cRowStr.split('{'))
         cRowStr = "}}".join(cRowStr.split('}'))
         printAutoInd(f, cRowStr)
 
-    delayedPrintCodes.update({key: []})  # clean the key value
+    bePrintedCodes.update({key: []})  # clean the key value
 
-    return delayedPrintCodes
-
-
-# def printRespCodes(f, delayedPrintCodes):
-#     # -------------------------------------------------------------
-#     # Step 1: print out previous widget's resp related codes
-#     # -------------------------------------------------------------
-#     if isinstance(delayedPrintCodes, dict):
-#         for cRowStr in delayedPrintCodes['respCodes']:
-#             cRowStr = "{{".join(cRowStr.split('{'))
-#             cRowStr = "}}".join(cRowStr.split('}'))
-#             printAutoInd(f, cRowStr)
-#         # clear out the print buffer
-#         delayedPrintCodes.update({'respCodes': []})
-#     elif isinstance(delayedPrintCodes, list):
-#         for cRowStr in delayedPrintCodes:
-#             cRowStr = "{{".join(cRowStr.split('{'))
-#             cRowStr = "}}".join(cRowStr.split('}'))
-#             printAutoInd(f, cRowStr)
-#         delayedPrintCodes = []
-#
-#     return delayedPrintCodes
+    return bePrintedCodes
 
 
-def printBeforeFlipCodes(f, delayedPrintCodes):
-    if isinstance(delayedPrintCodes, dict):
-        for cRowStr in delayedPrintCodes['codesBeFip']:
+def printBeforeFlipCodes(f, bePrintedCodes: dict or list) -> dict or list:
+    if isinstance(bePrintedCodes, dict):
+        cCodesBeFip = bePrintedCodes.get('codesBeFip', [])
+        for cRowStr in cCodesBeFip:
             cRowStr = "{{".join(cRowStr.split('{'))
             cRowStr = "}}".join(cRowStr.split('}'))
             printAutoInd(f, cRowStr)
         # clear out the print buffer
-        delayedPrintCodes.update({'codesBeFip': []})
-    elif isinstance(delayedPrintCodes, list):
-        for cRowStr in delayedPrintCodes:
+        bePrintedCodes.update({'codesBeFip': []})
+    elif isinstance(bePrintedCodes, list):
+        for cRowStr in bePrintedCodes:
             cRowStr = "{{".join(cRowStr.split('{'))
             cRowStr = "}}".join(cRowStr.split('}'))
             printAutoInd(f, cRowStr)
-        delayedPrintCodes = []
+        bePrintedCodes = []
 
-    return delayedPrintCodes
+    return bePrintedCodes
 
 
-def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
+def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     global historyPropDict, isDummyPrint
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
 
-    cWinIdx = historyPropDict['cWinIdx']
-    cWinStr = historyPropDict['cWinStr']
+    # get screen index and cWinStr :winIdx(index)
+    _, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
-    # transedScrName = replaceDot(historyPropDict['cScreenName'])
-    clearAfter = historyPropDict['clearAfter']
+    clearAfter = getClearAfterInfo(cWidget, attributesSetDict)
+
     cWidgetName = getWidgetName(cWidget.widget_id)
     cWidgetPos = getWidgetEventPos(cWidget.widget_id)
 
-    cRespCodes = delayedPrintCodes.get('respCodes', [])
+    cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_cRespCodes", [])
 
     if getWidgetPos(cWidget.widget_id) > 0:
         # Step 2: print out help info for the current widget
@@ -1585,9 +1760,9 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     if isVideoRelatedWidget(cWidget):
         # printAutoInd(f, "% for first event, flip immediately.. ")
 
-        printUpateWidgetDur(cWidget, f, attributesSetDict, 'afVideoFipReqTime')
+        allWidgetCodes = genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, 'afVideoFipReqTime')
 
-        delayedPrintCodes = printBeforeFlipCodes(f, delayedPrintCodes)
+        allWidgetCodes = printBeforeFlipCodes(f, allWidgetCodes)
 
         printAutoInd(f, "%initialise video flip ")
         printAutoInd(f, "isFirstVideoFrame = true;")
@@ -1617,7 +1792,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
         draw all visual stim looply over here: print cVSLCodes
         '''
 
-        delayedPrintCodes = printKeyValueInDelayedCodes(f, delayedPrintCodes, 'forVideoSliderLoopCodes')
+        allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, 'forVideoSliderLoopCodes')
 
         printAutoInd(f, "% check the 'esc' key to abort the exp")
         printAutoInd(f, "detectAbortKey(abortKeyCode);\n")
@@ -1633,7 +1808,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
             printAutoInd(f, "{0}.onsettime({1})= Screen('Flip',{2},nextEvFlipReqTime,{3});", cWidgetName, cOpRowIdxStr,
                          cWinStr, clearAfter)
 
-        delayedPrintCodes = printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
+        allWidgetCodes = genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes)
 
         printAutoInd(f, "nextEvFlipReqTime = afVideoFipReqTime; % after the first flip, update nextEvFlipReqTime")
         printAutoInd(f, "isFirstVideoFrame = false; ")
@@ -1661,18 +1836,13 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
             printAutoInd(cRespCodes, "Screen('CloseMovie', {0}_mPtrs);", cWidgetName)
             printAutoInd(cRespCodes, "Screen('Close',TPtrs); % close the last video frame")
 
-        cAfEndVideoFlipCodes = delayedPrintCodes.get('codesAfEndVideoFip', [])
+        cAfEndVideoFlipCodes = allWidgetCodes.get('codesAfEndVideoFip', [])
 
         cRespCodes.extend(cAfEndVideoFlipCodes)
 
-        delayedPrintCodes.update({'codesAfEndVideoFip': []})
-        delayedPrintCodes.update({'respCodes': cRespCodes})
+        allWidgetCodes.update({'codesAfEndVideoFip': []})
 
-        # for the last one ,print respcodes here
-        if isLastStimWidgetInTL(cWidget.widget_id):
-            delayedPrintCodes = printKeyValueInDelayedCodes(f, delayedPrintCodes, 'respCodes')
-            cRespCodes = []
-
+        allWidgetCodes.update({f"{cWidget.widget_id}_cRespCodes": cRespCodes})
 
     else:
         # Flip the Screen
@@ -1687,18 +1857,18 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
                          cWidgetName,
                          cOpRowIdxStr, cWinStr, clearAfter)
 
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
 def flipAudio(cWidget, f, cLoopLevel, attributesSetDict, iSlave=1):
     # for sound widget only, not for slider that contains sound item
     global historyPropDict, isDummyPrint
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
 
-    cWinIdx = historyPropDict['cWinIdx']
-    cWinStr = historyPropDict['cWinStr']
+    # get screen cWinIdx and cWinStr: winIdx(index)
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
-    clearAfter = historyPropDict['clearAfter']
+    clearAfter = getClearAfterInfo(cWidget, attributesSetDict)
 
     # isSyncToVbl = True
     # haveSound = isContainSound(cWidget)
@@ -1738,8 +1908,7 @@ def flipAudio(cWidget, f, cLoopLevel, attributesSetDict, iSlave=1):
             printAutoInd(f, "predictedVisOnset = PredictVisualOnsetForTime({0}, nextEvFlipReqTime);", cWinStr)
             printAutoInd(f, "% schedule start of audio at exactly the predicted time caused by the next flip")
             printAutoInd(f, "PsychPortAudio('Start', {0}, {1}, predictedVisOnset, 0); %\n",
-                         cSoundIdxStr,
-                         repetitionsStr)
+                         cSoundIdxStr, repetitionsStr)
             printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},nextEvFlipReqTime, {3}); %#ok<*STRNU>\n",
                          getWidgetName(cWidget.widget_id), cOpRowIdxStr, cWinStr, clearAfter)
     else:
@@ -1752,26 +1921,26 @@ def flipAudio(cWidget, f, cLoopLevel, attributesSetDict, iSlave=1):
             printAutoInd(f, "% for multiple screens, use the maximum of the predicted onsettime")
             printAutoInd(f,
                          "{0}.onsettime({1}) = PsychPortAudio('Start', {2}, {3}, max(cDurs + lastScrOnsettime), 1); % % wait for start and get the real start time\n",
-                         getWidgetName(cWidget.widget_id), cOpRowIdxStr, cSoundIdxStr,
-                         repetitionsStr)
+                         getWidgetName(cWidget.widget_id), cOpRowIdxStr, cSoundIdxStr, repetitionsStr)
 
 
-def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
+def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     global outputDevNameIdxDict, historyPropDict, isDummyPrint, queueDevIdxValueStr
+
+    # for video related widget, will do this during the flip loop
+    if isVideoRelatedWidget(cWidget):
+        return allWidgetCodes
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"
     cWidgetName = getWidgetName(cWidget.widget_id)
-
-    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip', [])
-    cRespCodes = delayedPrintCodes.get('respCodes', [])
 
     cOutDeviceDict = historyPropDict.get('cOutDevices', {})
     historyPropDict.update({'cOutDevices': {}})
 
     outDevCountsDict = getOutputDevCountsDict()
 
-    cWinIdx = historyPropDict['cWinIdx']
-    cWinStr = f"winIds({cWinIdx})"
+    # get screen cWinIdx and cWinStr: winIds(idx)
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
     cInputDevices = cWidget.getInputDevice()
 
@@ -1811,7 +1980,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
     if len(cInputDevices) > 0:
 
         iRespDev = 1
-        cRespCodes.append("%-- make respDev struct --/")
+        printAutoInd(f, "%-- make respDev struct --/")
         for cInputDev, cProperties in cInputDevices.items():
             # get allowable keys
             allowableKeysStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cProperties.get('Allowable'),
@@ -1849,7 +2018,7 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
             # get No Resp
             noRespStr = dataStrConvert(*getRefValue(cWidget, cProperties['No Resp'], attributesSetDict), True)
 
-            # get resp output dev name
+            # get resp simple_info dev name
             respOutDevNameStr, isRefValue = getRefValue(cWidget, cProperties['Output Device'], attributesSetDict)
 
             devIndexesVarName = None
@@ -1872,126 +2041,298 @@ def checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
                 else:
                     needTobeRetStr = 'false'
 
-            cRespCodes.append(
-                f"cRespDevs({iRespDev}) = struct("
-                f"'beUpdatedVar',sprintf('{cWidgetName}(%d)',{cOpRowIdxStr}),"
-                f"'allowAble',{allowableKeysStr},"
-                f"'corResp',{corRespStr},...")
-            cRespCodes.append(
-                f"'rtWindow',{rtWindowStr},"
-                f"'endAction',{endActionStr},"
-                f"'type',{cDevType},"
-                f"'index',{cInputDevIndexValueStr},"
-                f"'isQueue',{cIsQueue},"
-                f"'startTime',lastScrOnsettime({cWinIdx}),...")
-            cRespCodes.append(
-                f"'isOn',true,"
-                f"'needTobeReset',{needTobeRetStr},"  # trigger in this resp dev should be reset back to 0
-                f"'right',{rightStr},"
-                f"'wrong',{wrongStr},"
-                f"'noResp',{noRespStr},"
-                f"'respCodeDevType',{respCodeDevTypeStr},"
-                f"'respCodeDevIdx',{respCodeDevIdxStr} );")
+            printAutoInd(f,
+                         "cRespDevs({0}) = struct("
+                         "'beUpdatedVar',sprintf('{1}(%d)',{2}),"
+                         "'allowAble',{3},"
+                         "'corResp',{4},...",
+                         iRespDev, cWidgetName, cOpRowIdxStr, allowableKeysStr, corRespStr)
+
+            printAutoInd(f,
+                         "'rtWindow',{0},"
+                         "'endAction',{1},"
+                         "'type',{2},"
+                         "'index',{3},"
+                         "'isQueue',{4},"
+                         "'startTime',lastScrOnsettime({5}),...",
+                         rtWindowStr, endActionStr, cDevType, cInputDevIndexValueStr, cIsQueue, cWinIdx)
+
+            printAutoInd(f,
+                         "'isOn',true,"
+                         "'needTobeReset',{0},"  # trigger in this resp dev should be reset back to 0
+                         "'right',{1},"
+                         "'wrong',{2},"
+                         "'noResp',{3},"
+                         "'respCodeDevType',{4},"
+                         "'respCodeDevIdx',{5} );",
+                         needTobeRetStr, rightStr, wrongStr, noRespStr, respCodeDevTypeStr, respCodeDevIdxStr)
+
             iRespDev += 1
 
-        cRespCodes.append(f"beCheckedRespDevs = [beCheckedRespDevs, cRespDevs];")
+        printAutoInd(f, f"beCheckedRespDevs = [beCheckedRespDevs, cRespDevs];")
 
         if len(queueDevIdxValueStr) > 0:
-            cRespCodes.append(f"refreshKbQueue_bcl(beCheckedRespDevs,{queueDevIdxValueStr});")
+            printAutoInd(f, "refreshKbQueue_bcl(beCheckedRespDevs,{0});", queueDevIdxValueStr)
 
-        cRespCodes.append("%-------------------------\\\n")
+        printAutoInd(f, "%-------------------------\\\n")
 
-    #
-    cRespCodes.append(f"beCheckedRespDevs = checkRespAndSendTriggers(beCheckedRespDevs,{cWinIdx}"
-                      f", cFrame, nextEvFlipReqTime);\n")
-    # cRespCodes.append("%=================================================\\\n")
+    printAutoInd(f, "beCheckedRespDevs = checkRespAndSendTriggers(beCheckedRespDevs,{0}, cFrame, nextEvFlipReqTime);\n",
+                 cWinIdx)
+    # printAutoInd(f, "%=================================================\\\n")
 
     shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
 
-    # to be continue ...
-    # if not isDummyPrint and cWidget.widget_id == cInfoDict.get("lastWidgetId"):
-    #     cRespCodes.append(f"WaitSecs(cDurs({cWinIdx})); for the last event in all Exp, just wait for duration")
-    #
-
-    # if the current widget is the last one in the timeline, just print response codes here
-    # if isLastStimWidgetInTL(cWidget.widget_id):
-    #     cRespCodes.append(f"if numel(beCheckedRespDevs) < 1")
-    #
-    #     cRespCodes.append(f"WaitSecs('UntilTime', nextEvFlipReqTime); % for the last event in timeline just wait for duration")
-    #     # cRespCodes.append(f"WaitSecs(cDurs('UntilTime', {cWinIdx})); % for the last event in timeline just wait for duration")
-    #     cRespCodes.append(f"end")
-    #
-    #     cRespCodes.append(f"beCheckedRespDevs(:) = []; % empty the to be checked response devices at end of trial")
-    #
-    #     cRespCodes = printRespCodes(f, cRespCodes)
-
-    # ------------------------------------------
-    # the last step: upload the delayed codes
-    # ------------------------------------------
-    delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
-    delayedPrintCodes.update({'respCodes': cRespCodes})
-    # in case of the last widget, print the response codes over here
-    if isLastStimWidgetInTL(cWidget.widget_id):
-        delayedPrintCodes = printKeyValueInDelayedCodes(f, delayedPrintCodes, 'respCodes')
-        cRespCodes = []
-
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
-def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes):
+    cStimCodes = list()
+    cFlipCodes = list()
+    cStimTriggerCodes = list()
+    cUpdateDurCodes = list()
+    cRespCodes = list()
+
+    if cWidget is None:
+        return allWidgetCodes
     # print comments to indicate the current frame order
-    # Step 1: draw the content of current frame
     cWidgetName = getWidgetName(cWidget.widget_id)
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     cWidgetType = getWidgetType(cWidget)
 
-    cWidgetAddedAttrsList = ['rt', 'resp', 'acc', 'onsettime']
-    for cAddedAttr in cWidgetAddedAttrsList:
-        attributesSetDict.update({
-            f"{cWidgetName}.{cAddedAttr}":
-                [cLoopLevel, f"{cWidgetName}({cOpRowIdxStr}).{cAddedAttr}",
-                 {f"{cWidgetName}({cOpRowIdxStr}).{cAddedAttr}"}]
-        })
+    if isSubWidgetOfIfOrSwitch(cWidget) is False:
+        #  update the attributresSetDict only for the main widgets
+        cWidgetAddedAttrsList = ['rt', 'resp', 'acc', 'onsettime']
+        for cAddedAttr in cWidgetAddedAttrsList:
+            attributesSetDict.update({
+                f"{cWidgetName}.{cAddedAttr}":
+                    [cLoopLevel, f"{cWidgetName}({cOpRowIdxStr}).{cAddedAttr}",
+                     {f"{cWidgetName}({cOpRowIdxStr}).{cAddedAttr}"}]
+            })
 
+    # Step 1: generate codes to draw stim
     if Info.TEXT == cWidgetType:
-        delayedPrintCodes = drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+        drawTextWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
     elif Info.IMAGE == cWidgetType:
-        delayedPrintCodes, *_ = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+        allWidgetCodes, *_ = drawImageWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
     elif Info.SOUND == cWidgetType:
-        delayedPrintCodes = drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+        allWidgetCodes = drawSoundWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
     elif Info.SLIDER == cWidgetType:
-        delayedPrintCodes = drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+        allWidgetCodes = drawSliderWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
     elif Info.VIDEO == cWidgetType:
-        delayedPrintCodes, _ = drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+        allWidgetCodes, _ = drawVideoWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
 
-    # step 2: print delayed resp codes or none if the widget is the first one
+    elif Info.IF == cWidgetType:
+        falseWidget = cWidget.getFalseWidget()
+        allWidgetCodes = genStimWidgetAllCodes(falseWidget, attributesSetDict, cLoopLevel, allWidgetCodes)
 
-    delayedPrintCodes = printKeyValueInDelayedCodes(f, delayedPrintCodes, 'respCodes')
+        trueWidget = cWidget.getTrueWidget()
+        allWidgetCodes = genStimWidgetAllCodes(trueWidget, attributesSetDict, cLoopLevel, allWidgetCodes)
 
-    # STEP 3: flip screen
+        # concatenate codes for IF widget
+        allWidgetCodes = makeCodes4IfWidget(cWidget, attributesSetDict, allWidgetCodes)
+
+        return allWidgetCodes
+
+    elif Info.SWITCH == cWidgetType:
+        caseWidgets = cWidget.getCases()
+
+        for cCase in caseWidgets:
+            cSubWid = cCase['Sub Wid']
+            allWidgetCodes = genStimWidgetAllCodes(Info.WID_WIDGET[cSubWid], attributesSetDict, cLoopLevel,
+                                                      allWidgetCodes)
+
+        # concatenate codes for switch widget
+        allWidgetCodes = makeCodes4SwitchWidget(cWidget, attributesSetDict, allWidgetCodes)
+
+        return allWidgetCodes
+
+    # STEP 2: generate flip code
     if Info.SOUND == cWidgetType:
-        flipAudio(cWidget, f, cLoopLevel, attributesSetDict)
+        flipAudio(cWidget, cFlipCodes, cLoopLevel, attributesSetDict)
     else:
-        flipScreen(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
+        flipScreen(cWidget, cFlipCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
 
-    # for video or slider contains video item, we need to hand the trigger and resp within the video play loop
-    if isVideoRelatedWidget(cWidget) is False:
-        # step 4: send trigger
-        delayedPrintCodes = printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
+    # for video related widget, will run step 4-6 (do nothing) in dummy as we already did this in Step3:
+    # step 3: generate sending trigger codes
+    allWidgetCodes = genStimTriggers(cWidget, cStimTriggerCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
 
-        # step 5: print the upated cDur
-        printUpateWidgetDur(cWidget, f, attributesSetDict)
+    # step 4: generate updating cDurs codes
+    allWidgetCodes = genUpdateWidgetDur(cWidget, cUpdateDurCodes, attributesSetDict, allWidgetCodes)
 
-        # step 6: make the delayed resp codes for the current frame
-        checkResponse(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes)
+    # step 5: generate response checking codes
+    allWidgetCodes = genCheckResponse(cWidget, cRespCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
 
-    return delayedPrintCodes
+    # save all codes for the current widget
+    cStimExistCodes: list = allWidgetCodes.get(f"{cWidget.widget_id}_cStimCodes", [])
+    allWidgetCodes.update({f"{cWidget.widget_id}_cStimCodes": cStimExistCodes.extend(cStimCodes)})
+
+    cFlipExistCodes: list = allWidgetCodes.get(f"{cWidget.widget_id}_cFlipCodes", [])
+    allWidgetCodes.update({f"{cWidget.widget_id}_cFlipCodes": cFlipExistCodes.extend(cFlipCodes)})
+
+    cStimTriggerExistCodes: list = allWidgetCodes.get(f"{cWidget.widget_id}_cStimTriggerCodes", [])
+    allWidgetCodes.update(
+        {f"{cWidget.widget_id}_cStimTriggerCodes": cStimTriggerExistCodes.extend(cStimTriggerCodes)})
+
+    cUpdateDurExistCodes: list = allWidgetCodes.get(f"{cWidget.widget_id}_cUpdateDurCodes", [])
+    allWidgetCodes.update({f"{cWidget.widget_id}_cUpdateDurCodes": cUpdateDurExistCodes.extend(cUpdateDurCodes)})
+
+    cRespExistCodes: list = allWidgetCodes.get(f"{cWidget.widget_id}_cRespCodes", [])
+    allWidgetCodes.update({f"{cWidget.widget_id}_cRespCodes": cRespExistCodes.extend(cRespCodes)})
+
+    return allWidgetCodes
 
 
-def printUpateWidgetDur(cWidget, f, attributesSetDict, nextEventFlipReqTimeStr='nextEvFlipReqTime'):
+def makeCodes4SwitchWidget(cWidget, attributesSetDict, allWidgetCodes):
+    if getWidgetType(cWidget) == Info.SWITCH:
+        codeTypesList = ['_cStimCodes', '_cFlipCodes', '_cStimTriggerCodes', '_cUpdateDurCodes', '_cRespCodes']
+
+        switchExp = cWidget.getSwitch()
+        switchExp, *_ = getValueInContainRefExp(cWidget, switchExp, attributesSetDict)
+
+        # cases: list = [{'Case Value': '',
+        #  'Id Pool': {'Image': 'Image.0', 'Video': '', 'Text': '', 'Sound': '', 'Slider': ''},
+        #  'Sub Wid': 'Image.0', 'Stim Type': 'Image', 'Event Name': 'U_Image_6574'},]
+        cases = cWidget.getCases()
+        otherwiseExp = cases[-1]
+
+        cases = cases[0:-1]
+
+        for cCase in cases:
+            if cCase['Case Value']:
+                cCaseValueExp, *_ = getValueInContainRefExp(cWidget, cCase['Case Value'], attributesSetDict)
+                cCase.update({'Case Value': cCaseValueExp})
+
+        for cCodeType in codeTypesList:
+            cTypeCodes = list()
+
+            printAutoInd(cTypeCodes, "switch {0}", switchExp)
+
+            for cCase in cases:
+                printAutoInd(cTypeCodes, "case {0}", cCase['Case Value'])
+
+                if cCase['Sub Wid']:
+                    cTypeCodes.extend(allWidgetCodes[f"{cCase['Sub Wid']}{cCodeType}"])
+                else:
+                    printAutoInd(cTypeCodes, "% do nothing")
+
+            if otherwiseExp['Sub Wid']:
+                printAutoInd(cTypeCodes, "otherwise")
+                cTypeCodes.extend(allWidgetCodes[f"{otherwiseExp['Sub Wid']}{cCodeType}"])
+
+            printAutoInd(cTypeCodes, "end%switch")
+
+            allWidgetCodes.update({f"{cWidget.widget_id}{cCodeType}": cTypeCodes})
+
+    return allWidgetCodes
+
+
+def makeCodes4IfWidget(cWidget, attributesSetDict, allWidgetCodes):
+    if getWidgetType(cWidget) == Info.IF:
+        condStr = cWidget.getCondition()
+        condStr, *_ = getValueInContainRefExp(cWidget, condStr, attributesSetDict)
+
+        codeTypesList = ['_cStimCodes', '_cFlipCodes', '_cStimTriggerCodes', '_cUpdateDurCodes', '_cRespCodes']
+
+        trueWidget = cWidget.getTrueWidget()
+        falseWidget = cWidget.getFalseWidget()
+
+        for cCodeType in codeTypesList:
+            cTypeCodes = list()
+
+            printAutoInd(cTypeCodes, "if {0}", condStr)
+            cTypeCodes.extend(allWidgetCodes[f"{trueWidget.widget_id}{cCodeType}"])
+            printAutoInd(cTypeCodes, "else")
+            cTypeCodes.extend(allWidgetCodes[f"{falseWidget.widget_id}{cCodeType}"])
+            printAutoInd(cTypeCodes, "end ")
+
+            allWidgetCodes.update({f"{cWidget.widget_id}{cCodeType}": cTypeCodes})
+
+    return allWidgetCodes
+
+
+def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
+    # print comments to indicate the current frame order
+    # ====================
+    # PRINT ALL CODES
+    # ===================
+    preStimWId = getPreStimWID(cWidget.widget_id)
+
+    printPreRespCodesFirst = False
+
+    if getWidgetType(cWidget) == Info.SWITCH:
+        # switch expression
+        _, _, referObList = getValueInContainRefExp(cWidget, cWidget.getSwitch(), attributesSetDict)
+
+        # case values
+        for cCaseDict in cWidget.getCases():
+            cCaseValueStr = cCaseDict['Case Value']
+            if len(cCaseValueStr) > 0:
+                _, _, cValueReferObList = getValueInContainRefExp(cWidget, cCaseValueStr, attributesSetDict)
+                referObList.extend(cValueReferObList)
+
+        if preStimWId and preStimWId in referObList:
+            printPreRespCodesFirst = True
+
+    elif getWidgetType(cWidget) == Info.IF:
+        condStr = cWidget.getCondition()
+
+        condStr, haveRef, referObList = getValueInContainRefExp(cWidget, condStr, attributesSetDict)
+
+        trueWidget = cWidget.getTrueWidget()
+        falseWidget = cWidget.getFalseWidget()
+
+        if preStimWId and preStimWId in referObList:
+            printPreRespCodesFirst = True
+
+    # todo to be continued ...
+    # else:
+    if printPreRespCodesFirst:
+        # draw previous widget's resp code first
+        # step 2: print response codes of the previous widget if possible
+        printInAllWidgetCodesByKey(f, allWidgetCodes, f"{preStimWId}_cRespCodes")
+        # step 1: print stim codes of the current widget
+        printInAllWidgetCodesByKey(f, allWidgetCodes, f"{cWidget.widget_id}_cStimCodes")
+    else:
+        # step 1: print stim codes of the current widget
+        printInAllWidgetCodesByKey(f, allWidgetCodes, f"{cWidget.widget_id}_cStimCodes")
+
+        if preStimWId:
+            # step 2: print response codes of the previous widget if possible
+            printInAllWidgetCodesByKey(f, allWidgetCodes, f"{preStimWId}_cRespCodes")
+
+    # step 3: print flip codes of the current widget
+    printInAllWidgetCodesByKey(f, allWidgetCodes, f"{cWidget.widget_id}_cFlipCodes")
+    # step 4: print stim trigger codes of the current widget if possible
+    printInAllWidgetCodesByKey(f, allWidgetCodes, f"{cWidget.widget_id}_cStimTriggerCodes")
+    # step 5: print stim update duration codes of the current widget if possible
+    printInAllWidgetCodesByKey(f, allWidgetCodes, f"{cWidget.widget_id}_cUpdateDurCodes")
+
+    #  if the last stim widget print the resp codes here
+    if isLastStimWidgetInTL(cWidget.widget_id):
+        printInAllWidgetCodesByKey(f, allWidgetCodes, f"{cWidget.widget_id}_cRespCodes")
+
+    return allWidgetCodes
+
+
+def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
+    # step 1: generate all codes (stim, flip ,send stim trigger, update cDurs, response check)
+    allWidgetCodes = genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes)
+
+    # step 2: print out the generated codes
+    allWidgetCodes = printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
+
+    return allWidgetCodes
+
+
+def genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, nextEventFlipReqTimeStr='nextEvFlipReqTime'):
     global outputDevNameIdxDict, historyPropDict
 
-    cWinIdx = historyPropDict['cWinIdx']
+    # if is a video related widget, will do this within flip loop
+    if isVideoRelatedWidget(cWidget):
+        return allWidgetCodes
+
+    # get screen index
+    _, cWinIdx, _ = getScreenInfo(cWidget, attributesSetDict)
 
     # Step 1: get the current screen duration that determined by the next flip
     # after drawing the next widget's stimuli, get the duration first
@@ -2014,37 +2355,42 @@ def printUpateWidgetDur(cWidget, f, attributesSetDict, nextEventFlipReqTimeStr='
             printAutoInd(f, "cDurs({0})          = getDurValue({1},winIFIs({0}));", cWinIdx, durStr)
 
     # printAutoInd(f, "(not the real flip time) ")
-    printAutoInd(f,
-                 "{0} = cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur; % get the require time of the  Flip for the next event \n",
+    printAutoInd(f, "{0} = cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur; "
+                    "% get the required time of the  Flip for the next event \n",
                  nextEventFlipReqTimeStr, cWinIdx)
 
-    return 0  # O for successful
+    return allWidgetCodes  # O for successful
 
 
-def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCodes):
+def genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     global outputDevNameIdxDict, historyPropDict
+
+    # if is a video related widget, will do this within flip loop
+    if isVideoRelatedWidget(cWidget):
+        return allWidgetCodes
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"
     cWidgetName = getWidgetName(cWidget.widget_id)
     cWidgetType = getWidgetType(cWidget)
 
-    cWinIdx = historyPropDict['cWinIdx']
+    # get screen index
+    _, cWinIdx, _ = getScreenInfo(cWidget, attributesSetDict)
 
     # ---------------------------------------------------------------------------------------
     # Step 1: print out previous widget's codes that suppose to be print just after the Flip
     # ----------------------------------------------------------------------------------------
-    for cRowStr in delayedPrintCodes['codesAfFip']:
+    for cRowStr in allWidgetCodes['codesAfFip']:
         printAutoInd(f, cRowStr)
     # clear out the print buffer
-    delayedPrintCodes.update({'codesAfFip': []})
+    allWidgetCodes.update({'codesAfFip': []})
 
     # ------------------------------------------------------------
-    # Step 2: send output triggers and messages
+    # Step 2: send simple_info triggers and messages
     # ------------------------------------------------------------
 
     output_device = cWidget.getOutputDevice()
     if len(output_device) > 0:
-        printAutoInd(f, "% -- send output trigger and msg: --/")
+        printAutoInd(f, "% -- send simple_info trigger and msg: --/")
 
     # initializing the outDevices that could be used to store the outDev info
     cOutDeviceDict = dict()
@@ -2090,7 +2436,7 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
         printAutoInd(f, "% ----------------------------------\\\n")
 
     # print out event onset marker for eyelink
-    if delayedPrintCodes.get('isEyeLinkSartRecord'):
+    if allWidgetCodes.get('isEyeLinkSartRecord'):
         printAutoInd(f, "Eyelink('Message', '{0}_onsettime');", cWidgetName)
 
     # updated the screen flip times in matlab
@@ -2105,10 +2451,10 @@ def printStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, delayedPrintCod
                      getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr)
 
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
-def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes) -> dict:
+def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes) -> dict:
     global cInfoDict, isDummyPrint
 
     cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
@@ -2123,34 +2469,31 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintC
         cWidgetType = getWidgetType(cWidget)
 
         if Info.CYCLE == cWidgetType:
-            delayedPrintCodes = printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
-        elif cWidgetType in [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO]:
-            delayedPrintCodes = printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+            allWidgetCodes = printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
+        elif cWidgetType in [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]:
+            allWidgetCodes = printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
         elif Info.DC == cWidgetType:
-            delayedPrintCodes = printETDcCorrectWidget(cWidget, f, delayedPrintCodes)
+            allWidgetCodes = printETDcCorrectWidget(cWidget, f, allWidgetCodes)
         elif Info.CALIBRATION == cWidgetType:
-            delayedPrintCodes = printETCalibWidget(cWidget, f, delayedPrintCodes)
+            allWidgetCodes = printETCalibWidget(cWidget, f, allWidgetCodes)
         elif Info.STARTR == cWidgetType:
-            delayedPrintCodes = printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+            allWidgetCodes = printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
         elif Info.ENDR == cWidgetType:
-            delayedPrintCodes = printETEndRWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+            allWidgetCodes = printETEndRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
         elif Info.LOG == cWidgetType:
-            delayedPrintCodes = printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+            allWidgetCodes = printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
         elif Info.QUEST_UPDATE == cWidgetType:
-            delayedPrintCodes = printQuestUpateWidget(cWidget, f, attributesSetDict, delayedPrintCodes)
-        elif Info.IF == cWidgetType:
-            pass
-        elif Info.SWITCH == cWidgetType:
-            pass
-    return delayedPrintCodes
+            allWidgetCodes = printQuestUpateWidget(cWidget, f, attributesSetDict, allWidgetCodes)
+    return allWidgetCodes
 
 
-def printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+def printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     cProperties = Func.getProperties(cWidget.widget_id)
 
     # print previous widget's response code
-    delayedPrintCodes = printKeyValueInDelayedCodes(f, delayedPrintCodes, 'respCodes')
+    preStimWid = getPreStimWID(cWidget.widget_id)
+    allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
 
     printAutoInd(f, '%eyetracker: log variables')
 
@@ -2179,11 +2522,11 @@ def printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     '''
     printAutoInd(f, "Eyelink('Message', 'TRIAL_RESULT 0');\n\n")
 
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
-def printQuestUpateWidget(cWidget, f, attributesSetDict, delayedPrintCodes):
-    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+def printQuestUpateWidget(cWidget, f, attributesSetDict, allWidgetCodes):
+    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     cProperties = Func.getProperties(cWidget.widget_id)
 
     shouldNotBeCitationCheck('Quest name', cProperties['Quest name'])
@@ -2201,15 +2544,16 @@ def printQuestUpateWidget(cWidget, f, attributesSetDict, delayedPrintCodes):
     printAutoInd(f, "quest({0}) = getQuestValue(quest({0})); % get the new cValue", cQuestIdx)
     printAutoInd(f, "\n")
 
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
-def printETDcCorrectWidget(cWidget, f, delayedPrintCodes):
-    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+def printETDcCorrectWidget(cWidget, f, allWidgetCodes):
+    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     # cProperties = Func.getProperties(cWidget.widget_id)
-    delayedPrintCodes.update({"isEyeLinkSartRecord": True})
+    allWidgetCodes.update({"isEyeLinkSartRecord": True})
     # print previous widget's response code
-    delayedPrintCodes = printKeyValueInDelayedCodes(f, delayedPrintCodes, 'respCodes')
+    preStimWid = getPreStimWID(cWidget.widget_id)
+    allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
 
     nextWidgetId = getNextWID(cWidget.widget_id)
 
@@ -2222,28 +2566,29 @@ def printETDcCorrectWidget(cWidget, f, delayedPrintCodes):
     # printAutoInd(f, "Eyelink('Command', 'set_idle_mode');")
     printAutoInd(f, " ")
 
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
-def printETCalibWidget(cWidget, f, delayedPrintCodes):
-    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+def printETCalibWidget(cWidget, f, allWidgetCodes):
+    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     # cProperties = Func.getProperties(cWidget.widget_id)
 
-    delayedPrintCodes.update({"isEyeLinkSartRecord": True})
+    allWidgetCodes.update({"isEyeLinkSartRecord": True})
     # print previous widget's response code
-    delayedPrintCodes = printKeyValueInDelayedCodes(f, delayedPrintCodes, 'respCodes')
+    preStimWid = getPreStimWID(cWidget.widget_id)
+    allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
 
     printAutoInd(f, "EyelinkDoTrackerSetup(el); % eyelink setup: adjust the camera,calibration and validation")
 
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
-def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     cProperties = Func.getProperties(cWidget.widget_id)
 
-    delayedPrintCodes.update({"isEyeLinkSartRecord": True})
-    cCodesForResp = delayedPrintCodes.get('respCodes', [])
+    allWidgetCodes.update({"isEyeLinkSartRecord": True})
+    cCodesForResp = allWidgetCodes.get('respCodes', [])
 
     if len(cCodesForResp) > 0:
         haveRespCodes = True
@@ -2265,7 +2610,8 @@ def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintC
     printAutoInd(f, '%-----------------------------------\\\n')
 
     # print previous widget's response code
-    delayedPrintCodes = printKeyValueInDelayedCodes(f, delayedPrintCodes, 'respCodes')
+    preStimWid = getPreStimWID(cWidget.widget_id)
+    allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
 
     printAutoInd(f, "% record a few samples before we actually start displaying")
     printAutoInd(f, "% otherwise you may lose a few msec of data")
@@ -2280,61 +2626,48 @@ def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintC
     printAutoInd(f, "% mark zero-plot time in data file")
     printAutoInd(f, "Eyelink('message', 'SYNCTIME');\n")
 
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
-def printETEndRWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+def printETEndRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     cProperties = Func.getProperties(cWidget.widget_id)
 
-    delayedPrintCodes.update({"isEyeLinkSartRecord": False})
+    allWidgetCodes.update({"isEyeLinkSartRecord": False})
 
     # print previous widget's response code
-    delayedPrintCodes = printKeyValueInDelayedCodes(f, delayedPrintCodes, 'respCodes')
+    preStimWid = getPreStimWID(cWidget.widget_id)
+    allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
 
     printAutoInd(f, '%- eyetracker: stoprecord ---/')
     printAutoInd(f, "Eyelink('StopRecording');")
     printAutoInd(f, '%----------------------------\\\n')
 
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
-def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes):
     global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint, haveGaborStim, haveSnowStim
 
-    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip', [])
-    cRespCodes = delayedPrintCodes.get('respCodes', [])
-    cVSLCodes = delayedPrintCodes.get('forVideoSliderLoopCodes', [])
-    beClosedTxAFCycleList = delayedPrintCodes.get(f"beClosedTextures_{cLoopLevel}", [])
+    cVSLCodes = allWidgetCodes.get('forVideoSliderLoopCodes', [])
+    beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
 
     iVideoNum = 1
     # print(os.path.abspath(__file__))
 
     if getWidgetPos(cWidget.widget_id) == 0:
         # Step 2: print out help info for the current widget
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+        printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(sliderStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
                      getWidgetName(cWidget.widget_id))
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
     cSliderProperties = Func.getProperties(cWidget.widget_id)
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
-    shouldNotBeCitationCheck('Screen Name', cWidget.getScreenName())
-
-    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
-
-    # currently we just used the nearest previous flipped screen info
-    # cWinIdx = historyPropDict.get("cWinIdx")
-    cWinIdx = outputDevNameIdxDict.get(cScreenName)
-    cWinStr = f"winIds({cWinIdx})"
-
-    # historyPropDict.update({"cScreenName": cScreenName})
-    historyPropDict.update({"cWinIdx": cWinIdx})
-    historyPropDict.update({"cWinStr": cWinStr})
-
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
     # ------------------------------------------------
     # Step 2: draw eachItem
     # -------------------------------------------------
@@ -2346,9 +2679,9 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     itemIds = getSliderItemIds(cWidget)
     itemIds.reverse()  # reverse the key id order
     # itemIds = itemIds[-1::-1] # reverse the key id order in ascend
-    printAutoInd(f, "% prepare audio materials for widget {0}", getWidgetName(cWidget.widget_id))
+    printAutoInd(sliderStimCodes, "% prepare audio materials for widget {0}", getWidgetName(cWidget.widget_id))
     if isContainItemType(itemIds, Info.ITEM_SOUND):
-        printAutoInd(f,
+        printAutoInd(sliderStimCodes,
                      "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur);",
                      cWinStr, cWinIdx)
     # loop twice, once for audio and once for all visual stimuli
@@ -2358,11 +2691,13 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
         cItemProperties = cItems[cItemId]
 
         if getItemType(cItemId) == Info.ITEM_SOUND:
-            printAutoInd(f, "% create item: {0} in {1}", cItemId, getWidgetName(cWidget.widget_id))
+            printAutoInd(sliderStimCodes, "% create item: {0} in {1}", cItemId, getWidgetName(cWidget.widget_id))
             if iSoundSlave == 1:
-                printAutoInd(f, "% schedule start of audio at exactly the predicted time of the next flip")
+                printAutoInd(sliderStimCodes,
+                             "% schedule start of audio at exactly the predicted time of the next flip")
 
-            delayedPrintCodes = drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes,
+            allWidgetCodes = drawSoundWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel,
+                                                allWidgetCodes,
                                                 cItemProperties, iSoundSlave)
             iSoundSlave += 1
         else:
@@ -2372,7 +2707,6 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
     '''
     loop to handle all visual stimuli
     '''
-    # print(f"line 2160: {itemIds}")
     cWidgetName = getWidgetName(cWidget.widget_id)
 
     printAutoInd(cVSLCodes, "% draw item {0} in {1}", itemIds, cWidgetName)
@@ -2384,7 +2718,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
         isItemRef = False
 
         if cItemType in [Info.ITEM_GABOR, Info.ITEM_IMAGE, Info.ITEM_SNOW, Info.ITEM_TEXT, Info.ITEM_VIDEO]:
-            printAutoInd(f, "% prepare materials for item {0} in {1}", cItemId, cWidgetName)
+            printAutoInd(sliderStimCodes, "% prepare materials for item {0} in {1}", cItemId, cWidgetName)
 
         # printAutoInd(cVSLCodes, "% draw item {0} in {1}", cItemId, cWidgetName)
 
@@ -2420,7 +2754,8 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                 printAutoInd(cVSLCodes, "Screen('FillRect',{0} ,{1}, CenterRectOnPoint([0,0,{2},{3}], {4}, {5}));",
                              cWinStr, fillColor, cWidth, cHeight, centerX, centerY)
             else:
-                printAutoInd(f, "{0}cRect = CenterRectOnPoint([0, 0, {1}, {2}], {3}, {4});", cItemId, cWidth, cHeight,
+                printAutoInd(sliderStimCodes, "{0}cRect = CenterRectOnPoint([0, 0, {1}, {2}], {3}, {4});", cItemId,
+                             cWidth, cHeight,
                              centerX, centerY)
                 printAutoInd(cVSLCodes, "Screen('FillRect' ,{0} ,{1} ,{2}cRect);", cWinStr, fillColor, cItemId)
                 printAutoInd(cVSLCodes, "Screen('FrameRect' ,{0} ,{1} ,{2}cRect ,{3});", cWinStr, borderColor, cItemId,
@@ -2444,7 +2779,8 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                 printAutoInd(cVSLCodes, "Screen('FillOval', {0}, {1}, CenterRectOnPoint([0, 0, {2}, {3}], {4}, {5}));",
                              cWinStr, fillColor, cWidth, cHeight, centerX, centerY)
             else:
-                printAutoInd(f, "{0}cRect = CenterRectOnPoint([0, 0, {1}, {2}], {3}, {4});", cItemId, cWidth, cHeight,
+                printAutoInd(sliderStimCodes, "{0}cRect = CenterRectOnPoint([0, 0, {1}, {2}], {3}, {4});", cItemId,
+                             cWidth, cHeight,
                              centerX, centerY)
                 printAutoInd(cVSLCodes, "Screen('FillOval',{0}, {1}, {2}cRect);", cWinStr, fillColor, cItemId)
                 printAutoInd(cVSLCodes, "Screen('FrameOval',{0}, {1}, {2}cRect, {3}, {3});", cWinStr, borderColor,
@@ -2473,7 +2809,7 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
             elif lineWidth == '0' or fillColor == borderColor:
                 printAutoInd(cVSLCodes, "Screen('FillPoly', {0}, {1}, {2});", cWinStr, fillColor, pointListStr)
             else:
-                printAutoInd(f, "{0}cPointList = {1};", cItemId, pointListStr)
+                printAutoInd(sliderStimCodes, "{0}cPointList = {1};", cItemId, pointListStr)
                 printAutoInd(cVSLCodes, "Screen('FillPoly', {0}, {1}, {2}cPointList);", cWinStr, fillColor, cItemId)
                 printAutoInd(cVSLCodes, "Screen('FramePoly', {0}, {1}, {2}cPointList, {3}, {3});", cWinStr, borderColor,
                              cItemId, lineWidth)
@@ -2502,7 +2838,8 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                              cWinStr,
                              fillColor, cWidth, cHeight, centerX, centerY, angleStart, angleLength)
             else:
-                printAutoInd(f, "{0}cRect = CenterRectOnPoint([0, 0, {1}, {2}], {3}, {4});", cItemId, cWidth, cHeight,
+                printAutoInd(sliderStimCodes, "{0}cRect = CenterRectOnPoint([0, 0, {1}, {2}], {3}, {4});", cItemId,
+                             cWidth, cHeight,
                              centerX, centerY)
                 printAutoInd(cVSLCodes, "Screen('FillArc', {0}, {1}, {2}cRect, {3}, {4});", cWinStr, fillColor, cItemId,
                              angleStart, angleLength)
@@ -2552,19 +2889,21 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
 
             if isItemRef == 0 and cLoopLevel > 0:
                 # if its not ref and should be under cycling
-                printAutoInd(f, "if ~exist('{0}_Mx','var')", cItemId)
-                printAutoInd(f, "{0}_Mx  = makeGabor_bcl({1}, {2}, {3}, {4}, {5}, [{6},{7}], {8}, {9});", cItemId,
+                printAutoInd(sliderStimCodes, "if ~exist('{0}_Mx','var')", cItemId)
+                printAutoInd(sliderStimCodes, "{0}_Mx  = makeGabor_bcl({1}, {2}, {3}, {4}, {5}, [{6},{7}], {8}, {9});",
+                             cItemId,
                              cSpatialFreq,
                              cContrast, cPhase, cOrientation, cBackColor, cWidth, cHeight, cSDx, cSDy)
-                printAutoInd(f, "{0}_idx = Screen('MakeTexture', {1}, {0}_Mx);", cItemId, cWinStr)
-                printAutoInd(f, "end ")
+                printAutoInd(sliderStimCodes, "{0}_idx = Screen('MakeTexture', {1}, {0}_Mx);", cItemId, cWinStr)
+                printAutoInd(sliderStimCodes, "end ")
 
                 beClosedTxAFCycleList.append(f"{cItemId}_idx")
             else:
-                printAutoInd(f, "{0}_Mx  = makeGabor_bcl({1}, {2}, {3}, {4}, {5}, [{6},{7}], {8}, {9});", cItemId,
+                printAutoInd(sliderStimCodes, "{0}_Mx  = makeGabor_bcl({1}, {2}, {3}, {4}, {5}, [{6},{7}], {8}, {9});",
+                             cItemId,
                              cSpatialFreq,
                              cContrast, cPhase, cOrientation, cBackColor, cWidth, cHeight, cSDx, cSDy)
-                printAutoInd(f, "{0}_idx = Screen('MakeTexture', {1}, {0}_Mx);", cItemId, cWinStr)
+                printAutoInd(sliderStimCodes, "{0}_idx = Screen('MakeTexture', {1}, {0}_Mx);", cItemId, cWinStr)
 
                 cCloseIdxesStr += f"{cItemId}_idx, "
 
@@ -2597,16 +2936,18 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
             cTransparency = dataStrConvert(*getRefValue(cWidget, cItemProperties['Transparency'], attributesSetDict))
 
             if isItemRef == 0 and cLoopLevel > 0:
-                printAutoInd(f, "if ~exist('{0}_Mx','var')", cItemId)
-                printAutoInd(f, "{0}_Mx  = makeSnow_bcl({1}, {2}, {3});", cItemId, cWidth, cHeight, cScale)
+                printAutoInd(sliderStimCodes, "if ~exist('{0}_Mx','var')", cItemId)
+                printAutoInd(sliderStimCodes, "{0}_Mx  = makeSnow_bcl({1}, {2}, {3});", cItemId, cWidth, cHeight,
+                             cScale)
                 # printAutoInd(f, " stim = rand(round([stimHeigh, stimWidth]/scale)) * 255;")
-                printAutoInd(f, "{0}_idx = Screen('MakeTexture', {1}, {0}_Mx);", cItemId, cWinStr)
-                printAutoInd(f, "end")
+                printAutoInd(sliderStimCodes, "{0}_idx = Screen('MakeTexture', {1}, {0}_Mx);", cItemId, cWinStr)
+                printAutoInd(sliderStimCodes, "end")
 
                 beClosedTxAFCycleList.append(f"{cItemId}_idx")
             else:
-                printAutoInd(f, "{0}_Mx  = makeSnow_bcl({1}, {2}, {3});", cItemId, cWidth, cHeight, cScale)
-                printAutoInd(f, "{0}_idx = Screen('MakeTexture', {1}, {0}_Mx);", cItemId, cWinStr)
+                printAutoInd(sliderStimCodes, "{0}_Mx  = makeSnow_bcl({1}, {2}, {3});", cItemId, cWidth, cHeight,
+                             cScale)
+                printAutoInd(sliderStimCodes, "{0}_idx = Screen('MakeTexture', {1}, {0}_Mx);", cItemId, cWinStr)
                 # for possible to be closed textures
                 cCloseIdxesStr += f"{cItemId}_idx, "
 
@@ -2617,16 +2958,19 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
                          cTransparency)
 
         elif Info.ITEM_TEXT == cItemType:
-            cVSLCodes = drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes, cItemProperties,
+            cVSLCodes = drawTextForSlider(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes,
+                                          cItemProperties,
                                           cVSLCodes)
         elif cItemType == Info.ITEM_VIDEO:
-            delayedPrintCodes, cVSLCodes = drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes,
+            allWidgetCodes, cVSLCodes = drawVideoWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel,
+                                                           allWidgetCodes,
                                                            cItemProperties, cVSLCodes, iVideoNum)
             iVideoNum += 1
 
         elif cItemType == Info.ITEM_IMAGE:
-            delayedPrintCodes, cVSLCodes, isImFileNameRef = drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel,
-                                                                            delayedPrintCodes, cItemProperties,
+            allWidgetCodes, cVSLCodes, isImFileNameRef = drawImageWidget(cWidget, sliderStimCodes, attributesSetDict,
+                                                                            cLoopLevel,
+                                                                            allWidgetCodes, cItemProperties,
                                                                             cVSLCodes)
 
             if isImFileNameRef or cLoopLevel == 0:
@@ -2634,42 +2978,37 @@ def drawSliderWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCode
 
     # sortedZIdx = sorted(range(len(zVlaues)), key=zVlaues.__getitem__)
 
-    clearAfter = dataStrConvert(*getRefValue(cWidget, cSliderProperties['pro']['Clear after'], attributesSetDict))
-    clearAfter = parseDontClearAfterStr(clearAfter)
-
-    historyPropDict.update({"clearAfter": clearAfter})
-
     if isVideoRelatedWidget(cWidget) is not True:
-        printAutoInd(f, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
-        printAutoInd(f, "% check the 'esc' key to abort the exp")
-        printAutoInd(f, "detectAbortKey(abortKeyCode);\n")
+        clearAfter = getClearAfterInfo(cWidget, attributesSetDict)
+
+        printAutoInd(sliderStimCodes, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
+        printAutoInd(sliderStimCodes, "% check the 'esc' key to abort the exp")
+        printAutoInd(sliderStimCodes, "detectAbortKey(abortKeyCode);\n")
 
     # ------------------------------------------
     # the last step: upload the delayed codes
     # ------------------------------------------
 
     if len(cCloseIdxesStr) > 0:
-        cAfEndVideoFlipCodes = delayedPrintCodes.get('codesAfEndVideoFip', [])
+        cAfEndVideoFlipCodes = allWidgetCodes.get('codesAfEndVideoFip', [])
         cAfEndVideoFlipCodes.append(f"Screen('Close', [{cCloseIdxesStr[0:-2]}]);\n")
-        delayedPrintCodes.update({'codesAfEndVideoFip': cAfEndVideoFlipCodes})
+        allWidgetCodes.update({'codesAfEndVideoFip': cAfEndVideoFlipCodes})
 
-    delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
-    delayedPrintCodes.update({'respCodes': cRespCodes})
-    delayedPrintCodes.update({'forVideoSliderLoopCodes': cVSLCodes})
-    delayedPrintCodes.update({'f"beClosedTextures_{cLoopLevel}"': beClosedTxAFCycleList})
+    allWidgetCodes.update({'forVideoSliderLoopCodes': cVSLCodes})
 
-    return delayedPrintCodes
+    allWidgetCodes.update({'f"beClosedTextures_{cLoopLevel}"': beClosedTxAFCycleList})
+
+    return allWidgetCodes
 
 
-def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes, cProperties=None, iSlave=1):
+def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes, cProperties=None,
+                    iSlave=1):
     global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
 
     if cProperties is None:
         cProperties = []
 
-    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
-    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip', [])
-    cRespCodes = delayedPrintCodes.get('respCodes', [])
+    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
 
     if len(cProperties) == 0:
         isNotInSlide = True
@@ -2685,23 +3024,15 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
     if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide:
         # Step 2: print out help info for the current widget
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+        printAutoInd(soundStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(soundStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
                      getWidgetName(cWidget.widget_id))
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(soundStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
-    shouldNotBeCitationCheck('Screen Name', cWidget.getScreenName())
-
-    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
-
-    cWinIdx = outputDevNameIdxDict.get(cScreenName)
-    cWinStr = f"winIds({cWinIdx})"
-
-    historyPropDict.update({"cWinIdx": cWinIdx})
-    historyPropDict.update({"cWinStr": cWinStr})
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
     # 2) handle file name:
     cFilenameStr, isFileRef = getRefValue(cWidget, cProperties['File name'], attributesSetDict)
@@ -2743,57 +3074,49 @@ def drawSoundWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # 12) check the volume parameter:
     waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cProperties['Wait for start'], attributesSetDict))
 
-    if isNotInSlide:
-        clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-        clearAfter = parseDontClearAfterStr(clearAfter)
-
-        historyPropDict.update({"clearAfter": clearAfter})
-
     # read audio file
     if isFileRef is False and cLoopLevel > 0:
-        printAutoInd(f, "if ~exist({0}_Dat,'var')", cPrefixStr)
-        printAutoInd(f, "{0}_Dat = audioread(fullfile(cFolder,{1}) );", cPrefixStr, addSingleQuotes(cFilenameStr))
+        printAutoInd(soundStimCodes, "if ~exist({0}_Dat,'var')", cPrefixStr)
+        printAutoInd(soundStimCodes, "{0}_Dat = audioread(fullfile(cFolder,{1}) );", cPrefixStr,
+                     addSingleQuotes(cFilenameStr))
         # make audio buffer
         # printAutoInd(f, "{0}_idx = PsychPortAudio('CreateBuffer', {1}, cAudioData);",cPrefixStr,cSoundIdxStr)
-        printAutoInd(f, "end")
+        printAutoInd(soundStimCodes, "end")
     else:
-        printAutoInd(f, "{0}_Dat = audioread(fullfile(cFolder,{1}) );", cPrefixStr, addSingleQuotes(cFilenameStr))
+        printAutoInd(soundStimCodes, "{0}_Dat = audioread(fullfile(cFolder,{1}) );", cPrefixStr,
+                     addSingleQuotes(cFilenameStr))
         # make audio buffer
         # printAutoInd(f, "{0}_idx = PsychPortAudio('CreateBuffer', {1}, cAudioData);",cPrefixStr,cSoundIdxStr)
 
     #  draw buffer to  hw
     # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, {1}_idx, {2});",cSoundIdxStr,cPrefixStr, streamRefillStr)
 
-    printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, {1}_Dat, {2});", cSoundIdxStr, cPrefixStr, streamRefillStr)
+    printAutoInd(soundStimCodes, "PsychPortAudio('FillBuffer', {0}, {1}_Dat, {2});", cSoundIdxStr, cPrefixStr,
+                 streamRefillStr)
 
     if isVolumeControl:
-        printAutoInd(f, "PsychPortAudio('Volume', {0}, {1});\n", cSoundIdxStr, volumeStr)
+        printAutoInd(soundStimCodes, "PsychPortAudio('Volume', {0}, {1});\n", cSoundIdxStr, volumeStr)
 
     if isLantencyBiasControl:
-        printAutoInd(f, "PsychPortAudio('LatencyBias', {0}, {1}/1000);\n", cSoundIdxStr, latencyBiasStr)
+        printAutoInd(soundStimCodes, "PsychPortAudio('LatencyBias', {0}, {1}/1000);\n", cSoundIdxStr, latencyBiasStr)
 
     if isNotInSlide:
-        printAutoInd(f, "% check the 'esc' key to abort the exp")
-        printAutoInd(f, "detectAbortKey(abortKeyCode);\n")
+        printAutoInd(soundStimCodes, "% check the 'esc' key to abort the exp")
+        printAutoInd(soundStimCodes, "detectAbortKey(abortKeyCode);\n")
     else:
         # check the repetitions parameter:
         repetitionsStr, isRef = getRefValue(cWidget, cProperties['Repetitions'], attributesSetDict)
-        printAutoInd(f, "PsychPortAudio('Start', {0}, {1}, predictedVisOnset, 0); %\n", cSoundIdxStr, repetitionsStr)
+        printAutoInd(soundStimCodes, "PsychPortAudio('Start', {0}, {1}, predictedVisOnset, 0); %\n", cSoundIdxStr,
+                     repetitionsStr)
 
     # ------------------------------------------
     # the last step: upload the delayed codes
     # ------------------------------------------
 
-    # cRespCodes.append(f"% delete audio buffer corresponding to {cFilenameStr}")
-    # cRespCodes.append(f"PsychPortAudio('DeleteBuffer', cAudioIdx, 0);\n")
-
-    delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
-    delayedPrintCodes.update({'respCodes': cRespCodes})
-
-    return delayedPrintCodes
+    return allWidgetCodes
 
 
-def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes, cProperties=None, cVSLCodes=None):
+def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, cProperties=None, cVSLCodes=None):
     if cVSLCodes is None:
         cVSLCodes = []
     if cProperties is None:
@@ -2812,8 +3135,8 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     else:
         cPrefixStr = getWidgetName(cWidget.widget_id) + '_' + cProperties['name']
 
-    cRespCodes = delayedPrintCodes.get('respCodes', [])
-    beClosedTxAFCycleList = delayedPrintCodes.get(f"beClosedTextures_{cLoopLevel}", [])
+    cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_respCodes", [])
+    beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
 
     if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide:
         # Step 2: print out help info for the current widget
@@ -2826,16 +3149,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
-    shouldNotBeCitationCheck('Screen Name', cWidget.getScreenName())
-
-    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
-
-    cWinIdx = outputDevNameIdxDict.get(cScreenName)
-    cWinStr = f"winIds({cWinIdx})"
-
-    historyPropDict.update({"cScreenName": cScreenName})
-    historyPropDict.update({"cWinIdx": cWinIdx})
-    historyPropDict.update({"cWinStr": cWinStr})
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
     # 2) handle file name:
     cFilenameStr, isFileNameRef = getRefValue(cWidget, cProperties['File name'], attributesSetDict)
@@ -2993,10 +3307,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
             printAutoInd(cVSLCodes, "Screen('glPopMatrix', {0}); % restore to non mirror mode", cWinStr)
 
     if isNotInSlide:
-        clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-        clearAfter = parseDontClearAfterStr(clearAfter)
-
-        historyPropDict.update({"clearAfter": clearAfter})
+        clearAfter = getClearAfterInfo(cWidget, attributesSetDict)
 
         printAutoInd(f, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
         printAutoInd(f, "% check the 'esc' key to abort the exp")
@@ -3006,19 +3317,20 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         # in slider, will do the close texture job within slider widget instead of here
         '''
         if isFileNameRef or cLoopLevel == 0:
-            cRespCodes.append(f"% close the texture corresponding to {cFilenameStr}")
-            cRespCodes.append(f"Screen('Close', {cPrefixStr}_idx);\n")
+            printAutoInd(cRespCodes, "% close the texture corresponding to {0}", cFilenameStr)
+            printAutoInd(cRespCodes, "Screen('Close', {0}_idx);\n", cPrefixStr)
 
     # ------------------------------------------
     # the last step: upload the delayed codes
     # ------------------------------------------
-    # delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
-    delayedPrintCodes.update({'respCodes': cRespCodes})
-    delayedPrintCodes.update({f"beClosedTextures_{cLoopLevel}": beClosedTxAFCycleList})
-    return delayedPrintCodes, cVSLCodes, isFileNameRef
+    allWidgetCodes.update({f"{cWidget.widget_id}_respCodes": cRespCodes})
+
+    allWidgetCodes.update({f"beClosedTextures_{cLoopLevel}": beClosedTxAFCycleList})
+
+    return allWidgetCodes, cVSLCodes, isFileNameRef
 
 
-def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes, cProperties=None, cVSLCodes=None,
+def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, cProperties=None, cVSLCodes=None,
                     iVideoNum=0):
     # cVSLCode: codes for current video slider loop
     if cVSLCodes is None:
@@ -3042,9 +3354,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
 
     cVideoItemNums = getSliderItemTypeNums(cWidget, Info.ITEM_VIDEO)
 
-    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip', [])
-    cBeFlipCodes = delayedPrintCodes.get('codesBeFlip', [])
-    cRespCodes = delayedPrintCodes.get('respCodes', [])
+    cBeFlipCodes = allWidgetCodes.get('codesBeFlip', [])
 
     if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide:
         # Step 2: print out help info for the current widget
@@ -3057,16 +3367,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
-    shouldNotBeCitationCheck('Screen Name', cWidget.getScreenName())
-
-    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
-
-    cWinIdx = outputDevNameIdxDict.get(cScreenName)
-    cWinStr = f"winIds({cWinIdx})"
-
-    historyPropDict.update({"cScreenName": cScreenName})
-    historyPropDict.update({"cWinIdx": cWinIdx})
-    historyPropDict.update({"cWinStr": cWinStr})
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
     # 2) handle file name:
     cFilenameStr, isFileRef = getRefValue(cWidget, cProperties['File name'], attributesSetDict)
@@ -3189,11 +3490,11 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         if Info.PLATFORM == 'linux':
             cBeFlipCodes.append(
                 "% For linux, to use movie playback and PsychPortAudio at the same time, set specialFlags1 to 2")
-            cBeFlipCodes.append(
-                f"[{cWidgetName}Ptrs{iVideoNum},{cWidgetName}_mDurs{iVideoNum}, ~,{cWidgetName}_ImgWs{iVideoNum}, {cWidgetName}_ImgHs{iVideoNum}] = Screen('OpenMovie',{cWinStr}, fullfile(cFolder,{addSingleQuotes(cFilenameStr)}),[],[],2 );")
+            cBeFlipCodes.append(f"[{cWidgetName}Ptrs{iVideoNum},{cWidgetName}_mDurs{iVideoNum}, ~,"
+                                f"{cWidgetName}_ImgWs{iVideoNum}, {cWidgetName}_ImgHs{iVideoNum}] = Screen('OpenMovie',"
+                                f"{cWinStr}, fullfile(cFolder,{addSingleQuotes(cFilenameStr)}),[],[],2 );")
         else:
-            cBeFlipCodes.append(
-                f"[{cWidgetName}Ptrs{iVideoNum},{cWidgetName}_mDurs{iVideoNum}, ~,{cWidgetName}_ImgWs{iVideoNum}, {cWidgetName}_ImgHs{iVideoNum}] = Screen('OpenMovie',{cWinStr}, fullfile(cFolder,{addSingleQuotes(cFilenameStr)}) );")
+            cBeFlipCodes.append(f"[{cWidgetName}Ptrs{iVideoNum},{cWidgetName}_mDurs{iVideoNum}, ~,{cWidgetName}_ImgWs{iVideoNum}, {cWidgetName}_ImgHs{iVideoNum}] = Screen('OpenMovie',{cWinStr}, fullfile(cFolder,{addSingleQuotes(cFilenameStr)}) );")
 
         cBeFlipCodes.append(f"{cWidgetName}_sMTimes{iVideoNum} = {endPositionStr}/1000; ")
         cBeFlipCodes.append(
@@ -3218,47 +3519,33 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes
         printAutoInd(cVSLCodes, "end ")
 
     if isNotInSlide:
-        clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-        clearAfter = parseDontClearAfterStr(clearAfter)
-
-        historyPropDict.update({"clearAfter": clearAfter})
-        # for video widget , upload the cVSLCodes into dekayedPrintCodes
-        delayedPrintCodes.update({'forVideoSliderLoopCodes': cVSLCodes})
+        # for video widget , upload the cVSLCodes into allWidgetCodes
+        allWidgetCodes.update({'forVideoSliderLoopCodes': cVSLCodes})
 
     # ------------------------------------------
     # the last step: upload the delayed codes
     # ------------------------------------------
 
-    delayedPrintCodes.update({'codesBeFip': cBeFlipCodes})
-    delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
-    delayedPrintCodes.update({'respCodes': cRespCodes})
+    allWidgetCodes.update({'codesBeFip': cBeFlipCodes})
 
-    return delayedPrintCodes, cVSLCodes
+    return allWidgetCodes, cVSLCodes
 
 
-def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes, cProperties, cVSLCodes):
+def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, cProperties, cVSLCodes):
     global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
 
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
-    # cAfFlipCodes = delayedPrintCodes.get('codesAfFlip',[])
-    # cRespCodes = delayedPrintCodes.get('respCodes',[])
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
+
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
-    shouldNotBeCitationCheck('Screen Name', cWidget.getScreenName())
-
-    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
-
-    cWinIdx = outputDevNameIdxDict.get(cScreenName)
-    cWinStr = f"winIds({cWinIdx})"
-
-    historyPropDict.update({"cScreenName": cScreenName})
-    historyPropDict.update({"cWinIdx": cWinIdx})
-    historyPropDict.update({"cWinStr": cWinStr})
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
     # 2) handle the text content
-    cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
+    inputStr, isContainRef, _ = getValueInContainRefExp(cWidget, cProperties['Text'], attributesSetDict, True, dict())
+    cTextContentStr = parseTextContentStrNew(inputStr)
+    # cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
 
     # 3) check the alignment X parameter:
     leftX = dataStrConvert(*getRefValue(cWidget, cProperties['Center X'], attributesSetDict))
@@ -3314,21 +3601,14 @@ def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCod
     # ------------------------------------------
     # the last step: upload the delayed codes
     # ------------------------------------------
-    # delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
-    # delayedPrintCodes.update({'respCodes': cRespCodes})
 
     return cVSLCodes
 
 
-def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes):
+def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
     global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
 
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
-    cRespCodes = []
-    cAfFlipCodes = []
-
-    cAfFlipCodes = delayedPrintCodes.get('codesAfFlip', [])
-    cRespCodes = delayedPrintCodes.get('respCodes', [])
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
 
     if getWidgetPos(cWidget.widget_id) == 0:
         # Step 2: print out help info for the current widget
@@ -3342,19 +3622,12 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
     # 1) get the win id info in matlab format winIds(idNum)
-    shouldNotBeCitationCheck('Screen Name', cWidget.getScreenName())
-
-    cScreenName, ign = getRefValue(cWidget, cWidget.getScreenName(), attributesSetDict)
-
-    cWinIdx = outputDevNameIdxDict.get(cScreenName)
-    cWinStr = f"winIds({cWinIdx})"
-
-    historyPropDict.update({"cScreenName": cScreenName})
-    historyPropDict.update({"cWinIdx": cWinIdx})
-    historyPropDict.update({"cWinStr": cWinStr})
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
     # 2) handle the text content
-    cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
+    inputStr, isContainRef, _ = getValueInContainRefExp(cWidget, cProperties['Text'], attributesSetDict, True, dict())
+    cTextContentStr = parseTextContentStrNew(inputStr)
+    # cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
 
     # 3) check the alignment X parameter:
     alignmentX = dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
@@ -3456,53 +3729,13 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel, delayedPrintCodes)
                  rightToLeft,
                  frameRectStr)
 
-    clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear after'], attributesSetDict))
-    clearAfter = parseDontClearAfterStr(clearAfter)
-
-    historyPropDict.update({"clearAfter": clearAfter})
+    clearAfter = getClearAfterInfo(cWidget, attributesSetDict)
 
     printAutoInd(f, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
     printAutoInd(f, "% check the 'esc' key to abort the exp")
     printAutoInd(f, "detectAbortKey(abortKeyCode);\n")
 
-    # ------------------------------------------
-    # the last step: upload the delayed codes
-    # ------------------------------------------
-    delayedPrintCodes.update({'codesAfFip': cAfFlipCodes})
-    delayedPrintCodes.update({'respCodes': cRespCodes})
-
-    return delayedPrintCodes
-
-
-""" useless, because the timeline type will dependent on selected input when the selection order is counterbalanced
-def dummyRunTimeline(cWidget):
-    global incrOpRowNum
-
-    incrOpRowNum   += 1
-    cTimelineRowIdx = incrOpRowNum
-
-    cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
-
-    for cWidgetId in cTimelineWidgetIds:
-        cWidget = Info.WID_WIDGET[cWidgetId]
-
-        if Info.CYCLE == getWidgetType(cWidget):
-            dummyRunCycle(cWidget)
-        else:
-            pass
-
-def dummyRunCycle(cWidget):
-
-
-def getOutputnRows(globalSelf):
-    global  incrOpRowNum
-    incrOpRowNum = 0
-
-    dummyRunTimeline(Info.WID_WIDGET[f"{Info.TIMELINE}.0"])
-
-
-    return incrOpRowNum
-"""
+    return 0
 
 
 def compilePTB(globalSelf):
@@ -3522,7 +3755,7 @@ def compileCode(globalSelf, isDummyCompile):
 
     cInfoDict.update({'maximumRows': 1})
 
-    delayedPrintCodes = {'codesAfFip': [], 'respCodes': []}
+    allWidgetCodes = {'codesAfFip': [], 'respCodes': []}
 
     historyPropDict = dict()
 
@@ -3562,8 +3795,13 @@ def compileCode(globalSelf, isDummyCompile):
 
     globalSelf.save()
 
-    print(f"WID_WIDGET: {list(Info.WID_WIDGET.keys())}")
-    print(f"WID_NODE: {list(Info.WID_NODE.keys())}")
+    wid_widgetList = list(Info.WID_WIDGET.keys())
+    wid_node_list = list(Info.WID_NODE.keys())
+    print(f"Name:WID_WIDGET: {list(Func.getWidgetName(cId) for cId in wid_widgetList)}")
+    print(f"Name:WID_NODE: {list(Func.getWidgetName(cId) for cId in wid_node_list)}")
+
+    print(f"WID_WIDGET: {wid_widgetList}")
+    print(f"WID_NODE: {wid_node_list}")
     print(f"=====================================\n")
 
     # get save path
@@ -3591,9 +3829,10 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
         if not isDummyCompile:
-            globalVarStr = ''.join(' ' + cWidgetName for cWidgetName in getAllEventWidgetNamesList(1))
+            globalVarEventStr = ''.join(' ' + cWidgetName for cWidgetName in getAllEventWidgetNamesList(1))
+            globalVarAttStr = ''.join(' ' + cAttVarName for cAttVarName in getAllCycleAttVarNameList())
 
-            printAutoInd(f, "global{0}\n", globalVarStr)
+            printAutoInd(f, "global{0}{1}\n", globalVarEventStr,globalVarAttStr)
 
             # get subject information
         printAutoInd(f, "%===== get subject information =========/", )
@@ -3621,9 +3860,9 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f, "commandwindow;         % bring the command window into front")
 
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        printAutoInd(f, "% define and initialize input/output devices")
+        printAutoInd(f, "% define and initialize input/simple_info devices")
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        # get output devices, such as global output devices.
+        # get simple_info devices, such as global simple_info devices.
         # you can get each widget's device you selected
         output_devices = Info.OUTPUT_DEVICE_INFO
         input_devices = Info.INPUT_DEVICE_INFO
@@ -3639,7 +3878,7 @@ def compileCode(globalSelf, isDummyCompile):
             for cEyeTracker in eyetracker_devices.keys():
                 cEyeTrackerProperty = eyetracker_devices[cEyeTracker]
 
-                if cEyeTrackerProperty.get('Select tracker type') == 'EyeLink':
+                if cEyeTrackerProperty.get('Select Tracker Type') == 'EyeLink':
                     isEyelink = True
 
                     printAutoInd(f, "%====== define edf filename  ========/")
@@ -3723,14 +3962,6 @@ def compileCode(globalSelf, isDummyCompile):
         for inputDevId, cDevice in input_devices.items():
 
             cIsQueue = cDevice.get('Is KB Queue', False)
-            # create a map dict to map device name (key) to device ID (value)
-            # for keyboards, game-pads, mice (indices)
-            # if cDevice['Device Index'] == 'auto':
-            #
-            # else:
-            #     cInputDevIndexStr = f"{int(cDevice['Device Index']) + 1}"
-
-            # inputDevNameIdxDict.update({cDevice['Device Name']: [cInputDevIndexStr, int(cIsQueue),]})
 
             if cDevice['Device Type'] == Info.DEV_KEYBOARD:
                 cInputDevIndexStr = f"{iKeyboard}"
@@ -3741,7 +3972,7 @@ def compileCode(globalSelf, isDummyCompile):
             elif cDevice['Device Type'] == Info.DEV_GAMEPAD:
                 if Info.PLATFORM == 'windows' and cIsQueue:
                     throwCompileErrorInfo("In windows OS, using Gamepad for Queue is not allowed!\n")
-                    cInputDevIndexStr = f"{iGamepad}"
+                cInputDevIndexStr = f"{iGamepad}"
                 iGamepad += 1
             elif cDevice['Device Type'] == Info.DEV_RESPONSE_BOX:
                 printAutoInd(f, "rbIndices({0})   = CedrusResponseBox('Open', '{1}');", iRespBox,
@@ -3761,21 +3992,21 @@ def compileCode(globalSelf, isDummyCompile):
                                                                             cDevice['Device Index'] == 'auto')
             inputDevNameIdxDict.update({cDevice['Device Name']: [cInputDevIndexValueStr, int(cIsQueue), cDevTypeNum]})
 
-            if cIsQueue == True:
+            if cIsQueue is True:
                 queueDevIdxValueStr = cInputDevIndexValueStr
                 iQueueDev += 1
 
         # check input devs
         if Info.PLATFORM == 'windows':
             if iKeyboard > 2:
-                throwCompileErrorInfo("In windows OS, only one keyboard input device is allowed!\n"
+                throwCompileErrorInfo("In windows OS, only one keyboard is allowed!\n"
                                       " PTB can not address different keyboard devices!")
             elif iMouse > 2:
-                throwCompileErrorInfo("In windows OS, only one mouse input device is allowed!\n"
+                throwCompileErrorInfo("In windows OS, only one mouse is allowed!\n"
                                       " PTB can not address different mice!")
 
         if iEyetracker > 2:
-            throwCompileErrorInfo("Currently, we only support Eyelink(we only have this dev to debug)!\n"
+            throwCompileErrorInfo("Currently, we only support Eyelink(we only have a Eyelink1000 for debugging)!\n"
                                   "For Eyelink only one tracker device is allowed!")
         if iQueueDev > 2:
             throwCompileErrorInfo(f"Only one input device is allowed to be used for the KbQueue\n"
@@ -3801,7 +4032,7 @@ def compileCode(globalSelf, isDummyCompile):
 
         printAutoInd(f, "%====================================\\\n")
 
-        printAutoInd(f, "%===== define output devices ========/")
+        printAutoInd(f, "%===== define simple_info devices ========/")
 
         iMonitor = 1
         iParal = 1
@@ -3820,8 +4051,17 @@ def compileCode(globalSelf, isDummyCompile):
                 printAutoInd(f, "monitors({0}).port        =  {1};", iMonitor, cDevice['Device Index'])
                 printAutoInd(f, "monitors({0}).name        = '{1}';", iMonitor, cDevice['Device Name'])
                 printAutoInd(f, "monitors({0}).bkColor     = [{1}];", iMonitor, cDevice['Back Color'])
+
+                cDevResList = parsePhysicSize(cDevice['Resolution'])
+                if len(cDevResList) == 2:
+                    printAutoInd(f, "monitors({0}).rect        = [0,0,{2},{3}];", iMonitor, cDevResList[0],
+                                 cDevResList[1])
+                else:
+                    printAutoInd(f, "monitors({0}).rect        = [];", iMonitor)
+
                 printAutoInd(f, "monitors({0}).multiSample =  {1};\n", iMonitor, cDevice['Multi Sample'])
                 iMonitor += 1
+
             elif cDevice['Device Type'] == Info.DEV_NETWORK_PORT:
 
                 outputDevNameIdxDict.update({cDevice['Device Name']: f"tcpipCons({iNetPort})"})
@@ -3853,14 +4093,21 @@ def compileCode(globalSelf, isDummyCompile):
 
                 if soundDevSlavesDict.get(cSoundDevNameStr, 0) > 0:
                     outputDevNameIdxDict.update({cSoundDevNameStr: f"audioDevs({iSound}).slaveIdxes"})
-                    printAutoInd(f, "audioDevs({0}).nSlaves  = {1};", iSound, soundDevSlavesDict[cSoundDevNameStr])
-                    printAutoInd(f, "audioDevs({0}).port     = {1};", iSound, cDevice['Device Port'])
-                    printAutoInd(f, "audioDevs({0}).name     = '{1}';", iSound, cSoundDevNameStr)
+                    printAutoInd(f, "audioDevs({0}).nSlaves = {1};", iSound, soundDevSlavesDict[cSoundDevNameStr])
+
+                    if cDevice['Device Port'] == 'auto':
+                        printAutoInd(f, "soundDevs              = getOptimizedSoundDev;")
+                        printAutoInd(f, "audioDevs({0}).port    = soundDevs({0}).DeviceIndex;", iSound)
+                    else:
+                        printAutoInd(f, "audioDevs({0}).port    = {1};", iSound, cDevice['Device Port'])
+
+                    printAutoInd(f, "audioDevs({0}).name    = '{1}';", iSound, cSoundDevNameStr)
+
                     if 'auto' == cDevice['Sampling Rate']:
-                        printAutoInd(f, "audioDevs({0}).fs       = []; % the default value in PTB is 48000 Hz\n",
+                        printAutoInd(f, "audioDevs({0}).fs      = []; % the default value in PTB is 48000 Hz\n",
                                      iSound)
                     else:
-                        printAutoInd(f, "audioDevs({0}).fs       = {1};\n", iSound, cDevice['Sampling Rate'])
+                        printAutoInd(f, "audioDevs({0}).fs      = {1};\n", iSound, cDevice['Sampling Rate'])
 
                     iSound += 1
 
@@ -3878,28 +4125,37 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f,
                      "beCheckedRespDevs    = struct('beUpdatedVar','','allowAble',[],'corResp',[],'rtWindow',[],'endAction',[],'type',[],'index',[],'isQueue',[],'startTime',[],'isOn',[],'needTobeReset',[],'right',[],'wrong',[],'noResp',[],'respCodeDevType',[],'respCodeDevIdx',[]);")
         printAutoInd(f, "beCheckedRespDevs(1) = [];")
-        printAutoInd(f, "cFrame = struct('rt',[],'acc',[],'resp',[],'onsettime',[],'respOnsettime',[]);\n")
+        printAutoInd(f, "cFrame = struct('rt',[],'acc',[],'resp',[],'onsettime',[],'respOnsettime',[]);")
+        printAutoInd(f, "cFrameNoResp = struct('onsettime',[]);\n")
         #
         # print out initialize OP vars
         if not isDummyCompile:
             maximumOpDataRows = getMaximumOpDataRows()
             # input parameter 2 will include widget type of CYCLE
-            allEventWidgets = getAllEventWidgetsList(2)
+            allEventWidgets = getAllEventWidgetsList(3)
 
             for cWidget in allEventWidgets:
                 cWidgetType = getWidgetType(cWidget)
                 cWidgetName = getWidgetName(cWidget.widget_id)
+                cWidgetLoopLevel = getWidLevel(cWidget.widget_id)
 
                 if cWidgetType in [Info.SOUND, Info.IMAGE, Info.TEXT, Info.VIDEO, Info.SLIDER]:
                     output_device = cWidget.getOutputDevice()
-                    printAutoInd(f, "{0} = repmat(cFrame,{1},1);", cWidgetName, maximumOpDataRows)
+
+                    if len(output_devices) > 0:
+                        cFrameVarNameStr = 'cFrame'
+                    else:
+                        cFrameVarNameStr = 'cFrameNoResp'
+
+                    if cWidgetLoopLevel == 1:
+                        printAutoInd(f, "{0} = {1};", cWidgetName,cFrameVarNameStr)
+                    else:
+                        printAutoInd(f, "{0} = repmat({1},{2},1);", cWidgetName, cFrameVarNameStr, maximumOpDataRows)
 
                     if len(output_device) > 0:
-                        printAutoInd(f, "{0}({1}).msgEndTime = [];", cWidgetName, maximumOpDataRows)
+                        printAutoInd(f, "{0}(end).msgEndTime = [];", cWidgetName)
 
                 elif cWidgetType == Info.IF:
-                    printAutoInd(f, "{0} = repmat(cFrame,{1},1);", cWidgetName, maximumOpDataRows)
-
                     cTrueWidget = cWidget.getTrueWidget()
                     cFalseWidget = cWidget.getFalseWidget()
                     nTrueOutputDev = 0
@@ -3911,21 +4167,50 @@ def compileCode(globalSelf, isDummyCompile):
                         nFalseOutputDev = len(cFalseWidget.getOutputDevice())
 
                     if (nTrueOutputDev + nFalseOutputDev) > 0:
-                        printAutoInd(f, "{0}({1}).msgEndTime = [];", cWidgetName, maximumOpDataRows)
+                        cFrameVarNameStr = 'cFrame'
+                    else:
+                        cFrameVarNameStr = 'cFrameNoResp'
+
+                    if cWidgetLoopLevel == 1:
+                        printAutoInd(f, "{0} = {1};", cWidgetName,cFrameVarNameStr)
+                    else:
+                        printAutoInd(f, "{0} = repmat({1},{2},1);", cWidgetName, cFrameVarNameStr, maximumOpDataRows)
+
+                    if (nTrueOutputDev + nFalseOutputDev) > 0:
+                        printAutoInd(f, "{0}(end).msgEndTime = [];", cWidgetName)
 
                 elif cWidgetType == Info.SWITCH:
-                    printAutoInd(f, "{0} = repmat(cFrame,{1},1);", cWidgetName, maximumOpDataRows)
+                    haveRespDev = True
 
                     for cCaseDict in cWidget.getCases():
-                        if cCaseDict['Widget'] is not None:
+                        # {'Case Value': '',
+                        #  'Id Pool': {'Image': 'Image.0', 'Video': '', 'Text': '', 'Sound': '', 'Slider': ''},
+                        #  'Sub Wid': 'Image.0', 'Stim Type': 'Image', 'Event Name': 'U_Image_6574'}
+                        if cCaseDict['Sub Wid']:
                             if Info.WID_WIDGET.get(cCaseDict['Widget id']).getOutputDevice():
-                                printAutoInd(f, "{0}({1}).msgEndTime = [];", cWidgetName, maximumOpDataRows)
+                                haveRespDev = False
                                 break
 
+                    if haveRespDev:
+                        cFrameVarNameStr = 'cFrame'
+                    else:
+                        cFrameVarNameStr = 'cFrameNoResp'
+
+                    if cWidgetLoopLevel == 1:
+                        printAutoInd(f, "{0} = {1};", cWidgetName,cFrameVarNameStr)
+                    else:
+                        printAutoInd(f, "{0} = repmat({1},{2},1);", cWidgetName, cFrameVarNameStr, maximumOpDataRows)
+
+                    if haveRespDev:
+                        printAutoInd(f, "{0}(end).msgEndTime = [];", cWidgetName)
+
+
                 elif cWidgetType == Info.CYCLE:
-                    cRowDict = cWidget.getAttributes(0)
-                    #
-                    bePrintStr = ''.join(f"{cWidgetName}_{cVar}," for cVar in cRowDict.keys())
+
+                    cAttVarNameList = getCycleAttVarNamesList(cWidget)
+
+                    bePrintStr = ''.join(f"{cVar}," for cVar in cAttVarNameList)
+
                     bePrintStr = f"[{bePrintStr[0:-1]}] = deal(cell({maximumOpDataRows},1)); % save cycle attrs"
                     printAutoInd(f, bePrintStr)
 
@@ -3936,7 +4221,7 @@ def compileCode(globalSelf, isDummyCompile):
         # printAutoInd(f, "%--- open windows ---/")
         printAutoInd(f, "for iWin = 1:numel(monitors)")
         printAutoInd(f,
-                     "[winIds(iWin),fullRects(iWin,:)] = Screen('OpenWindow',monitors(iWin).port,monitors(iWin).bkColor,[],[],[],[],monitors(iWin).multiSample);")
+                     "[winIds(iWin),fullRects(iWin,:)] = Screen('OpenWindow',monitors(iWin).port,monitors(iWin).bkColor,monitors(iWin).rect,[],[],[],monitors(iWin).multiSample);")
         printAutoInd(f,
                      "Screen('BlendFunction', winIds(iWin),'GL_SRC_ALPHA','GL_ONE_MINUS_SRC_ALPHA'); % force to most common alpha-blending factors")
         printAutoInd(f,
@@ -3945,7 +4230,7 @@ def compileCode(globalSelf, isDummyCompile):
         # printAutoInd(f, "%--------------------\\\n")
         printAutoInd(f, " ")
 
-        printAutoInd(f, "%===== initialize output devices ========/")
+        printAutoInd(f, "%===== initialize simple_info devices ========/")
         # initialize TCPIP connections
         if iNetPort > 1:
             printAutoInd(f, "% open TCPIPs")
@@ -3995,17 +4280,15 @@ def compileCode(globalSelf, isDummyCompile):
                 printAutoInd(f, "end % if 0 ~= ")
 
             if Info.PLATFORM == 'mac':
-                printAutoInd(f, "error('Currently, we did not support output via parallel under Mac OX!');")
+                printAutoInd(f, "error('Currently, we did not support simple_info via parallel under Mac OX!');")
             # printAutoInd(f, "%----------------------------\\\n")
             printAutoInd(f, "")
 
-        #  initialize audio output devices
+        #  initialize audio simple_info devices
         if iSound > 1:
-            printAutoInd(f, "% open output audio devs")
-            # printAutoInd(f, "%--open output audio devs----/")
+            printAutoInd(f, "% open simple_info audio devs")
+            # printAutoInd(f, "%--open simple_info audio devs----/")
             printAutoInd(f, "InitializePsychSound(1); % Initialize the audio driver, require low-latency preinit\n")
-            # printAutoInd(f, "audioIds = zeros({0},1);", iSound - 1)
-            # printAutoInd(f,"audioFs = getAudioFsFromFirstAudioFile;")
 
             printAutoInd(f, "for iCount = 1:numel(audioDevs)")
             printAutoInd(f,
@@ -4025,7 +4308,10 @@ def compileCode(globalSelf, isDummyCompile):
             # get sound dev for eye tracker feedback:
             # shouldNotBeCitationCheck('Sound device', cEyeTrackerProperty['Sound device'])
             # cSoundDevName = cEyeTrackerProperty.get('Sound device')
-            cSoundDevName = cEyeTrackerProperty.get('Sound device', 'sound.0')
+            cSoundDevName = cEyeTrackerProperty.get('Sound', '')
+
+            if len(cSoundDevName) == 0:
+                throwCompileErrorInfo('should define a sound device for eyetracker')
 
             cSoundIdxStr = f"{outputDevNameIdxDict.get(cSoundDevName)}(1)"
 
@@ -4037,12 +4323,12 @@ def compileCode(globalSelf, isDummyCompile):
             printAutoInd(f, "el = initEyelink;\n")
 
         printAutoInd(f, "Priority(1); % Turn the priority to high priority")
-        printAutoInd(f, "opRowIdx = 1; % set the output variables row num")
-        # use iLoop_*_cOpR to record cTL's output var row, so that we can keep this num when there is a subCycle widget
-        printAutoInd(f, "iLoop_0_cOpR = opRowIdx; % use iLoop_*_cOpR to record cTL's output var row")
+        printAutoInd(f, "opRowIdx = 1; % set the simple_info variables row num")
+        # use iLoop_*_cOpR to record cTL's simple_info var row, so that we can keep this num when there is a subCycle widget
+        printAutoInd(f, "iLoop_0_cOpR = opRowIdx; % use iLoop_*_cOpR to record cTL's simple_info var row")
 
         # start to handle all the widgets
-        printTimelineWidget(Info.WID_WIDGET[f"{Info.TIMELINE}.0"], f, attributesSetDict, cLoopLevel, delayedPrintCodes)
+        printTimelineWidget(Info.WID_WIDGET[f"{Info.TIMELINE}.0"], f, attributesSetDict, cLoopLevel, allWidgetCodes)
 
         printAutoInd(f, "% for the last event in timeline just wait for duration")
         printAutoInd(f, "WaitSecs('UntilTime', nextEvFlipReqTime); \n")
@@ -4059,6 +4345,7 @@ def compileCode(globalSelf, isDummyCompile):
         if Info.PLATFORM == 'windows':
             printAutoInd(f, "ShowHideWinTaskbar(1);      % show the window taskbar.")
 
+        printAutoInd(f, "fillResultVars(opRowIdx); % update results vars for analysis")
         printAutoInd(f, "save(subInfo.filename); % save the results\n")
 
         if isEyelink:
@@ -4195,13 +4482,56 @@ def compileCode(globalSelf, isDummyCompile):
         iSubFunNum = 1
 
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f, "% subfun {0}: fillResultVars", iSubFunNum)
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f, "function fillResultVars(opRowIdx)")
+        printAutoInd(f, "global{0}{1}\n", globalVarEventStr,globalVarAttStr)
+
+        resultEventVarsStr4Cell = ''.join("'" + cWidgetName + "'," for cWidgetName in getAllEventWidgetNamesList(1))
+        resultAttVarsStr4Cell = ''.join("'" + cAttName + "'," for cAttName in getAllCycleAttVarNameList())
+
+        printAutoInd(f, f"resultVarNames = {{{resultEventVarsStr4Cell+resultAttVarsStr4Cell[0:-1]}}};")
+        printAutoInd(f, f"for iVar = 1:numel(resultVarNames)")
+        printAutoInd(f, "evalc(resultVarNames{iVar} = updateResultVar(resultVarNames{iVar}),opRowIdx);")
+        printAutoInd(f, f"end % for iVar")
+
+        printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
+        iSubFunNum = 1
+
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f, "% subfun {0}: updateResultVar", iSubFunNum)
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        printAutoInd(f, "function updateResultVar(beUpdatedVar,opRowIdx)")
+        printAutoInd(f, 'beUpdatedVar(opRowIdx:end) = [];')
+        printAutoInd(f, 'for iRow = 1:numel(beUpdatedVar)')
+        printAutoInd(f, 'if isstruct(beUpdatedVar)')
+
+        printAutoInd(f, '% for event log vars')
+        printAutoInd(f, 'if isempty(beUpdatedVar(iRow).onsettime)')
+        printAutoInd(f, 'beUpdatedVar(iRow) = beUpdatedVar(iRow - 1);')
+        printAutoInd(f, 'end')
+
+        printAutoInd(f, 'else')
+
+        printAutoInd(f, '% for attributes in cycle')
+        printAutoInd(f, 'if isempty(beUpdatedVar{iRow})')
+        printAutoInd(f, 'beUpdatedVar(iRow) = beUpdatedVar(iRow - 1);')
+        printAutoInd(f, 'end')
+
+        printAutoInd(f, 'end')
+        printAutoInd(f, '')
+        printAutoInd(f, 'end % for iRow')
+
+        printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
+        iSubFunNum = 1
+
+        printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "% subfun {0}: checkRespAndSendTriggers", iSubFunNum)
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
-        printAutoInd(f,
-                     "function [beCheckedRespDevs, isBreakWhile, secs] = checkRespAndSendTriggers(beCheckedRespDevs, cWIdx, cFrame, nextEvFlipReqTime, isOneTimeCheck)")
-        # globalVarStr = ''.join(' ' + cWidgetName for cWidgetName in getAllEventWidgetNamesList() )
-        printAutoInd(f, "global{0} %#ok<NUSED>\n", globalVarStr)
+        printAutoInd(f, "function [beCheckedRespDevs, isBreakWhile, secs] = checkRespAndSendTriggers(beCheckedRespDevs, cWIdx, cFrame, nextEvFlipReqTime, isOneTimeCheck)")
+        # globalVarEventStr = ''.join(' ' + cWidgetName for cWidgetName in getAllEventWidgetNamesList() )
+        printAutoInd(f, "global{0} %#ok<NUSED>\n", globalVarEventStr)
 
         printAutoInd(f, "if ~exist('isOneTimeCheck','var')")
         printAutoInd(f, "isOneTimeCheck = false;")
@@ -4278,7 +4608,7 @@ def compileCode(globalSelf, isDummyCompile):
                          "sendTriggerOrMsg(cRespDevs(iRespDev).respCodeDevType, cRespDevs(iRespDev).respCodeDevIdx, cRespDevs(iRespDev).wrong);")
             printAutoInd(f, "end \n")
 
-        printAutoInd(f, "eval([cRespDevs(iRespDev).beUpatedVar,' = cFrame;']); \n")
+        printAutoInd(f, "evalc([cRespDevs(iRespDev).beUpatedVar,' = cFrame;']); \n")
 
         printAutoInd(f, "cRespDevs(iRespDev).isOn = false;")
         printAutoInd(f, "if cRespDevs(iRespDev).endAction")
@@ -4382,7 +4712,7 @@ def compileCode(globalSelf, isDummyCompile):
         #     printAutoInd(f,"sendTriggerOrMsg(beCheckedRespDevs(iRespDev).respCodeDevType, beCheckedRespDevs(iRespDev).respCodeDevIdx, beCheckedRespDevs(iRespDev).wrong);")
         #     printAutoInd(f, "end \n")
         #
-        # printAutoInd(f, "eval([beCheckedRespDevs(iRespDev).beUpatedVar,' = cFrame;']);\n")
+        # printAutoInd(f, "evalc([beCheckedRespDevs(iRespDev).beUpatedVar,' = cFrame;']);\n")
         # printAutoInd(f, "beCheckedRespDevs(iRespDev).isOn = false;")
         #
         # printAutoInd(f, "if beCheckedRespDevs(iRespDev).endAction")
@@ -4859,6 +5189,54 @@ def compileCode(globalSelf, isDummyCompile):
             printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
             iSubFunNum += 1
 
+        if iSound > 1:
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "% subfun {0}: getOptimizedSoundDev", iSubFunNum)
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "function soundDevs = getOptimizedSoundDev()")
+
+            if Info.PLATFORM == 'linux':
+                printAutoInd(f, "% the first choice: ALSA excellent")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[8]);")
+
+                printAutoInd(f, "% the second choice: JACK excellent")
+                printAutoInd(f, "if isempty(soundDevs)")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[12]);")
+                printAutoInd(f, "end ")
+
+                printAutoInd(f, "% OSS is less capable but not very widespread in use anymore")
+                printAutoInd(f, "if isempty(soundDevs)")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[12]);")
+                printAutoInd(f, "end ")
+
+            elif Info.PLATFORM == 'windows':
+                printAutoInd(f, "% WASAPI it's ok")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[13]);")
+
+                printAutoInd(f, "% WdMKS it's ok")
+                printAutoInd(f, "if isempty(soundDevs)")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[11]);")
+                printAutoInd(f, "end ")
+
+                printAutoInd(f, "% DirectSound: the next worst")
+                printAutoInd(f, "if isempty(soundDevs)")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[1]);")
+                printAutoInd(f, "end ")
+
+                printAutoInd(f, "% MME: A completely unusable API")
+                printAutoInd(f, "if isempty(soundDevs)")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[2]);")
+                printAutoInd(f, "end ")
+            else:
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[5]);")
+
+            printAutoInd(f, "if isempty(soundDevs)")
+            printAutoInd(f, "error('failed to get any sound device!');")
+            printAutoInd(f, "end \n")
+            printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
+
+            iSubFunNum += 1
+
         if isEyelink:
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             printAutoInd(f, "% subfun {0}: initEyelink", iSubFunNum)
@@ -4892,29 +5270,34 @@ def compileCode(globalSelf, isDummyCompile):
             printAutoInd(f, "Eyelink('command', 'add_file_preamble_text ''Recorded for experiment {0}''');",
                          cFilenameOnly)
             """
-            todolist
+            todo list
             """
-            physWidth = cEyeTrackerProperty.get('Phys width', '')
-            physHeight = cEyeTrackerProperty.get('Phys height', '')
-            physDis = cEyeTrackerProperty.get('Phys distance', '')
+            physSizeList = parsePhysicSize(getDevPropertyValue(output_devices, cScreenName, 'Physic Size'))
+            physDisList = parsePhysicSize(getDevPropertyValue(output_devices, cScreenName, 'Viewing Distance'))
 
-            printAutoInd(f, "Eyelink('command','screen_phys_coords = %ld %ld %ld %ld',"
-                            " round(-{0}/2),round({1}/2),round({0}/2),round(-{1}/2)); % in mm\n",
-                         physWidth, physHeight)
+            if len(physSizeList) > 1:
+                printAutoInd(f, "Eyelink('command','screen_phys_coords = %ld %ld %ld %ld',"
+                                " round(-{0}/2),round({1}/2),round({0}/2),round(-{1}/2)); % in mm\n",
+                             physSizeList[0], physSizeList[1])
 
-            if len(physDis) > 0:
-                printAutoInd(f, "Eyelink('command','simulation_screen_distance = %ld',{0},{1});% in mm\n", physDis)
+            if physDisList[0] != 'NaN':
+                if len(physDisList) == 1:
+                    printAutoInd(f, "Eyelink('command','simulation_screen_distance = %ld',{0});% in mm\n",
+                                 physDisList[0])
+                else:
+                    printAutoInd(f, "Eyelink('command','simulation_screen_distance = %ld',{0},{1});% in mm\n",
+                                 physDisList[0], physDisList[1])
 
-            if cEyeTrackerProperty['Pupil size mode'] == 'area':
+            if cEyeTrackerProperty['Pupil Size Mode'] == 'area':
                 printAutoInd(f, "Eyelink('command','pupil_size_diameter = NO');")
             else:
                 printAutoInd(f, "Eyelink('command','pupil_size_diameter = YES');")
 
-            velThrStr = cEyeTrackerProperty.get('Saccade velocity threshold', '30')
+            velThrStr = cEyeTrackerProperty.get('Saccade Velocity Threshold', '30')
             if velThrStr == '':
                 velThrStr = 30
 
-            accelThrStr = cEyeTrackerProperty.get('Saccade acceleration threshold', '9500')
+            accelThrStr = cEyeTrackerProperty.get('Saccade Acceleration Threshold', '9500')
             if accelThrStr == '':
                 accelThrStr = 9500
 
@@ -5026,4 +5409,4 @@ def compileCode(globalSelf, isDummyCompile):
     copyYanglabFiles('OverwriteOrNot.p')
 
     if not isDummyPrint:
-        Func.log(f"Compile successful!:{compile_file_name}")  # print info to the output panel
+        Func.log(f"Compile successful!:{compile_file_name}")  # print info to the simple_info panel
