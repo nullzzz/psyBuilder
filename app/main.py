@@ -39,19 +39,25 @@ class Psy(QMainWindow):
         self.wait_dialog = WaitDialog()
         # save init state to restore the variable environment to its initial state
         # without any widgets even Timeline_0
-        if not os.path.exists(Info.InitFile):
-            self.store(Info.InitFile, False)
+        if not os.path.exists(Info.VarEnvFile):
+            self.store(Info.VarEnvFile, False)
         # load config
         Info.Psy = self
         Info.FILE_NAME = Settings("config.ini", Settings.IniFormat).value("file_path", "")
         Info.FILE_DIRECTORY = Settings("config.ini", Settings.IniFormat).value("file_directory", "")
         # if file name not none, we restore data from this file
         if Info.FILE_NAME:
-            if not self.restore(Info.FILE_NAME):
-                self.clear()
-                Func.print(
-                    f"The file {Info.FILE_NAME} you selected may be damaged, please check whether the file is correct.",
-                    2)
+            if Settings("config.ini", Settings.IniFormat).value("new", False):
+                # we init initial timeline => Timeline_0
+                self.initInitialTimeline()
+                self.store(Info.FILE_NAME, False)
+                Settings("config.ini", Settings.IniFormat).setValue("new", False)
+            else:
+                if not self.restore(Info.FILE_NAME):
+                    self.clear()
+                    Func.print(
+                        f"The file {Info.FILE_NAME} you selected may be damaged, please check whether the file is correct.",
+                        2)
         else:
             # we init initial timeline => Timeline_0
             self.initInitialTimeline()
@@ -875,7 +881,7 @@ class Psy(QMainWindow):
         :return:
         """
         self.clear()
-        self.restore(Info.InitFile, False)
+        self.restore(Info.VarEnvFile, False)
         self.initInitialTimeline()
 
     def setDockView(self, checked):

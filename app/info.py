@@ -154,6 +154,7 @@ class Info(object):
     #           new version info              #
     ###########################################
     # init file
+    VarEnvFile = "var_env.ini"
     InitFile = "init.ini"
     TempFile = "temp.ini"
 
