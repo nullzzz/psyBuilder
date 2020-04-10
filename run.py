@@ -313,6 +313,9 @@ class FileWindow(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    # set qss
+    app.setStyleSheet(qss)
+    # check open mode
     open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
     if open_mode == "default mode":
         # default open mode
@@ -324,6 +327,4 @@ if __name__ == '__main__':
         Settings("config.ini", Settings.IniFormat).setValue("file_directory", "")
         psy = Psy()
         psy.showMaximized()
-    # set qss
-    app.setStyleSheet(qss)
     sys.exit(app.exec_())
