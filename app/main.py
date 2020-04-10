@@ -82,7 +82,7 @@ class Psy(QMainWindow):
         open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
         self.changeOpenMode(open_mode)
         file_menu.addSeparator()
-        file_menu.addAction("Exit", sys.exit, QKeySequence(QKeySequence.Quit))
+        file_menu.addAction("Exit", sys.exit, QKeySequence("Ctrl+Q"))
         # view menu
         view_menu = menubar.addMenu("&View")
         self.attribute_action = QAction("&Attribute", self)
