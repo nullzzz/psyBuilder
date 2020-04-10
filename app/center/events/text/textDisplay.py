@@ -131,6 +131,10 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window.setProperties(properties)
         self.apply()
 
+    def getProperties(self) -> dict:
+        self.refresh()
+        return self.pro_window.getProperties()
+
     def store(self):
         """
         return necessary data for restoring this widget.
@@ -237,14 +241,28 @@ class TextDisplay(TabItemMainWindow):
         返回x坐标值
         :return:
         """
-        return self.x_pos
+        return self.default_properties.get("Frame").get("Center X")
 
     def getYAxisCoordinates(self) -> str:
         """
         返回y坐标值
         :return:
         """
-        return self.y_pos
+        return self.default_properties.get("Frame").get("Center Y")
+
+    def getWidth(self) -> str:
+        """
+        返回宽度
+        :return:
+        """
+        return self.default_properties.get("Frame").get("Width")
+
+    def getHeight(self) -> str:
+        """
+        返回高度
+        :return:
+        """
+        return self.default_properties.get("Frame").get("Height")
 
     def getEnable(self) -> str:
         """
@@ -257,26 +275,12 @@ class TextDisplay(TabItemMainWindow):
         """返回frame transparent"""
         return self.pro_window.frame.transparent.text()
 
-    def getWidth(self) -> str:
-        """
-        返回宽度
-        :return:
-        """
-        return self.w_size
-
-    def getHeight(self) -> str:
-        """
-        返回高度
-        :return:
-        """
-        return self.h_size
-
     def getBorderColor(self) -> str:
         """
         返回边框颜色
         :return:
         """
-        return self.pro_window.frame.border_color.currentText()
+        return self.pro_window.frame.border_color.getColor()
 
     def getBorderWidth(self) -> str:
         """
@@ -285,7 +289,7 @@ class TextDisplay(TabItemMainWindow):
         """
         return self.pro_window.frame.border_width.currentText()
 
-    def getFrameBackColor(self) -> str:
+    def getFrameFillColor(self) -> str:
         """
         返回边框背景色
         :return:
@@ -304,18 +308,17 @@ class TextDisplay(TabItemMainWindow):
         返回输出设备
         :return:
         """
-        return self.pro_window.duration.default_properties.get("Output devices", {})
+        return self.pro_window.duration.default_properties.get("Output Devices", {})
 
     def getInputDevice(self) -> dict:
         """
         返回输入设备
         :return: 输入设备字典
         """
-        return self.pro_window.duration.default_properties.get("Input devices", {})
+        return self.pro_window.duration.default_properties.get("Input Devices", {})
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
 
-    """
-    Functions that must be complete in new version
-    """
+    def get(self):
+        self.property()

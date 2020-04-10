@@ -16,6 +16,7 @@ class Scene(QGraphicsScene):
     def __init__(self, parent=None):
         super(Scene, self).__init__(parent)
 
+        # self.addLine(0, 0, 100, 100)
         self.my_mode = Scene.InsertItem
 
         self.attributes: list = []
@@ -125,9 +126,22 @@ class Scene(QGraphicsScene):
 
     def mouseMoveEvent(self, event):
         if self.my_mode == self.InsertLine and self.line:
-            new_line = QLineF(self.line.line().p1(), event.scenePos())
+            line = self.line.line()
+            p2 = event.scenePos()
+            # straight line
+            if event.modifiers() == Qt.ControlModifier:
+                dx = p2.x() - line.x1()
+                dy = p2.y() - line.y1()
+                if dx < 10:
+                    p2.setX(line.x1())
+                if dy < 10:
+                    p2.setY(line.y1())
+            new_line = QLineF(line.p1(), p2)
             self.line.setLine(new_line)
         elif self.my_mode == self.MoveItem or self.my_mode == self.InsertItem:
+            item = self.mouseGrabberItem()
+            if hasattr(item, "setPosition"):
+                item.setPosition()
             self.update()
             super(Scene, self).mouseMoveEvent(event)
         # 套索模式
@@ -143,7 +157,12 @@ class Scene(QGraphicsScene):
 
     def mouseReleaseEvent(self, mouseEvent):
         if self.line and self.my_mode == self.InsertLine:
-            item = LineItem(self.line.line())
+            item = LineItem(LineItem.Line)
+            l: QLineF = self.line.line()
+            cx, cy = self.line.line().center().x(), self.line.line().center().y()
+            item.setPos(self.line.line().center())
+            line = QLineF(l.x1() - cx, l.y1() - cy, l.x2() - cx, l.y2() - cy)
+            item.setLine(line)
             item.setPosition()
             self.addItem(item)
             self.itemAdd.emit(item.getName())
@@ -188,16 +207,7 @@ class Scene(QGraphicsScene):
             elif k.startswith(Info.ITEM_CIRCLE):
                 item = DiaItem(DiaItem.Circle, k)
             elif k.startswith(Info.ITEM_LINE):
-                x1: str = v.get("X1")
-                y1: str = v.get("Y1")
-                x2: str = v.get("X2")
-                y2: str = v.get("Y2")
-                if x1.startswith("[") or x2.startswith("[") or y1.startswith("[") or y2.startswith("["):
-                    line = QLineF(100, 100, 200, 200)
-                else:
-                    line = QLineF(float(x1), float(y1), float(x2), float(y2))
-                item = LineItem(line, k)
-                item.setLine(line)
+                item = LineItem(LineItem.Line, k)
 
             self.addItem(item)
             item.setProperties(v)
@@ -210,7 +220,7 @@ class Scene(QGraphicsScene):
 
     def copyItem(self, item: QGraphicsItem):
         new_item = item.clone()
-        new_pos = QPointF(item.pos().x() + 20, item.pos().y() + 20)
+        new_pos = QPointF(item.scenePos().x() + 20, item.scenePos().y() + 20)
         self.addItem(new_item)
         new_item.setPos(new_pos)
         new_item.setPosition()

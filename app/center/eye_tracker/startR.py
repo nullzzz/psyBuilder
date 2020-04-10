@@ -159,7 +159,3 @@ class StartR(TabItemWidget):
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)
-
-    """
-    Functions that must be complete in new version
-    """

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout
 
 from app.func import Func
 from lib import TabItemWidget
+from .case import Case
 from .caseArea import CaseArea
 from .condition import SwitchCondition
 
@@ -74,6 +75,9 @@ class Switch(TabItemWidget):
     def getInfo(self):
         return self.getProperties()
 
+    def getUsingDeviceCount(self) -> int:
+        return self.case_area.getUsingDeviceCount()
+
     def getProperties(self):
         self.refresh()
         return self.default_properties
@@ -114,6 +118,8 @@ class Switch(TabItemWidget):
 
     def getSubWidgetId(self):
         sub_wid = []
-        for c in self.case_area.case_list:
-            sub_wid.append(c.widget_id)
+        for case in self.case_area.case_list:
+            case: Case
+            if wid := case.getSubWid():
+                sub_wid.append(wid)
         return sub_wid

@@ -1,5 +1,5 @@
 import numpy as np
-from PyQt5.QtCore import QPointF, QRectF, QPoint, Qt
+from PyQt5.QtCore import QRectF, QPoint, Qt
 from PyQt5.QtGui import QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPolygonItem
 
@@ -71,7 +71,6 @@ class DiaItem(QGraphicsPolygonItem):
         self.keep_resize = False
         self.resizingFlag = False
 
-        self.center = QPointF(0, 0)
         self.fill_color = '0,0,0'
         self.border_color = '255,255,255'
         self.border_width = 1
@@ -99,32 +98,26 @@ class DiaItem(QGraphicsPolygonItem):
         self.border_width = width
         self.pro_window.general.setBorderWidth(width)
 
-    def mouseMoveEvent(self, mouseEvent):
-        x = mouseEvent.pos().x()
-        y = mouseEvent.pos().y()
+    def mouseMoveEvent(self, event):
+        x = event.pos().x()
+        y = event.pos().y()
 
         bounding_rect = self.polygon().boundingRect()
 
         height = bounding_rect.height()
         width = bounding_rect.width()
 
-        # 非等比例
+        # Non equal proportion
         if self.arbitrary_resize:
             self.resizingFlag = True
-        # 等比例
+        # Equal proportion
         if self.keep_resize:
             self.resizingFlag = True
 
-            if height < 5:
-                height = 5
-
-            if width < 5:
-                width = 5
-
             # make sure the zoom in/out ratio equal for h and w
-            ratio = height / width
+            ratio = height / width  # positive
 
-            if (y - height) / (x - width) > ratio:
+            if (y - height) > ratio * (x - width):
                 y = ratio * (x - width) + height
             else:
                 x = (y - height) / ratio + width
@@ -145,9 +138,9 @@ class DiaItem(QGraphicsPolygonItem):
 
             elif self.item_type == self.Arc:
                 path.moveTo(new_rect.center())
-                __start_angle = self.default_properties["Angle Start"]
+                __start_angle = self.properties["Angle Start"]
                 start_angle = 0 if __start_angle.startswith("[") else float(__start_angle)
-                __angle_length = self.default_properties["Angle Length"]
+                __angle_length = self.properties["Angle Length"]
                 angle_length = 0 if __angle_length.startswith("[") else float(__angle_length)
 
                 path.arcTo(new_rect, start_angle, angle_length)
@@ -156,49 +149,45 @@ class DiaItem(QGraphicsPolygonItem):
                 path.addRect(new_rect)
 
             elif self.item_type == self.Polygon:
-
                 h_ratio = (x - x0) / width
                 v_ratio = (y - y0) / height
-
                 if self.keep_resize:
                     if h_ratio > v_ratio:
                         v_ratio = h_ratio
                     else:
                         h_ratio = v_ratio
 
-                for iVertex in range(len(self.polygon())):
-                    cX = self.polygon().value(iVertex).x() * h_ratio
-                    cY = self.polygon().value(iVertex).y() * v_ratio
+                for v in range(len(self.polygon())):
+                    c_x = self.polygon().value(v).x() * h_ratio
+                    c_y = self.polygon().value(v).y() * v_ratio
 
-                    if iVertex == 0:
-                        path.moveTo(cX, cY)
+                    if v == 0:
+                        path.moveTo(c_x, c_y)
                     else:
-                        path.lineTo(cX, cY)
+                        path.lineTo(c_x, c_y)
             else:
                 raise Exception("item_type should be of 'Arc','rectangle', or 'circle' !!")
 
             self.mPolygon = path.toFillPolygon()
             self.setPolygon(self.mPolygon)
             self.update()
-
-            bound_rect = self.polygon().boundingRect()
-            self.center = bound_rect.center()
+            self.setPosition()
 
         else:
-            super(DiaItem, self).mouseMoveEvent(mouseEvent)
+            super(DiaItem, self).mouseMoveEvent(event)
 
-    def mousePressEvent(self, mouseEvent):
-        if mouseEvent.button() != Qt.LeftButton:
+    def mousePressEvent(self, event):
+        if event.button() != Qt.LeftButton:
             return
-        if mouseEvent.modifiers() == Qt.AltModifier:
+        if event.modifiers() == Qt.AltModifier:
             self.arbitrary_resize = True
             self.setCursor(Qt.SizeAllCursor)
 
-        elif mouseEvent.modifiers() == Qt.ShiftModifier:
+        elif event.modifiers() == Qt.ShiftModifier:
             self.keep_resize = True
             self.setCursor(Qt.SizeAllCursor)
 
-        super(DiaItem, self).mousePressEvent(mouseEvent)
+        super(DiaItem, self).mousePressEvent(event)
 
     def mouseReleaseEvent(self, mouseEvent):
         self.unsetCursor()
@@ -255,6 +244,7 @@ class DiaItem(QGraphicsPolygonItem):
         self.setZValue(z)
 
     def clone(self):
+        self.updateInfo()
         new = DiaItem(self.item_type)
         new.setProperties(self.default_properties.copy())
         new.changeSomething()
@@ -265,7 +255,6 @@ class DiaItem(QGraphicsPolygonItem):
         cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
         __cy = self.properties["Center Y"]
         cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
-
         self.setPos(QPoint(cx, cy))
 
         # fill color
@@ -346,6 +335,7 @@ class DiaItem(QGraphicsPolygonItem):
         self.mPolygon = path.toFillPolygon()
         self.setPolygon(self.mPolygon)
         self.update()
+        self.setPosition()
 
     ##############
     # change from main window
@@ -353,6 +343,8 @@ class DiaItem(QGraphicsPolygonItem):
     def setPosition(self):
         if self.item_type == self.Polygon:
             self.setVertex()
+        if self.item_type in (self.Arc, self.Rect, self.Circle):
+            self.setWh()
         self.pro_window.general.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def setWh(self):

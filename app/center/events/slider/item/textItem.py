@@ -4,8 +4,6 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsItem
 
 from app.func import Func
 from app.info import Info
-# 画图
-from ..item.itemMenu import ItemMenu
 from ..item.text import TextProperty
 
 
@@ -28,8 +26,6 @@ class TextItem(QGraphicsTextItem):
 
         self.item_name = item_name if item_name else self.generateItemName()
 
-        self.attributes: list = []
-
         self.pro_window = TextProperty()
 
         self.setPlainText('Hello World')
@@ -48,16 +44,17 @@ class TextItem(QGraphicsTextItem):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
+        self.properties = self.pro_window.default_properties
         self.default_properties = {
-            'Name': 'text',
+            'Name': self.item_name,
             'Font Family': 'SimSun',
             'Font Size': '20',
             'Text': 'Hello World',
             'Z': self.zValue(),
             'X': 1,
             'Y': 1,
+            "Properties": self.properties,
         }
-        self.menu = ItemMenu()
 
     def generateItemName(self) -> str:
         name = self.name[self.item_type]
@@ -75,7 +72,6 @@ class TextItem(QGraphicsTextItem):
         self.pro_window.show()
 
     def setAttributes(self, attributes):
-        self.attributes = attributes
         self.pro_window.setAttributes(attributes)
 
     def ok(self):
@@ -100,18 +96,15 @@ class TextItem(QGraphicsTextItem):
 
         text = self.toPlainText()
 
-        x = self.default_properties.get("Center X")
-        y = self.default_properties.get("Center Y")
-        z = self.default_properties.get("Z")
+        x = self.properties.get("Center X")
+        y = self.properties.get("Center Y")
 
-        style = self.default_properties.get("Style")
-        foreColor = self.default_properties.get("Fore Color")
-        backColor = self.default_properties.get("Back Color")
-        family = self.default_properties.get("Font Family")
-        size = self.default_properties.get("Font Size")
-        transparent = self.default_properties.get("Transparent")
+        style = self.properties.get("Style")
+        fore_color = self.properties.get("Fore Color")
+        back_color = self.properties.get("Back Color")
+        family = self.properties.get("Font Family")
+        size = self.properties.get("Font Size")
 
-        z = float(z)
         #  handle the ref values
         x = 0 if Func.isCitingValue(x) else int(x)
         y = 0 if Func.isCitingValue(y) else int(y)
@@ -119,16 +112,15 @@ class TextItem(QGraphicsTextItem):
         if Func.isCitingValue(style):
             style = 0
 
-        foreColor = "0,0,0" if Func.isCitingValue(foreColor) else foreColor
-        backColor = "255,255,255" if Func.isCitingValue(backColor) else backColor
+        fore_color = "0,0,0" if Func.isCitingValue(fore_color) else fore_color
+        back_color = "255,255,255" if Func.isCitingValue(back_color) else back_color
         family = "Times" if Func.isCitingValue(family) else family
         size = 20 if Func.isCitingValue(size) else int(size)
-        transparent = "100%" if Func.isCitingValue(transparent) else transparent
 
         # create html
         html = f'<body style = "font-size: {size}pt; "font-family: {family}">\
-                        <p style = "background-color: rgb({backColor})">\
-                        <font style = "color: rgb({foreColor})">\
+                        <p style = "background-color: rgb({back_color})">\
+                        <font style = "color: rgb({fore_color})">\
                          {text}</font></p></body>'
 
         font = QFont()
@@ -169,38 +161,32 @@ class TextItem(QGraphicsTextItem):
 
         self.setHtml(html)
         self.setPos(x, y)
-        self.setZValue(z)
 
     def getText(self) -> str:
         return self.toPlainText()
 
     def setProperties(self, properties: dict):
-        if isinstance(properties, dict):
-            self.default_properties = properties
-            self.pro_window.setProperties(properties)
-            self.loadSetting()
+        self.pro_window.setProperties(properties.get("Properties"))
+        self.default_properties["X"] = properties["X"]
+        self.default_properties["Y"] = properties["Y"]
+        self.default_properties["Z"] = properties["Z"]
+        self.loadSetting()
 
     def setPosition(self):
         self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def loadSetting(self):
-        # x = self.info.get("x", 0)
-        # y = self.info.get("y", 0)
-        # z = self.info.get("z", 0)
-        # self.setPos(x, y)
-        # self.setZValue(z)
-
-        self.changeSomething()
+        x = self.default_properties.get("X", 0)
+        y = self.default_properties.get("Y", 0)
+        z = self.default_properties.get("Z", 0)
+        self.setPos(x, y)
+        self.setZValue(z)
 
     def clone(self):
+        self.updateInfo()
         new = TextItem(self.item_type)
-        properties = self.pro_window.getInfo()
-        new.pro_window.setProperties(properties)
-
-        new.setPlainText(self.toPlainText())  # maybe a bug here
-        new.setTextInteractionFlags(Qt.TextEditorInteraction)
-        new.setZValue(self.zValue())
-
+        new.setProperties(self.default_properties.copy())
+        new.changeSomething()
         return new
 
     def setZValue(self, z: float) -> None:

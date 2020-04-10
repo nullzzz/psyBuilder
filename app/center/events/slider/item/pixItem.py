@@ -6,7 +6,6 @@ from app.func import Func
 from app.info import Info
 # 画图
 from ..item.image import ImageProperty
-from ..item.itemMenu import ItemMenu
 from ..item.sound import SoundProperty
 from ..item.video import VideoProperty
 
@@ -30,14 +29,9 @@ class PixItem(QGraphicsPixmapItem):
 
         self.item_name = item_name if item_name else self.generateItemName()
 
-        self.attributes: list = []
         if self.item_type == self.Image:
             self.pro_window = ImageProperty()
             self.setPixmap(QPixmap(Func.getImage("image.png")).scaled(100, 100))
-        # elif self.item_type == self.Text:
-        #     self.pro_window = TextProperty()
-        #     # insert new text item here
-        #     self.setPixmap(QPixmap(Func.getImage("text.png")).scaled(100, 100))
         elif self.item_type == self.Video:
             self.pro_window = VideoProperty()
             self.setPixmap(QPixmap(Func.getImage("video.png")).scaled(100, 100))
@@ -51,9 +45,6 @@ class PixItem(QGraphicsPixmapItem):
 
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        # self.flag = False
-        # self.arbitrary_resize = False
-        # self.keep_resize = False
 
         self.properties = self.pro_window.default_properties
         self.default_properties = {
@@ -63,8 +54,6 @@ class PixItem(QGraphicsPixmapItem):
             'Y': 1,
             "Properties": self.properties
         }
-
-        self.menu = ItemMenu()
 
     def generateItemName(self) -> str:
         name = self.name[self.item_type]
@@ -76,44 +65,6 @@ class PixItem(QGraphicsPixmapItem):
     def getName(self):
         return self.item_name
 
-    # ！！！ 别删
-    # def mousePressEvent(self, event):
-    #     if self.item_type < 8:
-    #         if event.button() == Qt.LeftButton and event.modifiers() == Qt.AltModifier:
-    #             self.arbitrary_resize = True
-    #             self.setCursor(Qt.SizeAllCursor)
-    #         elif event.button() == Qt.LeftButton and event.modifiers() == Qt.ShiftModifier:
-    #             self.keep_resize = True
-    #             self.setCursor(Qt.SizeAllCursor)
-    #         else:
-    #             super(PixItem, self).mousePressEvent(event)
-    #     else:
-    #         super(PixItem, self).mousePressEvent(event)
-    #
-    # def mouseMoveEvent(self, event):
-    #     x = event.pos().x()
-    #     y = event.pos().y()
-    #     if self.arbitrary_resize:
-    #         self.flag = True
-    #     if self.keep_resize:
-    #         self.flag = True
-    #         if x > y:
-    #             x = y
-    #         else:
-    #             y = x
-    #     if self.flag:
-    #         self.setPixmap(QPixmap(Func.getImage(f"{self.name[self.item_type]}.png")).scaled(x, y))
-    #         self.update()
-    #     else:
-    #         super(PixItem, self).mouseMoveEvent(event)
-    #
-    # def mouseReleaseEvent(self, event):
-    #     self.unsetCursor()
-    #     self.arbitrary_resize = False
-    #     self.keep_resize = False
-    #     self.flag = False
-    #     super(PixItem, self).mouseReleaseEvent(event)
-
     def mouseDoubleClickEvent(self, event):
         self.openPro()
 
@@ -123,7 +74,6 @@ class PixItem(QGraphicsPixmapItem):
         self.pro_window.show()
 
     def setAttributes(self, attributes):
-        self.attributes = attributes
         self.pro_window.setAttributes(attributes)
 
     def ok(self):
@@ -171,6 +121,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setZValue(z)
 
     def clone(self):
+        self.updateInfo()
         new = PixItem(self.item_type)
         new.setProperties(self.default_properties.copy())
         new.changeSomething()

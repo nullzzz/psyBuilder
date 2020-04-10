@@ -58,6 +58,9 @@ class Case(QGroupBox):
 
         self.setMaximumHeight(300)
 
+    def refresh(self):
+        self.icon_choose.refresh()
+
     def setNotAdd(self, no=True):
         self.add_bt.setEnabled(not no)
 
@@ -102,5 +105,8 @@ class Case(QGroupBox):
     def getCase(self) -> dict:
         return {
             "Case Value": self.default_properties.get("Case value", ""),
-            **self.icon_choose.getInfo(),
+            **self.icon_choose.default_properties,
         }
+
+    def getSubWid(self):
+        return self.icon_choose.current_sub_wid

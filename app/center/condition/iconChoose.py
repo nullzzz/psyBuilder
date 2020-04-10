@@ -209,6 +209,11 @@ class IconChoose(QWidget):
     def getWidgetId(self) -> str:
         return self.current_sub_wid
 
+    def getUsingDeviceCount(self):
+        if self.widget:
+            return self.widget.getUsingDeviceCount()
+        return 0
+
 
 class IconLabel(QLabel):
     doubleClick = pyqtSignal()

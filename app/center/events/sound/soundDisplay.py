@@ -351,14 +351,14 @@ class SoundDisplay(TabItemMainWindow):
         返回输出设备
         :return:
         """
-        return self.pro_window.duration.default_properties.get("Output devices", {})
+        return self.pro_window.duration.default_properties.get("Output Devices", {})
 
     def getInputDevice(self) -> dict:
         """
         返回输入设备
         :return: 输入设备字典
         """
-        return self.pro_window.duration.default_properties.get("Input devices", {})
+        return self.pro_window.duration.default_properties.get("Input Devices", {})
 
     def getPropertyByKey(self, key: str):
         return self.default_properties.get(key)

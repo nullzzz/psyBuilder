@@ -108,8 +108,8 @@ class IfBranch(TabItemWidget):
     def apply(self):
         self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
-        self.attributes = Func.getAttributes(self.widget_id)
-        self.setAttributes(self.attributes)
+        attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(attributes)
 
     def setProperties(self, properties: dict):
         self.condition_area.setProperties(properties.get("Condition"))
@@ -141,6 +141,8 @@ class IfBranch(TabItemWidget):
         self.true_icon_choose.setAttributes(format_attributes)
         self.false_icon_choose.setAttributes(format_attributes)
 
+    def getUsingDeviceCount(self) -> int:
+        return self.true_icon_choose.getUsingDeviceCount() + self.false_icon_choose.getUsingDeviceCount()
 
     def getCondition(self) -> str:
         """
@@ -154,13 +156,13 @@ class IfBranch(TabItemWidget):
         获取信息，包括Event name等
         :return:
         """
-        return self.true_icon_choose.getInfo()
+        return self.true_icon_choose.getProperties()
 
     def getTrueWidget(self):
         return self.true_icon_choose.getWidget()
 
     def getFalseWidgetInfo(self) -> dict:
-        return self.false_icon_choose.getInfo()
+        return self.false_icon_choose.getProperties()
 
     def getFalseWidget(self):
         return self.false_icon_choose.getWidget()

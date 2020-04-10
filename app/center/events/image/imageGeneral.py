@@ -19,7 +19,6 @@ class ImageTab1(QWidget):
             "Rotate": "0",
             "Stretch": False,
             "Stretch Mode": "Both",
-            "Back Color": "white",
             "Transparent": "100%",
             "Clear After": "Yes",
             "Screen Name": "screen_0"

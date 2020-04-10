@@ -140,6 +140,10 @@ class ArcGeneral(QWidget):
         if not self.border_color.currentText().startswith("["):
             self.border_color.setCurrentText(rgb)
 
+    def setBorderWidth(self, width: str):
+        if not self.border_width.text().startswith("["):
+            self.border_width.setText(width)
+
     # 加载参数设置
     def loadSetting(self):
         self.cx_pos.setText(self.default_properties["Center X"])
