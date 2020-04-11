@@ -33,7 +33,7 @@ class Version(QTextEdit):
         """)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setFixedHeight(120)
+        self.setFixedHeight(70)
 
     def enterEvent(self, QEvent):
         super(Version, self).enterEvent(QEvent)
@@ -168,7 +168,7 @@ class FileButtonArea(QWidget):
         layout = QGridLayout()
         for i in range(6):
             layout.setColumnStretch(i, 1)
-        layout.addWidget(icon, 0, 1, 1, 4, Qt.AlignHCenter)
+        layout.addWidget(icon, 0, 1, 1, 5, Qt.AlignHCenter)
         layout.setRowStretch(0, 13)
         layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, -1)
         layout.setRowStretch(1, 12)
