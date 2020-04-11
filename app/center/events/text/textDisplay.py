@@ -17,9 +17,6 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window = TextProperty()
         self.default_properties = self.pro_window.default_properties
 
-        self.html = self.pro_window.html
-        self.font = self.pro_window.font
-
         self.pro_window.general.text_edit.setDocument(self.text_label.document())
 
         self.lighter = AttributeHighlighter(self.text_label.document())
