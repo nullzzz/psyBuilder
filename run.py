@@ -98,6 +98,7 @@ class FilePathTable(TableWidget):
         self.setStyleSheet("border:none;border-right:1px solid rgb(236,236,236);background:white;")
         # hide headers
         self.horizontalHeader().setVisible(False)
+        self.horizontalScrollBar().setVisible(False)
         self.verticalHeader().setVisible(False)
         # one column
         self.setColumnCount(2)
