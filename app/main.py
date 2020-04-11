@@ -1029,14 +1029,14 @@ class Psy(QMainWindow):
         Info.WidgetTypeCount.clear()
         Info.WidgetNameCount.clear()
 
-    def showMaximized(self):
-        """
-
-        :return:
-        """
-        super(Psy, self).showMaximized()
-        self.animation = QPropertyAnimation(self, b"windowOpacity")
-        self.animation.setDuration(1000)
-        self.animation.setStartValue(0)
-        self.animation.setEndValue(1)
-        self.animation.start()
+    # def showMaximized(self):
+    #     """
+    #
+    #     :return:
+    #     """
+    #     super(Psy, self).showMaximized()
+    #     self.animation = QPropertyAnimation(self, b"windowOpacity")
+    #     self.animation.setDuration(0)
+    #     self.animation.setStartValue(0)
+    #     self.animation.setEndValue(1)
+    #     self.animation.start()
