@@ -3,7 +3,6 @@ import re
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
-from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QLabel, QMenu, QGridLayout, \
     QFrame
 
@@ -34,7 +33,6 @@ class Version(QTextEdit):
         """)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setFixedHeight(120)
 
     def enterEvent(self, QEvent):
         super(Version, self).enterEvent(QEvent)
@@ -137,6 +135,8 @@ class FilePathTable(TableWidget):
             if self.cellWidget(row, 0).file_path == file_path:
                 self.removeRow(row)
                 break
+        if not self.rowCount():
+            self.hide()
 
 
 class FileButtonArea(QWidget):
@@ -169,13 +169,13 @@ class FileButtonArea(QWidget):
         layout = QGridLayout()
         for i in range(6):
             layout.setColumnStretch(i, 1)
-        layout.addWidget(icon, 0, 1, 1, 4, Qt.AlignHCenter)
+        layout.addWidget(icon, 0, 1, 1, 5, Qt.AlignHCenter)
         layout.setRowStretch(0, 13)
-        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, 4)
+        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, -1)
         layout.setRowStretch(1, 12)
         layout.addWidget(create_button, 2, 2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(2, 1)
-        layout.addWidget(open_button, 3,2, 1, 2, Qt.AlignLeft)
+        layout.addWidget(open_button, 3, 2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(3, 1)
         layout.addWidget(setting_button, 4, 2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(4, 1)
