@@ -3,7 +3,7 @@ import re
 import sys
 import traceback
 
-from PyQt5.QtCore import Qt, QPropertyAnimation
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu
 
@@ -15,13 +15,13 @@ from .center.events import Cycle, ImageDisplay, Slider, SoundDisplay, TextDispla
 from .center.eyeTracker import EyeCalibrate, EyeDC, EndR, Close, StartR
 from .center.quest import QuestUpdate
 from .center.timeline import Timeline
+from .deviceSystem.Yun import TianBianYiDuoYun
 from .func import Func
 from .info import Info
 from .menubar.aboutUs import AboutUs
 from .menubar.compile_PTB import compilePTB
 from .menubar.registry import writeToRegistry
 from .menubar.update import Update
-from .deviceSystem.Yun import TianBianYiDuoYun
 from .output import Output
 from .properties import Properties
 from .structure import Structure
@@ -426,24 +426,35 @@ class Psy(QMainWindow):
         # start wait
         self.startWait()
         # do job
-        # refer widget firstly
-        self.referWidget(origin_widget_id, new_widget_id)
+        widget_name = Func.getWidgetName(origin_widget_id)
+        origin_children = Func.getWidgetChildren(origin_widget_id)
+        self.referNodeRecursive(parent_widget_id, new_widget_id, origin_widget_id, widget_name, index, origin_children)
         # we should consider a lot of things here because of reference.
         # we also need add node in those reference parents
-        # add node in origin parent node
-        widget_name = Func.getWidgetName(origin_widget_id)
-        self.structure.addNode(parent_widget_id, new_widget_id, widget_name, index)
         # add node in refer parent node
         refer_parent_widget_ids = Func.getWidgetReference(parent_widget_id)
         for refer_parent_widget_id in refer_parent_widget_ids:
             # we need exclude origin parent widget id
             if refer_parent_widget_id != parent_widget_id:
-                # refer widget
-                refer_widget_id = self.referWidget(new_widget_id)
-                # add refer node in refer parent
-                self.structure.addNode(refer_parent_widget_id, refer_widget_id, widget_name, index)
+                self.referNodeRecursive(refer_parent_widget_id, Info.ERROR_WIDGET_ID, origin_widget_id, widget_name,
+                                        index, origin_children)
         # end wait
         self.endWait()
+
+    def referNodeRecursive(self, parent_widget_id: str, widget_id: str, origin_widget_id: str,
+                           widget_name: str, index: int, origin_children: list):
+        """
+        refer node and children
+        """
+        # refer widget firstly
+        widget_id = self.referWidget(origin_widget_id, widget_id)
+        self.structure.addNode(parent_widget_id, widget_id, widget_name, index)
+        # if reference node has children, we also need to refer those nodes
+        for i in range(len(origin_children)):
+            origin_child_widget_id, child_widget_name = origin_children[i]
+            origin_child_children = Func.getWidgetChildren(origin_child_widget_id)
+            self.referNodeRecursive(widget_id, Info.ERROR_WIDGET_ID, origin_child_widget_id, child_widget_name, i,
+                                    origin_child_children)
 
     def handleItemMoved(self, origin_parent_widget_id: str, dest_parent_widget_id: str, widget_id: str,
                         origin_index: int, dest_index: int):
