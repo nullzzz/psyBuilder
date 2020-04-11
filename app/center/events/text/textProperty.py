@@ -18,8 +18,6 @@ class TextProperty(QWidget):
         self.frame.y_pos.setCurrentText("50%")
         self.duration = DurationPage()
 
-        self.html = self.general.html
-
         self.default_properties = {
             "General": self.general.default_properties,
             "Frame": self.frame.default_properties,
@@ -69,9 +67,6 @@ class TextProperty(QWidget):
         self.frame.setAttributes(attributes)
         self.duration.setAttributes(attributes)
 
-    def setOther(self, html: str = ""):
-        self.html = html
-
     def setProperties(self, properties: dict):
         self.general.setProperties(properties["General"])
         self.frame.setProperties(properties["Frame"])
@@ -87,6 +82,3 @@ class TextProperty(QWidget):
         self.frame.loadSetting()
         self.duration.loadSetting()
 
-    def testHtml(self):
-        html = self.general.text_edit.toHtml()
-        self.general.text_edit.setHtml(html)
