@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QIcon, QFontMetrics, QPixmap, QPalette
+from PyQt5.QtGui import QIcon, QFontMetrics, QPixmap, QPalette, QBrush, QColor, QPainter
 from PyQt5.QtWidgets import QWidget, QTextEdit, QLabel, QFrame, QVBoxLayout, QHBoxLayout
 
 from app.func import Func
@@ -17,12 +17,22 @@ class AboutUs(QWidget):
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(QPalette.Background, Qt.white)
+
+        cBkIm = QPixmap(Func.getImage("soochowUn.png"))
+
+        # cBkIm.scaled(self.size(),Qt.ignoreAspectRation)
+        # cBrush = QBrush(cBkIm.scaled(self.size(), Qt.KeepAspectRatioByExpanding))
+        # # cBrush.setStyle(Qt.RadialGradientPattern)
+        # p.setBrush(QPalette.Base, cBrush)
+
         self.setPalette(p)
 
         info = QTextEdit(self)
         info.setReadOnly(True)
         info.setTextInteractionFlags(Qt.NoTextInteraction)
         info.setFrameShape(QFrame.NoFrame)
+
+        # info.setTextBackgroundColor()
         info.setHtml("<b>PTB Builder (ver 0.1)</b> for Psychtoolbox 3 under MATLAB "
                      "was developed by the group leaded by Prof. "
                      "<a style='color: blue;' href=\"http://web.suda.edu.cn/yzhangpsy/index.html\">Yang Zhang</a> "
@@ -33,6 +43,10 @@ class AboutUs(QWidget):
                      "is designed for research purposes only and not to be used for "
                      "any business purpose, such as, but not limited to, business training)."
                      )
+
+        cP = info.palette()
+        cP.setColor(QPalette.Base,QColor(255,255,255,0))
+        info.setPalette(cP)
 
         info.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         info.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
