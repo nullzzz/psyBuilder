@@ -113,7 +113,7 @@ class Switch(TabItemWidget):
         :return: [case1, case2, ...]
         case1: dict
         """
-        return self.default_properties.get("Case", "")
+        return self.default_properties.get("Case", {})
 
     def getCases(self):
         return [case.getCase() for case in self.case_area.case_list]

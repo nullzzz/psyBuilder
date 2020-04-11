@@ -23,10 +23,8 @@ class TextTab1(QWidget):
             "Clear After": "Yes"
         }
 
-        # todo: highlight of variable
         self.text_edit = SmartTextEdit()
         self.text_edit.setLineWrapMode(QTextEdit.FixedColumnWidth)
-        self.html = ""
         self.align_mode = "center"
 
         self.align_x = VarComboBox()
@@ -270,7 +268,7 @@ class TextTab1(QWidget):
         self.style_box.setCompleter(QCompleter(attributes))
 
     def updateInfo(self):
-        self.default_properties["Html"] = self.html
+        self.default_properties["Html"] = self.text_edit.toHtml()
         self.default_properties["Text"] = self.text_edit.toPlainText()
         self.default_properties["Alignment X"] = self.align_x.currentText()
         self.default_properties["Alignment Y"] = self.align_y.currentText()
