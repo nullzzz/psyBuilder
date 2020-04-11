@@ -34,7 +34,7 @@ class Version(QTextEdit):
         """)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setFixedHeight(120)
+        self.setFixedHeight(70)
 
     def enterEvent(self, QEvent):
         super(Version, self).enterEvent(QEvent)
@@ -160,7 +160,7 @@ class FileButtonArea(QWidget):
         # buttons
         create_button = HoverButton("menu/add", "Create New File")
         create_button.clicked.connect(self.handleCreateButtonClicked)
-        open_button = HoverButton("menu/open", "Open")
+        open_button = HoverButton("menu/open", "Open existed file")
         open_button.clicked.connect(self.handleOpenButtonClicked)
         setting_button = HoverButton("menu/setting", "Change Open Mode")
         setting_button.clicked.connect(
@@ -171,7 +171,7 @@ class FileButtonArea(QWidget):
             layout.setColumnStretch(i, 1)
         layout.addWidget(icon, 0, 1, 1, 4, Qt.AlignHCenter)
         layout.setRowStretch(0, 13)
-        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, 4)
+        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, -1)
         layout.setRowStretch(1, 12)
         layout.addWidget(create_button, 2, 2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(2, 1)
