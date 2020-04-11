@@ -463,12 +463,6 @@ class Slider(TabItemMainWindow):
     ####################
     # single property
     ###################
-    def getDuration(self) -> str:
-        """
-        返回duration
-        :return:
-        """
-        return self.pro_window.duration.duration.currentText()
 
     def getClearAfter(self) -> str:
         """
@@ -484,19 +478,86 @@ class Slider(TabItemMainWindow):
         """
         return self.pro_window.general.screen_name.currentText()
 
+    def getXAxisCoordinates(self) -> str:
+        """
+        返回x坐标值
+        :return:
+        """
+        return self.default_properties.get("Properties").get("Frame").get("Center X")
+
+    def getYAxisCoordinates(self) -> str:
+        """
+        返回y坐标值
+        :return:
+        """
+        return self.default_properties.get("Properties").get("Frame").get("Center Y")
+
+    def getWidth(self) -> str:
+        """
+        返回宽度
+        :return:
+        """
+        return self.default_properties.get("Properties").get("Frame").get("Width")
+
+    def getHeight(self) -> str:
+        """
+        返回高度
+        :return:
+        """
+        return self.default_properties.get("Properties").get("Frame").get("Height")
+
+    def getEnable(self) -> str:
+        """
+        返回frame enable
+        :return:
+        """
+        return self.pro_window.frame.enable.currentText()
+
+    def getFrameTransparent(self) -> str:
+        """返回frame transparent"""
+        return self.pro_window.frame.transparent.text()
+
+    def getBorderColor(self) -> str:
+        """
+        返回边框颜色
+        :return:
+        """
+        return self.pro_window.frame.border_color.getColor()
+
+    def getBorderWidth(self) -> str:
+        """
+        返回边框宽度
+        :return:
+        """
+        return self.pro_window.frame.border_width.currentText()
+
+    def getFrameFillColor(self) -> str:
+        """
+        返回边框背景色
+        :return:
+        """
+        return self.pro_window.frame.back_color.getColor()
+
+    def getDuration(self) -> str:
+        """
+        返回duration
+        :return:
+        """
+        return self.pro_window.duration.duration.currentText()
+
     def getOutputDevice(self) -> dict:
         """
         返回输出设备
         :return:
         """
-        return self.pro_window.duration.default_properties.get("Output devices", {})
+        return self.pro_window.duration.default_properties.get("Output Devices", {})
 
     def getInputDevice(self) -> dict:
         """
         返回输入设备
         :return: 输入设备字典
         """
-        return self.pro_window.duration.default_properties.get("Input devices", {})
+        return self.pro_window.duration.default_properties.get("Input Devices", {})
 
-    def getPropertyByKey(self, key: str):
-        return self.default_properties.get(key)
+    def getItems(self):
+        return self.scene.getInfo()

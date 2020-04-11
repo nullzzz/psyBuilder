@@ -137,5 +137,5 @@ class QuestUpdate(TabItemWidget):
     def getResponseVariable(self) -> str:
         return self.response_variable.currentText()
 
-    def getPropertyByKey(self, key: str):
-        return self.default_properties.get(key)
+    def getQuestName(self) -> str:
+        return self.quest_name.currentText()
