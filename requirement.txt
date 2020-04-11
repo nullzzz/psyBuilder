@@ -3,4 +3,3 @@ PyOpenGL==3.1.5
 PyQt5==5.14.1
 PyQt5-sip==12.7.2
 qimage2ndarray==1.8.3
-python 3.8.2
