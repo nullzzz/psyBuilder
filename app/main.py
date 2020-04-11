@@ -12,7 +12,7 @@ from .attributes import Attributes
 from .center import Center
 from .center.condition import IfBranch, Switch
 from .center.events import Cycle, ImageDisplay, Slider, SoundDisplay, TextDisplay, VideoDisplay
-from .center.eye_tracker import EyeCalibrate, EyeDC, EndR, Close, StartR
+from .center.eyeTracker import EyeCalibrate, EyeDC, EndR, Close, StartR
 from .center.quest import QuestUpdate
 from .center.timeline import Timeline
 from .func import Func
@@ -21,7 +21,7 @@ from .menubar.aboutUs import AboutUs
 from .menubar.compile_PTB import compilePTB
 from .menubar.registry import writeToRegistry
 from .menubar.update import Update
-from .newDevice.Yun import TianBianYiDuoYun
+from .deviceSystem.Yun import TianBianYiDuoYun
 from .output import Output
 from .properties import Properties
 from .structure import Structure
@@ -1029,14 +1029,14 @@ class Psy(QMainWindow):
         Info.WidgetTypeCount.clear()
         Info.WidgetNameCount.clear()
 
-    def showMaximized(self):
-        """
-
-        :return:
-        """
-        super(Psy, self).showMaximized()
-        self.animation = QPropertyAnimation(self, b"windowOpacity")
-        self.animation.setDuration(1000)
-        self.animation.setStartValue(0)
-        self.animation.setEndValue(1)
-        self.animation.start()
+    # def showMaximized(self):
+    #     """
+    #
+    #     :return:
+    #     """
+    #     super(Psy, self).showMaximized()
+    #     self.animation = QPropertyAnimation(self, b"windowOpacity")
+    #     self.animation.setDuration(0)
+    #     self.animation.setStartValue(0)
+    #     self.animation.setEndValue(1)
+    #     self.animation.start()

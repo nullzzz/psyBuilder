@@ -7,26 +7,28 @@ from app.func import Func
 
 
 class LeftBox(QToolBox):
-    Line, Polygon, Circle, Arc, Rect, Image, Text, Video, Sound, Snow, Gabor, Open = range(12)
+    Line, Open, Polygon, Circle, Arc, Rect, Image, Video, Text, Sound, Snow, Gabor, Dot = range(13)
 
     def __init__(self, parent=None):
         super(LeftBox, self).__init__(parent=parent)
         # here to create geometries items
         self.basic = QWidget()
+        open = Item("3D", self.Open)
+        open.setEnabled(False)
         polygon = Item("Polygon", self.Polygon)
         circle = Item("Circle", self.Circle)
         arc = Item("Arc", self.Arc)
         rect = Item("Rect", self.Rect)
 
         self.stimuli = QWidget()
-        image = Item("image", self.Image)
-        video = Item("video", self.Video)
-        text = Item("text", self.Text)
-        sound = Item("sound", self.Sound)
-        snow = Item("snow", self.Snow)
-        gabor = Item("gabor", self.Gabor)
-        open = Item("3D", self.Open)
-        open.setEnabled(False)
+        image = Item("image", LeftBox.Image)
+        video = Item("video", LeftBox.Video)
+        text = Item("text", LeftBox.Text)
+        sound = Item("sound", LeftBox.Sound)
+        snow = Item("snow", LeftBox.Snow)
+        gabor = Item("gabor", LeftBox.Gabor)
+        dot = Item("dot", LeftBox.Dot)
+        dot.setEnabled(False)
 
         self.addItem(self.basic, "Basic Geometries")
         self.addItem(self.stimuli, "Stimuli")
@@ -51,6 +53,7 @@ class LeftBox(QToolBox):
         stim_Layout.addWidget(sound)
         stim_Layout.addWidget(snow)
         stim_Layout.addWidget(gabor)
+        stim_Layout.addWidget(dot)
 
         self.basic.setLayout(basic_layout)
         self.stimuli.setLayout(stim_Layout)
@@ -83,6 +86,8 @@ class Button(QPushButton):
         super().__init__(parent)
         self.setMouseTracking(True)
         self.item_type = item_type
+        self.setStyleSheet("border:none")
+
         if text == "text":
             text = "textpointer"
         elif text == "3D":

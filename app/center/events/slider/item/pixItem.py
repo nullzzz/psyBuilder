@@ -14,7 +14,7 @@ class PixItem(QGraphicsPixmapItem):
     """
     Image、Text、Video、Sound
     """
-    Image, Video, Sound = [5, 7, 8]
+    Image, Video, Sound = (6, 7, 9)
 
     name = {
         Image: Info.ITEM_IMAGE,

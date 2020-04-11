@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMenu, QAction, \
-    QComboBox, QColorDialog, QToolBar
+    QComboBox, QColorDialog, QToolBar, QSlider
 
 from app.center.events.slider.left.leftBox import LeftBox
 from app.func import Func
@@ -34,7 +34,7 @@ class Slider(TabItemMainWindow):
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
         self.view.setMaximumSize(width, height)
         self.scene.setSceneRect(0, 0, width, height)
-        self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
+        # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
         self.default_properties: dict = {
             "Items": {},
@@ -136,12 +136,20 @@ class Slider(TabItemMainWindow):
         setting.addWidget(self.pointer_bt)
         setting.addWidget(line_bt)
         setting.addWidget(lasso_bt)
+
         self.background_bt = QToolButton()
         self.background_bt.setPopupMode(QToolButton.MenuButtonPopup)
         self.background_bt.setMenu(
             self.createBackgroundMenu(self.changeBackground))
         self.background_bt.setIcon(QIcon(Func.getImage("background4.png")))
         setting.addWidget(self.background_bt)
+
+        slider = QSlider(Qt.Horizontal)
+        slider.setRange(5, 200)
+        slider.setValue(100)
+        slider.valueChanged[int].connect(self.zoom)
+        setting.addWidget(slider)
+
 
         self.addToolBar(Qt.TopToolBarArea, setting)
 
@@ -193,8 +201,8 @@ class Slider(TabItemMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            if item.zValue() >= z_value: # and (
-            #         isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
+            if item.zValue() >= z_value:  # and (
+                #         isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
                 z_value = item.zValue() + 0.1
         selected_item.setZValue(z_value)
 
@@ -205,8 +213,8 @@ class Slider(TabItemMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            if item.zValue() <= z_value: # and (
-                    # isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
+            if item.zValue() <= z_value:  # and (
+                # isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
                 z_value = item.zValue() - 0.1
         selected_item.setZValue(z_value)
 
@@ -390,6 +398,13 @@ class Slider(TabItemMainWindow):
                 color_menu.setDefaultAction(action)
         color_menu.addAction(more_action)
         return color_menu
+
+    def zoom(self, value):
+        factor = value / 100.0
+        matrix = self.view.transform()
+        matrix.reset()
+        matrix.scale(factor, factor)
+        self.view.setTransform(matrix)
 
     @staticmethod
     def createColorButtonIcon(file_path, color):
