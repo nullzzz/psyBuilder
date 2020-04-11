@@ -187,7 +187,10 @@ class FileButtonArea(QWidget):
 
         :return:
         """
-        file_path, _ = QFileDialog().getSaveFileName(self, "Create file", os.getcwd(), "Psy Files (*.psy);")
+        directory = Settings("config.ini", Settings.IniFormat).value("file_directory", "")
+        if not directory:
+            directory = os.getcwd()
+        file_path, _ = QFileDialog().getSaveFileName(self, "Create file", directory, "Psy Files (*.psy);")
         if file_path:
             if not re.search(r"\.psy$", file_path):
                 file_path = file_path + ".psy"
@@ -198,7 +201,10 @@ class FileButtonArea(QWidget):
 
         :return:
         """
-        file_path, _ = QFileDialog.getOpenFileName(self, "Choose File", os.getcwd(), "Psy File (*.psy)")
+        directory = Settings("config.ini", Settings.IniFormat).value("file_directory", "")
+        if not directory:
+            directory = os.getcwd()
+        file_path, _ = QFileDialog.getOpenFileName(self, "Choose File", directory, "Psy File (*.psy)")
         if file_path:
             self.fileOpened.emit(file_path)
 
