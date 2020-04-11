@@ -13,7 +13,7 @@ class TextItem(QGraphicsTextItem):
     Text
     """
     # Image, Text, Video, Sound = range(5, 9)
-    Text = 6
+    Text = 7
 
     name = {
         Text: Info.ITEM_TEXT,

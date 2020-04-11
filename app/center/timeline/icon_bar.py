@@ -71,7 +71,7 @@ class IconBar(QTabWidget):
         self.events.addItem(WidgetIconItem(Info.SOUND))
         self.events.addItem(WidgetIconItem(Info.TEXT))
         self.events.addItem(WidgetIconItem(Info.VIDEO))
-        # add eye_tracker items
+        # add eyeTracker items
         self.eye_tracker.addItem(WidgetIconItem(Info.CALIBRATION))
         self.eye_tracker.addItem(WidgetIconItem(Info.DC))
         self.eye_tracker.addItem(WidgetIconItem(Info.ENDR))

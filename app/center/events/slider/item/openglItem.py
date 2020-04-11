@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSceneMouseEvent
 
 
 class GLItem(QGraphicsItem):
+    Open = 1
 
     def __init__(self, item_type="open", item_name: str = "opengel"):
         super(GLItem, self).__init__()

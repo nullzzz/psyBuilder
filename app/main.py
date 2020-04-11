@@ -12,7 +12,7 @@ from .attributes import Attributes
 from .center import Center
 from .center.condition import IfBranch, Switch
 from .center.events import Cycle, ImageDisplay, Slider, SoundDisplay, TextDisplay, VideoDisplay
-from .center.eye_tracker import EyeCalibrate, EyeDC, EndR, Close, StartR
+from .center.eyeTracker import EyeCalibrate, EyeDC, EndR, Close, StartR
 from .center.quest import QuestUpdate
 from .center.timeline import Timeline
 from .func import Func
@@ -20,7 +20,8 @@ from .info import Info
 from .menubar.aboutUs import AboutUs
 from .menubar.compile_PTB import compilePTB
 from .menubar.registry import writeToRegistry
-from .newDevice.Yun import TianBianYiDuoYun
+from .menubar.update import Update
+from .deviceSystem.Yun import TianBianYiDuoYun
 from .output import Output
 from .properties import Properties
 from .structure import Structure
@@ -191,18 +192,19 @@ class Psy(QMainWindow):
         reg_action = QAction("&Registry", self)
         about_action = QAction("&About Us", self)
         about_Qt_action = QAction("&About Qt", self)
-        # check_for_update = QAction("&Check for updates", self)
+        check_for_update = QAction("&Check for updates", self)
 
         self.about_us = AboutUs()
+        self.check_update = Update()
         reg_action.triggered.connect(self.registry)
         about_action.triggered.connect(self.about_us.show)
         about_Qt_action.triggered.connect(QApplication.instance().aboutQt)
-        # check_for_update.triggered.connect(self.checkUpdate)
+        check_for_update.triggered.connect(self.check_update.show)
 
         help_menu.addAction(reg_action)
         help_menu.addAction(about_action)
         help_menu.addAction(about_Qt_action)
-        # help_menu.addAction(check_for_update)
+        help_menu.addAction(check_for_update)
 
     def initDockWidget(self):
         """

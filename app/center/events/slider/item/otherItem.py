@@ -11,7 +11,7 @@ from ..item.snow import SnowProperty
 
 
 class OtherItem(QGraphicsPixmapItem):
-    Snow, Gabor = 9, 10
+    Snow, Gabor = 10, 11
     name = {
         Snow: Info.ITEM_SNOW,
         Gabor: Info.ITEM_GABOR,

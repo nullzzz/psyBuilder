@@ -72,7 +72,7 @@ class ConditionArea(QWidget):
 
     def getButtonIndex(self, button):
         for i, v in enumerate(self.conditions):
-            if button is v.add_bt:
+            if button is v.add_bt or button is v.del_bt:
                 return i
         return -1
 
