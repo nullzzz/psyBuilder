@@ -3,7 +3,7 @@ import re
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
-from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QVBoxLayout, QLabel, QMenu
+from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QLabel, QMenu, QGridLayout
 
 from app import Psy
 from app.func import Func
@@ -26,7 +26,7 @@ class Version(QTextEdit):
         self.setText(f"""
         <div style="text-align: center;">
             <b style="font:36px;vertical-align: middle;">{name}</b><br />
-            <b style="color:rgb(157,157,157); font:20px;vertical-align: middle;">{version}</b>
+            <b style="color:rgb(157,157,157); font:18px;vertical-align: middle;">{version}</b>
         </div>
         """)
 
@@ -61,7 +61,7 @@ class FilePath(QTextEdit):
         if os.path.exists(file_path):
             self.append(f"""<p style="color:rgb(157,157,157); font:12px">{file_path}</p>""")
         else:
-            self.append(f"""<p style="color:rgb(142,15,15); font-size:12px">{file_path}</p>""")
+            self.append(f"""<p style="color:rgb(142,15,15); font:12px">{file_path}</p>""")
         self.setReadOnly(True)
         self.setTextInteractionFlags(Qt.NoTextInteraction)
 
@@ -110,7 +110,7 @@ class FilePathTable(TableWidget):
         if index == -1:
             index = self.rowCount()
         self.insertRow(index)
-        self.setRowHeight(index, 48)
+        self.setRowHeight(index, 56)
         # insert line edit into table
         file = FilePath(file_path)
         self.setCellWidget(index, 0, file)
@@ -154,20 +154,26 @@ class FileButtonArea(QWidget):
         # buttons
         create_button = HoverButton("menu/add", "Create New File")
         create_button.clicked.connect(self.handleCreateButtonClicked)
-        open_button = HoverButton("menu/open", "Open Local File")
+        open_button = HoverButton("menu/open", "Open")
         open_button.clicked.connect(self.handleOpenButtonClicked)
-        setting_button = HoverButton("menu/setting", "Set Open Mode..")
+        setting_button = HoverButton("menu/setting", "Change Open Mode")
         setting_button.clicked.connect(
             lambda checked: self.menu.exec(self.mapToGlobal(setting_button.pos())))
         # layout
-        layout = QVBoxLayout()
-        layout.addWidget(icon, 18, Qt.AlignCenter)
-        layout.addWidget(Version("Psy Builder", "Version 0.1"), 20)
-        layout.addWidget(create_button, 1, Qt.AlignHCenter)
-        layout.addWidget(open_button, 1, Qt.AlignHCenter)
-        layout.addWidget(setting_button, 1, Qt.AlignHCenter)
-        layout.addStretch(20)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout = QGridLayout()
+        for i in range(6):
+            layout.setColumnStretch(i, 1)
+        layout.addWidget(icon, 0, 1, 1, 4, Qt.AlignHCenter)
+        layout.setRowStretch(0, 13)
+        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, 4)
+        layout.setRowStretch(1, 12)
+        layout.addWidget(create_button, 2, 2, 1, 2, Qt.AlignLeft)
+        layout.setRowStretch(2, 1)
+        layout.addWidget(open_button, 3,2, 1, 2, Qt.AlignLeft)
+        layout.setRowStretch(3, 1)
+        layout.addWidget(setting_button, 4, 2, 1, 2, Qt.AlignLeft)
+        layout.setRowStretch(4, 1)
+        layout.setRowStretch(5, 20)
         self.setLayout(layout)
 
     def handleCreateButtonClicked(self, checked):

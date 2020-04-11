@@ -48,7 +48,8 @@ class Psy(QMainWindow):
         Info.FILE_DIRECTORY = Settings("config.ini", Settings.IniFormat).value("file_directory", "")
         # if file name not none, we restore data from this file
         if Info.FILE_NAME:
-            if Settings("config.ini", Settings.IniFormat).value("new", False):
+            new = Settings("config.ini", Settings.IniFormat).value("new", False)
+            if new != "false":
                 # we init initial timeline => Timeline_0
                 self.initInitialTimeline()
                 self.store(Info.FILE_NAME, False)

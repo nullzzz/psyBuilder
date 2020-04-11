@@ -856,7 +856,7 @@ def getHaveOutputDevs(cWidget) -> bool:
             if cFalseWidget is not None:
                 nFalseOutputDev = len(cFalseWidget.getOutputDevice())
 
-            haveOPDev = (nTrueOutputDev+nFalseOutputDev)> 0
+            haveOPDev = (nTrueOutputDev + nFalseOutputDev) > 0
         else:
             haveOPDev = len(cWidget.getOutputDevice()) > 0
 
@@ -2133,7 +2133,7 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
 
     if isSubWidgetOfIfOrSwitch(cWidget) is False:
         #  update the attributesSetDict only for the main widgets
-        cWidgetAddedAttrsList = ['rt', 'resp', 'acc', 'onsettime','respOnsettime']
+        cWidgetAddedAttrsList = ['rt', 'resp', 'acc', 'onsettime', 'respOnsettime']
         for cAddedAttr in cWidgetAddedAttrsList:
             attributesSetDict.update({
                 f"{cWidgetName}.{cAddedAttr}":
@@ -2990,7 +2990,8 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
                          cTransparency)
 
         elif Info.ITEM_TEXT == cItemType:
-            cVSLCodes = drawTextForSlider(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, cItemProperties, cVSLCodes)
+            cVSLCodes = drawTextForSlider(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, cItemProperties,
+                                          cVSLCodes)
         elif cItemType == Info.ITEM_VIDEO:
             allWidgetCodes, cVSLCodes = drawVideoWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel,
                                                         allWidgetCodes,
@@ -3120,7 +3121,8 @@ def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allW
     #  draw buffer to  hw
     # printAutoInd(f, "PsychPortAudio('FillBuffer', {0}, {1}_idx, {2});",cSoundIdxStr,cPrefixStr, streamRefillStr)
 
-    printAutoInd(soundStimCodes, "PsychPortAudio('FillBuffer', {0}, {1}_Dat, {2});", cSoundIdxStr, cPrefixStr, streamRefillStr)
+    printAutoInd(soundStimCodes, "PsychPortAudio('FillBuffer', {0}, {1}_Dat, {2});", cSoundIdxStr, cPrefixStr,
+                 streamRefillStr)
 
     if isVolumeControl:
         printAutoInd(soundStimCodes, "PsychPortAudio('Volume', {0}, {1});\n", cSoundIdxStr, volumeStr)
@@ -4170,7 +4172,7 @@ def compileCode(globalSelf, isDummyCompile):
 
                 if cWidgetType in stimWidgetTypesList:
                     output_device = cWidget.getOutputDevice()
-                    haveRespDev = cWidget.getUsingDeviceCount()>0
+                    haveRespDev = cWidget.getUsingDeviceCount() > 0
 
                     if haveRespDev:
                         cFrameVarNameStr = 'cFrame'
@@ -4184,7 +4186,6 @@ def compileCode(globalSelf, isDummyCompile):
 
                     if getHaveOutputDevs(cWidget):
                         printAutoInd(f, "{0}(end).msgEndTime = [];", cWidgetName)
-
 
                 elif cWidgetType == Info.CYCLE:
 
@@ -4457,7 +4458,8 @@ def compileCode(globalSelf, isDummyCompile):
         printAutoInd(f, "end % main function \n\n\n\n\n\n\n")
 
         outDevCountsDict = getOutputDevCountsDict()
-        nOutPortsNums = outDevCountsDict[Info.DEV_PARALLEL_PORT] + outDevCountsDict[Info.DEV_NETWORK_PORT] + outDevCountsDict[Info.DEV_SERIAL_PORT]
+        nOutPortsNums = outDevCountsDict[Info.DEV_PARALLEL_PORT] + outDevCountsDict[Info.DEV_NETWORK_PORT] + \
+                        outDevCountsDict[Info.DEV_SERIAL_PORT]
 
         iSubFunNum = 1
 
