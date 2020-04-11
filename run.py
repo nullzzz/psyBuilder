@@ -3,7 +3,9 @@ import re
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
-from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QLabel, QMenu, QGridLayout
+from PyQt5.QtGui import QFontMetrics
+from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QLabel, QMenu, QGridLayout, \
+    QFrame
 
 from app import Psy
 from app.func import Func
@@ -16,6 +18,7 @@ class Version(QTextEdit):
         super(Version, self).__init__()
         self.setReadOnly(True)
         self.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.setFrameShape(QFrame.NoFrame)
         self.setStyleSheet("""
                 QTextEdit{
                     border:none;
@@ -29,6 +32,9 @@ class Version(QTextEdit):
             <b style="color:rgb(157,157,157); font:18px;vertical-align: middle;">{version}</b>
         </div>
         """)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setFixedHeight(120)
 
     def enterEvent(self, QEvent):
         super(Version, self).enterEvent(QEvent)
