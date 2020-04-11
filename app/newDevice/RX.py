@@ -38,32 +38,29 @@ class RX(QWidget):
             self.default_properties: dict = {}
 
         # 已选择设备
-        self.selected_devices = DeviceHome()
-        self.selected_devices.itemDoubleClicked.connect(self.rename)
-        self.selected_devices.itemDoubleClick.connect(self.rename)
-        self.selected_devices.deviceChanged.connect(self.changeItem)
-        self.selected_devices.deviceDeleted.connect(self.changeItem)
+        self.device_home = DeviceHome()
+        self.device_home.itemDoubleClicked.connect(self.rename)
+        self.device_home.itemDoubleClick.connect(self.rename)
+        self.device_home.deviceChanged.connect(self.changeItem)
+        self.device_home.deviceDeleted.connect(self.changeItem)
 
         # 展示区
         self.describer = Describer()
 
-        # very import!!!
-        # very import!!!
-        # very import!!!
-        self.selected_devices.default_properties = self.default_properties
+        self.device_home.default_properties = self.default_properties
         self.describer.default_properties = self.default_properties
 
         # device_list是写死的
         if device_type == Info.OUTPUT_DEVICE:
             # default device
-            self.selected_devices.createDevice("screen")
+            self.device_home.createDevice("screen")
             Info.OUTPUT_DEVICE_INFO = self.default_properties
             self.devices = ("serial_port", "parallel_port", "network_port", "screen", "sound")
             self.setWindowTitle("Output Devices")
         elif device_type == Info.INPUT_DEVICE:
             # default devices
-            self.selected_devices.createDevice("mouse")
-            self.selected_devices.createDevice("keyboard")
+            self.device_home.createDevice("mouse")
+            self.device_home.createDevice("keyboard")
             Info.INPUT_DEVICE_INFO = self.default_properties
             self.devices = ("mouse", "keyboard", "response box", "game pad", "action")
             self.setWindowTitle("Input Devices")
@@ -94,7 +91,7 @@ class RX(QWidget):
         layout = QVBoxLayout()
 
         layout1 = QHBoxLayout()
-        layout1.addWidget(self.selected_devices, 1)
+        layout1.addWidget(self.device_home, 1)
         layout1.addWidget(self.describer, 1)
 
         layout2 = QHBoxLayout()
@@ -113,7 +110,7 @@ class RX(QWidget):
         self.close()
 
     def cancel(self):
-        self.selected_devices.loadSetting()
+        self.device_home.loadSetting()
 
     def apply(self):
         self.getInfo()
@@ -129,11 +126,11 @@ class RX(QWidget):
         text, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
         if ok and text != '' and "." not in text:
             text: str
-            if text.lower() in self.selected_devices.device_list and item_name != text.lower():
+            if text.lower() in self.device_home.device_list and item_name != text.lower():
                 QMessageBox.warning(self, f"{text} is invalid!", "Device name must be unique and without spaces",
                                     QMessageBox.Ok)
             else:
-                self.selected_devices.changeCurrentName(item_name, text)
+                self.device_home.changeCurrentName(item_name, text)
                 self.describer.changeName(item_name, text)
                 # self.getInfo()
                 self.deviceNameChanged.emit(item.getDeviceId(), text)
@@ -143,7 +140,7 @@ class RX(QWidget):
         # get device information from GUI
         self.describer.updateInfo()
         # update device information
-        self.selected_devices.updateDeviceInfo()
+        self.device_home.updateDeviceInfo()
         return self.default_properties.copy()
 
     # 参数导入
@@ -154,7 +151,7 @@ class RX(QWidget):
         self.deviceOK.emit()
 
     def loadSetting(self):
-        self.selected_devices.loadSetting()
+        self.device_home.loadSetting()
 
     def refresh(self):
         self.describer.updateSimpleInfo()
