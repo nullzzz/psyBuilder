@@ -182,7 +182,7 @@ class FileButtonArea(QFrame):
             layout.setColumnStretch(i, 1)
         layout.addWidget(icon, 0, 1, 1, 7, Qt.AlignHCenter)
         layout.setRowStretch(0, 13)
-        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, 7)
+        layout.addWidget(Version("PsyBuilder", "Version 0.1"), 1, 1, 1, 7)
         layout.setRowStretch(1, 12)
         layout.addWidget(create_button, 2, 3, 1, 3, Qt.AlignLeft)
         layout.setRowStretch(2, 1)
@@ -235,7 +235,7 @@ class FileWindow(QWidget):
     def __init__(self):
         super(FileWindow, self).__init__()
         # title
-        self.setWindowTitle("Welcome to Psy Builder")
+        self.setWindowTitle("Welcome to PsyBuilder")
         self.setFixedSize(820, 450)
         self.setStyleSheet("background:rgb(247,247,247)")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))

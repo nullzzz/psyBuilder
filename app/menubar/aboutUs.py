@@ -9,7 +9,7 @@ class AboutUs(QWidget):
     def __init__(self, parent=None):
         super(AboutUs, self).__init__(parent=parent)
 
-        self.setWindowTitle("About developers of PTB Builder 0.1")
+        self.setWindowTitle("About developers of PsyBuilder 0.1")
         self.setWindowModality(2)
         self.setWindowIcon(QIcon(Func.getImage("icon.png")))
         self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
@@ -33,11 +33,11 @@ class AboutUs(QWidget):
         info.setFrameShape(QFrame.NoFrame)
 
         # info.setTextBackgroundColor()
-        info.setHtml("<b>PTB Builder (ver 0.1)</b> for Psychtoolbox 3 under MATLAB "
+        info.setHtml("<b>PsyBuilder (ver 0.1)</b> for Psychtoolbox 3 under MATLAB "
                      "was developed by the group leaded by Prof. "
                      "<a style='color: blue;' href=\"http://web.suda.edu.cn/yzhangpsy/index.html\">Yang Zhang</a> "
                      "at Attention and Perception lab at Soochow university, Suzhou, China. "
-                     "<br><br><b>PTB Builder 0.1</b> are provided as is, no warranty for their "
+                     "<br><br><b>PsyBuilder 0.1</b> are provided as is, no warranty for their "
                      "correctness or usefulness for any purpose is made or implied by "
                      "the authors of the software, or by anyone else. This software "
                      "is designed for research purposes only and not to be used for "
@@ -54,7 +54,7 @@ class AboutUs(QWidget):
 
         author1 = self.getInfo("authorInfo01",
                                "Yang Zhang (张阳), Ph.D, Prof.<br>Department of Psychology, Soochow University,Suzhou"
-                               "<br><a href='mailto:yzhangpsy@suda.edu.cn?Subject= Inquire about the usage of PTB Builder 0.1'>yzhangpsy@suda.edu.cn</a>")
+                               "<br><a href='mailto:yzhangpsy@suda.edu.cn?Subject= Inquire about the usage of PsyBuilder 0.1'>yzhangpsy@suda.edu.cn</a>")
         author2 = self.getInfo("authorInfo02",
                                "Zhe Yang, Ph.D, Associate Prof. <br> Department of computer science, Soochow University,Suzhou")
 
