@@ -193,7 +193,7 @@ class Slider(TabItemMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            # if item.zValue() >= z_value: and (
+            if item.zValue() >= z_value: # and (
             #         isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
                 z_value = item.zValue() + 0.1
         selected_item.setZValue(z_value)
