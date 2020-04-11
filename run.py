@@ -67,7 +67,7 @@ class FilePath(QTextEdit):
         if os.path.exists(file_path):
             self.append(f"""<p style="color:rgb(157,157,157); font:12px">{file_path}</p>""")
         else:
-            self.append(f"""<p style="color:rgb(142,15,15); font-size:12px">{file_path}</p>""")
+            self.append(f"""<p style="color:rgb(142,15,15); font:12px">{file_path}</p>""")
         self.setReadOnly(True)
         self.setTextInteractionFlags(Qt.NoTextInteraction)
 
@@ -116,7 +116,7 @@ class FilePathTable(TableWidget):
         if index == -1:
             index = self.rowCount()
         self.insertRow(index)
-        self.setRowHeight(index, 48)
+        self.setRowHeight(index, 56)
         # insert line edit into table
         file = FilePath(file_path)
         self.setCellWidget(index, 0, file)
@@ -167,17 +167,17 @@ class FileButtonArea(QWidget):
             lambda checked: self.menu.exec(self.mapToGlobal(setting_button.pos())))
         # layout
         layout = QGridLayout()
-        for i in range(5):
+        for i in range(6):
             layout.setColumnStretch(i, 1)
-        layout.addWidget(icon, 0, 1, 1, 3, Qt.AlignHCenter)
+        layout.addWidget(icon, 0, 1, 1, 4, Qt.AlignHCenter)
         layout.setRowStretch(0, 13)
-        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, 3)
+        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, 4)
         layout.setRowStretch(1, 12)
-        layout.addWidget(create_button, 2, 1, 1, 2, Qt.AlignLeft)
+        layout.addWidget(create_button, 2, 2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(2, 1)
-        layout.addWidget(open_button, 3, 1, 1, 2, Qt.AlignLeft)
+        layout.addWidget(open_button, 3,2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(3, 1)
-        layout.addWidget(setting_button, 4, 1, 1, 2, Qt.AlignLeft)
+        layout.addWidget(setting_button, 4, 2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(4, 1)
         layout.setRowStretch(5, 20)
         self.setLayout(layout)
