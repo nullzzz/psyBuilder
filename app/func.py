@@ -409,6 +409,8 @@ class Func(object):
         get widget's properties through its widget id
         """
         widget = Info.Widgets[widget_id]
+        if Func.isWidgetType(widget_id, Info.TIMELINE) or Func.isWidgetType(widget_id,Info.CYCLE):
+            return widget.getProperties()
         dp: dict = copy.deepcopy(widget.store())
 
         # slider

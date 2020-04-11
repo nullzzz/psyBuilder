@@ -21,6 +21,7 @@ class AboutUs(QWidget):
 
         info = QTextEdit(self)
         info.setReadOnly(True)
+        info.setTextInteractionFlags(Qt.NoTextInteraction)
         info.setFrameShape(QFrame.NoFrame)
         info.setHtml("<b>PTB Builder (ver 0.1)</b> for Psychtoolbox 3 under MATLAB "
                      "was developed by the group leaded by Prof. "
