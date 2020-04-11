@@ -11,7 +11,7 @@ from ..item.rect import RectProperty
 
 
 class DiaItem(QGraphicsPolygonItem):
-    Polygon, Circle, Arc, Rect = range(1, 5)
+    Polygon, Circle, Arc, Rect = range(2, 6)
 
     name: dict = {
         Polygon: Info.ITEM_POLYGON,

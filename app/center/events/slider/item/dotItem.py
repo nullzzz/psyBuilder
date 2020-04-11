@@ -7,7 +7,7 @@ from app.info import Info
 
 
 class DotItem(QGraphicsItem):
-    Dot = 11
+    Dot = 12
     name = {
         Dot: Info.ITEM_DOT,
     }
@@ -110,7 +110,7 @@ class DotItem(QGraphicsItem):
         dot_size = int(__dot_size) if __dot_size.isdigit() else 1
 
         __dot_color = self.properties["Dot Color"]
-        dot_color =
+        dot_color = ""
 
         self.update()
 

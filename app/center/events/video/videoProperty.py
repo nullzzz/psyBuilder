@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
 from .videoGeneral import VideoTab1
-from ..duration import DurationPage
-from ..framePage import FramePage
+from app.center.events.__tools__ import DurationPage
+from app.center.events.__tools__ import FramePage
 
 
 class VideoProperty(QWidget):
