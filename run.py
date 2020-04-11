@@ -33,7 +33,6 @@ class Version(QTextEdit):
         """)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setFixedHeight(70)
 
     def enterEvent(self, QEvent):
         super(Version, self).enterEvent(QEvent)
@@ -136,6 +135,8 @@ class FilePathTable(TableWidget):
             if self.cellWidget(row, 0).file_path == file_path:
                 self.removeRow(row)
                 break
+        if not self.rowCount():
+            self.hide()
 
 
 class FileButtonArea(QWidget):
