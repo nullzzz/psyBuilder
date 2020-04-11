@@ -181,6 +181,7 @@ QMainWindow::separator {
     width: 1px;
     height: 1px;
 }
+ColorListEditor::drop-down {image: url(image/color_down_arrow.png);}
 """
 
 qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree + dock_widget + center

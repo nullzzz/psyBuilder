@@ -18,7 +18,7 @@ class DotGeneral(QWidget):
             "Dot Type": "1",
             "Dot Size": "1",
             "Dot Color": "0,0,0",
-            "Back Color": '0,0,0,0',
+            "Back Color": '192,192,192',
             "Move Direction": "0"
         }
 
@@ -33,8 +33,8 @@ class DotGeneral(QWidget):
 
         self.dot_num = VarLineEdit("50")
         self.dot_type = VarComboBox()
-        self.dot_type.addItems("1234")
-        self.dot_size = VarLineEdit("1")
+        self.dot_type.addItems(("1", "2", "3", "4"))
+        self.dot_size = VarLineEdit("5")
 
         # down
         self.dot_color = ColorListEditor()
@@ -42,6 +42,7 @@ class DotGeneral(QWidget):
 
         self.back_color = ColorListEditor()
         self.back_color.addTransparent()
+        self.back_color.setCurrentText("192,192,192")
         self.move_direction = VarLineEdit("0")
         self.setUI()
 
@@ -156,7 +157,7 @@ class DotGeneral(QWidget):
         if not self._height.text().startswith("["):
             self._height.setText(str(int(h)))
 
-    def setItemColor(self, rgb: str):
+    def setBackColor(self, rgb: str):
         if not self.back_color.currentText().startswith("["):
             self.back_color.setCurrentText(rgb)
 

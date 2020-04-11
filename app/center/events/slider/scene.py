@@ -58,8 +58,10 @@ class Scene(QGraphicsScene):
                 # item.getInfo()
             elif DiaItem.Polygon <= item_type <= DiaItem.Rect:
                 item = DiaItem(item_type)
-            else:
+            elif GLItem.Open == item_type:
                 item = GLItem(item_type)
+            elif DotItem.Dot == item_type:
+                item = DotItem(item_type)
             self.addItem(item)
             item.setPos(event.scenePos())  # move the item in the scene
 
@@ -98,6 +100,8 @@ class Scene(QGraphicsScene):
         for item in self.selectedItems():
             if isinstance(item, DiaItem):
                 item.setItemColor(color)  # update the default properties in GeneralTab
+            elif isinstance(item, DotItem):
+                item.setBackColor(color)
 
     def setLineWidth(self, width):
         for item in self.selectedItems():

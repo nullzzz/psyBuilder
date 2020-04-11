@@ -1,5 +1,7 @@
-from PyQt5.QtCore import Qt, QRect
-from PyQt5.QtGui import QPainterPath, QBrush
+import random
+
+from PyQt5.QtCore import Qt, QRect, QRectF, QTimer
+from PyQt5.QtGui import QPainterPath, QBrush, QColor
 from PyQt5.QtWidgets import QGraphicsItem
 
 from app.center.events.slider.item.dot.dotProperty import DotProperty
@@ -11,6 +13,8 @@ class DotItem(QGraphicsItem):
     name = {
         Dot: Info.ITEM_DOT,
     }
+
+    Interval = 300
 
     def __init__(self, item_type, item_name: str = ""):
         super(DotItem, self).__init__()
@@ -37,10 +41,21 @@ class DotItem(QGraphicsItem):
             "Properties": self.properties
         }
 
-        self.rect = QRect(-50, -50, 100, 100)
-        # self.color = color
-        # self.angle = angle
-        # self.setPos(position)
+        self.rect = QRectF(-100, -100, 200, 200)
+        self.dot_position: list = []
+
+        self.dot_cnt: int = 50
+        self.dot_type: int = 1
+        self.dot_size: int = 6
+        self.dot_color: QColor = QColor(Qt.black)
+        self.back_color: QColor = QColor(Qt.lightGray)
+        self.move_direction: int = 0
+
+        self.generateDotPosition()
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.updateDotPosition)
+        self.timer.start(DotItem.Interval)
 
     def mouseDoubleClickEvent(self, event):
         self.openPro()
@@ -56,12 +71,11 @@ class DotItem(QGraphicsItem):
         return item_name
 
     def openPro(self):
-        self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setPosition()
         self.pro_window.show()
 
     def setPosition(self):
-        pass
+        self.pro_window.setPosition(self.scenePos().x(), self.scenePos().y())
 
     def getName(self):
         return self.item_name
@@ -98,21 +112,48 @@ class DotItem(QGraphicsItem):
         __h = self.properties["Height"]
         h = int(__h) if __h.isdigit() else self.rect.height()
 
-        # todo bug
-        self.rect.setWidth(w)
-        self.rect.setHeight(h)
+        self.rect = QRectF(-w / 2, -h / 2, w, h)
 
         __dot_num = self.properties["Dot Num"]
-        dot_num = int(__dot_num) if __dot_num.isdigit() else 50
+        if __dot_num.isdigit():
+            self.dot_cnt = int(__dot_num)
+
         __dot_type = self.properties["Dot Type"]
-        dot_type = int(__dot_type) if __dot_type.isdigit() else 1
+        if __dot_type.isdigit():
+            self.dot_type = int(__dot_type)
+
         __dot_size = self.properties["Dot Size"]
-        dot_size = int(__dot_size) if __dot_size.isdigit() else 1
+        if __dot_size.isdigit():
+            self.dot_size = int(__dot_size)
 
         __dot_color = self.properties["Dot Color"]
-        dot_color = ""
+        if not __dot_color.startswith("["):
+            rgba = [int(x) for x in __dot_color.split(",")]
+            if len(rgba) == 4:
+                r, g, b, a = rgba
+            else:
+                r, g, b = rgba
+                a = 255
+            self.dot_color = QColor(r, g, b, a)
+        __back_color = self.properties["Back Color"]
+        if not __back_color.startswith("["):
+            rgba = [int(x) for x in __back_color.split(",")]
+            if len(rgba) == 4:
+                r, g, b, a = rgba
+            else:
+                r, g, b = rgba
+                a = 255
+            self.back_color.setRgb(r, g, b, a)
 
         self.update()
+
+    def setBackColor(self, color: QColor):
+        self.back_color = color
+        old_rgb = self.properties["Back Color"]
+        if not old_rgb.startswith("["):
+            rgb = f"{color.red()},{color.green()},{color.blue()}"
+            self.properties["Back Color"] = rgb
+            self.pro_window.general.setBackColor(rgb)
 
     def boundingRect(self):
         return self.rect
@@ -122,22 +163,43 @@ class DotItem(QGraphicsItem):
         path.addEllipse(self.rect)
         return path
 
+    def generateDotPosition(self):
+        """
+        # todo
+        you should complete this function.
+        you can use such parameters:
+        self.dot_cnt: int   the number of dot.
+        self.dot_type: str  the type of dot.
+        self.rect: QRectF   the bounding rectangle of this item.
+        all above are not referenced variables.
+        each dot position is a tuple, which has x and y.
+        all dots' position stored in variable self.dot_position.
+        """
+        ps = []
+        for i in range(self.dot_cnt):
+            x = random.randint(self.rect.left(), self.rect.right())
+            y = random.randint(self.rect.top(), self.rect.bottom())
+            ps.append([x, y])
+        self.dot_position = ps
+
+    def updateDotPosition(self):
+        # todo
+        for dp in self.dot_position:
+            dp[0] += random.choice((-3, -1, 1, 3))
+            dp[1] += random.choice((-3, -1, 1, 3))
+        self.update()
+
     def paint(self, painter, option, widget=None):
         painter.setPen(Qt.NoPen)
-        painter.setBrush(QBrush(self.color))
-        painter.drawEllipse(DotItem.Rect)
-        if option.levelOfDetailFromTransform(self.transform()) > 0.5:  # Outer eyes
-            painter.setBrush(QBrush(Qt.yellow))
-            painter.drawEllipse(-12, -19, 8, 8)
-            painter.drawEllipse(-12, 11, 8, 8)
-            if option.levelOfDetailFromTransform(self.transform()) > 0.8:  # Inner eyes
-                painter.setBrush(QBrush(Qt.darkBlue))
-                painter.drawEllipse(-12, -19, 4, 4)
-                painter.drawEllipse(-12, 11, 4, 4)
-                if option.levelOfDetailFromTransform(self.transform()) > 0.9:  # Nostrils
-                    painter.setBrush(QBrush(Qt.white))
-                    painter.drawEllipse(-27, -5, 2, 2)
-                    painter.drawEllipse(-27, 3, 2, 2)
+        painter.setBrush(QBrush(self.back_color))
+        painter.drawEllipse(self.rect)
+        painter.setBrush(QBrush(self.dot_color))
+        for p in self.dot_position:
+            p: tuple
+            x = p[0]
+            y = p[1]
+            rect = QRect(x - self.dot_size, y - self.dot_size, self.dot_size, self.dot_size)
+            painter.drawEllipse(rect)
 
     def setProperties(self, properties: dict):
         self.pro_window.setProperties(properties.get("Properties"))

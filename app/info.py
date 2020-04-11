@@ -123,6 +123,7 @@ class Info(object):
         ITEM_SNOW: 0,
         ITEM_GABOR: 0,
         ITEM_LINE: 0,
+        ITEM_DOT: 0,
     }
 
     # 图片保存路径
