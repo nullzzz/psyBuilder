@@ -34,7 +34,7 @@ class Slider(TabItemMainWindow):
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
         self.view.setMaximumSize(width, height)
         self.scene.setSceneRect(0, 0, width, height)
-        # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
+        self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
         self.default_properties: dict = {
             "Items": {},

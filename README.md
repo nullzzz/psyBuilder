@@ -10,3 +10,14 @@
 # bugs reported by yu
 > [main.clear] 默认timeline.0未保留 => clear是清空, 新增reset是重置, 在restore的读取中, 因为有些变量就是{}, 所以不能用来判定是否读取出错  
 > 您能不能把智障的启动页面去掉，或者判断一下有效的文件才显示上去，再或者不让他报错闪退ok???
+
+# 待增加功能： by yang zhang
+
+1）help 下面+ check for updates.. 
+检查一个固定网页地址（地址包含版本信息，先随便写一个地址），来决定有无新版本，有的话弹出对话框让去哪里下
+
+2）所有弹出对话框（属性）左上角设置ico
+
+3）slider里面，有些item的属性框里面涉及color的不是 标准color bar 需要修改为标准color bar。
+
+4）color bar最右边的图标改为在黑色背景下也能隐约看到
