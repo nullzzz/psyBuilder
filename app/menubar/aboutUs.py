@@ -23,7 +23,7 @@ class AboutUs(QWidget):
         # cBkIm.scaled(self.size(),Qt.ignoreAspectRation)
         # cBrush = QBrush(cBkIm.scaled(self.size(), Qt.KeepAspectRatioByExpanding))
         # # cBrush.setStyle(Qt.RadialGradientPattern)
-        # p.setBrush(QPalette.Base, cBrush)
+        # p.setBrush(QPalette.Background, cBrush)
 
         self.setPalette(p)
 

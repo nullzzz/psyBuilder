@@ -354,7 +354,10 @@ class Func(object):
         @param widget_id:
         @return:
         """
-        return Info.Nodes[widget_id].parent().widget_id
+        if parentWd:=Info.Nodes[widget_id].parent():
+            return parentWd.widget_id
+        else:
+            return parentWd
 
     @staticmethod
     def getWidgetChild(widget_id: str, index: int) -> (str, str):

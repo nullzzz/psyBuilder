@@ -184,9 +184,9 @@ def isSubWidgetOfIfOrSwitch(widgetOrId) -> bool:
         cWidgetId = widgetOrId
     else:
         cWidgetId = widgetOrId.widget_id
-
-    if getWidgetType(Func.getParentWid(cWidgetId)) in [Info.IF, Info.SWITCH]:
-        isSubWidget = True
+    if parentWid := Func.getParentWid(cWidgetId):
+        if getWidgetType(parentWid) in [Info.IF, Info.SWITCH]:
+            isSubWidget = True
 
     return isSubWidget
 
@@ -1091,6 +1091,14 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
     return inputStr, isContainRef, refedObList
 
 
+def getWidgetIDInTimeline(widget_id:str) -> list:
+    wid_name_list = Func.getWidgetIDInTimeline(widget_id)
+
+    return list(wId for wId,wName in wid_name_list)
+
+
+
+
 def getRefValue(cWidget, inputStr, attributesSetDict, allowUnlistedAttr=False) -> list:
     isRefValue = False
 
@@ -1484,7 +1492,7 @@ def getWidgetIdType(widget_id: str) -> str:
 def updateTLOpDataRow(cTLWidget, opDataRowsInPy: int) -> int:
     noSubCycleTL = True
 
-    cTimelineWidgetIds = Func.getWidgetIDInTimeline(cTLWidget.widget_id)
+    cTimelineWidgetIds = getWidgetIDInTimeline(cTLWidget.widget_id)
 
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
@@ -2489,7 +2497,7 @@ def genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
 def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes) -> dict:
     global cInfoDict, isDummyPrint
 
-    cTimelineWidgetIds = Func.getWidgetIDInTimeline(cWidget.widget_id)
+    cTimelineWidgetIds = getWidgetIDInTimeline(cWidget.widget_id)
 
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
@@ -3824,7 +3832,7 @@ def compileCode(globalSelf, isDummyCompile):
         QMessageBox.information(globalSelf, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
         return
 
-    globalSelf.save()
+    globalSelf.saveFile()
 
     wid_widgetList = list(Info.WID_WIDGET.keys())
     wid_node_list = list(Info.WID_NODE.keys())
