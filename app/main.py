@@ -38,7 +38,7 @@ class Psy(QMainWindow):
         # init dock widget
         self.initDockWidget()
         # wait dialog
-        self.wait_dialog = WaitDialog()
+        self.wait_dialog = WaitDialog(self)
         # save init state to restore the variable environment to its initial state
         # without any widgets even Timeline_0
         if not os.path.exists(Info.VarEnvFile):

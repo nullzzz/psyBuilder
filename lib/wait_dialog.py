@@ -8,8 +8,8 @@ class WaitDialog(QDialog):
     Clockwise = True
     Delta = 36
 
-    def __init__(self):
-        super(WaitDialog, self).__init__(None, Qt.FramelessWindowHint)
+    def __init__(self, parent=None):
+        super(WaitDialog, self).__init__(parent, Qt.FramelessWindowHint)
         self.angle = 0
         self._timer = QTimer(self, timeout=self.update)
         self._timer.start(1)
