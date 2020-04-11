@@ -3,7 +3,6 @@ import re
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
-from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QLabel, QMenu, QGridLayout, \
     QFrame
 
@@ -34,7 +33,6 @@ class Version(QTextEdit):
         """)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setFixedHeight(120)
 
     def enterEvent(self, QEvent):
         super(Version, self).enterEvent(QEvent)
@@ -175,7 +173,7 @@ class FileButtonArea(QWidget):
         layout.setRowStretch(1, 12)
         layout.addWidget(create_button, 2, 2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(2, 1)
-        layout.addWidget(open_button, 3,2, 1, 2, Qt.AlignLeft)
+        layout.addWidget(open_button, 3, 2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(3, 1)
         layout.addWidget(setting_button, 4, 2, 1, 2, Qt.AlignLeft)
         layout.setRowStretch(4, 1)
