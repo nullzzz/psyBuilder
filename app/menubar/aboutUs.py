@@ -27,11 +27,11 @@ class AboutUs(QWidget):
                      "was developed by the group leaded by Prof. "
                      "<a style='color: blue;' href=\"http://web.suda.edu.cn/yzhangpsy/index.html\">Yang Zhang</a> "
                      "at Attention and Perception lab at Soochow university, Suzhou, China. "
-                     "<br><br><b>PTB Builder 0.1</b> are provided as is, and no warranty for their "
+                     "<br><br><b>PTB Builder 0.1</b> are provided as is, no warranty for their "
                      "correctness or usefulness for any purpose is made or implied by "
                      "the authors of the software, or by anyone else. This software "
-                     "is designed for research purposes only and not allowed to be used "
-                     "for any business purpose (e.g., but not limited to, business training)."
+                     "is designed for research purposes only and not to be used for "
+                     "any business purpose, such as, but not limited to, business training)."
                      )
 
         info.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -39,18 +39,20 @@ class AboutUs(QWidget):
         info.setFixedHeight(QFontMetrics(info.font()).lineSpacing() * 11)
 
         author1 = self.getInfo("authorInfo01",
-                               "Yang Zhang (张阳), Ph.D, Prof.<br>Department of Psychology, Soochow University"
+                               "Yang Zhang (张阳), Ph.D, Prof.<br>Department of Psychology, Soochow University,Suzhou"
                                "<br><a href='mailto:yzhangpsy@suda.edu.cn?Subject= Inquire about the usage of PTB Builder 0.1'>yzhangpsy@suda.edu.cn</a>")
         author2 = self.getInfo("authorInfo02",
-                               "Zhe Yang, Ph.D, Associate Prof. <br> Department of computer science, Soochow University")
+                               "Zhe Yang, Ph.D, Associate Prof. <br> Department of computer science, Soochow University,Suzhou")
 
-        author3 = self.getInfo("authorInfo03",
-                               "ChenZhi Feng, Ph.D, Prof. <br> Department of Psychology, Soochow University")
+        author3 = self.getInfo("authorInfo03", "ChenZhi Feng, Ph.D, Prof. <br> Department of Psychology, Soochow University,Suzhou")
+
+        author4 = self.getInfo("authorInfo_zhicheng", "ZhiCheng Lin, Ph.D, Prof. <br> Applied Psychology,  Chinese University of Hong Kong,Shenzhen")
         layout = QVBoxLayout()
         layout.addWidget(info, 2)
         layout.addLayout(author1, 1)
         layout.addLayout(author2, 1)
         layout.addLayout(author3, 1)
+        layout.addLayout(author4, 1)
 
         self.setLayout(layout)
 

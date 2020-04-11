@@ -33,7 +33,7 @@ class TextDisplay(TabItemMainWindow):
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
-        pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
+        # pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
         # pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
         # tool.addAction(pre_view)

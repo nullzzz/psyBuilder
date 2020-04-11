@@ -20,6 +20,7 @@ from .info import Info
 from .menubar.aboutUs import AboutUs
 from .menubar.compile_PTB import compilePTB
 from .menubar.registry import writeToRegistry
+from .menubar.update import Update
 from .newDevice.Yun import TianBianYiDuoYun
 from .output import Output
 from .properties import Properties
@@ -191,18 +192,19 @@ class Psy(QMainWindow):
         reg_action = QAction("&Registry", self)
         about_action = QAction("&About Us", self)
         about_Qt_action = QAction("&About Qt", self)
-        # check_for_update = QAction("&Check for updates", self)
+        check_for_update = QAction("&Check for updates", self)
 
         self.about_us = AboutUs()
+        self.check_update = Update()
         reg_action.triggered.connect(self.registry)
         about_action.triggered.connect(self.about_us.show)
         about_Qt_action.triggered.connect(QApplication.instance().aboutQt)
-        # check_for_update.triggered.connect(self.checkUpdate)
+        check_for_update.triggered.connect(self.check_update.show)
 
         help_menu.addAction(reg_action)
         help_menu.addAction(about_action)
         help_menu.addAction(about_Qt_action)
-        # help_menu.addAction(check_for_update)
+        help_menu.addAction(check_for_update)
 
     def initDockWidget(self):
         """
