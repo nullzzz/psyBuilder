@@ -14,6 +14,7 @@ class HoverButton(QPushButton):
         self.setStyleSheet("""
         QPushButton{
             border:none;
+            background:transparent;
         }
         """)
 
@@ -25,6 +26,7 @@ class HoverButton(QPushButton):
                             QPushButton{
                                 border:none;
                                 color:rgb(59,120,181);
+                                background:transparent;
                             }
                             """)
 
@@ -35,5 +37,6 @@ class HoverButton(QPushButton):
             self.setStyleSheet("""
                             QPushButton{
                                 border:none;
+                                background:transparent;
                             }
                             """)

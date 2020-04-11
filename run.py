@@ -3,7 +3,7 @@ import re
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon,QPalette,QBrush
 from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QLabel, QMenu, QGridLayout, \
     QFrame
 
@@ -21,7 +21,8 @@ class Version(QTextEdit):
         self.setFrameShape(QFrame.NoFrame)
         self.setStyleSheet("""
                 QTextEdit{
-                    border:none;
+                    border: none;
+                    background: transparent;
                 }
                 """)
         # set text
@@ -140,15 +141,23 @@ class FilePathTable(TableWidget):
             self.hide()
 
 
-class FileButtonArea(QWidget):
+class FileButtonArea(QFrame):
     fileCreated = pyqtSignal(str)
     fileOpened = pyqtSignal(str)
 
     def __init__(self):
         super(FileButtonArea, self).__init__()
+        self.setObjectName("FileButtonArea")
+        self.setStyleSheet("""
+        QFrame#FileButtonArea {
+            border-image: url(images/common/background.png);
+        }
+        """)
+        self.setFixedWidth(500)
         # widget
         icon = QLabel()
         icon.setPixmap(Func.getImageObject("common/icon.png", type=0, size=QSize(60, 60)))
+        icon.setStyleSheet("background:transparent;")
         # menu
         self.menu = QMenu()
         self.default_mode_action = self.menu.addAction(Func.getImageObject("menu/checked", 1), "Default Mode",
@@ -168,17 +177,17 @@ class FileButtonArea(QWidget):
             lambda checked: self.menu.exec(self.mapToGlobal(setting_button.pos())))
         # layout
         layout = QGridLayout()
-        for i in range(6):
+        for i in range(9):
             layout.setColumnStretch(i, 1)
-        layout.addWidget(icon, 0, 1, 1, 5, Qt.AlignHCenter)
+        layout.addWidget(icon, 0, 1, 1, 7, Qt.AlignHCenter)
         layout.setRowStretch(0, 13)
-        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, -1)
+        layout.addWidget(Version("Psy Builder", "Version 0.1"), 1, 1, 1, 7)
         layout.setRowStretch(1, 12)
-        layout.addWidget(create_button, 2, 2, 1, 2, Qt.AlignLeft)
+        layout.addWidget(create_button, 2, 3, 1, 3, Qt.AlignLeft)
         layout.setRowStretch(2, 1)
-        layout.addWidget(open_button, 3, 2, 1, 2, Qt.AlignLeft)
+        layout.addWidget(open_button, 3, 3, 1, 3, Qt.AlignLeft)
         layout.setRowStretch(3, 1)
-        layout.addWidget(setting_button, 4, 2, 1, 2, Qt.AlignLeft)
+        layout.addWidget(setting_button, 4, 3, 1, 3, Qt.AlignLeft)
         layout.setRowStretch(4, 1)
         layout.setRowStretch(5, 20)
         self.setLayout(layout)
@@ -241,6 +250,7 @@ class FileWindow(QWidget):
         # layout
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         if self.file_path_table.rowCount():
             layout.addWidget(self.file_path_table, 2)
             layout.addWidget(self.file_button_area, 3, Qt.AlignHCenter)
