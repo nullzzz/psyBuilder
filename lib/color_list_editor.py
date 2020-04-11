@@ -34,7 +34,7 @@ class ColorListEditor(VarComboBox):
         # 支持输入255,255,255及#ffffff格式rgb
         valid_rgb = QRegExp(
             r"((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{6}|"
-            r"white|gray|black|red|orange|yellow|green|blue|purple|\[\w+\]")
+            r"white|gray|black|red|orange|yellow|green|blue|purple|\[[\w_\.]+\]")
         self.setValidator(QRegExpValidator(valid_rgb, self))
         self.setInsertPolicy(QComboBox.NoInsert)
 

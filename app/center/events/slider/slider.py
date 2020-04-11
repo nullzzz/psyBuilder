@@ -6,11 +6,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QB
 from app.center.events.slider.left.leftBox import LeftBox
 from app.func import Func
 from lib import TabItemMainWindow
-from ...events.slider.item.diaItem import DiaItem
-from ...events.slider.item.linItem import LineItem
-from ...events.slider.item.otherItem import OtherItem
-from ...events.slider.item.pixItem import PixItem
-from ...events.slider.item.textItem import TextItem
+from .item import *
 from ...events.slider.property import SliderProperty
 from ...events.slider.scene import Scene
 
@@ -27,13 +23,12 @@ class Slider(TabItemMainWindow):
 
         self.view = QGraphicsView(self.scene)
         self.view.setRenderHint(QPainter.Antialiasing)
-        # opengl = QGLWidget(QGLFormat(QGL.SampleBuffers))
-        # opengl.makeCurrent()
-        # self.view.setViewport(opengl)
 
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
         self.view.setMaximumSize(width, height)
         self.scene.setSceneRect(0, 0, width, height)
+        self.w = width
+        self.h = height
         # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
         self.default_properties: dict = {
@@ -46,7 +41,7 @@ class Slider(TabItemMainWindow):
 
     def initMenu(self):
         open_action = QAction(QIcon(Func.getImage("setting")), "setting", self)
-        open_action.triggered.connect(self.openPro)
+        open_action.triggered.connect(self.openSettingWindow)
 
         front_action = QAction(QIcon(Func.getImage("sendtoback.png")), "Bring to Front", self)
         front_action.setToolTip("Bring item to front")
@@ -145,11 +140,10 @@ class Slider(TabItemMainWindow):
         setting.addWidget(self.background_bt)
 
         slider = QSlider(Qt.Horizontal)
-        slider.setRange(5, 200)
+        slider.setRange(50, 200)
         slider.setValue(100)
         slider.valueChanged[int].connect(self.zoom)
         setting.addWidget(slider)
-
 
         self.addToolBar(Qt.TopToolBarArea, setting)
 
@@ -179,9 +173,6 @@ class Slider(TabItemMainWindow):
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
-    def openPro(self):
-        self.pro_window.show()
-
     def deleteItem(self):
         for item in self.scene.selectedItems():
             self.scene.removeItem(item)
@@ -201,8 +192,7 @@ class Slider(TabItemMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            if item.zValue() >= z_value:  # and (
-                #         isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
+            if item.zValue() >= z_value:
                 z_value = item.zValue() + 0.1
         selected_item.setZValue(z_value)
 
@@ -213,8 +203,7 @@ class Slider(TabItemMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            if item.zValue() <= z_value:  # and (
-                # isinstance(item, TextItem) or isinstance(item, DiaItem) or isinstance(item, PixItem)):
+            if item.zValue() <= z_value:
                 z_value = item.zValue() - 0.1
         selected_item.setZValue(z_value)
 
@@ -230,11 +219,11 @@ class Slider(TabItemMainWindow):
             if isinstance(item, TextItem) or isinstance(item, PixItem) \
                     or isinstance(item, LineItem) \
                     or isinstance(item, OtherItem) \
-                    or isinstance(item, DiaItem):
+                    or isinstance(item, DiaItem)\
+                    or isinstance(item, DotItem):
                 item.setSelected(item_name == item.getName())
                 if item_name == item.getName():
                     self.changeTool(item)
-                    # self.view.centerOn(item)
         self.blockSignals(False)
 
     def openItem(self):
@@ -286,6 +275,8 @@ class Slider(TabItemMainWindow):
         self.line_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("linecolor.png"), color))
 
         fill_color: str = item.properties.get("Fill Color", "255,255,255")
+        if fill_color == "255,255,255":
+            fill_color: str = item.properties.get("Back Color", "255,255,255")
         if fill_color.startswith("["):
             r, g, b, a = 255, 255, 255, 255
         else:
@@ -304,6 +295,8 @@ class Slider(TabItemMainWindow):
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
         self.setMaximumSize(width, height)
         self.scene.setSceneRect(0, 0, width, height)
+        self.w = width
+        self.h = height
         # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
     def setAttributes(self, attributes):
@@ -401,10 +394,12 @@ class Slider(TabItemMainWindow):
 
     def zoom(self, value):
         factor = value / 100.0
-        matrix = self.view.transform()
-        matrix.reset()
-        matrix.scale(factor, factor)
-        self.view.setTransform(matrix)
+        # matrix = self.view.transform()
+        # matrix.reset()
+        self.scene.setSceneRect(0, 0, self.w * factor, self.h * factor)
+        self.view.fitInView(0, 0, self.w * factor, self.h * factor, Qt.KeepAspectRatio)
+        # matrix.scale(factor, factor)
+        # self.view.setTransform(matrix)
 
     @staticmethod
     def createColorButtonIcon(file_path, color):
