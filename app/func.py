@@ -419,6 +419,18 @@ class Func(object):
             f = pro.get("Frame")
             d = pro.get("Duration")
             dp["Properties"] = {**g, **f, **d}
+
+            new_items = {}
+            items: dict = dp["Items"]
+            for k, v in items.items():
+                new_items[k] = {
+                    "X": v["X"],
+                    "Y": v["Y"],
+                    "Z": v["Z"],
+                    "Name": v["Name"],
+                    **v["Properties"],
+                }
+            dp["Items"] = new_items
         elif g := dp.get("General"):
             f = dp.get("Frame", {})
             d = dp.get("Duration")

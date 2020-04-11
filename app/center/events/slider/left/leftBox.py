@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QByteArray, QDataStream, QIODevice, QMimeData, pyqtSignal, QSize
 from PyQt5.QtGui import QDrag, QIcon
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QPushButton, QWidget, QGridLayout, QLabel, QToolBox, QSizePolicy, QFormLayout
+from PyQt5.QtWidgets import QPushButton, QWidget, QGridLayout, QLabel, QToolBox, QSizePolicy, QFormLayout, QDockWidget
 
 from app.func import Func
 
@@ -27,8 +27,8 @@ class LeftBox(QToolBox):
         sound = Item("sound", LeftBox.Sound)
         snow = Item("snow", LeftBox.Snow)
         gabor = Item("gabor", LeftBox.Gabor)
-        dot = Item("dot", LeftBox.Dot)
-        dot.setEnabled(False)
+        dot_motion = Item("dot motion", LeftBox.Dot)
+        # dot_motion.setEnabled(False)
 
         self.addItem(self.basic, "Basic Geometries")
         self.addItem(self.stimuli, "Stimuli")
@@ -53,7 +53,7 @@ class LeftBox(QToolBox):
         stim_Layout.addWidget(sound)
         stim_Layout.addWidget(snow)
         stim_Layout.addWidget(gabor)
-        stim_Layout.addWidget(dot)
+        stim_Layout.addWidget(dot_motion)
 
         self.basic.setLayout(basic_layout)
         self.stimuli.setLayout(stim_Layout)
@@ -92,6 +92,8 @@ class Button(QPushButton):
             text = "textpointer"
         elif text == "3D":
             text = "open"
+        elif text == "dot motion":
+            text = "dot"
 
         fp = QPixmap(Func.getImage(f"{text}.png")).scaled(50, 50)
         self.setIcon(QIcon(fp))

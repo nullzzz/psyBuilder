@@ -237,4 +237,4 @@ class BaseItem(QGraphicsItem):
         if not old_rgb.startswith("["):
             rgb = f"{color.red()},{color.green()},{color.blue()}"
             self.properties["Fill Color"] = rgb
-            self.pro_window.general.setItemColor(rgb)
+            self.pro_window.general.setBackColor(rgb)
