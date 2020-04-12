@@ -57,6 +57,7 @@ class FilePath(QTextEdit):
         QTextEdit{
             border:none;
             padding-left:10px;
+            padding-top:5px;
         }
         QTextEdit:hover{
             border-radius:2px;
@@ -64,12 +65,15 @@ class FilePath(QTextEdit):
         }
         """)
         self.file_path = file_path
+        self.setToolTip(file_path)
         file_name = os.path.basename(file_path)
         self.setText(f"""<b style="color:rgb(31,31,31)">{file_name}</b>""")
-        if os.path.exists(file_path):
-            self.append(f"""<p style="color:rgb(157,157,157); font:12px">{file_path}</p>""")
+        if len(file_path) > 45:
+            file_path = file_path[:21] + "..." + file_path[-21:]
+        if os.path.exists(self.file_path):
+            self.append(f"""<p style="color:rgb(157,157,157); font-size:12px">{file_path}</p>""")
         else:
-            self.append(f"""<p style="color:rgb(142,15,15); font:12px">{file_path}</p>""")
+            self.append(f"""<p style="color:rgb(142,15,15); font-size:12px">{file_path}</p>""")
         self.setReadOnly(True)
         self.setTextInteractionFlags(Qt.NoTextInteraction)
 
@@ -119,7 +123,7 @@ class FilePathTable(TableWidget):
         if index == -1:
             index = self.rowCount()
         self.insertRow(index)
-        self.setRowHeight(index, 56)
+        self.setRowHeight(index, 50)
         # insert line edit into table
         file = FilePath(file_path)
         self.setCellWidget(index, 0, file)
