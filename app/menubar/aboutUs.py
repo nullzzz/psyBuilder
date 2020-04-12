@@ -58,9 +58,9 @@ class AboutUs(QWidget):
         author2 = self.getInfo("authorInfo02",
                                "Zhe Yang, Ph.D, Associate Prof. <br> Department of computer science, Soochow University,Suzhou")
 
-        author3 = self.getInfo("authorInfo03", "ChenZhi Feng, Ph.D, Prof. <br> Department of Psychology, Soochow University,Suzhou")
+        author3 = self.getInfo("authorInfo03", "Chenzhi Feng, Ph.D, Prof. <br> Department of Psychology, Soochow University,Suzhou")
 
-        author4 = self.getInfo("authorInfo_zhicheng", "ZhiCheng Lin, Ph.D, Prof. <br> Applied Psychology,  Chinese University of Hong Kong,Shenzhen")
+        author4 = self.getInfo("authorInfo_zhicheng", "Zhicheng Lin, Ph.D, Prof. <br> Applied Psychology,  Chinese University of Hong Kong,Shenzhen")
         layout = QVBoxLayout()
         layout.addWidget(info, 2)
         layout.addLayout(author1, 1)
