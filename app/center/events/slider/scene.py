@@ -1,6 +1,6 @@
-from PyQt5.QtCore import pyqtSignal, Qt, QLineF, QPointF
+from PyQt5.QtCore import pyqtSignal, Qt, QLineF, QPointF, QRectF
 from PyQt5.QtGui import QPen, QTransform
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem, QGraphicsRectItem
 
 from app.info import Info
 from .item.openglItem import GLItem
@@ -30,7 +30,8 @@ class Scene(QGraphicsScene):
 
         self.t = QTransform()
 
-        self.myLineWidth = 1
+        self.border: QGraphicsRectItem = QGraphicsRectItem()
+        self.addItem(self.border)
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasFormat("application/x-icon-and-text"):
@@ -182,8 +183,9 @@ class Scene(QGraphicsScene):
     def getInfo(self):
         item_info: dict = {}
         for item in self.items():
-            item.setPosition()
-            item_info[item.getName()] = item.getInfo()
+            if item is not self.border:
+                item.setPosition()
+                item_info[item.getName()] = item.getInfo()
         return item_info
 
     def setProperties(self, properties: dict):
@@ -220,7 +222,8 @@ class Scene(QGraphicsScene):
     def setAttributes(self, attributes: list):
         self.attributes = attributes
         for item in self.items():
-            item.setAttributes(attributes)
+            if item is not self.border:
+                item.setAttributes(attributes)
 
     def copyItem(self, item: QGraphicsItem):
         new_item = item.clone()
@@ -235,3 +238,9 @@ class Scene(QGraphicsScene):
 
         item.setSelected(False)
         new_item.setSelected(True)
+
+    def setSceneRect(self, rect: QRectF) -> None:
+        self.border: QGraphicsRectItem
+
+        self.border.setRect(QRectF(0, 0, rect.width(), rect.height()))
+        super(Scene, self).setSceneRect(rect)

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtCore import Qt, QRect, QRectF
 from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMenu, QAction, \
     QComboBox, QColorDialog, QToolBar, QSlider
@@ -26,7 +26,7 @@ class Slider(TabItemMainWindow):
 
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
         self.view.setMaximumSize(width, height)
-        self.scene.setSceneRect(0, 0, width, height)
+        self.scene.setSceneRect(QRectF(0, 0, width, height))
         self.w = width
         self.h = height
         # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
@@ -142,6 +142,8 @@ class Slider(TabItemMainWindow):
         slider = QSlider(Qt.Horizontal)
         slider.setRange(50, 200)
         slider.setValue(100)
+        slider.setTickPosition(QSlider.TicksAbove)
+        slider.setTickInterval(10)
         slider.valueChanged[int].connect(self.zoom)
         setting.addWidget(slider)
 
@@ -293,10 +295,11 @@ class Slider(TabItemMainWindow):
         self.pro_window.refresh()
 
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
-        self.setMaximumSize(width, height)
-        self.scene.setSceneRect(0, 0, width, height)
-        self.w = width
-        self.h = height
+        if width != self.w or height != self.h:
+            self.setMaximumSize(width, height)
+            self.scene.setSceneRect(QRectF(0, 0, width, height))
+            self.w = width
+            self.h = height
         # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
     def setAttributes(self, attributes):
@@ -394,12 +397,10 @@ class Slider(TabItemMainWindow):
 
     def zoom(self, value):
         factor = value / 100.0
-        # matrix = self.view.transform()
-        # matrix.reset()
-        self.scene.setSceneRect(0, 0, self.w * factor, self.h * factor)
-        self.view.fitInView(0, 0, self.w * factor, self.h * factor, Qt.KeepAspectRatio)
-        # matrix.scale(factor, factor)
-        # self.view.setTransform(matrix)
+        matrix = self.view.transform()
+        matrix.reset()
+        matrix.scale(factor, factor)
+        self.view.setTransform(matrix)
 
     @staticmethod
     def createColorButtonIcon(file_path, color):
