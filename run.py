@@ -184,7 +184,7 @@ class FileButtonArea(QFrame):
             layout.setColumnStretch(i, 1)
         layout.setRowStretch(0, 2)
         layout.addWidget(icon, 1, 1, 1, 7, Qt.AlignHCenter)
-        layout.setRowStretch(1, 1)
+        layout.setRowStretch(1, 5)
         layout.addWidget(Version("PsyBuilder", "Version 0.1"), 2, 1, 1, 7)
         layout.setRowStretch(2, 12)
         layout.addWidget(create_button, 3, 3, 1, 3, Qt.AlignLeft)
