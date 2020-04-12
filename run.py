@@ -3,7 +3,7 @@ import re
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
-from PyQt5.QtGui import QIcon,QPalette,QBrush
+from PyQt5.QtGui import QFontDatabase
 from PyQt5.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QApplication, QFileDialog, QLabel, QMenu, QGridLayout, \
     QFrame
 
@@ -18,19 +18,21 @@ class Version(QTextEdit):
         super(Version, self).__init__()
         self.setReadOnly(True)
         self.setTextInteractionFlags(Qt.NoTextInteraction)
-        self.setFrameShape(QFrame.NoFrame)
         self.setStyleSheet("""
-                QTextEdit{
-                    border: none;
-                    background: transparent;
-                }
-                """)
+            border: none;
+            background: transparent;
+        """)
         # set text
         self.setAlignment(Qt.AlignHCenter)
         self.setText(f"""
         <div style="text-align: center;">
-            <b style="font:36px;vertical-align: middle;">{name}</b><br />
-            <b style="color:rgb(157,157,157); font:18px;vertical-align: middle;">{version}</b>
+            <span style="font-size:36px; font-family: 'times'">
+                {name}
+            </span>
+            <br/>
+            <span style="color:rgb(157,157,157); font-size:18px;">
+                {version}
+            </span>
         </div>
         """)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -351,12 +353,15 @@ class FileWindow(QWidget):
             Settings("config.ini", Settings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
             self.startPsy()
         else:
-            MessageBox.information(self, "Error", f"The path '{file_path}' does not exist.'")
+            MessageBox.information(self, "Error", f"The path '{file_path}' does not exist.")
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # set qss
+    # set qss and font
+    index = QFontDatabase().addApplicationFont("fonts/STHuPo.ttf")
+    if index == -1:
+        print("Fail to add application font.")
     app.setStyleSheet(qss)
     # check open mode
     open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
