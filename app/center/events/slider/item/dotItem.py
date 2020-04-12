@@ -185,7 +185,10 @@ class DotItem(QGraphicsItem):
 
     def shape(self):
         path = QPainterPath()
-        path.addEllipse(self.rect)
+        if self.is_oval:
+            path.addEllipse(self.rect)
+        else:
+            path.addRect(self.rect)
         return path
 
     def generateDotPosition(self):
