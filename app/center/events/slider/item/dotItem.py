@@ -46,7 +46,7 @@ class DotItem(QGraphicsItem):
 
         self.is_oval: bool = True
         self.dot_cnt: int = 50
-        self.dot_type: int = 1
+        self.dot_type: int = 0
         self.dot_size: int = 6
         self.move_direction: int = 0
         self.speed: int = 0
@@ -225,8 +225,8 @@ class DotItem(QGraphicsItem):
                 painter.drawEllipse(self.rect)
             else:
                 painter.drawRect(self.rect)
-        else:
-            painter.setPen(Qt.NoPen)
+
+        painter.setPen(Qt.NoPen)
         # draw fill color
         painter.setBrush(QBrush(self.fill_color))
         if self.is_oval:
@@ -241,7 +241,10 @@ class DotItem(QGraphicsItem):
             x = p[0]
             y = p[1]
             rect = QRect(x - self.dot_size, y - self.dot_size, self.dot_size, self.dot_size)
-            painter.drawEllipse(rect)
+            if self.dot_type == 0 or self.dot_type == 4:
+                painter.drawEllipse(rect)
+            else:
+                painter.drawRect(rect)
 
     def setProperties(self, properties: dict):
         self.pro_window.setProperties(properties.get("Properties"))
@@ -276,9 +279,8 @@ class DotItem(QGraphicsItem):
             self.properties["Back Color"] = rgb
             self.pro_window.general.setBackColor(rgb)
 
-    def setWidth(self, width):
-        if isinstance(width, str) and width.isdigit():
-            self.border_width = int(width)
+    def setWidth(self, width: int):
+        self.border_width = width
         self.update()
 
         old_width = self.properties["Border Width"]
