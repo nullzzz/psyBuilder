@@ -180,18 +180,21 @@ class FileButtonArea(QFrame):
             lambda checked: self.menu.exec(self.mapToGlobal(setting_button.pos())))
         # layout
         layout = QGridLayout()
-        for i in range(9):
+        # total number of columns
+        total_columns = 12
+        button_start_column = 6
+        for i in range(total_columns):
             layout.setColumnStretch(i, 1)
         layout.setRowStretch(0, 2)
-        layout.addWidget(icon, 1, 1, 1, 7, Qt.AlignHCenter)
+        layout.addWidget(icon, 1, 1, 1, total_columns - 2, Qt.AlignHCenter)
         layout.setRowStretch(1, 5)
-        layout.addWidget(Version("PsyBuilder", "Version 0.1"), 2, 1, 1, 7)
+        layout.addWidget(Version("PsyBuilder", "Version 0.1"), 2, 1, 1, total_columns - 2)
         layout.setRowStretch(2, 12)
-        layout.addWidget(create_button, 3, 3, 1, 3, Qt.AlignLeft)
+        layout.addWidget(create_button, 3, button_start_column, 1, 1, Qt.AlignLeft)
         layout.setRowStretch(3, 1)
-        layout.addWidget(open_button, 4, 3, 1, 3, Qt.AlignLeft)
+        layout.addWidget(open_button, 4, button_start_column, 1, 1, Qt.AlignLeft)
         layout.setRowStretch(4, 1)
-        layout.addWidget(setting_button, 5, 3, 1, 3, Qt.AlignLeft)
+        layout.addWidget(setting_button, 5, button_start_column, 1, 1, Qt.AlignLeft)
         layout.setRowStretch(5, 1)
         layout.setRowStretch(6, 20)
         self.setLayout(layout)
