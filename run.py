@@ -26,7 +26,7 @@ class Version(QTextEdit):
         self.setAlignment(Qt.AlignHCenter)
         self.setText(f"""
         <div style="text-align: center;">
-            <span style="font-size:36px; font-family: 'times'">
+            <span style="font-size:36px; font-family: 'STHupo'">
                 {name}
             </span>
             <br/>
@@ -359,9 +359,10 @@ class FileWindow(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     # set qss and font
-    index = QFontDatabase().addApplicationFont("fonts/STHuPo.ttf")
-    if index == -1:
-        print("Fail to add application font.")
+    QFontDatabase.addApplicationFont(os.path.abspath("fonts/STHuPo.ttf"))
+    # It should be noted that: the font name is not file name
+    # you need to get the font name by using the function 'QFontDatabase.applicationFontFamilies(id)'
+    # id is the return value of 'QFontDatabase.addApplicationFont(font_file_name)'
     app.setStyleSheet(qss)
     # check open mode
     open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
