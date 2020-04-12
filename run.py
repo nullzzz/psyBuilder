@@ -26,11 +26,11 @@ class Version(QTextEdit):
         self.setAlignment(Qt.AlignHCenter)
         self.setText(f"""
         <div style="text-align: center;">
-            <span style="color:rgb(64,64,64);font-size:32px; font-family: 'STHupo'">
+            <span style="color:rgb(64,64,64);font-size:32px; font-family: 'Gen Shin Gothic Light'">
                 {name}
             </span>
             <br/>
-            <span style="color:rgb(157,157,157); font-size:18px;">
+            <span style="color:rgb(157,157,157); font-size:18px; font-family: 'Gen Shin Gothic Light'">
                 {version}
             </span>
         </div>
@@ -363,7 +363,7 @@ class FileWindow(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     # set qss and font
-    QFontDatabase.addApplicationFont(os.path.abspath("fonts/STHuPo.ttf"))
+    QFontDatabase.addApplicationFont(os.path.abspath("fonts/GenShinGothic-Light.ttf"))
     # It should be noted that: the font name is not file name
     # you need to get the font name by using the function 'QFontDatabase.applicationFontFamilies(id)'
     # id is the return value of 'QFontDatabase.addApplicationFont(font_file_name)'
