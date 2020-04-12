@@ -99,14 +99,12 @@ class Scene(QGraphicsScene):
 
     def setItemColor(self, color):
         for item in self.selectedItems():
-            if isinstance(item, DiaItem):
+            if isinstance(item, DiaItem) or isinstance(item, DotItem):
                 item.setItemColor(color)  # update the default properties in GeneralTab
-            elif isinstance(item, DotItem):
-                item.setBackColor(color)
 
     def setLineWidth(self, width):
         for item in self.selectedItems():
-            if isinstance(item, LineItem) or isinstance(item, DiaItem):
+            if isinstance(item, LineItem) or isinstance(item, DiaItem) or isinstance(item, DotItem):
                 item.setWidth(width)
 
     def setMode(self, mode: int):

@@ -17,9 +17,14 @@ class DotGeneral(QWidget):
             "Dot Num": "50",
             "Dot Type": "1",
             "Dot Size": "1",
+            "Move Direction": "0",
+            "Speed": "0",
+            "Coherence": "0",
             "Dot Color": "0,0,0",
-            "Back Color": '192,192,192',
-            "Move Direction": "0"
+
+            "Frame Color": "0,0,0,0",
+            "Border Color": "0,0,0,0",
+            "Border Width": "0",
         }
 
         self.cx_pos = VarLineEdit("0")
@@ -36,14 +41,20 @@ class DotGeneral(QWidget):
         self.dot_type.addItems(("1", "2", "3", "4"))
         self.dot_size = VarLineEdit("5")
 
-        # down
+        self.move_direction = VarLineEdit("0")
+        self.speed = VarLineEdit("0")
+
         self.dot_color = ColorListEditor()
         self.dot_color.setCurrentText("0,0,0")
+        self.coherence = VarLineEdit("0")
+        # down
 
-        self.back_color = ColorListEditor()
-        self.back_color.addTransparent()
-        self.back_color.setCurrentText("192,192,192")
-        self.move_direction = VarLineEdit("0")
+        self.fill_color = ColorListEditor()
+        self.fill_color.addTransparent()
+        self.border_color = ColorListEditor()
+        self.border_color.addTransparent()
+        self.border_width = VarLineEdit("0")
+
         self.setUI()
 
     def setUI(self):
@@ -55,9 +66,14 @@ class DotGeneral(QWidget):
         l21 = QLabel("Dot Num:")
         l30 = QLabel("Dot Type:")
         l31 = QLabel("Dot Size:")
-        l4 = QLabel("Dot Color:")
-        l5 = QLabel("Back Color:")
-        l6 = QLabel("Move Direction:")
+        l40 = QLabel("Move Direction:")
+        l41 = QLabel("Speed(d/s):")
+        l50 = QLabel("Dot Color:")
+        l51 = QLabel("Coherence(%):")
+
+        l6 = QLabel("Fill Color:")
+        l7 = QLabel("Border Color:")
+        l8 = QLabel("Border Width:")
 
         l00.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l01.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -67,10 +83,14 @@ class DotGeneral(QWidget):
         l21.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l30.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l31.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l40.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l41.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l50.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l51.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l8.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         group1 = QGroupBox("Geometry")
         layout1 = QGridLayout()
@@ -91,21 +111,29 @@ class DotGeneral(QWidget):
         layout1.addWidget(self.dot_type, 3, 1)
         layout1.addWidget(l31, 3, 2)
         layout1.addWidget(self.dot_size, 3, 3)
+        layout1.addWidget(l40, 4, 0)
+        layout1.addWidget(self.move_direction, 4, 1)
+        layout1.addWidget(l41, 4, 2)
+        layout1.addWidget(self.speed, 4, 3)
+        layout1.addWidget(l50, 5, 0)
+        layout1.addWidget(self.dot_color, 5, 1)
+        layout1.addWidget(l51, 5, 2)
+        layout1.addWidget(self.coherence, 5, 3)
 
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("somethings")
+        group2 = QGroupBox("Fill & Frame")
         layout2 = QFormLayout()
         layout2.setRowWrapPolicy(QFormLayout.DontWrapRows)
         layout2.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
         layout2.setLabelAlignment(Qt.AlignLeft)
 
-        self.dot_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
-        self.back_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
-        layout2.addRow(l4, self.dot_color)
-        layout2.addRow(l5, self.back_color)
-        layout2.addRow(l6, self.move_direction)
+        layout2.addRow(l6, self.fill_color)
+        layout2.addRow(l7, self.border_color)
+        layout2.addRow(l8, self.border_width)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
@@ -123,9 +151,13 @@ class DotGeneral(QWidget):
         self.dot_num.setCompleter(QCompleter(attributes))
         self.dot_type.setCompleter(QCompleter(attributes))
         self.dot_size.setCompleter(QCompleter(attributes))
-        self.dot_color.setCompleter(QCompleter(attributes))
-        self.back_color.setCompleter(QCompleter(attributes))
         self.move_direction.setCompleter(QCompleter(attributes))
+        self.speed.setCompleter(QCompleter(attributes))
+        self.dot_color.setCompleter(QCompleter(attributes))
+        self.coherence.setCompleter(QCompleter(attributes))
+        self.fill_color.setCompleter(QCompleter(attributes))
+        self.border_color.setCompleter(QCompleter(attributes))
+        self.border_width.setCompleter(QCompleter(attributes))
 
     def updateInfo(self):
         self.default_properties['Center X'] = self.cx_pos.text()
@@ -136,10 +168,14 @@ class DotGeneral(QWidget):
         self.default_properties["Dot Num"] = self.dot_num.text()
         self.default_properties["Dot Type"] = self.dot_type.currentText()
         self.default_properties["Dot Size"] = self.dot_size.text()
-
-        self.default_properties['Dot Color'] = self.dot_color.getColor()
-        self.default_properties['Back Color'] = self.back_color.getColor()
         self.default_properties['Move Direction'] = self.move_direction.text()
+        self.default_properties['Speed'] = self.speed.text()
+        self.default_properties['Dot Color'] = self.dot_color.getColor()
+        self.default_properties['Coherence'] = self.coherence.text()
+
+        self.default_properties['Fill Color'] = self.fill_color.getColor()
+        self.default_properties["Border Color"] = self.border_color.getColor()
+        self.default_properties["Border Width"] = self.border_width.text()
 
     def setProperties(self, properties: dict):
         self.default_properties.update(properties)
@@ -157,13 +193,17 @@ class DotGeneral(QWidget):
         if not self._height.text().startswith("["):
             self._height.setText(str(int(h)))
 
-    def setBackColor(self, rgb: str):
-        if not self.back_color.currentText().startswith("["):
-            self.back_color.setCurrentText(rgb)
+    def setFillColor(self, rgb: str):
+        if not self.fill_color.currentText().startswith("["):
+            self.fill_color.setCurrentText(rgb)
 
     def setBorderColor(self, rgb: str):
-        if not self.dot_color.currentText().startswith("["):
-            self.dot_color.setCurrentText(rgb)
+        if not self.border_color.currentText().startswith("["):
+            self.border_color.setCurrentText(rgb)
+
+    def setBorderWidth(self, width: str):
+        if not self.border_width.text().startswith("["):
+            self.border_width.setText(width)
 
     # 加载参数设置
     def loadSetting(self):
@@ -176,7 +216,11 @@ class DotGeneral(QWidget):
         self.dot_num.setText(self.default_properties["Dot Num"])
         self.dot_type.setCurrentText(self.default_properties["Dot Type"])
         self.dot_size.setText(self.default_properties["Dot Size"])
+        self.move_direction.setText(self.default_properties["Move Direction"])
+        self.speed.setText(self.default_properties["Speed"])
 
         self.dot_color.setCurrentText(self.default_properties["Dot Color"])
-        self.back_color.setCurrentText(self.default_properties["Back Color"])
-        self.move_direction.setText(self.default_properties["Move Direction"])
+        self.coherence.setText(self.default_properties["Coherence"])
+        self.fill_color.setCurrentText(self.default_properties["Fill Color"])
+        self.border_color.setCurrentText(self.default_properties["Border Color"])
+        self.border_width.setText(self.default_properties["Border Width"])

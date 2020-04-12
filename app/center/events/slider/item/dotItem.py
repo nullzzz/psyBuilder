@@ -1,7 +1,7 @@
 import random
 
 from PyQt5.QtCore import Qt, QRect, QRectF, QTimer
-from PyQt5.QtGui import QPainterPath, QBrush, QColor
+from PyQt5.QtGui import QPainterPath, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem
 
 from app.center.events.slider.item.dot.dotProperty import DotProperty
@@ -44,12 +44,20 @@ class DotItem(QGraphicsItem):
         self.rect = QRectF(-100, -100, 200, 200)
         self.dot_position: list = []
 
+        self.is_oval: bool = True
         self.dot_cnt: int = 50
         self.dot_type: int = 1
         self.dot_size: int = 6
-        self.dot_color: QColor = QColor(Qt.black)
-        self.back_color: QColor = QColor(Qt.lightGray)
         self.move_direction: int = 0
+        self.speed: int = 0
+
+        self.dot_color: QColor = QColor(Qt.black)
+        self.coherence = ""
+
+        self.fill_color: QColor = QColor(Qt.transparent)
+        self.border_color: QColor = QColor(Qt.transparent)
+
+        self.border_width: int = 0
 
         self.generateDotPosition()
 
@@ -114,6 +122,18 @@ class DotItem(QGraphicsItem):
 
         self.rect = QRectF(-w / 2, -h / 2, w, h)
 
+        __is_oval = self.properties["Is Oval"]
+        if __is_oval in ("yes", "no"):
+            self.is_oval = __is_oval == "yes"
+
+        __move_direction = self.properties["Move Direction"]
+        if __move_direction.isdigit():
+            self.move_direction = int(__move_direction)
+
+        __speed = self.properties["Speed"]
+        if __speed.isdigit():
+            self.speed = int(__speed)
+
         __dot_num = self.properties["Dot Num"]
         if __dot_num.isdigit():
             self.dot_cnt = int(__dot_num)
@@ -135,25 +155,30 @@ class DotItem(QGraphicsItem):
                 r, g, b = rgba
                 a = 255
             self.dot_color = QColor(r, g, b, a)
-        __back_color = self.properties["Back Color"]
-        if not __back_color.startswith("["):
-            rgba = [int(x) for x in __back_color.split(",")]
+
+        __fill_color = self.properties["Fill Color"]
+        if not __fill_color.startswith("["):
+            rgba = [int(x) for x in __fill_color.split(",")]
             if len(rgba) == 4:
                 r, g, b, a = rgba
             else:
                 r, g, b = rgba
                 a = 255
-            self.back_color.setRgb(r, g, b, a)
+            self.fill_color.setRgb(r, g, b, a)
 
+        __border_color = self.properties["Border Color"]
+        if not __border_color.startswith("["):
+            rgba = [int(x) for x in __border_color.split(",")]
+            if len(rgba) == 4:
+                r, g, b, a = rgba
+            else:
+                r, g, b = rgba
+                a = 255
+            self.border_color.setRgb(r, g, b, a)
+        __border_width = self.properties["Border Width"]
+        if __border_width.isdigit():
+            self.border_width = int(__border_width)
         self.update()
-
-    def setBackColor(self, color: QColor):
-        self.back_color = color
-        old_rgb = self.properties["Back Color"]
-        if not old_rgb.startswith("["):
-            rgb = f"{color.red()},{color.green()},{color.blue()}"
-            self.properties["Back Color"] = rgb
-            self.pro_window.general.setBackColor(rgb)
 
     def boundingRect(self):
         return self.rect
@@ -190,9 +215,26 @@ class DotItem(QGraphicsItem):
         self.update()
 
     def paint(self, painter, option, widget=None):
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(QBrush(self.back_color))
-        painter.drawEllipse(self.rect)
+        # draw border
+        if self.border_width:
+            pen = QPen()
+            pen.setColor(self.border_color)
+            pen.setWidth(self.border_width)
+            painter.setPen(pen)
+            if self.is_oval:
+                painter.drawEllipse(self.rect)
+            else:
+                painter.drawRect(self.rect)
+        else:
+            painter.setPen(Qt.NoPen)
+        # draw fill color
+        painter.setBrush(QBrush(self.fill_color))
+        if self.is_oval:
+            painter.drawEllipse(self.rect)
+        else:
+            painter.drawRect(self.rect)
+
+        # draw dots
         painter.setBrush(QBrush(self.dot_color))
         for p in self.dot_position:
             p: tuple
@@ -225,3 +267,31 @@ class DotItem(QGraphicsItem):
     def setZValue(self, z: float) -> None:
         self.default_properties["Z"] = z
         super(DotItem, self).setZValue(z)
+
+    def setItemColor(self, color: QColor):
+        self.fill_color = color
+        old_rgb = self.properties["Back Color"]
+        if not old_rgb.startswith("["):
+            rgb = f"{color.red()},{color.green()},{color.blue()}"
+            self.properties["Back Color"] = rgb
+            self.pro_window.general.setBackColor(rgb)
+
+    def setWidth(self, width):
+        if isinstance(width, str) and width.isdigit():
+            self.border_width = int(width)
+        self.update()
+
+        old_width = self.properties["Border Width"]
+        if not old_width.startswith("["):
+            self.properties["Border Width"] = str(width)
+            self.pro_window.general.setBorderWidth(str(width))
+
+    def setLineColor(self, color: QColor):
+        self.border_color = color
+        self.update()
+
+        old_rgb = self.properties["Border Color"]
+        if not old_rgb.startswith("["):
+            rgb = f"{color.red()},{color.green()},{color.blue()}"
+            self.properties["Border Color"] = rgb
+            self.pro_window.general.setBorderColor(rgb)
