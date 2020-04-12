@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QRect, QRectF
 from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMenu, QAction, \
-    QComboBox, QColorDialog, QToolBar, QSlider
+    QComboBox, QColorDialog, QToolBar, QSlider, QSpinBox
 
 from app.center.events.slider.left.leftBox import LeftBox
 from app.func import Func
@@ -139,12 +139,22 @@ class Slider(TabItemMainWindow):
         self.background_bt.setIcon(QIcon(Func.getImage("background4.png")))
         setting.addWidget(self.background_bt)
 
+        slider_input = QSpinBox()
+        slider_input.setSuffix("%")
+        slider_input.setRange(25, 175)
+        slider_input.setValue(100)
+
         slider = QSlider(Qt.Horizontal)
-        slider.setRange(50, 200)
+        slider.setMaximumWidth(400)
+        slider.setRange(25, 175)
         slider.setValue(100)
         slider.setTickPosition(QSlider.TicksAbove)
         slider.setTickInterval(10)
+
+        slider_input.valueChanged.connect(slider.setValue)
         slider.valueChanged[int].connect(self.zoom)
+        slider.valueChanged[int].connect(slider_input.setValue)
+        setting.addWidget(slider_input)
         setting.addWidget(slider)
 
         self.addToolBar(Qt.TopToolBarArea, setting)
@@ -277,8 +287,6 @@ class Slider(TabItemMainWindow):
         self.line_color_bt.setIcon(self.createColorButtonIcon(Func.getImage("linecolor.png"), color))
 
         fill_color: str = item.properties.get("Fill Color", "255,255,255")
-        if fill_color == "255,255,255":
-            fill_color: str = item.properties.get("Back Color", "255,255,255")
         if fill_color.startswith("["):
             r, g, b, a = 255, 255, 255, 255
         else:
