@@ -26,7 +26,7 @@ class Version(QTextEdit):
         self.setAlignment(Qt.AlignHCenter)
         self.setText(f"""
         <div style="text-align: center;">
-            <span style="font-size:36px; font-family: 'STHupo'">
+            <span style="color:rgb(64,64,64);font-size:32px; font-family: 'STHupo'">
                 {name}
             </span>
             <br/>
