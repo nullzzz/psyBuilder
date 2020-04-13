@@ -213,7 +213,7 @@ class DotItem(QGraphicsItem):
             if self.is_oval:
                 cRdAngle = random.random() * 2 * math.pi
                 cX = (width / 2) * math.cos(cRdAngle)
-                cY = scaleRation * (width / 2) * math.cos(cRdAngle)
+                cY = scaleRation * (width / 2) * math.sin(cRdAngle)
             else:
                 cX = random.randrange(-width / 2, width / 2)
                 cY = random.randrange(-width / 2, width / 2)
