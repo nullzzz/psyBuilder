@@ -141,21 +141,21 @@ class Slider(TabItemMainWindow):
 
         slider_input = QSpinBox()
         slider_input.setSuffix("%")
-        slider_input.setRange(25, 175)
+        slider_input.setRange(25, 400)
         slider_input.setValue(100)
 
         slider = QSlider(Qt.Horizontal)
-        slider.setMaximumWidth(400)
-        slider.setRange(25, 175)
+        slider.setMaximumWidth(250)
+        slider.setRange(25, 400)
         slider.setValue(100)
-        slider.setTickPosition(QSlider.TicksAbove)
-        slider.setTickInterval(10)
+        slider.setTickPosition(QSlider.TicksBelow)
+        slider.setTickInterval(25)
 
         slider_input.valueChanged.connect(slider.setValue)
         slider.valueChanged[int].connect(self.zoom)
         slider.valueChanged[int].connect(slider_input.setValue)
-        setting.addWidget(slider_input)
         setting.addWidget(slider)
+        setting.addWidget(slider_input)
 
         self.addToolBar(Qt.TopToolBarArea, setting)
 

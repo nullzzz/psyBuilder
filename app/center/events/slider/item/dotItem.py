@@ -218,7 +218,6 @@ class DotItem(QGraphicsItem):
                 cRandR = random.random()*width/2
                 cX = cRandR * math.cos(cRdAngle)
                 cY = scaleRation * cRandR * math.sin(cRdAngle)
-                # print(f"{cX},{cY}")
             else:
                 cX = random.randrange(-width / 2, width / 2)
                 cY = random.randrange(-width / 2, width / 2)
@@ -226,13 +225,6 @@ class DotItem(QGraphicsItem):
             ps.append([cX,cY])
 
         self.dot_position = ps
-
-        # ps = []
-        # for i in range(self.dot_cnt):
-        #     x = random.randint(self.rect.left(), self.rect.right())
-        #     y = random.randint(self.rect.top(), self.rect.bottom())
-        #     ps.append([x, y])
-        # self.dot_position = ps
 
     def updateDotPosition(self):
         # todo
