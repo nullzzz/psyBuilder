@@ -94,7 +94,7 @@ class Scene(QGraphicsScene):
 
     def setLineColor(self, color):
         for item in self.selectedItems():
-            if isinstance(item, LineItem) or isinstance(item, DiaItem):
+            if isinstance(item, LineItem) or isinstance(item, DiaItem) or isinstance(item, DotItem):
                 item.setLineColor(color)
 
     def setItemColor(self, color):
