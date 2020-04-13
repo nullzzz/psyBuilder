@@ -218,7 +218,7 @@ class DotItem(QGraphicsItem):
                 cRandR = random.random()*width/2
                 cX = cRandR * math.cos(cRdAngle)
                 cY = scaleRation * cRandR * math.sin(cRdAngle)
-                print(f"{cX},{cY}")
+                # print(f"{cX},{cY}")
             else:
                 cX = random.randrange(-width / 2, width / 2)
                 cY = random.randrange(-width / 2, width / 2)
