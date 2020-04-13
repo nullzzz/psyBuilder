@@ -15,7 +15,7 @@ class DotGeneral(QWidget):
             "Height": "100",
             "Is Oval": "yes",
             "Dot Num": "50",
-            "Dot Type": "1",
+            "Dot Type": "0",
             "Dot Size": "1",
             "Move Direction": "0",
             "Speed": "0",
@@ -38,7 +38,7 @@ class DotGeneral(QWidget):
 
         self.dot_num = VarLineEdit("50")
         self.dot_type = VarComboBox()
-        self.dot_type.addItems(("1", "2", "3", "4"))
+        self.dot_type.addItems(("0", "1", "2", "3", "4"))
         self.dot_size = VarLineEdit("5")
 
         self.move_direction = VarLineEdit("0")

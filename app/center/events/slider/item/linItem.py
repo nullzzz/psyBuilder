@@ -59,13 +59,12 @@ class LineItem(QGraphicsLineItem):
         y2 = self.line().y2() + self.scenePos().y()
         self.pro_window.setPosition(x1, y1, x2, y2)
 
-    def setWidth(self, width):
-        if isinstance(width, str) and width.isdigit():
-            width = int(width)
+    def setWidth(self, width: int):
         pen = self.pen()
         pen.setWidth(width)
         self.setPen(pen)
         self.update()
+
         old_width = self.properties["Border Width"]
         if not old_width.startswith("["):
             self.properties["Border Width"] = str(width)

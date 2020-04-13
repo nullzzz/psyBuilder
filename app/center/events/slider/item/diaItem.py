@@ -94,10 +94,6 @@ class DiaItem(QGraphicsPolygonItem):
     def getName(self):
         return self.item_name
 
-    def setLineWidth(self, width):
-        self.border_width = width
-        self.pro_window.general.setBorderWidth(width)
-
     def mouseMoveEvent(self, event):
         x = event.pos().x()
         y = event.pos().y()
@@ -360,8 +356,6 @@ class DiaItem(QGraphicsPolygonItem):
         self.pro_window.general.setVertex(points)
 
     def setWidth(self, width):
-        if isinstance(width, str) and width.isdigit():
-            width = int(width)
         pen = self.pen()
         pen.setWidth(width)
         self.setPen(pen)
