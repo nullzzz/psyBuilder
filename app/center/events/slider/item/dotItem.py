@@ -1,3 +1,4 @@
+import math
 import random
 
 from PyQt5.QtCore import Qt, QRect, QRectF, QTimer
@@ -190,7 +191,6 @@ class DotItem(QGraphicsItem):
 
     def generateDotPosition(self):
         """
-        # todo
         you should complete this function.
         you can use such parameters:
         self.dot_cnt: int   the number of dot.
@@ -200,12 +200,34 @@ class DotItem(QGraphicsItem):
         each dot position is a tuple, which has x and y.
         all dots' position stored in variable self.dot_position.
         """
-        ps = []
-        for i in range(self.dot_cnt):
-            x = random.randint(self.rect.left(), self.rect.right())
-            y = random.randint(self.rect.top(), self.rect.bottom())
-            ps.append([x, y])
-        self.dot_position = ps
+
+        width = self.rect.width()
+        height = self.rect.height()
+
+
+        scaleRation = height / width
+
+        ps = list()
+
+        for iX in range(self.dot_cnt):
+            if self.is_oval:
+                cRdAngle = math.random() * 2 * math.pi
+                cX = (width / 2) * math.cos(cRdAngle)
+                cY = scaleRation * (width / 2) * math.cos(cRdAngle)
+            else:
+                cX = math.randrange(-width / 2, width / 2)
+                cY = math.randrange(-width / 2, width / 2)
+
+            ps.append([cX,cY])
+
+            self.dot_position = ps
+
+        # ps = []
+        # for i in range(self.dot_cnt):
+        #     x = random.randint(self.rect.left(), self.rect.right())
+        #     y = random.randint(self.rect.top(), self.rect.bottom())
+        #     ps.append([x, y])
+        # self.dot_position = ps
 
     def updateDotPosition(self):
         # todo
