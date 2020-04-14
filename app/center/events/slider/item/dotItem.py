@@ -297,7 +297,7 @@ class DotItem(QGraphicsItem):
             y = p[1]
 
             if p[3]:
-                rect = QRect(x - self.dot_size/2, y - self.dot_size/2, self.dot_size, self.dot_size)
+                rect = QRectF(x - self.dot_size/2, y - self.dot_size/2, self.dot_size, self.dot_size)
                 if self.dot_type == 0 or self.dot_type == 4:
                     painter.drawEllipse(rect)
                 else:
