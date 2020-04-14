@@ -100,7 +100,6 @@ class DotItem(QGraphicsItem):
     def apply(self):
         self.updateInfo()
         self.changeSomething()
-        self.generateDotPosition()
 
     def updateInfo(self):
         self.pro_window.updateInfo()
@@ -130,21 +129,22 @@ class DotItem(QGraphicsItem):
             self.is_oval = __is_oval == "yes"
 
         __move_direction = self.properties["Move Direction"]
-        print(f"line 133: {__move_direction}")
-        if Func.isFloatStr(__move_direction):
+        if not __move_direction.startswith("["):
             self.move_direction = float(__move_direction)
 
         __speed = self.properties["Speed"]
-        if Func.isFloatStr(__speed):
+        if not __speed.startswith("["):
             self.speed = float(__speed)
 
         __coherence = self.properties["Coherence"]
-        if Func.isFloatStr(__coherence):
+        if not __coherence.startswith("["):
             self.coherence = float(__coherence)
 
         __dot_num = self.properties["Dot Num"]
         if __dot_num.isdigit():
             self.dot_cnt = int(__dot_num)
+
+        self.generateDotPosition()
 
         __dot_type = self.properties["Dot Type"]
         if __dot_type.isdigit():
@@ -201,14 +201,6 @@ class DotItem(QGraphicsItem):
 
     def generateDotPosition(self):
         """
-        you should complete this function.
-        you can use such parameters:
-        self.dot_cnt: int   the number of dot.
-        self.dot_type: str  the type of dot.
-        self.rect: QRectF   the bounding rectangle of this item.
-        all above are not referenced variables.
-        each dot position is a tuple, which has x and y.
-        all dots' position stored in variable self.dot_position.
         """
         w = self.rect.width()
         h = self.rect.height()
@@ -243,21 +235,18 @@ class DotItem(QGraphicsItem):
         w = self.rect.width()
         h = self.rect.height()
 
-        moveDis = self.speed*self.Interval/1000
+        move_dis = self.speed*self.Interval/1000
 
         ps = list()
 
-        cPointNum = 0
-
         for cP in self.dot_position:
-            cPointNum += 1
 
             x = cP[0]
             y = cP[1]
             d = cP[2]
 
-            x += moveDis*math.cos(math.pi*d/180)
-            y += moveDis*math.sin(math.pi*d/180)
+            x += move_dis*math.cos(math.pi*d/180)
+            y += move_dis*math.sin(math.pi*d/180)
 
             if x < -w/2:
                 x += w
@@ -308,9 +297,8 @@ class DotItem(QGraphicsItem):
             p: tuple
             x = p[0]
             y = p[1]
-            isShow = p[3]
 
-            if isShow:
+            if p[3]:
                 rect = QRect(x - self.dot_size, y - self.dot_size, self.dot_size, self.dot_size)
                 if self.dot_type == 0 or self.dot_type == 4:
                     painter.drawEllipse(rect)

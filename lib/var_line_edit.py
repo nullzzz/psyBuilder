@@ -11,6 +11,10 @@ from .message_box import MessageBox
 class VarLineEdit(QLineEdit):
     focusLost = pyqtSignal()
 
+    Attribute = r"^\[[_\d\.\w]+\]$"
+    Float = r"^(-?\d+)(\.\d+)?$"
+    Integer = r"^\d+$"
+
     def __init__(self, *__args):
         super(VarLineEdit, self).__init__(*__args)
         self.setAcceptDrops(True)
@@ -19,11 +23,6 @@ class VarLineEdit(QLineEdit):
         self.returnPressed.connect(self.checkValidity)
         self.focusLost.connect(self.checkValidity)
         self.valid_data: str = self.text()
-
-        # font = self.font()  # lineedit current font
-        # font.setPointSize(12)  # change it's size
-        # font.setFamily("Times")
-        # self.setFont(font)  # set font
 
         self.suffix: str = ""
         self.reg_exp: str = ""
@@ -52,8 +51,11 @@ class VarLineEdit(QLineEdit):
     def setSuffix(self, suffix: str):
         self.suffix = suffix
 
-    def setReg(self, reg_exp: str):
-        self.reg_exp = reg_exp + r"|\[[_\d\w]+\]"
+    def setReg(self, reg_exp: str or list or tuple):
+        if isinstance(reg_exp, str):
+            self.reg_exp = f"{reg_exp}|{VarLineEdit.Attribute}"
+        elif isinstance(reg_exp, list) or isinstance(reg_exp, tuple):
+            self.reg_exp = f"{'|'.join(reg_exp)}|{VarLineEdit.Attribute}"
         self.setValidator(QRegExpValidator(QRegExp(self.reg_exp), self))
 
     def addSuffix(self, text: str):

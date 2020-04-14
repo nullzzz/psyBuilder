@@ -43,10 +43,12 @@ class DotGeneral(QWidget):
 
         self.move_direction = VarLineEdit("0")
         self.speed = VarLineEdit("20")
+        self.speed.setReg(VarLineEdit.Float)
 
         self.dot_color = ColorListEditor()
         self.dot_color.setCurrentText("0,0,0")
         self.coherence = VarLineEdit("100")
+        self.coherence.setReg(VarLineEdit.Float)
         # down
 
         self.fill_color = ColorListEditor()
@@ -54,6 +56,7 @@ class DotGeneral(QWidget):
         self.border_color = ColorListEditor()
         self.border_color.addTransparent()
         self.border_width = VarLineEdit("0")
+        self.border_width.setReg(VarLineEdit.Integer)
 
         self.setUI()
 
