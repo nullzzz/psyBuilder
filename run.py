@@ -247,7 +247,7 @@ class FileWindow(QWidget):
         # title
         self.setWindowTitle("Welcome to PsyBuilder")
         self.setFixedSize(820, 450)
-        self.setStyleSheet("background:rgb(247,247,247)")
+        self.setStyleSheet("background:rgb(245,245,245)")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         # widget file_table and file frame
         self.file_path_table = FilePathTable()
@@ -266,7 +266,7 @@ class FileWindow(QWidget):
             layout.addWidget(self.file_path_table, 2)
             layout.addWidget(self.file_button_area, 3, Qt.AlignHCenter)
         else:
-            layout.addWidget(self.file_button_area, 1, Qt.AlignCenter)
+            layout.addWidget(self.file_button_area, 1, Qt.AlignHCenter)
         self.setLayout(layout)
         # data
         self.opening = False
