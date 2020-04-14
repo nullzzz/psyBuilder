@@ -385,7 +385,7 @@ class DiaItem(QGraphicsPolygonItem):
         if not old_rgb.startswith("["):
             rgb = f"{color.red()},{color.green()},{color.blue()}"
             self.properties["Fill Color"] = rgb
-            self.pro_window.general.setBackColor(rgb)
+            self.pro_window.general.setItemColor(rgb)
 
     def setZValue(self, z: float) -> None:
         self.default_properties["Z"] = z

@@ -159,14 +159,13 @@ class Slider(TabItemMainWindow):
 
         self.addToolBar(Qt.TopToolBarArea, setting)
 
-        self.item_menu = QMenu()
-        self.item_menu.addAction(delete_action)
-        self.item_menu.addAction(copy_action)
-        self.item_menu.addSeparator()
-        self.item_menu.addAction(front_action)
-        self.item_menu.addAction(back_action)
-        self.item_menu.addAction(open_item_action)
-        self.scene.menu = self.item_menu
+        self.scene.menu = QMenu()
+        self.scene.menu.addAction(delete_action)
+        self.scene.menu.addAction(copy_action)
+        self.scene.menu.addSeparator()
+        self.scene.menu.addAction(front_action)
+        self.scene.menu.addAction(back_action)
+        self.scene.menu.addAction(open_item_action)
 
     def linkSignal(self):
         self.scene.itemAdd.connect(self.addItem)
@@ -308,7 +307,6 @@ class Slider(TabItemMainWindow):
             self.scene.setSceneRect(QRectF(0, 0, width, height))
             self.w = width
             self.h = height
-        # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
