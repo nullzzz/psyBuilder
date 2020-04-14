@@ -226,8 +226,6 @@ class DotItem(QGraphicsItem):
             # X,Y, direction, showOrNot
             ps.append([x,y,d,isShow])
 
-            print(f"line 237:{d}")
-
         self.dot_position = ps
 
     def updateDotPosition(self):
@@ -299,7 +297,7 @@ class DotItem(QGraphicsItem):
             y = p[1]
 
             if p[3]:
-                rect = QRect(x - self.dot_size, y - self.dot_size, self.dot_size, self.dot_size)
+                rect = QRect(x - self.dot_size/2, y - self.dot_size/2, self.dot_size, self.dot_size)
                 if self.dot_type == 0 or self.dot_type == 4:
                     painter.drawEllipse(rect)
                 else:
