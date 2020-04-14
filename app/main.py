@@ -516,6 +516,8 @@ class Psy(QMainWindow):
             # delete item in origin timeline (not graceful)
             timeline: Timeline = Info.Widgets[origin_parent_widget_id]
             timeline.deleteItemByWidgetName(widget_name)
+        # refresh attributes
+        self.attributes.refresh()
 
     def handleItemDeleted(self, sender_widget: int, widget_id: str):
         """
@@ -525,6 +527,10 @@ class Psy(QMainWindow):
         self.center.closeTab(widget_id)
         # delete node in structure (we need delete data in Kernel.Nodes and Kernel.Names) and item in timeline or timeline in cycle
         widget_name = Func.getWidgetName(widget_id)
+        if sender_widget != Info.CycleSend and widget_id == self.attributes.current_widget_id:
+            # we may need to clear attributes and properties if we delete showing widget
+            self.attributes.showAttributes(Func.getWidgetParent(widget_id))
+            self.properties.clear()
         if sender_widget == Info.StructureSend:
             # delete item in timeline or timeline in cycle
             if Func.isWidgetType(widget_id, Info.TIMELINE):
@@ -625,6 +631,8 @@ class Psy(QMainWindow):
                 copy_widget = self.cloneWidget(origin_widget_id, widget_id, new_widget_name)
                 for change_widget_id in change_widget_ids:
                     Info.Widgets[change_widget_id] = copy_widget
+        # refresh attributes
+        self.attributes.refresh()
 
     def handleItemClicked(self, widget_id: str):
         """

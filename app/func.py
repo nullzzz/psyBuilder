@@ -354,7 +354,7 @@ class Func(object):
         @param widget_id:
         @return:
         """
-        if parentWd:=Info.Nodes[widget_id].parent():
+        if parentWd := Info.Nodes[widget_id].parent():
             return parentWd.widget_id
         else:
             return parentWd
@@ -412,7 +412,7 @@ class Func(object):
         get widget's properties through its widget id
         """
         widget = Info.Widgets[widget_id]
-        if Func.isWidgetType(widget_id, Info.TIMELINE) or Func.isWidgetType(widget_id,Info.CYCLE):
+        if Func.isWidgetType(widget_id, Info.TIMELINE) or Func.isWidgetType(widget_id, Info.CYCLE):
             return widget.getProperties()
         dp: dict = copy.deepcopy(widget.store())
 

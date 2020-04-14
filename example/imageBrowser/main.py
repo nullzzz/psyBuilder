@@ -7,7 +7,7 @@ borderWidth = 10
 rotation = 45
 
 
-class ImageContainer(QFrame):
+class ImageContainer(QLabel):
     def __init__(self):
         super(ImageContainer, self).__init__()
 
@@ -19,30 +19,31 @@ class ImageContainer(QFrame):
         self.image_height = 432
         img = QImage(r"D:\新建文件夹\摸鱼.png")
 
-        matrix = QTransform()
-        matrix.rotate(rotation)
-        img2 = img.transformed(matrix)
-        self.pix = QPixmap.fromImage(img2)
+        self.pix = QPixmap.fromImage(img)
         self.border_color: str = "255,0,0"
         self.border_width = 1
+        self.rotate = 45
+
+    def setCenter(self, x: int, y: int):
+        self.cx = x
+        self.cy = y
 
     def paintEvent(self, a0: QPaintEvent) -> None:
         super(QFrame, self).paintEvent(a0)
         painter = QPainter(self)
 
-        rect = QRect(self.cx - self.image_width // 2,
-                     self.cy - self.image_height // 2,
+        rect = QRect(- self.image_width // 2,
+                     - self.image_height // 2,
                      self.image_width,
                      self.image_height)
 
+        painter.translate(self.cx, self.cy)
+        painter.rotate(45)
         painter.drawPixmap(rect,
                            self.pix)
 
-        painter.setPen(QPen(Qt.red, 2))
-        painter.drawRect(self.cx - self.image_width // 2,
-                         self.cy - self.image_height // 2,
-                         self.image_width,
-                         self.image_height)
+        painter.setPen(QPen(Qt.red, 12))
+        painter.drawRect(rect)
 
 
 class ImageBrowser(QScrollArea):
@@ -55,7 +56,6 @@ class ImageBrowser(QScrollArea):
         self.image.setMaximumSize(1920, 1080)
 
         self.setPix()
-        self.addFrame()
 
         self.setWidget(self.image)
 
@@ -65,9 +65,6 @@ class ImageBrowser(QScrollArea):
         matrix.rotate(45)
         img2 = img.transformed(matrix)
         self.image.setPixmap(QPixmap.fromImage(img2))
-
-    def addFrame(self):
-        self.image.setStyleSheet(f"border:{borderWidth}px solid black")
 
 
 class Win(QMainWindow):
