@@ -23,17 +23,19 @@ class Attributes(DockWidget):
         """
         show widget's attributes
         """
-        if self.current_widget_id != widget_id:
-            # we should clear firstly
-            self.clear()
-            # add
-            self.current_widget_id = widget_id
-            attributes: list = Func.getAttributes(widget_id)
-            for attribute in attributes:
-                self.attributes_table.addAttribute(attribute)
+        # we should clear firstly
+        self.clear()
+        # add
+        self.current_widget_id = widget_id
+        attributes: list = Func.getAttributes(widget_id)
+        for attribute in attributes:
+            self.attributes_table.addAttribute(attribute)
 
     def clear(self):
         """
         clear table
         """
         self.attributes_table.setRowCount(0)
+
+    def refresh(self):
+        self.showAttributes(self.current_widget_id)
