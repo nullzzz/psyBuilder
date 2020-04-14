@@ -203,34 +203,64 @@ class DotItem(QGraphicsItem):
         each dot position is a tuple, which has x and y.
         all dots' position stored in variable self.dot_position.
         """
-
-        width = self.rect.width()
-        height = self.rect.height()
-
-
-        scaleRation = height / width
+        w = self.rect.width()
+        h = self.rect.height()
 
         ps = list()
 
-        for iX in range(self.dot_cnt):
-            if self.is_oval:
-                cRdAngle = random.random() * 2 * math.pi
-                cRandR = random.random()*width/2
-                cX = cRandR * math.cos(cRdAngle)
-                cY = scaleRation * cRandR * math.sin(cRdAngle)
-            else:
-                cX = random.randrange(-width / 2, width / 2)
-                cY = random.randrange(-width / 2, width / 2)
+        for iP in range(self.dot_cnt):
 
-            ps.append([cX,cY])
+            x = (random.random() - 0.5)*w
+            y = (random.random() - 0.5)*h
+            d = random.random()*360
+
+
+            if self.is_oval:
+                isShow = 4*(x*x)/(w*w) + 4*(y*y)/(h*h) <= 1
+            else:
+                isShow = True
+
+            # X,Y, direction, showOrNot
+            ps.append([x,y,d,isShow])
 
         self.dot_position = ps
 
     def updateDotPosition(self):
-        # todo
-        for dp in self.dot_position:
-            dp[0] += random.choice((-3, -1, 1, 3))
-            dp[1] += random.choice((-3, -1, 1, 3))
+
+        w = self.rect.width()
+        h = self.rect.height()
+        moveDis = self.speed*self.Interval/1000
+        ps = list()
+
+        for cP in self.dot_position:
+            x = cP[0]
+            y = cP[1]
+            d = cP[2]
+
+            x += moveDis*math.cos(math.pi*d/180)
+            y += moveDis*math.sin(math.pi*d/180)
+
+            if x < -w/2:
+                x += w
+
+            if x > w/2:
+                x -= w
+
+            if y < -h/2:
+                y += h
+
+            if y > h/2:
+                y -= h
+
+            if self.is_oval:
+                isShow = 4*(x*x)/(w*w) + 4*(y*y)/(h*h) <= 1
+            else:
+                isShow = True
+
+            ps.append([x, y, d, isShow])
+
+        self.dot_position = ps
+
         self.update()
 
     def paint(self, painter, option, widget=None):
@@ -259,11 +289,14 @@ class DotItem(QGraphicsItem):
             p: tuple
             x = p[0]
             y = p[1]
-            rect = QRect(x - self.dot_size, y - self.dot_size, self.dot_size, self.dot_size)
-            if self.dot_type == 0 or self.dot_type == 4:
-                painter.drawEllipse(rect)
-            else:
-                painter.drawRect(rect)
+            isShow = p[3]
+
+            if isShow:
+                rect = QRect(x - self.dot_size, y - self.dot_size, self.dot_size, self.dot_size)
+                if self.dot_type == 0 or self.dot_type == 4:
+                    painter.drawEllipse(rect)
+                else:
+                    painter.drawRect(rect)
 
     def setProperties(self, properties: dict):
         self.pro_window.setProperties(properties.get("Properties"))
