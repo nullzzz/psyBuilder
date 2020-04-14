@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QGraphicsItem
 
 from app.center.events.slider.item.dot.dotProperty import DotProperty
 from app.info import Info
+from app.func import Func
 
 
 class DotItem(QGraphicsItem):
@@ -48,12 +49,12 @@ class DotItem(QGraphicsItem):
         self.is_oval: bool = True
         self.dot_cnt: int = 50
         self.dot_type: int = 0
-        self.dot_size: int = 6
-        self.move_direction: int = 0
-        self.speed: int = 0
+        self.dot_size: int = 5
+        self.move_direction: float = 0
+        self.speed: float = 20
 
         self.dot_color: QColor = QColor(Qt.black)
-        self.coherence = ""
+        self.coherence: float = 100
 
         self.fill_color: QColor = QColor(Qt.transparent)
         self.border_color: QColor = QColor(Qt.transparent)
@@ -99,6 +100,7 @@ class DotItem(QGraphicsItem):
     def apply(self):
         self.updateInfo()
         self.changeSomething()
+        self.generateDotPosition()
 
     def updateInfo(self):
         self.pro_window.updateInfo()
@@ -128,12 +130,17 @@ class DotItem(QGraphicsItem):
             self.is_oval = __is_oval == "yes"
 
         __move_direction = self.properties["Move Direction"]
-        if __move_direction.isdigit():
-            self.move_direction = int(__move_direction)
+        print(f"line 133: {__move_direction}")
+        if Func.isFloatStr(__move_direction):
+            self.move_direction = float(__move_direction)
 
         __speed = self.properties["Speed"]
-        if __speed.isdigit():
-            self.speed = int(__speed)
+        if Func.isFloatStr(__speed):
+            self.speed = float(__speed)
+
+        __coherence = self.properties["Coherence"]
+        if Func.isFloatStr(__coherence):
+            self.coherence = float(__coherence)
 
         __dot_num = self.properties["Dot Num"]
         if __dot_num.isdigit():
@@ -207,13 +214,17 @@ class DotItem(QGraphicsItem):
         h = self.rect.height()
 
         ps = list()
-
+        #
         for iP in range(self.dot_cnt):
+            # cPointNum += 1
 
             x = (random.random() - 0.5)*w
             y = (random.random() - 0.5)*h
-            d = random.random()*360
 
+            if iP > (self.coherence*self.dot_cnt)/100 - 1:
+                d = random.random()*360
+            else:
+                d = self.move_direction
 
             if self.is_oval:
                 isShow = 4*(x*x)/(w*w) + 4*(y*y)/(h*h) <= 1
@@ -223,16 +234,24 @@ class DotItem(QGraphicsItem):
             # X,Y, direction, showOrNot
             ps.append([x,y,d,isShow])
 
+            print(f"line 237:{d}")
+
         self.dot_position = ps
 
     def updateDotPosition(self):
 
         w = self.rect.width()
         h = self.rect.height()
+
         moveDis = self.speed*self.Interval/1000
+
         ps = list()
 
+        cPointNum = 0
+
         for cP in self.dot_position:
+            cPointNum += 1
+
             x = cP[0]
             y = cP[1]
             d = cP[2]

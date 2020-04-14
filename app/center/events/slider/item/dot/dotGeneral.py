@@ -18,8 +18,8 @@ class DotGeneral(QWidget):
             "Dot Type": "0",
             "Dot Size": "1",
             "Move Direction": "0",
-            "Speed": "0",
-            "Coherence": "0",
+            "Speed": "20",
+            "Coherence": "100",
             "Dot Color": "0,0,0",
 
             "Frame Color": "0,0,0,0",
@@ -42,11 +42,11 @@ class DotGeneral(QWidget):
         self.dot_size = VarLineEdit("5")
 
         self.move_direction = VarLineEdit("0")
-        self.speed = VarLineEdit("0")
+        self.speed = VarLineEdit("20")
 
         self.dot_color = ColorListEditor()
         self.dot_color.setCurrentText("0,0,0")
-        self.coherence = VarLineEdit("0")
+        self.coherence = VarLineEdit("100")
         # down
 
         self.fill_color = ColorListEditor()
@@ -66,8 +66,8 @@ class DotGeneral(QWidget):
         l21 = QLabel("Dot Num:")
         l30 = QLabel("Dot Type:")
         l31 = QLabel("Dot Size:")
-        l40 = QLabel("Move Direction:")
-        l41 = QLabel("Speed(d/s):")
+        l40 = QLabel("Move Direction(°):")
+        l41 = QLabel("Speed(pixes/s):")
         l50 = QLabel("Dot Color:")
         l51 = QLabel("Coherence(%):")
 

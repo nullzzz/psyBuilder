@@ -177,6 +177,12 @@ class Func(object):
         return False
 
     @staticmethod
+    def isFloatStr(floatStr: str):
+        if re.fullmatch(r"([\d]*\.[\d$]+)", floatStr):
+            return True
+        return False
+
+    @staticmethod
     def isWidgetType(widget_id: str, widget_type: str):
         """
         根据输入的widget_id来判断是不是输入的类型
