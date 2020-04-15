@@ -106,8 +106,7 @@ class StartR(TabItemWidget):
         self.status_message.setCompleter(QCompleter(attributes))
 
     def updateInfo(self):
-        self.default_properties.clear()
-        self.default_properties["Statue Message"] = self.status_message.text()
+        self.default_properties["Status Message"] = self.status_message.text()
         self.default_properties["Sync To Next Event Flip"] = self.sync_to_next_event_flip.currentText()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
 
@@ -116,7 +115,7 @@ class StartR(TabItemWidget):
         self.loadSetting()
 
     def loadSetting(self):
-        self.status_message.setText(self.default_properties["Statue Message"])
+        self.status_message.setText(self.default_properties["Status Message"])
         self.sync_to_next_event_flip.setCurrentText(self.default_properties["Sync To Next Event Flip"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
 

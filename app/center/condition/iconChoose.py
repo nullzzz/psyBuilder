@@ -102,8 +102,11 @@ class IconChoose(QWidget):
         self.name_line.setText(sub_name)
 
         if self.current_sub_wid != "":
-            self.widget = Func.getWidget(self.current_sub_wid)
-            self.linkWidgetSignal()
+            try:
+                self.widget = Func.getWidget(self.current_sub_wid)
+                self.linkWidgetSignal()
+            except KeyError:
+                pass
 
     def getSubId(self, event_type: str = ""):
         """
@@ -158,6 +161,12 @@ class IconChoose(QWidget):
         self.pro_window.close()
 
     def openProWindow(self):
+        if self.current_sub_wid != "":
+            try:
+                self.widget = Func.getWidget(self.current_sub_wid)
+                self.linkWidgetSignal()
+            except KeyError:
+                pass
         if self.event_type == Info.SLIDER:
             self.widget.show()
         else:

@@ -90,6 +90,10 @@ class Switch(TabItemWidget):
     def restore(self, properties: dict):
         self.setProperties(properties)
 
+    def store(self):
+        self.updateInfo()
+        return self.default_properties
+
     def loadSetting(self):
         self.switch_area.setProperties(self.default_properties.get("Switch", ""))
         self.case_area.loadSetting()
