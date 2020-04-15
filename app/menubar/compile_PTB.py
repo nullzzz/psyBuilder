@@ -4182,7 +4182,7 @@ def compileCode(globalSelf, isDummyCompile):
                 cWidgetLoopLevel = getWidLevel(cWidget.widget_id)
 
                 if cWidgetType in stimWidgetTypesList:
-                    output_device = cWidget.getOutputDevice()
+
                     haveRespDev = cWidget.getUsingDeviceCount() > 0
 
                     if haveRespDev:
