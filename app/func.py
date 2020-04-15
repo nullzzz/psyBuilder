@@ -178,7 +178,7 @@ class Func(object):
 
     @staticmethod
     def isFloatStr(floatStr: str):
-        if re.fullmatch(r"([\d]*\.[\d$]+)", floatStr):
+        if re.fullmatch(r"([\d]*\.[\d$]+)|(\d*)", floatStr):
             return True
         return False
 

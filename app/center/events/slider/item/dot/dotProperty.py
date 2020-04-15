@@ -26,7 +26,7 @@ class DotProperty(QWidget):
     # 生成主界面
     def setUI(self):
         self.setWindowTitle("Property")
-        self.resize(600, 600)
+        self.resize(600, 800)
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.tab, 6)
         main_layout.addWidget(self.below, 1)
