@@ -25,7 +25,7 @@ stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDE
 
 
 def throwCompileErrorInfo(inputStr):
-    Func.log(inputStr)
+    Func.print(inputStr, 3)
 
 
 def debugPrint(inputStr: str):
@@ -3769,6 +3769,7 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
 
 
 def compilePTB(globalSelf):
+    throwCompileErrorInfo("test")
     global cInfoDict
     cInfoDict.clear()
 

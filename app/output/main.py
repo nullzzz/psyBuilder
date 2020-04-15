@@ -1,4 +1,5 @@
 import datetime
+import winsound
 
 from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QTextEdit
@@ -31,6 +32,7 @@ class Output(DockWidget):
         :param information_type: 0 none
                                  1 success
                                  2 fail
+                                 3 compile error
         :return:
         """
         self.text_edit.append(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -39,8 +41,11 @@ class Output(DockWidget):
             self.text_edit.append(f"<p>{information}</p>")
         elif information_type == 1:
             self.text_edit.append(f'<b style="color:rgb(73,156,84)">[success]</b> {information}')
-        else:
+        elif information_type == 2:
             self.text_edit.append(f'<b style="color:rgb(199,84,80)">[fail]</b> {information}')
+        elif information_type == 3:
+            self.text_edit.append(f'<b style="color:rgb(199,84,80)">[error]</b> {information}')
+            winsound.MessageBeep(winsound.MB_ICONHAND)
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
         # to the bottom
         self.scroll_bar.setSliderPosition(self.scroll_bar.maximum())
