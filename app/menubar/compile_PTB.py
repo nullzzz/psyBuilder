@@ -4,7 +4,6 @@ import os
 import re
 import shutil
 
-from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox
 
 from app.func import Func
@@ -26,21 +25,7 @@ stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDE
 
 
 def throwCompileErrorInfo(inputStr):
-    msg = QMessageBox()
-    msg.setIcon(QMessageBox.Critical)
-    msg.setWindowIcon(QIcon(Func.getImage("icon.png")))
-
-    msg.setText(inputStr)
-    msg.setWindowTitle("    Attention!   ")
-
-    msg.setStandardButtons(QMessageBox.Ok)
-    # msg.setInformativeText("This is additional information")
-    # msg.setDetailedText("The details are as follows:")
-    # msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-    # msg.buttonClicked.connect(msgbtn)
-    # nomodal show
-    msg.exec_()
-    raise Exception(inputStr)
+    Func.log(inputStr)
 
 
 def debugPrint(inputStr: str):
@@ -4182,7 +4167,6 @@ def compileCode(globalSelf, isDummyCompile):
                 cWidgetLoopLevel = getWidLevel(cWidget.widget_id)
 
                 if cWidgetType in stimWidgetTypesList:
-                    output_device = cWidget.getOutputDevice()
                     haveRespDev = cWidget.getUsingDeviceCount() > 0
 
                     if haveRespDev:

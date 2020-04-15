@@ -1,8 +1,9 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QToolBar, QAction, QLabel, QMessageBox
+from PyQt5.QtCore import Qt, QFileInfo
+from PyQt5.QtGui import QIcon, QImage, QPixmap, QPainter, QColor
+from PyQt5.QtWidgets import QToolBar, QAction, QMessageBox, QScrollArea
 
 from app.func import Func
+from example.imageBrowser.imageLabel import ImageContainer
 from lib import TabItemMainWindow
 from .imageProperty import ImageProperty
 
@@ -11,7 +12,9 @@ class ImageDisplay(TabItemMainWindow):
     def __init__(self, widget_id: str, widget_name: str):
         super(ImageDisplay, self).__init__(widget_id, widget_name)
         # 图片展示框
-        self.label = QLabel()
+        self.label_scroll = QScrollArea()
+        self.label = ImageContainer()
+        self.label_scroll.setWidget(self.label)
         # 属性设置窗口
         self.pro_window = ImageProperty()
         self.default_properties = self.pro_window.default_properties
@@ -26,9 +29,9 @@ class ImageDisplay(TabItemMainWindow):
         """
         self.setWindowTitle("Image")
 
-        self.label.setText("Your image will show here")
-        self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.setCentralWidget(self.label)
+        # self.label.setText("Your image will show here")
+        # self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.setCentralWidget(self.label_scroll)
 
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
@@ -62,6 +65,7 @@ class ImageDisplay(TabItemMainWindow):
     def apply(self):
         # 发送信号
         self.updateInfo()
+        self.parseProperties()
         self.propertiesChanged.emit(self.widget_id)
 
     def updateInfo(self):
@@ -104,11 +108,87 @@ class ImageDisplay(TabItemMainWindow):
         clone_widget.apply()
         return clone_widget
 
-    ##########################################
-    # return single attribute
-    # most of them return string
-    # you can see this as a document。
-    ##########################################
+    def parseProperties(self):
+        screen_id = self.pro_window.general.getScreenId()
+        w, h = Func.getCurrentScreenRes(screen_id)
+        self.label.resize(w, h)
+
+        file_name = self.default_properties["General"]["File Name"]
+        if QFileInfo(file_name).isFile():
+            img = QImage(file_name)
+            mup = self.default_properties["General"]["Mirror Up/Down"]
+            mlr = self.default_properties["General"]["Mirror Left/Right"]
+
+            it = self.default_properties["General"]["Transparent"]
+            if it.endswith("%"):
+                img_tra = int(int(it.rstrip("%")) / 100 * 255)
+            elif it.isdigit():
+                img_tra = int(it)
+            else:
+                img_tra = 255
+            p = QPainter()
+            p.begin(img)
+            p.setCompositionMode(QPainter.CompositionMode_DestinationIn)
+            p.fillRect(img.rect(), QColor(0, 0, 0, img_tra))
+            p.end()
+
+            pix = QPixmap().fromImage(img.mirrored(mlr, mup))
+            is_stretch = self.default_properties["General"]["Stretch"]
+            if is_stretch:
+                mode = self.pro_window.general.stretch_mode.currentText()
+                if mode == "Both":
+                    pix = pix.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+                elif mode == "LeftRight":
+                    pix = pix.scaledToWidth(w, Qt.FastTransformation)
+                else:
+                    pix = pix.scaledToHeight(h, Qt.FastTransformation)
+            self.label.pix = pix
+
+            rotate = self.default_properties["General"]["Rotate"]
+            if rotate.isdigit():
+                self.label.rotate = int(rotate)
+
+            cx: str = self.default_properties["Frame"]["Center X"]
+            if cx.endswith("%"):
+                self.label.cx = w * int(cx.rstrip("%")) / 100
+            elif cx.isdigit():
+                self.label.cx = int(cx)
+            cy: str = self.default_properties["Frame"]["Center Y"]
+            if cy.endswith("%"):
+                self.label.cy = h * int(cy.rstrip("%")) / 100
+            elif cy.isdigit():
+                self.label.cy = int(cy)
+            self.label_scroll.horizontalScrollBar().setValue(self.label.cx / self.label.width() * (
+                        self.label_scroll.horizontalScrollBar().maximum() - self.label_scroll.horizontalScrollBar().minimum()))
+            self.label_scroll.verticalScrollBar().setValue(self.label.cy / self.label.height() * (
+                        self.label_scroll.horizontalScrollBar().maximum() - self.label_scroll.horizontalScrollBar().minimum()))
+
+            enable = self.default_properties["Frame"]["Enable"]
+            if enable == "Yes":
+                boc = self.default_properties["Frame"]["Border Color"]
+                if not boc.startswith("["):
+                    self.label.setColor(boc, 0)
+                bow = self.default_properties["Frame"]["Border Width"]
+                if bow.isdigit():
+                    self.label.border_width = int(bow)
+                bac = self.default_properties["Frame"]["Frame Fill Color"]
+                if not bac.startswith("["):
+                    self.label.setColor(bac, 1)
+
+                ft = self.default_properties["Frame"]["Frame Transparent"]
+                if ft.endswith("%"):
+                    self.label.setFrameTransparent(int(int(ft.rstrip("%")) / 100 * 255))
+                elif ft.isdigit():
+                    self.label.setFrameTransparent(int(ft))
+
+            self.label.update()
+
+            ##########################################
+            # return single attribute
+            # most of them return string
+            # you can see this as a document。
+            ##########################################
+
     def getFilename(self) -> str:
         """
         返回图片文件名（绝对路径）

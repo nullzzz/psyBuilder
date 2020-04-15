@@ -155,3 +155,6 @@ class ImageTab1(QWidget):
         self.transparent.setText(self.default_properties["Transparent"])
         self.clear_after.setCurrentText(self.default_properties["Clear After"])
         self.screen_name.setCurrentText(self.default_properties["Screen Name"])
+
+    def getScreenId(self):
+        return self.using_screen_id
