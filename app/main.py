@@ -829,10 +829,12 @@ class Psy(QMainWindow):
         names = setting.value("Names", -1)
         Info.WidgetTypeCount = setting.value("WidgetTypeCount", -1)
         Info.WidgetNameCount = setting.value("WidgetNameCount", -1)
-        Info.INPUT_DEVICE_INFO = setting.value("InputDeviceInfo", -1)
-        Info.OUTPUT_DEVICE_INFO = setting.value("OutputDeviceInfo", -1)
-        Info.QUEST_DEVICE_INFO = setting.value("QuestDeviceInfo", -1)
-        Info.TRACKER_DEVICE_INFO = setting.value("TrackerDeviceInfo", -1)
+        # do not change these device info object.
+        input_device_info = setting.value("InputDeviceInfo", -1)
+        output_device_info = setting.value("OutputDeviceInfo", -1)
+        quest_device_info = setting.value("QuestDeviceInfo", -1)
+        tracker_device_info = setting.value("TrackerDeviceInfo", -1)
+
         Info.SLIDER_COUNT = setting.value("SliderCount", -1)
         widgets_data = setting.value("Widgets", -1)
         structure = setting.value("Structure", -1)
@@ -841,10 +843,10 @@ class Psy(QMainWindow):
         if names == -1 or \
                 Info.WidgetTypeCount == -1 or \
                 Info.WidgetNameCount == -1 or \
-                Info.INPUT_DEVICE_INFO == -1 or \
-                Info.OUTPUT_DEVICE_INFO == -1 or \
-                Info.QUEST_DEVICE_INFO == -1 or \
-                Info.TRACKER_DEVICE_INFO == -1 or \
+                input_device_info == -1 or \
+                output_device_info == -1 or \
+                quest_device_info == -1 or \
+                tracker_device_info == -1 or \
                 Info.SLIDER_COUNT == -1 or \
                 widgets_data == -1 or \
                 structure == -1:
@@ -855,6 +857,12 @@ class Psy(QMainWindow):
             return False
         # restore widgets: create origin widget and map to right widget ids
         # try:
+        # restore device
+        self.device_cloud.input.setProperties(input_device_info)
+        self.device_cloud.output.setProperties(output_device_info)
+        self.device_cloud.quest.setProperties(quest_device_info)
+        self.device_cloud.tracker.setProperties(tracker_device_info)
+        # end restore device
         # restore structure
         self.structure.restore(structure)
         # restore widgets according to structure, because some widget need to get attributes in __init__ function
