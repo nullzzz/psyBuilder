@@ -128,10 +128,10 @@ class CaseArea(QScrollArea):
     def updateInfo(self):
         self.default_properties.clear()
         for case in self.case_list:
-            self.default_properties[case.title()] = case.getProperties()
+            self.default_properties[case.title()] = case.getInfo()
 
     def setProperties(self, properties: dict):
-        self.default_properties.clear()
+        print(properties)
         self.default_properties.update(properties)
         self.loadSetting()
 

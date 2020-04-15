@@ -72,6 +72,7 @@ class Case(QGroupBox):
         self.default_properties["Case Value"] = self.values.currentText()
 
     def getInfo(self):
+        self.updateInfo()
         return self.default_properties
 
     # 导入参数

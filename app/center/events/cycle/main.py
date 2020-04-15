@@ -122,7 +122,7 @@ class Cycle(TabItemMainWindow):
         """
         timelines = []
         for row in range(0, self.cycle_table.rowCount()):
-            timeline_name = self.item(row, 1).text()
+            timeline_name = self.cycle_table.item(row, 1).text()
             timelines.append([timeline_name, self.cycle_table.timelines.setdefault(timeline_name, "")[0]])
         return timelines
 
@@ -137,7 +137,7 @@ class Cycle(TabItemMainWindow):
         attributes = {}
         for col in range(0, self.cycle_table.columnCount()):
             attribute_name = self.cycle_table.attributes[col]
-            attributes[attribute_name] = self.item(row, col).text()
+            attributes[attribute_name] = self.cycle_table.item(row, col).text()
         return attributes
 
     def getAttributeValues(self, col: int) -> list:
@@ -152,8 +152,8 @@ class Cycle(TabItemMainWindow):
         #
         values = []
         # 遍历每行，将值取出
-        for row in range(self.timeline_table.rowCount()):
-            values.append(self.timeline_table.item(row, col).text())
+        for row in range(self.cycle_table.rowCount()):
+            values.append(self.cycle_table.item(row, col).text())
         return values
 
     def getOrder(self) -> str:

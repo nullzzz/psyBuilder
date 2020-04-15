@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QGraphicsItem
 
 from app.center.events.slider.item.dot.dotProperty import DotProperty
 from app.info import Info
-from app.func import Func
 
 
 class DotItem(QGraphicsItem):
@@ -210,21 +209,21 @@ class DotItem(QGraphicsItem):
         for iP in range(self.dot_cnt):
             # cPointNum += 1
 
-            x = (random.random() - 0.5)*w
-            y = (random.random() - 0.5)*h
+            x = (random.random() - 0.5) * w
+            y = (random.random() - 0.5) * h
 
-            if iP > (self.coherence*self.dot_cnt)/100 - 1:
-                d = random.random()*360
+            if iP > (self.coherence * self.dot_cnt) / 100 - 1:
+                d = random.random() * 360
             else:
                 d = self.move_direction
 
             if self.is_oval:
-                isShow = 4*(x*x)/(w*w) + 4*(y*y)/(h*h) <= 1
+                isShow = 4 * (x * x) / (w * w) + 4 * (y * y) / (h * h) <= 1
             else:
                 isShow = True
 
             # X,Y, direction, showOrNot
-            ps.append([x,y,d,isShow])
+            ps.append([x, y, d, isShow])
 
         self.dot_position = ps
 
@@ -233,7 +232,7 @@ class DotItem(QGraphicsItem):
         w = self.rect.width()
         h = self.rect.height()
 
-        move_dis = self.speed*self.Interval/1000
+        move_dis = self.speed * self.Interval / 1000
 
         ps = list()
 
@@ -243,23 +242,23 @@ class DotItem(QGraphicsItem):
             y = cP[1]
             d = cP[2]
 
-            x += move_dis*math.cos(math.pi*d/180)
-            y += move_dis*math.sin(math.pi*d/180)
+            x += move_dis * math.cos(math.pi * d / 180)
+            y += move_dis * math.sin(math.pi * d / 180)
 
-            if x < -w/2:
+            if x < -w / 2:
                 x += w
 
-            if x > w/2:
+            if x > w / 2:
                 x -= w
 
-            if y < -h/2:
+            if y < -h / 2:
                 y += h
 
-            if y > h/2:
+            if y > h / 2:
                 y -= h
 
             if self.is_oval:
-                isShow = 4*(x*x)/(w*w) + 4*(y*y)/(h*h) <= 1
+                isShow = 4 * (x * x) / (w * w) + 4 * (y * y) / (h * h) <= 1
             else:
                 isShow = True
 
@@ -297,7 +296,7 @@ class DotItem(QGraphicsItem):
             y = p[1]
 
             if p[3]:
-                rect = QRectF(x - self.dot_size/2, y - self.dot_size/2, self.dot_size, self.dot_size)
+                rect = QRectF(x - self.dot_size / 2, y - self.dot_size / 2, self.dot_size, self.dot_size)
                 if self.dot_type == 0 or self.dot_type == 4:
                     painter.drawEllipse(rect)
                 else:
