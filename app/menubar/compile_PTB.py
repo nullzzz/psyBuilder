@@ -851,6 +851,9 @@ def getHaveOutputDevs(cWidget) -> bool:
             cTrueWidget = cWidget.getTrueWidget()
             cFalseWidget = cWidget.getFalseWidget()
 
+            nTrueOutputDev = 0
+            nFalseOutputDev = 0
+
             if cTrueWidget is not None:
                 nTrueOutputDev = len(cTrueWidget.getOutputDevice())
             if cFalseWidget is not None:
