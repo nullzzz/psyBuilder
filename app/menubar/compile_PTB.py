@@ -3769,7 +3769,6 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
 
 
 def compilePTB(globalSelf):
-    throwCompileErrorInfo("test")
     global cInfoDict
     cInfoDict.clear()
 

@@ -44,7 +44,7 @@ class Output(DockWidget):
         elif information_type == 2:
             self.text_edit.append(f'<b style="color:rgb(199,84,80)">[fail]</b> {information}')
         elif information_type == 3:
-            self.text_edit.append(f'<b style="color:rgb(199,84,80)">[error]</b> {information}')
+            self.text_edit.append(f'<b style="color:rgb(255,84,80)">[error]</b> {information}')
             winsound.MessageBeep(winsound.MB_ICONHAND)
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
         # to the bottom
