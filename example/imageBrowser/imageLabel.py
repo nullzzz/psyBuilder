@@ -7,9 +7,7 @@ class ImageContainer(QFrame):
     def __init__(self):
         super(ImageContainer, self).__init__()
 
-        img = QImage(r"D:\新建文件夹\摸鱼.png")
-
-        self.pix = QPixmap.fromImage(img)
+        self.pix = None
 
         self.rotate = 0
 
@@ -36,25 +34,27 @@ class ImageContainer(QFrame):
     def paintEvent(self, a0: QPaintEvent) -> None:
         super(QFrame, self).paintEvent(a0)
 
-        palette = self.palette()
+        if self.pix is None:
+            painter = QPainter(self)
+            painter.drawText(100, 100, "Your image will displayed here.")
+        else:
+            palette = self.palette()
+            palette.setColor(QPalette.Background, self.back_color)
+            self.setPalette(palette)
 
-        palette.setColor(QPalette.Background, self.back_color)
+            painter = QPainter(self)
 
-        self.setPalette(palette)
+            rect = QRect(- self.pix.width() // 2,
+                         - self.pix.height() // 2,
+                         self.pix.width(),
+                         self.pix.height())
 
-        painter = QPainter(self)
+            painter.resetTransform()
+            painter.translate(self.cx, self.cy)
+            painter.rotate(self.rotate)
+            painter.drawPixmap(rect,
+                               self.pix)
 
-        rect = QRect(- self.pix.width() // 2,
-                     - self.pix.height() // 2,
-                     self.pix.width(),
-                     self.pix.height())
-
-        painter.resetTransform()
-        painter.translate(self.cx, self.cy)
-        painter.rotate(self.rotate)
-        painter.drawPixmap(rect,
-                           self.pix)
-
-        if self.border_width:
-            painter.setPen(QPen(self.border_color, self.border_width))
-            painter.drawRect(rect)
+            if self.border_width:
+                painter.setPen(QPen(self.border_color, self.border_width))
+                painter.drawRect(rect)

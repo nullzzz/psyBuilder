@@ -11,4 +11,4 @@ class Dialog(QDialog):
     def __init__(self, parent=None):
         super(Dialog, self).__init__(parent)
         # set its icon
-        self.setWindowIcon(Func.getImageObject("common/con.png", type=1))
+        self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))

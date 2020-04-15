@@ -21,22 +21,22 @@ class FramePage(QWidget):
         }
         # up
         self.x_pos = VarComboBox()
-        self.x_pos.setReg(r"\d+%?")
+        self.x_pos.setReg(VarComboBox.Percentage)
         self.y_pos = VarComboBox()
-        self.y_pos.setReg(r"\d+%?")
+        self.y_pos.setReg(VarComboBox.Percentage)
         self.width = VarComboBox()
-        self.width.setReg(r"\d+%?")
+        self.width.setReg(VarComboBox.Percentage)
         self.height = VarComboBox()
-        self.height.setReg(r"\d+%?")
+        self.height.setReg(VarComboBox.Percentage)
         # down
         self.enable = VarComboBox()
         self.enable.currentTextChanged.connect(self.operationAble)
         self.border_color = ColorListEditor()
         self.border_width = VarLineEdit("0")
-        self.border_width.setReg(r"\d+")
+        self.border_width.setReg(VarComboBox.Integer)
         self.back_color = ColorListEditor()
         self.transparent = VarLineEdit("100%")
-        self.transparent.setReg(r"[0-9]%|[1-9]\d%|100%")
+        self.transparent.setReg(VarComboBox.Percentage)
         self.enable.addItems(("No", "Yes"))
         self.setUI()
 
@@ -44,19 +44,19 @@ class FramePage(QWidget):
     def setUI(self):
         self.x_pos.addItems(["50%", "0%", "25%", "75%", "100%"])
         self.x_pos.setEditable(True)
-        self.x_pos.setReg(r"\d+%?")
+        self.x_pos.setReg(r"^\d+%?$")
 
         self.y_pos.addItems(["50%", "0%", "25%", "75%", "100%"])
         self.y_pos.setEditable(True)
-        self.y_pos.setReg(r"\d+%?")
+        self.y_pos.setReg(r"^\d+%?$")
 
         self.width.addItems(("100%", "75%", "50%", "25%"))
         self.width.setEditable(True)
-        self.width.setReg(r"\d+%?")
+        self.width.setReg(r"^\d+%?$")
 
         self.height.addItems(("100%", "75%", "50%", "25%"))
         self.height.setEditable(True)
-        self.height.setReg(r"\d+%?")
+        self.height.setReg(r"^\d+%?$")
 
         l1 = QLabel("Center X:")
         l2 = QLabel("Center Y:")

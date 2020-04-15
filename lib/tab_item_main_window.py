@@ -25,7 +25,7 @@ class TabItemMainWindow(QMainWindow):
 
     def __init__(self, widget_id: str, widget_name: str):
         super(TabItemMainWindow, self).__init__(None)
-        self.setWindowIcon(Func.getImageObject("common/con.png", type=1))
+        self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         # widget_id is used to distinguish different widgets
         self.widget_id = widget_id
         self.widget_name = widget_name

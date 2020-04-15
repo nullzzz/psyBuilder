@@ -14,6 +14,7 @@ class VarLineEdit(QLineEdit):
     Attribute = r"^\[[_\d\.\w]+\]$"
     Float = r"^(-?\d+)(\.\d+)?$"
     Integer = r"^\d+$"
+    Percentage = r"^(100|[1-9]?\d?)%$|0$"
 
     def __init__(self, *__args):
         super(VarLineEdit, self).__init__(*__args)

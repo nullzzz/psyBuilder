@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout)
 
+from app.func import Func
 from .soundGeneral import SoundTab1
 from app.center.events.__tools__ import DurationPage
 
@@ -8,6 +9,7 @@ from app.center.events.__tools__ import DurationPage
 class SoundProperty(QWidget):
     def __init__(self, parent=None):
         super(SoundProperty, self).__init__(parent)
+        self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.tab = QTabWidget()
 

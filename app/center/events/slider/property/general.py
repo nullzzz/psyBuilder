@@ -45,9 +45,10 @@ class SliderGeneral(QWidget):
             self.screen_name.setCurrentText(screen_name)
             self.using_screen_id = screen_id
 
-    def setAttributes(self, attributes):
-        self.clear_after.setCompleter(QCompleter(attributes))
-        self.screen_name.setCompleter(QCompleter(attributes))
+    def setAttributes(self, attributes: list):
+        pass
+        # self.clear_after.setCompleter(QCompleter(attributes))
+        # self.screen_name.setCompleter(QCompleter(attributes))
 
     def changeScreen(self, screen):
         for k, v in self.screen_info.items():

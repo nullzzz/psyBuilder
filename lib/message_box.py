@@ -7,4 +7,4 @@ class MessageBox(QMessageBox):
     def __init__(self, *__args):
         super(MessageBox, self).__init__(*__args)
         # 将图标设置为psy icon
-        self.setWindowIcon(Func.getImageObject("common/con.png", type=1))
+        self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))

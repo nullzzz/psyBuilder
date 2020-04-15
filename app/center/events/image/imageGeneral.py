@@ -49,7 +49,7 @@ class ImageTab1(QWidget):
         self.clear_after = VarComboBox()
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
-        self.using_screen_id: str = ""
+        self.using_screen_id: str = "screen.0"
         self.screen_name = VarComboBox()
         self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())

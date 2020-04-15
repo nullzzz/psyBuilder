@@ -156,6 +156,8 @@ class Func(object):
 
     @staticmethod
     def getCurrentScreenRes(screen_id: str) -> tuple:
+        if screen_id == "":
+            return 640, 480
         resolution = Info.OUTPUT_DEVICE_INFO[screen_id].get('Resolution', "auto")
         wh = resolution.lower().split('x')
 

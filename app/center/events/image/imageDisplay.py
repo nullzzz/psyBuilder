@@ -21,6 +21,7 @@ class ImageDisplay(TabItemMainWindow):
 
         self.setUI()
         self.linkSignal()
+        self.apply()
 
     def setUI(self):
         """
@@ -39,7 +40,7 @@ class ImageDisplay(TabItemMainWindow):
         preview = QAction(QIcon(Func.getImage("preview")), "preview", self)
         preview.triggered.connect(self.preview)
         tool.addAction(open_pro)
-        tool.addAction(preview)
+        # tool.addAction(preview)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
@@ -188,6 +189,10 @@ class ImageDisplay(TabItemMainWindow):
             # most of them return string
             # you can see this as a document。
             ##########################################
+        else:
+            self.label_scroll.horizontalScrollBar().setValue(0)
+            self.label_scroll.verticalScrollBar().setValue(0)
+            self.label.pix = None
 
     def getFilename(self) -> str:
         """

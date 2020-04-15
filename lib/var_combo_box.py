@@ -2,13 +2,19 @@ import re
 
 from PyQt5.QtCore import QDataStream, QIODevice, Qt, QRegExp, pyqtSignal
 from PyQt5.QtGui import QRegExpValidator, QFont
-from PyQt5.QtWidgets import QComboBox, QMessageBox
+from PyQt5.QtWidgets import QComboBox
 
 from app.info import Info
+from .message_box import MessageBox
 
 
 class VarComboBox(QComboBox):
     focusLost = pyqtSignal()
+
+    Attribute = r"^\[[_\d\.\w]+\]$"
+    Float = r"^(-?\d+)(\.\d+)?$"
+    Integer = r"^\d+$"
+    Percentage = r"^(100|[1-9]?\d?)%$|0$"
 
     def __init__(self, parent=None):
         super(VarComboBox, self).__init__(parent)
@@ -56,6 +62,6 @@ class VarComboBox(QComboBox):
         cur = self.currentText()
         if self.reg_exp != "" and re.fullmatch(self.reg_exp, cur) is None:
             self.setCurrentText(self.valid_data)
-            QMessageBox.warning(self, "Invalid", f"Invalid Parameter {cur}\nformat must conform to\n {self.reg_exp}")
+            MessageBox.warning(self, "Invalid", f"Invalid Parameter {cur}\nformat must conform to\n {self.reg_exp}")
         else:
             self.valid_data = cur

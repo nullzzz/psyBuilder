@@ -1,12 +1,13 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QLabel, QListWidget, QPushButton, QListView, QGridLayout, QListWidgetItem
+from PyQt5.QtWidgets import QLabel, QListWidget, QPushButton, QListView, QGridLayout, QListWidgetItem
 
 from app.func import Func
 from app.info import Info
+from lib import Dialog
 
 
-class DeviceDialog(QDialog):
+class DeviceDialog(Dialog):
     deviceAdd = pyqtSignal(str, str)
 
     def __init__(self, io_type, parent=None):

@@ -31,7 +31,18 @@ class InputDevice(QListWidgetItem):
             "Is Oval": "No",
         }
 
-        self.allowable = ""
+        if self.device_type == "keyboard":
+            self.allowable = "{any}"
+        elif self.device_type == "mouse":
+            self.allowable = "123"
+        elif self.device_type == "response box":
+            self.allowable = "12345678"
+        elif self.device_type == "action":
+            self.allowable = "3456789"
+        elif self.device_type == "game pad":
+            self.allowable = "12345678"
+        else:
+            self.allowable = ""
         self.correct = ""
         self.rt_window = "(Same as duration)"
         self.end_action = "Terminate"
