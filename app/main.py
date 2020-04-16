@@ -20,7 +20,7 @@ from .func import Func
 from .info import Info
 from .menubar.aboutUs import AboutUs
 from .menubar.compile_PTB import compilePTB
-from .menubar.registry import writeToRegistry
+from .menubar.registry import writeToRegistry, checkCpuId
 from .menubar.update import Update
 from .output import Output
 from .properties import Properties
@@ -219,6 +219,7 @@ class Psy(QMainWindow):
         # center
         self.center = Center()
         self.setCentralWidget(self.center)
+        self.center.setEnabled(Info.IS_REGISTER == "Yes")
         # output
         self.output = Output()
 
@@ -1003,13 +1004,14 @@ class Psy(QMainWindow):
         if Info.IS_REGISTER == "Yes":
             MessageBox.about(self, "Registry", "Already registry")
         else:
-            try:
-                writeToRegistry(Func.getPsyIconPath())
-                Info.CONFIG.setValue("register", "Yes")
+            if checkCpuId():
+                Settings("config.ini", Settings.IniFormat).setValue("register", "Yes")
                 MessageBox.about(self, "Registry", "Registry Successful!")
                 Info.IS_REGISTER = "Yes"
-            except Exception:
+            else:
                 MessageBox.about(self, "Registry", "Registry Failed!")
+
+        self.center.setEnabled(Info.IS_REGISTER == "Yes")
 
     def startWait(self):
         """

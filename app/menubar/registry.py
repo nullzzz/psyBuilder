@@ -1,6 +1,19 @@
 import ctypes
 import sys
 
+import wmi
+
+valid_cid = ("BFEBFBFF000406E3",)
+
+
+def checkCpuId():
+    c = wmi.WMI()
+    for cpu in c.Win32_Processor():
+        cid = cpu.ProcessorId.strip()
+        if cid in valid_cid:
+            return True
+    return False
+
 
 def writeToRegistry(ico_path: str, file_suffix: str = "psy"):
     try:
@@ -32,7 +45,3 @@ def refresh():
     SendMessageTimeoutW = ctypes.windll.user32.SendMessageTimeoutW
     SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, u'Environment', SMTO_ABORTIFHUNG, 5000,
                         ctypes.byref(result))
-
-
-if __name__ == "__main__":
-    writeToRegistry(r"D:\PsyDemo\image\psy.ico")
