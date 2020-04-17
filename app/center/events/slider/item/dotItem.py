@@ -329,7 +329,7 @@ class DotItem(QGraphicsItem):
 
     def setItemColor(self, color: QColor):
         self.fill_color = color
-        old_rgb = self.properties["Back Color"]
+        old_rgb = self.properties["Fill Color"]
         if not old_rgb.startswith("["):
             rgb = f"{color.red()},{color.green()},{color.blue()}"
             self.properties["Back Color"] = rgb

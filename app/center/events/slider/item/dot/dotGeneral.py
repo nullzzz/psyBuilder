@@ -22,7 +22,7 @@ class DotGeneral(QWidget):
             "Coherence": "100",
             "Dot Color": "0,0,0",
 
-            "Frame Color": "0,0,0,0",
+            "Fill Color": "0,0,0,0",
             "Border Color": "0,0,0,0",
             "Border Width": "0",
         }

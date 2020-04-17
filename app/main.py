@@ -20,7 +20,6 @@ from .func import Func
 from .info import Info
 from .menubar.aboutUs import AboutUs
 from .menubar.compile_PTB import compilePTB
-from .menubar.registry import writeToRegistry, checkCpuId
 from .menubar.update import Update
 from .output import Output
 from .properties import Properties
@@ -189,19 +188,16 @@ class Psy(QMainWindow):
 
         # help menu
         help_menu = menubar.addMenu("&Help")
-        reg_action = QAction("&Registry", self)
         about_action = QAction("&About Us", self)
         about_Qt_action = QAction("&About Qt", self)
         check_for_update = QAction("&Check for updates", self)
 
         self.about_us = AboutUs()
         self.check_update = Update()
-        reg_action.triggered.connect(self.registry)
         about_action.triggered.connect(self.about_us.show)
         about_Qt_action.triggered.connect(QApplication.instance().aboutQt)
         check_for_update.triggered.connect(self.check_update.show)
 
-        help_menu.addAction(reg_action)
         help_menu.addAction(about_action)
         help_menu.addAction(about_Qt_action)
         help_menu.addAction(check_for_update)
@@ -219,7 +215,6 @@ class Psy(QMainWindow):
         # center
         self.center = Center()
         self.setCentralWidget(self.center)
-        self.center.setEnabled(Info.IS_REGISTER == "Yes")
         # output
         self.output = Output()
 
@@ -999,19 +994,6 @@ class Psy(QMainWindow):
         except Exception as compileError:
             Func.print(str(compileError), 2)
             traceback.print_exc()
-
-    def registry(self):
-        if Info.IS_REGISTER == "Yes":
-            MessageBox.about(self, "Registry", "Already registry")
-        else:
-            if checkCpuId():
-                Settings("config.ini", Settings.IniFormat).setValue("register", "Yes")
-                MessageBox.about(self, "Registry", "Registry Successful!")
-                Info.IS_REGISTER = "Yes"
-            else:
-                MessageBox.about(self, "Registry", "Registry Failed!")
-
-        self.center.setEnabled(Info.IS_REGISTER == "Yes")
 
     def startWait(self):
         """

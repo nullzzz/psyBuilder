@@ -54,7 +54,7 @@ class RX(QWidget):
             # default device
             self.device_home.createDevice("screen")
             Info.OUTPUT_DEVICE_INFO = self.default_properties
-            self.devices = ("serial_port", "parallel_port", "network_port", "screen", "sound")
+            self.devices = ("serial port", "parallel port", "network port", "screen", "sound")
             self.setWindowTitle("Output Devices")
         elif device_type == Info.INPUT_DEVICE:
             # default devices

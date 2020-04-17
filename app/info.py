@@ -39,12 +39,6 @@ class Info(object):
     # 当前导入导出文件名
     FILE_NAME = ""
     FILE_DIRECTORY = ""
-    IS_REGISTER = QSettings("config.ini", QSettings.IniFormat).value("register", "No")
-
-    # 限制输入的正则表达式
-    RE_NUMBER = r"\[\w+\]|\d+"
-    RE_FLOAT = r"\[\w+\]|\d+\.\d+"
-    RE_NUM_PERCENT = r"\[\w+\]|\d+%?|\d+"
 
     # possible useful in the future
     REF_VALUE_SEPERATOR = "@"
@@ -72,10 +66,10 @@ class Info(object):
     SWITCH = "Switch"
     TIMELINE = "Timeline"
 
-    DEV_NETWORK_PORT = "network_port"
+    DEV_NETWORK_PORT = "network port"
     DEV_SCREEN = "screen"
-    DEV_PARALLEL_PORT = "parallel_port"
-    DEV_SERIAL_PORT = "serial_port"
+    DEV_PARALLEL_PORT = "parallel port"
+    DEV_SERIAL_PORT = "serial port"
     DEV_SOUND = "sound"
 
     DEV_KEYBOARD = "keyboard"
