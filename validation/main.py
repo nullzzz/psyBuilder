@@ -3,6 +3,7 @@ import sys
 import uuid
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QApplication, QPushButton, QLabel, QFrame
 
 
@@ -20,7 +21,7 @@ class ValidationWindow(QFrame):
             border-image: url(background.png);
         }
         """)
-        # self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
+        self.setWindowIcon(QIcon("icon.png"))
 
         self.tip = QLabel()
         self.tip.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -128,6 +129,5 @@ class ValidationWindow(QFrame):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     v = ValidationWindow()
-    # v.show()
-    v.confuse(v.hard_code)
+
     sys.exit(app.exec_())
