@@ -18,7 +18,7 @@ class ValidationWindow(QFrame):
         self.setStyleSheet("background:rgb(245,245,245)")
         self.setStyleSheet("""
         QLabel {
-            border-image: url(background.png);
+            border-image: url(validation/background.png);
         }
         """)
         self.setWindowIcon(QIcon("icon.png"))
@@ -101,12 +101,12 @@ class ValidationWindow(QFrame):
     def getHardCode():
         os_type = sys.platform.lower()
 
-        if "win" in os_type:
+        if "win" == os_type:
             command = "wmic bios get serialnumber"
-        elif "linux" in os_type:
+        elif "linux" == os_type:
             # hard driver uuid
             command = "blkid | grep UUID= | awk '{print $2}'"
-        elif "darwin" in os_type:
+        elif "darwin" == os_type:
             command = "ioreg -l | grep IOPlatformSerialNumber | awk '{print $4}'"
 
         hardware_id = os.popen(command).read().replace("\n", "").replace(" ", "").replace("|", "")
