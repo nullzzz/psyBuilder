@@ -101,12 +101,12 @@ class ValidationWindow(QFrame):
     def getHardCode():
         os_type = sys.platform.lower()
 
-        if "win" in os_type:
+        if os_type.startswith("win"):
             command = "wmic bios get serialnumber"
-        elif "linux" in os_type:
+        elif os_type.startswith("linux"):
             # hard driver uuid
             command = "blkid | grep UUID= | awk '{print $2}'"
-        elif "darwin" in os_type:
+        elif os_type.startswith("darwin"):
             command = "ioreg -l | grep IOPlatformSerialNumber | awk '{print $4}'"
 
         hardware_id = os.popen(command).read().replace("\n", "").replace(" ", "").replace("|", "")
