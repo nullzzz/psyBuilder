@@ -366,12 +366,18 @@ class FileWindow(QWidget):
 
 
 class V(ValidationWindow):
-    def __init__(self):
-        super(V, self).__init__()
-
     def start(self):
-
-
+        # check open mode
+        open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
+        if open_mode == "default mode":
+            # default open mode
+            file_window.show()
+        else:
+            # open a blank file directly
+            Settings("config.ini", Settings.IniFormat).setValue("file_path", "")
+            Settings("config.ini", Settings.IniFormat).setValue("file_directory", "")
+            psy = Psy()
+            psy.showMaximized()
         self.close()
 
 
@@ -379,21 +385,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     # set qss and font
     QFontDatabase.addApplicationFont(os.path.abspath("fonts/GenShinGothic-Light.ttf"))
-    # It should be noted that: the font name is not file name
-    # you need to get the font name by using the function 'QFontDatabase.applicationFontFamilies(id)'
-    # id is the return value of 'QFontDatabase.addApplicationFont(font_file_name)'
     app.setStyleSheet(qss)
-    # check open mode
-    open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
-    if open_mode == "default mode":
-        # default open mode
-        file_window = FileWindow()
-        file_window.show()
-    else:
-        # open a blank file directly
-        Settings("config.ini", Settings.IniFormat).setValue("file_path", "")
-        Settings("config.ini", Settings.IniFormat).setValue("file_directory", "")
-        psy = Psy()
-        psy.showMaximized()
-
+    # file window, this var must be defined here, otherwise it won't show.
+    file_window = FileWindow()
+    v = V()
     sys.exit(app.exec_())

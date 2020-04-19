@@ -1,4 +1,3 @@
-import hashlib
 import os
 import sys
 import uuid
@@ -19,7 +18,7 @@ class ValidationWindow(QFrame):
         self.setStyleSheet("background:rgb(245,245,245)")
         self.setStyleSheet("""
         QLabel {
-            border-image: url(background.png);
+            border-image: url(validation/background.png);
         }
         """)
         self.setWindowIcon(QIcon("icon.png"))
@@ -67,7 +66,6 @@ class ValidationWindow(QFrame):
 
     @staticmethod
     def confuse(cpu_id: str):
-
         rand_order = (244, 281, 32, 40, 22, 123, 99, 174, 294, 261, 175, 34, 152, 92, 170, 91, 146, 119, 190, 112, 127,
                     241, 165, 35, 6, 265, 121, 271, 228, 160, 236, 55, 148, 3, 96, 166, 136, 269, 68, 16, 140, 135, 69,
                     115, 11, 101, 54, 105, 296, 176, 218, 30, 133, 291, 186, 149, 224, 45, 184, 216, 77, 280, 211, 235,
@@ -86,31 +84,29 @@ class ValidationWindow(QFrame):
 
         n_min_num = min(len(cpu_id),len(rand_order))
 
+        id_in_dec = [ord(x) for x in cpu_id]
+
         rand_order = rand_order[:n_min_num]
 
         sorted_idx = sorted(range(len(rand_order)), key=rand_order.__getitem__)
 
-        raw_id = cpu_id.copy()
+        raw_id_in_dec = id_in_dec.copy()
 
         for i in range(0,n_min_num - 1):
-            cpu_id[i] = raw_id[sorted_idx[i]]
+            id_in_dec[i] = raw_id_in_dec[sorted_idx[i]]
 
-        hl = hashlib.md5()
-        hl.update(cpu_id.encode(encoding='utf-8'))
-
-        return hl.hexdigest()
-
+        return ''.join(hex(x)[2:] for x in id_in_dec)
 
     @staticmethod
     def getHardCode():
         os_type = sys.platform.lower()
 
-        if os_type.startswith("win"):
+        if "win" in os_type:
             command = "wmic bios get serialnumber"
-        elif os_type.startswith("linux"):
+        elif "linux" in os_type:
             # hard driver uuid
             command = "blkid | grep UUID= | awk '{print $2}'"
-        elif os_type.startswith("darwin"):
+        elif "darwin" in os_type:
             command = "ioreg -l | grep IOPlatformSerialNumber | awk '{print $4}'"
 
         hardware_id = os.popen(command).read().replace("\n", "").replace(" ", "").replace("|", "")
