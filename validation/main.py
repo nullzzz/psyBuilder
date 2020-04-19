@@ -68,6 +68,8 @@ class ValidationWindow(QFrame):
     @staticmethod
     def confuse(cpu_id: str):
 
+        cpu_id = 'gfweas12' + cpu_id + 'sc'
+
         hl = hashlib.md5()
         hl.update(cpu_id.encode(encoding='utf-8'))
 
