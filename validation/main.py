@@ -1,7 +1,6 @@
 import os
 import sys
 
-import wmi
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QApplication, QPushButton, QLabel, QFrame
 
