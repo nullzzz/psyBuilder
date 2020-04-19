@@ -1,3 +1,4 @@
+import hashlib
 import os
 import sys
 import uuid
@@ -66,6 +67,7 @@ class ValidationWindow(QFrame):
 
     @staticmethod
     def confuse(cpu_id: str):
+
         rand_order = (244, 281, 32, 40, 22, 123, 99, 174, 294, 261, 175, 34, 152, 92, 170, 91, 146, 119, 190, 112, 127,
                     241, 165, 35, 6, 265, 121, 271, 228, 160, 236, 55, 148, 3, 96, 166, 136, 269, 68, 16, 140, 135, 69,
                     115, 11, 101, 54, 105, 296, 176, 218, 30, 133, 291, 186, 149, 224, 45, 184, 216, 77, 280, 211, 235,
@@ -84,18 +86,20 @@ class ValidationWindow(QFrame):
 
         n_min_num = min(len(cpu_id),len(rand_order))
 
-        id_in_dec = [ord(x) for x in cpu_id]
-
         rand_order = rand_order[:n_min_num]
 
         sorted_idx = sorted(range(len(rand_order)), key=rand_order.__getitem__)
 
-        raw_id_in_dec = id_in_dec.copy()
+        raw_id = cpu_id.copy()
 
         for i in range(0,n_min_num - 1):
-            id_in_dec[i] = raw_id_in_dec[sorted_idx[i]]
+            cpu_id[i] = raw_id[sorted_idx[i]]
 
-        return ''.join(hex(x)[2:] for x in id_in_dec)
+        hl = hashlib.md5()
+        hl.update(cpu_id.encode(encoding='utf-8'))
+
+        return hl.hexdigest()
+
 
     @staticmethod
     def getHardCode():
