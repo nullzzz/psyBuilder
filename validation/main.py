@@ -35,7 +35,7 @@ class ValidationWindow(QFrame):
         self.confuse_id: str = self.confuse(self.cpu_id)
 
         self.local_code = self.getLocalCode()
-        if self.self.confuse_id != self.local_code:
+        if self.confuse_id != self.local_code:
             self.tip.setText(f"send the code below to get a validation code<br>"
                              f"<b>{self.cpu_id}<\b><br>"
                              f"<a href='mailto:yzhangpsy@suda.edu.cn?Subject=Inquire For Validation Code'>yzhangpsy@suda.edu.cn.")
@@ -88,8 +88,9 @@ class ValidationWindow(QFrame):
 
         sortedIdx = sorted(range(len(randOrder)), key=randOrder.__getitem__)
 
+        rawIdxInDec = idInDec.copy()
         for i in range(0,nMinNum - 1):
-            idInDec[i] = randOrder[sortedIdx[i]]
+            idInDec[i] = rawIdxInDec[sortedIdx[i]]
 
         return ''.join(hex(x)[2:] for x in idInDec)
 
