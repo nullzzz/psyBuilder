@@ -118,12 +118,14 @@ class ValidationWindow(QFrame):
 
         sorted_idx = sorted(range(len(rand_order)), key=rand_order.__getitem__)
 
-        raw_cpu_id = cpu_id
+        cpu_id_in_list = [x for x in cpu_id]
+
+        raw_cpu_id_List = cpu_id_in_list.copy()
 
         for i in range(0, n_min_num - 1):
-            cpu_id[i] = raw_cpu_id[sorted_idx[i]]
+            cpu_id_in_list[i] = raw_cpu_id_List[sorted_idx[i]]
 
-        return cpu_id
+        return ''.join(x for x in cpu_id_in_list)
 
     @staticmethod
     def getLocalCode():
