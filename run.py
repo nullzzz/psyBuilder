@@ -11,6 +11,7 @@ from app import Psy
 from app.func import Func
 from lib import MessageBox, TableWidget, HoverButton, Settings
 from qss import qss
+from validation.main import ValidationWindow
 
 
 class Version(QTextEdit):
@@ -364,6 +365,16 @@ class FileWindow(QWidget):
             MessageBox.information(self, "Error", f"The path '{file_path}' does not exist.")
 
 
+class V(ValidationWindow):
+    def __init__(self):
+        super(V, self).__init__()
+
+    def start(self):
+
+
+        self.close()
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     # set qss and font
@@ -384,4 +395,5 @@ if __name__ == '__main__':
         Settings("config.ini", Settings.IniFormat).setValue("file_directory", "")
         psy = Psy()
         psy.showMaximized()
+
     sys.exit(app.exec_())

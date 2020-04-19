@@ -61,14 +61,12 @@ class EyeCalibrate(TabItemWidget):
         l3 = QLabel("Target Color:")
         l4 = QLabel("Target Style:")
         l5 = QLabel("EyeTracker Name:")
-        # l6 = QLabel("Screen Name:")
 
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        # l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)

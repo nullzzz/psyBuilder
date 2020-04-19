@@ -29,7 +29,7 @@ class Properties(DockWidget):
         self.clear()
         # add
         self.current_widget_id = widget_id
-        properties = Func.getWidgetProperties(widget_id)
+        properties = Func.getWidgetProperties(widget_id, display=True)
         # sorted_properties = sorted(properties.items(), key=lambda x: x[0])
         # for key, value in sorted_properties:
         #     self.properties_table.addProperty(key, str(value))

@@ -45,7 +45,7 @@ class Func(object):
 
     @staticmethod
     def getPsyIconPath() -> str:
-        return os.path.join(Info.IMAGE_SOURCE_PATH, "psy.ico")
+        return os.path.join(Info.IMAGE_SOURCE_PATH, "psy.icon")
 
     @staticmethod
     def getProperties(widget_id) -> dict:
@@ -415,11 +415,13 @@ class Func(object):
             return -1
 
     @staticmethod
-    def getWidgetProperties(widget_id: str) -> dict:
+    def getWidgetProperties(widget_id: str, display: bool = False) -> dict:
         """
         get widget's properties through its widget id
         """
         widget = Info.Widgets[widget_id]
+        if display:
+            return widget.getProperties()
         if Func.isWidgetType(widget_id, Info.TIMELINE) or Func.isWidgetType(widget_id, Info.CYCLE):
             return widget.getProperties()
         dp: dict = copy.deepcopy(widget.store())

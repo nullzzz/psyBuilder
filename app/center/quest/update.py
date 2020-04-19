@@ -55,7 +55,7 @@ class QuestUpdate(TabItemWidget):
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
-        layout1.addWidget(QLabel("Is correct:"), 2, 0, 1, 1)
+        layout1.addWidget(QLabel("Is Correct:"), 2, 0, 1, 1)
         layout1.addWidget(self.response_variable, 2, 1, 1, 1)
         layout1.addWidget(QLabel("Quest Name:"), 3, 0, 1, 1)
         layout1.addWidget(self.quest_name, 3, 1, 1, 1)
@@ -90,6 +90,10 @@ class QuestUpdate(TabItemWidget):
         if quest_name:
             self.quest_name.setCurrentText(quest_name)
             self.using_quest_id = quest_id
+
+        attributes = Func.getAttributes(self.widget_id)
+        self.setAttributes(attributes)
+        self.updateInfo()
 
     def apply(self):
         self.updateInfo()

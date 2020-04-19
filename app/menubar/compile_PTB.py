@@ -1156,7 +1156,7 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
 
     for widgetId, cWidget in wIdAndWidgetItems:
 
-        cProperties = Func.getProperties(widgetId)
+        cProperties = Func.getWidgetProperties(widgetId)
 
         if Func.isWidgetType(widgetId, Info.CYCLE):
             pass
@@ -1361,9 +1361,9 @@ def getClearAfterInfo(cWidget, attributesSetDict) -> str:
     """
 
     if Info.SLIDER == getWidgetType(cWidget):
-        cProperties = Func.getProperties(cWidget.widget_id)['Properties']
+        cProperties = Func.getWidgetProperties(cWidget.widget_id)['Properties']
     else:
-        cProperties = Func.getProperties(cWidget.widget_id)
+        cProperties = Func.getWidgetProperties(cWidget.widget_id)
 
     clearAfter = dataStrConvert(*getRefValue(cWidget, cProperties['Clear After'], attributesSetDict))
     clearAfter = parseDontClearAfterStr(clearAfter)
@@ -1395,7 +1395,7 @@ def getScreenInfo(cWidget, attributesSetDict):
 def getSliderItemIds(cWidget, itemType='') -> list:
     itemIds = []
     if Func.isWidgetType(cWidget.widget_id, Info.SLIDER):
-        properties = Func.getProperties(cWidget.widget_id)
+        properties = Func.getWidgetProperties(cWidget.widget_id)
 
         if len(itemType) == 0:
             itemIds = [key for key in properties['Items'].keys()]
@@ -1443,7 +1443,7 @@ def getMaxSlaveSoundDevs() -> dict:
         if Func.isWidgetType(cWidgetId, Info.SLIDER):
             itemIds = getSliderItemIds(cWidget)
 
-            cProperties = Func.getProperties(cWidget.widget_id)
+            cProperties = Func.getWidgetProperties(cWidget.widget_id)
 
             if isContainItemType(itemIds, Info.ITEM_SOUND):
                 cSoundNumList = dict()
@@ -1459,7 +1459,7 @@ def getMaxSlaveSoundDevs() -> dict:
                         maxSlaveSoundDevs.update({cSoundDevName: nSounds})
 
         elif Func.isWidgetType(cWidgetId, Info.SOUND):
-            cProperties = Func.getProperties(cWidget.widget_id)
+            cProperties = Func.getWidgetProperties(cWidget.widget_id)
             nSounds = max(maxSlaveSoundDevs.get(cProperties['Sound Device'], 0), 1)
             maxSlaveSoundDevs.update({cProperties['Sound Device']: nSounds})
 
@@ -2520,7 +2520,7 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
 
 def printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
-    cProperties = Func.getProperties(cWidget.widget_id)
+    cProperties = Func.getWidgetProperties(cWidget.widget_id)
 
     # print previous widget's response code
     preStimWid = getPreStimWID(cWidget.widget_id)
@@ -2558,7 +2558,7 @@ def printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
 def printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes):
     # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
-    cProperties = Func.getProperties(cWidget.widget_id)
+    cProperties = Func.getWidgetProperties(cWidget.widget_id)
 
     shouldNotBeCitationCheck('Quest Name', cProperties['Quest Name'])
 
@@ -2580,7 +2580,7 @@ def printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes):
 
 def printETDcCorrectWidget(cWidget, f, allWidgetCodes):
     # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
-    # cProperties = Func.getProperties(cWidget.widget_id)
+    # cProperties = Func.getWidgetProperties(cWidget.widget_id)
     allWidgetCodes.update({"isEyeLinkStartRecord": True})
     # print previous widget's response code
     preStimWid = getPreStimWID(cWidget.widget_id)
@@ -2602,7 +2602,7 @@ def printETDcCorrectWidget(cWidget, f, allWidgetCodes):
 
 def printETCalibWidget(cWidget, f, allWidgetCodes):
     # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
-    # cProperties = Func.getProperties(cWidget.widget_id)
+    # cProperties = Func.getWidgetProperties(cWidget.widget_id)
 
     allWidgetCodes.update({"isEyeLinkStartRecord": True})
     # print previous widget's response code
@@ -2616,7 +2616,7 @@ def printETCalibWidget(cWidget, f, allWidgetCodes):
 
 def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
-    # cProperties = Func.getProperties(cWidget.widget_id)
+    # cProperties = Func.getWidgetProperties(cWidget.widget_id)
 
     allWidgetCodes.update({"isEyeLinkStartRecord": True})
     cCodesForResp = allWidgetCodes.get('respCodes', [])
@@ -2662,7 +2662,7 @@ def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
 
 def printETEndRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
-    cProperties = Func.getProperties(cWidget.widget_id)
+    cProperties = Func.getWidgetProperties(cWidget.widget_id)
 
     allWidgetCodes.update({"isEyeLinkStartRecord": False})
 
@@ -2693,7 +2693,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
                      getWidgetName(cWidget.widget_id))
         printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
-    cSliderProperties = Func.getProperties(cWidget.widget_id)
+    cSliderProperties = Func.getWidgetProperties(cWidget.widget_id)
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
@@ -3041,7 +3041,7 @@ def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allW
 
     if len(cProperties) == 0:
         isNotInSlide = True
-        cProperties = Func.getProperties(cWidget.widget_id)
+        cProperties = Func.getWidgetProperties(cWidget.widget_id)
     else:
         isNotInSlide = False
 
@@ -3155,7 +3155,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     isNotInSlide = True
 
     if len(cProperties) == 0:
-        cProperties = Func.getProperties(cWidget.widget_id)
+        cProperties = Func.getWidgetProperties(cWidget.widget_id)
     else:
         isNotInSlide = False
 
@@ -3371,7 +3371,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     isNotInSlide = True
 
     if len(cProperties) == 0:
-        cProperties = Func.getProperties(cWidget.widget_id)
+        cProperties = Func.getWidgetProperties(cWidget.widget_id)
     else:
         isNotInSlide = False
 
@@ -3647,7 +3647,7 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
                      getWidgetName(cWidget.widget_id))
         printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
-    cProperties = Func.getProperties(cWidget.widget_id)
+    cProperties = Func.getWidgetProperties(cWidget.widget_id)
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
