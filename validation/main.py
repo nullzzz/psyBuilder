@@ -104,9 +104,20 @@ class ValidationWindow(QFrame):
 
     @staticmethod
     def getCpuId():
-        c = wmi.WMI()
-        for cpu in c.Win32_Processor():
-            return cpu.ProcessorId.strip()
+        os_type = sys.platform.lower()
+
+        if "win" in os_type:
+            command = "wmic bios get serialnumber"
+        elif "linux" in os_type:
+            # hard driver uuid
+            command = "blkid | grep UUID= | awk '{print $2}'"
+        elif "darwin" in os_type:
+            command = "ioreg -l | grep IOPlatformSerialNumber | awk '{print $4}'"
+
+        hardwareId = os.popen(command).read().replace("\n", "").replace(" ", "").replace("|", "")
+        hardwareId = hardwareId.replace('SerialNumber', '').replace('UUID', '').replace('=', '').replace('-', '')
+
+        return hardwareId
 
     @staticmethod
     def getLocalCode():
