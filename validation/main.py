@@ -118,7 +118,7 @@ class ValidationWindow(QFrame):
 
         sorted_idx = sorted(range(len(rand_order)), key=rand_order.__getitem__)
 
-        raw_cpu_id = cpu_id.copy()
+        raw_cpu_id = cpu_id
 
         for i in range(0, n_min_num - 1):
             cpu_id[i] = raw_cpu_id[sorted_idx[i]]
