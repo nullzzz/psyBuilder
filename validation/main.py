@@ -90,8 +90,10 @@ class ValidationWindow(QFrame):
 
         sorted_idx = sorted(range(len(rand_order)), key=rand_order.__getitem__)
 
+        raw_id_in_dec = id_in_dec.copy()
+
         for i in range(0,n_min_num - 1):
-            id_in_dec[i] = rand_order[sorted_idx[i]]
+            id_in_dec[i] = raw_id_in_dec[sorted_idx[i]]
 
         return ''.join(hex(x)[2:] for x in id_in_dec)
 
