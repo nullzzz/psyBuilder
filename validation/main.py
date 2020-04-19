@@ -36,10 +36,10 @@ class ValidationWindow(QFrame):
         self.confuse_id: str = self.confuse(self.cpu_id)
 
         self.local_code = self.getLocalCode()
-        if self.translate(self.confuse_id) != self.local_code:
+        if self.self.confuse_id != self.local_code:
             self.tip.setText(f"send the code below to get a validation code<br>"
-                             f"<b>{self.confuse_id}<\b><br>"
-                             f"<a href='mailto:yzhangpsy@suda.edu.cn?Subject=Inquire For Validation Code'>PsyBuilder@support.com.")
+                             f"<b>{self.cpu_id}<\b><br>"
+                             f"<a href='mailto:yzhangpsy@suda.edu.cn?Subject=Inquire For Validation Code'>yzhangpsy@suda.edu.cn.")
             self.show()
         else:
             self.start()
