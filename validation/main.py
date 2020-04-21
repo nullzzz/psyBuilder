@@ -2,6 +2,7 @@ import hashlib
 import os
 import sys
 import uuid
+import pyperclip
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -22,7 +23,7 @@ class ValidationWindow(QFrame):
             border-image: url(validation/background.png);
         }
         """)
-        self.setWindowIcon(QIcon("icon.png"))
+        self.setWindowIcon(QIcon("validation/icon.png"))
 
         self.tip = QLabel()
         self.tip.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -41,12 +42,15 @@ class ValidationWindow(QFrame):
         if self.confuse_code != self.local_code:
             self.tip.setText(f"send the code below to get a validation code<br>"
                              f"<b>{self.hard_code}<\b><br>"
+                             f"the code has been copied to clipboard<br>"
                              f"<a href='mailto:yzhangpsy@suda.edu.cn?Subject=Inquire For Validation Code'>yzhangpsy@suda.edu.cn.")
+            pyperclip.copy(self.hard_code)
             self.show()
         else:
             self.start()
 
     def setUI(self):
+        self.setFixedSize(500, 450)
         layout = QVBoxLayout()
         layout.addWidget(self.tip)
         layout.addWidget(self.input)
@@ -89,7 +93,7 @@ class ValidationWindow(QFrame):
 
         hardware_id = os.popen(command).read().replace("\n", "").replace(" ", "").replace("|", "")
         hardware_id = hardware_id.replace('SerialNumber', '').replace('UUID', '').replace('=', '').replace('-', '')
-        mac_addr = uuid.UUID(int = uuid.getnode()).hex[-12:]
+        mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
 
         cpu_id = hardware_id + mac_addr
 
