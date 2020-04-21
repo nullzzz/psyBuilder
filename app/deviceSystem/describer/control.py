@@ -38,11 +38,11 @@ class Describer(QStackedWidget):
                     d = Screen()
                 elif device_id.startswith("sound"):
                     d = Sound()
-                elif device_id.startswith("network_port"):
+                elif device_id.startswith("network port"):
                     d = Net()
-                elif device_id.startswith("parallel_port"):
+                elif device_id.startswith("parallel port"):
                     d = Parallel()
-                elif device_id.startswith("serial_port"):
+                elif device_id.startswith("serial port"):
                     d = Serial()
                 elif device_id.startswith("quest"):
                     d = Quest()
