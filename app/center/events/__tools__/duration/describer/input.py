@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QCompleter, QGridLayout, QLabel
 
+from app.info import Info
 from lib import VarLineEdit, VarComboBox
 
 
@@ -116,7 +117,7 @@ class EyeAction(QWidget):
         self.end.setText(end)
         self.mean.setText(mean)
         self.is_oval.setCurrentText(is_oval)
-        self.setEnabled(device_id.startswith("action"))
+        self.setEnabled(device_id.startswith(Info.DEV_EYE_ACTION))
 
     def setAttributes(self, attributes):
         self.start.setCompleter(QCompleter(attributes))

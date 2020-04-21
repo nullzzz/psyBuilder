@@ -71,6 +71,8 @@ class Info(object):
     DEV_PARALLEL_PORT = "parallel port"
     DEV_SERIAL_PORT = "serial port"
     DEV_SOUND = "sound"
+    DEV_TRACKER = "tracker"
+    DEV_QUEST = "quest"
 
     DEV_KEYBOARD = "keyboard"
     DEV_MOUSE = "mouse"
@@ -103,7 +105,7 @@ class Info(object):
     ITEM_SNOW = "snow"
     ITEM_GABOR = "gabor"
     ITEM_LINE = "line"
-    ITEM_DOT = "dot"
+    ITEM_DOT_MOTION = "dot motion"
 
     SLIDER_COUNT: dict = {
         ITEM_POLYGON: 0,

@@ -2,6 +2,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QCompleter
 
 from app.func import Func
+from app.info import Info
 from lib import VarComboBox, TabItemWidget
 
 
@@ -21,7 +22,7 @@ class QuestUpdate(TabItemWidget):
         self.response_variable = VarComboBox()
         self.response_variable.addItems(["1", "0"])
 
-        self.quest_info = Func.getDeviceInfo("quest")
+        self.quest_info = Func.getDeviceInfo(Info.DEV_QUEST)
         self.quest_name = VarComboBox()
         self.quest_name.currentTextChanged.connect(self.changeQuestId)
 
@@ -81,7 +82,7 @@ class QuestUpdate(TabItemWidget):
         self.loadSetting()
 
     def refresh(self):
-        self.quest_info = Func.getDeviceInfo("quest")
+        self.quest_info = Func.getDeviceInfo(Info.DEV_QUEST)
         quest_id = self.using_quest_id
 
         self.quest_name.clear()

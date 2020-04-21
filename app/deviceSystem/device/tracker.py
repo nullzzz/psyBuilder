@@ -1,8 +1,9 @@
 from app.deviceSystem.device import Device
+from app.info import Info
 
 
 class Tracker(Device):
-    def __init__(self, device_type: str = "tracker", device_id: str = "", parent=None):
+    def __init__(self, device_type: str = Info.DEV_TRACKER, device_id: str = "", parent=None):
         super(Tracker, self).__init__(device_type, device_id, parent)
 
         self.select_tracker_type = "Simple dummy"

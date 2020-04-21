@@ -1,12 +1,14 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QComboBox
 
+from app.info import Info
+
 
 class Quest(QWidget):
     def __init__(self, parent=None):
         super(Quest, self).__init__(parent)
 
-        self.device_type = QLabel("quest")
+        self.device_type = QLabel(Info.DEV_QUEST)
         self.device_name = QLabel("Unselected")
         self.estimated_threshold = QLineEdit()
         self.estimated_threshold.setToolTip("Used For Starting Test Value")

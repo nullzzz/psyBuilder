@@ -3,6 +3,8 @@ import re
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QTextEdit, QFrame
 
+from app.info import Info
+
 
 class Shower(QWidget):
     def __init__(self, parent=None):
@@ -45,11 +47,11 @@ class Shower(QWidget):
         flag: bool = True
         tipStr = ""
         device_type: str = self.device_type.text()
-        if device_type == "screen":
+        if device_type == Info.DEV_SCREEN:
             if not port.isdigit() or int(port) > 10:
                 flag = False
                 tipStr = "Screen index should be in [0 to 10]"
-        elif device_type == "network_port":
+        elif device_type == Info.DEV_NETWORK_PORT:
             port_list = port.split(".")
             if len(port_list) == 4:
                 for i in port_list:
@@ -64,7 +66,7 @@ class Shower(QWidget):
             if flag is False:
                 tipStr = "invalid IP address"
 
-        elif device_type == "serial_port":
+        elif device_type == Info.DEV_SERIAL_PORT:
             if port.startswith("COM") and port[3:].isdigit():
                 # window
                 pass
@@ -78,7 +80,7 @@ class Shower(QWidget):
                 flag = False
                 tipStr = "invalid serial address"
 
-        elif device_type == "response box":
+        elif device_type == Info.DEV_RESPONSE_BOX:
             if port.startswith("COM") and port[3:].isdigit():
                 # window
                 pass
@@ -92,13 +94,13 @@ class Shower(QWidget):
                 flag = False
                 tipStr = "invalid Cedrus port address"
 
-        elif device_type == "parallel_port":
+        elif device_type ==Info.DEV_PARALLEL_PORT:
             # Check whether a text string holds just a hexadecimal number
             if re.match('\A[0-9a-fA-F]+\Z', port) is None:
                 flag = False
                 tipStr = "should be a hexadecimal"
 
-        elif device_type == "sound":
+        elif device_type == Info.DEV_SOUND:
             flag = port.isdigit()
 
             if flag is False:

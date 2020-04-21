@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QLineEdit, QCheckB
     QCompleter
 
 from app.func import Func
+from app.info import Info
 from lib import VarLineEdit, VarComboBox, ColorListEditor, TabItemWidget
 
 
@@ -38,7 +39,7 @@ class EyeDC(TabItemWidget):
         self.fixation_triggered.stateChanged.connect(self.statueChanged)
 
         self.using_tracker_id = ""
-        self.tracker_info = Func.getDeviceInfo("tracker")
+        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
         self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
@@ -118,7 +119,7 @@ class EyeDC(TabItemWidget):
                 break
 
     def refresh(self):
-        self.tracker_info = Func.getDeviceInfo("tracker")
+        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
         tracker_id = self.using_tracker_id
         self.tracker_name.clear()
         self.tracker_name.addItems(self.tracker_info.values())
