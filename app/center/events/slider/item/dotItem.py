@@ -12,7 +12,7 @@ from app.info import Info
 class DotItem(QGraphicsItem):
     Dot = 12
     name = {
-        Dot: Info.ITEM_DOT,
+        Dot: Info.ITEM_DOT_MOTION,
     }
 
     Interval = 300
