@@ -2,7 +2,7 @@ import hashlib
 import os
 import sys
 import uuid
-import pyperclip
+# import pyperclip
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -44,7 +44,7 @@ class ValidationWindow(QFrame):
                              f"<b>{self.hard_code}<\b><br>"
                              f"the code has been copied to clipboard<br>"
                              f"<a href='mailto:yzhangpsy@suda.edu.cn?Subject=Inquire For Validation Code'>yzhangpsy@suda.edu.cn.")
-            pyperclip.copy(self.hard_code)
+            # pyperclip.copy(self.hard_code)
             self.show()
         else:
             self.start()

@@ -22,9 +22,9 @@ class DeviceHome(QListWidget):
             "game pad": 0,
             "action": 0,
             # simple_info device
-            "serial_port": 0,
-            "parallel_port": 0,
-            "network_port": 0,
+            "serial port": 0,
+            "parallel port": 0,
+            "network port": 0,
             "screen": 0,
             "sound": 0,
             # quest
