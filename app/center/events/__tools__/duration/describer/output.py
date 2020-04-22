@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QCompleter
 
+from app.info import Info
 from lib import VarLineEdit, VarComboBox
 
 
@@ -36,7 +37,7 @@ class TriggerInfo(QWidget):
         device_type = info.get("Device Type")
 
         pul_dur = info.get("Pulse Duration")
-        self.pulse_dur.setEnabled(device_type == "parallel_port")
+        self.pulse_dur.setEnabled(device_type ==Info.DEV_PARALLEL_PORT)
         self.pulse_dur.setCurrentText(pul_dur)
 
     def setAttributes(self, attributes):

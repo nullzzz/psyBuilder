@@ -5,7 +5,7 @@ import traceback
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox
 
 from lib import MessageBox, WaitDialog, Settings
 from .attributes import Attributes
@@ -678,7 +678,8 @@ class Psy(QMainWindow):
         # choose directory
         file_directory = Info.FILE_DIRECTORY
         if not file_directory:
-            file_directory = os.getcwd()
+            # file_directory = os.getcwd()
+            file_directory = os.path.dirname(os.path.abspath(__file__))
         # get new file's directory
         file_directory = QFileDialog().getExistingDirectory(None, "Choose Directory", file_directory,
                                                             QFileDialog.ShowDirsOnly)
@@ -700,7 +701,8 @@ class Psy(QMainWindow):
         else:
             file_directory = Info.FILE_DIRECTORY
             if not file_directory:
-                file_directory = os.getcwd()
+                # file_directory = os.getcwd()
+                file_directory = os.path.dirname(os.path.abspath(__file__))
             file_path, _ = QFileDialog().getSaveFileName(self, "Save file", file_directory, "Psy Files (*.psy);")
             if file_path:
                 if not re.search(r"\.psy$", file_path):
@@ -730,7 +732,8 @@ class Psy(QMainWindow):
         """
         directory = Info.FILE_DIRECTORY
         if not directory:
-            directory = os.getcwd()
+            # directory = os.getcwd()
+            directory = os.path.dirname(os.path.abspath(__file__))
         file_path, _ = QFileDialog().getSaveFileName(self, "Save As file", directory, "Psy Files (*.psy);")
         if file_path:
             if not re.search(r"(\.psy|\.ini)$", file_path):
@@ -751,7 +754,7 @@ class Psy(QMainWindow):
         """
         open file through restart software
         """
-        file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.getcwd(), "Psy File (*.psy)")
+        file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.path.dirname(os.path.abspath(__file__)), "Psy File (*.psy)")
         if file_path and file_path != Info.FILE_NAME:
             # store current state
             self.store(Info.TempFile, False)
@@ -989,8 +992,14 @@ class Psy(QMainWindow):
             self.before_exp_action.setIconVisibleInMenu(imageLoadMode == "before_exp")
 
     def compile(self):
+        if not Info.FILE_NAME and not self.getFileName():
+            QMessageBox.information(self, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
+            return
+
+        self.saveFile()
+
         try:
-            compilePTB(self)
+            compilePTB()
         except Exception as compileError:
             Func.print(str(compileError), 2)
             traceback.print_exc()

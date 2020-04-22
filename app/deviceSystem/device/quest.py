@@ -1,8 +1,9 @@
 from app.deviceSystem.device import Device
+from app.info import Info
 
 
 class Quest(Device):
-    def __init__(self, device_type: str = "quest", device_id: str = None, parent=None):
+    def __init__(self, device_type: str = Info.DEV_QUEST, device_id: str = None, parent=None):
         super(Quest, self).__init__(device_type, device_id, parent)
         self.device_type = device_type
 

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
     QFileDialog, QCompleter, QSizePolicy
 
 from app.func import Func
+from app.info import Info
 from lib import VarLineEdit, VarComboBox
 
 
@@ -55,7 +56,7 @@ class SoundGeneral(QWidget):
 
         self.using_sound_id: str = ""
         self.sound = VarComboBox()
-        self.sound_info = Func.getDeviceInfo("sound")
+        self.sound_info = Func.getDeviceInfo(Info.DEV_SOUND)
         self.sound.addItems(self.sound_info.values())
         self.sound.currentTextChanged.connect(self.changeSound)
 
@@ -135,7 +136,7 @@ class SoundGeneral(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.sound_info = Func.getDeviceInfo("sound")
+        self.sound_info = Func.getDeviceInfo(Info.DEV_SOUND)
         sound_id = self.using_sound_id
         self.sound.clear()
         self.sound.addItems(self.sound_info.values())

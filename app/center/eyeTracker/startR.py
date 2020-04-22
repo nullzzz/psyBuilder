@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLa
     QCompleter
 
 from app.func import Func
+from app.info import Info
 from lib import VarLineEdit, VarComboBox, TabItemWidget
 
 
@@ -24,7 +25,7 @@ class StartR(TabItemWidget):
         self.sync_to_next_event_flip.addItems(("No", "Yes"))
 
         self.using_tracker_id = ""
-        self.tracker_info = Func.getDeviceInfo("tracker")
+        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
         self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
@@ -75,7 +76,7 @@ class StartR(TabItemWidget):
                 break
 
     def refresh(self):
-        self.tracker_info = Func.getDeviceInfo("tracker")
+        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
         tracker_id = self.using_tracker_id
         self.tracker_name.clear()
         self.tracker_name.addItems(self.tracker_info.values())

@@ -2,20 +2,23 @@ from PyQt5.QtCore import QRectF, Qt
 from PyQt5.QtGui import QPainterPath, QColor
 from PyQt5.QtWidgets import QGraphicsItem, QWidget
 
+from app.info import Info
+
 
 class BaseItem(QGraphicsItem):
     SLIDER_COUNT: dict = {
-        "polygon": 0,
-        "arc": 0,
-        "rect": 0,
-        "circle": 0,
-        "image": 0,
-        "text": 0,
-        "video": 0,
-        "sound": 0,
-        "snow": 0,
-        "gabor": 0,
-        "line": 0,
+        Info.ITEM_POLYGON: 0,
+        Info.ITEM_ARC: 0,
+        Info.ITEM_RECT: 0,
+        Info.ITEM_CIRCLE: 0,
+        Info.ITEM_IMAGE: 0,
+        Info.ITEM_TEXT: 0,
+        Info.ITEM_VIDEO: 0,
+        Info.ITEM_SOUND: 0,
+        Info.ITEM_SNOW: 0,
+        Info.ITEM_GABOR: 0,
+        Info.ITEM_LINE: 0,
+        Info.ITEM_DOT_MOTION: 0,
     }
 
     # "polygon", "arc", "rect", "circle", "image", "text", "video", "sound", "snow", "gabor", "line"

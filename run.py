@@ -211,7 +211,9 @@ class FileButtonArea(QFrame):
         """
         directory = Settings("config.ini", Settings.IniFormat).value("file_directory", "")
         if not directory:
-            directory = os.getcwd()
+            # in order to compatible with pyinstaller
+            # directory = os.getcwd()
+            directory = os.path.dirname(os.path.abspath(__file__))
         file_path, _ = QFileDialog().getSaveFileName(self, "Create file", directory, "Psy Files (*.psy);")
         if file_path:
             if not re.search(r"\.psy$", file_path):
@@ -225,7 +227,8 @@ class FileButtonArea(QFrame):
         """
         directory = Settings("config.ini", Settings.IniFormat).value("file_directory", "")
         if not directory:
-            directory = os.getcwd()
+            # directory = os.getcwd()
+            directory = os.path.dirname(os.path.abspath(__file__))
         file_path, _ = QFileDialog.getOpenFileName(self, "Choose File", directory, "Psy File (*.psy)")
         if file_path:
             self.fileOpened.emit(file_path)

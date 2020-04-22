@@ -1,4 +1,5 @@
 from app.deviceSystem.device import Device
+from app.info import Info
 
 
 class Screen(Device):
@@ -28,7 +29,7 @@ class Screen(Device):
         return self.device_index
 
     def getColor(self) -> str:
-        if self.device_type == "screen":
+        if self.device_type == Info.DEV_SCREEN:
             return self.back_color
         return ""
 

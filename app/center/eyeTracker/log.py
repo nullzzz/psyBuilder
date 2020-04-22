@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLa
     QGridLayout, QCheckBox, QTextEdit, QListWidget, QAbstractItemView
 
 from app.func import Func
+from app.info import Info
 from lib import VarLineEdit, VarComboBox, TabItemWidget
 
 
@@ -19,7 +20,7 @@ class Close(TabItemWidget):
         self.pause_between_msg = VarLineEdit("1")
 
         self.using_tracker_id = ""
-        self.tracker_info = Func.getDeviceInfo("tracker")
+        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
         self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
@@ -108,7 +109,7 @@ class Close(TabItemWidget):
                 break
 
     def refresh(self):
-        self.tracker_info = Func.getDeviceInfo("tracker")
+        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
         tracker_id = self.using_tracker_id
         self.tracker_name.clear()
         self.tracker_name.addItems(self.tracker_info.values())

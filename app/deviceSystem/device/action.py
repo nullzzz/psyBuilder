@@ -1,8 +1,9 @@
 from app.deviceSystem.device.basis import Device
+from app.info import Info
 
 
 class Action(Device):
-    def __init__(self, device_type: str = "action", device_id: str = "", parent=None):
+    def __init__(self, device_type: str = Info.DEV_EYE_ACTION, device_id: str = "", parent=None):
         super(Action, self).__init__(device_type, device_id, parent)
         self.tracker_name = ""
 

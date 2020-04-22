@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QPushButton, QWidget, QGridLayout, QLabel, QToolBox, QSizePolicy, QFormLayout, QDockWidget
 
 from app.func import Func
+from app.info import Info
 
 
 class LeftBox(QToolBox):
@@ -21,13 +22,13 @@ class LeftBox(QToolBox):
         rect = Item("Rect", self.Rect)
 
         self.stimuli = QWidget()
-        image = Item("image", LeftBox.Image)
-        video = Item("video", LeftBox.Video)
-        text = Item("text", LeftBox.Text)
-        sound = Item("sound", LeftBox.Sound)
-        snow = Item("snow", LeftBox.Snow)
-        gabor = Item("gabor", LeftBox.Gabor)
-        dot_motion = Item("dot motion", LeftBox.Dot)
+        image = Item(Info.ITEM_IMAGE, LeftBox.Image)
+        video = Item(Info.ITEM_VIDEO, LeftBox.Video)
+        text = Item(Info.ITEM_TEXT, LeftBox.Text)
+        sound = Item(Info.ITEM_SOUND, LeftBox.Sound)
+        snow = Item(Info.ITEM_SNOW, LeftBox.Snow)
+        gabor = Item(Info.ITEM_GABOR, LeftBox.Gabor)
+        dot_motion = Item(Info.ITEM_DOT_MOTION, LeftBox.Dot)
         # dot_motion.setEnabled(False)
 
         self.addItem(self.basic, "Basic Geometries")
@@ -88,12 +89,12 @@ class Button(QPushButton):
         self.item_type = item_type
         self.setStyleSheet("border:none")
 
-        if text == "text":
+        if text == Info.ITEM_TEXT:
             text = "textpointer"
         elif text == "3D":
             text = "open"
-        elif text == "dot motion":
-            text = "dot"
+        elif text == Info.ITEM_DOT_MOTION:
+            text = "dot_motion"
 
         fp = QPixmap(Func.getImage(f"{text}.png")).scaled(50, 50)
         self.setIcon(QIcon(fp))

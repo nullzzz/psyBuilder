@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
     QFileDialog, QCompleter, QSizePolicy
 
 from app.func import Func
+from app.info import Info
 from lib import VarLineEdit, VarComboBox
 
 
@@ -58,7 +59,7 @@ class SoundTab1(QWidget):
 
         self.using_sound_id: str = ""
         self.sound = VarComboBox()
-        self.sound_info = Func.getDeviceInfo("sound")
+        self.sound_info = Func.getDeviceInfo(Info.DEV_SOUND)
         self.sound.addItems(self.sound_info.values())
         self.sound.currentTextChanged.connect(self.changeSound)
 
@@ -79,7 +80,7 @@ class SoundTab1(QWidget):
 
         self.using_screen_id: str = ""
         self.screen_name = VarComboBox()
-        self.screen_info = Func.getDeviceInfo("screen")
+        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)
         self.screen_name.setEnabled(self.sync_to_vbl.checkState())
@@ -167,7 +168,7 @@ class SoundTab1(QWidget):
 
     def refresh(self):
         # refresh sound Dev
-        self.sound_info = Func.getDeviceInfo("sound")
+        self.sound_info = Func.getDeviceInfo(Info.DEV_SOUND)
         sound_id = self.using_sound_id
         self.sound.clear()
         self.sound.addItems(self.sound_info.values())
@@ -177,7 +178,7 @@ class SoundTab1(QWidget):
             self.using_sound_id = sound_id
 
         # refresh screen
-        self.screen_info = Func.getDeviceInfo("screen")
+        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
         screen_id = self.using_screen_id
         self.screen_name.clear()
         self.screen_name.addItems(self.screen_info.values())

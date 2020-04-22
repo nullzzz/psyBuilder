@@ -52,24 +52,24 @@ class RX(QWidget):
         # device_list是写死的
         if device_type == Info.OUTPUT_DEVICE:
             # default device
-            self.device_home.createDevice("screen")
+            self.device_home.createDevice(Info.DEV_SCREEN)
             Info.OUTPUT_DEVICE_INFO = self.default_properties
-            self.devices = ("serial port", "parallel port", "network port", "screen", "sound")
+            self.devices = (Info.DEV_SERIAL_PORT, Info.DEV_PARALLEL_PORT, Info.DEV_NETWORK_PORT, Info.DEV_SCREEN, Info.DEV_SOUND)
             self.setWindowTitle("Output Devices")
         elif device_type == Info.INPUT_DEVICE:
             # default devices
-            self.device_home.createDevice("mouse")
-            self.device_home.createDevice("keyboard")
+            self.device_home.createDevice(Info.DEV_MOUSE)
+            self.device_home.createDevice(Info.DEV_KEYBOARD)
             Info.INPUT_DEVICE_INFO = self.default_properties
-            self.devices = ("mouse", "keyboard", "response box", "game pad", "action")
+            self.devices = (Info.DEV_MOUSE, Info.DEV_KEYBOARD, Info.DEV_RESPONSE_BOX, Info.DEV_GAMEPAD, Info.DEV_EYE_ACTION)
             self.setWindowTitle("Input Devices")
         elif device_type == Info.QUEST_DEVICE:
             Info.QUEST_DEVICE_INFO = self.default_properties
-            self.devices = ("quest",)
+            self.devices = (Info.DEV_QUEST,)
             self.setWindowTitle("Quest Devices")
         elif device_type == Info.TRACKER_DEVICE:
             Info.TRACKER_DEVICE_INFO = self.default_properties
-            self.devices = ("tracker",)
+            self.devices = (Info.DEV_TRACKER,)
             self.setWindowTitle("Tracker Devices")
         self.setWindowIcon(QIcon(Func.getImage("icon.png")))
         for device in self.devices:

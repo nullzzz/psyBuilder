@@ -1,6 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QCheckBox, QSpinBox, QGridLayout, QLineEdit, QComboBox
 
+from app.info import Info
+
 
 class Tracker(QWidget):
     simple_info = {}
@@ -70,9 +72,9 @@ class Tracker(QWidget):
         self.sound = QComboBox()
         self.screen.currentTextChanged.connect(self.changeExternalDevice)
         for k, v in self.simple_info.items():
-            if k.startswith("screen"):
+            if k.startswith(Info.DEV_SCREEN):
                 self.screen.addItem(v)
-            elif k.startswith("sound"):
+            elif k.startswith(Info.DEV_SOUND):
                 self.sound.addItem(v)
 
         self.setUI()
@@ -174,7 +176,7 @@ class Tracker(QWidget):
 
     def getInfo(self):
         properties: dict = {
-            "Device Type": "tracker",
+            "Device Type": Info.DEV_TRACKER,
             "Device Name": self.device_name.text(),
             "Select Tracker Type": self.tracker_type.currentText(),
             "Calibrate Tracker": self.calibrate_tracker.checkState(),
@@ -211,9 +213,9 @@ class Tracker(QWidget):
         self.screen.clear()
         self.sound.clear()
         for k, v in self.simple_info.items():
-            if k.startswith("screen"):
+            if k.startswith(Info.DEV_SCREEN):
                 self.screen.addItem(v)
-            elif k.startswith("sound"):
+            elif k.startswith(Info.DEV_SOUND):
                 self.sound.addItem(v)
 
         if self.using_screen_id in Tracker.simple_info.keys():

@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFormLayout, QVBoxLayout, QComboBox
 
 from app.deviceSystem.describer.basis import Shower
+from app.info import Info
 
 
 class Action(Shower):
@@ -16,7 +17,7 @@ class Action(Shower):
         self.update_flag = True
         self.tracker.currentTextChanged.connect(self.changeExternalDevice)
         for k, v in Action.simple_info.items():
-            if k.startswith("tracker"):
+            if k.startswith(Info.DEV_TRACKER):
                 self.tracker.addItem(v)
 
         self.setUI()
@@ -57,7 +58,7 @@ class Action(Shower):
         self.update_flag = False
         self.tracker.clear()
         for k, v in self.simple_info.items():
-            if k.startswith("tracker"):
+            if k.startswith(Info.DEV_TRACKER):
                 self.tracker.addItem(v)
 
         if self.using_tracker_id in Action.simple_info.keys():

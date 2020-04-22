@@ -1,5 +1,6 @@
 from app.deviceSystem.RX import RX
 from app.deviceSystem.describer import Tracker, Action
+from app.info import Info
 
 
 class TianBianYiDuoYun:
@@ -30,7 +31,7 @@ class TianBianYiDuoYun:
         Tracker.simple_info = self.simple_info
         Action.simple_info = self.simple_info
 
-    def updateSimpleInfo(self, device_types: tuple = ("screen", "sound", "tracker")):
+    def updateSimpleInfo(self, device_types: tuple = (Info.DEV_SCREEN, Info.DEV_SOUND, Info.DEV_TRACKER)):
         """
         now we just update screen information.
         :param device_types:

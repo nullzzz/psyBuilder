@@ -48,7 +48,7 @@ class DeviceDialog(Dialog):
         self.devices_list.clear()
         for k, v in devices.items():
             device_type = v.get("Device Type")
-            if device_type == "screen" or device_type == "sound":
+            if device_type == Info.DEV_SCREEN or device_type == Info.DEV_SOUND:
                 continue
             device_name = v.get("Device Name")
 

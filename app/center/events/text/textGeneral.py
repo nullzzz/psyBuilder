@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
     QFontComboBox, QCompleter
 
 from app.func import Func
+from app.info import Info
 from example import SmartTextEdit
 from lib import VarComboBox, VarLineEdit, ColorListEditor
 
@@ -75,7 +76,7 @@ class TextTab1(QWidget):
 
         self.using_screen_id: str = "screen.0"
         self.screen = VarComboBox()
-        self.screen_info = Func.getDeviceInfo("screen")
+        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
         self.screen.addItems(self.screen_info.values())
         self.screen.currentTextChanged.connect(self.changeScreen)
 
@@ -175,7 +176,7 @@ class TextTab1(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.screen_info = Func.getDeviceInfo("screen")
+        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
         screen_id = self.using_screen_id
         self.screen.clear()
         self.screen.addItems(self.screen_info.values())

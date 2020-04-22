@@ -2,6 +2,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QListWidgetItem
 
 from app.func import Func
+from app.info import Info
 
 
 class InputDevice(QListWidgetItem):
@@ -31,15 +32,15 @@ class InputDevice(QListWidgetItem):
             "Is Oval": "No",
         }
 
-        if self.device_type == "keyboard":
+        if self.device_type == Info.DEV_KEYBOARD:
             self.allowable = "{any}"
-        elif self.device_type == "mouse":
+        elif self.device_type == Info.DEV_MOUSE:
             self.allowable = "123"
-        elif self.device_type == "response box":
+        elif self.device_type == Info.DEV_RESPONSE_BOX:
             self.allowable = "12345678"
-        elif self.device_type == "action":
+        elif self.device_type == Info.DEV_EYE_ACTION:
             self.allowable = "3456789"
-        elif self.device_type == "game pad":
+        elif self.device_type == Info.DEV_GAMEPAD:
             self.allowable = "12345678"
         else:
             self.allowable = ""
