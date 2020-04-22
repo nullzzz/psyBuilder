@@ -100,7 +100,7 @@ class DeviceHome(QListWidget):
         info = {}
         for i in range(self.count()):
             item = self.item(i)
-            info[item.getDeviceId] = item.getDeviceName()
+            info[item.getDeviceId()] = item.getDeviceName()
         return info
 
     def refresh(self):
