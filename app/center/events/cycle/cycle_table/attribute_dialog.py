@@ -1,14 +1,14 @@
 import re
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QDialog, QScrollArea, QFormLayout, QHBoxLayout, QLabel, QPushButton, \
+from PyQt5.QtWidgets import QWidget, QScrollArea, QFormLayout, QHBoxLayout, QLabel, QPushButton, \
     QVBoxLayout
 
-from lib import MessageBox
+from lib import MessageBox, Dialog
 from .attribute_area import AttributeArea
 
 
-class AttributeDialog(QDialog):
+class AttributeDialog(Dialog):
     # when user add some attributes, emit signal (col)
     attributesAdded = pyqtSignal(int)
     # when user change attributes, emit signal (col, attribute_name, attribute_value)
@@ -61,6 +61,7 @@ class AttributeDialog(QDialog):
         add new attribute area into widget
         """
         attribute_area = AttributeArea(name, value)
+        attribute_area.nameChanged.connect(self.handleAttributeNameChanged)
         self.layout.insertRow(self.layout.rowCount(), attribute_area)
         self.attribute_areas.append(attribute_area)
 
@@ -146,3 +147,14 @@ class AttributeDialog(QDialog):
                 value = attribute_area.value()
                 attributes.append((name, value))
         return attributes
+
+    def handleAttributeNameChanged(self, attribute_area: AttributeArea):
+        """
+        check validity of attribute's name on time.
+        """
+        # only pattern now
+        name = attribute_area.name()
+        if name and not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
+            attribute_area.showTip("Name starts with a letter and contain only letters, numbers, _")
+        else:
+            attribute_area.hideTip()
