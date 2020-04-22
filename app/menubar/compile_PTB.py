@@ -463,7 +463,7 @@ def outPutTriggerCheck(cWidget) -> dict:
     shortPulseDurParallelsDict = dict()
 
     for cOpDevInfo in cOutPutDevices.values():
-        if cOpDevInfo['Device Type'] == 'parallel port':
+        if cOpDevInfo['Device Type'] == Info.DEV_PARALLEL_PORT:
             if cOpDevInfo['Device Name'] in respTriggerDevNames:
                 shortPulseDurParallelsDict.update({cOpDevInfo['Device Id']: 10})
                 Func.log('Currently we will force the pulse duration to be 10 ms', False)
@@ -2386,7 +2386,7 @@ def genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, nextEventF
             printAutoInd(f, "cDurs({0})          = getDurValue({1},winIFIs({0}));", cWinIdx, durStr)
 
     # printAutoInd(f, "(not the real flip time) ")
-    printAutoInd(f, "{0} = cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur; "
+    printAutoInd(f, "{0} = cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur({1}); "
                     "% get the required time of the  Flip for the next event \n",
                  nextEventFlipReqTimeStr, cWinIdx)
 
@@ -2713,7 +2713,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
     printAutoInd(sliderStimCodes, "% prepare audio materials for widget {0}", getWidgetName(cWidget.widget_id))
     if isContainItemType(itemIds, Info.ITEM_SOUND):
         printAutoInd(sliderStimCodes,
-                     "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur);",
+                     "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur({1}));",
                      cWinStr, cWinIdx)
     # loop twice, once for audio and once for all visual stimuli
     iSoundSlave = 1
@@ -2726,8 +2726,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
             if iSoundSlave == 1:
                 printAutoInd(sliderStimCodes, "% schedule start of audio at exactly the predicted time of the next flip")
 
-            allWidgetCodes = drawSoundWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel,
-                                             allWidgetCodes,
+            allWidgetCodes = drawSoundWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes,
                                              cItemProperties, iSoundSlave)
             iSoundSlave += 1
         else:
@@ -4142,7 +4141,6 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "[winIds,winIFIs,lastScrOnsettime, cDurs] = deal(zeros({0},1)); %#ok<ASGLU>", iMonitor - 1)
         printAutoInd(f, "nextEvFlipReqTime = 0;")
 
-        printAutoInd(f, "flipComShiftDur   = 0.003; % 3 ms before flip to ensure flipping at right time")
         printAutoInd(f, "fullRects         = zeros({0},4);\n", iMonitor - 1)
         #
         printAutoInd(f,
@@ -4198,11 +4196,11 @@ def compileCode(isDummyCompile):
                      "[winIds(iWin),fullRects(iWin,:)] = Screen('OpenWindow',monitors(iWin).port,monitors(iWin).bkColor,monitors(iWin).rect,[],[],[],monitors(iWin).multiSample);")
         printAutoInd(f,
                      "Screen('BlendFunction', winIds(iWin),'GL_SRC_ALPHA','GL_ONE_MINUS_SRC_ALPHA'); % force to most common alpha-blending factors")
-        printAutoInd(f,
-                     "winIFIs(iWin) = Screen('GetFlipInterval',winIds(iWin));                        % get inter frame interval (i.e., 1/refresh rate)")
+        printAutoInd(f, "winIFIs(iWin) = Screen('GetFlipInterval',winIds(iWin));                        % get inter frame interval (i.e., 1/refresh rate)")
         printAutoInd(f, "end % for iWin ")
         # printAutoInd(f, "%--------------------\\\n")
         printAutoInd(f, " ")
+        printAutoInd(f, "flipComShiftDur  = winIFIs*0.5; % 0.5 IFI before flip to ensure flipping at right time")
 
         printAutoInd(f, "%===== initialize simple_info devices ========/")
         # initialize TCPIP connections
