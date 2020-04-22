@@ -1,7 +1,5 @@
 import os
 
-from PyQt5.QtCore import QSettings
-
 
 class Info(object):
     """
@@ -156,8 +154,7 @@ class Info(object):
     TempFile = "temp.ini"
 
     # image path
-    Image_Path = "images"
-    ImageSourcePath = "images"
+    ImagePath = "source/images"
 
     # widget type
     ERROR_WIDGET_ID = ""

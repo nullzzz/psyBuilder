@@ -522,7 +522,7 @@ class Func(object):
                      1: icon
         @return: Qt image object
         """
-        path = os.path.join(Info.Image_Path, image_path)
+        path = os.path.join(Info.ImagePath, image_path)
         if not type:
             if size:
                 return QPixmap(path).scaled(size, transformMode=Qt.SmoothTransformation)
