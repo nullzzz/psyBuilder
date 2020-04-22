@@ -3,7 +3,6 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QListWidget, QMenu, QListWidgetItem
 
 from app.deviceSystem.device import *
-from app.info import Info
 
 
 class DeviceHome(QListWidget):
@@ -17,21 +16,21 @@ class DeviceHome(QListWidget):
         # 设备计数，生成设备id
         self.device_count = {
             # input device
-            Info.DEV_MOUSE: 0,
-            Info.DEV_KEYBOARD: 0,
-            Info.DEV_RESPONSE_BOX: 0,
-            Info.DEV_GAMEPAD: 0,
-            Info.DEV_EYE_ACTION: 0,
+            "mouse": 0,
+            "keyboard": 0,
+            "response box": 0,
+            "game pad": 0,
+            "action": 0,
             # simple_info device
-            Info.DEV_SERIAL_PORT: 0,
-            Info.DEV_PARALLEL_PORT: 0,
-            Info.DEV_NETWORK_PORT: 0,
-            Info.DEV_SCREEN: 0,
-            Info.DEV_SOUND: 0,
+            "serial port": 0,
+            "parallel port": 0,
+            "network port": 0,
+            "screen": 0,
+            "sound": 0,
             # quest
-            Info.DEV_QUEST: 0,
+            "quest": 0,
             # tracker
-            Info.DEV_TRACKER: 0,
+            "tracker": 0,
         }
 
         # 存放当前选择设备名，避免重复，只通过create\delete操作
@@ -160,29 +159,29 @@ class DeviceHome(QListWidget):
             device_id = self.createDeviceId(device_type)
 
         # 新建设备对象
-        if device_type == Info.DEV_SOUND:
+        if device_type == "sound":
             device = Sound(device_type, device_id)
-        elif device_type == Info.DEV_SCREEN:
+        elif device_type == "screen":
             device = Screen(device_type, device_id)
-        elif device_type == Info.DEV_NETWORK_PORT:
+        elif device_type == "network port":
             device = Net(device_type, device_id)
-        elif device_type == Info.DEV_PARALLEL_PORT:
+        elif device_type == "parallel port":
             device = Parallel(device_type, device_id)
-        elif device_type == Info.DEV_SERIAL_PORT:
+        elif device_type == "serial port":
             device = Serial(device_type, device_id)
-        elif device_type == Info.DEV_QUEST:
+        elif device_type == "quest":
             device = Quest(device_type, device_id)
-        elif device_type == Info.DEV_TRACKER:
+        elif device_type == "tracker":
             device = Tracker(device_type, device_id)
-        elif device_type == Info.DEV_EYE_ACTION:
+        elif device_type == "action":
             device = Action(device_type, device_id)
-        elif device_type == Info.DEV_GAMEPAD:
+        elif device_type == "game pad":
             device = GamePad(device_type, device_id)
-        elif device_type == Info.DEV_MOUSE:
+        elif device_type == "mouse":
             device = Mouse(device_type, device_id)
-        elif device_type == Info.DEV_KEYBOARD:
+        elif device_type == "keyboard":
             device = Keyboard(device_type, device_id)
-        elif device_type == Info.DEV_RESPONSE_BOX:
+        elif device_type == "response box":
             device = ResponseBox(device_type, device_id)
         else:
             device = Device(device_type, device_id)
