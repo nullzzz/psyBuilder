@@ -22,9 +22,9 @@ class DeviceHome(QListWidget):
             "game pad": 0,
             "action": 0,
             # simple_info device
-            "serial_port": 0,
-            "parallel_port": 0,
-            "network_port": 0,
+            "serial port": 0,
+            "parallel port": 0,
+            "network port": 0,
             "screen": 0,
             "sound": 0,
             # quest
@@ -163,11 +163,11 @@ class DeviceHome(QListWidget):
             device = Sound(device_type, device_id)
         elif device_type == "screen":
             device = Screen(device_type, device_id)
-        elif device_type == "network_port":
+        elif device_type == "network port":
             device = Net(device_type, device_id)
-        elif device_type == "parallel_port":
+        elif device_type == "parallel port":
             device = Parallel(device_type, device_id)
-        elif device_type == "serial_port":
+        elif device_type == "serial port":
             device = Serial(device_type, device_id)
         elif device_type == "quest":
             device = Quest(device_type, device_id)
