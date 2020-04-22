@@ -3768,16 +3768,16 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
     return 0
 
 
-def compilePTB(globalSelf):
+def compilePTB():
     global cInfoDict
     cInfoDict.clear()
 
-    compileCode(globalSelf, False)
+    compileCode(False)
 
     cInfoDict.clear()
 
 
-def compileCode(globalSelf, isDummyCompile):
+def compileCode(isDummyCompile):
     global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, cIndents, historyPropDict, isDummyPrint, spFormatVarDict, cInfoDict, queueDevIdxValueStr
 
     # -----------initialize global variables ------/
@@ -3818,12 +3818,6 @@ def compileCode(globalSelf, isDummyCompile):
 
     # only replaced percent vars that will be reffed by % with - value /100
     spFormatVarDict = getSpecialFormatAtts()
-
-    if not Info.FILE_NAME and not globalSelf.getFileName():
-        QMessageBox.information(globalSelf, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
-        return
-
-    globalSelf.saveFile()
 
     wid_widgetList = list(Info.WID_WIDGET.keys())
     wid_node_list = list(Info.WID_NODE.keys())

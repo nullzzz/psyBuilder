@@ -5,7 +5,7 @@ import traceback
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox
 
 from lib import MessageBox, WaitDialog, Settings
 from .attributes import Attributes
@@ -992,8 +992,14 @@ class Psy(QMainWindow):
             self.before_exp_action.setIconVisibleInMenu(imageLoadMode == "before_exp")
 
     def compile(self):
+        if not Info.FILE_NAME and not self.getFileName():
+            QMessageBox.information(self, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
+            return
+
+        self.saveFile()
+
         try:
-            compilePTB(self)
+            compilePTB()
         except Exception as compileError:
             Func.print(str(compileError), 2)
             traceback.print_exc()
