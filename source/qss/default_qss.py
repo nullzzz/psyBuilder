@@ -66,7 +66,7 @@ QTabBar::tab:hover {
 }
 
 QTabBar::close-button {
-    image: url(images/tab_bar/close.png);
+    image: url(source/images/tab_bar/close.png);
     subcontrol-position: right;
     subcontrol-origin: margin;
     position: absolute;
@@ -74,7 +74,7 @@ QTabBar::close-button {
 }
 
 QTabBar::close-button:hover {
-    image: url(images/tab_bar/close_pressed.png);
+    image: url(source/images/tab_bar/close_pressed.png);
 }
 
 """
@@ -127,34 +127,34 @@ QTreeView::branch:selected {
 }
 
 QTreeView::branch:has-siblings:!adjoins-Item {
-    border-image: url(images/structure/vertical_line.png) 0;
+    border-image: url(source/images/structure/vertical_line.png) 0;
 }
 
 QTreeView::branch:has-siblings:adjoins-Item {
-    border-image: url(images/structure/branch_more.png) 0;
+    border-image: url(source/images/structure/branch_more.png) 0;
 }
 
 QTreeView::branch:!has-children:!has-siblings:adjoins-Item {
-    border-image: url(images/structure/branch_end.png) 0;
+    border-image: url(source/images/structure/branch_end.png) 0;
 }
 
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
     border-image: none;
-    image: url(images/structure/branch_closed.png);
+    image: url(source/images/structure/branch_closed.png);
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings {
     border-image: none;
-    image: url(images/structure/branch_open.png);
+    image: url(source/images/structure/branch_open.png);
 }
 """
 
 dock_widget = """
 QDockWidget {
     border: 1px solid rgb(206,206,206);
-    titlebar-close-icon: url(images/dock_widget/hide.png);
+    titlebar-close-icon: url(source/images/dock_widget/hide.png);
 }
 
 QDockWidget::title {
@@ -184,4 +184,4 @@ QMainWindow::separator {
 ColorListEditor::drop-down {image: url(image/color_down_arrow.png);}
 """
 
-qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree + dock_widget + center
+default_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree + dock_widget + center

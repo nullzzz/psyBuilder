@@ -138,3 +138,6 @@ dmypy.json
 # ignore ini or psy file
 *.ini
 *.psy
+
+# __KEY__
+__KEY__
