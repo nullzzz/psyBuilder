@@ -42,8 +42,8 @@ QTabWidget::tab-bar {
 QTabBar::tab {
     background: rgb(246,246,246);
     border: 1px solid rgb(201,201,201);
-    min-height: 28px;
-    max-height: 28px;
+    min-height: 27px;
+    max-height: 27px;
     min-width: 100px;
     text-align: center;
 }
@@ -54,7 +54,6 @@ QTabBar::tab#TabWidget {
 
 QTabBar::tab:selected{
     background: white;
-    border-bottom:0px;
 }
 
 QTabBar::tab:!selected {
@@ -113,13 +112,17 @@ QListView#IconList::Item:selected{
 """
 
 structure_tree = """
+QTreeView::item {
+    border: 1px solid transparent;
+}
+
 QTreeView::item:selected {
-    border: 0px solid rgb(186, 215, 251);
+    border: 1px solid transparent;
     background: rgb(186, 215, 251);
 }
 
 QTreeView::item:hover {
-    border:1px solid rgb(110,110,110);
+    border: 1px solid rgb(110,110,110);
 }
 
 QTreeView::branch:selected {
@@ -141,13 +144,11 @@ QTreeView::branch:!has-children:!has-siblings:adjoins-Item {
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
     border-image: none;
-    image: url(source/images/structure/branch_closed.png);
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings {
     border-image: none;
-    image: url(source/images/structure/branch_open.png);
 }
 """
 
@@ -160,6 +161,8 @@ QDockWidget {
 QDockWidget::title {
     background: rgb(237,237,237);
     text-align: center;
+    padding-top: 6px;
+    padding-bottom: 6px;
 }
 
 QDockWidget::close-button {
@@ -184,4 +187,13 @@ QMainWindow::separator {
 ColorListEditor::drop-down {image: url(image/color_down_arrow.png);}
 """
 
-default_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree + dock_widget + center
+cycle = """
+QToolBar#CycleToolBar {
+    border: 1px solid rgb(201,201,201);
+    min-height: 35px;
+    max-height: 35px;
+    spacing: 2px;
+}
+"""
+
+default_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree + dock_widget + center + cycle

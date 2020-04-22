@@ -527,6 +527,9 @@ class Func(object):
             if size:
                 return QPixmap(path).scaled(size, transformMode=Qt.SmoothTransformation)
             return QPixmap(path)
+        else:
+            if size:
+                return QIcon(QPixmap(path).scaled(size, transformMode=Qt.SmoothTransformation))
         return QIcon(path)
 
     @staticmethod

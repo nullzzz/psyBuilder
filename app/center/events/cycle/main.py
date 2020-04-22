@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QSize
 
 from app.func import Func
 from app.info import Info
@@ -44,20 +44,21 @@ class Cycle(TabItemMainWindow):
         @return:
         """
         tool_bar = self.addToolBar("Tool Bar")
+        tool_bar.setObjectName("CycleToolBar")
         tool_bar.setMovable(False)
         tool_bar.setFloatable(False)
         # add action
-        tool_bar.addAction(Func.getImageObject("tool_bar/setting.png", 1), "Setting", self.properties.exec)
-        tool_bar.addAction(Func.getImageObject("tool_bar/add_row.png", 1), "Add Row", self.addRow)
-        tool_bar.addAction(Func.getImageObject("tool_bar/add_rows.png", 1), "Add Rows",
+        tool_bar.addAction(Func.getImageObject("cycle/setting.png", 1, QSize(22, 22)), "Setting", self.properties.exec)
+        tool_bar.addAction(Func.getImageObject("cycle/add_row.png", 1, QSize(22, 22)), "Add› Row", self.addRow)
+        tool_bar.addAction(Func.getImageObject("cycle/add_rows.png", 1, QSize(22, 22)), "Add Rows",
                            self.cycle_table.addRowsActionFunc)
-        tool_bar.addAction(Func.getImageObject("tool_bar/delete_row.png", 1), "Delete Rows",
+        tool_bar.addAction(Func.getImageObject("cycle/delete_row.png", 1, QSize(22, 22)), "Delete Rows",
                            self.cycle_table.deleteRowsActionFunc)
-        tool_bar.addAction(Func.getImageObject("tool_bar/add_column.png", 1), "Add Attribute",
+        tool_bar.addAction(Func.getImageObject("cycle/add_column.png", 1, QSize(22, 22)), "Add Attribute",
                            self.cycle_table.addAttributeActionFunc)
-        tool_bar.addAction(Func.getImageObject("tool_bar/add_columns.png", 1), "Add Attributes",
+        tool_bar.addAction(Func.getImageObject("cycle/add_columns.png", 1, QSize(22, 22)), "Add Attributes",
                            self.cycle_table.addAttributesActionFunc)
-        tool_bar.addAction(Func.getImageObject("tool_bar/delete_column.png", 1), "Delete Attributes",
+        tool_bar.addAction(Func.getImageObject("cycle/delete_column.png", 1, QSize(22, 22)), "Delete Attributes",
                            self.cycle_table.deleteAttributesActionFunc)
 
     def getColumnAttributes(self) -> list:
