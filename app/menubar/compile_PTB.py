@@ -463,7 +463,7 @@ def outPutTriggerCheck(cWidget) -> dict:
     shortPulseDurParallelsDict = dict()
 
     for cOpDevInfo in cOutPutDevices.values():
-        if cOpDevInfo['Device Type'] == 'parallel_port':
+        if cOpDevInfo['Device Type'] == 'parallel port':
             if cOpDevInfo['Device Name'] in respTriggerDevNames:
                 shortPulseDurParallelsDict.update({cOpDevInfo['Device Id']: 10})
                 Func.log('Currently we will force the pulse duration to be 10 ms', False)
@@ -2433,7 +2433,7 @@ def genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         cDevName = properties.get("Device Name", "")
         devType = properties.get("Device Type", "")
 
-        if devType == 'parallel_port':
+        if devType == Info.DEV_PARALLEL_PORT:
             # currently only ppl need to be reset to zero
             # cOutDeviceDict[cDevName] = ['1', pulseDur, re.split('(\(\d*\))', outputDevNameIdxDict.get(cDevName))[1][1:-1]]
             cOutDeviceDict[cDevName] = ['1', pulseDur, outputDevNameIdxDict.get(cDevName)]
@@ -2447,12 +2447,12 @@ def genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
 
             # printAutoInd(f, "isParallelOn = true; ")
         # outputDevNameIdxDict.update({cDevice['Device Name']: f"tcpipCons({iNetPort})"})
-        elif devType == 'network_port':
+        elif devType == Info.DEV_NETWORK_PORT:
             printAutoInd(f, "pnet({0},'write',{1});", outputDevNameIdxDict.get(cDevName), msgValue)
             # cOutDeviceDict[cDevName] = ['2', pulseDur, re.split('(\(\d*\))', outputDevNameIdxDict.get(cDevName))[1][1:-1]]
             cOutDeviceDict[cDevName] = ['2', pulseDur, outputDevNameIdxDict.get(cDevName)]
 
-        elif devType == 'serial_port':
+        elif devType == Info.DEV_SERIAL_PORT:
             printAutoInd(f, "[ign, when] = IOPort('Write', {0}, {1});", outputDevNameIdxDict.get(cDevName), msgValue)
             # cOutDeviceDict[cDevName] = ['3', pulseDur, re.split('(\(\d*\))', outputDevNameIdxDict.get(cDevName))[1][1:-1]]
             cOutDeviceDict[cDevName] = ['3', pulseDur, outputDevNameIdxDict.get(cDevName)]
@@ -2724,8 +2724,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
         if getItemType(cItemId) == Info.ITEM_SOUND:
             printAutoInd(sliderStimCodes, "% create item: {0} in {1}", cItemId, getWidgetName(cWidget.widget_id))
             if iSoundSlave == 1:
-                printAutoInd(sliderStimCodes,
-                             "% schedule start of audio at exactly the predicted time of the next flip")
+                printAutoInd(sliderStimCodes, "% schedule start of audio at exactly the predicted time of the next flip")
 
             allWidgetCodes = drawSoundWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel,
                                              allWidgetCodes,
