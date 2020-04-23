@@ -19,10 +19,10 @@ class VarComboBox(QComboBox):
     def __init__(self, parent=None):
         super(VarComboBox, self).__init__(parent)
         self.setAcceptDrops(True)
+        self.setDuplicatesEnabled(False)
         self.setInsertPolicy(QComboBox.NoInsert)
         self.currentTextChanged.connect(self.findVar)
         self.focusLost.connect(self.checkValidity)
-        # self.lineEdit().returnPressed.connect(self.checkValidity)
         self.valid_data: str = ""
         self.reg_exp = ""
 

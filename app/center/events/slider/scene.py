@@ -212,6 +212,8 @@ class Scene(QGraphicsScene):
                 item = DiaItem(DiaItem.Circle, k)
             elif k.startswith(Info.ITEM_LINE):
                 item = LineItem(LineItem.Line, k)
+            elif k.startswith(Info.ITEM_DOT_MOTION):
+                item = DotItem(DotItem.Dot, k)
 
             self.addItem(item)
             item.setProperties(v)

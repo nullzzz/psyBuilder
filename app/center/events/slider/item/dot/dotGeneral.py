@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QGridLayout, QFormLayout, QVBoxLayout, QCompleter, QSizePolicy
 
-from lib import ColorListEditor, VarLineEdit, VarComboBox
+from lib import ColComboBox, VarLineEdit, VarComboBox
 
 
 class DotGeneral(QWidget):
@@ -45,15 +45,15 @@ class DotGeneral(QWidget):
         self.speed = VarLineEdit("20")
         self.speed.setReg(VarLineEdit.Float)
 
-        self.dot_color = ColorListEditor()
+        self.dot_color = ColComboBox()
         self.dot_color.setCurrentText("0,0,0")
         self.coherence = VarLineEdit("100")
         self.coherence.setReg(VarLineEdit.Float)
         # down
 
-        self.fill_color = ColorListEditor()
+        self.fill_color = ColComboBox()
         self.fill_color.addTransparent()
-        self.border_color = ColorListEditor()
+        self.border_color = ColComboBox()
         self.border_color.addTransparent()
         self.border_width = VarLineEdit("0")
         self.border_width.setReg(VarLineEdit.Integer)
@@ -150,9 +150,7 @@ class DotGeneral(QWidget):
         self.cy_pos.setCompleter(QCompleter(attributes))
         self._width.setCompleter(QCompleter(attributes))
         self._height.setCompleter(QCompleter(attributes))
-        self.is_oval.setCompleter(QCompleter(attributes))
         self.dot_num.setCompleter(QCompleter(attributes))
-        self.dot_type.setCompleter(QCompleter(attributes))
         self.dot_size.setCompleter(QCompleter(attributes))
         self.move_direction.setCompleter(QCompleter(attributes))
         self.speed.setCompleter(QCompleter(attributes))
@@ -173,11 +171,11 @@ class DotGeneral(QWidget):
         self.default_properties["Dot Size"] = self.dot_size.text()
         self.default_properties['Move Direction'] = self.move_direction.text()
         self.default_properties['Speed'] = self.speed.text()
-        self.default_properties['Dot Color'] = self.dot_color.getColor()
+        self.default_properties['Dot Color'] = self.dot_color.getRGB()
         self.default_properties['Coherence'] = self.coherence.text()
 
-        self.default_properties['Fill Color'] = self.fill_color.getColor()
-        self.default_properties["Border Color"] = self.border_color.getColor()
+        self.default_properties['Fill Color'] = self.fill_color.getRGB()
+        self.default_properties["Border Color"] = self.border_color.getRGB()
         self.default_properties["Border Width"] = self.border_width.text()
 
     def setProperties(self, properties: dict):

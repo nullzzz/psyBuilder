@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QFontComboBox, QCompleter
 
-from lib import VarComboBox, VarLineEdit, ColorListEditor
+from lib import VarComboBox, VarLineEdit, ColComboBox
 
 
 class TextGeneral(QWidget):
@@ -31,8 +31,8 @@ class TextGeneral(QWidget):
         self.cy_pos.setEditable(True)
         self.cy_pos.addItem('100')
 
-        self.fore_color = ColorListEditor()
-        self.back_color = ColorListEditor()
+        self.fore_color = ColComboBox()
+        self.back_color = ColComboBox()
         self.fore_color.setCurrentText("black")
 
         self.transparent = VarLineEdit("100%")
@@ -137,9 +137,9 @@ class TextGeneral(QWidget):
     def updateInfo(self):
         self.default_properties["Center X"] = self.cx_pos.currentText()
         self.default_properties["Center Y"] = self.cy_pos.currentText()
-        self.default_properties["Fore Color"] = self.fore_color.getColor()
+        self.default_properties["Fore Color"] = self.fore_color.getRGB()
 
-        self.default_properties["Back Color"] = self.back_color.getColor()
+        self.default_properties["Back Color"] = self.back_color.getRGB()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Font Family"] = self.font_box.currentText()
         self.default_properties["Font Size"] = self.font_size_box.currentText()

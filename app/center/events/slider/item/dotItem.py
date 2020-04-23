@@ -1,7 +1,7 @@
 import math
 import random
 
-from PyQt5.QtCore import Qt, QRect, QRectF, QTimer
+from PyQt5.QtCore import Qt, QRectF, QTimer
 from PyQt5.QtGui import QPainterPath, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem
 
@@ -18,8 +18,6 @@ class DotItem(QGraphicsItem):
     Interval = 300
 
     def __init__(self, item_type, item_name: str = ""):
-        super(DotItem, self).__init__()
-
         super(DotItem, self).__init__()
 
         self.item_type = item_type
@@ -153,35 +151,17 @@ class DotItem(QGraphicsItem):
         if __dot_size.isdigit():
             self.dot_size = int(__dot_size)
 
-        __dot_color = self.properties["Dot Color"]
-        if not __dot_color.startswith("["):
-            rgba = [int(x) for x in __dot_color.split(",")]
-            if len(rgba) == 4:
-                r, g, b, a = rgba
-            else:
-                r, g, b = rgba
-                a = 255
-            self.dot_color = QColor(r, g, b, a)
+        __dot_color = self.pro_window.general.dot_color.getColor()
+        if __dot_color:
+            self.dot_color = __dot_color
 
-        __fill_color = self.properties["Fill Color"]
-        if not __fill_color.startswith("["):
-            rgba = [int(x) for x in __fill_color.split(",")]
-            if len(rgba) == 4:
-                r, g, b, a = rgba
-            else:
-                r, g, b = rgba
-                a = 255
-            self.fill_color.setRgb(r, g, b, a)
+        __fill_color = self.pro_window.general.fill_color.getColor()
+        if __fill_color:
+            self.fill_color = __fill_color
 
-        __border_color = self.properties["Border Color"]
-        if not __border_color.startswith("["):
-            rgba = [int(x) for x in __border_color.split(",")]
-            if len(rgba) == 4:
-                r, g, b, a = rgba
-            else:
-                r, g, b = rgba
-                a = 255
-            self.border_color.setRgb(r, g, b, a)
+        __border_color = self.pro_window.general.border_color.getColor()
+        if __border_color:
+            self.border_color = __border_color
         __border_width = self.properties["Border Width"]
         if __border_width.isdigit():
             self.border_width = int(__border_width)

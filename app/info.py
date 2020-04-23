@@ -43,9 +43,9 @@ class Info(object):
 
     # widget type
     CYCLE = "Cycle"
-    SOUND = "Sound"
-    TEXT = "Text"
     IMAGE = "Image"
+    TEXT = "Text"
+    SOUND = "Sound"
     VIDEO = "Video"
     SLIDER = "Slider"
     BUG = "Bug"

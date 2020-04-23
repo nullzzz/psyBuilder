@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLa
 
 from app.func import Func
 from app.info import Info
-from lib import VarComboBox, ColorListEditor, TabItemWidget
+from lib import VarComboBox, ColComboBox, TabItemWidget
 
 
 class EyeCalibrate(TabItemWidget):
@@ -25,7 +25,7 @@ class EyeCalibrate(TabItemWidget):
 
         self.calibration_type = VarComboBox()
         self.calibration_beep = VarComboBox()
-        self.target_color = ColorListEditor()
+        self.target_color = ColComboBox()
         self.target_color.setCurrentText("gray")
 
         self.target_style = VarComboBox()
@@ -134,7 +134,7 @@ class EyeCalibrate(TabItemWidget):
     def updateInfo(self):
         self.default_properties["Calibration Type"] = self.calibration_type.currentText()
         self.default_properties["Calibration Beep"] = self.calibration_beep.currentText()
-        self.default_properties["Target Color"] = self.target_color.getColor()
+        self.default_properties["Target Color"] = self.target_color.getRGB()
         self.default_properties["Target Style"] = self.target_style.currentText()
         self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
 
@@ -175,7 +175,7 @@ class EyeCalibrate(TabItemWidget):
         return self.calibration_beep.currentText()
 
     def getTargetColor(self) -> str:
-        return self.target_color.getColor()
+        return self.target_color.getRGB()
 
     def getTargetStyle(self) -> str:
         return self.target_style.currentText()

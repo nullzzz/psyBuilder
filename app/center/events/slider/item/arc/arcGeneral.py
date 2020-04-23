@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QGridLayout, QFormLayout, QVBoxLayout, QCompleter, QSizePolicy
 
-from lib import ColorListEditor, VarLineEdit, VarComboBox
+from lib import ColComboBox, VarLineEdit, VarComboBox
 
 
 class ArcGeneral(QWidget):
@@ -35,10 +35,10 @@ class ArcGeneral(QWidget):
         self.angle_length.setEditable(True)
 
         # down
-        self.border_color = ColorListEditor()
+        self.border_color = ColComboBox()
         self.border_color.setCurrentText("0,0,0")
         self.border_width = VarLineEdit("1")
-        self.fill_color = ColorListEditor()
+        self.fill_color = ColComboBox()
         self.fill_color.addTransparent()
         self.setUI()
 
@@ -117,8 +117,8 @@ class ArcGeneral(QWidget):
         self.default_properties["Angle Length"] = self.angle_length.currentText()
 
         self.default_properties['Border Width'] = self.border_width.text()
-        self.default_properties['Border Color'] = self.border_color.getColor()
-        self.default_properties['Fill Color'] = self.fill_color.getColor()
+        self.default_properties['Border Color'] = self.border_color.getRGB()
+        self.default_properties['Fill Color'] = self.fill_color.getRGB()
 
     def setPosition(self, x, y):
         if not self.cx_pos.text().startswith("["):

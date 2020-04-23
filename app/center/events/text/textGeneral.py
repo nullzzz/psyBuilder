@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
 from app.func import Func
 from app.info import Info
 from example import SmartTextEdit
-from lib import VarComboBox, VarLineEdit, ColorListEditor
+from lib import VarComboBox, VarLineEdit, ColComboBox
 
 
 class TextTab1(QWidget):
@@ -35,8 +35,8 @@ class TextTab1(QWidget):
         self.align_y.setEditable(True)
         self.align_y.currentTextChanged.connect(self.changeAlign)
 
-        self.fore_color = ColorListEditor()
-        self.back_color = ColorListEditor()
+        self.fore_color = ColComboBox()
+        self.back_color = ColComboBox()
         self.fore_color.setCurrentText("black")
         self.fore_color_name = "black"
         self.back_color_name = "white"
@@ -273,8 +273,8 @@ class TextTab1(QWidget):
         self.default_properties["Text"] = self.text_edit.toPlainText()
         self.default_properties["Alignment X"] = self.align_x.currentText()
         self.default_properties["Alignment Y"] = self.align_y.currentText()
-        self.default_properties["Fore Color"] = self.fore_color.getColor()
-        self.default_properties["Back Color"] = self.back_color.getColor()
+        self.default_properties["Fore Color"] = self.fore_color.getRGB()
+        self.default_properties["Back Color"] = self.back_color.getRGB()
         self.default_properties["Screen Name"] = self.screen.currentText()
         self.default_properties["Transparent"] = self.transparent.text()
         self.default_properties["Clear After"] = self.clear_after.currentText()

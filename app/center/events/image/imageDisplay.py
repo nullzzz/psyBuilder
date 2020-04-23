@@ -300,7 +300,7 @@ class ImageDisplay(TabItemMainWindow):
         返回边框颜色
         :return:
         """
-        return self.pro_window.frame.border_color.getColor()
+        return self.pro_window.frame.border_color.getRGB()
 
     def getBorderWidth(self) -> str:
         """
@@ -314,7 +314,7 @@ class ImageDisplay(TabItemMainWindow):
         返回边框背景色
         :return:
         """
-        return self.pro_window.frame.back_color.getColor()
+        return self.pro_window.frame.back_color.getRGB()
 
     def getDuration(self) -> str:
         """

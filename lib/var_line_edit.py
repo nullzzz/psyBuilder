@@ -1,7 +1,7 @@
 import re
 
-from PyQt5.QtCore import QDataStream, QIODevice, QRegExp, pyqtSignal
-from PyQt5.QtGui import QFont, QRegExpValidator
+from PyQt5.QtCore import QDataStream, QIODevice, QRegExp, pyqtSignal, Qt
+from PyQt5.QtGui import QFont, QRegExpValidator, QKeyEvent
 from PyQt5.QtWidgets import QLineEdit
 
 from app.info import Info
@@ -20,9 +20,9 @@ class VarLineEdit(QLineEdit):
         super(VarLineEdit, self).__init__(*__args)
         self.setAcceptDrops(True)
         self.textChanged.connect(self.findVar)
-        self.editingFinished.connect(self.checkValidity)
+        # self.editingFinished.connect(self.checkValidity)
         self.returnPressed.connect(self.checkValidity)
-        self.focusLost.connect(self.checkValidity)
+        # self.focusLost.connect(self.checkValidity)
         self.valid_data: str = self.text()
 
         self.suffix: str = ""
@@ -68,7 +68,12 @@ class VarLineEdit(QLineEdit):
         self.focusLost.emit()
         QLineEdit.focusOutEvent(self, e)
 
+    # def keyPressEvent(self, e: QKeyEvent) -> None:
+    #     if e.key() == Qt.Key_Return:
+
+
     def checkValidity(self):
+        print("check")
         cur = self.text()
         if self.reg_exp != "" and re.fullmatch(self.reg_exp, cur) is None:
             self.setText(self.valid_data)

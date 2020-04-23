@@ -184,7 +184,7 @@ QMainWindow::separator {
     width: 1px;
     height: 1px;
 }
-ColorListEditor::drop-down {image: url(image/color_down_arrow.png);}
+ColComboBox::drop-down {image: url(image/color_down_arrow.png);}
 """
 
 cycle = """

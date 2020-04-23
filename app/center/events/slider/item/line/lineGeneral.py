@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFormLayout, QGroupBox, QGridLayout, QLabel, QCompleter
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
-from lib import ColorListEditor, VarLineEdit
+from lib import ColComboBox, VarLineEdit
 
 
 class LineGeneral(QWidget):
@@ -26,7 +26,7 @@ class LineGeneral(QWidget):
         self.y_pos2 = VarLineEdit()
 
         # down
-        self.border_color = ColorListEditor()
+        self.border_color = ColComboBox()
         self.border_color.setCurrentText("0,0,0")
         self.border_width = VarLineEdit()
         self.border_width.setReg(r"\d+")
@@ -102,7 +102,7 @@ class LineGeneral(QWidget):
         self.default_properties['X2'] = self.x_pos2.text()
         self.default_properties['Y2'] = self.y_pos2.text()
 
-        self.default_properties['Border Color'] = self.border_color.getColor()
+        self.default_properties['Border Color'] = self.border_color.getRGB()
         self.default_properties['Border Width'] = self.border_width.text()
 
     def setProperties(self, properties: dict):

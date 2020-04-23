@@ -1,4 +1,4 @@
-from .color_list_editor import ColorListEditor
+from .color_combo_box import ColComboBox
 from .dialog import Dialog
 from .dock_widget import DockWidget
 from .hover_button import HoverButton

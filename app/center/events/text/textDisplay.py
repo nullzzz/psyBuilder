@@ -125,7 +125,7 @@ class TextDisplay(TabItemMainWindow):
         返回前景色
         :return:
         """
-        return self.pro_window.general.fore_color.getColor()
+        return self.pro_window.general.fore_color.getRGB()
 
     def getScreenName(self) -> str:
         """
@@ -139,7 +139,7 @@ class TextDisplay(TabItemMainWindow):
         返回背景颜色
         :return:
         """
-        return self.pro_window.general.back_color.getColor()
+        return self.pro_window.general.back_color.getRGB()
 
     def getTransparent(self) -> str:
         """
@@ -227,7 +227,7 @@ class TextDisplay(TabItemMainWindow):
         返回边框颜色
         :return:
         """
-        return self.pro_window.frame.border_color.getColor()
+        return self.pro_window.frame.border_color.getRGB()
 
     def getBorderWidth(self) -> str:
         """
@@ -241,7 +241,7 @@ class TextDisplay(TabItemMainWindow):
         返回边框背景色
         :return:
         """
-        return self.pro_window.frame.back_color.getColor()
+        return self.pro_window.frame.back_color.getRGB()
 
     def getDuration(self) -> str:
         """

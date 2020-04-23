@@ -2,11 +2,13 @@ from PyQt5.QtCore import Qt, QRegExp, pyqtSignal
 from PyQt5.QtGui import QColor, QIcon, QRegExpValidator, QFont
 from PyQt5.QtWidgets import QComboBox, QColorDialog, QMessageBox
 
+from .message_box import MessageBox
 from .var_combo_box import VarComboBox
 
 
-class ColorListEditor(VarComboBox):
+class ColComboBox(VarComboBox):
     colorChanged = pyqtSignal(str)
+
     color_map: dict = {
         "white": "255,255,255",
         "gray": "128,128,128",
@@ -19,13 +21,14 @@ class ColorListEditor(VarComboBox):
         "purple": "128,0,128",
         "transparent": "0,0,0,0"
     }
+    default_color = ("white", "gray", "black",
+                     "red", "orange", "yellow",
+                     "green", "blue", "purple")
 
     def __init__(self, widget=None):
-        super(ColorListEditor, self).__init__(widget)
+        super(ColComboBox, self).__init__(widget)
         self.setEditable(True)
         self.is_valid: int = 1
-        self.is_showing = False
-        self.is_chose = False
         self.default_color = ("white", "gray", "black", "red",
                               "orange", "yellow", "green", "blue", "purple")
         self.init()
@@ -40,7 +43,7 @@ class ColorListEditor(VarComboBox):
 
     # 添加默认颜色，白灰黑、红橙黄绿蓝紫
     def init(self):
-        for i, color_name in enumerate(self.default_color):
+        for i, color_name in enumerate(ColComboBox.default_color):
             color = QColor(color_name)
             self.insertItem(i, color_name)
             self.setItemData(i, color, Qt.DecorationRole)
@@ -65,7 +68,6 @@ class ColorListEditor(VarComboBox):
                 self.setFont(QFont("宋体", 9, QFont.Normal))
                 # 取色板
                 if text == "More...":
-                    self.is_chose = True
                     self.setStyleSheet("background: white;")
                     color_rgb = QColorDialog.getColor(Qt.white, self)
                     # 选了颜色
@@ -73,17 +75,11 @@ class ColorListEditor(VarComboBox):
                         color_name = color_rgb.name()
                         color_name_ = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
                         self.setStyleSheet("background: {}".format(color_name))
-                        # if self.findText(color_name_, Qt.MatchExactly) == -1:
-                        #     self.insertItem(1, color_name_)
-                        #     self.setItemData(1, color_rgb, Qt.DecorationRole)
-                        #     self.setCurrentIndex(1)
-                        # else:
                         self.setCurrentText(color_name_)
                     # 未选颜色
                     else:
                         self.setCurrentIndex(1)
                     self.is_valid = 1
-                    self.is_chose = False
                 # 255,255,255格式rgb
                 elif text[0].isdigit():
                     color_rgb = text.split(",")
@@ -109,12 +105,12 @@ class ColorListEditor(VarComboBox):
                         self.setCurrentIndex(1)
                     self.setStyleSheet("background: {}".format(text))
                     self.is_valid = 1
-                elif text in self.default_color:
+                elif text in ColComboBox.default_color:
                     self.is_valid = 1
                     self.setStyleSheet("background: rgb({})".format(self.color_map.get(text)))
                 elif text == "transparent":
                     self.is_valid = 1
-                    self.setStyleSheet("background: white")
+                    self.setStyleSheet("background: transparent")
                 else:
                     self.is_valid = 0
                     self.setStyleSheet("background: white")
@@ -123,37 +119,36 @@ class ColorListEditor(VarComboBox):
             self.setStyleSheet("background: white")
 
         if self.is_valid == 1:
-            self.colorChanged.emit(self.getColor())
+            self.colorChanged.emit(self.getRGB())
 
     # 重写下拉菜单展开
     def showPopup(self):
-        self.is_showing = True
         self.setStyleSheet("background: white;")
         QComboBox.showPopup(self)
 
     # 重写下拉菜单收起
     def hidePopup(self):
-        self.is_showing = False
         color = self.currentText()
         if self.is_valid == 1:
             if ',' in color:
                 self.setStyleSheet("background: rgb({})".format(color))
             else:
                 self.setStyleSheet("background: {};".format(color))
+        elif self.is_valid == 2:
+            self.setStyleSheet("color: blue")
+            self.setFont(QFont("Timers", 9, QFont.Bold))
         else:
             self.setStyleSheet("background: white;")
         QComboBox.hidePopup(self)
 
     def focusOutEvent(self, e):
-        if not self.is_chose:
-            if not self.is_showing:
-                if not self.is_valid:
-                    self.setStyleSheet("background: white;")
-                    self.setCurrentText("white")
-                    QMessageBox.warning(
-                        self, "Warning", "Invalid Color!", QMessageBox.Ok)
-                else:
-                    pass
+        if not self.is_valid:
+            self.setStyleSheet("background: white;")
+            self.setCurrentText("white")
+            MessageBox.warning(
+                self, "Warning", "Invalid Color!", MessageBox.Ok)
+        else:
+            pass
         QComboBox.focusOutEvent(self, e)
 
     def setCurrentText(self, text: str) -> None:
@@ -163,32 +158,17 @@ class ColorListEditor(VarComboBox):
                 break
         return QComboBox.setCurrentText(self, text)
 
-    def getColor(self):
+    def getColor(self) -> QColor:
         """
-        返回当前颜色R,G,B
+        返回当前颜色QColor
         :return:
         """
-        color_name = self.currentText()
-        if color_name.startswith("["):
-            return color_name
-        elif color_name.startswith("#"):
-            color_name = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
-        return self.color_map.get(color_name, color_name)
+        return self.itemData(self.currentIndex(), Qt.DecorationRole)
 
-    def getRGB(self):
+    def getRGB(self) -> str:
         color_name = self.currentText()
         if color_name.startswith("["):
-            color_name = '255,255,255'
-        elif color_name.startswith("#"):
-            color_name = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
-        elif color_name == "transparent":
-            color_name = '255,255,255'
-        return self.color_map.get(color_name, color_name)
-
-    def getRGBA(self):
-        color_name = self.currentText()
-        if color_name.startswith("["):
-            return color_name
+            pass
         elif color_name.startswith("#"):
             color_name = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
         return self.color_map.get(color_name, color_name)

@@ -3,7 +3,7 @@ from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QLineEdit, QFormLayout, QVBoxLayout
 
 from app.deviceSystem.describer.basis import Shower
-from lib import ColorListEditor
+from lib import ColComboBox
 
 
 class Screen(Shower):
@@ -11,7 +11,7 @@ class Screen(Shower):
         super(Screen, self).__init__(parent=parent)
         self.device_index = QLineEdit()
         self.device_index.textEdited.connect(self.showAddressTip)
-        self.bg_color = ColorListEditor()
+        self.bg_color = ColComboBox()
         self.mu_sample = QLineEdit()
         self.resolution = QLineEdit("auto")
         self.refresh_rate = QLineEdit("auto")

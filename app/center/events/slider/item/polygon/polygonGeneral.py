@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGroupBox, QGridLayout, QVBoxLayout, QFormLayout, QHBoxLayout, \
     QCompleter, QSizePolicy
 
-from lib import VarLineEdit, ColorListEditor
+from lib import VarLineEdit, ColComboBox
 
 
 class Point:
@@ -60,11 +60,11 @@ class PolygonGeneral(QWidget):
         self.del_bt.clicked.connect(self.delPoint)
         self.del_bt.setEnabled(False)
         # down
-        self.border_color = ColorListEditor()
+        self.border_color = ColComboBox()
         self.border_color.setCurrentText("0,0,0")
         self.border_width = VarLineEdit("1")
 
-        self.fill_color = ColorListEditor()
+        self.fill_color = ColComboBox()
         self.fill_color.addTransparent()
 
         self.setUI()
@@ -202,8 +202,8 @@ class PolygonGeneral(QWidget):
         self.default_properties["Points"] = points
 
         self.default_properties['Border Width'] = self.border_width.text()
-        self.default_properties['Border Color'] = self.border_color.getColor()
-        self.default_properties['Fill Color'] = self.fill_color.getColor()
+        self.default_properties['Border Color'] = self.border_color.getRGB()
+        self.default_properties['Fill Color'] = self.fill_color.getRGB()
 
     def loadSetting(self):
         # 加载参数设置

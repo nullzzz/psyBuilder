@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QFormLayout, QGroupBox, QGridLayout, QWidget, QLabel, \
     QCompleter
 
-from lib import VarComboBox, VarLineEdit, ColorListEditor
+from lib import VarComboBox, VarLineEdit, ColComboBox
 
 
 class FramePage(QWidget):
@@ -31,10 +31,10 @@ class FramePage(QWidget):
         # down
         self.enable = VarComboBox()
         self.enable.currentTextChanged.connect(self.operationAble)
-        self.border_color = ColorListEditor()
+        self.border_color = ColComboBox()
         self.border_width = VarLineEdit("0")
         self.border_width.setReg(VarComboBox.Integer)
-        self.back_color = ColorListEditor()
+        self.back_color = ColComboBox()
         self.transparent = VarLineEdit("100%")
         self.transparent.setReg(VarComboBox.Percentage)
         self.enable.addItems(("No", "Yes"))
@@ -148,9 +148,9 @@ class FramePage(QWidget):
             self.height.setCurrentText("100%")
 
         self.default_properties["Enable"] = self.enable.currentText()
-        self.default_properties["Border Color"] = self.border_color.getColor()
+        self.default_properties["Border Color"] = self.border_color.getRGB()
         self.default_properties["Border Width"] = self.border_width.text()
-        self.default_properties["Frame Fill Color"] = self.back_color.getColor()
+        self.default_properties["Frame Fill Color"] = self.back_color.getRGB()
         self.default_properties["Frame Transparent"] = self.transparent.text()
 
     def getProperties(self):

@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QLineEdit, QCheckB
 
 from app.func import Func
 from app.info import Info
-from lib import VarLineEdit, VarComboBox, ColorListEditor, TabItemWidget
+from lib import VarLineEdit, VarComboBox, ColComboBox, TabItemWidget
 
 
 class EyeDC(TabItemWidget):
@@ -29,7 +29,7 @@ class EyeDC(TabItemWidget):
         self.x_pos.installEventFilter(self)
         self.y_pos = VarLineEdit()
         self.y_pos.installEventFilter(self)
-        self.target_color = ColorListEditor()
+        self.target_color = ColComboBox()
         self.target_color.setCurrentText("128,128,128")
         self.target_style = VarComboBox()
 
@@ -162,7 +162,7 @@ class EyeDC(TabItemWidget):
     def updateInfo(self):
         self.default_properties["Center X"] = self.x_pos.text()
         self.default_properties["Center Y"] = self.y_pos.text()
-        self.default_properties["Target Color"] = self.target_color.getColor()
+        self.default_properties["Target Color"] = self.target_color.getRGB()
         self.default_properties["Target Style"] = self.target_style.currentText()
         self.default_properties[
             "Show Display With Drift Correction"] = self.show_display_with_drift_correction_target.checkState()
@@ -213,7 +213,7 @@ class EyeDC(TabItemWidget):
         return self.y_pos.text()
 
     def getTargetColor(self) -> str:
-        return self.target_color.getColor()
+        return self.target_color.getRGB()
 
     def getTargetStyle(self) -> str:
         return self.target_style.currentText()

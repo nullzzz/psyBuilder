@@ -317,7 +317,7 @@ class VideoDisplay(TabItemMainWindow):
         返回边框背景色
         :return:
         """
-        return self.pro_window.frame.back_color.getColor()
+        return self.pro_window.frame.back_color.getRGB()
 
     def getDuration(self) -> str:
         """
