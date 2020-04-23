@@ -67,16 +67,16 @@ class IconBar(QTabWidget):
         # add events items
         self.events.addItem(WidgetIconItem(Info.CYCLE))
         self.events.addItem(WidgetIconItem(Info.IMAGE))
-        self.events.addItem(WidgetIconItem(Info.SLIDER))
-        self.events.addItem(WidgetIconItem(Info.SOUND))
         self.events.addItem(WidgetIconItem(Info.TEXT))
+        self.events.addItem(WidgetIconItem(Info.SOUND))
         self.events.addItem(WidgetIconItem(Info.VIDEO))
+        self.events.addItem(WidgetIconItem(Info.SLIDER))
         # add eyeTracker items
         self.eye_tracker.addItem(WidgetIconItem(Info.CALIBRATION))
         self.eye_tracker.addItem(WidgetIconItem(Info.DC))
+        self.eye_tracker.addItem(WidgetIconItem(Info.STARTR))
         self.eye_tracker.addItem(WidgetIconItem(Info.ENDR))
         self.eye_tracker.addItem(WidgetIconItem(Info.LOG))
-        self.eye_tracker.addItem(WidgetIconItem(Info.STARTR))
         # add quest items
         self.quest.addItem(WidgetIconItem(Info.QUEST_UPDATE))
         # add condition items
