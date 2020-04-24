@@ -4,8 +4,6 @@ import os
 import re
 import shutil
 
-from PyQt5.QtWidgets import QMessageBox
-
 from app.func import Func
 from app.info import Info
 

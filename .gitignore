@@ -141,3 +141,5 @@ dmypy.json
 
 # __KEY__
 __KEY__
+!/build/
+!/dist/
