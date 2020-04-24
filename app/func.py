@@ -511,7 +511,7 @@ class Func(object):
 
         # ********* untested ************
         # 是否需要详细信息
-        return attributes if detail else attributes.keys()
+        return attributes if detail else list(attributes.keys())
 
     @staticmethod
     def getImageObject(image_path: str, type: int = 0, size: QSize = None) -> QPixmap or QIcon:
