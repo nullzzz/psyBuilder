@@ -3,7 +3,6 @@ from PyQt5.QtGui import QPen, QTransform
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem, QGraphicsRectItem
 
 from app.info import Info
-from .item.openglItem import GLItem
 from ...events.slider.item import *
 
 
@@ -59,8 +58,6 @@ class Scene(QGraphicsScene):
                 # item.getInfo()
             elif DiaItem.Polygon <= item_type <= DiaItem.Rect:
                 item = DiaItem(item_type)
-            elif GLItem.Open == item_type:
-                item = GLItem(item_type)
             elif DotItem.Dot == item_type:
                 item = DotItem(item_type)
             self.addItem(item)

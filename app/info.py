@@ -121,7 +121,7 @@ class Info(object):
     }
 
     # 图片保存路径
-    IMAGE_SOURCE_PATH = "image"
+    IMAGE_SOURCE_PATH = "source/image"
     # widget不同类型对应图片
     WIDGET_TYPE_IMAGE_PATH = {
         CYCLE: os.path.join(IMAGE_SOURCE_PATH, "cycle.png"),

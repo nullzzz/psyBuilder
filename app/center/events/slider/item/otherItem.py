@@ -23,8 +23,6 @@ class OtherItem(QGraphicsPixmapItem):
         self.item_type = item_type
         self.item_name = item_name if item_name else self.generateItemName()
 
-        self.attributes: list = []
-
         if self.item_type == self.Snow:
             self.pro_window = SnowProperty()
             self.setPixmap(QPixmap(Func.getImage("snow.png")).scaled(100, 100))
@@ -47,10 +45,6 @@ class OtherItem(QGraphicsPixmapItem):
             'Y': 1,
             "Properties": self.properties
         }
-
-        # self.timer = QTimer()
-        # self.timer.timeout.connect(self.changeSomething)
-        # self.timer.start(1)
 
     def mouseDoubleClickEvent(self, event):
         self.openPro()

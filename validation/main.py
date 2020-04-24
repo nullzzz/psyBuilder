@@ -2,7 +2,6 @@ import hashlib
 import os
 import sys
 import uuid
-# import pyperclip
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -20,10 +19,10 @@ class ValidationWindow(QFrame):
         self.setStyleSheet("background:rgb(245,245,245)")
         self.setStyleSheet("""
         QLabel {
-            border-image: url(validation/background.png);
+            border-image: url(source/images/common/background.png);
         }
         """)
-        self.setWindowIcon(QIcon("validation/icon.png"))
+        self.setWindowIcon(QIcon("source/images/common/icon.png"))
 
         self.tip = QLabel()
         self.tip.setTextInteractionFlags(Qt.TextSelectableByMouse)
