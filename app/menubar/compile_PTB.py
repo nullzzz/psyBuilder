@@ -18,7 +18,7 @@ inputDevNameIdxDict = dict()
 outputDevNameIdxDict = dict()
 historyPropDict = dict()
 cInfoDict = dict()
-queueDevIdxValueStr = ''
+queueDevIdxValueStr = str()
 stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
 
 

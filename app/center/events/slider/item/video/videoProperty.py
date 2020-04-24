@@ -1,11 +1,16 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
+from app.func import Func
 from .videoGeneral import VideoGeneral
 
 
 class VideoProperty(QWidget):
     def __init__(self, parent=None):
         super(VideoProperty, self).__init__(parent)
+        self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
+        self.setWindowFlag(Qt.WindowStaysOnTopHint)
+
         self.tab = QTabWidget()
         self.below = QWidget()
         self.ok_bt = QPushButton("OK")

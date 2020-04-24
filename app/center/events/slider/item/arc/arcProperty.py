@@ -1,11 +1,16 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QTabWidget, QHBoxLayout
 
+from app.func import Func
 from .arcGeneral import ArcGeneral
 
 
 class ArcProperty(QWidget):
     def __init__(self, parent=None):
         super(ArcProperty, self).__init__(parent=parent)
+        self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
+        self.setWindowFlag(Qt.WindowStaysOnTopHint)
+
         self.tab = QTabWidget()
 
         self.general = ArcGeneral()

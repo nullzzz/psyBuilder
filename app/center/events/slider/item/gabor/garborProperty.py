@@ -1,11 +1,16 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBoxLayout
 
+from app.func import Func
 from .gaborGeneral import GaborGeneral
 
 
 class GaborProperty(QWidget):
     def __init__(self, parent=None):
         super(GaborProperty, self).__init__(parent)
+        self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
+        self.setWindowFlag(Qt.WindowStaysOnTopHint)
+
         self.tab = QTabWidget()
         self.below = QWidget()
 
