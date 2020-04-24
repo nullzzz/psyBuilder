@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QRegExp, pyqtSignal
 from PyQt5.QtGui import QColor, QIcon, QRegExpValidator, QFont
-from PyQt5.QtWidgets import QComboBox, QColorDialog, QMessageBox
+from PyQt5.QtWidgets import QComboBox, QColorDialog
 
 from .message_box import MessageBox
 from .var_combo_box import VarComboBox
@@ -158,12 +158,15 @@ class ColComboBox(VarComboBox):
                 break
         return QComboBox.setCurrentText(self, text)
 
-    def getColor(self) -> QColor:
+    def getColor(self) -> QColor or None:
         """
         返回当前颜色QColor
         :return:
         """
-        return self.itemData(self.currentIndex(), Qt.DecorationRole)
+        if (index := self.findText(self.currentText())) != -1:
+            if isinstance(color := self.itemData(index, Qt.DecorationRole), QColor):
+                return QColor(color)
+        return None
 
     def getRGB(self) -> str:
         color_name = self.currentText()

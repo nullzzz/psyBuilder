@@ -1,7 +1,7 @@
 import math
 import random
 
-from PyQt5.QtCore import Qt, QRectF, QTimer
+from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtGui import QPainterPath, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem
 
@@ -60,9 +60,9 @@ class DotItem(QGraphicsItem):
 
         self.generateDotPosition()
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.updateDotPosition)
-        self.timer.start(DotItem.Interval)
+        # self.timer = QTimer()
+        # self.timer.timeout.connect(self.updateDotPosition)
+        # self.timer.start(DotItem.Interval)
 
     def mouseDoubleClickEvent(self, event):
         self.openPro()
@@ -151,8 +151,7 @@ class DotItem(QGraphicsItem):
         if __dot_size.isdigit():
             self.dot_size = int(__dot_size)
 
-        __dot_color = self.pro_window.general.dot_color.getColor()
-        if __dot_color:
+        if isinstance(__dot_color := self.pro_window.general.dot_color.getColor(), QColor):
             self.dot_color = __dot_color
 
         __fill_color = self.pro_window.general.fill_color.getColor()
@@ -218,9 +217,7 @@ class DotItem(QGraphicsItem):
 
         for cP in self.dot_position:
 
-            x = cP[0]
-            y = cP[1]
-            d = cP[2]
+            x, y, d, s = cP
 
             x += move_dis * math.cos(math.pi * d / 180)
             y += move_dis * math.sin(math.pi * d / 180)
@@ -274,7 +271,6 @@ class DotItem(QGraphicsItem):
             p: tuple
             x = p[0]
             y = p[1]
-
             if p[3]:
                 rect = QRectF(x - self.dot_size / 2, y - self.dot_size / 2, self.dot_size, self.dot_size)
                 if self.dot_type == 0 or self.dot_type == 4:

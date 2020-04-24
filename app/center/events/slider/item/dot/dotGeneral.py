@@ -47,6 +47,7 @@ class DotGeneral(QWidget):
 
         self.dot_color = ColComboBox()
         self.dot_color.setCurrentText("0,0,0")
+
         self.coherence = VarLineEdit("100")
         self.coherence.setReg(VarLineEdit.Float)
         # down
