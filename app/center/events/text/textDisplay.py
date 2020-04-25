@@ -1,10 +1,11 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QToolBar, QAction, QTextEdit
+from PyQt5.QtWidgets import QToolBar, QAction
 
 from app.func import Func
-from example.highlightOfTextEdit import AttributeHighlighter
 from lib import TabItemMainWindow
+from .lighter import AttributeHighlighter
+from .smart import SmartTextEdit
 from .textProperty import TextProperty
 
 
@@ -12,14 +13,13 @@ class TextDisplay(TabItemMainWindow):
     def __init__(self, widget_id: str, widget_name: str):
         super(TextDisplay, self).__init__(widget_id, widget_name)
 
-        self.text_label = QTextEdit()
+        self.text_label = SmartTextEdit()
 
         self.pro_window = TextProperty()
         self.default_properties = self.pro_window.default_properties
 
-        self.pro_window.general.text_edit.setDocument(self.text_label.document())
-
         self.lighter = AttributeHighlighter(self.text_label.document())
+
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
@@ -33,12 +33,13 @@ class TextDisplay(TabItemMainWindow):
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
-        # pre_view = QAction(QIcon(Func.getImage("preview")), "preview", self)
-        # pre_view.triggered.connect(self.preView)
         tool.addAction(open_pro)
-        # tool.addAction(pre_view)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
+
+    def openSettingWindow(self):
+        self.pro_window.general.text_edit.setHtml(self.text_label.toHtml())
+        super(TextDisplay, self).openSettingWindow()
 
     def refresh(self):
         self.pro_window.refresh()
@@ -53,12 +54,10 @@ class TextDisplay(TabItemMainWindow):
     def apply(self):
         self.updateInfo()
 
+        self.text_label.setHtml(self.default_properties.get("General").get("Html"))
+
     def updateInfo(self):
         self.pro_window.updateInfo()
-
-    def changeDisplayText(self):
-        self.html = self.text_label.toHtml()
-        self.pro_window.general.text_edit.setDocument(self.text_label.document())
 
     # 设置可选参数
     def setAttributes(self, attributes):
@@ -263,4 +262,3 @@ class TextDisplay(TabItemMainWindow):
         :return: 输入设备字典
         """
         return self.pro_window.duration.default_properties.get("Input Devices", {})
-

@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox
 
-from lib import MessageBox, WaitDialog, Settings
+from lib import WaitDialog, Settings
 from .attributes import Attributes
 from .center import Center
 from .center.condition import IfBranch, Switch
@@ -189,17 +189,14 @@ class Psy(QMainWindow):
         # help menu
         help_menu = menubar.addMenu("&Help")
         about_action = QAction("&About Us", self)
-        about_Qt_action = QAction("&About Qt", self)
         check_for_update = QAction("&Check for updates", self)
 
         self.about_us = AboutUs()
         self.check_update = Update()
         about_action.triggered.connect(self.about_us.show)
-        about_Qt_action.triggered.connect(QApplication.instance().aboutQt)
         check_for_update.triggered.connect(self.check_update.show)
 
         help_menu.addAction(about_action)
-        help_menu.addAction(about_Qt_action)
         help_menu.addAction(check_for_update)
 
     def initDockWidget(self):
@@ -754,7 +751,8 @@ class Psy(QMainWindow):
         """
         open file through restart software
         """
-        file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.path.dirname(os.path.abspath(__file__)), "Psy File (*.psy)")
+        file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.path.dirname(os.path.abspath(__file__)),
+                                                     "Psy File (*.psy)")
         if file_path and file_path != Info.FILE_NAME:
             # store current state
             self.store(Info.TempFile, False)

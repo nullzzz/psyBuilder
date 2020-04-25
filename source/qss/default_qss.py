@@ -143,12 +143,12 @@ QTreeView::branch:!has-children:!has-siblings:adjoins-Item {
 
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
-    border-image: none;
+    border-image: url(source/images/structure/branch_closed.png) 0;
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings {
-    border-image: none;
+    border-image: url(source/images/structure/branch_open.png) 0;
 }
 """
 
@@ -184,7 +184,7 @@ QMainWindow::separator {
     width: 1px;
     height: 1px;
 }
-ColComboBox::drop-down {image: url(image/color_down_arrow.png);}
+ColComboBox::drop-down {image: url(source/image/color_down_arrow.png);}
 """
 
 cycle = """

@@ -185,6 +185,8 @@ class Scene(QGraphicsScene):
 
     def setProperties(self, properties: dict):
         self.clear()
+        self.border: QGraphicsRectItem = QGraphicsRectItem()
+        self.addItem(self.border)
         for k, v in properties.items():
             k: str
             if k.startswith(Info.ITEM_IMAGE):
@@ -236,8 +238,7 @@ class Scene(QGraphicsScene):
         item.setSelected(False)
         new_item.setSelected(True)
 
-    def setSceneRect(self, rect: QRectF) -> None:
+    def setBorderRect(self, rect: QRectF) -> None:
+        print(rect)
         self.border: QGraphicsRectItem
-
         self.border.setRect(QRectF(0, 0, rect.width(), rect.height()))
-        super(Scene, self).setSceneRect(rect)
