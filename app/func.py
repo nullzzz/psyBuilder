@@ -232,7 +232,7 @@ class Func(object):
 
     @staticmethod
     def log(text, error=False, timer=True):
-        Func.print(text)
+        Func.printOut(text)
 
     @staticmethod
     def getParentWid(widget_id: str) -> str:
@@ -547,14 +547,14 @@ class Func(object):
         Info.Psy.endWait()
 
     @staticmethod
-    def print(information: str, information_type: int = 0):
+    def printOut(information: str, information_type: int = 0):
         """
         print information in output.
         information_type: 0 none
                           1 success
                           2 fail
         """
-        Info.Psy.output.print(str(information), information_type)
+        Info.Psy.output.printOut(str(information), information_type)
 
     @staticmethod
     def checkReferValidity(target_timeline_widget_id: str, widget_id: str) -> bool:
