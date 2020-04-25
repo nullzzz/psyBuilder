@@ -4,7 +4,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+*.pyd
 # Distribution / packaging
 .Python
 env/
@@ -143,3 +143,4 @@ dmypy.json
 __KEY__
 !/build/
 !/dist/
+!/app/center/events/slider/item/baseItem.pyd

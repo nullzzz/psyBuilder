@@ -96,9 +96,12 @@ class TabItemMainWindow(QMainWindow):
         :return:
         :rtype: int
         """
-        if duration := self.default_properties.get("Duration"):
+        duration = self.default_properties.get("Duration")
+        properties = self.default_properties.get("Properties")
+
+        if duration:
             return len(duration.get("Input Devices", {}))
-        elif properties := self.default_properties.get("Properties"):
+        elif properties:
             return len(properties.get("Duration").get("Input Devices", {}))
         return 0
 

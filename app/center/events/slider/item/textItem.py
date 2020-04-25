@@ -165,6 +165,9 @@ class TextItem(QGraphicsTextItem):
     def getText(self) -> str:
         return self.toPlainText()
 
+    def getInfo(self):
+        return self.default_properties
+
     def setProperties(self, properties: dict):
         self.pro_window.setProperties(properties.get("Properties"))
         self.default_properties["X"] = properties["X"]

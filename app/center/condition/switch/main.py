@@ -126,6 +126,7 @@ class Switch(TabItemWidget):
         sub_wid = []
         for case in self.case_area.case_list:
             case: Case
-            if wid := case.getSubWid():
+            wid = case.getSubWid()
+            if wid:
                 sub_wid.append(wid)
         return sub_wid

@@ -107,5 +107,6 @@ class DeviceHome(QListWidget):
         for i in range(self.count()):
             device = self.item(i)
             device_id = device.getDeviceId()
-            if (new_name := Func.getDeviceNameById(device_id)) != "":
+            new_name = Func.getDeviceNameById(device_id)
+            if new_name  != "":
                 device.setDeviceName(new_name)

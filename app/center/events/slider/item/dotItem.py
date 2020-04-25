@@ -151,7 +151,8 @@ class DotItem(QGraphicsItem):
         if __dot_size.isdigit():
             self.dot_size = int(__dot_size)
 
-        if isinstance(__dot_color := self.pro_window.general.dot_color.getColor(), QColor):
+        __dot_color = self.pro_window.general.dot_color.getColor()
+        if isinstance(__dot_color, QColor):
             self.dot_color = __dot_color
 
         __fill_color = self.pro_window.general.fill_color.getColor()

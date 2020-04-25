@@ -134,6 +134,6 @@ class FileButtonArea(QFrame):
         # config
         Settings("config.ini", Settings.IniFormat).setValue("open_mode", mode)
         # menu
-        mode = ("default mode" == mode)
-        self.default_mode_action.setIconVisibleInMenu(mode)
-        self.open_blank_file_action.setIconVisibleInMenu(not mode)
+        isSetIcoVisible = ("default mode" == mode)
+        self.default_mode_action.setIconVisibleInMenu(isSetIcoVisible)
+        self.open_blank_file_action.setIconVisibleInMenu(not isSetIcoVisible)
