@@ -29,7 +29,6 @@ class Slider(TabItemMainWindow):
         self.scene.setSceneRect(QRectF(0, 0, width, height))
         self.w = width
         self.h = height
-        # self.view.fitInView(0, 0, width / 2, height / 2, Qt.KeepAspectRatio)
 
         self.default_properties: dict = {
             "Items": {},
@@ -307,6 +306,7 @@ class Slider(TabItemMainWindow):
             self.scene.setSceneRect(QRectF(0, 0, width, height))
             self.w = width
             self.h = height
+        self.scene.setBorderRect(QRectF(0, 0, width, height))
 
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
@@ -319,6 +319,7 @@ class Slider(TabItemMainWindow):
         return self.default_properties
 
     def getProperties(self):
+        self.refresh()
         return self.pro_window.getProperties()
 
     def pointerGroupClicked(self, i):

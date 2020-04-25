@@ -3,6 +3,7 @@ from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QTextEdit, \
     QFontComboBox, QCompleter
 
+from app.center.events.text.lighter import AttributeHighlighter
 from app.func import Func
 from app.info import Info
 from example import SmartTextEdit
@@ -14,6 +15,7 @@ class TextTab1(QWidget):
         super(TextTab1, self).__init__(parent)
 
         self.default_properties = {
+            "Html": "",
             "Text": "",
             "Alignment": "center",
             "Fore Color": "0,0,0",
@@ -26,6 +28,8 @@ class TextTab1(QWidget):
 
         self.text_edit = SmartTextEdit()
         self.text_edit.setLineWrapMode(QTextEdit.FixedColumnWidth)
+        self.lighter = AttributeHighlighter(self.text_edit.document())
+
         self.align_mode = "center"
 
         self.align_x = VarComboBox()
@@ -226,7 +230,6 @@ class TextTab1(QWidget):
 
         size = self.font_size_box.currentText()
         size = int(size) if size.isdigit() else 8
-        # font = self.text_edit.currentFont()
         font = QFont()
         font.setFamily(family)
         font.setPointSize(size)
@@ -259,6 +262,7 @@ class TextTab1(QWidget):
         self.text_edit.setCurrentFont(font)
 
     def setAttributes(self, attributes):
+        self.lighter.updateRule(attributes)
         self.align_x.setCompleter(QCompleter(attributes))
         self.align_y.setCompleter(QCompleter(attributes))
         self.fore_color.setCompleter(QCompleter(attributes))

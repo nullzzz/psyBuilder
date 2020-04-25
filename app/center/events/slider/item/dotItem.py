@@ -1,7 +1,7 @@
 import math
 import random
 
-from PyQt5.QtCore import Qt, QRectF
+from PyQt5.QtCore import Qt, QRectF, QTimer
 from PyQt5.QtGui import QPainterPath, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem
 
@@ -60,9 +60,9 @@ class DotItem(QGraphicsItem):
 
         self.generateDotPosition()
 
-        # self.timer = QTimer()
-        # self.timer.timeout.connect(self.updateDotPosition)
-        # self.timer.start(DotItem.Interval)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.updateDotPosition)
+        self.timer.start(DotItem.Interval)
 
     def mouseDoubleClickEvent(self, event):
         self.openPro()
