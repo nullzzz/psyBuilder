@@ -44,7 +44,8 @@ def pyStr2MatlabStr(inputStr):
     return inputStr
 
 
-def dataStrConvert(dataStr, isRef=False, transMATStr=False, transPercent=True) -> str or float or int:
+# def dataStrConvert(dataStr, isRef=False, transMATStr=False, transPercent=True) -> str or float or int:
+def dataStrConvert(dataStr, isRef=False, transMATStr=False, transPercent=True):
     # convert string to neither a string or a num
     # e.g.,
     # 1） "2"    to 2
@@ -424,13 +425,14 @@ def shouldNotBeEmptyCheck(keyStr, value):
         throwCompileErrorInfo(f"'{keyStr}'should NOT be empty!")
 
 
-def copyYanglabFiles(filename: str or list):
+# def copyYanglabFiles(filename: str or list):
+def copyYanglabFile(filename):
     destinationDir = os.path.dirname(os.path.abspath(Info.FILE_NAME))
 
-    if isinstance(filename, list):
-        for cFile in filename:
-            copyYanglabFiles(cFile)
-        return 0
+    # if isinstance(filename, list):
+    #     for cFile in filename:
+    #         copyYanglabFile(cFile)
+    #     return 0
 
     destinationFile = os.path.join(destinationDir, filename)
 
@@ -889,7 +891,8 @@ def getWidgetPos(widgetOrId) -> None or int:
 
 
 # noinspection PyBroadException
-def getWidgetEventPos(widget_id: str) -> int or None:
+def getWidgetEventPos(widget_id: str):
+# def getWidgetEventPos(widget_id: str) -> int or None:
     allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
     # 如果是widget是timeline，不存在位置信息
     if widget_id.startswith(Info.TIMELINE):
@@ -1003,7 +1006,8 @@ def getAllCycleAttVarNameList() -> list:
     return allAttrVarNameList
 
 
-def getDevPropertyValue(devList: dict, devName: str, searchedKey: str) -> str or float or int or None:
+# def getDevPropertyValue(devList: dict, devName: str, searchedKey: str) -> str or float or int or None:
+def getDevPropertyValue(devList: dict, devName: str, searchedKey: str):
     keyValue = None
     for cDevId, cDevPro in devList.items():
         if devName == cDevPro['Device Name']:
@@ -1096,7 +1100,7 @@ def getRefValue(cWidget, inputStr, attributesSetDict, allowUnlistedAttr=False) -
         isRefValue = isRefStr(inputStr)
 
         if isRefValue:
-            # remove the brackets for refValue
+            # remove the brackets for refValue : a possible bug here
             inputStr = re.sub(r'[\[\]]', '', inputStr)
 
             if inputStr in attributesSetDict:
@@ -1291,7 +1295,8 @@ def getOutputDevCountsDict() -> dict:
             Info.DEV_SERIAL_PORT: iSerial, Info.DEV_SOUND: iSound}
 
 
-def getWidgetPosType(cWidget) -> int or None:
+# def getWidgetPosType(cWidget) -> int or None:
+def getWidgetPosType(cWidget):
     global stimWidgetTypesList
     cWidgetPosType = None  # 0 -1 None for start, end, and others in event position respectively
 
@@ -1745,7 +1750,8 @@ def printInAllWidgetCodesByKey(f, bePrintedCodes: dict, key='respCodes') -> dict
     return bePrintedCodes
 
 
-def printBeforeFlipCodes(f, bePrintedCodes: dict or list) -> dict or list:
+# def printBeforeFlipCodes(f, bePrintedCodes: dict or list) -> dict or list:
+def printBeforeFlipCodes(f, bePrintedCodes):
     if isinstance(bePrintedCodes, dict):
         cCodesBeFip = bePrintedCodes.get('codesBeFip', [])
         for cRowStr in cCodesBeFip:
@@ -2515,7 +2521,7 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
         elif Info.LOG == cWidgetType:
             allWidgetCodes = printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
         elif Info.QUEST_UPDATE == cWidgetType:
-            allWidgetCodes = printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes)
+            allWidgetCodes = printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes,cLoopLevel)
     return allWidgetCodes
 
 
@@ -2557,9 +2563,14 @@ def printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     return allWidgetCodes
 
 
-def printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes):
-    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
+def printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes, cLoopLevel):
+    global outputDevNameIdxDict
+    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the simple_info var's row num
     cProperties = Func.getWidgetProperties(cWidget.widget_id)
+
+    # print previous widget's response code
+    preStimWid = getPreStimWID(cWidget.widget_id)
+    allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
 
     shouldNotBeCitationCheck('Quest Name', cProperties['Quest Name'])
 
@@ -2571,9 +2582,20 @@ def printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes):
 
     cQuestIdx = outputDevNameIdxDict.get('quest-' + cQuestName)
 
-    printAutoInd(f, "% update QUEST: quest({0})", cQuestIdx)
-    printAutoInd(f, "quest({0}) = updateQuestValue(quest({0}),quest({0}).cValue,response);", cQuestIdx, respVarStr)
-    printAutoInd(f, "quest({0}) = getQuestValue(quest({0})); % get the new cValue", cQuestIdx)
+    printAutoInd(f, "% update {0}: quest(1})",cQuestName , cQuestIdx)
+
+    if cQuestName == "quest_rand":
+        printAutoInd(f, "quest({0}) = updateQuestValue(quest({0}),quest({0}).cValue,response);", f"randQuestIds({cOpRowIdxStr})", respVarStr)
+        printAutoInd(f, "quest({0}) = getQuestValue(quest({0})); % get the new cValue",f"randQuestIds({cOpRowIdxStr})")
+
+    else:
+        printAutoInd(f, "quest({0}) = updateQuestValue(quest({0}),quest({0}).cValue,response);", cQuestIdx, respVarStr)
+        printAutoInd(f, "quest({0}) = getQuestValue(quest({0})); % get the new cValue", cQuestIdx)
+
+
+
+
+
     printAutoInd(f, "\n")
 
     return allWidgetCodes
@@ -3885,6 +3907,9 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "% define and initialize input/simple_info devices")
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+
+        maximumOpDataRows = getMaximumOpDataRows()
+
         # get simple_info devices, such as global simple_info devices.
         # you can get each widget's device you selected
         output_devices = Info.OUTPUT_DEVICE_INFO
@@ -3957,20 +3982,22 @@ def compileCode(isDummyCompile):
                 # printAutoInd(f, "quest({0}) = questValueTrans(quest({0}));\n", iQuest)
                 printAutoInd(f, "")
 
-                attributesSetDict.update(
-                    {f"{quest['Quest Name']}.cValue": [0, f"quest({iQuest}).cValue", {f"quest({iQuest}).cValue"}]})
+                # attributesSetDict 0,1,2 for looplevel, becitedStr,all possible values
+                attributesSetDict.update({f"{quest['Quest Name']}.cValue": [0, f"quest({iQuest}).cValue", {f"quest({iQuest}).cValue"}]})
 
                 iQuest += 1
 
-            if iQuest > 1:
-                attributesSetDict.update({f"randQuestValue": [0, f"quest(Randi(numel(quest),1)).cValue",
-                                                              {f"quest(Randi(numel(quest),1)).cValue"}]})
-
             if iQuest > 0:
+                printAutoInd(f, "nQuests = numel(quest);")
                 printAutoInd(f, "% get the first stimulus intensity")
-                printAutoInd(f, "for iQuest = 1:numel(quest)")
+                printAutoInd(f, "for iQuest = 1:nQuests")
                 printAutoInd(f, "quest(iQuest) = getQuestValue(quest(iQuest));")
                 printAutoInd(f, "end")
+
+            if iQuest > 1:
+                printAutoInd(f, "randQuestIds = Randi(nQuests,[{0},1]);",maximumOpDataRows)
+                attributesSetDict.update({f"randQuestValue": [0, f"quest(questRandIdx).cValue", {f"quest(questRandIdx).cValue"}]})
+
 
             printAutoInd(f, "%====================================\\\n")
 
@@ -4152,7 +4179,7 @@ def compileCode(isDummyCompile):
         #
         # print out initialize OP vars
         if not isDummyCompile:
-            maximumOpDataRows = getMaximumOpDataRows()
+            # maximumOpDataRows = getMaximumOpDataRows()
             # input parameter 2 will include widget type of CYCLE
             allEventWidgets = getAllEventWidgetsList(3)
 
@@ -5375,9 +5402,9 @@ def compileCode(isDummyCompile):
             iSubFunNum += 1
 
     # copy yanglab's supplementary files
-    copyYanglabFiles('subjectinfo.p')
-    copyYanglabFiles('OpenExp_BCL.p')
-    copyYanglabFiles('OverwriteOrNot.p')
+    copyYanglabFile('subjectinfo.p')
+    copyYanglabFile('OpenExp_BCL.p')
+    copyYanglabFile('OverwriteOrNot.p')
 
     if not isDummyPrint:
         Func.log(f"Compile successful!:{compile_file_name}")  # print info to the simple_info panel

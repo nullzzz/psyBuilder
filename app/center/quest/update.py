@@ -48,7 +48,7 @@ class QuestUpdate(TabItemWidget):
         self.setWindowTitle("Update")
         self.resize(500, 750)
         self.tip1.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
-        self.tip1.setText("QUEST staircase next")
+        self.tip1.setText("Updating Quest")
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip2.setText("Updates the Quest test value based on a response")
