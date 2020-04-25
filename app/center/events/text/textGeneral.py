@@ -3,10 +3,9 @@ from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QTextEdit, \
     QFontComboBox, QCompleter
 
-from app.center.events.text.lighter import AttributeHighlighter
+from .lighter import AttributeHighlighter
+from .smart import SmartTextEdit
 from app.func import Func
-from app.info import Info
-from example import SmartTextEdit
 from lib import VarComboBox, VarLineEdit, ColComboBox
 
 
@@ -42,16 +41,14 @@ class TextTab1(QWidget):
         self.fore_color = ColComboBox()
         self.back_color = ColComboBox()
         self.fore_color.setCurrentText("black")
-        self.fore_color_name = "black"
-        self.back_color_name = "white"
         self.fore_color.colorChanged.connect(self.changeColor)
         self.back_color.colorChanged.connect(self.changeColor)
 
         self.clear_after = VarComboBox()
         self.transparent = VarLineEdit("100%")
-        self.transparent.setReg(r"0%|[1-9]\d%|100%")
+        self.transparent.setReg(VarLineEdit.Percentage)
         self.word_wrap = VarLineEdit("80")
-        self.word_wrap.setReg(r"\d+")
+        self.word_wrap.setReg(VarLineEdit.Integer)
         self.word_wrap.textChanged.connect(self.changeWrap)
         self.text_edit.setLineWrapColumnOrWidth(80)
 
@@ -68,7 +65,7 @@ class TextTab1(QWidget):
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
         self.style_box.currentTextChanged.connect(self.changeFont)
         self.font_size_box = VarComboBox()
-        self.font_size_box.setReg(r"\d+")
+        self.font_size_box.setReg(VarComboBox.Integer)
         self.font_size_box.setEditable(True)
         for i in range(12, 72, 2):
             self.font_size_box.addItem(str(i))
@@ -80,7 +77,7 @@ class TextTab1(QWidget):
 
         self.using_screen_id: str = "screen.0"
         self.screen = VarComboBox()
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_info = Func.getDeviceInfo("screen")
         self.screen.addItems(self.screen_info.values())
         self.screen.currentTextChanged.connect(self.changeScreen)
 
@@ -125,11 +122,10 @@ class TextTab1(QWidget):
         l60.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l70.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        self.align_x.addItems(["center", "left", "right", "wrapat", "justifytomax"])
+        self.align_x.addItems(("center", "left", "right", "justify"))
         self.align_y.addItem("center")
 
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
-
         self.screen.addItem("screen_0")
 
         group1 = QGroupBox("Text")
@@ -180,7 +176,7 @@ class TextTab1(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen.clear()
         self.screen.addItems(self.screen_info.values())
@@ -200,11 +196,9 @@ class TextTab1(QWidget):
         r, g, b = 255, 255, 255
         if "," in color:
             r, g, b = [int(x) for x in color.split(",")]
-        if self.sender() == self.fore_color:
-            self.fore_color_name = color
+        if self.sender() is self.fore_color:
             self.text_edit.setTextColor(QColor(r, g, b))
-        elif self.sender() == self.back_color:
-            self.back_color_name = color
+        elif self.sender() is self.back_color:
             self.text_edit.setTextBackgroundColor(QColor(r, g, b))
 
     def changeAlign(self, align_mode: str):
@@ -216,14 +210,12 @@ class TextTab1(QWidget):
             self.text_edit.setAlignment(Qt.AlignLeft)
         elif align_mode == "right":
             self.text_edit.setAlignment(Qt.AlignRight)
-        elif align_mode == "justifytomax":
+        elif align_mode == "justify":
             self.text_edit.setAlignment(Qt.AlignJustify)
 
     def changeWrap(self, chars: str):
         if chars.isdigit():
             self.text_edit.setLineWrapColumnOrWidth(int(chars))
-        else:
-            self.text_edit.setLineWrapColumnOrWidth(80)
 
     def changeFont(self):
         family = self.font_box.currentFont().family()

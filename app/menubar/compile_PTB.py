@@ -677,7 +677,7 @@ def parseStretchModeStr(inputStr, isRef=False):
 
 def parseTextContentStrNew(inputStr) -> str:
     """
-    new fun to support citation within text
+    new fun to support citation within current_text
     :param inputStr:
     :return:
     """
@@ -3593,7 +3593,7 @@ def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, cProperties, cV
     # 1) get the win id info in matlab format winIds(idNum)
     cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
-    # 2) handle the text content
+    # 2) handle the current_text content
     inputStr, isContainRef, _ = getValueInContainRefExp(cWidget, cProperties['Text'], attributesSetDict, True, dict())
     cTextContentStr = parseTextContentStrNew(inputStr)
     # cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
@@ -3675,7 +3675,7 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
     # 1) get the win id info in matlab format winIds(idNum)
     cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
-    # 2) handle the text content
+    # 2) handle the current_text content
     inputStr, isContainRef, _ = getValueInContainRefExp(cWidget, cProperties['Text'], attributesSetDict, True, dict())
     cTextContentStr = parseTextContentStrNew(inputStr)
     # cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
@@ -3767,7 +3767,7 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
             printAutoInd(f, "Screen('FrameRect',{0},{1},{2},{3});", cWinStr,
                          addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr, borderWidth)
 
-    #  print out the text
+    #  print out the current_text
     printAutoInd(f, "DrawFormattedText({0},{1},{2},{3},{4},{5},{6},{7},[],{8},{9});",
                  cWinStr,
                  cTextContentStr,

@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
     QFileDialog, QCompleter, QFormLayout
 
 from app.func import Func
-from app.info import Info
 from lib import VarLineEdit, VarComboBox
 
 
@@ -52,7 +51,7 @@ class ImageTab1(QWidget):
 
         self.using_screen_id: str = "screen.0"
         self.screen_name = VarComboBox()
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)
 
@@ -93,7 +92,7 @@ class ImageTab1(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen_name.clear()
         self.screen_name.addItems(self.screen_info.values())

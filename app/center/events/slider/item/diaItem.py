@@ -57,13 +57,11 @@ class DiaItem(QGraphicsPolygonItem):
                     path.lineTo(points[p][0], points[p][1])
             path.lineTo(points[0][0], points[0][1])
 
-        self.mPolygon = path.toFillPolygon()
-
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
-        self.setPolygon(self.mPolygon)
+        self.setPolygon(path.toFillPolygon())
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
@@ -223,6 +221,7 @@ class DiaItem(QGraphicsPolygonItem):
         self.default_properties["Z"] = self.zValue()
 
     def getInfo(self):
+        self.updateInfo()
         return self.default_properties
 
     def setProperties(self, properties: dict):
@@ -254,22 +253,9 @@ class DiaItem(QGraphicsPolygonItem):
         self.setPos(QPoint(cx, cy))
 
         # fill color
-        fill_color = self.properties["Fill Color"]
-        if not fill_color.startswith("["):
-            self.fill_color = fill_color
-        # todo
-        color = [int(x) for x in self.fill_color.split(",")]
-        if len(color) == 3:
-            r, g, b = color
-            a = 255
-        else:
-            r, g, b, a = color
+        if fill_color := self.pro_window.general.fill_color.getColor():
+            self.setBrush(fill_color)
 
-        self.setBrush(QColor(r, g, b, a))
-        # border color
-        border_color = self.properties["Border Color"]
-        if not border_color.startswith("["):
-            self.border_color = border_color
 
         border_width = self.properties["Border Width"]
         if not border_width.startswith("["):
@@ -277,13 +263,9 @@ class DiaItem(QGraphicsPolygonItem):
         pen = self.pen()
         pen.setWidth(self.border_width)
 
-        color = [int(x) for x in self.border_color.split(",")]
-        if len(color) == 3:
-            r, g, b = color
-            a = 255
-        else:
-            r, g, b, a = color
-        pen.setColor(QColor(r, g, b, a))
+        # border color
+        if border_color := self.pro_window.general.border_color.getColor():
+            pen.setColor(border_color)
         self.setPen(pen)
 
         path = QPainterPath()
@@ -328,8 +310,7 @@ class DiaItem(QGraphicsPolygonItem):
                 rect = QRectF(-w / 2, -h / 2, w, h)
                 path.addRect(rect)
 
-        self.mPolygon = path.toFillPolygon()
-        self.setPolygon(self.mPolygon)
+        self.setPolygon(path.toFillPolygon())
         self.update()
         self.setPosition()
 

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QComboBox, QGridLayout, QLabel, QGroupBox, QComplete
 
 from lib import VarComboBox
 from ..addDeleteButton import AddDeleteButton
-from ..iconChoose import IconChoose
+from ..childWidget import IconChoose
 
 
 class Case(QGroupBox):
@@ -19,7 +19,7 @@ class Case(QGroupBox):
     delCase = pyqtSignal(int)
     addCase = pyqtSignal(int)
 
-    def __init__(self, title: str = "test", parent=None):
+    def __init__(self, title: str = "", parent=None):
         super(Case, self).__init__(title, parent)
 
         self.index = 0

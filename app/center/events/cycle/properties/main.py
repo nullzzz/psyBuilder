@@ -1,4 +1,5 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QDialog, QTabWidget
 
 from .selection import Selection
@@ -11,6 +12,8 @@ class Properties(QDialog):
     def __init__(self, parent=None):
         super(Properties, self).__init__(parent)
         # title
+        self.setWindowIcon(QIcon("source/images/common/icon.png"))
+        self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setWindowTitle("properties")
         # data
         self.properties = {"order_combo": 0, "no_repeat_after": 0, "order_by_combo": 0}

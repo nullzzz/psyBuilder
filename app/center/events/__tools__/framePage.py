@@ -20,14 +20,18 @@ class FramePage(QWidget):
             "Frame Transparent": "100%"
         }
         # up
-        self.x_pos = VarComboBox()
-        self.x_pos.setReg(VarComboBox.Percentage)
-        self.y_pos = VarComboBox()
-        self.y_pos.setReg(VarComboBox.Percentage)
-        self.width = VarComboBox()
-        self.width.setReg(VarComboBox.Percentage)
-        self.height = VarComboBox()
-        self.height.setReg(VarComboBox.Percentage)
+        self.x_pos = VarComboBox(True)
+        self.x_pos.addItems(("50%", "0%", "25%", "75%", "100%"))
+        self.x_pos.setReg((VarComboBox.Percentage, VarComboBox.Integer))
+        self.y_pos = VarComboBox(True)
+        self.y_pos.addItems(("50%", "0%", "25%", "75%", "100%"))
+        self.y_pos.setReg((VarComboBox.Percentage, VarComboBox.Integer))
+        self.width = VarComboBox(True)
+        self.width.addItems(("100%", "75%", "50%", "25%"))
+        self.width.setReg((VarComboBox.Percentage, VarComboBox.Integer))
+        self.height = VarComboBox(True)
+        self.height.addItems(("100%", "75%", "50%", "25%"))
+        self.height.setReg((VarComboBox.Percentage, VarComboBox.Integer))
         # down
         self.enable = VarComboBox()
         self.enable.currentTextChanged.connect(self.operationAble)
@@ -42,22 +46,6 @@ class FramePage(QWidget):
 
     # 生成frame页面
     def setUI(self):
-        self.x_pos.addItems(["50%", "0%", "25%", "75%", "100%"])
-        self.x_pos.setEditable(True)
-        self.x_pos.setReg(r"^\d+%?$")
-
-        self.y_pos.addItems(["50%", "0%", "25%", "75%", "100%"])
-        self.y_pos.setEditable(True)
-        self.y_pos.setReg(r"^\d+%?$")
-
-        self.width.addItems(("100%", "75%", "50%", "25%"))
-        self.width.setEditable(True)
-        self.width.setReg(r"^\d+%?$")
-
-        self.height.addItems(("100%", "75%", "50%", "25%"))
-        self.height.setEditable(True)
-        self.height.setReg(r"^\d+%?$")
-
         l1 = QLabel("Center X:")
         l2 = QLabel("Center Y:")
         l3 = QLabel("Width:")
@@ -88,7 +76,7 @@ class FramePage(QWidget):
         layout1.addWidget(self.height, 1, 3)
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("Border and background")
+        group2 = QGroupBox("Border & Background")
         layout2 = QFormLayout()
 
         layout2.addRow(l45, self.enable)

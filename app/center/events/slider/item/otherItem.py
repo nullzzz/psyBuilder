@@ -85,6 +85,7 @@ class OtherItem(QGraphicsPixmapItem):
         self.default_properties["Z"] = self.zValue()
 
     def getInfo(self):
+        self.updateInfo()
         return self.default_properties
 
     def changeSomething(self):

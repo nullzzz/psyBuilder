@@ -8,10 +8,6 @@ from .properties import Properties
 
 
 class Cycle(TabItemMainWindow):
-    """
-
-    """
-
     # when add new timeline, emit signal(parent_widget_id, widget_id, widget_name, index)
     itemAdded = pyqtSignal(str, str, str, int)
     # when delete signals, emit signal(sender_widget, widget_id)

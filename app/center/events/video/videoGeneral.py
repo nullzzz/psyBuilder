@@ -2,7 +2,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton, QSpinBox, QGridLayout, QLabel, QFileDialog, QCompleter, QWidget
 
 from app.func import Func
-from app.info import Info
 from lib import VarComboBox, VarLineEdit
 
 
@@ -17,7 +16,7 @@ class VideoTab1(QWidget):
             "Aspect Ratio": "Default",
             "Playback Rate": "1",
             "Clear After": "clear_0",
-            "Screen Name": "screen.0"
+            "Screen Name": "screen_0"
         }
         # general
         self.file_name = VarLineEdit()
@@ -37,7 +36,7 @@ class VideoTab1(QWidget):
 
         self.using_screen_id: str = "screen.0"
         self.screen_name = VarComboBox()
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)
 
@@ -49,7 +48,7 @@ class VideoTab1(QWidget):
         self.end_pos.setText("9999999")
 
         self.playback_rate.addItems(("1.0", "1.25", "1.5", "1.75", "2.0", "-1.0"))
-        self.playback_rate.currentTextChanged.connect(self.pbTip)
+        self.playback_rate.currentTextChanged.connect(self.changeRateTip)
         self.aspect_ratio.addItems(("Default", "Ignore", "Keep", "KeepByExpanding"))
 
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
@@ -95,7 +94,7 @@ class VideoTab1(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen_name.clear()
         self.screen_name.addItems(self.screen_info.values())
@@ -112,7 +111,7 @@ class VideoTab1(QWidget):
                 self.using_screen_id = k
                 break
 
-    def pbTip(self, text):
+    def changeRateTip(self, text):
         if text == "-1.0":
             self.playback_rate_tip.setText("may not support")
         else:
@@ -125,18 +124,6 @@ class VideoTab1(QWidget):
                                                    "Video File (*)", options=options)
         if file_name:
             self.file_name.setText(file_name)
-
-    def changed1(self, e):
-        if e == "Yes":
-            self.stop_after_mode.setEnabled(True)
-        else:
-            self.stop_after_mode.setEnabled(False)
-
-    def stretchChange(self, e):
-        if e == "Yes":
-            self.stretch_mode.setEnabled(True)
-        else:
-            self.stretch_mode.setEnabled(False)
 
     def setAttributes(self, attributes):
         self.file_name.setCompleter(QCompleter(attributes))

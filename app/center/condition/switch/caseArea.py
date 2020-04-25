@@ -131,7 +131,6 @@ class CaseArea(QScrollArea):
             self.default_properties[case.title()] = case.getInfo()
 
     def setProperties(self, properties: dict):
-        print(properties)
         self.default_properties.update(properties)
         self.loadSetting()
 
@@ -152,7 +151,7 @@ class CaseArea(QScrollArea):
         for case in self.case_list:
             case.setAttributes(self.attributes)
 
-    def getUsingDeviceCount(self):
+    def getUsingDeviceCount(self) -> int:
         cnt = 0
         for case in self.case_list:
             cnt += case.icon_choose.getUsingDeviceCount()

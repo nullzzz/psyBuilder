@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QRect, Qt
-from PyQt5.QtGui import QImage, QPixmap, QPaintEvent, QPainter, QPen, QColor, QPalette
+from PyQt5.QtGui import QPaintEvent, QPainter, QPen, QColor, QPalette
 from PyQt5.QtWidgets import QFrame
 
 

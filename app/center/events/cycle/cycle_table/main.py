@@ -235,7 +235,7 @@ class CycleTable(TableWidget):
                                     widget_id = Func.generateWidgetId(Info.TIMELINE)
                                     self.timelineAdded.emit(widget_id, text, len(self.timelines))
                                     self.timelines[text] = [widget_id, 1]
-                                    # secondly check old text
+                                    # secondly check old current_text
                                     self.timelines[item.old_text][1] -= 1
                                     if not self.timelines[item.old_text][1]:
                                         # if user delete all this timeline, we delete data
@@ -243,7 +243,7 @@ class CycleTable(TableWidget):
                                         del self.timelines[item.old_text]
                                     item.save()
                             else:
-                                # simply change data and check old text
+                                # simply change data and check old current_text
                                 self.timelines[text][1] += 1
                                 self.timelines[item.old_text][1] -= 1
                                 if not self.timelines[item.old_text][1]:
@@ -531,10 +531,10 @@ class CycleTable(TableWidget):
         # get start pos
         start_row = select_ranges[0].topRow()
         start_col = select_ranges[0].leftColumn()
-        # get paste text from system's clipboard
+        # get paste current_text from system's clipboard
         clipboard = QApplication.clipboard()
         paste_text = clipboard.text()
-        # if text is none, we ignore it
+        # if current_text is none, we ignore it
         if not paste_text:
             return
         # we only allow excel-like formats

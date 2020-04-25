@@ -141,15 +141,6 @@ class IconChoose(QWidget):
         name = f"U_{event_type}_{int(time.time() % 10007)}"
         return name
 
-    # def changeName(self, new_name: str):
-    #     if new_name in Info.NAME_WID.keys() and new_name != self.event_name:
-    #         self.name_line.setColor("red")
-    #     else:
-    #         self.name_line.setColor("white")
-    #         if new_name != self.event_name:
-    #             self.event_name = new_name
-    #             self.itemNameChanged.emit(self.current_sub_wid, new_name)
-
     def ok(self):
         self.apply()
         self.pro_window.close()

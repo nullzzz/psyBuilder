@@ -26,7 +26,7 @@ class ColComboBox(VarComboBox):
                      "green", "blue", "purple")
 
     def __init__(self, widget=None):
-        super(ColComboBox, self).__init__(widget)
+        super(ColComboBox, self).__init__(True, widget)
         self.setEditable(True)
         self.is_valid: int = 1
         self.default_color = ("white", "gray", "black", "red",
@@ -57,9 +57,9 @@ class ColComboBox(VarComboBox):
         self.setItemData(1, color, Qt.DecorationRole)
         self.setCurrentIndex(1)
 
-    def findVar(self, text: str):
-        if text:
-            if text.startswith("["):
+    def searchVariable(self, current_text: str):
+        if current_text:
+            if current_text.startswith("["):
                 self.setStyleSheet("color: blue")
                 self.setFont(QFont("Timers", 9, QFont.Bold))
                 self.is_valid = 2
@@ -67,7 +67,7 @@ class ColComboBox(VarComboBox):
                 self.setStyleSheet("color: black")
                 self.setFont(QFont("宋体", 9, QFont.Normal))
                 # 取色板
-                if text == "More...":
+                if current_text == "More...":
                     self.setStyleSheet("background: white;")
                     color_rgb = QColorDialog.getColor(Qt.white, self)
                     # 选了颜色
@@ -81,15 +81,15 @@ class ColComboBox(VarComboBox):
                         self.setCurrentIndex(1)
                     self.is_valid = 1
                 # 255,255,255格式rgb
-                elif text[0].isdigit():
-                    color_rgb = text.split(",")
+                elif current_text[0].isdigit():
+                    color_rgb = current_text.split(",")
                     if len(color_rgb) >= 3 and color_rgb[2] != "":
-                        self.setStyleSheet("background-color: rgb({});".format(text))
+                        self.setStyleSheet("background-color: rgb({});".format(current_text))
                         # 添加到下拉菜单
-                        if self.findText(text, Qt.MatchExactly) == -1:
+                        if self.findText(current_text, Qt.MatchExactly) == -1:
                             color = QColor(int(color_rgb[0]), int(
                                 color_rgb[1]), int(color_rgb[2]))
-                            self.insertItem(1, text)
+                            self.insertItem(1, current_text)
                             self.setItemData(1, color, Qt.DecorationRole)
                             self.setCurrentIndex(1)
                         self.is_valid = 1
@@ -97,18 +97,18 @@ class ColComboBox(VarComboBox):
                         self.is_valid = 0
                         self.setStyleSheet("background: white")
                 # #ffffff格式rgb
-                elif text[0] == "#" and len(text) == 7:
-                    if self.findText(text) == -1:
-                        color = QColor(text)
-                        self.insertItem(1, text)
+                elif current_text[0] == "#" and len(current_text) == 7:
+                    if self.findText(current_text) == -1:
+                        color = QColor(current_text)
+                        self.insertItem(1, current_text)
                         self.setItemData(1, color, Qt.DecorationRole)
                         self.setCurrentIndex(1)
-                    self.setStyleSheet("background: {}".format(text))
+                    self.setStyleSheet("background: {}".format(current_text))
                     self.is_valid = 1
-                elif text in ColComboBox.default_color:
+                elif current_text in ColComboBox.default_color:
                     self.is_valid = 1
-                    self.setStyleSheet("background: rgb({})".format(self.color_map.get(text)))
-                elif text == "transparent":
+                    self.setStyleSheet("background: rgb({})".format(self.color_map.get(current_text)))
+                elif current_text == "transparent":
                     self.is_valid = 1
                     self.setStyleSheet("background: transparent")
                 else:
@@ -141,15 +141,15 @@ class ColComboBox(VarComboBox):
             self.setStyleSheet("background: white;")
         QComboBox.hidePopup(self)
 
-    def focusOutEvent(self, e):
-        if not self.is_valid:
-            self.setStyleSheet("background: white;")
-            self.setCurrentText("white")
-            MessageBox.warning(
-                self, "Warning", "Invalid Color!", MessageBox.Ok)
-        else:
-            pass
-        QComboBox.focusOutEvent(self, e)
+    # def focusOutEvent(self, e):
+    #     if not self.is_valid:
+    #         self.setStyleSheet("background: white;")
+    #         self.setCurrentText("white")
+    #         MessageBox.warning(
+    #             self, "Warning", "Invalid Color!", MessageBox.Ok)
+    #     else:
+    #         pass
+    #     QComboBox.focusOutEvent(self, e)
 
     def setCurrentText(self, text: str) -> None:
         for k, v in self.color_map.items():

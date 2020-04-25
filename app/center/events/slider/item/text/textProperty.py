@@ -12,9 +12,7 @@ class TextProperty(QWidget):
         self.setWindowFlag(Qt.WindowStaysOnTopHint)
 
         self.tab = QTabWidget()
-
         self.general = TextGeneral()
-
         self.default_properties = self.general.default_properties
 
         self.tab.addTab(self.general, "general")

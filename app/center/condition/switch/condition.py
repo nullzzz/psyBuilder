@@ -18,11 +18,11 @@ class SwitchCondition(QWidget):
 
     def setUI(self):
         layout = QFormLayout()
-        layout.addRow("Switch", self.switch_choice)
+        layout.addRow("Switch:", self.switch_choice)
         layout.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
 
-    def addVar(self, var_choice: list):
+    def addSwitchValue(self, var_choice: list):
         self.vars = var_choice
         self.switch_choice.addItems(var_choice)
 

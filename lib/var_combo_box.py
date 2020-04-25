@@ -16,14 +16,14 @@ class VarComboBox(QComboBox):
     Integer = r"^\d+$"
     Percentage = r"^(100|[1-9]?\d?)%$|0$"
 
-    def __init__(self, parent=None):
+    def __init__(self, editable: bool = False, parent=None):
         super(VarComboBox, self).__init__(parent)
         self.setAcceptDrops(True)
-        self.setDuplicatesEnabled(False)
+        self.setEditable(editable)
         self.setInsertPolicy(QComboBox.NoInsert)
-        self.currentTextChanged.connect(self.findVar)
+        self.currentTextChanged.connect(self.searchVariable)
         self.focusLost.connect(self.checkValidity)
-        self.valid_data: str = ""
+        self.valid_data: str = self.currentText()
         self.reg_exp = ""
 
     def dragEnterEvent(self, e):
@@ -42,16 +42,19 @@ class VarComboBox(QComboBox):
         self.setCurrentText(text)
 
     # 检查变量
-    def findVar(self, text: str):
-        if text.startswith("[") and text.endswith("]"):
+    def searchVariable(self, current_text: str):
+        if current_text.startswith("[") and current_text.endswith("]"):
             self.setStyleSheet("color: blue")
             self.setFont(QFont("Timers", 9, QFont.Bold))
         else:
             self.setStyleSheet("color: black")
             self.setFont(QFont("宋体", 9, QFont.Normal))
 
-    def setReg(self, reg_exp: str):
-        self.reg_exp = reg_exp + r"|\[[\w\d_\.]+\]"
+    def setReg(self, reg_exp: str or list or tuple):
+        if isinstance(reg_exp, str):
+            self.reg_exp = f"{reg_exp}|{VarComboBox.Attribute}"
+        elif isinstance(reg_exp, list) or isinstance(reg_exp, tuple):
+            self.reg_exp = f"{'|'.join(reg_exp)}|{VarComboBox.Attribute}"
         self.setValidator(QRegExpValidator(QRegExp(self.reg_exp), self))
 
     def focusOutEvent(self, e):
