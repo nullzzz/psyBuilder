@@ -2582,7 +2582,7 @@ def printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes, cLoopL
 
     cQuestIdx = outputDevNameIdxDict.get('quest-' + cQuestName)
 
-    printAutoInd(f, "% update {0}: quest(1})",cQuestName , cQuestIdx)
+    printAutoInd(f, "% update {0}: quest(1} )",cQuestName , cQuestIdx)
 
     if cQuestName == "quest_rand":
         printAutoInd(f, "quest({0}) = updateQuestValue(quest({0}),quest({0}).cValue,response);", f"randQuestIds({cOpRowIdxStr})", respVarStr)

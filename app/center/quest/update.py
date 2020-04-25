@@ -23,6 +23,10 @@ class QuestUpdate(TabItemWidget):
         self.response_variable.addItems(["1", "0"])
 
         self.quest_info = Func.getDeviceInfo(Info.DEV_QUEST)
+
+        if len(self.quest_info) > 1:
+            self.quest_info.update({'quest_rand':'quest_rand'})
+
         self.quest_name = VarComboBox()
         self.quest_name.currentTextChanged.connect(self.changeQuestId)
 
@@ -83,11 +87,16 @@ class QuestUpdate(TabItemWidget):
 
     def refresh(self):
         self.quest_info = Func.getDeviceInfo(Info.DEV_QUEST)
+
+        if len(self.quest_info) > 1:
+            self.quest_info.update({'quest_rand':'quest_rand'})
+
         quest_id = self.using_quest_id
 
         self.quest_name.clear()
         self.quest_name.addItems(self.quest_info.values())
         quest_name = self.quest_info.get(quest_id)
+
         if quest_name:
             self.quest_name.setCurrentText(quest_name)
             self.using_quest_id = quest_id
