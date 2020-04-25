@@ -75,7 +75,8 @@ class Describer(QStackedWidget):
     def refresh(self):
         for w, d in self.id_widget.items():
             if isinstance(d, RespInfo):
-                if (new_name := Func.getDeviceNameById(w)) != "":
+                new_name = Func.getDeviceNameById(w)
+                if new_name != "":
                     d.changeName(new_name)
 
     def setAttributes(self, attributes: list):

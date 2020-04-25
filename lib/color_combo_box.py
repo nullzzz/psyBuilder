@@ -163,8 +163,10 @@ class ColComboBox(VarComboBox):
         返回当前颜色QColor
         :return:
         """
-        if (index := self.findText(self.currentText())) != -1:
-            if isinstance(color := self.itemData(index, Qt.DecorationRole), QColor):
+        index = self.findText(self.currentText())
+        if index != -1:
+            color = self.itemData(index, Qt.DecorationRole)
+            if isinstance(color, QColor):
                 return QColor(color)
         return None
 

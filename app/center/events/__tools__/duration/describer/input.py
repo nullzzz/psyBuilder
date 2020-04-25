@@ -57,7 +57,9 @@ class RespTrigger(QWidget):
         self.resp_trigger_out.addItem("none")
         self.resp_trigger_out.addItems(simple_info.values())
 
-        if (output_name := self.using_output_device.get(self.current_output_device_id, "")) != "":
+        output_name = self.using_output_device.get(self.current_output_device_id, "")
+
+        if output_name != "":
             self.resp_trigger_out.setCurrentText(output_name)
         else:
             self.resp_trigger_out.setCurrentIndex(0)

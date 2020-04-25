@@ -430,7 +430,6 @@ class Func(object):
         # slider
         pro = dp.get("Properties")
         g = dp.get("General")
-
         if pro:
             g = pro.get("General")
             f = pro.get("Frame")
@@ -448,7 +447,6 @@ class Func(object):
                     **v["Properties"],
                 }
             dp["Items"] = new_items
-
         elif g:
             f = dp.get("Frame", {})
             d = dp.get("Duration")
