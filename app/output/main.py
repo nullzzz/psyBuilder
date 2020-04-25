@@ -25,7 +25,7 @@ class Output(DockWidget):
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
         self.setWidget(self.text_edit)
 
-    def print(self, information: str, information_type: int = 0) -> None:
+    def printOut(self, information: str, information_type: int = 0) -> None:
         """
         print information in its widget_name edit
         :param information:

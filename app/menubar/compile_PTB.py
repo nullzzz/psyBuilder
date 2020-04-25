@@ -23,7 +23,7 @@ stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDE
 
 
 def throwCompileErrorInfo(inputStr):
-    Func.print(inputStr, 3)
+    Func.printOut(inputStr, 3)
 
 
 def debugPrint(inputStr: str):
@@ -167,7 +167,10 @@ def isSubWidgetOfIfOrSwitch(widgetOrId) -> bool:
         cWidgetId = widgetOrId
     else:
         cWidgetId = widgetOrId.widget_id
-    if parentWid := Func.getParentWid(cWidgetId):
+
+    parentWid = Func.getParentWid(cWidgetId)
+
+    if parentWid:
         if getWidgetType(parentWid) in [Info.IF, Info.SWITCH]:
             isSubWidget = True
 

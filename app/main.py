@@ -57,7 +57,7 @@ class Psy(QMainWindow):
             else:
                 if not self.restore(Info.FILE_NAME):
                     self.clear()
-                    Func.print(
+                    Func.printOut(
                         f"The file {Info.FILE_NAME} you selected may be damaged, please check whether the file is correct.",
                         2)
         else:
@@ -808,10 +808,10 @@ class Psy(QMainWindow):
             # tabs = self.center.store()
             # setting.setValue("Tabs", tabs)
             if show:
-                Func.print(f"File '{file_path}' saved successfully.", 1)
+                Func.printOut(f"File '{file_path}' saved successfully.", 1)
             return True
         except Exception as e:
-            Func.print(f"Due to error {e}. File {file_path} saving failed.", 2)
+            Func.printOut(f"Due to error {e}. File {file_path} saving failed.", 2)
             return False
 
     def restore(self, file_path: str, show=True) -> bool:
@@ -848,7 +848,7 @@ class Psy(QMainWindow):
                 widgets_data == -1 or \
                 structure == -1:
             if show:
-                Func.print(
+                Func.printOut(
                     f"The file '{file_path}' you selected may be damaged, please check whether the file is correct.",
                     2)
             return False
@@ -872,7 +872,7 @@ class Psy(QMainWindow):
         # self.center.restore(tabs)
         self.center.openTab(f"{Info.TIMELINE}.0")
         if show:
-            Func.print(f"File '{file_path}' loaded successfully.", 1)
+            Func.printOut(f"File '{file_path}' loaded successfully.", 1)
         return True
         # except Exception as e:
         #     Func.print(f"Due to error '{e}', the file {file_path} failed to load.", 2)
@@ -999,7 +999,7 @@ class Psy(QMainWindow):
         try:
             compilePTB()
         except Exception as compileError:
-            Func.print(str(compileError), 2)
+            Func.printOut(str(compileError), 2)
             traceback.print_exc()
 
     def startWait(self):
