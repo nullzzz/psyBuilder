@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QCompleter
 from PyQt5.QtWidgets import (QWidget)
 
-from lib import VarComboBox, VarLineEdit
+from lib import VarComboBox, VarLineEdit, ColComboBox
 
 
 class GaborGeneral(QWidget):
@@ -33,7 +33,7 @@ class GaborGeneral(QWidget):
         self.contrast = VarComboBox()
         self.phase = VarComboBox()
         self.orientation = VarComboBox()
-        self.back_color = VarComboBox()
+        self.back_color = ColComboBox()
         self.sdx = VarComboBox()
         self.sdy = VarComboBox()
         self.rotation = VarComboBox()
@@ -66,9 +66,8 @@ class GaborGeneral(QWidget):
         self.rotation.setEditable(True)
         self.transparency.addItems(["0%", "25%", "50%", "75%", "100%"])
         self.transparency.setEditable(True)
-        self.back_color.addItems(["64,64,64", "128,128,128", "192,192,192", "255,255,255"])
-        self.back_color.setEditable(True)
         self.back_color.setCurrentText("128,128,128")
+        self.back_color.setEditable(True)
 
         l1 = QLabel("Center X:")
         l2 = QLabel("Center Y:")
@@ -162,7 +161,7 @@ class GaborGeneral(QWidget):
         self.default_properties['Contrast'] = self.contrast.currentText()
         self.default_properties['Phase'] = self.phase.currentText()
         self.default_properties['Orientation'] = self.orientation.currentText()
-        self.default_properties['Back Color'] = self.back_color.currentText()
+        self.default_properties['Back Color'] = self.back_color.getRGB()
         self.default_properties['SDx'] = self.sdx.currentText()
         self.default_properties['SDy'] = self.sdy.currentText()
         self.default_properties['Rotation'] = self.rotation.currentText()

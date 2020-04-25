@@ -425,8 +425,13 @@ def shouldNotBeEmptyCheck(keyStr, value):
         throwCompileErrorInfo(f"'{keyStr}'should NOT be empty!")
 
 
-# def copyYanglabFiles(filename: str or list):
-def copyYanglabFile(filename):
+def copyYanglabFiles(beCopyFilenames:list):
+    for cFile in beCopyFilenames:
+        copyYanglabFile(cFile)
+    return 0
+
+
+def copyYanglabFile(filename:str):
     destinationDir = os.path.dirname(os.path.abspath(Info.FILE_NAME))
 
     # if isinstance(filename, list):
