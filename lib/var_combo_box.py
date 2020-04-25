@@ -62,6 +62,6 @@ class VarComboBox(QComboBox):
         cur = self.currentText()
         if self.reg_exp != "" and re.fullmatch(self.reg_exp, cur) is None:
             self.setCurrentText(self.valid_data)
-            MessageBox.warning(self, "Invalid", f"Invalid Parameter {cur}\nformat must conform to\n {self.reg_exp}")
+            MessageBox.warning(self, "Invalid", f"Invalid Parameter '{cur}'\nFormat must conform to\n{self.reg_exp}")
         else:
             self.valid_data = cur

@@ -239,6 +239,5 @@ class Scene(QGraphicsScene):
         new_item.setSelected(True)
 
     def setBorderRect(self, rect: QRectF) -> None:
-        print(rect)
         self.border: QGraphicsRectItem
         self.border.setRect(QRectF(0, 0, rect.width(), rect.height()))
