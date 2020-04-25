@@ -8,8 +8,6 @@ class TextGeneral(QWidget):
     def __init__(self, parent=None):
         super(TextGeneral, self).__init__(parent)
 
-        self.attributes: list = []
-
         self.default_properties = {
             "Text": "Hello World",
             "Center X": "0",
@@ -23,20 +21,17 @@ class TextGeneral(QWidget):
             "Style": "normal_0",
         }
 
-        self.cx_pos = VarComboBox()
-        self.cx_pos.setEditable(True)
-        self.cx_pos.addItem('100')
-
-        self.cy_pos = VarComboBox()
-        self.cy_pos.setEditable(True)
-        self.cy_pos.addItem('100')
+        self.left_x = VarLineEdit()
+        self.left_x.setReg(VarLineEdit.Integer)
+        self.top_y = VarLineEdit()
+        self.top_y.setReg(VarLineEdit.Integer)
 
         self.fore_color = ColComboBox()
         self.back_color = ColComboBox()
         self.fore_color.setCurrentText("black")
 
         self.transparent = VarLineEdit("100%")
-        self.transparent.setReg(r"0%|[1-9]\d%|100%")
+        self.transparent.setReg(VarLineEdit.Percentage)
 
         self.flip_horizontal = VarComboBox()
         self.flip_horizontal.addItems(("No", "Yes"))
@@ -45,12 +40,11 @@ class TextGeneral(QWidget):
 
         self.font_box = QFontComboBox()
 
-        self.style_box = VarComboBox()
-        self.style_box.setEditable(True)
+        self.style_box = VarComboBox(True)
         self.style_box.addItems(
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
         self.font_size_box = VarComboBox()
-        self.font_size_box.setReg(r"\d+")
+        self.font_size_box.setReg(VarComboBox.Integer)
         self.font_size_box.setEditable(True)
         for i in range(12, 72, 2):
             self.font_size_box.addItem(str(i))
@@ -63,71 +57,61 @@ class TextGeneral(QWidget):
 
     def setUI(self):
         l00 = QLabel("Left X:")
-        l10 = QLabel("Top  Y:")
+        l01 = QLabel("Top  Y:")
 
-        l02 = QLabel("Fore Color:")
-        l12 = QLabel("Back Color:")
+        l10 = QLabel("Fore Color:")
+        l11 = QLabel("Back Color:")
 
-        l30 = QLabel("Transparent:")
+        l20 = QLabel("Transparent:")
+        l21 = QLabel("Right to Left:")
 
-        l50 = QLabel("Font Family:")
-        l52 = QLabel("Style:")
-        l60 = QLabel("Font Size:")
-        l70 = QLabel("Right to Left:")
+        l3 = QLabel("Font Family:")
+        l40 = QLabel("Font Size:")
+        l41 = QLabel("Style:")
 
         l00.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l02.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l10.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l12.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l01.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l11.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l20.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l41.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l40.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        l21.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        l30.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-
-        l50.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l52.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l60.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l70.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         group2 = QGroupBox("")
         layout2 = QGridLayout()
-
         layout2.addWidget(l00, 0, 0)
-        layout2.addWidget(self.cx_pos, 0, 1)
+        layout2.addWidget(self.left_x, 0, 1)
+        layout2.addWidget(l01, 0, 2)
+        layout2.addWidget(self.top_y, 0, 3)
+
         layout2.addWidget(l10, 1, 0)
-        layout2.addWidget(self.cy_pos, 1, 1)
+        layout2.addWidget(self.fore_color, 1, 1)
+        layout2.addWidget(l11, 1, 2)
+        layout2.addWidget(self.back_color, 1, 3)
 
-        layout2.addWidget(l02, 0, 2, 1, 2)
-        layout2.addWidget(self.fore_color, 0, 4)
-        layout2.addWidget(l12, 1, 2, 1, 2)
-        layout2.addWidget(self.back_color, 1, 4)
-        layout2.addWidget(l30, 2, 0)
-
+        layout2.addWidget(l20, 2, 0)
         layout2.addWidget(self.transparent, 2, 1)
-        layout2.addWidget(l70, 2, 2, 1, 2)
-        layout2.addWidget(self.right_to_left, 2, 4)
+        layout2.addWidget(l21, 2, 2)
+        layout2.addWidget(self.right_to_left, 2, 3)
 
-        layout2.addWidget(l50, 4, 0)
-        layout2.addWidget(self.font_box, 4, 1, 1, 3)
+        layout2.addWidget(l3, 3, 0)
+        layout2.addWidget(self.font_box, 3, 1, 1, 3)
 
-        layout2.addWidget(l60, 5, 0)
-        layout2.addWidget(self.font_size_box, 5, 1)
-        layout2.addWidget(l52, 5, 2, 1, 2)
-        layout2.addWidget(self.style_box, 5, 4)
+        layout2.addWidget(l40, 4, 0)
+        layout2.addWidget(self.font_size_box, 4, 1)
+        layout2.addWidget(l41, 4, 2)
+        layout2.addWidget(self.style_box, 4, 3)
 
         group2.setLayout(layout2)
-
         layout = QVBoxLayout()
-
         layout.addWidget(group2, 1)
-
         self.setLayout(layout)
 
-    """
-    def refresh(self):
-        pass
-    """
-
     def setAttributes(self, attributes):
-        self.cx_pos.setCompleter(QCompleter(attributes))
-        self.cy_pos.setCompleter(QCompleter(attributes))
+        self.left_x.setCompleter(QCompleter(attributes))
+        self.top_y.setCompleter(QCompleter(attributes))
         self.fore_color.setCompleter(QCompleter(attributes))
         self.back_color.setCompleter(QCompleter(attributes))
         self.transparent.setCompleter(QCompleter(attributes))
@@ -135,30 +119,29 @@ class TextGeneral(QWidget):
         self.style_box.setCompleter(QCompleter(attributes))
 
     def updateInfo(self):
-        self.default_properties["Center X"] = self.cx_pos.currentText()
-        self.default_properties["Center Y"] = self.cy_pos.currentText()
+        self.default_properties["Left X"] = self.left_x.text()
+        self.default_properties["Top Y"] = self.top_y.text()
         self.default_properties["Fore Color"] = self.fore_color.getRGB()
-
         self.default_properties["Back Color"] = self.back_color.getRGB()
         self.default_properties["Transparent"] = self.transparent.text()
+        self.default_properties["Right To Left"] = self.right_to_left.currentText()
         self.default_properties["Font Family"] = self.font_box.currentText()
         self.default_properties["Font Size"] = self.font_size_box.currentText()
         self.default_properties["Style"] = self.style_box.currentText()
-        self.default_properties["Right To Left"] = self.right_to_left.currentText()
 
     def setProperties(self, properties: dict):
         self.default_properties.update(properties)
         self.loadSetting()
 
     def setPosition(self, x, y):
-        if not self.cx_pos.currentText().startswith("["):
-            self.cx_pos.setCurrentText(str(int(x)))
-        if not self.cy_pos.currentText().startswith("["):
-            self.cy_pos.setCurrentText(str(int(y)))
+        if not self.left_x.text().startswith("["):
+            self.left_x.setText(str(int(x)))
+        if not self.top_y.text().startswith("["):
+            self.top_y.setText(str(int(y)))
 
     def loadSetting(self):
-        self.cx_pos.setCurrentText(self.default_properties["Center X"])
-        self.cy_pos.setCurrentText(self.default_properties["Center Y"])
+        self.left_x.setText(self.default_properties["Left X"])
+        self.top_y.setText(self.default_properties["Top Y"])
         self.fore_color.setCurrentText(self.default_properties["Fore Color"])
         self.back_color.setCurrentText(self.default_properties["Back Color"])
         self.transparent.setText(self.default_properties["Transparent"])

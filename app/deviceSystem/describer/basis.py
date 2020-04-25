@@ -95,7 +95,7 @@ class Shower(QWidget):
                 tipStr = "invalid Cedrus port address"
 
         elif device_type ==Info.DEV_PARALLEL_PORT:
-            # Check whether a text string holds just a hexadecimal number
+            # Check whether a current_text string holds just a hexadecimal number
             if re.match('\A[0-9a-fA-F]+\Z', port) is None:
                 flag = False
                 tipStr = "should be a hexadecimal"

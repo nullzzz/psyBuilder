@@ -589,7 +589,7 @@ class Psy(QMainWindow):
             children = Func.getWidgetChildren(reference_parent)
             for child_widget_id, child_widget_name in children:
                 if child_widget_name == old_widget_name:
-                    # change node's text
+                    # change node's current_text
                     self.structure.changeNodeName(child_widget_id, new_widget_name)
                     if child_widget_id != widget_id:
                         change_widget_ids.append(child_widget_id)

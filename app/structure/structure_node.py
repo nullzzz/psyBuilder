@@ -30,7 +30,7 @@ class StructureNode(QTreeWidgetItem):
 
     def setText(self, p_int, p_str):
         """
-        save text as old_text
+        save current_text as old_text
         @param p_int:
         @param p_str:
         @return:

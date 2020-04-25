@@ -8,7 +8,7 @@ class TableWidgetItem(QTableWidgetItem):
 
     def __init__(self, value: str = ""):
         super(TableWidgetItem, self).__init__(value)
-        # save old text to redo
+        # save old current_text to redo
         if value:
             self.old_text = value
         else:
@@ -16,7 +16,7 @@ class TableWidgetItem(QTableWidgetItem):
 
     def redo(self):
         """
-        redo its text, you should combine it with func save()
+        redo its current_text, you should combine it with func save()
         :return:
         """
         self.setText(self.old_text)

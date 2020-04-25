@@ -1,10 +1,10 @@
 from PyQt5.QtCore import Qt, QFileInfo
 from PyQt5.QtGui import QIcon, QImage, QPixmap, QPainter, QColor
-from PyQt5.QtWidgets import QToolBar, QAction, QMessageBox, QScrollArea
+from PyQt5.QtWidgets import QToolBar, QAction, QScrollArea
 
 from app.func import Func
-from example.imageBrowser.imageLabel import ImageContainer
 from lib import TabItemMainWindow
+from .imageContainer import ImageContainer
 from .imageProperty import ImageProperty
 
 
@@ -29,18 +29,12 @@ class ImageDisplay(TabItemMainWindow):
         :return:
         """
         self.setWindowTitle("Image")
-
-        # self.label.setText("Your image will show here")
-        # self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.setCentralWidget(self.label_scroll)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
+        open_pro = QAction(QIcon(r"source\image\setting.png"), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
-        preview = QAction(QIcon(Func.getImage("preview")), "preview", self)
-        preview.triggered.connect(self.preview)
         tool.addAction(open_pro)
-        # tool.addAction(preview)
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
@@ -48,10 +42,6 @@ class ImageDisplay(TabItemMainWindow):
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
-
-    def preview(self):
-        # todo: preview of image
-        QMessageBox.warning(self, "undo", "refactoring")
 
     def refresh(self):
         self.pro_window.refresh()
@@ -130,6 +120,7 @@ class ImageDisplay(TabItemMainWindow):
             p = QPainter()
             p.begin(img)
             p.setCompositionMode(QPainter.CompositionMode_DestinationIn)
+            # todo
             p.fillRect(img.rect(), QColor(0, 0, 0, img_tra))
             p.end()
 
@@ -184,16 +175,16 @@ class ImageDisplay(TabItemMainWindow):
 
             self.label.update()
 
-            ##########################################
-            # return single attribute
-            # most of them return string
-            # you can see this as a document。
-            ##########################################
         else:
             self.label_scroll.horizontalScrollBar().setValue(0)
             self.label_scroll.verticalScrollBar().setValue(0)
             self.label.pix = None
 
+    ##########################################
+    # return single attribute
+    # most of them return string
+    # you can see this as a document。
+    ##########################################
     def getFilename(self) -> str:
         """
         返回图片文件名（绝对路径）

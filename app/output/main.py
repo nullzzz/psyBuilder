@@ -52,7 +52,7 @@ class Output(DockWidget):
 
     def clear(self):
         """
-        clear text
+        clear current_text
         :return:
         """
         self.text_edit.clear()

@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget
     QFileDialog, QCompleter, QSizePolicy
 
 from app.func import Func
-from app.info import Info
 from lib import VarLineEdit, VarComboBox
 
 
@@ -59,7 +58,7 @@ class SoundTab1(QWidget):
 
         self.using_sound_id: str = ""
         self.sound = VarComboBox()
-        self.sound_info = Func.getDeviceInfo(Info.DEV_SOUND)
+        self.sound_info = Func.getDeviceInfo("sound")
         self.sound.addItems(self.sound_info.values())
         self.sound.currentTextChanged.connect(self.changeSound)
 
@@ -80,7 +79,7 @@ class SoundTab1(QWidget):
 
         self.using_screen_id: str = ""
         self.screen_name = VarComboBox()
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)
         self.screen_name.setEnabled(self.sync_to_vbl.checkState())
@@ -88,9 +87,8 @@ class SoundTab1(QWidget):
         self.setGeneral()
 
     def setGeneral(self):
-
-        self.start_offset.setReg(r"\d+")
-        self.stop_offset.setReg(r"\d+")
+        self.start_offset.setReg(VarLineEdit.Integer)
+        self.stop_offset.setReg(VarLineEdit.Integer)
         self.repetitions.setReg(r"(\d+)|(\d*\.?\d{,2})")
 
         self.stream_refill.addItems(["0", "1", "2"])
@@ -98,10 +96,10 @@ class SoundTab1(QWidget):
         self.bias_time.setEnabled(False)
 
         l0 = QLabel("File Name:")
-        l1 = QLabel("Buffer Size (ms):")
+        l1 = QLabel("Buffer Size(ms):")
         l2 = QLabel("Stream Refill:")
-        l3 = QLabel("Start Offset (ms):")
-        l4 = QLabel("Stop Offset (ms):")
+        l3 = QLabel("Start Offset(ms):")
+        l4 = QLabel("Stop Offset(ms):")
         l5 = QLabel("Repetitions:")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -168,7 +166,7 @@ class SoundTab1(QWidget):
 
     def refresh(self):
         # refresh sound Dev
-        self.sound_info = Func.getDeviceInfo(Info.DEV_SOUND)
+        self.sound_info = Func.getDeviceInfo("sound")
         sound_id = self.using_sound_id
         self.sound.clear()
         self.sound.addItems(self.sound_info.values())
@@ -178,7 +176,7 @@ class SoundTab1(QWidget):
             self.using_sound_id = sound_id
 
         # refresh screen
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen_name.clear()
         self.screen_name.addItems(self.screen_info.values())

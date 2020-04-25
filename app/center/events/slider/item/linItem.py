@@ -101,10 +101,12 @@ class LineItem(QGraphicsLineItem):
         self.default_properties["X"] = self.scenePos().x()
         self.default_properties["Y"] = self.scenePos().y()
         self.default_properties["Z"] = self.zValue()
+        # todo store real position for restore
         self.default_properties["P1"] = (self.line().x1() + self.scenePos().x(), self.line().y1() + self.scenePos().y())
         self.default_properties["P2"] = (self.line().x2() + self.scenePos().x(), self.line().y2() + self.scenePos().y())
 
     def getInfo(self):
+        self.updateInfo()
         return self.default_properties
 
     def changeSomething(self):

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QGroupBox, QPushButton, QVBoxLayout, QHBoxLayout
 
 from app.func import Func
 from lib import TabItemWidget
-from ..iconChoose import IconChoose
+from ..childWidget import IconChoose
 from ..ifBranch.condition import ConditionArea
 
 
@@ -56,12 +56,12 @@ class IfBranch(TabItemWidget):
         layout1.addWidget(self.condition_area)
         condition_group.setLayout(layout1)
 
-        true_group = QGroupBox("Yes")
+        true_group = QGroupBox("True")
         layout2 = QVBoxLayout()
         layout2.addWidget(self.true_icon_choose)
         true_group.setLayout(layout2)
 
-        false_group = QGroupBox("No")
+        false_group = QGroupBox("False")
         layout3 = QVBoxLayout()
         layout3.addWidget(self.false_icon_choose)
         false_group.setLayout(layout3)
