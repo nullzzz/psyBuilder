@@ -253,7 +253,8 @@ class DiaItem(QGraphicsPolygonItem):
         self.setPos(QPoint(cx, cy))
 
         # fill color
-        if fill_color := self.pro_window.general.fill_color.getColor():
+        fill_color = self.pro_window.general.fill_color.getColor()
+        if fill_color:
             self.setBrush(fill_color)
 
 
@@ -264,7 +265,8 @@ class DiaItem(QGraphicsPolygonItem):
         pen.setWidth(self.border_width)
 
         # border color
-        if border_color := self.pro_window.general.border_color.getColor():
+        border_color = self.pro_window.general.border_color.getColor()
+        if border_color:
             pen.setColor(border_color)
         self.setPen(pen)
 

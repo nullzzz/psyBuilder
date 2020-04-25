@@ -87,17 +87,24 @@ class TextItem(QGraphicsTextItem):
         self.setPos(cx, cy)
 
         family = self.pro_window.general.font_box.currentFont().family()
-        if (size := self.properties.get("Font Size")).isdigit():
+        size = self.properties.get("Font Size")
+        if size.isdigit():
             size = int(size)
         else:
             size = 20
-        if (fore_color := self.properties.get("Fore Color")).startswith("["):
+
+        fore_color = self.properties.get("Fore Color")
+        if fore_color.startswith("["):
             fore_color = "0,0,0"
-        if (back_color := self.properties.get("Back Color")).startswith("["):
+
+        back_color = self.properties.get("Back Color")
+        if back_color.startswith("["):
             back_color = "255,255,255"
 
         text = self.getText()
-        if (r2l := self.properties.get("Right To Left")) == "Yes":
+
+        r2l = self.properties.get("Right To Left")
+        if r2l == "Yes":
             text = text[::-1]
 
         html = f'<body style = "font-size: {size}pt; "font-family: {family}">\

@@ -3599,10 +3599,10 @@ def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, cProperties, cV
     # cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
 
     # 3) check the alignment X parameter:
-    leftX = dataStrConvert(*getRefValue(cWidget, cProperties['Center X'], attributesSetDict))
+    leftX = dataStrConvert(*getRefValue(cWidget, cProperties['Left X'], attributesSetDict))
 
     # 4) check the alignment X parameter:
-    topY = dataStrConvert(*getRefValue(cWidget, cProperties['Center Y'], attributesSetDict))
+    topY = dataStrConvert(*getRefValue(cWidget, cProperties['Top Y'], attributesSetDict))
 
     # 5) check the color parameter:
     fontColorStr = dataStrConvert(*getRefValue(cWidget, cProperties['Fore Color'], attributesSetDict))
