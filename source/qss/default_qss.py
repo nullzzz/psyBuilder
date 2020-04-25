@@ -1,31 +1,27 @@
-timeline_item = """
-QLabel#TimelineItem{
-    background-color: transparent;
+# base qss
+dock_widget = """
+QDockWidget {
+    border: 1px solid rgb(206,206,206);
+    titlebar-close-icon: url(source/images/dock_widget/hide.png);
 }
-QLabel#TimelineItem:hover{
-    border: 1px solid rgb(110,110,110);
-    border-radius: 2px;
-    padding: 2px;
-}
-"""
 
-icon_bar = """
-QTabWidget::pane#IconBar {
-    min-height:75px;
-    max-height:75px;
+QDockWidget::title {
+    background: rgb(237,237,237);
+    text-align: center;
+    padding-top: 6px;
+    padding-bottom: 6px;
 }
-"""
 
-timeline_table = """
-QTableWidget#TimelineTable {
-    selection-background-color:rgb(186,215,251);
+QDockWidget::close-button {
+    subcontrol-position: right;
+    border: 0.5px solid transparent;
+    background: transparent;
+    margin-right: 2px;
+    icon-size: 16px;
 }
-"""
 
-timeline_area = """
-QFrame#TimelineArea {
-    background:white;
-    border: 1px solid rgb(201,201,201);
+QDockWidget::close-button:hover {
+    background: rgb(221,221,221);
 }
 """
 
@@ -78,40 +74,16 @@ QTabBar::close-button:hover {
 
 """
 
-icon_list = """
-QListView#IconList{
-    border: 1px solid rgb(201,201,201);
-    border-top: none;
-    show-decoration-selected: 1;
-    font-size: 12px;
-    min-height:75px;
-    max-height:75px;
-}
-
-QListView#IconList::Item{
-    border-top: 10px solid transparent;
-    border-bottom: 1px solid transparent;
-    min-height: 64px;
-    max-height: 64px;
-    min-width: 100px;
-}
-
-QListView#IconList::Item:hover{
-    padding-top: 9px;
-    background: transparent;
-    border-radius:2px;
-    border: 1px solid rgb(110, 110, 110);
-}
-
-QListView#IconList::Item:selected{
-    padding-top: 9px;
-    background: rgb(186,215,251);
-    border-radius:2px;
-    border: 1px solid rgb(110, 110, 110);
+# main windows' qss
+center = """
+QMainWindow::separator {
+    background: rgb(110,110,110);
+    width: 1px;
+    height: 1px;
 }
 """
 
-structure_tree = """
+structure = """
 QTreeView::item {
     border: 1px solid transparent;
 }
@@ -152,39 +124,64 @@ QTreeView::branch:open:has-children:has-siblings {
 }
 """
 
-dock_widget = """
-QDockWidget {
-    border: 1px solid rgb(206,206,206);
-    titlebar-close-icon: url(source/images/dock_widget/hide.png);
+# widgets' qss
+timeline = """
+/* IconBar */
+QTabWidget::pane#IconBar {
+    min-height:75px;
+    max-height:75px;
 }
 
-QDockWidget::title {
-    background: rgb(237,237,237);
-    text-align: center;
-    padding-top: 6px;
-    padding-bottom: 6px;
+QListView#IconList{
+    border: 1px solid rgb(201,201,201);
+    border-top: none;
+    show-decoration-selected: 1;
+    font-size: 12px;
+    min-height:75px;
+    max-height:75px;
 }
 
-QDockWidget::close-button {
-    subcontrol-position: right;
-    border: 0.5px solid transparent;
+QListView#IconList::Item{
+    border-top: 10px solid transparent;
+    border-bottom: 1px solid transparent;
+    min-height: 64px;
+    max-height: 64px;
+    min-width: 100px;
+}
+
+QListView#IconList::Item:hover{
+    padding-top: 9px;
     background: transparent;
-    margin-right: 2px;
-    icon-size: 16px;
+    border-radius:2px;
+    border: 1px solid rgb(110, 110, 110);
 }
 
-QDockWidget::close-button:hover {
-    background: rgb(221,221,221);
+QListView#IconList::Item:selected{
+    padding-top: 9px;
+    background: rgb(186,215,251);
+    border-radius:2px;
+    border: 1px solid rgb(110, 110, 110);
 }
-"""
 
-center = """
-QMainWindow::separator {
-    background: rgb(110,110,110);
-    width: 1px;
-    height: 1px;
+/* Timeline Area */
+QFrame#TimelineArea {
+    background:white;
+    border: 1px solid rgb(201,201,201);
 }
-ColComboBox::drop-down {image: url(source/image/color_down_arrow.png);}
+
+QLabel#TimelineItem{
+    background-color: transparent;
+}
+
+QLabel#TimelineItem:hover{
+    border: 1px solid rgb(110,110,110);
+    border-radius: 2px;
+    padding: 2px;
+}
+
+QTableWidget#TimelineTable {
+    selection-background-color:rgb(186,215,251);
+}
 """
 
 cycle = """
@@ -196,4 +193,9 @@ QToolBar#CycleToolBar {
 }
 """
 
-default_qss = timeline_item + icon_bar + icon_list + timeline_area + timeline_table + tab_bar + structure_tree + dock_widget + center + cycle
+# other
+other = """
+ColComboBox::drop-down {image: url(source/image/color_down_arrow.png);}
+"""
+
+default_qss = dock_widget + tab_bar + center + structure + timeline + cycle + other
