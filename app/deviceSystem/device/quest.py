@@ -8,7 +8,7 @@ class Quest(Device):
         self.device_type = device_type
 
         self.quest_id: str = device_id
-        self.estimated_threshold = "0.5"
+        self.guess_threshold = "0.5"
         self.std_dev = "0.25"
         self.desired_proportion = "0.75"
         self.steepness = "3.5"
@@ -18,12 +18,14 @@ class Quest(Device):
         self.minimum = "0"
         self.maximum = "1"
         self.is_log10_transform = "Yes"
+        self.grain = "0.01"
+        self.range = "5"
 
     def getThreshold(self) -> str:
-        return self.estimated_threshold
+        return self.guess_threshold
 
     def setThreshold(self, threshold: str):
-        self.estimated_threshold = threshold
+        self.guess_threshold = threshold
 
     def setSD(self, sd: str):
         self.std_dev = sd
@@ -52,6 +54,12 @@ class Quest(Device):
     def setIsTransform(self, is_transform: str):
         self.is_log10_transform = is_transform
 
+    def setGrain(self, grain: str):
+        self.grain = grain
+
+    def setRange(self, range: str):
+        self.range = range
+
     def setProperties(self, properties: dict):
         if isinstance(properties, dict):
             self.default_properties = properties.copy()
@@ -59,7 +67,7 @@ class Quest(Device):
 
     def loadSetting(self):
         self.setName(self.default_properties["Device Name"])
-        self.estimated_threshold = self.default_properties["Threshold Value"]
+        self.guess_threshold = self.default_properties["Guess Threshold"]
         self.std_dev = self.default_properties["Std. Dev."]
         self.desired_proportion = self.default_properties["Desired Proportion"]
         self.steepness = self.default_properties["Steepness"]
@@ -69,12 +77,14 @@ class Quest(Device):
         self.minimum = self.default_properties["Minimum Test Value"]
         self.maximum = self.default_properties["Maximum Test Value"]
         self.is_log10_transform = self.default_properties["Is Log10 Transform"]
+        self.grain = self.default_properties["Grain"]
+        self.range = self.default_properties["Range"]
 
     def getInfo(self):
         self.default_properties.clear()
         self.default_properties["Device Type"] = self.device_type
         self.default_properties["Device Name"] = self.text()
-        self.default_properties["Threshold Value"] = self.estimated_threshold
+        self.default_properties["Guess Threshold"] = self.guess_threshold
         self.default_properties["Std. Dev."] = self.std_dev
         self.default_properties["Desired Proportion"] = self.desired_proportion
         self.default_properties["Steepness"] = self.steepness
@@ -84,4 +94,6 @@ class Quest(Device):
         self.default_properties["Minimum Test Value"] = self.minimum
         self.default_properties["Maximum Test Value"] = self.maximum
         self.default_properties["Is Log10 Transform"] = self.is_log10_transform
+        self.default_properties["Grain"] = self.grain
+        self.default_properties["Range"] = self.range
         return self.default_properties
