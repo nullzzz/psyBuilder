@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal, Qt, QLineF, QPointF, QRectF
 from PyQt5.QtGui import QPen, QTransform
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem, QGraphicsRectItem
 
-from app.info import Info
+from app.defi import *
 from ...events.slider.item import *
 
 
@@ -138,12 +138,13 @@ class Scene(QGraphicsScene):
                     p2.setY(line.y1())
             new_line = QLineF(line.p1(), p2)
             self.line.setLine(new_line)
-        elif self.my_mode == self.MoveItem or self.my_mode == self.InsertItem:
-            item = self.mouseGrabberItem()
-            if hasattr(item, "setPosition"):
-                item.setPosition()
-            self.update()
-            super(Scene, self).mouseMoveEvent(event)
+        # Update point coordinates in real time
+        # elif self.my_mode == self.MoveItem or self.my_mode == self.InsertItem:
+        #     item = self.mouseGrabberItem()
+        #     if hasattr(item, "setPosition"):
+        #         item.setPosition()
+        #     self.update()
+        #     super(Scene, self).mouseMoveEvent(event)
         # 套索模式
         elif self.my_mode == self.SelectItem and self.lasso:
             self.lasso: Lasso
@@ -189,29 +190,29 @@ class Scene(QGraphicsScene):
         self.addItem(self.border)
         for k, v in properties.items():
             k: str
-            if k.startswith(Info.ITEM_IMAGE):
+            if k.startswith(ITEM_IMAGE):
                 item = PixItem(PixItem.Image, k)
-            elif k.startswith(Info.ITEM_TEXT):
+            elif k.startswith(ITEM_TEXT):
                 item = TextItem(TextItem.Text, k)
-            elif k.startswith(Info.ITEM_VIDEO):
+            elif k.startswith(ITEM_VIDEO):
                 item = PixItem(PixItem.Video, k)
-            elif k.startswith(Info.ITEM_SOUND):
+            elif k.startswith(ITEM_SOUND):
                 item = PixItem(PixItem.Sound, k)
-            elif k.startswith(Info.ITEM_SNOW):
+            elif k.startswith(ITEM_SNOW):
                 item = OtherItem(OtherItem.Snow, k)
-            elif k.startswith(Info.ITEM_GABOR):
+            elif k.startswith(ITEM_GABOR):
                 item = OtherItem(OtherItem.Gabor, k)
-            elif k.startswith(Info.ITEM_POLYGON):
+            elif k.startswith(ITEM_POLYGON):
                 item = DiaItem(DiaItem.Polygon, k)
-            elif k.startswith(Info.ITEM_ARC):
+            elif k.startswith(ITEM_ARC):
                 item = DiaItem(DiaItem.Arc, k)
-            elif k.startswith(Info.ITEM_RECT):
+            elif k.startswith(ITEM_RECT):
                 item = DiaItem(DiaItem.Rect, k)
-            elif k.startswith(Info.ITEM_CIRCLE):
+            elif k.startswith(ITEM_CIRCLE):
                 item = DiaItem(DiaItem.Circle, k)
-            elif k.startswith(Info.ITEM_LINE):
+            elif k.startswith(ITEM_LINE):
                 item = LineItem(LineItem.Line, k)
-            elif k.startswith(Info.ITEM_DOT_MOTION):
+            elif k.startswith(ITEM_DOT_MOTION):
                 item = DotItem(DotItem.Dot, k)
 
             self.addItem(item)

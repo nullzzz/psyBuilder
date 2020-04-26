@@ -14,26 +14,48 @@ class Func(object):
     This class stores some common functions
     """
 
-    ###########################################
-    #           old version func              #
-    ###########################################
+    ############################
+    # update device information
+    ############################
     @staticmethod
-    def getWidgetImage(widget_type: str, image_type: str = 'icon') -> QPixmap or QIcon:
+    def getDeviceInfo(device_type: str) -> dict:
         """
-        返回widget_type对应的图片
-        :param widget_type: widget类型
-        :param image_type: 返回图片类型
+        for each widget which has device information such as screen or sound.
+        :param device_type: screen or sound, and maybe more in the future.
         :return:
         """
-        # 得到图片路径
-        if widget_type in Info.WIDGET_TYPE_IMAGE_PATH:
-            path = Info.WIDGET_TYPE_IMAGE_PATH[widget_type]
-            if image_type == "icon":
-                return QIcon(path)
-            else:
-                return QPixmap(path)
-        raise Exception("unknown widget type.")
+        devices = {}
+        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.QUEST_DEVICE_INFO, **Info.TRACKER_DEVICE_INFO}.items():
+            if k.startswith(device_type):
+                devices[k] = v["Device Name"]
+        return devices
 
+    @staticmethod
+    def getDeviceNameById(device_id: str) -> str:
+        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
+            if device_id == k:
+                return v.get("Device Name")
+        return ""
+
+    @staticmethod
+    def getCurrentScreenRes(screen_id: str) -> tuple:
+        if screen_id == "":
+            return 640, 480
+        resolution = Info.OUTPUT_DEVICE_INFO[screen_id].get('Resolution', "auto")
+        wh = resolution.lower().split('x')
+
+        if len(wh) > 1:
+            width = int(wh[0])
+            height = int(wh[1])
+        else:
+            scr_rect = QDesktopWidget().screenGeometry()
+            width = scr_rect.width()
+            height = scr_rect.height()
+        return width, height
+
+    ###########################################
+    #           compile version func              #
+    ###########################################
     @staticmethod
     def getImage(image_name: str) -> str:
         """
@@ -42,43 +64,6 @@ class Func(object):
         :return:
         """
         return os.path.join(Info.IMAGE_SOURCE_PATH, image_name)
-
-    @staticmethod
-    def getPsyIconPath() -> str:
-        return os.path.join(Info.IMAGE_SOURCE_PATH, "psy.icon")
-
-    @staticmethod
-    def getProperties(widget_id) -> dict:
-        """
-        按widget_id得到对应widget的属性
-        :param widget_id:
-        :return:
-        """
-        return Func.getWidgetProperties(widget_id)
-
-    @staticmethod
-    def delWidget(widget_id: str) -> None:
-        """
-        删除widget，几乎没用，python不支持主动的内存回收
-        :param widget_id:
-        :return:
-        """
-        try:
-            if widget_id.startswith("If") or widget_id.startswith("Switch"):
-                sub_wid = Info.WID_WIDGET[widget_id].getSubWidgetId()
-                for wid in sub_wid:
-                    Info.WID_WIDGET.pop(wid)
-            Info.WID_WIDGET.pop(widget_id)
-        except KeyError:
-            pass
-
-    @staticmethod
-    def createWidget(widget_id: str, visible: bool = True):
-        raise Exception("Deprecated functions")
-
-    @staticmethod
-    def getAttributes(widget_id, detail=False) -> dict or list:
-        return Func.getWidgetAttributes(widget_id, detail)
 
     @staticmethod
     def getWidgetPosition(widget_id: str) -> int:
@@ -148,43 +133,6 @@ class Func(object):
         return Func.getWidgetChildren(widget_id)
 
     @staticmethod
-    def isCitingValue(value: str) -> bool:
-        # print(f"line 616: {value}")
-        if re.fullmatch(r"\[[A-Za-z]+[a-zA-Z\._0-9]*\]", value):
-            return True
-        return False
-
-    @staticmethod
-    def getCurrentScreenRes(screen_id: str) -> tuple:
-        if screen_id == "":
-            return 640, 480
-        resolution = Info.OUTPUT_DEVICE_INFO[screen_id].get('Resolution', "auto")
-        wh = resolution.lower().split('x')
-
-        if len(wh) > 1:
-            width = int(wh[0])
-            height = int(wh[1])
-        else:
-            scr_rect = QDesktopWidget().screenGeometry()
-            width = scr_rect.width()
-            height = scr_rect.height()
-        return width, height
-
-    @staticmethod
-    def isRGBStr(RGBStr: str):
-        if re.fullmatch("^\d+,\d+,\d+$", RGBStr):
-            output = RGBStr.split(',')
-            return output
-
-        return False
-
-    @staticmethod
-    def isFloatStr(floatStr: str):
-        if re.fullmatch(r"([\d]*\.[\d$]+)|(\d*)", floatStr):
-            return True
-        return False
-
-    @staticmethod
     def isWidgetType(widget_id: str, widget_type: str):
         """
         根据输入的widget_id来判断是不是输入的类型
@@ -196,43 +144,6 @@ class Func(object):
             return widget_id.split('.')[0] == widget_type
         except:
             return False
-
-    @staticmethod
-    def createDeviceId(device_type: str):
-        current_id = Info.device_count[device_type]
-        Info.device_count[device_type] = current_id + 1
-        return f"{device_type}.{current_id}"
-
-    @staticmethod
-    def getDeviceInfo(device_type: str) -> dict:
-        """
-        for each widget which has device information such as screen or sound.
-        :param device_type: screen or sound, and maybe more in the future.
-        :return:
-        """
-        devices = {}
-        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.QUEST_DEVICE_INFO, **Info.TRACKER_DEVICE_INFO}.items():
-            if k.startswith(device_type):
-                devices[k] = v["Device Name"]
-        return devices
-
-    @staticmethod
-    def getDeviceNameById(device_id: str) -> str:
-        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
-            if device_id == k:
-                return v.get("Device Name")
-        return ""
-
-    @staticmethod
-    def getDeviceIdByName(device_name: str):
-        for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.INPUT_DEVICE_INFO}.items():
-            if device_name == v.get("Device Name"):
-                return k
-        return ""
-
-    @staticmethod
-    def log(text, error=False, timer=True):
-        Func.printOut(text)
 
     @staticmethod
     def getParentWid(widget_id: str) -> str:
@@ -371,7 +282,7 @@ class Func(object):
     @staticmethod
     def getWidgetChild(widget_id: str, index: int) -> (str, str):
         """
-
+        no usages
         @param widget_id:
         @param index:
         @return: child's widget id and widget name

@@ -78,19 +78,6 @@ class Info(object):
     DEV_GAMEPAD = "game pad"
     DEV_EYE_ACTION = "action"
 
-    # 设备id计数
-    device_count: dict = {
-        DEV_SERIAL_PORT: 0,
-        DEV_PARALLEL_PORT: 0,
-        DEV_NETWORK_PORT: 0,
-        DEV_SCREEN: 0,
-        DEV_MOUSE: 0,
-        DEV_KEYBOARD: 0,
-        DEV_RESPONSE_BOX: 0,
-        DEV_GAMEPAD: 0,
-        DEV_EYE_ACTION: 0
-    }
-
     # FOR SLIDER ITEMS:
     ITEM_POLYGON = "polygon"
     ITEM_ARC = "arc"
@@ -123,28 +110,6 @@ class Info(object):
     # 图片保存路径
     IMAGE_SOURCE_PATH = "source/image"
     # widget不同类型对应图片
-    WIDGET_TYPE_IMAGE_PATH = {
-        CYCLE: os.path.join(IMAGE_SOURCE_PATH, "cycle.png"),
-        SOUND: os.path.join(IMAGE_SOURCE_PATH, "sound.png"),
-        TEXT: os.path.join(IMAGE_SOURCE_PATH, "current_text.png"),
-        IMAGE: os.path.join(IMAGE_SOURCE_PATH, "image.png"),
-        VIDEO: os.path.join(IMAGE_SOURCE_PATH, "video.png"),
-        SLIDER: os.path.join(IMAGE_SOURCE_PATH, "slider.png"),
-        BUG: os.path.join(IMAGE_SOURCE_PATH, "bug.png"),
-        OPEN: os.path.join(IMAGE_SOURCE_PATH, "open_eye.png"),
-        DC: os.path.join(IMAGE_SOURCE_PATH, "DC_eye.png"),
-        CALIBRATION: os.path.join(IMAGE_SOURCE_PATH, "calibration_eye.png"),
-        ACTION: os.path.join(IMAGE_SOURCE_PATH, "action_eye.png"),
-        STARTR: os.path.join(IMAGE_SOURCE_PATH, "start_eye.png"),
-        ENDR: os.path.join(IMAGE_SOURCE_PATH, "end_eye.png"),
-        LOG: os.path.join(IMAGE_SOURCE_PATH, "close_eye.png"),
-        QUEST_INIT: os.path.join(IMAGE_SOURCE_PATH, "start_quest.png"),
-        QUEST_UPDATE: os.path.join(IMAGE_SOURCE_PATH, "update_quest.png"),
-        QUEST_GET_VALUE: os.path.join(IMAGE_SOURCE_PATH, "get_value.png"),
-        IF: os.path.join(IMAGE_SOURCE_PATH, "if.png"),
-        SWITCH: os.path.join(IMAGE_SOURCE_PATH, "switch.png"),
-        TIMELINE: os.path.join(IMAGE_SOURCE_PATH, "timeline.png"),
-    }
 
     ###########################################
     #           new version info              #

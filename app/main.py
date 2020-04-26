@@ -19,7 +19,7 @@ from .deviceSystem.Yun import TianBianYiDuoYun
 from .func import Func
 from .info import Info
 from .menubar.aboutUs import AboutUs
-from .menubar.compile_PTB import compilePTB
+from app.menubar.compile_PTB import compilePTB
 from .menubar.update import Update
 from .output import Output
 from .properties import Properties
@@ -1039,7 +1039,6 @@ class Psy(QMainWindow):
         Info.TRACKER_DEVICE_INFO.clear()
         Info.FILE_NAME = ""
         Info.FILE_DIRECTORY = ""
-        Info.device_count.clear()
         Info.SLIDER_COUNT.clear()
         Info.Widgets.clear()
         Info.Names.clear()

@@ -33,11 +33,6 @@ class TextGeneral(QWidget):
         self.transparent = VarLineEdit("100%")
         self.transparent.setReg(VarLineEdit.Percentage)
 
-        self.flip_horizontal = VarComboBox()
-        self.flip_horizontal.addItems(("No", "Yes"))
-        self.flip_vertical = VarComboBox()
-        self.flip_vertical.addItems(("No", "Yes"))
-
         self.font_box = QFontComboBox()
 
         self.style_box = VarComboBox(True)
@@ -50,9 +45,6 @@ class TextGeneral(QWidget):
             self.font_size_box.addItem(str(i))
             self.font_size_box.setCurrentText('20')
 
-        self.right_to_left = VarComboBox()
-        self.right_to_left.addItems(("No", "Yes"))
-
         self.setUI()
 
     def setUI(self):
@@ -63,7 +55,6 @@ class TextGeneral(QWidget):
         l11 = QLabel("Back Color:")
 
         l20 = QLabel("Transparent:")
-        l21 = QLabel("Right to Left:")
 
         l3 = QLabel("Font Family:")
         l40 = QLabel("Font Size:")
@@ -77,7 +68,6 @@ class TextGeneral(QWidget):
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l41.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l40.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l21.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         group2 = QGroupBox("")
         layout2 = QGridLayout()
@@ -93,8 +83,6 @@ class TextGeneral(QWidget):
 
         layout2.addWidget(l20, 2, 0)
         layout2.addWidget(self.transparent, 2, 1)
-        layout2.addWidget(l21, 2, 2)
-        layout2.addWidget(self.right_to_left, 2, 3)
 
         layout2.addWidget(l3, 3, 0)
         layout2.addWidget(self.font_box, 3, 1, 1, 3)
@@ -124,7 +112,6 @@ class TextGeneral(QWidget):
         self.default_properties["Fore Color"] = self.fore_color.getRGB()
         self.default_properties["Back Color"] = self.back_color.getRGB()
         self.default_properties["Transparent"] = self.transparent.text()
-        self.default_properties["Right To Left"] = self.right_to_left.currentText()
         self.default_properties["Font Family"] = self.font_box.currentText()
         self.default_properties["Font Size"] = self.font_size_box.currentText()
         self.default_properties["Style"] = self.style_box.currentText()
@@ -145,7 +132,6 @@ class TextGeneral(QWidget):
         self.fore_color.setCurrentText(self.default_properties["Fore Color"])
         self.back_color.setCurrentText(self.default_properties["Back Color"])
         self.transparent.setText(self.default_properties["Transparent"])
-        self.right_to_left.setCurrentText(self.default_properties["Right To Left"])
         self.font_box.setCurrentText(self.default_properties["Font Family"])
         self.font_size_box.setCurrentText(self.default_properties["Font Size"])
         self.style_box.setCurrentText(self.default_properties["Style"])

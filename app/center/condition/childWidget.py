@@ -1,26 +1,20 @@
 import time
 
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QComboBox
 
 from app.func import Func
 from app.info import Info
 
 
-class IconChoose(QWidget):
-    """
-    {
-        "stim type": "Image",
-        "event name": "",
-        "Pro window": {}
-    }
-    """
+class ChildWidget(QWidget):
     itemAdded = pyqtSignal(str, str)
     itemDeleted = pyqtSignal(str)
     itemNameChanged = pyqtSignal(str, str)
 
     def __init__(self, parent=None):
-        super(IconChoose, self).__init__(parent)
+        super(ChildWidget, self).__init__(parent)
 
         self.event_types = QComboBox()
         self.event_types.addItems(("None", Info.IMAGE, Info.VIDEO, Info.TEXT, Info.SOUND, Info.SLIDER))
@@ -229,5 +223,5 @@ class IconLabel(QLabel):
         if event_type == "None":
             self.clear()
         else:
-            pix_map = Func.getWidgetImage(event_type, "pixmap")
+            pix_map = QPixmap(fr"source\image\{event_type}.png")
             self.setPixmap(pix_map.scaled(100, 100))

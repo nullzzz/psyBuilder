@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QFileInfo
-from PyQt5.QtGui import QIcon, QImage, QPixmap, QPainter, QColor
+from PyQt5.QtGui import QIcon, QImage, QPixmap, QPainter, QColor, QDragEnterEvent, QDropEvent
 from PyQt5.QtWidgets import QToolBar, QAction, QScrollArea
 
 from app.func import Func
@@ -11,6 +11,8 @@ from .imageProperty import ImageProperty
 class ImageDisplay(TabItemMainWindow):
     def __init__(self, widget_id: str, widget_name: str):
         super(ImageDisplay, self).__init__(widget_id, widget_name)
+        # self.setAcceptDrops(True)
+
         # 图片展示框
         self.label_scroll = QScrollArea()
         self.label = ImageContainer()

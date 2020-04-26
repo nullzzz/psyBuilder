@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QGroupBox, QPushButton, QVBoxLayout, QHBoxLayout
 
 from app.func import Func
 from lib import TabItemWidget
-from ..childWidget import IconChoose
+from ..childWidget import ChildWidget
 from ..ifBranch.condition import ConditionArea
 
 
@@ -26,12 +26,12 @@ class IfBranch(TabItemWidget):
         # 条件
         self.condition_area = ConditionArea()
         # 事件
-        self.true_icon_choose = IconChoose()
+        self.true_icon_choose = ChildWidget()
         self.true_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b))
         self.true_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(3, a))
         self.true_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
 
-        self.false_icon_choose = IconChoose()
+        self.false_icon_choose = ChildWidget()
         self.false_icon_choose.itemAdded.connect(lambda a, b: self.itemAdded.emit(self.widget_id, a, b))
         self.false_icon_choose.itemDeleted.connect(lambda a: self.itemDeleted.emit(3, a))
         self.false_icon_choose.itemNameChanged.connect(lambda a, b: self.itemNameChanged.emit(a, b))
@@ -86,7 +86,7 @@ class IfBranch(TabItemWidget):
     def refresh(self):
         self.true_icon_choose.refresh()
         self.false_icon_choose.refresh()
-        self.setAttributes(Func.getAttributes(self.widget_id))
+        self.setAttributes(Func.getWidgetAttributes(self.widget_id))
 
     def updateInfo(self):
         self.condition_area.updateInfo()

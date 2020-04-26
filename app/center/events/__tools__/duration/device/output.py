@@ -12,7 +12,7 @@ class OutputDevice(QListWidgetItem):
         self.device_name = device_name
         self.device_id = device_id
         self.device_type = device_id.split(".")[0]
-        self.setIcon(QIcon(Func.getImage("{}_device.png".format(self.device_type))))
+        self.setIcon(QIcon(fr"source\image\{self.device_type}_device.png"))
 
         self.default_properties = {
             "Device Id": self.device_id,

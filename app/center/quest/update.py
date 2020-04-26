@@ -40,7 +40,7 @@ class QuestUpdate(TabItemWidget):
         self.bt_apply.clicked.connect(self.apply)
         self.setUI()
 
-        self.setAttributes(Func.getAttributes(self.widget_id))
+        self.setAttributes(Func.getWidgetAttributes(self.widget_id))
 
     def changeQuestId(self, quest_name):
         for k, v in self.quest_info.items():
@@ -101,7 +101,7 @@ class QuestUpdate(TabItemWidget):
             self.quest_name.setCurrentText(quest_name)
             self.using_quest_id = quest_id
 
-        attributes = Func.getAttributes(self.widget_id)
+        attributes = Func.getWidgetAttributes(self.widget_id)
         self.setAttributes(attributes)
         self.updateInfo()
 

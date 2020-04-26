@@ -30,8 +30,9 @@ class SmartTextEdit(QTextEdit):
         super().__init__(*args, **kwargs)
         self.completer = SmartCompleter()
         self.completer.setWidget(self)
-
         self.completer.activated.connect(self.insertCompletion)
+
+        # self.setAcceptDrops(False)
 
     def insertCompletion(self, completion):
         if completion == self.completer.completionPrefix():
@@ -45,7 +46,7 @@ class SmartTextEdit(QTextEdit):
         text_cursor = self.textCursor()
         text_cursor.select(QtGui.QTextCursor.LineUnderCursor)
         selected_text = text_cursor.selectedText()
-        if "@" in selected_text:
+        if "]@" in selected_text:
             return "@" + selected_text.split("@")[-1]
         return selected_text
 

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QComboBox, QGridLayout, QLabel, QGroupBox, QComplete
 
 from lib import VarComboBox
 from ..addDeleteButton import AddDeleteButton
-from ..childWidget import IconChoose
+from ..childWidget import ChildWidget
 
 
 class Case(QGroupBox):
@@ -34,7 +34,7 @@ class Case(QGroupBox):
         self.values.setInsertPolicy(QComboBox.NoInsert)
 
         # icon choose
-        self.icon_choose = IconChoose()
+        self.icon_choose = ChildWidget()
 
         self.default_properties: dict = self.icon_choose.default_properties
         self.default_properties["Case Value"] = ""

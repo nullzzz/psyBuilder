@@ -474,7 +474,7 @@ def outPutTriggerCheck(cWidget) -> dict:
         if cOpDevInfo['Device Type'] == Info.DEV_PARALLEL_PORT:
             if cOpDevInfo['Device Name'] in respTriggerDevNames:
                 shortPulseDurParallelsDict.update({cOpDevInfo['Device Id']: 10})
-                Func.log('Currently we will force the pulse duration to be 10 ms', False)
+                Func.printOut('Currently we will force the pulse duration to be 10 ms', False)
 
     return shortPulseDurParallelsDict
 
@@ -5412,4 +5412,4 @@ def compileCode(isDummyCompile):
     copyYanglabFile('OverwriteOrNot.p')
 
     if not isDummyPrint:
-        Func.log(f"Compile successful!:{compile_file_name}")  # print info to the simple_info panel
+        Func.printOut(f"Compile successful!:{compile_file_name}")  # print info to the simple_info panel

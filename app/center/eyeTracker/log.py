@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLa
     QGridLayout, QCheckBox, QTextEdit, QListWidget, QAbstractItemView
 
 from app.func import Func
-from app.info import Info
 from lib import VarLineEdit, VarComboBox, TabItemWidget
 
 
@@ -20,7 +19,7 @@ class Close(TabItemWidget):
         self.pause_between_msg = VarLineEdit("1")
 
         self.using_tracker_id = ""
-        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
+        self.tracker_info = Func.getDeviceInfo("tracker")
         self.tracker_name = VarComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
@@ -36,7 +35,7 @@ class Close(TabItemWidget):
         self.log_msg = QTextEdit()
 
         self.all_attr = QListWidget()
-        self.all_attr.addItems(Func.getAttributes(self.widget_id))
+        self.all_attr.addItems(Func.getWidgetAttributes(self.widget_id))
         self.all_attr.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.refresh_bt = QPushButton("refresh")
         self.refresh_bt.clicked.connect(self.refreshAttr)
@@ -109,7 +108,7 @@ class Close(TabItemWidget):
                 break
 
     def refresh(self):
-        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
+        self.tracker_info = Func.getDeviceInfo("tracker")
         tracker_id = self.using_tracker_id
         self.tracker_name.clear()
         self.tracker_name.addItems(self.tracker_info.values())
@@ -118,12 +117,12 @@ class Close(TabItemWidget):
             self.tracker_name.setCurrentText(tracker_name)
             self.using_tracker_id = tracker_id
 
-        attributes = Func.getAttributes(self.widget_id)
+        attributes = Func.getWidgetAttributes(self.widget_id)
         self.setAttributes(attributes)
         self.updateInfo()
 
     def refreshAttr(self):
-        self.attributes = Func.getAttributes(self.widget_id)
+        self.attributes = Func.getWidgetAttributes(self.widget_id)
         self.all_attr.clear()
         self.select_attr.clear()
         self.all_attr.addItems(self.attributes)

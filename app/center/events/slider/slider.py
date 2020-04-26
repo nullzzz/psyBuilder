@@ -357,7 +357,7 @@ class Slider(TabItemMainWindow):
 
     def changeBackground(self):
         fn = f"background{self.sender().data()}.png"
-        fp = Func.getImage(fn)
+        fp = fr"source\image\{fn}"
         self.background_bt.setIcon(QIcon(fp))
         self.scene.setBackgroundBrush(QBrush(QPixmap(fp)))
         self.scene.update()

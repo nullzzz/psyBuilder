@@ -80,7 +80,7 @@ class EndR(TabItemWidget):
             self.tracker_name.setCurrentText(tracker_name)
             self.using_tracker_id = tracker_id
 
-        attributes = Func.getAttributes(self.widget_id)
+        attributes = Func.getWidgetAttributes(self.widget_id)
         self.setAttributes(attributes)
 
         self.updateInfo()

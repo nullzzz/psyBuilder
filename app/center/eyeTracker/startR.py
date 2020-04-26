@@ -86,7 +86,7 @@ class StartR(TabItemWidget):
             self.using_tracker_id = tracker_id
 
         # 更新attributes
-        attributes = Func.getAttributes(self.widget_id)
+        attributes = Func.getWidgetAttributes(self.widget_id)
         self.setAttributes(attributes)
         self.updateInfo()
 

@@ -68,7 +68,7 @@ class Switch(TabItemWidget):
         self.propertiesChanged.emit(self.widget_id)
 
     def refresh(self):
-        attributes = Func.getAttributes(self.widget_id)
+        attributes = Func.getWidgetAttributes(self.widget_id)
         self.setAttributes(attributes)
         self.case_area.refresh()
 
