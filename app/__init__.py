@@ -1,1 +1,1 @@
-from .main import Psy
+from app.main import Psy
