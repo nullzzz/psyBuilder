@@ -51,6 +51,7 @@ class ImageTab1(QWidget):
 
         self.using_screen_id: str = "screen.0"
         self.screen_name = VarComboBox()
+        self.screen_name.setAcceptDrops(False)
         self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)
