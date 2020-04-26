@@ -28,6 +28,7 @@ class QuestUpdate(TabItemWidget):
             self.quest_info.update({'quest_rand':'quest_rand'})
 
         self.quest_name = VarComboBox()
+        self.quest_name.setAcceptDrops(False)
         self.quest_name.currentTextChanged.connect(self.changeQuestId)
 
         self.using_quest_id = ""
