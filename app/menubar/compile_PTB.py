@@ -3954,7 +3954,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "%======= initialize Quests ==========/")
 
             for quest in quest_devices.values():
-                outputDevNameIdxDict.update({f"quest-{quest['Quest Name']}": f"{iQuest}"})
+                outputDevNameIdxDict.update({f"quest-{quest['Device Name']}": f"{iQuest}"})
 
                 printAutoInd(f, "quest({0}) = QuestCreate({1},{2},{3},{4},{5},{6});",
                              iQuest,
@@ -3988,7 +3988,7 @@ def compileCode(isDummyCompile):
                 printAutoInd(f, "")
 
                 # attributesSetDict 0,1,2 for looplevel, becitedStr,all possible values
-                attributesSetDict.update({f"{quest['Quest Name']}.cValue": [0, f"quest({iQuest}).cValue", {f"quest({iQuest}).cValue"}]})
+                attributesSetDict.update({f"{quest['Device Name']}.cValue": [0, f"quest({iQuest}).cValue", {f"quest({iQuest}).cValue"}]})
 
                 iQuest += 1
 
