@@ -224,7 +224,7 @@ class PolygonGeneral(QWidget):
         self.border_width.setText(self.default_properties["Border Width"])
         self.fill_color.setCurrentText(self.default_properties['Fill Color'])
 
-    def setPosition(self, x: str, y: str):
+    def setPosition(self, x, y):
         if not self.cx_pos.text().startswith("["):
             self.cx_pos.setText(str(int(x)))
         if not self.cy_pos.text().startswith("["):
