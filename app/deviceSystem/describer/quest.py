@@ -10,8 +10,8 @@ class Quest(QWidget):
 
         self.device_type = QLabel(Info.DEV_QUEST)
         self.device_name = QLabel("Unselected")
-        self.estimated_threshold = QLineEdit()
-        self.estimated_threshold.setToolTip("Used For Starting Test Value")
+        self.guess_threshold = QLineEdit()
+        self.guess_threshold.setToolTip("Used For Starting Test Value")
 
         self.std_dev = QLineEdit()
         self.std_dev.setToolTip("Of Estimated Threshold")
@@ -33,8 +33,15 @@ class Quest(QWidget):
 
         self.minimum = QLineEdit()
         self.maximum = QLineEdit()
+
         self.is_log10_transform = QComboBox()
         self.is_log10_transform.addItems(("Yes", "No"))
+
+        self.grain = QLineEdit()
+        self.grain.setToolTip("Step Size of The Internal Table")
+
+        self.range = QLineEdit()
+        self.range.setToolTip("Intensity Difference Between The Largest and Smallest Intensity")
 
         self.setUI()
 
@@ -42,7 +49,7 @@ class Quest(QWidget):
         layout = QFormLayout()
         layout.addRow("Device Type:", self.device_type)
         layout.addRow("Device Name:", self.device_name)
-        layout.addRow("Threshold Value:", self.estimated_threshold)
+        layout.addRow("Guess Threshold:", self.guess_threshold)
         layout.addRow("Std. Dev.:", self.std_dev)
         layout.addRow("Desired Proportion:", self.desired_proportion)
         layout.addRow("Steepness(β):", self.steepness)
@@ -52,6 +59,8 @@ class Quest(QWidget):
         layout.addRow("Minimum Test Value:", self.minimum)
         layout.addRow("Maximum Test Value:", self.maximum)
         layout.addRow("Is Log10 Transform:", self.is_log10_transform)
+        layout.addRow("Grain:", self.grain)
+        layout.addRow("Range:", self.range)
         layout.setLabelAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.setLayout(layout)
 
@@ -59,7 +68,7 @@ class Quest(QWidget):
         device_name = info.get("Device Name")
 
         self.device_name.setText(device_name)
-        self.estimated_threshold.setText(info.get("Threshold Value", ""))
+        self.guess_threshold.setText(info.get("Guess Threshold", ""))
         self.std_dev.setText(info.get("Std. Dev.", ""))
         self.desired_proportion.setText(info.get("Desired Proportion", ""))
         self.steepness.setText(info.get("Steepness", ""))
@@ -69,6 +78,8 @@ class Quest(QWidget):
         self.minimum.setText(info.get("Minimum Test Value", ""))
         self.maximum.setText(info.get("Maximum Test Value", ""))
         self.is_log10_transform.setCurrentText(info.get("Is Log10 Transform", ""))
+        self.grain.setText(info.get("Grain", ""))
+        self.range.setText(info.get("Range", ""))
 
     def changeName(self, name: str):
         self.device_name.setText(name)
@@ -77,7 +88,7 @@ class Quest(QWidget):
         properties: dict = {
             "Device Type": self.device_type.text(),
             "Device Name": self.device_name.text(),
-            "Threshold Value": self.estimated_threshold.text(),
+            "Guess Threshold": self.guess_threshold.text(),
             "Std. Dev.": self.std_dev.text(),
             "Desired Proportion": self.desired_proportion.text(),
             "Steepness": self.steepness.text(),
@@ -86,6 +97,8 @@ class Quest(QWidget):
             "Method": self.method.currentText(),
             "Minimum Test Value": self.minimum.text(),
             "Maximum Test Value": self.maximum.text(),
-            "Is Log10 Transform": self.is_log10_transform.currentText()
+            "Is Log10 Transform": self.is_log10_transform.currentText(),
+            "Grain": self.maximum.text(),
+            "Range": self.maximum.text()
         }
         return properties
