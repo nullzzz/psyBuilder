@@ -98,7 +98,7 @@ class Quest(QWidget):
             "Minimum Test Value": self.minimum.text(),
             "Maximum Test Value": self.maximum.text(),
             "Is Log10 Transform": self.is_log10_transform.currentText(),
-            "Grain": self.maximum.text(),
-            "Range": self.maximum.text()
+            "Grain": self.grain.text(),
+            "Range": self.range.text()
         }
         return properties
