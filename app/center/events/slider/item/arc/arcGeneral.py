@@ -7,7 +7,7 @@ from lib import ColComboBox, VarLineEdit, VarComboBox
 class ArcGeneral(QWidget):
     def __init__(self, parent=None):
         super(ArcGeneral, self).__init__(parent)
-        self.attributes = []
+
         self.default_properties = {
             "Center X": "0",
             "Center Y": "0",
@@ -136,7 +136,7 @@ class ArcGeneral(QWidget):
         if not self.fill_color.currentText().startswith("["):
             self.fill_color.setCurrentText(rgb)
 
-    def setLineColor(self, rgb: str):
+    def setBorderColor(self, rgb: str):
         if not self.border_color.currentText().startswith("["):
             self.border_color.setCurrentText(rgb)
 

@@ -3,12 +3,12 @@ from PyQt5.QtGui import QIcon, QColor, QIntValidator, QPixmap, QPainter, QBrush
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QButtonGroup, QMenu, QAction, \
     QComboBox, QColorDialog, QToolBar, QSlider, QSpinBox
 
-from app.center.events.slider.left.leftBox import LeftBox
 from app.func import Func
 from lib import TabItemMainWindow
 from .item import *
-from ...events.slider.property import SliderProperty
-from ...events.slider.scene import Scene
+from .property import SliderProperty
+from .scene import Scene
+from .left.leftBox import LeftBox
 
 
 class Slider(TabItemMainWindow):
@@ -122,9 +122,9 @@ class Slider(TabItemMainWindow):
         lasso_bt.setIcon(QIcon(Func.getImage("lasso.png")))
 
         self.pointer_group = QButtonGroup()
-        self.pointer_group.addButton(self.pointer_bt, Scene.MoveItem)
-        self.pointer_group.addButton(line_bt, Scene.InsertLine)
-        self.pointer_group.addButton(lasso_bt, Scene.SelectItem)
+        self.pointer_group.addButton(self.pointer_bt, Scene.NormalMode)
+        self.pointer_group.addButton(line_bt, Scene.LineMode)
+        self.pointer_group.addButton(lasso_bt, Scene.LassoMode)
         self.pointer_group.buttonClicked[int].connect(self.pointerGroupClicked)
 
         setting.addWidget(self.pointer_bt)
@@ -248,7 +248,7 @@ class Slider(TabItemMainWindow):
         :return:
         """
         self.pointer_bt.setChecked(True)
-        self.scene.setMode(Scene.InsertItem)
+        self.scene.setMode(Scene.NormalMode)
         self.item_list.addItem(item_name)
 
     def changeItemList(self):

@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QLineF, QPointF, QRectF
-from PyQt5.QtGui import QPen, QTransform
+from PyQt5.QtGui import QPen, QTransform, QColor
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem, QGraphicsRectItem
 
 from app.defi import *
@@ -7,16 +7,14 @@ from ...events.slider.item import *
 
 
 class Scene(QGraphicsScene):
-    InsertItem, InsertLine, MoveItem, SelectItem = range(4)
+    NormalMode, LineMode, LassoMode = range(3)
 
     itemAdd = pyqtSignal(str)
     itemSelected = pyqtSignal()
 
     def __init__(self, parent=None):
         super(Scene, self).__init__(parent)
-
-        # self.addLine(0, 0, 100, 100)
-        self.my_mode = Scene.InsertItem
+        self.my_mode = Scene.NormalMode
 
         self.attributes: list = []
         self.line = None
@@ -46,8 +44,7 @@ class Scene(QGraphicsScene):
 
     def dropEvent(self, event):
         if event.mimeData().hasFormat("application/x-icon-and-text"):
-            # 添加图形
-            # if self.my_mode == self.InsertItem:
+            # 添加子控件
             item_type, ok = event.mimeData().data("item-type").toUInt()
             if TextItem.Text == item_type:
                 item = TextItem(item_type)
@@ -55,7 +52,6 @@ class Scene(QGraphicsScene):
                 item = PixItem(item_type)
             elif OtherItem.Snow <= item_type <= OtherItem.Gabor:
                 item = OtherItem(item_type)
-                # item.getInfo()
             elif DiaItem.Polygon <= item_type <= DiaItem.Rect:
                 item = DiaItem(item_type)
             elif DotItem.Dot == item_type:
@@ -89,17 +85,19 @@ class Scene(QGraphicsScene):
             it.setSelected(True)
             self.menu.exec_(event.screenPos())
 
-    def setLineColor(self, color):
+    def setLineColor(self, color: QColor):
+        self.line_color = color
         for item in self.selectedItems():
             if isinstance(item, LineItem) or isinstance(item, DiaItem) or isinstance(item, DotItem):
                 item.setLineColor(color)
 
-    def setItemColor(self, color):
+    def setItemColor(self, color: QColor):
         for item in self.selectedItems():
             if isinstance(item, DiaItem) or isinstance(item, DotItem):
                 item.setItemColor(color)  # update the default properties in GeneralTab
 
-    def setLineWidth(self, width):
+    def setLineWidth(self, width: int):
+        self.border_width = width
         for item in self.selectedItems():
             if isinstance(item, LineItem) or isinstance(item, DiaItem) or isinstance(item, DotItem):
                 item.setWidth(width)
@@ -108,16 +106,16 @@ class Scene(QGraphicsScene):
         self.my_mode = mode
 
     def mousePressEvent(self, event):
-        if self.lasso:
-            self.removeItem(self.lasso)
-            self.lasso = None
+        # if self.lasso:
+        #     self.removeItem(self.lasso)
+        #     self.lasso = None
         if event.button() == Qt.LeftButton:
-            if self.my_mode == self.InsertLine:
+            if self.my_mode == self.LineMode:
                 self.line = QGraphicsLineItem(QLineF(event.scenePos(),
                                                      event.scenePos()))
-                self.line.setPen(QPen(self.line_color, 2))
+                self.line.setPen(QPen(self.line_color, self.border_width))
                 self.addItem(self.line)
-            elif self.my_mode == self.SelectItem:
+            elif self.my_mode == self.LassoMode:
                 x = event.scenePos().x()
                 y = event.scenePos().y()
                 self.lasso = Lasso(x, y)
@@ -125,7 +123,7 @@ class Scene(QGraphicsScene):
         super(Scene, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        if self.my_mode == self.InsertLine and self.line:
+        if self.my_mode == self.LineMode and self.line:
             line = self.line.line()
             p2 = event.scenePos()
             # straight line
@@ -139,27 +137,27 @@ class Scene(QGraphicsScene):
             new_line = QLineF(line.p1(), p2)
             self.line.setLine(new_line)
         # Update point coordinates in real time
-        elif self.my_mode == self.MoveItem or self.my_mode == self.InsertItem:
-            item = self.mouseGrabberItem()
-            if hasattr(item, "setPosition"):
-                item.setPosition()
-            self.update()
-            super(Scene, self).mouseMoveEvent(event)
+        # elif self.my_mode == self.NormalMode:
+        #     # item = self.mouseGrabberItem()
+        #     # if hasattr(item, "setPosition"):
+        #     #     item.setPosition()
+        #     self.update()
+        #     super(Scene, self).mouseMoveEvent(event)
         # 套索模式
-        elif self.my_mode == self.SelectItem and self.lasso:
+        elif self.my_mode == self.LassoMode and self.lasso:
             self.lasso: Lasso
             x = event.scenePos().x()
             y = event.scenePos().y()
             self.lasso.draw(x, y)
             self.update()
-
-            self.lasso.center = self.lasso.polygon().boundingRect().center()
+            # self.lasso.center = self.lasso.polygon().boundingRect().center()
             self.setSelectionArea(self.lasso.path, self.t)
         else:
+            self.update()
             super(Scene, self).mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, mouseEvent):
-        if self.line and self.my_mode == self.InsertLine:
+        if self.line and self.my_mode == self.LineMode:
             item = LineItem(LineItem.Line)
             l: QLineF = self.line.line()
             cx, cy = self.line.line().center().x(), self.line.line().center().y()
@@ -167,15 +165,16 @@ class Scene(QGraphicsScene):
             line = QLineF(l.x1() - cx, l.y1() - cy, l.x2() - cx, l.y2() - cy)
             item.setLine(line)
             item.setPosition()
+            item.setLineColor(self.line_color)
+            item.setWidth(self.border_width)
             self.addItem(item)
             self.itemAdd.emit(item.getName())
             self.update()
             self.removeItem(self.line)
             self.line = None
-        if self.lasso and self.my_mode == self.SelectItem:
+        if self.lasso and self.my_mode == self.LassoMode:
             self.removeItem(self.lasso)
             self.lasso = None
-
         super(Scene, self).mouseReleaseEvent(mouseEvent)
 
     def getInfo(self):
