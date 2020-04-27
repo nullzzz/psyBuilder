@@ -1,8 +1,7 @@
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QCompleter
+from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QCompleter, QComboBox
 
 from app.func import Func
-from app.info import Info
 from lib import VarComboBox, TabItemWidget
 
 
@@ -22,13 +21,9 @@ class QuestUpdate(TabItemWidget):
         self.response_variable = VarComboBox()
         self.response_variable.addItems(["1", "0"])
 
-        self.quest_info = Func.getDeviceInfo(Info.DEV_QUEST)
+        self.quest_info = Func.getDeviceInfo("quest")
 
-        if len(self.quest_info) > 1:
-            self.quest_info.update({'quest_rand':'quest_rand'})
-
-        self.quest_name = VarComboBox()
-        self.quest_name.setAcceptDrops(False)
+        self.quest_name = QComboBox()
         self.quest_name.currentTextChanged.connect(self.changeQuestId)
 
         self.using_quest_id = ""
@@ -87,13 +82,9 @@ class QuestUpdate(TabItemWidget):
         self.loadSetting()
 
     def refresh(self):
-        self.quest_info = Func.getDeviceInfo(Info.DEV_QUEST)
-
-        if len(self.quest_info) > 1:
-            self.quest_info.update({'quest_rand':'quest_rand'})
+        self.quest_info = Func.getDeviceInfo("quest")
 
         quest_id = self.using_quest_id
-
         self.quest_name.clear()
         self.quest_name.addItems(self.quest_info.values())
         quest_name = self.quest_info.get(quest_id)

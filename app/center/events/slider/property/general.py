@@ -1,7 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QFormLayout, QCompleter
+from PyQt5.QtWidgets import QWidget, QFormLayout, QComboBox
 
 from app.func import Func
-from app.info import Info
 from lib import VarComboBox
 
 
@@ -10,8 +9,6 @@ class SliderGeneral(QWidget):
     def __init__(self, parent=None):
         super(SliderGeneral, self).__init__(parent)
 
-        # 当前可使用attribute
-        self.attributes = []
         # 当前页面属性
         self.default_properties = {
             "Clear After": "Yes",
@@ -22,9 +19,8 @@ class SliderGeneral(QWidget):
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
         self.using_screen_id: str = "screen.0"
-        self.screen_name = VarComboBox()
-        self.screen_name.setAcceptDrops(False)
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_name = QComboBox()
+        self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)
 
@@ -38,7 +34,7 @@ class SliderGeneral(QWidget):
         self.setLayout(layout)
 
     def refresh(self):
-        self.screen_info = Func.getDeviceInfo(Info.DEV_SCREEN)
+        self.screen_info = Func.getDeviceInfo("screen")
         screen_id = self.using_screen_id
         self.screen_name.clear()
         self.screen_name.addItems(self.screen_info.values())
@@ -49,8 +45,6 @@ class SliderGeneral(QWidget):
 
     def setAttributes(self, attributes: list):
         pass
-        # self.clear_after.setCompleter(QCompleter(attributes))
-        # self.screen_name.setCompleter(QCompleter(attributes))
 
     def changeScreen(self, screen):
         for k, v in self.screen_info.items():

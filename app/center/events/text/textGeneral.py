@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QTextEdit, \
-    QFontComboBox, QCompleter
+    QFontComboBox, QCompleter, QComboBox
 
 from .lighter import AttributeHighlighter
 from .smart import SmartTextEdit
@@ -76,7 +76,7 @@ class TextTab1(QWidget):
         self.right_to_left.addItems(("No", "Yes"))
 
         self.using_screen_id: str = "screen.0"
-        self.screen = VarComboBox()
+        self.screen = QComboBox()
         self.screen_info = Func.getDeviceInfo("screen")
         self.screen.addItems(self.screen_info.values())
         self.screen.currentTextChanged.connect(self.changeScreen)

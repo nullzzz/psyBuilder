@@ -1,10 +1,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, \
-    QGridLayout, QCompleter
+    QGridLayout, QCompleter, QComboBox
 
 from app.func import Func
-from app.info import Info
 from lib import VarComboBox, ColComboBox, TabItemWidget
 
 
@@ -31,8 +30,8 @@ class EyeCalibrate(TabItemWidget):
         self.target_style = VarComboBox()
 
         self.using_tracker_id: str = ""
-        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
-        self.tracker_name = VarComboBox()
+        self.tracker_info = Func.getDeviceInfo("tracker")
+        self.tracker_name = QComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
 
@@ -102,7 +101,7 @@ class EyeCalibrate(TabItemWidget):
                 break
 
     def refresh(self):
-        self.tracker_info = Func.getDeviceInfo(Info.DEV_TRACKER)
+        self.tracker_info = Func.getDeviceInfo("tracker")
         tracker_id = self.using_tracker_id
         self.tracker_name.clear()
         self.tracker_name.addItems(self.tracker_info.values())

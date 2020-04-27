@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QFileDialog, QCompleter, QSizePolicy
+    QFileDialog, QCompleter, QSizePolicy, QComboBox
 
 from app.func import Func
 from lib import VarLineEdit, VarComboBox
@@ -10,8 +10,6 @@ from lib import VarLineEdit, VarComboBox
 class SoundTab1(QWidget):
     def __init__(self, parent=None):
         super(SoundTab1, self).__init__(parent)
-        self.attributes = []
-
         self.default_properties = {
             "File Name": "",
             "Buffer Size": "5000",
@@ -57,14 +55,13 @@ class SoundTab1(QWidget):
         self.repetitions = VarLineEdit("1")
 
         self.using_sound_id: str = ""
-        self.sound = VarComboBox()
+        self.sound = QComboBox()
         self.sound_info = Func.getDeviceInfo("sound")
         self.sound.addItems(self.sound_info.values())
         self.sound.currentTextChanged.connect(self.changeSound)
 
         self.wait_for_start = VarComboBox()
         self.wait_for_start.addItems(("No", "Yes"))
-        self.wait_for_start.setEnabled(False)
 
         # added by yang
         self.sync_to_vbl = QCheckBox("Sync to Screen VBL:")  # Latency Bias
@@ -78,8 +75,7 @@ class SoundTab1(QWidget):
         self.clear_after.setEnabled(self.sync_to_vbl.checkState())
 
         self.using_screen_id: str = ""
-        self.screen_name = VarComboBox()
-        self.screen_name.setAcceptDrops(False)
+        self.screen_name = QComboBox()
         self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)

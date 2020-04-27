@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QPushButton, QCheckBox, \
-    QFileDialog, QCompleter, QFormLayout
+    QFileDialog, QCompleter, QFormLayout, QComboBox
 
 from app.func import Func
 from lib import VarLineEdit, VarComboBox
@@ -34,7 +34,7 @@ class ImageTab1(QWidget):
 
         # Rotate
         self.rotate = VarLineEdit("0")
-        self.rotate.setReg(r"\[\w+\]|\d+")
+        self.rotate.setReg(VarLineEdit.Integer)
 
         # 拉伸模式
         self.stretch = QCheckBox("Stretch")
@@ -50,8 +50,7 @@ class ImageTab1(QWidget):
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
         self.using_screen_id: str = "screen.0"
-        self.screen_name = VarComboBox()
-        self.screen_name.setAcceptDrops(False)
+        self.screen_name = QComboBox()
         self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)

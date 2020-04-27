@@ -38,9 +38,8 @@ class TextGeneral(QWidget):
         self.style_box = VarComboBox(True)
         self.style_box.addItems(
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
-        self.font_size_box = VarComboBox()
+        self.font_size_box = VarComboBox(True)
         self.font_size_box.setReg(VarComboBox.Integer)
-        self.font_size_box.setEditable(True)
         for i in range(12, 72, 2):
             self.font_size_box.addItem(str(i))
             self.font_size_box.setCurrentText('20')

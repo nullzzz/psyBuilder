@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLayout, \
-    QGridLayout, QCheckBox, QTextEdit, QListWidget, QAbstractItemView
+    QGridLayout, QCheckBox, QTextEdit, QListWidget, QAbstractItemView, QComboBox
 
 from app.func import Func
 from lib import VarLineEdit, VarComboBox, TabItemWidget
@@ -20,7 +20,7 @@ class Close(TabItemWidget):
 
         self.using_tracker_id = ""
         self.tracker_info = Func.getDeviceInfo("tracker")
-        self.tracker_name = VarComboBox()
+        self.tracker_name = QComboBox()
         self.tracker_name.addItems(self.tracker_info.values())
         self.tracker_name.currentTextChanged.connect(self.changeTrackerId)
         self.default_properties = {
