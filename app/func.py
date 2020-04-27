@@ -28,8 +28,9 @@ class Func(object):
         for k, v in {**Info.OUTPUT_DEVICE_INFO, **Info.QUEST_DEVICE_INFO, **Info.TRACKER_DEVICE_INFO}.items():
             if k.startswith(device_type):
                 devices[k] = v["Device Name"]
-        if device_type == "quest" and len(devices) > 1:
-            devices["quest_rand"] = "quest_rand"
+        #
+        # if device_type == "quest" and len(devices) > 1:
+        #     devices["quest_rand"] = "quest_rand"
         return devices
 
     @staticmethod

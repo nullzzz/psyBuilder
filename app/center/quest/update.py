@@ -23,6 +23,9 @@ class QuestUpdate(TabItemWidget):
 
         self.quest_info = Func.getDeviceInfo("quest")
 
+        if len(self.quest_info) > 1:
+            self.quest_info.update({'quest_rand':'quest_rand'})
+
         self.quest_name = QComboBox()
         self.quest_name.currentTextChanged.connect(self.changeQuestId)
 
