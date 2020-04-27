@@ -169,7 +169,9 @@ class DotItem(QGraphicsItem):
         self.update()
 
     def boundingRect(self):
-        return self.rect
+        w, h = self.rect.width(), self.rect.height()
+        bigger_rect = QRectF(-w / 2 - 10, -h / 2 - 10, w+20, h+20)
+        return bigger_rect
 
     def shape(self):
         path = QPainterPath()
@@ -311,7 +313,7 @@ class DotItem(QGraphicsItem):
         if not old_rgb.startswith("["):
             rgb = f"{color.red()},{color.green()},{color.blue()}"
             self.properties["Back Color"] = rgb
-            self.pro_window.general.setBackColor(rgb)
+            self.pro_window.general.setFillColor(rgb)
 
     def setWidth(self, width: int):
         self.border_width = width
