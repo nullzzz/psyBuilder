@@ -101,6 +101,13 @@ class TextItem(QGraphicsTextItem):
         if back_color.startswith("["):
             back_color = "255,255,255"
 
+        # r2l = self.properties.get("Right To Left")
+
+        # if r2l == "Yes":
+        #     textWithDir = '<dir="rtl"' + self.getText() + ">"
+        # else:
+        #     textWithDir = self.getText()
+
         html = f'<body style = "font-size: {size}pt; "font-family: {family}">\
                         <p style = "background-color: rgb({back_color})">\
                         <font style = "color: rgb({fore_color})">\
