@@ -79,6 +79,7 @@ class SoundTab1(QWidget):
 
         self.using_screen_id: str = ""
         self.screen_name = VarComboBox()
+        self.screen_name.setAcceptDrops(False)
         self.screen_info = Func.getDeviceInfo("screen")
         self.screen_name.addItems(self.screen_info.values())
         self.screen_name.currentTextChanged.connect(self.changeScreen)

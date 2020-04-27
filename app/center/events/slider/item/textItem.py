@@ -105,7 +105,9 @@ class TextItem(QGraphicsTextItem):
 
         r2l = self.properties.get("Right To Left")
         if r2l == "Yes":
-            text = text[::-1]
+            pass
+            # do nothing here
+            # text = text[::-1]
 
         html = f'<body style = "font-size: {size}pt; "font-family: {family}">\
                         <p style = "background-color: rgb({back_color})">\
