@@ -155,6 +155,8 @@ class Scene(QGraphicsScene):
 
             self.lasso.center = self.lasso.polygon().boundingRect().center()
             self.setSelectionArea(self.lasso.path, self.t)
+        else:
+            super(Scene, self).mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, mouseEvent):
         if self.line and self.my_mode == self.InsertLine:
