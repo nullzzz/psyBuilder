@@ -72,6 +72,7 @@ class InputDevice(QListWidgetItem):
         self.default_properties["End Action"] = self.end_action
 
         self.default_properties["Device Name"] = self.device_name
+        self.default_properties["Device Type"] = self.device_type
         self.default_properties["Right"] = self.right
         self.default_properties["Wrong"] = self.wrong
         self.default_properties["No Resp"] = self.no_resp
