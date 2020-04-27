@@ -58,7 +58,7 @@ class ValidationWindow(QFrame):
 
     def checkCode(self):
         input_code = self.input.text()
-        if input_code == self.confuse(self.hard_code) or input_code == "psy":
+        if input_code == self.confuse(self.hard_code):
             self.setLocalCode(input_code)
             self.start()
         else:
