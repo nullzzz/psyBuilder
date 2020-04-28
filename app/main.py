@@ -7,19 +7,19 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox
 
+from app.menubar.compile_PTB import compilePTB
 from lib import WaitDialog, Settings
 from .attributes import Attributes
 from .center import Center
-from .center.condition import IfBranch, Switch
-from .center.events import Cycle, ImageDisplay, Slider, SoundDisplay, TextDisplay, VideoDisplay
-from .center.eyeTracker import EyeCalibrate, EyeDC, EndR, Close, StartR
+from .center.condition import *
+from .center.events import *
+from .center.eyeTracker import *
 from .center.quest import QuestUpdate
 from .center.timeline import Timeline
-from .deviceSystem.Yun import TianBianYiDuoYun
+from .deviceSystem import TianBianYiDuoYun
 from .func import Func
 from .info import Info
 from .menubar.aboutUs import AboutUs
-from app.menubar.compile_PTB import compilePTB
 from .menubar.update import Update
 from .output import Output
 from .properties import Properties
@@ -990,7 +990,7 @@ class Psy(QMainWindow):
             self.before_exp_action.setIconVisibleInMenu(imageLoadMode == "before_exp")
 
     def compile(self):
-        if not Info.FILE_NAME and not self.getFileName():
+        if not Info.FILE_NAME:
             QMessageBox.information(self, "Warning", "File must be saved before compiling.", QMessageBox.Ok)
             return
 

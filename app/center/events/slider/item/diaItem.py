@@ -4,10 +4,10 @@ from PyQt5.QtGui import QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPolygonItem
 
 from app.info import Info
-from ..item.arc import ArcProperty
-from ..item.circle import CircleProperty
-from ..item.polygon import PolygonProperty
-from ..item.rect import RectProperty
+from .arc import ArcProperty
+from .circle import CircleProperty
+from .polygon import PolygonProperty
+from .rect import RectProperty
 
 
 class DiaItem(QGraphicsPolygonItem):
@@ -246,17 +246,13 @@ class DiaItem(QGraphicsPolygonItem):
         return new
 
     def changeSomething(self):
-        __cx = self.properties["Center X"]
-        cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
-        __cy = self.properties["Center Y"]
-        cy = int(__cy) if __cy.isdigit() else self.scenePos().y()
-        self.setPos(QPoint(cx, cy))
+        cx = self.properties["Center X"]
+        cy = self.properties["Center Y"]
 
         # fill color
         fill_color = self.pro_window.general.fill_color.getColor()
         if fill_color:
             self.setBrush(fill_color)
-
 
         border_width = self.properties["Border Width"]
         if not border_width.startswith("["):

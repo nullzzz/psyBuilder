@@ -1,6 +1,6 @@
+from app.defi import *
 from app.deviceSystem.RX import RX
 from app.deviceSystem.describer import Tracker, Action
-from app.info import Info
 
 
 class TianBianYiDuoYun:
@@ -31,7 +31,7 @@ class TianBianYiDuoYun:
         Tracker.simple_info = self.simple_info
         Action.simple_info = self.simple_info
 
-    def updateSimpleInfo(self, device_types: tuple = (Info.DEV_SCREEN, Info.DEV_SOUND, Info.DEV_TRACKER)):
+    def updateSimpleInfo(self, device_types: tuple = (DEV_SCREEN, DEV_SOUND, DEV_TRACKER)):
         """
         now we just update screen information.
         :param device_types:
@@ -48,13 +48,13 @@ class TianBianYiDuoYun:
                 if k.startswith(device_type):
                     self.simple_info[k] = v.get("Device Name", "")
 
-    def getDeviceName(self, device_type: str):
+    def getDeviceName(self, device_type: str) -> list:
         """
         you can get any one type's name you want
         :param device_type: screen or sound
         :return: device_name
         """
-        device = []
+        device: list = []
 
         for k, v in self.output_properties.items():
             if k.startswith(device_type):

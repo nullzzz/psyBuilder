@@ -3,7 +3,7 @@ from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsItem
 
 from app.info import Info
-from ..item.line import LineProperty
+from .line import LineProperty
 
 
 class LineItem(QGraphicsLineItem):

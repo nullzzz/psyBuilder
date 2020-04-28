@@ -13,7 +13,9 @@ class Point:
         self.x_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.y_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.x = VarLineEdit(x)
+        self.x.setReg(VarLineEdit.Integer)
         self.y = VarLineEdit(y)
+        self.y.setReg(VarLineEdit.Integer)
 
     def getX(self):
         return self.x.text()
@@ -35,18 +37,17 @@ class PolygonGeneral(QWidget):
         super(PolygonGeneral, self).__init__(parent)
         self.attributes = []
         self.default_properties = {
-            "Center X": "0",
-            "Center Y": "0",
+            "Center X": 0,
+            "Center Y": 0,
             "Points": [],
             "Border Color": "0,0,0",
             "Border Width": '1',
             "Fill Color": "0,0,0,0"
         }
 
-        self.cx_pos = VarLineEdit("0")
-        self.cy_pos = VarLineEdit("0")
-        self.cx_pos.setEnabled(False)
-        self.cy_pos.setEnabled(False)
+        # 圆心
+        self.cx_pos: int = 0
+        self.cy_pos: int = 0
 
         self.p1 = Point("X1:", "Y1:")
         self.p2 = Point("X2:", "Y2:")
@@ -63,56 +64,43 @@ class PolygonGeneral(QWidget):
         self.border_color = ColComboBox()
         self.border_color.setCurrentText("0,0,0")
         self.border_width = VarLineEdit("1")
-
         self.fill_color = ColComboBox()
         self.fill_color.addTransparent()
-
         self.setUI()
 
     def addPoint(self):
-        n = len(self.points) + 1
-        p = Point(f"X{n}:", f"Y{n}:")
-        p.setAttributes(self.attributes)
-        self.points.append(p)
+        point_index = len(self.points) + 1
+        point = Point(f"X{point_index}:", f"Y{point_index}:")
+        point.setAttributes(self.attributes)
+        self.points.append(point)
 
         # 给顶点赋值
-        # 圆心
-        __x = self.cx_pos.text()
-        x = 100 if __x.startswith("[") else int(__x)
-        __y = self.cy_pos.text()
-        y = 100 if __y.startswith("[") else int(__y)
-
         for i, p in enumerate(self.points):
             p: Point
-            new_x = str(x + int(100 * np.cos(np.pi / 2 - i * 2 * np.pi / n)))
-            new_y = str(y + int(100 * np.sin(i * 2 * np.pi / n - np.pi / 2)))
+            new_x = str(self.cx_pos + int(100 * np.cos(np.pi / 2 - i * 2 * np.pi / point_index)))
+            new_y = str(self.cy_pos + int(100 * np.sin(i * 2 * np.pi / point_index - np.pi / 2)))
             p.set(new_x, new_y)
 
-        self.point_layout.addWidget(p.x_label, n, 0)
-        self.point_layout.addWidget(p.x, n, 1)
-        self.point_layout.addWidget(p.y_label, n, 2)
-        self.point_layout.addWidget(p.y, n, 3)
+        self.point_layout.addWidget(point.x_label, point_index, 0)
+        self.point_layout.addWidget(point.x, point_index, 1)
+        self.point_layout.addWidget(point.y_label, point_index, 2)
+        self.point_layout.addWidget(point.y, point_index, 3)
 
-        self.del_bt.setEnabled(n > 3)
-        self.add_bt.setEnabled(n <= 20)
+        self.del_bt.setEnabled(point_index > 3)
+        self.add_bt.setEnabled(point_index <= 20)
 
     def delPoint(self):
-        p = self.points.pop(-1)
-        p.x_label.deleteLater()
-        p.y_label.deleteLater()
-        p.x.deleteLater()
-        p.y.deleteLater()
+        point = self.points.pop(-1)
+        point.x_label.deleteLater()
+        point.y_label.deleteLater()
+        point.x.deleteLater()
+        point.y.deleteLater()
 
-        __x = self.cx_pos.text()
-        x = 100 if __x.startswith("[") else int(__x)
-        __y = self.cy_pos.text()
-        y = 100 if __y.startswith("[") else int(__y)
         n = len(self.points)
-
         for i, p in enumerate(self.points):
             p: Point
-            new_x = str(x + int(100 * np.cos(np.pi / 2 - i * 2 * np.pi / n)))
-            new_y = str(y + int(100 * np.sin(i * 2 * np.pi / n - np.pi / 2)))
+            new_x = str(self.cx_pos + int(100 * np.cos(np.pi / 2 - i * 2 * np.pi / n)))
+            new_y = str(self.cy_pos + int(100 * np.sin(i * 2 * np.pi / n - np.pi / 2)))
             p.set(new_x, new_y)
 
         self.del_bt.setEnabled(n > 3)
@@ -120,19 +108,12 @@ class PolygonGeneral(QWidget):
 
     # 生成frame页面
     def setUI(self):
-        l00 = QLabel("Center X:")
-        l01 = QLabel("Center Y:")
-
         l1 = QLabel("Border Color:")
         l2 = QLabel("Border Width:")
         l3 = QLabel("Fill Color:")
-        l00.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        l01.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-
         group1 = QGroupBox("Geometry")
 
         self.point_layout = QGridLayout()
@@ -162,7 +143,6 @@ class PolygonGeneral(QWidget):
         group1.setLayout(up_layout)
 
         group2 = QGroupBox("Fill && Borderline")
-
         layout2 = QFormLayout()
         layout2.setRowWrapPolicy(QFormLayout.DontWrapRows)
         layout2.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
@@ -184,16 +164,14 @@ class PolygonGeneral(QWidget):
     # 设置可选属性
     def setAttributes(self, attributes: list):
         self.attributes = attributes
-        self.cx_pos.setCompleter(QCompleter(attributes))
-        self.cy_pos.setCompleter(QCompleter(attributes))
         self.p1.setAttributes(attributes)
         self.p2.setAttributes(attributes)
         self.p3.setAttributes(attributes)
         self.border_width.setCompleter(QCompleter(attributes))
 
     def updateInfo(self):
-        self.default_properties['Center X'] = self.cx_pos.text()
-        self.default_properties['Center Y'] = self.cy_pos.text()
+        self.default_properties['Center X'] = self.cx_pos
+        self.default_properties['Center Y'] = self.cy_pos
 
         points: list = []
         for p in self.points:
@@ -207,8 +185,8 @@ class PolygonGeneral(QWidget):
 
     def loadSetting(self):
         # 加载参数设置
-        self.cx_pos.setText(self.default_properties["Center X"])
-        self.cy_pos.setText(self.default_properties["Center Y"])
+        self.cx_pos = self.default_properties["Center X"]
+        self.cy_pos = self.default_properties["Center Y"]
 
         l1 = len(self.points)
         l2 = len(self.default_properties["Points"])
@@ -225,10 +203,8 @@ class PolygonGeneral(QWidget):
         self.fill_color.setCurrentText(self.default_properties['Fill Color'])
 
     def setPosition(self, x, y):
-        if not self.cx_pos.text().startswith("["):
-            self.cx_pos.setText(str(int(x)))
-        if not self.cy_pos.text().startswith("["):
-            self.cy_pos.setText(str(int(y)))
+        self.cx_pos = int(x)
+        self.cy_pos = int(y)
 
     def setWh(self, w, h):
         pass

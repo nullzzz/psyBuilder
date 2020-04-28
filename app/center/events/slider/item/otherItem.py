@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPixmapItem
 
 from app.func import Func
 from app.info import Info
-from ..item.gabor import GaborProperty
-from ..item.snow import SnowProperty
+from .gabor import GaborProperty
+from .snow import SnowProperty
 
 
 class OtherItem(QGraphicsPixmapItem):

@@ -5,9 +5,9 @@ from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsItem
 from app.func import Func
 from app.info import Info
 # 画图
-from ..item.image import ImageProperty
-from ..item.sound import SoundProperty
-from ..item.video import VideoProperty
+from .image import ImageProperty
+from .sound import SoundProperty
+from .video import VideoProperty
 
 
 class PixItem(QGraphicsPixmapItem):
@@ -26,7 +26,6 @@ class PixItem(QGraphicsPixmapItem):
         super(PixItem, self).__init__()
 
         self.item_type = item_type
-
         self.item_name = item_name if item_name else self.generateItemName()
 
         if self.item_type == self.Image:
@@ -69,7 +68,6 @@ class PixItem(QGraphicsPixmapItem):
         self.openPro()
 
     def openPro(self):
-        self.pro_window.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setPosition()
         self.pro_window.show()
 

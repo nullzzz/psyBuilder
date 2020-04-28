@@ -3,7 +3,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsItem
 
 from app.info import Info
-from ..item.text import TextProperty
+from .text import TextProperty
 
 
 class TextItem(QGraphicsTextItem):
@@ -23,7 +23,7 @@ class TextItem(QGraphicsTextItem):
 
         self.setPlainText('Hello World')
         font = QFont()
-        font.setPointSize(20)  # set the inital font size to 20 pt (dot)
+        font.setPointSize(20)  # set the initial font size to 20 pt (dot)
         self.setFont(font)
 
         self.setTextInteractionFlags(Qt.TextEditorInteraction)
@@ -149,9 +149,6 @@ class TextItem(QGraphicsTextItem):
     def getText(self) -> str:
         return self.toPlainText()
 
-    def getInfo(self):
-        return self.default_properties
-
     def setProperties(self, properties: dict):
         self.pro_window.setProperties(properties.get("Properties"))
         self.default_properties["X"] = properties["X"]
@@ -183,3 +180,6 @@ class TextItem(QGraphicsTextItem):
     def setZValue(self, z: float) -> None:
         self.default_properties["Z"] = z
         super(TextItem, self).setZValue(z)
+
+    def mouseDoubleClickEvent(self, event):
+        self.openPro()

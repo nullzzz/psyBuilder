@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QRectF, QTimer
 from PyQt5.QtGui import QPainterPath, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem
 
-from app.center.events.slider.item.dot.dotProperty import DotProperty
+from .dot.dotProperty import DotProperty
 from app.info import Info
 
 

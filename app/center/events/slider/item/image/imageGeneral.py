@@ -18,7 +18,7 @@ class ImageGeneral(QWidget):
             "Rotate": "0",
             "Stretch": False,
             "Stretch Mode": "Both",
-            "Back Color": "white",
+            "Back Color": "255,255,255",
             "Transparent": "100%",
             "Center X": "50%",
             "Center Y": "50%",
@@ -36,66 +36,47 @@ class ImageGeneral(QWidget):
         self.mirrorLR = QCheckBox("Mirror left/right")
 
         # Rotate
-        self.rotate = VarComboBox()
+        self.rotate = VarComboBox(True)
+        self.rotate.addItems(("0", "90", "180", "270", "360"))
+        self.rotate.setReg(VarComboBox.Integer)
 
         # 拉伸模式
         self.stretch = QCheckBox("Stretch")
         self.stretch_mode = VarComboBox()
+        self.stretch_mode.addItems(("Both", "LeftRight", "UpDown"))
 
         # 背景色、透明度
-        self.transparent = VarComboBox()
+        self.transparent = VarComboBox(True)
+        self.transparent.addItems(("0%", "25%", "50%", "75%", "100%"))
+        self.transparent.setCurrentText("100%")
+        self.transparent.setReg(VarComboBox.Percentage)
 
-        self.x_pos = VarComboBox()
-        self.y_pos = VarComboBox()
-        self._width = VarComboBox()
-        self._height = VarComboBox()
+        self.x_pos = VarLineEdit()
+        self.x_pos.setReg(VarLineEdit.Integer)
+        self.y_pos = VarLineEdit()
+        self.y_pos.setReg(VarLineEdit.Integer)
+        self._width = VarComboBox(True)
+        self._width.addItems(("25%", "50%", "75%", "100%"))
+        self._width.setCurrentText("100%")
+        self._width.setReg(r"\d+%?")
+        self._height = VarComboBox(True)
+        self._height.addItems(("25%", "50%", "75%", "100%"))
+        self._height.setCurrentText("100%")
+        self._height.setReg(r"\d+%?")
 
         self.setGeneral()
 
     def setGeneral(self):
-        self.stretch_mode.addItems(("Both", "LeftRight", "UpDown"))
-
-        self.rotate.addItems(("0", "90", "180", "270", "360"))
-        self.rotate.setEditable(True)
-        self.rotate.setReg(r"\d+|\d+\.\d+")
-
-        self.transparent.addItems(("0%", "25%", "50%", "75%", "100%"))
-        self.transparent.setCurrentText("100%")
-        self.transparent.setEditable(True)
-        self.transparent.setReg(r"\d+%?|\d+\.\d+%?")
-
-        self.x_pos.addItems(("25%", "50%", "75%", "100%"))
-        self.x_pos.setCurrentText("50%")
-        self.x_pos.setEditable(True)
-        self.x_pos.setReg(r"\d+%?")
-
-        self.y_pos.addItems(("25%", "50%", "75%", "100%"))
-        self.y_pos.setCurrentText("50%")
-        self.y_pos.setEditable(True)
-        self.y_pos.setReg(r"\d+%?")
-
-        self._width.addItems(("25%", "50%", "75%", "100%"))
-        self._width.setCurrentText("100%")
-        self._width.setEditable(True)
-        self._width.setReg(r"\d+%?")
-
-        self._height.addItems(("25%", "50%", "75%", "100%"))
-        self._height.setCurrentText("100%")
-        self._height.setEditable(True)
-        self._height.setReg(r"\d+%?")
-
         # 打开文件按钮布局
         group1 = QGroupBox("File && Effects")
 
         layout1 = QGridLayout()
-
         layout1.addWidget(QLabel("File Name"), 0, 0, 1, 1)
         layout1.addWidget(self.file_name, 0, 1, 1, 4)
         layout1.addWidget(self.open_bt, 0, 5, 1, 1)
 
         self.stretch.stateChanged.connect(self.stretchChecked)
         self.stretch_mode.setEnabled(False)
-
         layout1.addWidget(self.mirrorUD, 1, 0)
         layout1.setColumnMinimumWidth(1, 40)
 
@@ -111,14 +92,11 @@ class ImageGeneral(QWidget):
 
         layout1.addWidget(l_tra, 2, 2)
         layout1.addWidget(self.transparent, 2, 3, 1, 2)
-
         layout1.addWidget(self.stretch, 3, 0)
         layout1.addWidget(self.stretch_mode, 3, 2)
-
         group1.setLayout(layout1)
 
         group2 = QGroupBox("Geometry")
-
         layout2 = QGridLayout()
         layout2.setVerticalSpacing(10)
 
@@ -132,22 +110,18 @@ class ImageGeneral(QWidget):
         l_width.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_height.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        layout2.addWidget(l_x_pos, 0, 0, 1, 1)
+        layout2.addWidget(l_x_pos, 0, 0)
         layout2.addWidget(self.x_pos, 0, 1)
+        layout2.addWidget(l_y_pos, 0, 2)
+        layout2.addWidget(self.y_pos, 0, 3)
 
-        layout2.addWidget(l_width, 0, 2, 1, 2)
-        layout2.addWidget(self._width, 0, 4)
-
-        layout2.addWidget(l_y_pos, 1, 0, 1, 1)
-        layout2.addWidget(self.y_pos, 1, 1)
-
-        layout2.addWidget(l_height, 1, 2, 1, 2)
-        layout2.addWidget(self._height, 1, 4)
-
+        layout2.addWidget(l_width, 1, 0)
+        layout2.addWidget(self._width, 1, 1)
+        layout2.addWidget(l_height, 1, 2)
+        layout2.addWidget(self._height, 1, 3)
         group2.setLayout(layout2)
 
         layout = QVBoxLayout()
-
         layout.addWidget(group1)
         layout.addWidget(group2)
         self.setLayout(layout)
@@ -187,8 +161,8 @@ class ImageGeneral(QWidget):
         self.default_properties["Stretch"] = bool(self.stretch.checkState())
         self.default_properties["Stretch Mode"] = self.stretch_mode.currentText()
         self.default_properties["Transparent"] = self.transparent.currentText()
-        self.default_properties["Center X"] = self.x_pos.currentText()
-        self.default_properties["Center Y"] = self.y_pos.currentText()
+        self.default_properties["Center X"] = self.x_pos.text()
+        self.default_properties["Center Y"] = self.y_pos.text()
         self.default_properties["Width"] = self._width.currentText()
         self.default_properties["Height"] = self._height.currentText()
 
@@ -197,10 +171,10 @@ class ImageGeneral(QWidget):
         self.loadSetting()
 
     def setPosition(self, x, y):
-        if not self.x_pos.currentText().startswith("["):
-            self.x_pos.setCurrentText(str(int(x)))
-        if not self.y_pos.currentText().startswith("["):
-            self.y_pos.setCurrentText(str(int(y)))
+        if not self.x_pos.text().startswith("["):
+            self.x_pos.setText(str(int(x)))
+        if not self.y_pos.text().startswith("["):
+            self.y_pos.setText(str(int(y)))
 
     def loadSetting(self):
         self.file_name.setText(self.default_properties["File Name"])
@@ -210,7 +184,7 @@ class ImageGeneral(QWidget):
         self.stretch.setChecked(self.default_properties["Stretch"])
         self.stretch_mode.setCurrentText(self.default_properties["Stretch Mode"])
         self.transparent.setCurrentText(self.default_properties["Transparent"])
-        self.x_pos.setCurrentText(self.default_properties["Center X"])
-        self.y_pos.setCurrentText(self.default_properties["Center Y"])
+        self.x_pos.setText(self.default_properties["Center X"])
+        self.y_pos.setText(self.default_properties["Center Y"])
         self._width.setCurrentText(self.default_properties["Width"])
         self._height.setCurrentText(self.default_properties["Height"])
