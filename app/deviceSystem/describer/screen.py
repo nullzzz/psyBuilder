@@ -14,6 +14,8 @@ class Screen(Shower):
         self.bg_color = ColComboBox()
         self.mu_sample = QLineEdit()
         self.resolution = QLineEdit("auto")
+        self.resolution.setValidator(QRegExpValidator(QRegExp(r"\d+x\d+|auto")))
+        self.resolution.setToolTip("such as: 1920x1080")
         self.refresh_rate = QLineEdit("auto")
         self.physic_size = QLineEdit()
         self.viewing_distance = QLineEdit()
@@ -22,6 +24,14 @@ class Screen(Shower):
         self.mu_sample.setValidator(QRegExpValidator(QRegExp(r"\d+")))
         self.physic_size.setValidator(QRegExpValidator(QRegExp(r"\d+\.\d+|\d+\.\d+x\d+\.\d+|NaN")))
         self.viewing_distance.setValidator(QRegExpValidator(QRegExp(r"\d+\.\d+|\d+\.\d+,\d+\.\d+|NaN")))
+
+        self.index_tip.setHtml("About parameters:"
+                               "<br><br><b>Index</b>: a index value returned by Screen('screens') in MATLAB"
+                               "<br><br><b>Resolution</b>: WidthxHeight e.g., 1024x768"
+                               "<br><br><b>physic size</b> (for Eyetracker Only) mm: WdithxHeight, e.g., 30x50"
+                               "<br><br><b>Viewing distance</b> (for Eyetracker Only) mm: e.g., 50"
+                               "<br><br><b>!x is the char before y</b>")
+
         self.setUI()
 
     def setUI(self):
@@ -53,12 +63,6 @@ class Screen(Shower):
         self.refresh_rate.setText(info.get("Refresh Rate", "auto"))
         self.physic_size.setText(info.get("Physic Size", ""))
         self.viewing_distance.setText(info.get("Viewing Distance", ""))
-        self.index_tip.setHtml("About parameters:"
-                               "<br><br><b>Index</b>: a index value returned by Screen('screens') in MATLAB"
-                               "<br><br><b>Resolution</b>: WidthxHeight e.g., 1024x768"
-                               "<br><br><b>physic size</b> (for Eyetracker Only) mm: WdithxHeight, e.g., 30x50"
-                               "<br><br><b>Viewing distance</b> (for Eyetracker Only) mm: e.g., 50"
-                               "<br><br><b>!x is the char before y</b>")
 
     def getInfo(self):
         properties: dict = {

@@ -1,5 +1,5 @@
 import numpy as np
-from PyQt5.QtCore import QRectF, QPoint, Qt
+from PyQt5.QtCore import QRectF, Qt
 from PyQt5.QtGui import QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPolygonItem
 

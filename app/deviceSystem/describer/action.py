@@ -19,7 +19,9 @@ class Action(Shower):
         for k, v in Action.simple_info.items():
             if k.startswith(Info.DEV_TRACKER):
                 self.tracker.addItem(v)
-
+        self.index_tip.setHtml("About eye action:"
+                               "<br><br><br>Currently, only Eyelink action is supported, "
+                               "because we only have the EYELINK device for debug.")
         self.setUI()
 
         self.using_tracker_id = ""
@@ -42,9 +44,6 @@ class Action(Shower):
         super().describe(info)
         tracker_name = info.get("Tracker Name", "")
         self.tracker.setCurrentText(tracker_name)
-
-        self.index_tip.setHtml("About eye action:"
-                               "<br><br><br>Currently, only Eyelink action is supported, because we only have the EYELINK device for debug.")
 
     def getInfo(self):
         properties: dict = {

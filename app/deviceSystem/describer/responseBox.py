@@ -9,6 +9,13 @@ class ResponseBox(Shower):
         super(ResponseBox, self).__init__(parent=parent)
         self.device_index = QLineEdit()
         self.device_index.textEdited.connect(self.showAddressTip)
+
+        self.index_tip.setHtml("About Device Port:"
+                               "<br>Currently, only Cedrus's response box devices are supported, because we only have this device"
+                               "<br><br><b>windows: </b> serial 'port' name: e.g., <br>'COM2' for 'auto'"
+                               "<br><br><b>Mac OS: </b> serial 'port' name: e.g., <br>'/dev/cu.usbserial-FTDI125ZX9' for 'auto'"
+                               "<br><br><b>Linux: </b> serial 'port' name: e.g., <br>'/dev/ttyS0' for 'auto'"
+                               )
         self.setUI()
 
     def setUI(self):
@@ -28,13 +35,6 @@ class ResponseBox(Shower):
     def describe(self, info: dict):
         self.device_index.setText(info.get("Device Index", "0"))
         super().describe(info)
-
-        self.index_tip.setHtml("About Device Port:"
-                               "<br>Currently, only Cedrus's response box devices are supported, because we only have this device"
-                               "<br><br><b>windows: </b> serial 'port' name: e.g., <br>'COM2' for 'auto'"
-                               "<br><br><b>Mac OS: </b> serial 'port' name: e.g., <br>'/dev/cu.usbserial-FTDI125ZX9' for 'auto'"
-                               "<br><br><b>Linux: </b> serial 'port' name: e.g., <br>'/dev/ttyS0' for 'auto'"
-                               )
 
     def getInfo(self):
         properties: dict = {

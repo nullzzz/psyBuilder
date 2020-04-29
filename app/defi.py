@@ -1,3 +1,9 @@
+# device type
+INPUT_DEVICE = 0
+OUTPUT_DEVICE = 1
+QUEST_DEVICE = 2
+TRACKER_DEVICE = 3
+
 # widget type
 CYCLE = "Cycle"
 IMAGE = "Image"

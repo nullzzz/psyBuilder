@@ -10,12 +10,10 @@ class ImageContainer(QFrame):
         self.pix = None
 
         self.rotate = 0
-
         self.cx = 960
         self.cy = 540
 
         self.back_color: QColor = QColor(Qt.transparent)
-
         self.border_color: QColor = QColor(Qt.transparent)
         self.border_width = 0
 
@@ -38,7 +36,7 @@ class ImageContainer(QFrame):
             painter = QPainter(self)
             painter.drawText(100, 100, "Your image will displayed here.")
         else:
-            palette = self.palette()
+            palette: QPalette = self.palette()
             palette.setColor(QPalette.Background, self.back_color)
             self.setPalette(palette)
 

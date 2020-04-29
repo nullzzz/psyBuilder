@@ -26,14 +26,14 @@ class RespTrigger(QWidget):
     def setUI(self):
         layout = QGridLayout()
         layout.addWidget(QLabel("Resp Trigger"), 0, 0, 1, 2)
-        layout.addWidget(QLabel("Right:"), 1, 0)
-        layout.addWidget(self.right, 1, 1)
-        layout.addWidget(QLabel("Wrong:"), 1, 2)
-        layout.addWidget(self.wrong, 1, 3)
-        layout.addWidget(QLabel("No resp:"), 1, 4)
-        layout.addWidget(self.ignore, 1, 5)
-        layout.addWidget(QLabel("Device:"), 1, 6)
-        layout.addWidget(self.resp_trigger_out, 1, 7)
+        layout.addWidget(QLabel("Right:"), 1, 0, 1, 1)
+        layout.addWidget(self.right, 1, 1, 1, 1)
+        layout.addWidget(QLabel("Wrong:"), 1, 2, 1, 1)
+        layout.addWidget(self.wrong, 1, 3, 1, 1)
+        layout.addWidget(QLabel("No resp:"), 1, 4, 1, 1)
+        layout.addWidget(self.ignore, 1, 5, 1, 1)
+        layout.addWidget(QLabel("Device:"), 1, 6, 1, 1)
+        layout.addWidget(self.resp_trigger_out, 1, 7, 1, 1)
         self.setLayout(layout)
 
     def describe(self, info: dict):
@@ -58,7 +58,6 @@ class RespTrigger(QWidget):
         self.resp_trigger_out.addItems(simple_info.values())
 
         output_name = self.using_output_device.get(self.current_output_device_id, "")
-
         if output_name != "":
             self.resp_trigger_out.setCurrentText(output_name)
         else:
@@ -98,14 +97,14 @@ class EyeAction(QWidget):
     def setUI(self):
         layout = QGridLayout()
         layout.addWidget(QLabel("Eye action correct(gaze area rect)"), 0, 0, 1, 8)
-        layout.addWidget(QLabel("Start:"), 1, 0)
-        layout.addWidget(self.start, 1, 1)
-        layout.addWidget(QLabel("End:"), 1, 2)
-        layout.addWidget(self.end, 1, 3)
-        layout.addWidget(QLabel("Mean:"), 1, 4)
-        layout.addWidget(self.mean, 1, 5)
-        layout.addWidget(QLabel("IsOval:"), 1, 6)
-        layout.addWidget(self.is_oval, 1, 7)
+        layout.addWidget(QLabel("Start:"), 1, 0, 1, 1)
+        layout.addWidget(self.start, 1, 1, 1, 1)
+        layout.addWidget(QLabel("End:"), 1, 2, 1, 1)
+        layout.addWidget(self.end, 1, 3, 1, 1)
+        layout.addWidget(QLabel("Mean:"), 1, 4, 1, 1)
+        layout.addWidget(self.mean, 1, 5, 1, 1)
+        layout.addWidget(QLabel("IsOval:"), 1, 6, 1, 1)
+        layout.addWidget(self.is_oval, 1, 7, 1, 1)
         self.setLayout(layout)
 
     def describe(self, info: dict):
@@ -137,18 +136,14 @@ class EyeAction(QWidget):
 
 
 class RespInfo(QWidget):
-
     def __init__(self, parent=None):
         super(RespInfo, self).__init__(parent=parent)
 
         self.device_label = QLabel()
-
         self.allowable = VarLineEdit()
-
         self.correct = VarLineEdit()
 
-        self.RT_window = VarComboBox()
-        self.RT_window.setEditable(True)
+        self.RT_window = VarComboBox(True)
         self.RT_window.addItems(["(Same as duration)", "(End of timeline)", "1000", "2000", "3000", "4000", "5000"])
 
         self.end_action = VarComboBox()

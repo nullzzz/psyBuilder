@@ -29,11 +29,6 @@ class Info(object):
     QUEST_DEVICE_INFO: dict = {}
     TRACKER_DEVICE_INFO: dict = {}
 
-    INPUT_DEVICE = 0
-    OUTPUT_DEVICE = 1
-    QUEST_DEVICE = 2
-    TRACKER_DEVICE = 3
-
     # 当前导入导出文件名
     FILE_NAME = ""
     FILE_DIRECTORY = ""

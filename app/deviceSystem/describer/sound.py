@@ -14,6 +14,10 @@ class Sound(Shower):
         self.device_index.setValidator(QRegExpValidator(QRegExp(r"\d+|auto")))
         self.sampling_rate.setValidator(QRegExpValidator(QRegExp(r"\d+|auto")))
 
+        self.index_tip.setHtml("About Device Index:"
+                               "<br>any sound device index returned by PsychPortAudio('GetDevices') in MATLAB"
+                               f"<br><br><b>'auto':</b>automatically get an optimized sound device index"
+                               )
         self.setUI()
 
     def setUI(self):
@@ -35,11 +39,6 @@ class Sound(Shower):
         super().describe(info)
         self.device_index.setText(info.get("Device Index", "0"))
         self.sampling_rate.setText(info.get("Sampling Rate", "auto"))
-
-        self.index_tip.setHtml("About Device Index:"
-                               "<br>any sound device index returned by PsychPortAudio('GetDevices') in MATLAB"
-                               f"<br><br><b>'auto':</b>automatically get an optimized sound device index"
-                               )
 
     def getInfo(self):
         properties: dict = {

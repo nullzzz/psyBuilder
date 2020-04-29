@@ -13,7 +13,7 @@ class VarComboBox(QComboBox):
 
     Attribute = r"^\[[_\d\.\w]+\]$"
     Float = r"^(-?\d+)(\.\d+)?$"
-    Integer = r"^\d+$"
+    Integer = r"^-?\d+$"
     Percentage = r"^(100|[1-9]?\d?)%$|0$"
 
     def __init__(self, editable: bool = False, parent=None):

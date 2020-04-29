@@ -66,7 +66,6 @@ class Quest(QWidget):
 
     def describe(self, info: dict):
         device_name = info.get("Device Name")
-
         self.device_name.setText(device_name)
         self.guess_threshold.setText(info.get("Guess Threshold", ""))
         self.std_dev.setText(info.get("Std. Dev.", ""))

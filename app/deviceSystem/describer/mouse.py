@@ -44,14 +44,14 @@ class Mouse(Shower):
         else:
             self.is_kb_queue.setCheckState(0)
 
-        gpOrderNum = int(info.get("Device Id").split(".")[1]) + 1
+        order_num = int(info.get("Device Id").split(".")[1]) + 1
 
-        if gpOrderNum == 1:
+        if order_num == 1:
             gpOrderStr = 'first'
-        elif gpOrderNum == 2:
+        elif order_num == 2:
             gpOrderStr = 'second'
         else:
-            gpOrderStr = f"{gpOrderNum}th"
+            gpOrderStr = f"{order_num}th"
 
         self.index_tip.setHtml("About Device Index('auto' or an int):"
                                "<br><b>int: </b> any mouse index (returned by GetMouseIndices in MATLAB)"

@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QLis
 from app.deviceSystem.describer.control import Describer
 from app.deviceSystem.device.control import DeviceHome, Device
 from app.func import Func
+from app.defi import *
 from app.info import Info
 
 
@@ -39,7 +40,6 @@ class RX(QWidget):
         # 已选择设备
         self.device_home = DeviceHome()
         self.device_home.itemDoubleClicked.connect(self.rename)
-        self.device_home.itemDoubleClick.connect(self.rename)
         self.device_home.deviceChanged.connect(self.changeItem)
         self.device_home.deviceDeleted.connect(self.changeItem)
 
@@ -50,26 +50,26 @@ class RX(QWidget):
         self.describer.default_properties = self.default_properties
 
         # device_list是写死的
-        if device_type == Info.OUTPUT_DEVICE:
+        if device_type == OUTPUT_DEVICE:
             # default device
-            self.device_home.createDevice(Info.DEV_SCREEN)
+            self.device_home.createDevice(DEV_SCREEN)
             Info.OUTPUT_DEVICE_INFO = self.default_properties
-            self.devices = (Info.DEV_SERIAL_PORT, Info.DEV_PARALLEL_PORT, Info.DEV_NETWORK_PORT, Info.DEV_SCREEN, Info.DEV_SOUND)
+            self.devices = (DEV_SERIAL_PORT, DEV_PARALLEL_PORT, DEV_NETWORK_PORT, DEV_SCREEN, DEV_SOUND)
             self.setWindowTitle("Output Devices")
-        elif device_type == Info.INPUT_DEVICE:
+        elif device_type == INPUT_DEVICE:
             # default devices
-            self.device_home.createDevice(Info.DEV_MOUSE)
-            self.device_home.createDevice(Info.DEV_KEYBOARD)
+            self.device_home.createDevice(DEV_MOUSE)
+            self.device_home.createDevice(DEV_KEYBOARD)
             Info.INPUT_DEVICE_INFO = self.default_properties
-            self.devices = (Info.DEV_MOUSE, Info.DEV_KEYBOARD, Info.DEV_RESPONSE_BOX, Info.DEV_GAMEPAD, Info.DEV_EYE_ACTION)
+            self.devices = (DEV_MOUSE, DEV_KEYBOARD, DEV_RESPONSE_BOX, DEV_GAMEPAD, DEV_EYE_ACTION)
             self.setWindowTitle("Input Devices")
-        elif device_type == Info.QUEST_DEVICE:
+        elif device_type == QUEST_DEVICE:
             Info.QUEST_DEVICE_INFO = self.default_properties
-            self.devices = (Info.DEV_QUEST,)
+            self.devices = (DEV_QUEST,)
             self.setWindowTitle("Quest Devices")
-        elif device_type == Info.TRACKER_DEVICE:
+        elif device_type == TRACKER_DEVICE:
             Info.TRACKER_DEVICE_INFO = self.default_properties
-            self.devices = (Info.DEV_TRACKER,)
+            self.devices = (DEV_TRACKER,)
             self.setWindowTitle("Tracker Devices")
         self.setWindowIcon(QIcon(Func.getImage("icon.png")))
         for device in self.devices:

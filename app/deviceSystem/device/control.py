@@ -6,7 +6,6 @@ from app.deviceSystem.device import *
 
 
 class DeviceHome(QListWidget):
-    itemDoubleClick = pyqtSignal(QListWidgetItem)
     deviceChanged = pyqtSignal(str, dict)
     deviceDeleted = pyqtSignal(str, dict)
 
@@ -67,7 +66,7 @@ class DeviceHome(QListWidget):
         self.customContextMenuRequested.connect(self.showContextMenu)
         self.contextMenu = QMenu(self)
         self.rename_action = self.contextMenu.addAction("rename")
-        self.rename_action.triggered.connect(lambda: self.itemDoubleClick.emit(self.currentItem()))
+        self.rename_action.triggered.connect(lambda: self.itemDoubleClicked.emit(self.currentItem()))
 
         self.delete_action = self.contextMenu.addAction("delete")
         self.delete_action.triggered.connect(lambda: self.deleteDevice(index=-1))
