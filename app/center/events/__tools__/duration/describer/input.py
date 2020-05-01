@@ -147,7 +147,7 @@ class RespInfo(QWidget):
         self.RT_window.addItems(["(Same as duration)", "(End of timeline)", "1000", "2000", "3000", "4000", "5000"])
 
         self.end_action = VarComboBox()
-        self.end_action.addItems(["Terminate", "(None)"])
+        self.end_action.addItems(["Terminate", "Terminate Till Release", "(None)"])
         self.setUI()
 
     def setUI(self):
