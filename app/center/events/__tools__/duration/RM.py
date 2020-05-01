@@ -7,7 +7,7 @@ from app.center.events.__tools__.duration.device.control import DeviceHome
 
 
 class BiggerUP(QGroupBox):
-    deviceChanged = pyqtSignal(dict)
+    deviceChanged = pyqtSignal(list)
 
     def __init__(self, title: str = "Stim Trigger", parent=None):
         super(BiggerUP, self).__init__(title, parent)
@@ -59,12 +59,12 @@ class BiggerUP(QGroupBox):
     def add(self, device_id, device_name):
         self.home.createDevice(device_id, device_name)
         self.del_bt.setEnabled(self.home.count() > 0)
-        self.deviceChanged.emit(self.home.getDeviceInfo())
+        self.deviceChanged.emit(self.home.getDeviceList())
 
     def delete(self):
         self.home.deleteDevice()
         self.del_bt.setEnabled(self.home.count() > 0)
-        self.deviceChanged.emit(self.home.getDeviceInfo())
+        self.deviceChanged.emit(self.home.getDeviceList())
 
     def updateInfo(self):
         self.describer.updateInfo()
@@ -118,7 +118,7 @@ class BiggerDown(QGroupBox):
         self.home.deleteDevice()
         self.del_bt.setEnabled(self.home.count() > 0)
 
-    def updateExternalInfo(self, output_device: dict):
+    def updateExternalInfo(self, output_device: list):
         self.resp_trigger.updateSimpleInfo(output_device)
 
     def updateInfo(self):

@@ -62,13 +62,13 @@ class Describer(QStackedWidget):
         for k, v in self.id_widget.items():
             self.default_properties[k] = v.getInfo()
             self.default_properties[k]["Device Id"] = k
-            self.default_properties[k]["Device Type"] = k.split(".")[0]
+            self.default_properties[k]["Device Type"] = k.split('.')[0]
 
     def getInfo(self):
         self.updateInfo()
         return self.default_properties
 
-    def updateSimpleInfo(self, info: dict):
+    def updateSimpleInfo(self, info: list):
         RespTrigger.OUTPUT_DEVICE = info
         for k, v in self.id_widget.items():
             v.updateExternalDeviceInformation(info)

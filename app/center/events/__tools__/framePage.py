@@ -76,7 +76,7 @@ class FramePage(QWidget):
         layout1.addWidget(self.height, 1, 3)
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("Border & Background")
+        group2 = QGroupBox("Border && Background")
         layout2 = QFormLayout()
 
         layout2.addRow(l45, self.enable)
