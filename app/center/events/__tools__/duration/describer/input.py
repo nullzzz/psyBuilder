@@ -6,7 +6,7 @@ from lib import VarLineEdit, VarComboBox
 
 
 class RespTrigger(QWidget):
-    OUTPUT_DEVICE = {}
+    OUTPUT_DEVICE = []
 
     def __init__(self, parent=None):
         super(RespTrigger, self).__init__(parent=parent)
@@ -19,7 +19,7 @@ class RespTrigger(QWidget):
         self.resp_trigger_out = QComboBox()
         self.resp_trigger_out.currentTextChanged.connect(self.changeOutput)
         self.resp_trigger_out.addItem("none")
-        self.resp_trigger_out.addItems(RespTrigger.OUTPUT_DEVICE.values())
+        self.resp_trigger_out.addItems(RespTrigger.OUTPUT_DEVICE)
 
         self.setUI()
 
@@ -51,11 +51,11 @@ class RespTrigger(QWidget):
         self.wrong.setCompleter(QCompleter(attributes))
         self.ignore.setCompleter(QCompleter(attributes))
 
-    def updateExternalDeviceInformation(self, simple_info: dict):
+    def updateExternalDeviceInformation(self, simple_info: list):
         self.using_output_device.clear()
         self.resp_trigger_out.clear()
         self.resp_trigger_out.addItem("none")
-        self.resp_trigger_out.addItems(simple_info.values())
+        self.resp_trigger_out.addItems(simple_info)
 
         output_name = self.using_output_device.get(self.current_output_device_id, "")
         if output_name != "":
