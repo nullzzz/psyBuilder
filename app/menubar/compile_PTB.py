@@ -2191,8 +2191,6 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
 
             iRespDev += 1
 
-
-
         if len(queueDevIdxValueStr) > 0:
             printAutoInd(f, "refreshKbQueue_bcl(beCheckedRespDevs,{0});", queueDevIdxValueStr)
 
