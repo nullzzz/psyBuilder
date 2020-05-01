@@ -233,9 +233,18 @@ def isRgbaStr(inputStr):
     return isRgbaFormat
 
 
+def isRectStr(inputStr):
+    isRectFormat = re.fullmatch(r"^\d+,\d+,\d+,\d+$", inputStr)
+    return isRectFormat
+
+
 def isRgbaWithBracketsStr(inputStr):
     isRgbaFormat = re.fullmatch(r"^\[\d+,\d+,\d+,\d+\]$", inputStr)
     return isRgbaFormat
+
+def isRectWithBracketsStr(inputStr):
+    isRectFormat = re.fullmatch(r"^\[\d+,\d+,\d+,\d+\]$", inputStr)
+    return isRectFormat
 
 
 def isRgbWithBracketsStr(inputStr):
@@ -272,15 +281,17 @@ def isPercentStr(inputStr):
 
 
 def isRefStr(inputStr):
-    if isinstance(inputStr, str):
+    isRef = False
 
-        if isRgbWithBracketsStr(inputStr):
-            return False
+    if isinstance(inputStr, str):
+        # if isRgbWithBracketsStr(inputStr):
+        #     return False
+
         # special chars lose their special meaning inside sets [], so . inside [] just means the char '.'
         if re.fullmatch(r'\[[A-Za-z]+[a-zA-Z._0-9]*\]', inputStr):
-            return True
+            isRef = True
 
-    return False
+    return isRef
 
 
 def isContainCycleTL(widgetId) -> bool:
@@ -2056,6 +2067,18 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
 
             # get No Resp
             noRespStr = dataStrConvert(*getRefValue(cWidget, cProperties['No Resp'], attributesSetDict), True)
+
+            # get start rect
+            startRectStr = dataStrConvert(*getRefValue(cWidget, cProperties['Start'], attributesSetDict), True)
+
+            # get end rect
+            startRectStr = dataStrConvert(*getRefValue(cWidget, cProperties['End'], attributesSetDict), True)
+
+            # get mean rect
+            meanRectStr = dataStrConvert(*getRefValue(cWidget, cProperties['End'], attributesSetDict), True)
+
+            # get os oval
+            isOvalStr = parseBooleanStr(cProperties['Is Oval'])
 
             # get resp output dev name
             respOutDevNameStr, isRefValue = getRefValue(cWidget, cProperties['Output Device'], attributesSetDict)
