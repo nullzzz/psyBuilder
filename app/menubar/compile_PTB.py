@@ -500,6 +500,21 @@ def updateEnableKbKeysList(allowKeyStr):
             enabledKBKeysSet.add(allowKeyStr)
 
 
+def parseRectStr(inputStr:str, isRef=False) -> str:
+    if isinstance(inputStr, str):
+        if not isRef:
+            if isRectStr(inputStr):
+                inputStr = addSquBrackets(inputStr)
+            elif isRectWithBracketsStr(inputStr):
+                pass
+            elif len(inputStr) == 0:
+                inputStr = addSquBrackets(inputStr)
+            else:
+                throwCompileErrorInfo(f"the value {inputStr} is not a rect format in PTB ('x0,y0,x1,y1' or '[x0,y0,x1,y1]')!")
+
+    return inputStr
+
+
 def parseBooleanStr(inputStr, isRef=False):
     if isinstance(inputStr, str):
         if not isRef:
@@ -1161,6 +1176,10 @@ def getSpecialRespsFormatAtts(cInputDevices, cSpecialFormatVarDict):
             updateSpFormatVarDict(cRespProperties['Correct'], 'noKbDevCorrectResp', cSpecialFormatVarDict)
             updateSpFormatVarDict(cRespProperties['Allowable'], 'noKbAllowKeys', cSpecialFormatVarDict)
 
+        updateSpFormatVarDict(cRespProperties['Start'], 'startRect', cSpecialFormatVarDict)
+        updateSpFormatVarDict(cRespProperties['End'], 'endRect', cSpecialFormatVarDict)
+        updateSpFormatVarDict(cRespProperties['Mean'], 'meanRect', cSpecialFormatVarDict)
+
 
 def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: dict = None) -> dict:
     """
@@ -1638,6 +1657,18 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
                     cValue = parseAspectRationStr(cValue, isRefValue)
                     cRowDict[key] = cValue
 
+                elif 'startRect' == spFormatVarDict[cKeyAttrName]:
+                    cValue = parseRectStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif 'endRect' == spFormatVarDict[cKeyAttrName]:
+                    cValue = parseRectStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif 'meanRect' == spFormatVarDict[cKeyAttrName]:
+                    cValue = parseRectStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
             #     TO BE CONTINUING... FOR ALL OTHER Special Types
             # --------------------------------------\
 
@@ -2069,13 +2100,13 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
             noRespStr = dataStrConvert(*getRefValue(cWidget, cProperties['No Resp'], attributesSetDict), True)
 
             # get start rect
-            startRectStr = dataStrConvert(*getRefValue(cWidget, cProperties['Start'], attributesSetDict), True)
+            startRectStr = parseRectStr(*getRefValue(cWidget, cProperties['Start'], attributesSetDict))
 
             # get end rect
-            startRectStr = dataStrConvert(*getRefValue(cWidget, cProperties['End'], attributesSetDict), True)
+            endRectStr = parseRectStr(*getRefValue(cWidget, cProperties['End'], attributesSetDict))
 
             # get mean rect
-            meanRectStr = dataStrConvert(*getRefValue(cWidget, cProperties['End'], attributesSetDict), True)
+            meanRectStr = parseRectStr(*getRefValue(cWidget, cProperties['Mean'], attributesSetDict))
 
             # get os oval
             isOvalStr = parseBooleanStr(cProperties['Is Oval'])
@@ -2083,7 +2114,7 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
             # get resp output dev name
             respOutDevNameStr, isRefValue = getRefValue(cWidget, cProperties['Output Device'], attributesSetDict)
 
-            devIndexesVarName = None
+            # devIndexesVarName = None
             # get dev type and devIndexesVarName
             cInputDevIndexValueStr, cIsQueue, cDevType = inputDevNameIdxDict[cProperties['Device Name']]
 
@@ -2103,35 +2134,64 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
                 else:
                     needTobeRetStr = 'false'
 
-            printAutoInd(f,
-                         "cRespDevs({0}) = struct("
-                         "'beUpdatedVar',sprintf('{1}(%d)',{2}),"
-                         "'allowAble',{3},"
-                         "'corResp',{4},...",
-                         iRespDev, cWidgetName, cOpRowIdxStr, allowableKeysStr, corRespStr)
+            beUpdatedVarStr = f"sprintf('{cWidgetName}(%d)',{cOpRowIdxStr})"
+            startTimeStr = f"lastScrOnsettime({cWinIdx})"
 
             printAutoInd(f,
-                         "'rtWindow',{0},"
-                         "'endAction',{1},"
-                         "'type',{2},"
-                         "'index',{3},"
-                         "'isQueue',{4},"
-                         "'startTime',lastScrOnsettime({5}),...",
-                         rtWindowStr, endActionStr, cDevType, cInputDevIndexValueStr, cIsQueue, cWinIdx)
+                         "cRespDev = makeRespStruct({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19});",
+                         beUpdatedVarStr,         #0 beUpdatedVar
+                         allowableKeysStr,        #1 allowAble
+                         corRespStr,              #2 corResp
+                         rtWindowStr,             #3 rtWindow
+                         endActionStr,            #4 endAction
+                         cDevType,                #5 type
+                         cInputDevIndexValueStr,  #6 index
+                         cIsQueue,                #7 isQueue
+                         startTimeStr,            #8 startTime
+                         'true',                  #9 isOn
+                         needTobeRetStr,          #10 needTobeReset
+                         rightStr,                #11 right
+                         wrongStr,                #12 wrong
+                         noRespStr,               #13 noResp
+                         respCodeDevTypeStr,      #14 respCodeDevType
+                         respCodeDevIdxStr,       #15 respCodeDevIdx
+                         startRectStr,            #16 start
+                         endRectStr,              #17 end
+                         meanRectStr,             #18 mean
+                         isOvalStr,               #19 isOval
+                         )
 
-            printAutoInd(f,
-                         "'isOn',true,"
-                         "'needTobeReset',{0},"  # trigger in this resp dev should be reset back to 0
-                         "'right',{1},"
-                         "'wrong',{2},"
-                         "'noResp',{3},"
-                         "'respCodeDevType',{4},"
-                         "'respCodeDevIdx',{5} );",
-                         needTobeRetStr, rightStr, wrongStr, noRespStr, respCodeDevTypeStr, respCodeDevIdxStr)
+            printAutoInd(f, "beCheckedRespDevs = [beCheckedRespDevs, cRespDev];")
+
+            # printAutoInd(f,
+            #              "cRespDevs({0}) = struct("
+            #              "'beUpdatedVar',sprintf('{1}(%d)',{2}),"
+            #              "'allowAble',{3},"
+            #              "'corResp',{4},...",
+            #              iRespDev, cWidgetName, cOpRowIdxStr, allowableKeysStr, corRespStr)
+            #
+            # printAutoInd(f,
+            #              "'rtWindow',{0},"
+            #              "'endAction',{1},"
+            #              "'type',{2},"
+            #              "'index',{3},"
+            #              "'isQueue',{4},"
+            #              "'startTime',lastScrOnsettime({5}),...",
+            #              rtWindowStr, endActionStr, cDevType, cInputDevIndexValueStr, cIsQueue, cWinIdx)
+            #
+            # printAutoInd(f,
+            #              "'isOn',true,"
+            #              "'needTobeReset',{0},"  # trigger in this resp dev should be reset back to 0
+            #              "'right',{1},"
+            #              "'wrong',{2},"
+            #              "'noResp',{3},"
+            #              "'respCodeDevType',{4},"
+            #              "'respCodeDevIdx',{5} );",
+            #              needTobeRetStr, rightStr, wrongStr, noRespStr, respCodeDevTypeStr, respCodeDevIdxStr)
 
             iRespDev += 1
 
-        printAutoInd(f, f"beCheckedRespDevs = [beCheckedRespDevs, cRespDevs];")
+
 
         if len(queueDevIdxValueStr) > 0:
             printAutoInd(f, "refreshKbQueue_bcl(beCheckedRespDevs,{0});", queueDevIdxValueStr)
