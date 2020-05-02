@@ -41,8 +41,9 @@ class ValidationWindow(QFrame):
         if self.confuse_code != self.local_code and self.local_code != "psy":
         # if self.confuse_code != self.local_code:
             self.tip.setText(f"send the code below to get a validation code<br>"
+                             f"with your full name and institute <br>"
                              f"<b>{self.hard_code}<\b><br>"
-                             f"<a href='mailto:yzhangpsy@suda.edu.cn?Subject=Inquire For Validation Code'> Name:  Institute: ")
+                             f"<a href='mailto:zhangyang873@gmail.com?Subject=Inquire For Validation Code'> zhangyang873@gmail.com")
             # pyperclip.copy(self.hard_code)
             self.show()
         else:

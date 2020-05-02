@@ -96,12 +96,12 @@ class EyeAction(QWidget):
 
     def setUI(self):
         layout = QGridLayout()
-        layout.addWidget(QLabel("Eye action correct(gaze area rect)"), 0, 0, 1, 8)
+        layout.addWidget(QLabel("Gaze Correct ROI (e.g., x0,y0,x1,y1)"), 0, 0, 1, 8)
         layout.addWidget(QLabel("Start:"), 1, 0, 1, 1)
         layout.addWidget(self.start, 1, 1, 1, 1)
-        layout.addWidget(QLabel("End:"), 1, 2, 1, 1)
+        layout.addWidget(QLabel("  End:"), 1, 2, 1, 1)
         layout.addWidget(self.end, 1, 3, 1, 1)
-        layout.addWidget(QLabel("Mean:"), 1, 4, 1, 1)
+        layout.addWidget(QLabel("  Mean:"), 1, 4, 1, 1)
         layout.addWidget(self.mean, 1, 5, 1, 1)
         layout.addWidget(QLabel("IsOval:"), 1, 6, 1, 1)
         layout.addWidget(self.is_oval, 1, 7, 1, 1)
@@ -115,8 +115,11 @@ class EyeAction(QWidget):
         mean = info.get("Mean")
         is_oval = info.get("Is Oval")
         self.start.setText(start)
+        self.start.setToolTip("An rect define by a 1x4 vector(e.g., x0,y0,x1,y1)")
         self.end.setText(end)
+        self.end.setToolTip("An rect define by a 1x4 vector(e.g., x0,y0,x1,y1)")
         self.mean.setText(mean)
+        self.mean.setToolTip("An rect define by a 1x4 vector(e.g., x0,y0,x1,y1)")
         self.is_oval.setCurrentText(is_oval)
         self.setEnabled(device_id.startswith(Info.DEV_EYE_ACTION))
 
@@ -144,10 +147,12 @@ class RespInfo(QWidget):
         self.correct = VarLineEdit()
 
         self.RT_window = VarComboBox(True)
+        self.RT_window.setAcceptDrops(False)
         self.RT_window.addItems(["(Same as duration)", "(End of timeline)", "1000", "2000", "3000", "4000", "5000"])
 
         self.end_action = VarComboBox()
-        self.end_action.addItems(["Terminate", "(None)"])
+        self.end_action.setAcceptDrops(False)
+        self.end_action.addItems(["Terminate", "Terminate Till Release", "(None)"])
         self.setUI()
 
     def setUI(self):
