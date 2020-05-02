@@ -39,6 +39,7 @@ class TextItem(QGraphicsTextItem):
         self.default_properties = {
             'Name': self.item_name,
             'Text': 'Hello World',
+            "Html": "",
             'Z': self.zValue(),
             'X': 1,
             'Y': 1,
@@ -78,6 +79,7 @@ class TextItem(QGraphicsTextItem):
         self.default_properties["X"] = self.scenePos().x()
         self.default_properties["Y"] = self.scenePos().y()
         self.default_properties["Z"] = self.zValue()
+        self.default_properties["Html"] = self.toHtml()
 
     def changeSomething(self):
         __lx = self.properties.get("Left X")
@@ -154,6 +156,7 @@ class TextItem(QGraphicsTextItem):
         self.default_properties["X"] = properties["X"]
         self.default_properties["Y"] = properties["Y"]
         self.default_properties["Z"] = properties["Z"]
+        self.default_properties["Html"] = properties["Html"]
         self.loadSetting()
 
     def setPosition(self):
@@ -163,8 +166,10 @@ class TextItem(QGraphicsTextItem):
         x = self.default_properties.get("X", 0)
         y = self.default_properties.get("Y", 0)
         z = self.default_properties.get("Z", 0)
+        html = self.default_properties.get("Html", "")
         self.setPos(x, y)
         self.setZValue(z)
+        self.setHtml(html)
 
     def getInfo(self):
         self.updateInfo()

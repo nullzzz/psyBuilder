@@ -1,5 +1,7 @@
+import datetime
+
 from PyQt5.QtCore import pyqtSignal, Qt, QLineF, QPointF, QRectF
-from PyQt5.QtGui import QPen, QTransform, QColor
+from PyQt5.QtGui import QPen, QTransform, QColor, QImage, QPainter
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem, QGraphicsRectItem
 
 from app.defi import *
@@ -20,9 +22,9 @@ class Scene(QGraphicsScene):
         self.line = None
         self.lasso = None
 
-        self.line_color = Qt.black
+        self.line_color = QColor(Qt.black)
         self.fill_color = Qt.transparent
-        self.border_color = Qt.black
+        self.border_color = QColor(Qt.black)
         self.border_width = 2
 
         self.t = QTransform()
@@ -243,3 +245,16 @@ class Scene(QGraphicsScene):
     def setBorderRect(self, rect: QRectF) -> None:
         self.border: QGraphicsRectItem
         self.border.setRect(QRectF(0, 0, rect.width(), rect.height()))
+
+    def screenshot(self):
+        try:
+            file_name = f"Scene_{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}.png"
+            self.image = QImage(self.border.boundingRect().width(),
+                           self.border.boundingRect().height(),
+                           QImage.Format_ARGB32)
+            painter = QPainter(self.image)
+            painter.setRenderHint(QPainter.Antialiasing)
+            self.render(self.painter)
+            self.image.save(file_name)
+        except Exception as e:
+            print(e)

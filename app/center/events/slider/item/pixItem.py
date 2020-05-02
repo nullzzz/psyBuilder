@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt, QPoint
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QPoint, QFileInfo
+from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsItem
 
 from app.func import Func
@@ -38,12 +38,18 @@ class PixItem(QGraphicsPixmapItem):
             self.pro_window = SoundProperty()
             self.setPixmap(QPixmap(Func.getImage("sound_item.png")).scaled(100, 100))
 
+        self.pix = self.pixmap()
+
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+
+        self.arbitrary_resize = False
+        self.keep_resize = False
+        self.resizing_flag = False
 
         self.properties = self.pro_window.default_properties
         self.default_properties = {
@@ -127,12 +133,14 @@ class PixItem(QGraphicsPixmapItem):
         return new
 
     def changeSomething(self):
-        if self.item_type != self.Sound:
+        w, h = 100, 100
+        if self.item_type != PixItem.Sound:
             __w = self.properties["Width"]
-            w = int(__w) if __w.isdigit() else 100
+            if __w.isdigit():
+                w = int(__w)
             __h = self.properties["Height"]
-            h = int(__h) if __h.isdigit() else 100
-
+            if __h.isdigit():
+                h = int(__h)
             __cx = self.properties["Center X"]
             cx = int(__cx) if __cx.isdigit() else self.scenePos().x()
             __cy = self.properties["Center Y"]
@@ -140,6 +148,78 @@ class PixItem(QGraphicsPixmapItem):
 
             self.setPos(QPoint(cx - (w / 2), cy - (h / 2)))
 
+        if self.item_type == PixItem.Image:
+            file_name = self.properties["File Name"]
+            if QFileInfo(file_name).isFile():
+                img = QImage(file_name)
+                mup = self.properties["Mirror Up/Down"]
+                mlr = self.properties["Mirror Left/Right"]
+
+                it = self.properties["Transparent"]
+                if it.endswith("%"):
+                    img_tra = int(int(it.rstrip("%")) / 100 * 255)
+                elif it.isdigit():
+                    img_tra = int(it)
+                else:
+                    img_tra = 255
+                p = QPainter()
+                p.begin(img)
+                p.setCompositionMode(QPainter.CompositionMode_DestinationIn)
+                # todo
+                p.fillRect(img.rect(), QColor(0, 0, 0, img_tra))
+                p.end()
+
+                pix = QPixmap().fromImage(img.mirrored(mlr, mup))
+                is_stretch = self.properties["Stretch"]
+                if is_stretch:
+                    mode = self.pro_window.general.stretch_mode.currentText()
+                    if mode == "Both":
+                        pix = pix.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+                    elif mode == "LeftRight":
+                        pix = pix.scaledToWidth(w, Qt.FastTransformation)
+                    else:
+                        pix = pix.scaledToHeight(h, Qt.FastTransformation)
+                self.setPixmap(pix)
+                self.pix = pix
+
     def setZValue(self, z: float) -> None:
         self.default_properties["Z"] = z
         super(PixItem, self).setZValue(z)
+
+    # ！！！ 别删
+    def mousePressEvent(self, event):
+        if self.item_type == PixItem.Image:
+            if event.button() == Qt.LeftButton and event.modifiers() == Qt.AltModifier:
+                self.arbitrary_resize = True
+                self.setCursor(Qt.SizeAllCursor)
+            elif event.button() == Qt.LeftButton and event.modifiers() == Qt.ShiftModifier:
+                self.keep_resize = True
+                self.setCursor(Qt.SizeAllCursor)
+            else:
+                super(PixItem, self).mousePressEvent(event)
+        else:
+            super(PixItem, self).mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        x = event.pos().x()
+        y = event.pos().y()
+        if self.arbitrary_resize:
+            self.resizing_flag = True
+        if self.keep_resize:
+            self.resizing_flag = True
+            if x > y:
+                x = y
+            else:
+                y = x
+        if self.resizing_flag:
+            self.setPixmap(self.pix.scaled(x, y))
+            self.update()
+        else:
+            super(PixItem, self).mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self.unsetCursor()
+        self.arbitrary_resize = False
+        self.keep_resize = False
+        self.resizing_flag = False
+        super(PixItem, self).mouseReleaseEvent(event)

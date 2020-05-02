@@ -39,14 +39,17 @@ class Slider(TabItemMainWindow):
         self.setUI()
 
     def initMenu(self):
-        open_action = QAction(QIcon(Func.getImage("setting")), "setting", self)
+        open_action = QAction(QIcon(Func.getImage("setting")), "Setting", self)
         open_action.triggered.connect(self.openSettingWindow)
+
+        save_action = QAction(QIcon(r"source\image\screenshot.png"), "Screenshot(beta)", self)
+        save_action.triggered.connect(self.scene.screenshot)
 
         front_action = QAction(QIcon(Func.getImage("sendtoback.png")), "Bring to Front", self)
         front_action.setToolTip("Bring item to front")
         front_action.triggered.connect(self.toFront)
 
-        back_action = QAction(QIcon(Func.getImage("bringtofront.png")), "Sendto & Back", self)
+        back_action = QAction(QIcon(Func.getImage("bringtofront.png")), "Send to Back", self)
         back_action.setToolTip("Send item to back")
         back_action.triggered.connect(self.toBack)
 
@@ -75,6 +78,7 @@ class Slider(TabItemMainWindow):
 
         setting = QToolBar()
         setting.addAction(open_action)
+        setting.addAction(save_action)
         setting.addSeparator()
         setting.addAction(delete_action)
         setting.addAction(copy_action)
