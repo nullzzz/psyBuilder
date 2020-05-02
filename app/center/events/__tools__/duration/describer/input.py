@@ -139,7 +139,7 @@ class EyeAction(QWidget):
 
 
 class RespInfo(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self,isEyeAction=False, parent=None):
         super(RespInfo, self).__init__(parent=parent)
 
         self.device_label = QLabel()
@@ -152,7 +152,11 @@ class RespInfo(QWidget):
 
         self.end_action = VarComboBox()
         self.end_action.setAcceptDrops(False)
-        self.end_action.addItems(["Terminate", "Terminate Till Release", "(None)"])
+
+        if isEyeAction:
+            self.end_action.addItems(["Terminate", "(None)"])
+        else:
+            self.end_action.addItems(["Terminate", "Terminate Till Release", "(None)"])
         self.setUI()
 
     def setUI(self):
