@@ -254,7 +254,7 @@ class Scene(QGraphicsScene):
                            QImage.Format_ARGB32)
             painter = QPainter(self.image)
             painter.setRenderHint(QPainter.Antialiasing)
-            self.render(self.painter)
+            self.render(painter)
             self.image.save(file_name)
         except Exception as e:
             print(e)
