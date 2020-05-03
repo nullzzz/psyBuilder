@@ -811,6 +811,16 @@ def printAutoInd(f, inputStr, *argins):
 
     return
 
+def haveTrackerType(trackerType: str = 'EyeLink') -> bool:
+    eyetracker_devices = Info.TRACKER_DEVICE_INFO
+
+    haveTrackerType = False
+
+    for cEyeTracker, cEyeTrackerProperty in eyetracker_devices.items():
+        if cEyeTrackerProperty.get('Select Tracker Type') == trackerType:
+            haveTrackerType = True
+
+    return haveTrackerType
 
 def getAllEventWidgetsList(includedType: int = 1) -> list:
     """
@@ -3968,7 +3978,12 @@ def compileCode(isDummyCompile):
             globalVarEventStr = ''.join(' ' + cWidgetName for cWidgetName in getAllEventWidgetNamesList(1))
             globalVarAttStr = ''.join(' ' + cAttVarName for cAttVarName in getAllCycleAttVarNameList())
 
-            printAutoInd(f, "global{0}{1} cRespDevStruct\n", globalVarEventStr, globalVarAttStr)
+            isEyelink = haveTrackerType('EyeLink')
+
+            if isEyelink:
+                printAutoInd(f, "global{0}{1} cRespDevStruct tracker2PtbTimeCoefs\n", globalVarEventStr, globalVarAttStr)
+            else:
+                printAutoInd(f, "global{0}{1} cRespDevStruct\n", globalVarEventStr, globalVarAttStr)
 
             # get subject information
         printAutoInd(f, "%===== get subject information =========/", )
@@ -4013,8 +4028,6 @@ def compileCode(isDummyCompile):
         eyetracker_devices = Info.TRACKER_DEVICE_INFO
         quest_devices = Info.QUEST_DEVICE_INFO
 
-        isEyelink = False
-
         if len(eyetracker_devices) == 0:
             pass
         elif len(eyetracker_devices) == 1:
@@ -4023,7 +4036,6 @@ def compileCode(isDummyCompile):
                 cEyeTrackerProperty = eyetracker_devices[cEyeTracker]
 
                 if cEyeTrackerProperty.get('Select Tracker Type') == 'EyeLink':
-                    isEyelink = True
 
                     printAutoInd(f, "%====== define edf filename  ========/")
                     printAutoInd(f, "edfFile = [subInfo.num,'_',subInfo.session,'.edf'];% should be less than 8 chars")
@@ -4424,7 +4436,6 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "Snd('Open', {0})", cSoundIdxStr)
             printAutoInd(f, "end ")
             printAutoInd(f, "% init and send global commands to Eyelink")
-            printAutoInd(f, "global tracker2PtbTimeCoefs")
             printAutoInd(f, "el = initEyelink;\n")
 
         printAutoInd(f, "opRowIdx = 1; % set the output variables row num")
