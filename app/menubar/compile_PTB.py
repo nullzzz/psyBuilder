@@ -4692,7 +4692,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "cRespDevs(iRespDev).checkStatus = 0;")
         printAutoInd(f, "end \n")
 
-        printAutoInd(f, "if cRespDevs(iRespDev).checkStatus")
+        printAutoInd(f, "if cRespDevs(iRespDev).checkStatus == 1")
         printAutoInd(f, "if cRespDevs(iRespDev).isQueue")
         printAutoInd(f, "% excluded the key presses before the onsettime of the current event")
         printAutoInd(f, "cValidRespKeys = keyCode(cRespDevs(iRespDev).allowAble)> cRespDevs(iRespDev).startTime;")
@@ -4704,12 +4704,14 @@ def compileCode(isDummyCompile):
 
         printAutoInd(f, "if cRespDevs(iRespDev).isQueue")
         printAutoInd(f, "cFrame.respOnsettime = min(keyCodes(cRespDevs(iRespDev).allowAble(cValidRespKeys))); % only the first key are valid ")
-        printAutoInd(f, "cFrame.resp          = intersect(find(keyCode),cRespDevs(iRespDev).allowAble(cValidRespKeys));")
         printAutoInd(f, "else")
         printAutoInd(f, "cFrame.respOnsettime = secs;")
-        printAutoInd(f, "cFrame.resp          = find(keyCode);")
+        # printAutoInd(f, "cFrame.resp          = find(keyCode);")
         printAutoInd(f, "end \n")
-        printAutoInd(f, "cFrame.rt = cFrame.respOnsettime - cRespDevs(iRespDev).startTime; \n")
+        printAutoInd(f, "cFrame.resp = intersect(find(keyCode),cRespDevs(iRespDev).allowAble(cValidRespKeys));\n")
+
+        printAutoInd(f, "cFrame.rt = cFrame.respOnsettime - cRespDevs(iRespDev).startTime; ")
+        printAutoInd(f, "cRespDevs(iRespDev).onsettime = cFrame.respOnsettime;\n")
         printAutoInd(f, "if cRespDevs(iRespDev).respCodeDevType == 82 % 82 is Eyelink eye action")
         printAutoInd(f, "cFrame.acc = all(ismember(cRespDevs(iRespDev).resp, cRespDevs(iRespDev).corResp)) && isEyeActionInROIs(fEventOrFirstRelease, cRespDevs(iRespDev));")
         printAutoInd(f, "else ")
@@ -4729,7 +4731,13 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "switch cRespDevs(iRespDev).endAction")
         printAutoInd(f, "case 2")
         printAutoInd(f, "% end action: terminate till release")
-        printAutoInd(f, "cRespDevs(iRespDev).checkStatus = 2;")
+        printAutoInd(f, "cRespDevs(iRespDev).checkStatus = 2;\n")
+        printAutoInd(f, "cRespDevs(iRespDev).onsettime = cFrame.respOnsettime;")
+        printAutoInd(f, "cRespDevs(iRespDev).resp = cFrame.resp;\n")
+        printAutoInd(f, "if cRespDevs(iRespDev).isQueue")
+        printAutoInd(f, "% to be continue ...")
+        printAutoInd(f, "end")
+
         printAutoInd(f, "case 1")
         printAutoInd(f, "% end action: terminate")
         printAutoInd(f, "cRespDevs(iRespDev).checkStatus = 0;")
@@ -4746,6 +4754,13 @@ def compileCode(isDummyCompile):
 
         printAutoInd(f, "% check key release ")
         printAutoInd(f, "elseif cRespDevs(iRespDev).checkStatus == 2")
+
+        printAutoInd(f, "if cRespDevs(iRespDev).isQueue")
+        printAutoInd(f, "else")
+        printAutoInd(f, "if any(~keyCode(cRespDevs(iRespDev).resp))")
+        printAutoInd(f, "cRespDevs(iRespDev).checkStatus = 0;")
+        printAutoInd(f, "end \n")
+        printAutoInd(f, "end \n")
 
 
         printAutoInd(f, "end % if the check switch is on\n")
@@ -5179,7 +5194,8 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "cRespDevStruct.end              = endRect;")
         printAutoInd(f, "cRespDevStruct.mean             = meanRect;")
         printAutoInd(f, "cRespDevStruct.isOval           = isOval;")
-        printAutoInd(f, "cRespDevStruct.onsettime    = [];")
+        printAutoInd(f, "cRespDevStruct.onsettime        = [];")
+        printAutoInd(f, "cRespDevStruct.resp             = [];")
         printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
 
         iSubFunNum += 1

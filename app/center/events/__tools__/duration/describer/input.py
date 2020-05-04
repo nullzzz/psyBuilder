@@ -139,11 +139,16 @@ class EyeAction(QWidget):
 
 
 class RespInfo(QWidget):
-    def __init__(self,isEyeAction=False, parent=None):
+    def __init__(self,devType:str, parent=None):
         super(RespInfo, self).__init__(parent=parent)
 
         self.device_label = QLabel()
         self.allowable = VarLineEdit()
+
+        if devType == Info.DEV_MOUSE:
+            self.allowable.setToolTip("1,2,3 for left, right, and middle key respectively")
+
+
         self.correct = VarLineEdit()
 
         self.RT_window = VarComboBox(True)
@@ -153,7 +158,7 @@ class RespInfo(QWidget):
         self.end_action = VarComboBox()
         self.end_action.setAcceptDrops(False)
 
-        if isEyeAction:
+        if devType == Info.DEV_EYE_ACTION:
             self.end_action.addItems(["Terminate", "(None)"])
         else:
             self.end_action.addItems(["Terminate", "Terminate Till Release", "(None)"])

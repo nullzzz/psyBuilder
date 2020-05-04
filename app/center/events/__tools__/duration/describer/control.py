@@ -40,10 +40,7 @@ class Describer(QStackedWidget):
                 if self.d_type == 0:
                     d = TriggerInfo()
                 elif self.d_type == 1:
-                    if device_id.startswith("action"):
-                        d = RespInfo(True)
-                    else:
-                        d = RespInfo()
+                    d = RespInfo(device_id.split('.')[0])
                 elif self.d_type == 2:
                     d = RespTrigger()
                 else:
