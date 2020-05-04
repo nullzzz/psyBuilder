@@ -4165,14 +4165,16 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "kbIndices      = unique(GetKeyboardIndices);")
 
         if iGamepad > 1:
-            if Info.PLATFORM == 'windows':
-                if iGamepad == 2:
-                    printAutoInd(f, "gamepadIndices = 0; % joystickMex starts from 0 ")
-                else:
-                    printAutoInd(f, "gamepadIndices = 0:{0}; % getGamepadIndices does not work on windows ",
-                                 iGamepad - 2)
-            else:
-                printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices);")
+            # looks like GetGamepadIndeces can work on windows
+            printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices);")
+            # if Info.PLATFORM == 'windows':
+            #     if iGamepad == 2:
+            #         printAutoInd(f, "gamepadIndices = 0; % joystickMex starts from 0 ")
+            #     else:
+            #         printAutoInd(f, "gamepadIndices = 0:{0}; % getGamepadIndices does not work on windows ",
+            #                      iGamepad - 2)
+            # else:
+            #     printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices);")
 
         if Info.PLATFORM == "linux":
             printAutoInd(f, "miceIndices    = unique(GetMouseIndices('slavePointer'));")
