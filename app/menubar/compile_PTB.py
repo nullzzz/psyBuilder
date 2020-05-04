@@ -1891,8 +1891,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         printAutoInd(f, "% check the 'esc' key to abort the exp")
         printAutoInd(f, "detectAbortKey(abortKeyCode);\n")
 
-        printAutoInd(f,
-                     f"[beCheckedRespDevs, isTerminateStimEvent, secs]= checkRespAndSendTriggers(beCheckedRespDevs, {cWinIdx}, cFrame, afVideoFipReqTime, true); ")
+        printAutoInd(f,f"[beCheckedRespDevs, isTerminateStimEvent, secs]= checkRespAndSendTriggers(beCheckedRespDevs, {cWinIdx}, cFrame, afVideoFipReqTime, true); ")
 
         printAutoInd(f, "if isFirstVideoFrame ")
         if cWidgetPos == 0:
@@ -2155,7 +2154,7 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
                 endActionStr = "1"
 
             printAutoInd(f,
-                         "cRespDev = makeRespStruct({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19});",
+                         "cRespDev = makeRespStruct(beCheckedRespDevs,{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19});",
                          beUpdatedVarStr,  # 0 beUpdatedVar
                          allowableKeysStr,  # 1 allowAble
                          corRespStr,  # 2 corResp
@@ -2165,7 +2164,7 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
                          cInputDevIndexValueStr,  # 6 index
                          cIsQueue,  # 7 isQueue
                          startTimeStr,  # 8 startTime
-                         '2',  # 9 checkStatus
+                         '1',  # 9 checkStatus
                          needTobeRetStr,  # 10 needTobeReset
                          rightStr,  # 11 right
                          wrongStr,  # 12 wrong
@@ -2178,40 +2177,15 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
                          isOvalStr,  # 19 isOval
                          )
 
-            printAutoInd(f, "beCheckedRespDevs = [beCheckedRespDevs, cRespDev];")
-
-            # printAutoInd(f,
-            #              "cRespDevs({0}) = struct("
-            #              "'beUpdatedVar',sprintf('{1}(%d)',{2}),"
-            #              "'allowAble',{3},"
-            #              "'corResp',{4},...",
-            #              iRespDev, cWidgetName, cOpRowIdxStr, allowableKeysStr, corRespStr)
-            #
-            # printAutoInd(f,
-            #              "'rtWindow',{0},"
-            #              "'endAction',{1},"
-            #              "'type',{2},"
-            #              "'index',{3},"
-            #              "'isQueue',{4},"
-            #              "'startTime',lastScrOnsettime({5}),...",
-            #              rtWindowStr, endActionStr, cDevType, cInputDevIndexValueStr, cIsQueue, cWinIdx)
-            #
-            # printAutoInd(f,
-            #              "'checkStatus',true,"
-            #              "'needTobeReset',{0},"  # trigger in this resp dev should be reset back to 0
-            #              "'right',{1},"
-            #              "'wrong',{2},"
-            #              "'noResp',{3},"
-            #              "'respCodeDevType',{4},"
-            #              "'respCodeDevIdx',{5} );",
-            #              needTobeRetStr, rightStr, wrongStr, noRespStr, respCodeDevTypeStr, respCodeDevIdxStr)
-
             iRespDev += 1
 
         if len(queueDevIdxValueStr) > 0:
-            printAutoInd(f, "refreshKbQueue_bcl(beCheckedRespDevs,{0});", queueDevIdxValueStr)
+            printAutoInd(f, "isQueueStart = switchQueue_bcl(beCheckedRespDevs, {0}, isQueueStart);", queueDevIdxValueStr)
 
         printAutoInd(f, "%-------------------------\\\n")
+    else:
+        if len(queueDevIdxValueStr) > 0:
+            printAutoInd(f, "isQueueStart = switchQueue_bcl(beCheckedRespDevs, {0}, isQueueStart);", queueDevIdxValueStr)
 
     printAutoInd(f, "beCheckedRespDevs = checkRespAndSendTriggers(beCheckedRespDevs,{0}, cFrame, nextEvFlipReqTime);\n",
                  cWinIdx)
@@ -3919,6 +3893,7 @@ def compileCode(isDummyCompile):
 
     cIndents = 0
     cLoopLevel = 0
+    isGampadWorksInWIn = True
 
     inputDevNameIdxDict = dict()
     outputDevNameIdxDict = dict()
@@ -4127,19 +4102,24 @@ def compileCode(isDummyCompile):
             if cDevice['Device Type'] == Info.DEV_KEYBOARD:
                 cInputDevIndexStr = f"{iKeyboard}"
                 iKeyboard += 1
+
             elif cDevice['Device Type'] == Info.DEV_MOUSE:
                 cInputDevIndexStr = f"{iMouse}"
                 iMouse += 1
+
             elif cDevice['Device Type'] == Info.DEV_GAMEPAD:
-                if Info.PLATFORM == 'windows' and cIsQueue:
+                # looks like current the gamepad can be queued
+                if Info.PLATFORM == 'windows' and cIsQueue and not(isGampadWorksInWIn):
                     throwCompileErrorInfo("In windows OS, using Gamepad for Queue is not allowed!\n")
                 cInputDevIndexStr = f"{iGamepad}"
                 iGamepad += 1
+
             elif cDevice['Device Type'] == Info.DEV_RESPONSE_BOX:
                 printAutoInd(f, "rbIndices({0})   = CedrusResponseBox('Open', '{1}');", iRespBox,
                              cDevice['Device Index'])
                 cInputDevIndexStr = f"{iRespBox}"
                 iRespBox += 1
+
             elif cDevice['Device Type'] == Info.DEV_EYE_ACTION:
                 # only one eye tracker are allow currently
                 cInputDevIndexStr = f"{iEyetracker}"
@@ -4177,22 +4157,29 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "kbIndices      = unique(GetKeyboardIndices);")
 
         if iGamepad > 1:
-            # looks like GetGamepadIndeces can work on windows
-            printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices);")
-            # if Info.PLATFORM == 'windows':
-            #     if iGamepad == 2:
-            #         printAutoInd(f, "gamepadIndices = 0; % joystickMex starts from 0 ")
-            #     else:
-            #         printAutoInd(f, "gamepadIndices = 0:{0}; % getGamepadIndices does not work on windows ",
-            #                      iGamepad - 2)
-            # else:
-            #     printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices);")
+            # looks like GetGamepadIndices can work on windows
+            if Info.PLATFORM == 'windows':
+                if isGampadWorksInWIn:
+                    printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices);")
+                else:
+                    if iGamepad == 2:
+                        printAutoInd(f, "gamepadIndices = 0; % joystickMex starts from 0 ")
+                    else:
+                        printAutoInd(f, "gamepadIndices = 0:{0}; % getGamepadIndices does not work on windows ",
+                                     iGamepad - 2)
+            else:
+                printAutoInd(f, "gamepadIndices = unique(GetGamepadIndices);")
 
         if Info.PLATFORM == "linux":
             printAutoInd(f, "miceIndices    = unique(GetMouseIndices('slavePointer'));")
         else:
             printAutoInd(f, "miceIndices    = unique(GetMouseIndices);")
 
+
+        if len(cInputDevIndexValueStr)>0:
+            printAutoInd(f, "% initialize the to be queued Device")
+            printAutoInd(f, "KbQueueCreate({0});",cInputDevIndexValueStr)
+            printAutoInd(f, "isQueueStart = false;")
         printAutoInd(f, "%====================================\\\n")
 
         printAutoInd(f, "%===== define output devices ========/")
@@ -4289,7 +4276,7 @@ def compileCode(isDummyCompile):
                         "'right',[],'wrong',[],'noResp',[],'respCodeDevType',[],'respCodeDevIdx',[],'start',[],"
                         "'end',[],'mean',[],'isOval',false,'onsettime',[]);")
 
-        printAutoInd(f, "cRespDevStruct = beCheckedRespDevs;")
+        # printAutoInd(f, "cRespDevStruct = beCheckedRespDevs;")
         printAutoInd(f, "beCheckedRespDevs(1) = [];\n")
         printAutoInd(f, "cFrame = struct('rt',[],'acc',[],'resp',[],'onsettime',[],'respOnsettime',[]);")
         printAutoInd(f, "cFrameNoResp = struct('onsettime',[]);\n")
@@ -4953,21 +4940,41 @@ def compileCode(isDummyCompile):
 
         if len(queueDevIdxValueStr) > 0:
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            printAutoInd(f, "% subfun {0}: refreshKbQueue_bcl", iSubFunNum)
+            printAutoInd(f, "% subfun {0}: switchQueue_bcl", iSubFunNum)
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
-            printAutoInd(f, "function refreshKbQueue_bcl(beCheckedRespDevs,queueDevIndex)")
-            printAutoInd(f, "if numel(beCheckedRespDevs) > 0")
-            printAutoInd(f, "devIsQueue = [beCheckedRespDevs(:).isQueue];")
+            printAutoInd(f, "function isQueueStart = switchQueue_bcl(beCheckedRespDevs,queueDevIdx,isQueueStart)")
+            printAutoInd(f, "if isQueueStart")
 
+            printAutoInd(f, "if isempty(beCheckedRespDevs)")
+            printAutoInd(f, "KbQueueStop(queueDevIdx);")
+            printAutoInd(f, "isQueueStart = false;")
+            printAutoInd(f, "end ")
+
+            printAutoInd(f, "else")
+
+            printAutoInd(f, "if ~isempty(beCheckedRespDevs)")
+            printAutoInd(f, "devIsQueue = [beCheckedRespDevs(:).isQueue];")
             printAutoInd(f, "if any(devIsQueue)")
-            printAutoInd(f, "% update the allowed key list")
-            printAutoInd(f, "KbQueueCreate(queueDevIndex,[beCheckedRespDevs(devIsQueue).allowAble]);")
+            printAutoInd(f, "KbQueueStart(queueDevIdx);")
+            printAutoInd(f, "isQueueStart = true;")
+            printAutoInd(f, "end %any(devIsQueue)")
+
             printAutoInd(f, "end ")
-            printAutoInd(f, "else ")
-            printAutoInd(f, "KbQueueStop(queueDevIndex);")
-            printAutoInd(f, "KbQueueFlush(queueDevIndex);")
-            printAutoInd(f, "end ")
+
+            printAutoInd(f, "end %isQueueStart")
+
+            # printAutoInd(f, "if numel(beCheckedRespDevs) > 0")
+            # printAutoInd(f, "devIsQueue = [beCheckedRespDevs(:).isQueue];")
+            #
+            # printAutoInd(f, "if any(devIsQueue)")
+            # printAutoInd(f, "% update the allowed key list")
+            # printAutoInd(f, "KbQueueCreate(queueDevIndex,[beCheckedRespDevs(devIsQueue).allowAble]);")
+            # printAutoInd(f, "end ")
+            # printAutoInd(f, "else ")
+            # printAutoInd(f, "KbQueueStop(queueDevIndex);")
+            # printAutoInd(f, "KbQueueFlush(queueDevIndex);")
+            # printAutoInd(f, "end ")
 
             printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
 
@@ -5172,32 +5179,33 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "% subfun {0}: makeRespStruct", iSubFunNum)
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        printAutoInd(f, "function cRespDevStruct = makeRespStruct(beUpdatedVar,allowAble,corResp,rtWindow,endAction,"
+        printAutoInd(f, "function cRespDevStruct = makeRespStruct(beCheckedRespDevs,beUpdatedVar,allowAble,corResp,rtWindow,endAction,"
                         "devType,index,isQueue,lastScrOnsettime,checkStatus,needTobeReset,right,wrong,noResp,respCodeDevType,"
                         "respCodeDevIdx,startRect,endRect,meanRect,isOval)")
-        printAutoInd(f, "global cRespDevStruct  %#ok<*REDEF>")
-        printAutoInd(f, "cRespDevStruct.beUpdatedVar     = beUpdatedVar; %#ok<*STRNU>")
-        printAutoInd(f, "cRespDevStruct.allowAble        = allowAble;")
-        printAutoInd(f, "cRespDevStruct.corResp          = corResp;")
-        printAutoInd(f, "cRespDevStruct.rtWindow         = rtWindow;")
-        printAutoInd(f, "cRespDevStruct.endAction        = endAction;")
-        printAutoInd(f, "cRespDevStruct.type             = devType;")
-        printAutoInd(f, "cRespDevStruct.index            = index;")
-        printAutoInd(f, "cRespDevStruct.isQueue          = isQueue;")
-        printAutoInd(f, "cRespDevStruct.startTime        = lastScrOnsettime;")
-        printAutoInd(f, "cRespDevStruct.checkStatus      = checkStatus;")
-        printAutoInd(f, "cRespDevStruct.needTobeReset    = needTobeReset;")
-        printAutoInd(f, "cRespDevStruct.right            = right;")
-        printAutoInd(f, "cRespDevStruct.wrong            = wrong;")
-        printAutoInd(f, "cRespDevStruct.noResp           = noResp;")
-        printAutoInd(f, "cRespDevStruct.respCodeDevType  = respCodeDevType;")
-        printAutoInd(f, "cRespDevStruct.respCodeDevIdx   = respCodeDevIdx;")
-        printAutoInd(f, "cRespDevStruct.start            = startRect;")
-        printAutoInd(f, "cRespDevStruct.end              = endRect;")
-        printAutoInd(f, "cRespDevStruct.mean             = meanRect;")
-        printAutoInd(f, "cRespDevStruct.isOval           = isOval;")
-        printAutoInd(f, "cRespDevStruct.onsettime        = [];")
-        printAutoInd(f, "cRespDevStruct.resp             = [];")
+        # printAutoInd(f, "global cRespDevStruct  %#ok<*REDEF>")
+        printAutoInd(f, "cIdx = numel(beCheckedRespDevs)+1;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).beUpdatedVar     = beUpdatedVar; %#ok<*STRNU>")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).allowAble        = allowAble;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).corResp          = corResp;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).rtWindow         = rtWindow;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).endAction        = endAction;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).type             = devType;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).index            = index;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).isQueue          = isQueue;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).startTime        = lastScrOnsettime;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).checkStatus      = checkStatus;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).needTobeReset    = needTobeReset;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).right            = right;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).wrong            = wrong;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).noResp           = noResp;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).respCodeDevType  = respCodeDevType;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).respCodeDevIdx   = respCodeDevIdx;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).start            = startRect;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).end              = endRect;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).mean             = meanRect;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).isOval           = isOval;")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).onsettime        = [];")
+        printAutoInd(f, "beCheckedRespDevs(cIdx).resp             = [];")
         printAutoInd(f, "end %  end of subfun{0}", iSubFunNum)
 
         iSubFunNum += 1
