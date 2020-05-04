@@ -1854,18 +1854,19 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     if isVideoRelatedWidget(cWidget):
         # printAutoInd(f, "% for first event, flip immediately.. ")
 
-        allWidgetCodes = genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, 'afVideoFipReqTime')
-
         allWidgetCodes = printBeforeFlipCodes(f, allWidgetCodes)
 
+        # printAutoInd(f, " ")
+        allWidgetCodes = genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes)
         printAutoInd(f, "%initialise video flip ")
         printAutoInd(f, "isFirstVideoFrame = true;")
-        printAutoInd(f, "secs              = GetSecs;\n")
+        printAutoInd(f, "secs              = GetSecs;")
+        printAutoInd(f, "afVideoFipReqTime = GetSecs; % temp value but ensure larger than secs\n")
 
         cVideoItemNums = getSliderItemTypeNums(cWidget, Info.ITEM_VIDEO)
         if cVideoItemNums <= 1:
             printAutoInd(f, "{0}_tPtr = 1;", cWidgetName)
-            printAutoInd(f, "{0}_CPt  =-1;", cWidgetName)
+            printAutoInd(f, "{0}_CPt  =-1;\n", cWidgetName)
 
             # printAutoInd(f, "while {0}_tPtr > 0 && {0}_CPt < {0}_eMTime", cWidgetName)
             printAutoInd(f, "while secs < afVideoFipReqTime", cWidgetName)
@@ -1894,14 +1895,15 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         printAutoInd(f,f"[beCheckedRespDevs, isTerminateStimEvent, secs]= checkRespAndSendTriggers(beCheckedRespDevs, {cWinIdx}, cFrame, afVideoFipReqTime, true); ")
 
         printAutoInd(f, "if isFirstVideoFrame ")
+
         if cWidgetPos == 0:
             printAutoInd(f, "{0}.onsettime({1})= Screen('Flip',{2},nextEvFlipReqTime,{3});", cWidgetName, cOpRowIdxStr,
                          cWinStr, clearAfter)
         else:
             printAutoInd(f, "{0}.onsettime({1})= Screen('Flip',{2},nextEvFlipReqTime,{3});", cWidgetName, cOpRowIdxStr,
                          cWinStr, clearAfter)
-
         allWidgetCodes = genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes)
+        allWidgetCodes = genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, 'afVideoFipReqTime')
 
         printAutoInd(f, "nextEvFlipReqTime = afVideoFipReqTime; % after the first flip, update nextEvFlipReqTime")
         printAutoInd(f, "isFirstVideoFrame = false; ")
@@ -1910,16 +1912,16 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         printAutoInd(f, "end ")
 
         if cVideoItemNums <= 1:
-            printAutoInd(f, "Screen('Close',{0}_tPtr);", cWidgetName)
+            printAutoInd(f, "Screen('Close',{0}_tPtr);\n", cWidgetName)
         else:
-            printAutoInd(f, "Screen('Close',{0}_tPtrs);", cWidgetName)
+            printAutoInd(f, "Screen('Close',{0}_tPtrs);\n", cWidgetName)
 
         printAutoInd(f, "if isTerminateStimEvent")
         printAutoInd(f, "nextEvFlipReqTime = 0;")
         printAutoInd(f, "break;")
         printAutoInd(f, "end")
         # print response check section
-        printAutoInd(f, "end % while")
+        printAutoInd(f, "end % while\n")
 
         printAutoInd(cRespCodes, "% close opened movie prts and visual textures")
         if cVideoItemNums <= 1:
@@ -2021,8 +2023,8 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     global outputDevNameIdxDict, historyPropDict, isDummyPrint, queueDevIdxValueStr
 
     # for video related widget, will do this during the flip loop
-    if isVideoRelatedWidget(cWidget):
-        return allWidgetCodes
+    # if isVideoRelatedWidget(cWidget):
+    #     return allWidgetCodes
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"
     cWidgetName = getWidgetName(cWidget.widget_id)
@@ -2187,8 +2189,9 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         if len(queueDevIdxValueStr) > 0:
             printAutoInd(f, "isQueueStart = switchQueue_bcl(beCheckedRespDevs, {0}, isQueueStart);", queueDevIdxValueStr)
 
-    printAutoInd(f, "beCheckedRespDevs = checkRespAndSendTriggers(beCheckedRespDevs,{0}, cFrame, nextEvFlipReqTime);\n",
-                 cWinIdx)
+    if not isVideoRelatedWidget(cWidget):
+        printAutoInd(f, "beCheckedRespDevs = checkRespAndSendTriggers(beCheckedRespDevs,{0}, cFrame, nextEvFlipReqTime);\n",
+                     cWinIdx)
     # printAutoInd(f, "%=================================================\\\n")
 
     shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
@@ -2263,15 +2266,18 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
     else:
         flipScreen(cWidget, cFlipCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
 
+
     # for video related widget, will run step 4-6 (do nothing) in dummy as we already did this in Step3:
-    # step 3: generate sending trigger codes
-    allWidgetCodes = genStimTriggers(cWidget, cStimTriggerCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
+    # if is a video related widget, will do this within flip loop
+    if not isVideoRelatedWidget(cWidget):
+        # step 3: generate sending trigger codes
+        allWidgetCodes = genStimTriggers(cWidget, cStimTriggerCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
 
-    # step 4: generate updating cDurs codes
-    allWidgetCodes = genUpdateWidgetDur(cWidget, cUpdateDurCodes, attributesSetDict, allWidgetCodes)
+        # step 4: generate updating cDurs codes
+        allWidgetCodes = genUpdateWidgetDur(cWidget, cUpdateDurCodes, attributesSetDict, allWidgetCodes)
 
-    # step 5: generate response checking codes
-    allWidgetCodes = genCheckResponse(cWidget, cRespCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
+        # step 5: generate response checking codes
+        allWidgetCodes = genCheckResponse(cWidget, cRespCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
 
     # save all codes for the current widget
     cStimExistCodes: list = allWidgetCodes.get(f"{cWidget.widget_id}_cStimCodes", [])
@@ -2442,9 +2448,6 @@ def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 def genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, nextEventFlipReqTimeStr='nextEvFlipReqTime'):
     global outputDevNameIdxDict, historyPropDict
 
-    # if is a video related widget, will do this within flip loop
-    if isVideoRelatedWidget(cWidget):
-        return allWidgetCodes
 
     # get screen index
     _, cWinIdx, _ = getScreenInfo(cWidget, attributesSetDict)
@@ -2481,8 +2484,8 @@ def genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     global outputDevNameIdxDict, historyPropDict
 
     # if is a video related widget, will do this within flip loop
-    if isVideoRelatedWidget(cWidget):
-        return allWidgetCodes
+    # if isVideoRelatedWidget(cWidget):
+    #     return allWidgetCodes
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"
     cWidgetName = getWidgetName(cWidget.widget_id)
