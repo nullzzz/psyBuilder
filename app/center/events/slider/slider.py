@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGraphicsView, QToolButton, QB
 from app.func import Func
 from lib import TabItemMainWindow
 from .item import *
+from .left.leftBox import LeftBox
 from .property import SliderProperty
 from .scene import Scene
-from .left.leftBox import LeftBox
 
 
 class Slider(TabItemMainWindow):
@@ -172,6 +172,7 @@ class Slider(TabItemMainWindow):
 
     def linkSignal(self):
         self.scene.itemAdd.connect(self.addItem)
+        self.scene.itemSelected.connect(lambda: self.pointer_bt.setChecked(True))
         self.scene.selectionChanged.connect(self.changeItemList)
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
@@ -233,7 +234,7 @@ class Slider(TabItemMainWindow):
             if isinstance(item, TextItem) or isinstance(item, PixItem) \
                     or isinstance(item, LineItem) \
                     or isinstance(item, OtherItem) \
-                    or isinstance(item, DiaItem)\
+                    or isinstance(item, DiaItem) \
                     or isinstance(item, DotItem):
                 item.setSelected(item_name == item.getName())
                 if item_name == item.getName():

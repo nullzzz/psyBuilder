@@ -215,7 +215,7 @@ class DotItem(QGraphicsItem):
         w = self.rect.width()
         h = self.rect.height()
 
-        move_dis = self.speed * self.Interval / 1000
+        move_dis = self.speed * DotItem.Interval / 1000
 
         ps = list()
 

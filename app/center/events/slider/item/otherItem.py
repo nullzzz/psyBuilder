@@ -23,10 +23,10 @@ class OtherItem(QGraphicsPixmapItem):
         self.item_type = item_type
         self.item_name = item_name if item_name else self.generateItemName()
 
-        if self.item_type == self.Snow:
+        if self.item_type == OtherItem.Snow:
             self.pro_window = SnowProperty()
             self.setPixmap(QPixmap(Func.getImage("snow.png")).scaled(100, 100))
-        elif self.item_type == self.Gabor:
+        elif self.item_type == OtherItem.Gabor:
             self.pro_window = GaborProperty()
             self.setPixmap(QPixmap(Func.getImage("gabor.png")).scaled(100, 100))
 
@@ -150,14 +150,12 @@ class OtherItem(QGraphicsPixmapItem):
 
     @staticmethod
     def getSnow(h, w, is_binary=False):
-
         snow = np.random.rand(h, w)
         if is_binary:
             snow[snow <= 0.5] = 0
             snow[snow > 0.5] = 255
         else:
             snow = snow * 255
-
         snow.astype(np.uint8)
         return snow
 
