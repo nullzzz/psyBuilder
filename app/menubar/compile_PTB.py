@@ -984,8 +984,8 @@ def getNextWID(WID: str) -> None or str:
 def getPreStimWID(WID: str) -> None or str:
     preWID = getPreWID(WID)
 
-    while preWID and getWidgetType(WID) not in stimWidgetTypesList:
-        preWID = getPreWID(WID)
+    while preWID and getWidgetType(preWID) not in stimWidgetTypesList:
+        preWID = getPreWID(preWID)
 
     return preWID
 
@@ -1179,7 +1179,7 @@ def getRefValueSet(cWidget, inputStr, attributesSetDict):
 
 def getSpecialRespsFormatAtts(cInputDevices, cSpecialFormatVarDict):
     for cRespProperties in cInputDevices.values():
-        if cRespProperties['Device Type'] == Info.DEV_KEYBOARD:
+        if cRespProperties['Device Id'].split('.')[1] == Info.DEV_KEYBOARD:
             updateSpFormatVarDict(cRespProperties['Correct'], 'kbCorrectResp', cSpecialFormatVarDict)
             updateSpFormatVarDict(cRespProperties['Allowable'], 'kbAllowKeys', cSpecialFormatVarDict)
         else:
@@ -2661,7 +2661,7 @@ def printQuestUpdateWidget(cWidget, f, attributesSetDict, allWidgetCodes, cLoopL
 
     cQuestIdx = outputDevNameIdxDict.get('quest-' + cQuestName)
 
-    printAutoInd(f, "% update {0}: quest(1} )", cQuestName, cQuestIdx)
+    printAutoInd(f, "% update {0}: quest({1})", cQuestName, cQuestIdx)
 
     if cQuestName == "quest_rand":
         printAutoInd(f, "quest({0}) = updateQuestValue(quest({0}),quest({0}).cValue,response);",
@@ -2706,6 +2706,7 @@ def printETCalibWidget(cWidget, f, allWidgetCodes):
     allWidgetCodes.update({"isEyeLinkStartRecord": True})
     # print previous widget's response code
     preStimWid = getPreStimWID(cWidget.widget_id)
+    # if preStimWid:
     allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
 
     printAutoInd(f, "EyelinkDoTrackerSetup(el); % eyelink setup: adjust the camera,calibration and validation")
@@ -4180,9 +4181,9 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "miceIndices    = unique(GetMouseIndices);")
 
 
-        if len(cInputDevIndexValueStr)>0:
+        if len(queueDevIdxValueStr)>0:
             printAutoInd(f, "% initialize the to be queued Device")
-            printAutoInd(f, "KbQueueCreate({0});",cInputDevIndexValueStr)
+            printAutoInd(f, "KbQueueCreate({0});",queueDevIdxValueStr)
             printAutoInd(f, "isQueueStart = false;")
         printAutoInd(f, "%====================================\\\n")
 
