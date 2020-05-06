@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QVBoxLayout, QHBoxLa
     QGridLayout, QCheckBox, QTextEdit, QListWidget, QAbstractItemView, QComboBox
 
 from app.func import Func
-from lib import VarLineEdit, VarComboBox, TabItemWidget
+from lib import VarLineEdit, TabItemWidget
 
 
 class Close(TabItemWidget):
@@ -117,8 +117,8 @@ class Close(TabItemWidget):
             self.tracker_name.setCurrentText(tracker_name)
             self.using_tracker_id = tracker_id
 
-        attributes = Func.getWidgetAttributes(self.widget_id)
-        self.setAttributes(attributes)
+        self.attributes = Func.getWidgetAttributes(self.widget_id)
+        self.setAttributes(self.attributes)
         self.updateInfo()
 
     def refreshAttr(self):

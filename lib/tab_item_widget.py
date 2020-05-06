@@ -64,8 +64,8 @@ class TabItemWidget(QWidget):
         :return: list of attributes
         """
         if self.getUsingDeviceCount():
-            return ["onsettime", "acc", "resp", "rt", "respOnsettime"]
-        return ["onsettime"]
+            return ["acc", "resp", "rt", "respOnsettime"]
+        return []
 
     def getUsingAttributes(self):
         using_attributes: list = []
