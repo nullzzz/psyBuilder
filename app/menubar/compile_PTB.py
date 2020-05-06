@@ -4656,9 +4656,9 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "allTypeIndex = [beChkedRespDevs(:).type;beChkedRespDevs(:).index]';")
         printAutoInd(f, "uniqueDevs   = unique(allTypeIndex,'rows');\n")
 
-        printAutoInd(f, "if numel(beChkedRespDevs) > 0 && any([cRespDevs(:).checkStatus])")
+        printAutoInd(f, "if ~isempty(beChkedRespDevs) && any([beChkedRespDevs(:).checkStatus])")
 
-        printAutoInd(f, "while secs < nextEvFlipReqTime")
+        printAutoInd(f, "while secs < nextEvFlipReqTime && any([beChkedRespDevs(:).checkStatus])")
         printAutoInd(f, "% loop across each unique resp dev: ")
         printAutoInd(f, "for iUniDev = 1:size(uniqueDevs,1)")
 
@@ -4740,7 +4740,10 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "cRespDevs(iRespDev).onsettime = cFrame.respOnsettime;")
         printAutoInd(f, "cRespDevs(iRespDev).resp = cFrame.resp;\n")
         printAutoInd(f, "if cRespDevs(iRespDev).isQueue")
-        printAutoInd(f, "% to be continue ...")
+        printAutoInd(f, "if any(fEventOr1stRelease(cRespDevs(iRespDev).resp))")
+        printAutoInd(f, "cRespDevs(iRespDev).checkStatus = 0;")
+        printAutoInd(f, "isTerminateStimEvent = true; % will break out the while loop soon")
+        printAutoInd(f, "end")
         printAutoInd(f, "end")
 
         printAutoInd(f, "case 1")
@@ -4761,9 +4764,14 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "elseif cRespDevs(iRespDev).checkStatus == 2")
 
         printAutoInd(f, "if cRespDevs(iRespDev).isQueue")
+        printAutoInd(f, "if any(fEventOr1stRelease(cRespDevs(iRespDev).resp))")
+        printAutoInd(f, "cRespDevs(iRespDev).checkStatus = 0;")
+        printAutoInd(f, "isTerminateStimEvent = true; % will break out the while loop soon")
+        printAutoInd(f, "end")
         printAutoInd(f, "else")
         printAutoInd(f, "if any(~keyCode(cRespDevs(iRespDev).resp))")
         printAutoInd(f, "cRespDevs(iRespDev).checkStatus = 0;")
+        printAutoInd(f, "isTerminateStimEvent = true; % will break out the while loop soon")
         printAutoInd(f, "end \n")
         printAutoInd(f, "end \n")
 
