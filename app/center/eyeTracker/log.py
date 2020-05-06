@@ -10,7 +10,7 @@ from lib import VarLineEdit, VarComboBox, TabItemWidget
 class Close(TabItemWidget):
     def __init__(self, widget_id: str, widget_name: str):
         super(Close, self).__init__(widget_id, widget_name)
-
+        self.attributes = []
         self.tip1 = QLineEdit()
         self.tip2 = QLineEdit()
         self.tip1.setReadOnly(True)
