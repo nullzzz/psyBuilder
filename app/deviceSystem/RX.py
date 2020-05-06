@@ -1,3 +1,5 @@
+import re
+
 from PyQt5.QtCore import QSize, pyqtSignal, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QListView, QFrame, \
@@ -122,17 +124,17 @@ class RX(QWidget):
         name: str = item.text()
         item_name: str = name.lower()
 
-        text, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
-        if ok and text != '' and "." not in text:
-            text: str
-            if text.lower() in self.device_home.device_list and item_name != text.lower():
-                QMessageBox.warning(self, f"{text} is invalid!", "Device name must be unique and without spaces",
+        new_name, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
+        if ok and new_name != '' and re.fullmatch(r"[A-Za-z][\d\sA-Za-z]+", name):
+            new_name: str
+            if new_name.lower() in self.device_home.device_list and item_name != new_name.lower():
+                QMessageBox.warning(self, f"{new_name} is invalid!", "Device name must be unique and without spaces",
                                     QMessageBox.Ok)
             else:
-                self.device_home.changeCurrentName(item_name, text)
-                self.describer.changeName(item_name, text)
+                self.device_home.changeCurrentName(item_name, new_name)
+                self.describer.changeName(item_name, new_name)
                 # self.getInfo()
-                self.deviceNameChanged.emit(item.getDeviceId(), text)
+                self.deviceNameChanged.emit(item.getDeviceId(), new_name)
 
     # 参数导出, 记录到Info
     def getInfo(self):
