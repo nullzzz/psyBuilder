@@ -86,6 +86,8 @@ class QuestUpdate(TabItemWidget):
 
     def refresh(self):
         self.quest_info = Func.getDeviceInfo("quest")
+        if len(self.quest_info) > 1:
+            self.quest_info.update({'quest_rand':'quest_rand'})
 
         quest_id = self.using_quest_id
         self.quest_name.clear()

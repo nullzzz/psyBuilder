@@ -478,7 +478,7 @@ def outPutTriggerCheck(cWidget) -> dict:
 
         shouldNotBeCitationCheck('Resp Trigger Device', cRespTriggerDevName)
 
-        respTriggerDevNames.update(cRespTriggerDevName)
+        respTriggerDevNames.update([cRespTriggerDevName])
 
     shortPulseDurParallelsDict = dict()
 
@@ -3350,8 +3350,8 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     # make texture
     if isFileNameRef is False and cLoopLevel > 0:
         printAutoInd(f, "if ~exist('{0}_dat','var')", cPrefixStr)
-        printAutoInd(f, "{0}_dat  = imread(fullfile(cFolder,{1}) );", cPrefixStr, addSingleQuotes(cFilenameStr))
-        printAutoInd(f, "{0}_idx  = Screen('MakeTexture',{1}, {0}_dat);", cPrefixStr, cWinStr)
+        printAutoInd(f, "{0}_dat   = imread(fullfile(cFolder,{1}) );", cPrefixStr, addSingleQuotes(cFilenameStr))
+        printAutoInd(f, "{0}_idx   = Screen('MakeTexture',{1}, {0}_dat);", cPrefixStr, cWinStr)
         printAutoInd(f, "end")
 
         beClosedTxAFCycleList.append(f"{cPrefixStr}_idx")
@@ -4048,13 +4048,13 @@ def compileCode(isDummyCompile):
                              quest['Grain'],
                              quest['Range'])
 
-                if quest['Is log10 transform'] == 'yes':
+                if quest['Is Log10 Transform'] == 'yes':
                     printAutoInd(f, "quest({0}).isLog10Trans = true;", iQuest)
                 else:
                     printAutoInd(f, "quest({0}).isLog10Trans = false;", iQuest)
 
-                printAutoInd(f, "quest({0}).maxValue = {1};", iQuest, quest['Maximum'])
-                printAutoInd(f, "quest({0}).minValue = {1};", iQuest, quest['Minimum'])
+                printAutoInd(f, "quest({0}).maxValue = {1};", iQuest, quest['Maximum Test Value'])
+                printAutoInd(f, "quest({0}).minValue = {1};", iQuest, quest['Minimum Test Value'])
 
                 # printAutoInd(f, "% get the first stimulus intensity")
                 if quest['Method'] == 'quantile':
@@ -4126,6 +4126,7 @@ def compileCode(isDummyCompile):
             elif cDevice['Device Type'] == Info.DEV_EYE_ACTION:
                 # only one eye tracker are allow currently
                 cInputDevIndexStr = f"{iEyetracker}"
+                cDevice.update({'Device Index':cDevice['Tracker Name']})
                 iEyetracker += 1
 
             if cDevice['Device Type'] in [Info.DEV_MOUSE, Info.DEV_KEYBOARD, Info.DEV_GAMEPAD]:
@@ -4218,7 +4219,7 @@ def compileCode(isDummyCompile):
             elif cDevice['Device Type'] == Info.DEV_NETWORK_PORT:
 
                 outputDevNameIdxDict.update({cDevice['Device Name']: f"tcpipCons({iNetPort})"})
-                printAutoInd(f, "TCPIPs({0}).ipAdd    = '{1}';", iNetPort, cDevice['Device Port'])
+                printAutoInd(f, "TCPIPs({0}).ipAdd    = '{1}';", iNetPort, cDevice['IP Address'])
                 printAutoInd(f, "TCPIPs({0}).port     =  {1};", iNetPort, cDevice['IP Port'])
                 printAutoInd(f, "TCPIPs({0}).name     = '{1}';", iNetPort, cDevice['Device Name'])
                 printAutoInd(f, "TCPIPs({0}).isClient = {1};\n", iNetPort, cDevice['Is Client'])
@@ -4248,11 +4249,11 @@ def compileCode(isDummyCompile):
                     outputDevNameIdxDict.update({cSoundDevNameStr: f"audioDevs({iSound}).slaveIdxes"})
                     printAutoInd(f, "audioDevs({0}).nSlaves = {1};", iSound, soundDevSlavesDict[cSoundDevNameStr])
 
-                    if cDevice['Device Port'] == 'auto':
+                    if cDevice['Device Index'] == 'auto':
                         printAutoInd(f, "soundDevs              = getOptimizedSoundDev;")
                         printAutoInd(f, "audioDevs({0}).port    = soundDevs({0}).DeviceIndex;", iSound)
                     else:
-                        printAutoInd(f, "audioDevs({0}).port    = {1};", iSound, cDevice['Device Port'])
+                        printAutoInd(f, "audioDevs({0}).port    = {1};", iSound, cDevice['Device Index'])
 
                     printAutoInd(f, "audioDevs({0}).name    = '{1}';", iSound, cSoundDevNameStr)
 
@@ -4347,10 +4348,11 @@ def compileCode(isDummyCompile):
 
             printAutoInd(f, "for iCount = 1:numel(TCPIPs)")
 
-            if cDevice['Is Client'] == 'yes':
-                printAutoInd(f, "tcpipCons(iCount) = pnet('tcpconnect',TCPIPs(iCount).ipAdd,TCPIPs(iCount).port);")
-            else:
-                printAutoInd(f, "tcpipCons(iCount) = pnet('tcpsocket',TCPIPs(iCount).port);")
+            printAutoInd(f, "if TCPIPs(iCount).isClient")
+            printAutoInd(f, "tcpipCons(iCount) = pnet('tcpconnect',TCPIPs(iCount).ipAdd,TCPIPs(iCount).port);")
+            printAutoInd(f, "else")
+            printAutoInd(f, "tcpipCons(iCount) = pnet('tcpsocket',TCPIPs(iCount).port);")
+            printAutoInd(f, "end")
 
             printAutoInd(f, "end % iCount")
 
