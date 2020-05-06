@@ -310,7 +310,6 @@ class DiaItem(QGraphicsPolygonItem):
 
         self.setPolygon(path.toFillPolygon())
         self.update()
-        self.setPosition()
 
     ##############
     # change from main window

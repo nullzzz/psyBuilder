@@ -177,6 +177,8 @@ class Scene(QGraphicsScene):
         if self.lasso and self.my_mode == self.LassoMode:
             self.removeItem(self.lasso)
             self.lasso = None
+            self.itemSelected.emit()
+            self.setMode(Scene.NormalMode)
         super(Scene, self).mouseReleaseEvent(mouseEvent)
 
     def getInfo(self):
@@ -250,8 +252,8 @@ class Scene(QGraphicsScene):
         try:
             file_name = f"Scene_{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}.png"
             self.image = QImage(self.border.boundingRect().width(),
-                           self.border.boundingRect().height(),
-                           QImage.Format_ARGB32)
+                                self.border.boundingRect().height(),
+                                QImage.Format_ARGB32)
             painter = QPainter(self.image)
             painter.setRenderHint(QPainter.Antialiasing)
             self.render(painter)
