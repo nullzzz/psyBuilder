@@ -62,7 +62,6 @@ class Describer(QStackedWidget):
         for k, v in self.id_widget.items():
             self.default_properties[k] = v.getInfo()
             self.default_properties[k]["Device Id"] = k
-            self.default_properties[k]["Device Type"] = k.split('.')[0]
 
     def getInfo(self):
         self.updateInfo()

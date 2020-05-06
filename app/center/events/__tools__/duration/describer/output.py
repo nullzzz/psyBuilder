@@ -18,6 +18,9 @@ class TriggerInfo(QWidget):
 
         self.pulse_dur.setReg(r"\d+|End of Duration")
 
+        self.device_name = ""
+        self.device_type = ""
+
         self.setUI()
 
     def setUI(self):
@@ -34,10 +37,11 @@ class TriggerInfo(QWidget):
         value = info.get("Value Or Msg")
         self.value.setText(value)
 
-        device_type = info.get("Device Type")
+        self.device_name = info.get("Device Name")
+        self.device_type = info.get("Device Type")
 
         pul_dur = info.get("Pulse Duration")
-        self.pulse_dur.setEnabled(device_type ==Info.DEV_PARALLEL_PORT)
+        self.pulse_dur.setEnabled(self.device_type == Info.DEV_PARALLEL_PORT)
         self.pulse_dur.setCurrentText(pul_dur)
 
     def setAttributes(self, attributes):
@@ -46,7 +50,9 @@ class TriggerInfo(QWidget):
 
     def getInfo(self):
         info = {
+            "Device Name": self.device_name,
+            "Device Type": self.device_type,
             "Value Or Msg": self.value.text(),
-            "Pulse Duration": self.pulse_dur.currentText()
+            "Pulse Duration": self.pulse_dur.currentText(),
         }
         return info

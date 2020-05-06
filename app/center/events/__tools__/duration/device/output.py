@@ -44,12 +44,12 @@ class OutputDevice(QListWidgetItem):
         return self.default_properties
 
     def setProperties(self, device_info: dict):
-        self.default_properties = device_info.copy()
+        self.default_properties.update(device_info)
         self.loadSetting()
 
     def loadSetting(self):
-        self.device_id = self.default_properties.get("Device Id")
-        self.device_name = self.default_properties.get("Device Name")
-        self.device_type = self.default_properties.get("Device Type")
+        self.device_id = self.default_properties.get("Device Id", self.device_id)
+        self.device_name = self.default_properties.get("Device Name", self.device_name)
+        self.device_type = self.default_properties.get("Device Type", self.device_type)
         self.value_or_msg = self.default_properties["Value Or Msg"]
         self.pulse_duration = self.default_properties["Pulse Duration"]
