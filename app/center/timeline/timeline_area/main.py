@@ -172,6 +172,11 @@ class TimelineArea(QFrame):
             # accept
             self.handleReferDrag(data, e.pos().x())
             e.accept()
+        elif data_format == Info.StructureCopyToTimeline:
+            # copy item in timeline
+            self.handleCopyDrag(data, e.pos().x())
+            # accept
+            e.accept()
         else:
             e.ignore()
 
