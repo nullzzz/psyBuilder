@@ -148,6 +148,12 @@ class RespInfo(QWidget):
 
         if device_type == Info.DEV_MOUSE:
             self.allowable.setToolTip("1,2,3 for left, right, and middle key respectively")
+        elif device_type == Info.DEV_EYE_ACTION:
+            self.allowable.setToolTip("3:9 for start blink, end blink, start saccade, end saccade, start fixation, end fixation , and fixation update respectively")
+        elif device_type == Info.DEV_KEYBOARD:
+            self.allowable.setToolTip("See detail info in matlab by running the command KbName([1:255])")
+        elif device_type == Info.DEV_GAMEPAD:
+            self.allowable.setToolTip("1:8 for the keys in Gamepad (! NOT ALL GAMEPAD HAVE 8 KEYS!)")
 
         self.correct = VarLineEdit()
 
