@@ -1,131 +1,145 @@
-import os
 import re
 
 from app.info import Info
 
-dock_widget = """
-QDockWidget {
+image_path = "/".join(re.split(r'\\', Info.ImagePath))
+another_one = "/".join(re.split(r"\\", Info.IMAGE_SOURCE_PATH))
+
+
+def imageURL(image_path: str, flag: int = 0):
+    """
+    return image url
+    """
+
+    if not flag:
+        return image_path + image_path
+    return another_one + image_path
+
+
+# base qss
+dock_widget = f"""
+QDockWidget {{
     border: 1px solid rgb(206,206,206);
-    titlebar-close-icon: url("C:/Users/Administrator/PycharmProjects/ptbGui/source/images/dock_widget/hide.png");
-}
+    titlebar-close-icon: url({imageURL("/dock_widget/hide.png")});
+}}
 
-QDockWidget::title {
-    background: rgb(237,237,237);
-    text-align: center;
-    padding-top: 6px;
-    padding-bottom: 6px;
-}
+QDockWidget::title {{
+background: rgb(237, 237, 237);
+text-align: center;
+padding-top: 6px;
+padding-bottom: 6px;
+}}
 
-QDockWidget::close-button {
-    subcontrol-position: right;
-    border: 0.5px solid transparent;
-    background: transparent;
-    margin-right: 2px;
-    icon-size: 16px;
-}
+QDockWidget::close-button {{
+subcontrol-position: right;
+border: 0.5px solid transparent;
+background: transparent;
+margin-right: 2px;
+icon-size: 16px;
+}}
 
-QDockWidget::close-button:hover {
-    background: rgb(221,221,221);
-}
-"""
+QDockWidget::close-button:hover {{
+background: rgb(221, 221, 221);
+}}
+              """
 
-tab_bar = """
-QTabWidget::pane {
+tab_bar = f"""
+QTabWidget::pane {{
     background-color: rgb(240,240,240);
     border: 0px solid red;
-}
+}}
 
-QTabWidget::tab-bar {
+QTabWidget::tab-bar {{
     left: 0px;
-}
+}}
 
-QTabBar::tab {
+QTabBar::tab {{
     background: rgb(246,246,246);
     border: 1px solid rgb(201,201,201);
     min-height: 27px;
     max-height: 27px;
     min-width: 100px;
     text-align: center;
-}
+}}
 
-QTabBar::tab#TabWidget {
+QTabBar::tab#TabWidget {{
     border-left: 10px solid transparent;
-}
+}}
 
-QTabBar::tab:selected{
+QTabBar::tab:selected {{
     background: white;
-}
+}}
 
-QTabBar::tab:!selected {
+QTabBar::tab:!selected {{
     background: rgb(236,236,236);
-}
+}}
 
-QTabBar::tab:hover {
+QTabBar::tab:hover {{
     background: rgb(225,225,225);
-}
+}}
 
-QTabBar::close-button {
-    image: url(source/images/tab_bar/close.png);
+QTabBar::close-button {{
+    image: url({imageURL("/tab_bar/close.png")});
     subcontrol-position: right;
     subcontrol-origin: margin;
     position: absolute;
     icon-size: 2px;;
-}
+}}
 
-QTabBar::close-button:hover {
-    image: url(source/images/tab_bar/close_pressed.png);
-}
+QTabBar::close-button:hover {{
+    image: url({imageURL("/tab_bar/close_pressed.png")});
+}}
 
 """
 
 # main windows' qss
-center = """
-QMainWindow::separator {
+center = f"""
+QMainWindow::separator {{
     background: rgb(110,110,110);
     width: 1px;
     height: 1px;
-}
+}}
 """
 
-structure = """
-QTreeView::item {
+structure = f"""
+QTreeView::item {{
     border: 1px solid transparent;
-}
+}}
 
-QTreeView::item:selected {
+QTreeView::item:selected {{
     border: 1px solid transparent;
     background: rgb(186, 215, 251);
-}
+}}
 
-QTreeView::item:hover {
+QTreeView::item:hover {{
     border: 1px solid rgb(110,110,110);
-}
+}}
 
-QTreeView::branch:selected {
+QTreeView::branch:selected {{
     background: rgb(186, 215, 251);
-}
+}}
 
-QTreeView::branch:has-siblings:!adjoins-Item {
-    border-image: url(source/images/structure/vertical_line.png) 0;
-}
+QTreeView::branch:has-siblings:!adjoins-Item {{
+    border-image: url({imageURL("/structure/vertical_line.png")}) 0;
+}}
 
-QTreeView::branch:has-siblings:adjoins-Item {
-    border-image: url(source/images/structure/branch_more.png) 0;
-}
+QTreeView::branch:has-siblings:adjoins-Item {{
+    border-image: url({imageURL("/structure/branch_more.png")}) 0;
+}}
 
-QTreeView::branch:!has-children:!has-siblings:adjoins-Item {
-    border-image: url(source/images/structure/branch_end.png) 0;
-}
+QTreeView::branch:!has-children:!has-siblings:adjoins-Item {{
+    border-image: url({imageURL("/structure/branch_end.png")}) 0;
+}}
 
 QTreeView::branch:has-children:!has-siblings:closed,
-QTreeView::branch:closed:has-children:has-siblings {
-    border-image: url(source/images/structure/branch_closed.png) 0;
-}
+QTreeView::branch:closed:has-children:has-siblings {{
+    border-image: url({imageURL("/structure/branch_closed.png")}) 0;
+}}
 
 QTreeView::branch:open:has-children:!has-siblings,
-QTreeView::branch:open:has-children:has-siblings {
-    border-image: url(source/images/structure/branch_open.png) 0;
-}
+QTreeView::branch:open:has-children:has-siblings {{
+    border-image: url({imageURL("/structure/branch_open.png")}) 0;
+}}
 """
 
 # widgets' qss
@@ -198,9 +212,8 @@ QToolBar#CycleToolBar {
 """
 
 # other
-other = """
-ColComboBox::drop-down {image: url(source/image/color_down_arrow.png);}
+other = f"""
+ColComboBox::drop-down {{image: url({imageURL("/color_down_arrow.png")});}}
 """
 
 default_qss = dock_widget + tab_bar + center + structure + timeline + cycle + other
-
