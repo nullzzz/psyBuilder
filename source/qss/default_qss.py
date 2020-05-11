@@ -138,7 +138,7 @@ QTreeView::branch:closed:has-children:has-siblings {{
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings {{
-    border-image: url({imageURL("/structure/branch_open.png")}) 0;
+    border-image: url({imageURL("/common/branch_open.png")}) 0;
 }}
 """
 
