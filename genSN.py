@@ -19,7 +19,7 @@ class genKeyWindow(QFrame):
 
         self.setWindowTitle("KeyGen for PsyBuilder")
         self.setWindowIcon(QIcon(r"source\images\common\icon.png"))
-        self.setFixedSize(300, 90)
+        self.setFixedSize(300, 120)
 
         self.input = QLineEdit()
         self.input.setPlaceholderText("Input your hardware sn here")

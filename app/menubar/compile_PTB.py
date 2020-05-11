@@ -2855,7 +2855,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
         cItemId = cWidgetName + '_' + cItemId
 
         if cItemType == Info.ITEM_LINE:
-            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Color'], attributesSetDict))
             lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Width'], attributesSetDict))
             cX1 = dataStrConvert(*getRefValue(cWidget, cItemProperties['X1'], attributesSetDict))
             cY1 = dataStrConvert(*getRefValue(cWidget, cItemProperties['Y1'], attributesSetDict))
@@ -2873,8 +2873,8 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
             cHeight = dataStrConvert(*getRefValue(cWidget, cItemProperties['Height'], attributesSetDict))
             lineWidth = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Width'], attributesSetDict))
 
-            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill color'], attributesSetDict))
-            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border color'], attributesSetDict))
+            fillColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Fill Color'], attributesSetDict))
+            borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Color'], attributesSetDict))
 
             if fillColor == "[0,0,0,0]":
                 printAutoInd(cVSLCodes,
@@ -5454,9 +5454,9 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "function el = initEyelink()")
 
             # 1) get the win id info in matlab format winIds(idNum)
-            shouldNotBeCitationCheck('Screen Name', cEyeTrackerProperty.get('Screen Name'))
+            shouldNotBeCitationCheck('Screen', cEyeTrackerProperty.get('Screen'))
 
-            cScreenName = cEyeTrackerProperty.get('Screen Name')
+            cScreenName = cEyeTrackerProperty.get('Screen')
 
             cWinIdx = outputDevNameIdxDict.get(cScreenName)
             cWinStr = f"winIds({cWinIdx})"
