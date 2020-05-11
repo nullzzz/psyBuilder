@@ -718,6 +718,11 @@ def parseTextContentStrNew(inputStr) -> str:
     """
     # inputStr = pyStr2MatlabStr(inputStr)
 
+    # if inputStr.startswith("'") and inputStr.endswith("'"):
+    #     pass
+    # else:
+    #     pass
+
     if isContainChStr(inputStr):
         inputStr = "double(" + inputStr + ")"
 
@@ -1094,9 +1099,9 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
 
         rawInputStr = inputStr
 
-        inputStr = re.sub(meanPat, r"',num2str(mean(\1)),'", inputStr)
-        inputStr = re.sub(medianPat, r"',num2str(median(\1)),'", inputStr)
-        inputStr = re.sub(modePat, r"',num2str(mode(\1)),'", inputStr)
+        inputStr = re.sub(meanPat, r"',num2str(mean([\1])),'", inputStr)
+        inputStr = re.sub(medianPat, r"',num2str(median([\1])),'", inputStr)
+        inputStr = re.sub(modePat, r"',num2str(mode([\1])),'", inputStr)
 
         # in case the citation located in the begin or the end of inputStr
         if rawInputStr != inputStr:
@@ -1105,9 +1110,9 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
             if inputStr.endswith(")),''"):
                 inputStr = inputStr[0:-3] + "'"
     else:
-        inputStr = re.sub(meanPat, r'mean(\1)', inputStr)
-        inputStr = re.sub(medianPat, r'median(\1)', inputStr)
-        inputStr = re.sub(modePat, r'mode(\1)', inputStr)
+        inputStr = re.sub(meanPat, r'mean([\1])', inputStr)
+        inputStr = re.sub(medianPat, r'median([\1])', inputStr)
+        inputStr = re.sub(modePat, r'mode([\1])', inputStr)
 
     allRefs = re.findall(refPat, inputStr)
 
@@ -1124,7 +1129,9 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
     isContainRef = isContainRef != 0
 
     if isMatlabStr or isOutStr:
-        inputStr = addSquBrackets(inputStr)
+        # for whole citation, there no need to add square brackets
+        if len(allRefs)>1:
+            inputStr = addSquBrackets(inputStr)
 
     return inputStr, isContainRef, refedObList
 
@@ -1776,7 +1783,10 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     beClosedTxList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
     if len(beClosedTxList) > 0:
         bePrintStr = "".join(f"{cTx}," for cTx in beClosedTxList)
-        bePrintStr = "Screen('Close',[" + bePrintStr[0:-1] + "]);\n"
+        if len(beClosedTxList) == 1:
+            bePrintStr = "Screen('Close'," + bePrintStr[0:-1] + ");\n"
+        else:
+            bePrintStr = "Screen('Close',[" + bePrintStr[0:-1] + "]);\n"
 
         printAutoInd(f, ' ')
         printAutoInd(f, '% close visual textures')
@@ -3964,9 +3974,9 @@ def compileCode(isDummyCompile):
             isEyelink = haveTrackerType('EyeLink')
 
             if isEyelink:
-                printAutoInd(f, "global{0}{1} beChkedRespDevs tracker2PtbTimeCoefs abortKeyCode cFrame\n", globalVarEventStr, globalVarAttStr)
+                printAutoInd(f, "global{0}{1} beChkedRespDevs tracker2PtbTimeCoefs abortKeyCode cFrame %#ok<*NUSED>\n", globalVarEventStr, globalVarAttStr)
             else:
-                printAutoInd(f, "global{0}{1} beChkedRespDevs abortKeyCode cFrame\n", globalVarEventStr, globalVarAttStr)
+                printAutoInd(f, "global{0}{1} beChkedRespDevs abortKeyCode cFrame %#ok<*NUSED>\n", globalVarEventStr, globalVarAttStr)
 
             # get subject information
         printAutoInd(f, "%===== get subject information =========/", )
@@ -3980,7 +3990,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "KbName('UnifyKeyNames');")
         printAutoInd(f, "abortKeyCode = KbName('ESCAPE');")
 
-        printAutoInd(f, "expStartTime = datestr(now,'dd-mmm-YYYY:HH:MM:SS'); % record start time \n")
+        printAutoInd(f, "expStartTime = datestr(now,'dd-mmm-YYYY:HH:MM:SS'); %#ok<*NASGU> % record start time \n")
 
         printAutoInd(f, "%======= Reinitialize the global random seed =======/")
         printAutoInd(f, "cRandSeed = RandStream('mt19937ar','Seed','shuffle');")
@@ -4275,7 +4285,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "disableSomeKbKeys; % restrictKeysForKbCheck \n")
 
         printAutoInd(f, "% initialize vars")
-        printAutoInd(f, "[winIds,winIFIs,lastScrOnsettime, cDurs] = deal(zeros({0},1)); %#ok<ASGLU>", iMonitor - 1)
+        printAutoInd(f, "[winIds,winIFIs,lastScrOnsettime, cDurs] = deal(zeros({0},1));", iMonitor - 1)
         printAutoInd(f, "nextEvFlipReqTime = 0;")
 
         printAutoInd(f, "fullRects         = zeros({0},4);\n", iMonitor - 1)
@@ -4598,8 +4608,8 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "% subfun {0}: fillResultVars", iSubFunNum)
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        printAutoInd(f, "function fillResultVars(opRowIdx)%#ok<*INUSD>")
-        printAutoInd(f, "global{0}{1}%#ok<NUSED>\n", globalVarEventStr, globalVarAttStr)
+        printAutoInd(f, "function fillResultVars(opRowIdx)%#ok<*DEFNU,*INUSD>")
+        printAutoInd(f, "global{0}{1}\n", globalVarEventStr, globalVarAttStr)
 
         resultEventVarsStr4Cell = ''.join("'" + cWidgetName + "'," for cWidgetName in getAllEventWidgetNamesList(1))
         resultAttVarsStr4Cell = ''.join("'" + cAttName + "'," for cAttName in getAllCycleAttVarNameList())
@@ -4650,7 +4660,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f,
                      "function [isTerminateStimEvent, secs] = checkRespAndSendTriggers(cWIdx, nextEvFlipReqTime, isOneTimeCheck)")
         # globalVarEventStr = ''.join(' ' + cWidgetName for cWidgetName in getAllEventWidgetNamesList() )
-        printAutoInd(f, "global{0} abortKeyCode beChkedRespDevs cFrame %#ok<NUSED>\n", globalVarEventStr)
+        printAutoInd(f, "global{0} abortKeyCode beChkedRespDevs cFrame\n", globalVarEventStr)
 
         # printAutoInd(f, "% to speed up the process, we removed argins check")
         # printAutoInd(f, "%if ~exist('isOneTimeCheck','var')")
