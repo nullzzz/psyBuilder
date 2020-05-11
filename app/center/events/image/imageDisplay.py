@@ -34,7 +34,7 @@ class ImageDisplay(TabItemMainWindow):
         self.setCentralWidget(self.label_scroll)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(r"source\image\setting.png"), "setting", self)
+        open_pro = QAction(QIcon(Func.getImage("menu/setting.png")), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
         tool.addAction(open_pro)
 

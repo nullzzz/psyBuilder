@@ -223,5 +223,5 @@ class IconLabel(QLabel):
         if event_type == "None":
             self.clear()
         else:
-            pix_map = QPixmap(fr"source\image\{event_type}.png")
+            pix_map = QPixmap(Func.getImage(f"widgets/{event_type}.png"))
             self.setPixmap(pix_map.scaled(100, 100))

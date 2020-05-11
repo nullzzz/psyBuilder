@@ -42,7 +42,7 @@ class Slider(TabItemMainWindow):
         open_action = QAction(QIcon(Func.getImage("menu/setting.png")), "Setting", self)
         open_action.triggered.connect(self.openSettingWindow)
 
-        save_action = QAction(QIcon(r"source\image\screenshot.png"), "Screenshot(beta)", self)
+        save_action = QAction(QIcon(Func.getImage("operate/screenshot.png")), "Screenshot(beta)", self)
         save_action.triggered.connect(self.scene.screenshot)
 
         front_action = QAction(QIcon(Func.getImage("operate/sendtoback.png")), "Bring to Front", self)
@@ -362,7 +362,7 @@ class Slider(TabItemMainWindow):
 
     def changeBackground(self):
         fn = f"background{self.sender().data()}.png"
-        fp = fr"source\image\{fn}"
+        fp = Func.getImage(f"widgets/{fn}")
         self.background_bt.setIcon(QIcon(fp))
         self.scene.setBackgroundBrush(QBrush(QPixmap(fp)))
         self.scene.update()

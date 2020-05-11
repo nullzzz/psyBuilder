@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt, QRegExp, pyqtSignal
 from PyQt5.QtGui import QColor, QIcon, QRegExpValidator, QFont
 from PyQt5.QtWidgets import QComboBox, QColorDialog
 
+from app.func import Func
 from .message_box import MessageBox
 from .var_combo_box import VarComboBox
 
@@ -48,7 +49,7 @@ class ColComboBox(VarComboBox):
             self.insertItem(i, color_name)
             self.setItemData(i, color, Qt.DecorationRole)
         self.insertItem(0, "More...", Qt.DecorationRole)
-        self.setItemIcon(0, QIcon("source/image/more_color.png"))
+        self.setItemIcon(0, QIcon(Func.getImage("operate/more_color.png")))
 
     def addTransparent(self):
         color_name = "transparent"

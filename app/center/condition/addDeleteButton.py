@@ -2,6 +2,8 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLabel
 
+from app.func import Func
+
 
 class AddDeleteButton(QLabel):
     clicked = pyqtSignal()
@@ -37,18 +39,18 @@ class AddDeleteButton(QLabel):
 
     def becomeDisabled(self):
         if self.button_type == 'add':
-            self.setPixmap(QPixmap(r"source\image\add_disabled.png"))
+            self.setPixmap(QPixmap(Func.getImage("operate/add_disabled.png")))
         elif self.button_type == 'delete':
-            self.setPixmap(QPixmap(r"source\image\delete_disabled.png"))
+            self.setPixmap(QPixmap(Func.getImage("operate/delete_disabled.png")))
 
     def becomeEnabled(self):
         if self.button_type == 'add':
-            self.setPixmap(QPixmap(r"source\image\add.png"))
+            self.setPixmap(QPixmap(Func.getImage("operate/add.png")))
         elif self.button_type == 'delete':
-            self.setPixmap(QPixmap(r"source\image\delete.png"))
+            self.setPixmap(QPixmap(Func.getImage("operate/delete.png")))
 
     def becomePressed(self):
         if self.button_type == 'add':
-            self.setPixmap(QPixmap(r"source\image\add_press.png"))
+            self.setPixmap(QPixmap(Func.getImage("operate/add_press.png")))
         elif self.button_type == 'del':
-            self.setPixmap(QPixmap(r"source\image\delete_press.png"))
+            self.setPixmap(QPixmap(Func.getImage("operate/delete_press.png")))
