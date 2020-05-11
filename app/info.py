@@ -1,4 +1,5 @@
 import os
+import sys
 
 
 class Info(object):
@@ -103,7 +104,8 @@ class Info(object):
     }
 
     # 图片保存路径
-    IMAGE_SOURCE_PATH = "source/image"
+    BasePath = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname("run.py")))
+    IMAGE_SOURCE_PATH = os.path.join(BasePath, "source", "image")
     # widget不同类型对应图片
 
     ###########################################
@@ -114,7 +116,8 @@ class Info(object):
     TempFile = "temp.ini"
 
     # image path
-    ImagePath = "source/images"
+    ImagePath = os.path.join(BasePath, "source", "images")
+    # ImagePath = "source/images"
 
     # widget type
     ERROR_WIDGET_ID = ""
