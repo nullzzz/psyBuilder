@@ -2731,7 +2731,7 @@ def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
     cMessageStr = cWidget.getStatusMessage()
 
     if len(cMessageStr) == 0:
-        cMessageStr = ''
+        cMessageStr = "''"
 
     printAutoInd(f, '%--- Eye tracker: start to record ---/')
     printAutoInd(f, "% Sending a 'TRIALID' message to mark the start of a trial in Data Viewer")
@@ -5473,7 +5473,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "cEdfId = Eyelink('Openfile', edfFile);")
             printAutoInd(f, "if cEdfId~=0")
             # printAutoInd(f, "cleanup;")
-            printAutoInd(f, "error(sprintf('Cannot create EDF file ''%s'' ', edfFile));")
+            printAutoInd(f, "error('Cannot create EDF file ''%s'' ', edfFile);")
             printAutoInd(f, "end")
             printAutoInd(f, "% make sure we're still connected.")
 
