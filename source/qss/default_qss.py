@@ -1,34 +1,47 @@
-import os
 import re
 
 from app.info import Info
+
+image_path = "/".join(re.split(r'\\', Info.ImagePath))
+another_one = "/".join(re.split(r"\\", Info.IMAGE_SOURCE_PATH))
+
+
+def imageURL(image_path: str, flag: int = 0):
+    """
+    return image url
+    """
+
+    if not flag:
+        return image_path + image_path
+    return another_one + image_path
+
 
 # base qss
 dock_widget = f"""
 QDockWidget {{
     border: 1px solid rgb(206,206,206);
-    titlebar-close-icon: url({os.path.join(Info.ImagePath, *re.split(r"/", "/dock_widget/hide.png"))});
+    titlebar-close-icon: url({imageURL("/dock_widget/hide.png")});
 }}
 
 QDockWidget::title {{
-    background: rgb(237,237,237);
-    text-align: center;
-    padding-top: 6px;
-    padding-bottom: 6px;
+background: rgb(237, 237, 237);
+text-align: center;
+padding-top: 6px;
+padding-bottom: 6px;
 }}
 
 QDockWidget::close-button {{
-    subcontrol-position: right;
-    border: 0.5px solid transparent;
-    background: transparent;
-    margin-right: 2px;
-    icon-size: 16px;
+subcontrol-position: right;
+border: 0.5px solid transparent;
+background: transparent;
+margin-right: 2px;
+icon-size: 16px;
 }}
 
 QDockWidget::close-button:hover {{
-    background: rgb(221,221,221);
+background: rgb(221, 221, 221);
 }}
-"""
+              """
 
 tab_bar = f"""
 QTabWidget::pane {{
@@ -66,7 +79,7 @@ QTabBar::tab:hover {{
 }}
 
 QTabBar::close-button {{
-    image: url({os.path.join(Info.ImagePath, *re.split(r"/", "/tab_bar/close.png"))});
+    image: url({imageURL("/tab_bar/close.png")});
     subcontrol-position: right;
     subcontrol-origin: margin;
     position: absolute;
@@ -74,7 +87,7 @@ QTabBar::close-button {{
 }}
 
 QTabBar::close-button:hover {{
-    image: url({os.path.join(Info.ImagePath, *re.split(r"/", "/tab_bar/close_pressed.png"))});
+    image: url({imageURL("/tab_bar/close_pressed.png")});
 }}
 
 """
@@ -107,25 +120,25 @@ QTreeView::branch:selected {{
 }}
 
 QTreeView::branch:has-siblings:!adjoins-Item {{
-    border-image: url({os.path.join(Info.ImagePath, *re.split(r"/", "/structure/vertical_line.png"))}) 0;
+    border-image: url({imageURL("/structure/vertical_line.png")}) 0;
 }}
 
 QTreeView::branch:has-siblings:adjoins-Item {{
-    border-image: url({os.path.join(Info.ImagePath, *re.split(r"/", "/structure/branch_more.png"))}) 0;
+    border-image: url({imageURL("/structure/branch_more.png")}) 0;
 }}
 
 QTreeView::branch:!has-children:!has-siblings:adjoins-Item {{
-    border-image: url({os.path.join(Info.ImagePath, *re.split(r"/", "/structure/branch_end.png"))}) 0;
+    border-image: url({imageURL("/structure/branch_end.png")}) 0;
 }}
 
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {{
-    border-image: url({os.path.join(Info.ImagePath, *re.split(r"/", "/structure/branch_closed.png"))}) 0;
+    border-image: url({imageURL("/structure/branch_closed.png")}) 0;
 }}
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings {{
-    border-image: url({os.path.join(Info.ImagePath, *re.split(r"/", "/structure/branch_open.png"))}) 0;
+    border-image: url({imageURL("/structure/branch_open.png")}) 0;
 }}
 """
 
@@ -200,7 +213,7 @@ QToolBar#CycleToolBar {
 
 # other
 other = f"""
-ColComboBox::drop-down {{image: url({os.path.join(Info.IMAGE_SOURCE_PATH, *re.split(r"/", "/color_down_arrow.png"))});}}
+ColComboBox::drop-down {{image: url({imageURL("/color_down_arrow.png")});}}
 """
 
 default_qss = dock_widget + tab_bar + center + structure + timeline + cycle + other
