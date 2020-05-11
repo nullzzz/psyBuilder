@@ -104,10 +104,10 @@ class Info(object):
     }
 
     # 图片保存路径
-    if getattr(sys, 'frozen', False): # we are running in a |PyInstaller| bundle
-        BasePath = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname("run.py")))
-    else: # we are running in a normal Python environment
-        BasePath = os.path.abspath(os.path.dirname("run.py"))
+    # if getattr(sys, 'frozen', False): # we are running in a |PyInstaller| bundle
+    #     BasePath = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname("run.py")))
+    # else: # we are running in a normal Python environment
+    BasePath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
     IMAGE_SOURCE_PATH = os.path.join(BasePath, "source", "image")
     # widget不同类型对应图片
