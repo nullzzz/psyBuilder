@@ -3537,7 +3537,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     cWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Width'], attributesSetDict))
     cHeight = dataStrConvert(*getRefValue(cWidget, cProperties['Height'], attributesSetDict))
 
-    printAutoInd(f, "{0}_fRect = makeFrameRect({1}, {2}, {3}, {4}, fullRects({4},:));", cItemOrWidgetNameStr, sx, sy,
+    printAutoInd(f, "{0}_fRect = makeFrameRect({1}, {2}, {3}, {4}, fullRects({5},:));", cItemOrWidgetNameStr, sx, sy,
                  cWidth, cHeight, cWinIdx)
 
     if isNotInSlide:
@@ -4265,7 +4265,7 @@ def compileCode(isDummyCompile):
                     printAutoInd(f, "audioDevs({0}).nSlaves = {1};", iSound, soundDevSlavesDict[cSoundDevNameStr])
 
                     if cDevice['Device Index'] == 'auto':
-                        printAutoInd(f, "soundDevs              = getOptimizedSoundDev;")
+                        printAutoInd(f, "soundDevs            = getOptimizedSoundDev;")
                         printAutoInd(f, "audioDevs({0}).port    = soundDevs({0}).DeviceIndex;", iSound)
                     else:
                         printAutoInd(f, "audioDevs({0}).port    = {1};", iSound, cDevice['Device Index'])
@@ -4544,7 +4544,7 @@ def compileCode(isDummyCompile):
 
         # close TCPIP connections
         if iNetPort > 1:
-            printAutoInd(f, "close serial ports:")
+            printAutoInd(f, "%close net ports:")
 
             printAutoInd(f, "for iCount = 1:numel(tcpipCons)")
             printAutoInd(f, "pnet(tcpipCons(iCount),'close');")
