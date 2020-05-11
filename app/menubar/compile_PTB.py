@@ -2728,6 +2728,11 @@ def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
 
     cLoopStr = f"iLoop_{cLoopLevel}"
 
+    cMessageStr = cWidget.getStatusMessage()
+
+    if len(cMessageStr) == 0:
+        cMessageStr = ''
+
     printAutoInd(f, '%--- Eye tracker: start to record ---/')
     printAutoInd(f, "% Sending a 'TRIALID' message to mark the start of a trial in Data Viewer")
     if haveRespCodes:
@@ -2735,8 +2740,7 @@ def printETStartRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
     printAutoInd(f, "Eyelink('Message','TRIALID %d',{0});", cLoopStr)
 
     printAutoInd(f, "% This status message will be displayed at the bottom of the eyetracker display")
-    printAutoInd(f, "Eyelink('Command','record_status_message \"TRIAL\" %d: %s',{0},{1});", cLoopStr,
-                 cWidget.getStatusMessage())
+    printAutoInd(f, "Eyelink('Command','record_status_message \"TRIAL\" %d: %s',{0},{1});", cLoopStr,cMessageStr)
     printAutoInd(f, "Eyelink('StartRecording');")
     printAutoInd(f, '%-----------------------------------\\\n')
 
@@ -5407,38 +5411,38 @@ def compileCode(isDummyCompile):
 
             if Info.PLATFORM == 'linux':
                 printAutoInd(f, "% the first choice: ALSA excellent")
-                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[8]);")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',8);")
 
                 printAutoInd(f, "% the second choice: JACK excellent")
                 printAutoInd(f, "if isempty(soundDevs)")
-                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[12]);")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',12);")
                 printAutoInd(f, "end ")
 
                 printAutoInd(f, "% OSS is less capable but not very widespread in use anymore")
                 printAutoInd(f, "if isempty(soundDevs)")
-                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[12]);")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',12);")
                 printAutoInd(f, "end ")
 
             elif Info.PLATFORM == 'windows':
                 printAutoInd(f, "% WASAPI it's ok")
-                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[13]);")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',13);")
 
                 printAutoInd(f, "% WdMKS it's ok")
                 printAutoInd(f, "if isempty(soundDevs)")
-                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[11]);")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',11);")
                 printAutoInd(f, "end ")
 
                 printAutoInd(f, "% DirectSound: the next worst")
                 printAutoInd(f, "if isempty(soundDevs)")
-                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[1]);")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',1);")
                 printAutoInd(f, "end ")
 
                 printAutoInd(f, "% MME: A completely unusable API")
                 printAutoInd(f, "if isempty(soundDevs)")
-                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[2]);")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',2);")
                 printAutoInd(f, "end ")
             else:
-                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',[5]);")
+                printAutoInd(f, "soundDevs = PsychPortAudio('GetDevices',5);")
 
             printAutoInd(f, "if isempty(soundDevs)")
             printAutoInd(f, "error('failed to get any sound device!');")
@@ -5554,7 +5558,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "trackerTimes = zeros(testTimes,1);")
             printAutoInd(f, "for iTime = 1:50")
             printAutoInd(f, "beforeTime = GetSecs;")
-            printAutoInd(f, "trackerTimes(iTime) = Eyelink('TrackerTime')")
+            printAutoInd(f, "trackerTimes(iTime) = Eyelink('TrackerTime');")
             printAutoInd(f, "afterTime = GetSecs;")
             printAutoInd(f, "ptbTimes(iTime) = mean(beforeTime,afterTime);")
             printAutoInd(f, "tracker2PtbTimeCoefs = regress(ptbTimes,[ones(testTimes,1),trackerTimes]);")
