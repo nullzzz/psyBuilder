@@ -96,7 +96,7 @@ class Button(QPushButton):
         elif text == Info.ITEM_DOT_MOTION:
             text = "dot_motion"
 
-        fp = QPixmap(Func.getImage(f"{text}.png")).scaled(50, 50)
+        fp = QPixmap(Func.getImage(f"widgets/{text}.png")).scaled(50, 50)
         self.setIcon(QIcon(fp))
         self.setIconSize(QSize(50, 50))
         self.setMouseTracking(True)

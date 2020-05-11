@@ -25,10 +25,10 @@ class OtherItem(QGraphicsPixmapItem):
 
         if self.item_type == OtherItem.Snow:
             self.pro_window = SnowProperty()
-            self.setPixmap(QPixmap(Func.getImage("snow.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImage("widgets/snow.png")).scaled(100, 100))
         elif self.item_type == OtherItem.Gabor:
             self.pro_window = GaborProperty()
-            self.setPixmap(QPixmap(Func.getImage("gabor.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImage("widgets/gabor.png")).scaled(100, 100))
 
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)

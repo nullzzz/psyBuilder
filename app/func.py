@@ -66,7 +66,7 @@ class Func(object):
         :param image_name:
         :return:
         """
-        return os.path.join(Info.IMAGE_SOURCE_PATH, image_name)
+        return os.path.join(Info.ImagePath, image_name)
 
     @staticmethod
     def getWidgetPosition(widget_id: str) -> int:

@@ -135,7 +135,7 @@ class Psy(QMainWindow):
         self.windows_action = QAction("&Windows", self)
         self.mac_action = QAction("&Mac", self)
 
-        icon = QIcon(Func.getImage("dock_visible.png"))
+        icon = QIcon(Func.getImage("common/dock_visible.png"))
 
         self.linux_action.setIcon(icon)
 
@@ -162,7 +162,7 @@ class Psy(QMainWindow):
         self.before_trial_action = QAction("&before_trial", self)
         self.before_exp_action = QAction("&before_exp", self)
 
-        # icon = QIcon(Func.getImage("dock_visible.png"))
+        # icon = QIcon(Func.getImage("common/dock_visible.png"))
 
         self.before_event_action.setIcon(icon)
 
@@ -953,7 +953,7 @@ class Psy(QMainWindow):
         """
         dock = self.sender().windowTitle()
         if is_visible:
-            icon = QIcon(Func.getImage("dock_visible.png"))
+            icon = QIcon(Func.getImage("common/dock_visible.png"))
         else:
             icon = QIcon("")
         if dock == "Attributes":

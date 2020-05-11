@@ -13,7 +13,7 @@ class Update(QDialog):
 
         self.setWindowTitle("About developers of PsyBuilder 0.1")
         self.setWindowModality(Qt.WindowModal)
-        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImage("common/icon.png")))
 
         self.label = QLabel("The current version is the latest version.")
         self.label.setOpenExternalLinks(True)

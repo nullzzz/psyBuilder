@@ -11,14 +11,14 @@ class AboutUs(QWidget):
 
         self.setWindowTitle("About developers of PsyBuilder 0.1")
         self.setWindowModality(2)
-        self.setWindowIcon(QIcon(Func.getImage("icon.png")))
+        self.setWindowIcon(QIcon(Func.getImage("common/icon.png")))
         self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
 
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(QPalette.Background, Qt.white)
 
-        cBkIm = QPixmap(Func.getImage("soochowUn.png"))
+        cBkIm = QPixmap(Func.getImage("common/soochowUn.png"))
 
         # cBkIm.scaled(self.size(),Qt.ignoreAspectRation)
         # cBrush = QBrush(cBkIm.scaled(self.size(), Qt.KeepAspectRatioByExpanding))
@@ -77,7 +77,7 @@ class AboutUs(QWidget):
         head_portrait.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         detail.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
 
-        head_portrait.setPixmap(QPixmap(Func.getImage(f"{name}.png")))
+        head_portrait.setPixmap(QPixmap(Func.getImage(f"authors/{name}.png")))
         detail.setTextFormat(Qt.RichText)
         detail.setTextInteractionFlags(Qt.TextBrowserInteraction)
         detail.setOpenExternalLinks(True)

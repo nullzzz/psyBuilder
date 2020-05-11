@@ -21,7 +21,7 @@ class SoundDisplay(TabItemMainWindow):
         self.default_properties = self.pro_window.default_properties
 
         self.play_bt = QPushButton("")
-        self.play_bt.setIcon(QIcon(Func.getImage("start_video")))
+        self.play_bt.setIcon(QIcon(Func.getImage("operate/start_video.png")))
         self.player = QMediaPlayer()
 
         self.player_list = QMediaPlaylist()
@@ -70,7 +70,7 @@ class SoundDisplay(TabItemMainWindow):
         self.setCentralWidget(center)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
+        open_pro = QAction(QIcon(Func.getImage("menu/setting.png")), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
 
         tool.addAction(open_pro)
@@ -190,9 +190,9 @@ class SoundDisplay(TabItemMainWindow):
 
     def changeIcon(self, statue):
         if statue == QMediaPlayer.PlayingState:
-            self.play_bt.setIcon(QIcon(Func.getImage("pause_video")))
+            self.play_bt.setIcon(QIcon(Func.getImage("operate/pause_video.png")))
         else:
-            self.play_bt.setIcon(QIcon(Func.getImage("play")))
+            self.play_bt.setIcon(QIcon(Func.getImage("operate/play.png")))
 
     # 设置可选参数
     def setAttributes(self, attributes):

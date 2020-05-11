@@ -1,6 +1,7 @@
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QListWidgetItem
 
+from app.func import Func
 from app.info import Info
 
 
@@ -11,7 +12,7 @@ class InputDevice(QListWidgetItem):
         self.device_name = device_name
         self.device_id = device_id
         self.device_type = device_id.split(".")[0]
-        self.setIcon(QIcon(fr"source\image\{self.device_type}_device.png"))
+        self.setIcon(QIcon(Func.getImage(f"devices/{self.device_type}_device.png")))
 
         self.default_properties = {
             "Device Id": self.device_id,

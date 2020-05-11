@@ -46,11 +46,11 @@ class VideoDisplay(TabItemMainWindow):
         self.setCentralWidget(self.label)
 
         tool = QToolBar()
-        open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
+        open_pro = QAction(QIcon(Func.getImage("menu/setting.png")), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
         tool.addAction(open_pro)
 
-        self.play_video = QAction(QIcon(Func.getImage("start_video")), "start", self)
+        self.play_video = QAction(QIcon(Func.getImage("operate/start_video.png")), "start", self)
         self.play_video.triggered.connect(self.playVideo)
         tool.addAction(self.play_video)
         self.video_widget.play_and_pause.connect(lambda: self.play_video.trigger())
@@ -180,10 +180,10 @@ class VideoDisplay(TabItemMainWindow):
 
     def changeIcon(self, statue):
         if statue == QMediaPlayer.PlayingState:
-            self.play_video.setIcon(QIcon(Func.getImage("pause_video")))
+            self.play_video.setIcon(QIcon(Func.getImage("operate/pause_video.png")))
             self.play_video.setText("pause")
         else:
-            self.play_video.setIcon(QIcon(Func.getImage("start_video")))
+            self.play_video.setIcon(QIcon(Func.getImage("operate/start_video.png")))
             self.play_video.setText("start")
 
     def keyPressEvent(self, event: QKeyEvent):

@@ -32,7 +32,7 @@ class TextDisplay(TabItemMainWindow):
         self.text_label.setAlignment(Qt.AlignCenter)
         self.setCentralWidget(self.text_label)
         tool = QToolBar()
-        open_pro = QAction(QIcon(Func.getImage("setting")), "setting", self)
+        open_pro = QAction(QIcon(Func.getImage("menu/setting.png")), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
         tool.addAction(open_pro)
 
