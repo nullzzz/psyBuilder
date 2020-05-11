@@ -213,7 +213,7 @@ QToolBar#CycleToolBar {
 
 # other
 other = f"""
-ColComboBox::drop-down {{image: url({imageURL("/color_down_arrow.png")});}}
+ColComboBox::drop-down {{image: url({imageURL("/common/color_down_arrow.png")});}}
 """
 
 default_qss = dock_widget + tab_bar + center + structure + timeline + cycle + other
