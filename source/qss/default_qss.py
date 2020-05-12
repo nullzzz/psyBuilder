@@ -3,7 +3,7 @@ import re
 from app.info import Info
 
 source_image_path = "/".join(re.split(r'\\', Info.ImagePath))
-another_one = "/".join(re.split(r"\\", Info.IMAGE_SOURCE_PATH))
+# another_one = "/".join(re.split(r"\\", Info.IMAGE_SOURCE_PATH))
 
 
 def imageURL(image_path: str, flag: int = 0):

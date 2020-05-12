@@ -109,7 +109,7 @@ class Info(object):
     # else: # we are running in a normal Python environment
     BasePath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-    IMAGE_SOURCE_PATH = os.path.join(BasePath, "source", "image")
+    # IMAGE_SOURCE_PATH = os.path.join(BasePath, "source", "image")
     # widget不同类型对应图片
 
     ###########################################
