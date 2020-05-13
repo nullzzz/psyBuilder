@@ -304,6 +304,7 @@ class Slider(TabItemMainWindow):
 
     def refresh(self):
         self.pro_window.refresh()
+        self.scene.refresh()
 
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
         if width != self.w or height != self.h:

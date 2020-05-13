@@ -189,6 +189,11 @@ class Scene(QGraphicsScene):
                 item_info[item.getName()] = item.getInfo()
         return item_info
 
+    def refresh(self):
+        for item in self.items():
+            if item is not self.border:
+                item.setAttributes(self.attributes)
+
     def setProperties(self, properties: dict):
         self.clear()
         self.border: QGraphicsRectItem = QGraphicsRectItem()

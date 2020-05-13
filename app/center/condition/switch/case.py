@@ -29,8 +29,7 @@ class Case(QGroupBox):
                 break
 
         # case
-        self.values = VarComboBox()
-        self.values.setEditable(True)
+        self.values = VarComboBox(True)
         self.values.setInsertPolicy(QComboBox.NoInsert)
 
         # icon choose
@@ -49,8 +48,9 @@ class Case(QGroupBox):
         grid_layout = QGridLayout()
         tip = QLabel("Value:")
         tip.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        grid_layout.addWidget(tip, 0, 0, 1, 1)
-        grid_layout.addWidget(self.values, 0, 1, 1, 5)
+        if self.index:
+            grid_layout.addWidget(tip, 0, 0, 1, 1)
+            grid_layout.addWidget(self.values, 0, 1, 1, 5)
         grid_layout.addWidget(self.icon_choose, 1, 0, 3, 5)
         grid_layout.addWidget(self.add_bt, 4, 1, 1, 1)
         grid_layout.addWidget(self.del_bt, 4, 3, 1, 1)
