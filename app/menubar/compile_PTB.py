@@ -4629,7 +4629,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         printAutoInd(f, "function beUpdatedVar = updateResultVar(beUpdatedVar,opRowIdx)")
         printAutoInd(f, 'if numel(beUpdatedVar) > 1')
-        printAutoInd(f, 'beUpdatedVar(opRowIdx:end) = [];\n')
+        printAutoInd(f, 'beUpdatedVar(opRowIdx+1:end) = [];\n')
         printAutoInd(f, 'for iRow = 1:numel(beUpdatedVar)')
         printAutoInd(f, 'if isstruct(beUpdatedVar)')
 
@@ -5227,6 +5227,7 @@ def compileCode(isDummyCompile):
                         "devType,index,isQueue,lastScrOnsettime,checkStatus,needTobeReset,right,wrong,noResp,respCodeDevType,"
                         "respCodeDevIdx,startRect,endRect,meanRect,isOval)")
         printAutoInd(f, "global beChkedRespDevs  %#ok<*REDEF>")
+        printAutoInd(f, "currently this method is not so beautiful, but it's faster than the struct function")
         printAutoInd(f, "cIdx = numel(beChkedRespDevs) + 1;")
         printAutoInd(f, "beChkedRespDevs(cIdx).beUpdatedVar     = beUpdatedVar; %#ok<*STRNU>")
         printAutoInd(f, "beChkedRespDevs(cIdx).allowAble        = allowAble;")
@@ -5465,7 +5466,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             printAutoInd(f, "% subfun {0}: initEyelink", iSubFunNum)
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            printAutoInd(f, "function el = initEyelink()")
+            printAutoInd(f, "function el = initEyelink(winIds, monitors, edfFile)")
 
             # 1) get the win id info in matlab format winIds(idNum)
             shouldNotBeCitationCheck('Screen', cEyeTrackerProperty.get('Screen'))
@@ -5566,7 +5567,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "testTimes = 50;")
             printAutoInd(f, "ptbTimes = zeros(testTimes,1);")
             printAutoInd(f, "trackerTimes = zeros(testTimes,1);")
-            printAutoInd(f, "for iTime = 1:50")
+            printAutoInd(f, "for iTime = 1:testTimes")
             printAutoInd(f, "beforeTime = GetSecs;")
             printAutoInd(f, "trackerTimes(iTime) = Eyelink('TrackerTime');")
             printAutoInd(f, "afterTime = GetSecs;")

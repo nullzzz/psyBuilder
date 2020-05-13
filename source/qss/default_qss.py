@@ -13,7 +13,7 @@ def imageURL(image_path: str, flag: int = 0):
 
     if not flag:
         return source_image_path + image_path
-    return another_one + image_path
+    return image_path
 
 
 # base qss
