@@ -5658,6 +5658,12 @@ def compileCode(isDummyCompile):
     copyYanglabFile('subjectinfo.p')
     copyYanglabFile('OpenExp_BCL.p')
     copyYanglabFile('OverwriteOrNot.p')
+    copyYanglabFile('OverwriteOrNot.p')
+    if outDevCountsDict[Info.DEV_PARALLEL_PORT] > 0:
+        copyYanglabFile('lptOut.p')
+        copyYanglabFile('lptoutMex.mexa64')
+
+
 
     if not isDummyPrint:
         Func.printOut(f"Compile successful!:{compile_file_name}")  # print info to the output panel

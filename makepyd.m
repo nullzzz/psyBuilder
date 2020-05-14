@@ -6,12 +6,21 @@ end
 
 
 if ~exist('runAllMatchFiles','var')
-    runAllMatchFiles = true;
+    runAllMatchFiles = false;
 end
 
 
 directory = fileparts(mfilename('fullpath'));
-deleteFiles(directory,'*.pyd');
+
+if IsWin
+    deleteFiles(directory,'*.pyd');
+end
+
+if ismac
+    deleteFiles(directory,'*.so');
+end
+
+
 deleteFiles(directory,'*.c');
 
 if ~clearHisOnly
@@ -41,12 +50,14 @@ if ~clearHisOnly
             else
                 if IsWin
                     [status,result] = system(['ren "',fullfile(cpath,[cfilename,'.cp38-win_amd64.pyd']),'" ',cfilename,'.pyd']);
+                elseif ismac
+                    [status,result] = system(['mv "',fullfile(cpath,[cfilename,'.cpython-38-darwin.so']),'" "',fullfile(cpath,[cfilename,'.so']) ,'"']);
                 end
             end
             if IsWin
                 [status,result] = system(['del /F/S/Q "',fullfile(cpath,[cfilename,'.c']),'"']);
             else
-                [status,result] = system(['rm -rf "',fullfile(cpath,[cfilename,'.c']),'"']);
+                [status,result] = system(['rm -f "',fullfile(cpath,[cfilename,'.c']),'"']);
             end
         end
     end
