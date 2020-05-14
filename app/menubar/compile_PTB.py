@@ -5658,8 +5658,13 @@ def compileCode(isDummyCompile):
     copyYanglabFile('subjectinfo.p')
     copyYanglabFile('OpenExp_BCL.p')
     copyYanglabFile('OverwriteOrNot.p')
-    copyYanglabFile('OverwriteOrNot.p')
-    if outDevCountsDict[Info.DEV_PARALLEL_PORT] > 0:
+
+    if Info.PLATFORM == 'windows':
+        copyYanglabFile('ShowHideWinTaskbar.p')
+        copyYanglabFile('ShowHideWinStartButtonMex.mexw64')
+        copyYanglabFile('ShowHideWinTaskbarAndButtonMex.mexw64')
+
+    if outDevCountsDict[Info.DEV_PARALLEL_PORT] > 0 and Info.PLATFORM == 'linux':
         copyYanglabFile('lptOut.p')
         copyYanglabFile('lptoutMex.mexa64')
 
