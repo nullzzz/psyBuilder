@@ -1,5 +1,6 @@
 import os
 import re
+import platform
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtWidgets import QTextEdit, QApplication, QFileDialog, QLabel, QMenu, QGridLayout, \
@@ -20,13 +21,18 @@ class Version(QTextEdit):
         """)
         # set text
         self.setAlignment(Qt.AlignHCenter)
+        if platform.system()=='Darwin':
+            cFontTypeStr = "Gen Shin Gothic"
+        else:
+            cFontTypeStr = "Gen Shin Gothic Light"
+
         self.setText(f"""
         <div style="text-align: center;">
-            <span style="color:rgb(64,64,64);font-size:32px; font-family: 'Gen Shin Gothic Light'">
+            <span style="color:rgb(64,64,64);font-size:32px; font-family: '{cFontTypeStr}'">
                 {name}
             </span>
             <br/>
-            <span style="color:rgb(157,157,157); font-size:18px; font-family: 'Gen Shin Gothic Light'">
+            <span style="color:rgb(157,157,157); font-size:18px; font-family: '{cFontTypeStr}'">
                 {version}
             </span>
         </div>

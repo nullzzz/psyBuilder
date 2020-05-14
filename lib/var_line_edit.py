@@ -1,7 +1,7 @@
 import re
 
-from PyQt5.QtCore import QDataStream, QIODevice, QRegExp, pyqtSignal, Qt
-from PyQt5.QtGui import QFont, QRegExpValidator, QKeyEvent
+from PyQt5.QtCore import QDataStream, QIODevice, QRegExp, pyqtSignal
+from PyQt5.QtGui import QFont, QRegExpValidator
 from PyQt5.QtWidgets import QLineEdit
 
 from app.info import Info
