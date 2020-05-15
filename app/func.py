@@ -232,8 +232,8 @@ class Func(object):
         check the validity of widget name.
         It should be unique, unless it's a reference.
         """
-        if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", widget_name):
-            return False, "Name must start with a letter and contain only letters, numbers and _."
+        if not re.match(Info.WidgetPattern[0], widget_name):
+            return False, Info.WidgetPattern[1]
         if widget_name in Info.Names:
             return False, "Name already exists."
         return True, ""
@@ -337,7 +337,7 @@ class Func(object):
         widget = Info.Widgets[widget_id]
         if display:
             return widget.getProperties()
-        if Func.isWidgetType(widget_id, Info.TIMELINE) or Func.isWidgetType(widget_id, Info.CYCLE):
+        if Func.isWidgetType(widget_id, Info.TIMELINE) or Func.isWidgetType(widget_id, Info.LOOP):
             return widget.getProperties()
         dp: dict = copy.deepcopy(widget.store())
 
@@ -402,7 +402,7 @@ class Func(object):
                 if child_node.widget_id == widget_id:
                     break
                 # ignore cycle before item
-                if not Func.isWidgetType(child_node.widget_id, Info.CYCLE):
+                if not Func.isWidgetType(child_node.widget_id, Info.LOOP):
                     for attribute in Info.Widgets[child_node.widget_id].getHiddenAttributes():
                         attributes[f"{child_node.text(0)}.{attribute}"] = depth
         # do 2. 3.
@@ -411,7 +411,7 @@ class Func(object):
         depth -= 1
         while node:
             # we just need cycle
-            if Func.isWidgetType(node.widget_id, Info.CYCLE):
+            if Func.isWidgetType(node.widget_id, Info.LOOP):
                 cycle = Info.Widgets[node.widget_id]
                 cycle_name = node.text(0)
                 col_attributes = cycle.getColumnAttributes()

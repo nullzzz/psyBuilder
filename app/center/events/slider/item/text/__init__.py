@@ -1,1 +1,0 @@
-from .textProperty import TextProperty

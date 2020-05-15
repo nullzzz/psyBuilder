@@ -1,1 +1,0 @@
-from .arcProperty import ArcProperty

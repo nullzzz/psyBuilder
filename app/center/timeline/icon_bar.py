@@ -16,6 +16,18 @@ class WidgetIconItem(QListWidgetItem):
         icon = Func.getImageObject(f"widgets/{widget_type}", 1)
         super(WidgetIconItem, self).__init__(icon, widget_type)
 
+        if widget_type == Info.DC:
+            self.setText("Drift Correction")
+        elif widget_type == Info.STARTR:
+            self.setText("Start Recording")
+        elif widget_type == Info.ENDR:
+            self.setText("End Recording")
+        elif widget_type == Info.QUEST_UPDATE:
+            self.setText("Quest Update")
+        elif widget_type == Info.LOOP:
+            self.setText("Looping")
+
+
 
 class IconList(QListWidget):
     """
@@ -32,6 +44,7 @@ class IconList(QListWidget):
         self.setFlow(QListView.LeftToRight)
         self.setWrapping(False)
         self.setMovement(QListView.Static)
+
         # set no frame
         self.setFrameStyle(QFrame.NoFrame)
         # set draggable
@@ -65,12 +78,12 @@ class IconBar(QTabWidget):
         self.quest = IconList()
         self.condition = IconList()
         # add events items
-        self.events.addItem(WidgetIconItem(Info.CYCLE))
+        self.events.addItem(WidgetIconItem(Info.LOOP))
         self.events.addItem(WidgetIconItem(Info.IMAGE))
         self.events.addItem(WidgetIconItem(Info.TEXT))
         self.events.addItem(WidgetIconItem(Info.SOUND))
         self.events.addItem(WidgetIconItem(Info.VIDEO))
-        self.events.addItem(WidgetIconItem(Info.SLIDER))
+        self.events.addItem(WidgetIconItem(Info.COMBO))
         # add eyeTracker items
         self.eye_tracker.addItem(WidgetIconItem(Info.CALIBRATION))
         self.eye_tracker.addItem(WidgetIconItem(Info.DC))

@@ -1,1 +1,0 @@
-from .circleProperty import CircleProperty

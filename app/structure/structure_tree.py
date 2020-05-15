@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMimeData, QPoint, QSize
 from PyQt5.QtGui import QDrag, QKeySequence
-from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut
+from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut, QMessageBox
 
 from app.func import Func
 from app.info import Info
@@ -151,10 +151,10 @@ class StructureTree(QTreeWidget):
             widget_id = item.widget_id
             if e.modifiers() == Qt.ControlModifier:
                 # ctrl -> copy
-                if not Func.isWidgetType(widget_id, Info.CYCLE):
+                if not Func.isWidgetType(widget_id, Info.LOOP):
                     self.copyDrag(widget_id)
             elif e.modifiers() == Qt.ShiftModifier:
-                if not Func.isWidgetType(widget_id, Info.CYCLE):
+                if not Func.isWidgetType(widget_id, Info.LOOP):
                     self.moveDrag(widget_id)
             else:
                 # none -> refer

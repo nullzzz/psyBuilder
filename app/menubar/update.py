@@ -11,7 +11,7 @@ class Update(QDialog):
     def __init__(self, parent=None):
         super(Update, self).__init__(parent=parent)
 
-        self.setWindowTitle("About developers of PsyBuilder 0.1")
+        self.setWindowTitle("Checking new version...")
         self.setWindowModality(Qt.WindowModal)
         self.setWindowIcon(QIcon(Func.getImage("common/icon.png")))
 

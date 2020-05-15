@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView,
 
 from app.func import Func
 from app.info import Info
-from lib import TableWidget, MessageBox
+from lib import MessageBox, TableWidget
 from .timeline_item import TimelineItem
 from .timeline_name_item import TimelineNameItem
 

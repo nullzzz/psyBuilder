@@ -1,1 +1,0 @@
-from .lineProperty import LineProperty

@@ -24,7 +24,7 @@ DisableProgramGroupPage=yes
 UsedUserAreasWarning=no
 LicenseFile=C:\Users\Administrator\PycharmProjects\ptbGui\license.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
-;PrivilegesRequired=lowest
+PrivilegesRequired=lowest
 OutputDir=C:\Users\Administrator\PycharmProjects
 OutputBaseFilename=psyBuilder
 SetupIconFile=C:\Users\Administrator\PycharmProjects\ptbGui\source\images\common\psybuilder.ico

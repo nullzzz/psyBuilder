@@ -61,13 +61,13 @@ class Close(TabItemWidget):
 
     def setUI(self):
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.setWindowTitle("Close")
+        self.setWindowTitle("Logging")
         self.resize(500, 750)
         self.tip1.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
-        self.tip1.setText("Log")
+        self.tip1.setText("Data Logging")
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
-        self.tip2.setText("Writes information to the eye-tracker logfile")
+        self.tip2.setText("Writes information into the EDF file")
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)

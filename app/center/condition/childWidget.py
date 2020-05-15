@@ -17,7 +17,7 @@ class ChildWidget(QWidget):
         super(ChildWidget, self).__init__(parent)
 
         self.event_types = QComboBox()
-        self.event_types.addItems(("None", Info.IMAGE, Info.VIDEO, Info.TEXT, Info.SOUND, Info.SLIDER))
+        self.event_types.addItems(("None", Info.IMAGE, Info.VIDEO, Info.TEXT, Info.SOUND, Info.COMBO))
 
         self.name_line = QLabel()
         self.linkSignal()
@@ -117,7 +117,7 @@ class ChildWidget(QWidget):
         return sub_id
 
     def linkWidgetSignal(self):
-        if self.event_type == Info.SLIDER:
+        if self.event_type == Info.COMBO:
             self.pro_window = self.widget
         else:
             self.pro_window = self.widget.pro_window
@@ -152,7 +152,7 @@ class ChildWidget(QWidget):
                 self.linkWidgetSignal()
             except KeyError:
                 pass
-        if self.event_type == Info.SLIDER:
+        if self.event_type == Info.COMBO:
             self.widget.show()
         else:
             self.widget.pro_window.show()
@@ -188,7 +188,7 @@ class ChildWidget(QWidget):
 
     def setAttributes(self, attributes: list):
         if self.pro_window:
-            if self.event_type == Info.SLIDER:
+            if self.event_type == Info.COMBO:
                 self.pro_window.setAttributes([i[1:-1] for i in attributes])
             else:
                 self.pro_window.setAttributes(attributes)

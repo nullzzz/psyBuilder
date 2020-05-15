@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QMessageBox
 
 from app.func import Func
 
-
 class MessageBox(QMessageBox):
     def __init__(self, *__args):
         super(MessageBox, self).__init__(*__args)

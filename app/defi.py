@@ -5,18 +5,18 @@ QUEST_DEVICE = 2
 TRACKER_DEVICE = 3
 
 # widget type
-CYCLE = "Cycle"
+LOOP = "Loop"
 IMAGE = "Image"
 TEXT = "Text"
 SOUND = "Sound"
 VIDEO = "Video"
-SLIDER = "Slider"
+COMBO = "Combo"
 
 DC = "DC"
 CALIBRATION = "Calibration"
 STARTR = "StartR"
 ENDR = "EndR"
-LOG = "Log"
+LOG = "Logging"
 
 QUEST_UPDATE = "QuestUpdate"
 

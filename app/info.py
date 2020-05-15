@@ -38,12 +38,12 @@ class Info(object):
     REF_VALUE_SEPERATOR = "@"
 
     # widget type
-    CYCLE = "Cycle"
+    LOOP = "Loop"
     IMAGE = "Image"
     TEXT = "Text"
     SOUND = "Sound"
     VIDEO = "Video"
-    SLIDER = "Slider"
+    COMBO = "Combo"
     BUG = "Bug"
 
     OPEN = "Open"
@@ -52,7 +52,7 @@ class Info(object):
     ACTION = "Action"
     STARTR = "StartR"
     ENDR = "EndR"
-    LOG = "Log"
+    LOG = "Logging"
     QUEST_INIT = "QuestInit"
     QUEST_UPDATE = "QuestUpdate"
     QUEST_GET_VALUE = "QuestGetValue"
@@ -74,7 +74,7 @@ class Info(object):
     DEV_GAMEPAD = "game pad"
     DEV_EYE_ACTION = "action"
 
-    # FOR SLIDER ITEMS:
+    # FOR COMBO ITEMS:
     ITEM_POLYGON = "polygon"
     ITEM_ARC = "arc"
     ITEM_RECT = "rect"
@@ -88,7 +88,7 @@ class Info(object):
     ITEM_LINE = "line"
     ITEM_DOT_MOTION = "dot motion"
 
-    SLIDER_COUNT: dict = {
+    COMBO_COUNT: dict = {
         ITEM_POLYGON: 0,
         ITEM_ARC: 0,
         ITEM_RECT: 0,
@@ -143,7 +143,7 @@ class Info(object):
 
     # name pattern
     WidgetPattern = [r"^[a-zA-Z][a-zA-Z0-9_]*$",
-                     "Name must start with a letter and contain only letters, numbers and _."]
+                     "Name must start with a letter and contain only letters, numbers, and _."]
     WeightPattern = [r"^\+?[1-9][0-9]*$", "Only positive number is enabled."]
 
     ###########################################
@@ -159,12 +159,12 @@ class Info(object):
 
     # wid num of different add_type of widget
     WidgetTypeCount = {
-        CYCLE: 0,
+        LOOP: 0,
         SOUND: 0,
         TEXT: 0,
         IMAGE: 0,
         VIDEO: 0,
-        SLIDER: 0,
+        COMBO: 0,
         BUG: 0,
         OPEN: 0,
         DC: 0,
@@ -183,12 +183,12 @@ class Info(object):
 
     # it's used to counter the count of widget name should go.
     WidgetNameCount = {
-        CYCLE: 0,
+        LOOP: 0,
         SOUND: 0,
         TEXT: 0,
         IMAGE: 0,
         VIDEO: 0,
-        SLIDER: 0,
+        COMBO: 0,
         BUG: 0,
         OPEN: 0,
         DC: 0,
