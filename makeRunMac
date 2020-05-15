@@ -12,7 +12,7 @@ sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data sourc
 echo "start to codesign the app"
 
 APP_PATH="./dist/run.app"
-sudo codesign --deep -f -s B1B17CC1866C978FE90BA83228B6D4045A1081A8  "$APP_PATH"
+sudo codesign --deep -f -s B406553BC6044A7B8EB4EA9D42CCE348677576AE "$APP_PATH"
 
 #echo "rename the run to runa"
 
