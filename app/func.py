@@ -66,7 +66,8 @@ class Func(object):
         :param image_name:
         :return:
         """
-        return os.path.join(Info.ImagePath, *(re.split(r'[\\/]',image_name)))
+        return os.path.join(Info.ImagePath, image_name)
+        # return os.path.join(Info.ImagePath, *(re.split(r'[\\/]',image_name)))
 
     @staticmethod
     def getWidgetPosition(widget_id: str) -> int:
@@ -439,7 +440,8 @@ class Func(object):
                      1: icon
         @return: Qt image object
         """
-        path = os.path.join(Info.ImagePath,  *(re.split(r'[\\/]',image_path)) )
+        # path = os.path.join(Info.ImagePath,  *(re.split(r'[\\/]',image_path)) )
+        path = os.path.join(Info.ImagePath,  image_path )
         if not type:
             if size:
                 return QPixmap(path).scaled(size, transformMode=Qt.SmoothTransformation)
