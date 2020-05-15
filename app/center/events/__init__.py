@@ -1,4 +1,4 @@
-from .cycle import Cycle
+from .loop import Loop
 from .image import ImageDisplay
 from .combo import Combo
 from .sound import SoundDisplay

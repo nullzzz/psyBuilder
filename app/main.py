@@ -249,7 +249,7 @@ class Psy(QMainWindow):
         elif widget_type == Info.SWITCH:
             widget = Switch(widget_id, widget_name)
         elif widget_type == Info.CYCLE:
-            widget = Cycle(widget_id, widget_name)
+            widget = Loop(widget_id, widget_name)
         elif widget_type == Info.IMAGE:
             widget = ImageDisplay(widget_id, widget_name)
         elif widget_type == Info.VIDEO:
@@ -528,7 +528,7 @@ class Psy(QMainWindow):
             # delete item in timeline or timeline in cycle
             if Func.isWidgetType(widget_id, Info.TIMELINE):
                 # delete timeline in cycle
-                cycle: Cycle = Info.Widgets[Func.getWidgetParent(widget_id)]
+                cycle: Loop = Info.Widgets[Func.getWidgetParent(widget_id)]
                 cycle.deleteTimeline(widget_name)
             else:
                 # delete item in timeline

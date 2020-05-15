@@ -3,18 +3,18 @@ from PyQt5.QtCore import pyqtSignal, QSize
 from app.func import Func
 from app.info import Info
 from lib import TabItemMainWindow
-from .cycle_table import CycleTable
+from .loop_table import CycleTable
 from .properties import Properties
 
 
-class Cycle(TabItemMainWindow):
+class Loop(TabItemMainWindow):
     # when add new timeline, emit signal(parent_widget_id, widget_id, widget_name, index)
     itemAdded = pyqtSignal(str, str, str, int)
     # when delete signals, emit signal(sender_widget, widget_id)
     itemDeleted = pyqtSignal(int, str)
 
     def __init__(self, widget_id: str, widget_name: str):
-        super(Cycle, self).__init__(widget_id, widget_name)
+        super(Loop, self).__init__(widget_id, widget_name)
         self.cycle_table = CycleTable()
         self.properties = Properties()
         self.setCentralWidget(self.cycle_table)
