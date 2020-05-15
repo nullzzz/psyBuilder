@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBo
 
 from app.center.events.__tools__ import DurationPage
 from app.center.events.__tools__ import FramePage
-from app.center.events.slider.property.general import SliderGeneral
+from app.center.events.combo.property.general import SliderGeneral
 from app.func import Func
 
 

@@ -5,7 +5,7 @@ from PyQt5.QtGui import QPen, QTransform, QColor, QImage, QPainter
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem, QGraphicsRectItem
 
 from app.defi import *
-from ...events.slider.item import *
+from ...events.combo.item import *
 
 
 class Scene(QGraphicsScene):
