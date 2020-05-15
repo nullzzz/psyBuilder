@@ -52,7 +52,7 @@ class TimelineTable(TableWidget):
         # set menu and shortcut
         self.setMenuAndShortcut()
 
-        self.setWindowIcon(QIcon("source/images/common/icon.png"))
+        self.setWindowIcon(Func.getImageObject("common/icon.png",1))
 
     def linkSignals(self):
         """

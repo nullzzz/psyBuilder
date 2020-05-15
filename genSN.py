@@ -18,7 +18,7 @@ class genKeyWindow(QFrame):
         #     basedir = os.path.dirname(__file__)
 
         self.setWindowTitle("KeyGen for PsyBuilder")
-        self.setWindowIcon(QIcon(r"source\images\common\icon.png"))
+        self.setWindowIcon(QIcon(r"source/images/common/icon.png"))
         self.setFixedSize(300, 120)
 
         self.input = QLineEdit()

@@ -17,7 +17,7 @@ class Tracker(QWidget):
         self.tracker_type = QComboBox()
         # self.tracker_type.addItems(("Simple dummy", "Advanced dummy(mouse simulation)", "EyeLink", "SMI",
         #                             "EyeTribe", "OpenGaze", "Tobii", "Tobii-legacy", "Tobii Pro Glasses 2"))
-        self.tracker_type.addItems(("EyeLink"))
+        self.tracker_type.addItem("EyeLink")
         self.tracker_type.setItemData(0,"Currently only Eyelink is supported, eyetracker manufactures are welcome to contact us to add supports",Qt.ToolTipRole)
         self.tracker_type.currentIndexChanged.connect(self.typeChanged)
 
