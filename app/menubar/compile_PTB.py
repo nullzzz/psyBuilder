@@ -2457,7 +2457,6 @@ def printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 def genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, nextEventFlipReqTimeStr='nextEvFlipReqTime'):
     global outputDevNameIdxDict, historyPropDict
 
-
     # get screen index
     _, cWinIdx, _ = getScreenInfo(cWidget, attributesSetDict)
 
