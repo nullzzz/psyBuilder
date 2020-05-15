@@ -155,6 +155,6 @@ class AttributeDialog(Dialog):
         # only pattern now
         name = attribute_area.name()
         if name and not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-            attribute_area.showTip("Name starts with a letter and contain only letters, numbers, _")
+            attribute_area.showTip("Name must start with a letter and contain only letters, numbers, _")
         else:
             attribute_area.hideTip()

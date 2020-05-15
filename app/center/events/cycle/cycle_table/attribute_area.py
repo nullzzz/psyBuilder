@@ -9,18 +9,21 @@ class AttributeArea(QGroupBox):
         super(AttributeArea, self).__init__(None)
         # widget
         self.tip_label = QLabel()
-        self.tip_label.setFixedHeight(20)
+        self.tip_label.setFixedHeight(18)
         self.tip_label.hide()
         self.name_line_edit = QLineEdit(name)
         self.name_line_edit.textEdited.connect(lambda text: self.nameChanged.emit(self))
         self.value_line_edit = QLineEdit(value)
         self.name_line_edit.setMinimumWidth(150)
         self.value_line_edit.setMinimumWidth(150)
+        self.setMinimumHeight(80)
+        self.setMinimumWidth(400)
         # layout
         layout = QFormLayout()
         layout.addRow(self.tip_label)
         layout.addRow("Name: ", self.name_line_edit)
         layout.addRow("Default Value: ", self.value_line_edit)
+
         self.setLayout(layout)
 
     def name(self):
