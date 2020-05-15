@@ -259,7 +259,7 @@ class Psy(QMainWindow):
         elif widget_type == Info.SOUND:
             widget = SoundDisplay(widget_id, widget_name)
         elif widget_type == Info.COMBO:
-            widget = Slider(widget_id, widget_name)
+            widget = Combo(widget_id, widget_name)
         elif widget_type == Info.CALIBRATION:
             widget = EyeCalibrate(widget_id, widget_name)
         elif widget_type == Info.ENDR:

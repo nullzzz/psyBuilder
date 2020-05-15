@@ -1,1 +1,1 @@
-from .slider import Slider
+from .combo import Combo

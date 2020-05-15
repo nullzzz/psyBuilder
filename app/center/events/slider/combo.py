@@ -11,9 +11,9 @@ from .property import SliderProperty
 from .scene import Scene
 
 
-class Slider(TabItemMainWindow):
+class Combo(TabItemMainWindow):
     def __init__(self, widget_id: str, widget_name: str):
-        super(Slider, self).__init__(widget_id, widget_name)
+        super(Combo, self).__init__(widget_id, widget_name)
         self.current_wid = widget_id
 
         self.pro_window = SliderProperty()
@@ -478,7 +478,7 @@ class Slider(TabItemMainWindow):
         :param new_widget_id:
         :return:
         """
-        clone_page = Slider(new_widget_id, new_widget_name)
+        clone_page = Combo(new_widget_id, new_widget_name)
         self.getInfo()
         clone_page.pro_window.setProperties(self.pro_window.default_properties.copy())
         clone_page.scene.setProperties(self.scene.getInfo())
