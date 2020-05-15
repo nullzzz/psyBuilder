@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QGridLayout,QVBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout
 
 from app.info import Info
 from lib import TabItemWidget
