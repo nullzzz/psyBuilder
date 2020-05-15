@@ -24,6 +24,9 @@ class WidgetIconItem(QListWidgetItem):
             self.setText("End Recording")
         elif widget_type == Info.QUEST_UPDATE:
             self.setText("Quest Update")
+        elif widget_type == Info.LOOP:
+            self.setText("Looping")
+
 
 
 class IconList(QListWidget):
@@ -75,7 +78,7 @@ class IconBar(QTabWidget):
         self.quest = IconList()
         self.condition = IconList()
         # add events items
-        self.events.addItem(WidgetIconItem(Info.CYCLE))
+        self.events.addItem(WidgetIconItem(Info.LOOP))
         self.events.addItem(WidgetIconItem(Info.IMAGE))
         self.events.addItem(WidgetIconItem(Info.TEXT))
         self.events.addItem(WidgetIconItem(Info.SOUND))

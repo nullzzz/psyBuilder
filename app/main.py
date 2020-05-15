@@ -248,7 +248,7 @@ class Psy(QMainWindow):
             widget = IfBranch(widget_id, widget_name)
         elif widget_type == Info.SWITCH:
             widget = Switch(widget_id, widget_name)
-        elif widget_type == Info.CYCLE:
+        elif widget_type == Info.LOOP:
             widget = Loop(widget_id, widget_name)
         elif widget_type == Info.IMAGE:
             widget = ImageDisplay(widget_id, widget_name)
@@ -334,7 +334,7 @@ class Psy(QMainWindow):
             widget.itemCopied.connect(self.handleItemCopied)
             widget.itemReferenced.connect(self.handleItemReferenced)
             widget.itemDeleted.connect(self.handleItemDeleted)
-        elif widget_type == Info.CYCLE:
+        elif widget_type == Info.LOOP:
             # cycle
             widget.itemAdded.connect(self.handleItemAdded)
             widget.itemDeleted.connect(self.handleItemDeleted)
@@ -549,7 +549,7 @@ class Psy(QMainWindow):
         @param widget_name: root node's widget name
         @return:
         """
-        if Func.isWidgetType(widget_id, Info.CYCLE) or Func.isWidgetType(widget_id, Info.TIMELINE):
+        if Func.isWidgetType(widget_id, Info.LOOP) or Func.isWidgetType(widget_id, Info.TIMELINE):
             for child_widget_id, child_widget_name in Func.getWidgetChildren(widget_id):
                 self.deleteNodeRecursive(child_widget_id, child_widget_name)
         # delete data (Kernel.Nodes, Kernel.Widgets, Kernel.Name)

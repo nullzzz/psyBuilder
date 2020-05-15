@@ -38,7 +38,7 @@ class Info(object):
     REF_VALUE_SEPERATOR = "@"
 
     # widget type
-    CYCLE = "Loop"
+    LOOP = "Loop"
     IMAGE = "Image"
     TEXT = "Text"
     SOUND = "Sound"
@@ -159,7 +159,7 @@ class Info(object):
 
     # wid num of different add_type of widget
     WidgetTypeCount = {
-        CYCLE: 0,
+        LOOP: 0,
         SOUND: 0,
         TEXT: 0,
         IMAGE: 0,
@@ -183,7 +183,7 @@ class Info(object):
 
     # it's used to counter the count of widget name should go.
     WidgetNameCount = {
-        CYCLE: 0,
+        LOOP: 0,
         SOUND: 0,
         TEXT: 0,
         IMAGE: 0,

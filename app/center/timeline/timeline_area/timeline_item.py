@@ -124,7 +124,7 @@ class TimelineItem(QLabel):
         """
         if e.modifiers() == Qt.ControlModifier:
             # copy timeline item
-            if self.widget_type != Info.CYCLE:
+            if self.widget_type != Info.LOOP:
                 self.copyDrag()
         else:
             # move timeline item

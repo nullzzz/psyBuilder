@@ -5,7 +5,7 @@ QUEST_DEVICE = 2
 TRACKER_DEVICE = 3
 
 # widget type
-CYCLE = "Loop"
+LOOP = "Loop"
 IMAGE = "Image"
 TEXT = "Text"
 SOUND = "Sound"

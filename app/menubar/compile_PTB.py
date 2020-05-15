@@ -299,7 +299,7 @@ def isContainCycleTL(widgetId) -> bool:
     cTimelineWidgetIds = Func.getWidgetIDInTimeline(widgetId)
 
     for cWidgetId in cTimelineWidgetIds:
-        if Func.isWidgetType(cWidgetId, Info.CYCLE):
+        if Func.isWidgetType(cWidgetId, Info.LOOP):
             return True
     return False
 
@@ -829,16 +829,16 @@ def haveTrackerType(trackerType: str = 'EyeLink') -> bool:
 
 def getAllEventWidgetsList(includedType: int = 1) -> list:
     """
-    :param includedType: 1 none CYCLE, 2 CYCLE, 3 all eventTypes
+    :param includedType: 1 none LOOP, 2 LOOP, 3 all eventTypes
     :return: a list for event widget
     """
     allEventWidgets = []
 
     if includedType == 3:
         allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH,
-                               Info.CYCLE]
+                               Info.LOOP]
     elif includedType == 2:
-        allEventWidgetTypes = [Info.CYCLE]
+        allEventWidgetTypes = [Info.LOOP]
     else:
         allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]
 
@@ -850,16 +850,16 @@ def getAllEventWidgetsList(includedType: int = 1) -> list:
 
 def getAllEventWidgetNamesList(includedType: int = 1) -> list:
     """
-    :param includedType: 1 not include CYCLE, 2 include CYCLE
+    :param includedType: 1 not include LOOP, 2 include LOOP
     :return: a list for event widget names
     """
     cAllEventWidgetNameList = []
 
     if includedType == 3:
         allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH,
-                               Info.CYCLE]
+                               Info.LOOP]
     elif includedType == 2:
-        allEventWidgetTypes = [Info.CYCLE]
+        allEventWidgetTypes = [Info.LOOP]
     else:
         allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]
 
@@ -1217,7 +1217,7 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
 
         cProperties = Func.getWidgetProperties(widgetId)
 
-        if Func.isWidgetType(widgetId, Info.CYCLE):
+        if Func.isWidgetType(widgetId, Info.LOOP):
             pass
         elif Func.isWidgetType(widgetId, Info.SWITCH):
             # we do not need to do this here because all sub widgets are contained in Info.Wid_WIDGET
@@ -1398,7 +1398,7 @@ def getWidLoopLevel(wid: str) -> int:
 
     while node:
         node = node.parent()
-        if Func.isWidgetType(node.widget_id, Info.CYCLE):
+        if Func.isWidgetType(node.widget_id, Info.LOOP):
             loopLevel += 1
     return loopLevel
 
@@ -1545,7 +1545,7 @@ def updateTLOpDataRow(cTLWidget, opDataRowsInPy: int) -> int:
     for cWidgetId in cTimelineWidgetIds:
         cWidget = Info.WID_WIDGET[cWidgetId]
 
-        if Func.isWidgetType(cWidgetId, Info.CYCLE):
+        if Func.isWidgetType(cWidgetId, Info.LOOP):
             noSubCycleTL = False
             opDataRowsInPy = updateCycleOpDataRows(cWidget, opDataRowsInPy)
 
@@ -2595,7 +2595,7 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
 
         cWidgetType = getWidgetType(cWidget)
 
-        if Info.CYCLE == cWidgetType:
+        if Info.LOOP == cWidgetType:
             allWidgetCodes = printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
         elif cWidgetType in [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]:
             allWidgetCodes = printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
@@ -4303,7 +4303,7 @@ def compileCode(isDummyCompile):
         # print out initialize OP vars
         if not isDummyCompile:
             # maximumOpDataRows = getMaximumOpDataRows()
-            # input parameter 2 will include widget type of CYCLE
+            # input parameter 2 will include widget type of LOOP
             allEventWidgets = getAllEventWidgetsList(3)
 
             for cWidget in allEventWidgets:
@@ -4328,7 +4328,7 @@ def compileCode(isDummyCompile):
                     if getHaveOutputDevs(cWidget):
                         printAutoInd(f, "{0}(end).msgEndTime = [];", cWidgetName)
 
-                elif cWidgetType == Info.CYCLE:
+                elif cWidgetType == Info.LOOP:
 
                     cAttVarNameList = getCycleAttVarNamesList(cWidget)
 
