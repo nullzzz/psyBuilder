@@ -48,9 +48,9 @@ class TextItem(QGraphicsTextItem):
 
     def generateItemName(self) -> str:
         name = self.name[self.item_type]
-        cnt = Info.SLIDER_COUNT.get(name)
+        cnt = Info.COMBO_COUNT.get(name)
         item_name = f"{name}_{cnt}"
-        Info.SLIDER_COUNT[name] += 1
+        Info.COMBO_COUNT[name] += 1
         return item_name
 
     def getName(self):

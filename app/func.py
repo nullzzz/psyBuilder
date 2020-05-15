@@ -232,8 +232,8 @@ class Func(object):
         check the validity of widget name.
         It should be unique, unless it's a reference.
         """
-        if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", widget_name):
-            return False, "Name must start with a letter and contain only letters, numbers and _."
+        if not re.match(Info.WidgetPattern[0], widget_name):
+            return False, Info.WidgetPattern[1]
         if widget_name in Info.Names:
             return False, "Name already exists."
         return True, ""

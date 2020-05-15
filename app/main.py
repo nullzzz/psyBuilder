@@ -258,7 +258,7 @@ class Psy(QMainWindow):
             widget = TextDisplay(widget_id, widget_name)
         elif widget_type == Info.SOUND:
             widget = SoundDisplay(widget_id, widget_name)
-        elif widget_type == Info.SLIDER:
+        elif widget_type == Info.COMBO:
             widget = Slider(widget_id, widget_name)
         elif widget_type == Info.CALIBRATION:
             widget = EyeCalibrate(widget_id, widget_name)
@@ -792,7 +792,7 @@ class Psy(QMainWindow):
             setting.setValue("OutputDeviceInfo", Info.OUTPUT_DEVICE_INFO)
             setting.setValue("QuestDeviceInfo", Info.QUEST_DEVICE_INFO)
             setting.setValue("TrackerDeviceInfo", Info.TRACKER_DEVICE_INFO)
-            setting.setValue("SliderCount", Info.SLIDER_COUNT)
+            setting.setValue("SliderCount", Info.COMBO_COUNT)
             # Info.Widgets: we just need to save origin widget
             widgets_data = {}
             for name in Info.Names:
@@ -832,7 +832,7 @@ class Psy(QMainWindow):
         quest_device_info = setting.value("QuestDeviceInfo", -1)
         tracker_device_info = setting.value("TrackerDeviceInfo", -1)
 
-        Info.SLIDER_COUNT = setting.value("SliderCount", -1)
+        Info.COMBO_COUNT = setting.value("SliderCount", -1)
         widgets_data = setting.value("Widgets", -1)
         structure = setting.value("Structure", -1)
         # tabs = setting.value("Tabs", -1)
@@ -844,7 +844,7 @@ class Psy(QMainWindow):
                 output_device_info == -1 or \
                 quest_device_info == -1 or \
                 tracker_device_info == -1 or \
-                Info.SLIDER_COUNT == -1 or \
+                Info.COMBO_COUNT == -1 or \
                 widgets_data == -1 or \
                 structure == -1:
             if show:
@@ -1039,7 +1039,7 @@ class Psy(QMainWindow):
         Info.TRACKER_DEVICE_INFO.clear()
         Info.FILE_NAME = ""
         Info.FILE_DIRECTORY = ""
-        Info.SLIDER_COUNT.clear()
+        Info.COMBO_COUNT.clear()
         Info.Widgets.clear()
         Info.Names.clear()
         Info.Nodes.clear()

@@ -37,9 +37,9 @@ class LineItem(QGraphicsLineItem):
 
     def generateItemName(self) -> str:
         name = Info.ITEM_LINE
-        cnt = Info.SLIDER_COUNT.get(name)
+        cnt = Info.COMBO_COUNT.get(name)
         item_name = f"{name}_{cnt}"
-        Info.SLIDER_COUNT[name] += 1
+        Info.COMBO_COUNT[name] += 1
         return item_name
 
     def getName(self):

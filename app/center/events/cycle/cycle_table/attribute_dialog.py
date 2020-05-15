@@ -83,7 +83,7 @@ class AttributeDialog(Dialog):
                         return
                     elif not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
                         MessageBox.information(self, "warning",
-                                               "Name must start with a letter and contain only letters, numbers and _.")
+                                               "Name must start with a letter and contain only letters, numbers, and _.")
                         return
                     new_attributes.add(name)
             self.attributesAdded.emit(self.col)

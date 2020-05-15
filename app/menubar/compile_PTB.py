@@ -19,7 +19,7 @@ outputDevNameIdxDict = dict()
 historyPropDict = dict()
 cInfoDict = dict()
 queueDevIdxValueStr = str()
-stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
+stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]
 
 
 def throwCompileErrorInfo(inputStr):
@@ -208,7 +208,7 @@ def isSoundRelatedWidget(cWidget) -> bool:
 
     if Info.SOUND == cWidgetType:
         haveSound = True
-    elif Info.SLIDER == cWidgetType:
+    elif Info.COMBO == cWidgetType:
         itemIds = getSliderItemIds(cWidget)
 
         if isContainItemType(itemIds, Info.ITEM_SOUND):
@@ -307,7 +307,7 @@ def isContainCycleTL(widgetId) -> bool:
 def isVideoRelatedWidget(cWidget) -> bool:
     if Func.isWidgetType(cWidget.widget_id, Info.VIDEO):
         return True
-    elif Func.isWidgetType(cWidget.widget_id, Info.SLIDER):
+    elif Func.isWidgetType(cWidget.widget_id, Info.COMBO):
         return isContainItemType(getSliderItemIds(cWidget), Info.ITEM_VIDEO)
     else:
         return False
@@ -835,12 +835,12 @@ def getAllEventWidgetsList(includedType: int = 1) -> list:
     allEventWidgets = []
 
     if includedType == 3:
-        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH,
+        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH,
                                Info.CYCLE]
     elif includedType == 2:
         allEventWidgetTypes = [Info.CYCLE]
     else:
-        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
+        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]
 
     for cWidgetId, cWidget in Info.WID_WIDGET.items():
         if not isSubWidgetOfIfOrSwitch(cWidgetId) and getWidgetType(cWidgetId) in allEventWidgetTypes:
@@ -856,12 +856,12 @@ def getAllEventWidgetNamesList(includedType: int = 1) -> list:
     cAllEventWidgetNameList = []
 
     if includedType == 3:
-        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH,
+        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH,
                                Info.CYCLE]
     elif includedType == 2:
         allEventWidgetTypes = [Info.CYCLE]
     else:
-        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
+        allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]
 
     for cWidgetId, cWidget in Info.WID_NODE.items():
         if not isSubWidgetOfIfOrSwitch(cWidgetId) and getWidgetType(cWidgetId) in allEventWidgetTypes:
@@ -943,7 +943,7 @@ def getWidgetPos(widgetOrId) -> None or int:
 # noinspection PyBroadException
 def getWidgetEventPos(widget_id: str):
     # def getWidgetEventPos(widget_id: str) -> int or None:
-    allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]
+    allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]
     # 如果是widget是timeline，不存在位置信息
     if widget_id.startswith(Info.TIMELINE):
         return None
@@ -1289,7 +1289,7 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
 
             getSpecialRespsFormatAtts(cWidget.getInputDevice(), cSpecialFormatVarDict)
 
-        elif Func.isWidgetType(widgetId, Info.SLIDER):
+        elif Func.isWidgetType(widgetId, Info.COMBO):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Properties']['Clear After'], 'clearAfter', cSpecialFormatVarDict)
 
@@ -1420,7 +1420,7 @@ def getClearAfterInfo(cWidget, attributesSetDict) -> str:
     : "2" -> "2"
     """
 
-    if Info.SLIDER == getWidgetType(cWidget):
+    if Info.COMBO == getWidgetType(cWidget):
         cProperties = Func.getWidgetProperties(cWidget.widget_id)['Properties']
     else:
         cProperties = Func.getWidgetProperties(cWidget.widget_id)
@@ -1454,7 +1454,7 @@ def getScreenInfo(cWidget, attributesSetDict):
 
 def getSliderItemIds(cWidget, itemType='') -> list:
     itemIds = []
-    if Func.isWidgetType(cWidget.widget_id, Info.SLIDER):
+    if Func.isWidgetType(cWidget.widget_id, Info.COMBO):
         properties = Func.getWidgetProperties(cWidget.widget_id)
 
         if len(itemType) == 0:
@@ -1468,7 +1468,7 @@ def getSliderItemIds(cWidget, itemType='') -> list:
 def getSliderItemTypeNums(cWidget, itemType: str) -> int:
     itemNums = 0
 
-    if Func.isWidgetType(cWidget.widget_id, Info.SLIDER):
+    if Func.isWidgetType(cWidget.widget_id, Info.COMBO):
         itemIds = getSliderItemIds(cWidget)
 
         for cItemId in itemIds:
@@ -1500,7 +1500,7 @@ def getMaxSlaveSoundDevs() -> dict:
     for cWidgetId in Info.WID_WIDGET.keys():
         cWidget = Info.WID_WIDGET[cWidgetId]
 
-        if Func.isWidgetType(cWidgetId, Info.SLIDER):
+        if Func.isWidgetType(cWidgetId, Info.COMBO):
             itemIds = getSliderItemIds(cWidget)
 
             cProperties = Func.getWidgetProperties(cWidget.widget_id)
@@ -1977,7 +1977,7 @@ def flipAudio(cWidget, f, cLoopLevel, attributesSetDict, iSlave=1):
 
     # isSyncToVbl = True
     # haveSound = isContainSound(cWidget)
-    # isSlider = Func.isWidgetType(cWidget.widget_id, Info.SLIDER)
+    # isSlider = Func.isWidgetType(cWidget.widget_id, Info.COMBO)
 
     # 1) check the sound dev parameter:
     cSoundDevName, isRef = getRefValue(cWidget, cWidget.getSoundDeviceName(), attributesSetDict)
@@ -2239,7 +2239,7 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
         allWidgetCodes, *_ = drawImageWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
     elif Info.SOUND == cWidgetType:
         allWidgetCodes = drawSoundWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
-    elif Info.SLIDER == cWidgetType:
+    elif Info.COMBO == cWidgetType:
         allWidgetCodes = drawSliderWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
     elif Info.VIDEO == cWidgetType:
         allWidgetCodes, _ = drawVideoWidget(cWidget, cStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes)
@@ -2597,7 +2597,7 @@ def printTimelineWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
 
         if Info.CYCLE == cWidgetType:
             allWidgetCodes = printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
-        elif cWidgetType in [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO, Info.IF, Info.SWITCH]:
+        elif cWidgetType in [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]:
             allWidgetCodes = printStimWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
         elif Info.DC == cWidgetType:
             allWidgetCodes = printETDcCorrectWidget(cWidget, f, allWidgetCodes)
@@ -3918,7 +3918,7 @@ def compileCode(isDummyCompile):
 
     enabledKBKeysSet.clear()
 
-    # eventWidgetList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.SLIDER, Info.VIDEO,Info.IF, Info.SWITCH]
+    # eventWidgetList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO,Info.IF, Info.SWITCH]
 
     enabledKBKeysSet.add(parseKbCorRespStr('{escape}', False, Info.DEV_KEYBOARD)[1:-1])
 
