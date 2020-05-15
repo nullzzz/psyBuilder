@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal, Qt, QDataStream, QIODevice, QByteArray, QMimeData, QPoint, QSize
 from PyQt5.QtGui import QDrag, QKeySequence
-from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut
+from PyQt5.QtWidgets import QTreeWidget, QMenu, QShortcut, QMessageBox
 
 from app.func import Func
 from app.info import Info

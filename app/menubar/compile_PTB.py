@@ -2622,7 +2622,7 @@ def printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     preStimWid = getPreStimWID(cWidget.widget_id)
     allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, f'{preStimWid}_respCodes')
 
-    printAutoInd(f, '%eyetracker: log variables')
+    printAutoInd(f, '%eyetracker: logging variables')
 
     shouldNotBeCitationCheck('Pause between messages', cWidget.getPauseBetweenMessages())
 

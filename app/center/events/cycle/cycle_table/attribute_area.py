@@ -9,7 +9,7 @@ class AttributeArea(QGroupBox):
         super(AttributeArea, self).__init__(None)
         # widget
         self.tip_label = QLabel()
-        self.tip_label.setFixedHeight(12)
+        self.tip_label.setFixedHeight(20)
         self.tip_label.hide()
         self.name_line_edit = QLineEdit(name)
         self.name_line_edit.textEdited.connect(lambda text: self.nameChanged.emit(self))
@@ -56,7 +56,7 @@ class AttributeArea(QGroupBox):
             self.value_line_edit.setEnabled(False)
 
     def showTip(self, tip: str):
-        self.tip_label.setText(f"""<span style="color: red; font-size:8px">
+        self.tip_label.setText(f"""<span style="color: red; font-size:12px">
                                     {tip}
                                     </span>""")
         self.tip_label.show()

@@ -12,11 +12,11 @@ SOUND = "Sound"
 VIDEO = "Video"
 SLIDER = "Slider"
 
-DC = "DC"
+DC = "DriftCorrection"
 CALIBRATION = "Calibration"
 STARTR = "StartR"
 ENDR = "EndR"
-LOG = "Log"
+LOG = "Logging"
 
 QUEST_UPDATE = "QuestUpdate"
 

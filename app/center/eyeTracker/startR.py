@@ -38,7 +38,7 @@ class StartR(TabItemWidget):
         self.setUI()
 
     def setUI(self):
-        self.setWindowTitle("StartR")
+        self.setWindowTitle("Start Recording")
         self.resize(500, 750)
         self.tip1.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
         self.tip1.setText("Start recording")
