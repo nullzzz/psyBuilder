@@ -16,8 +16,7 @@ class AttributeArea(QGroupBox):
         self.value_line_edit = QLineEdit(value)
         self.name_line_edit.setMinimumWidth(150)
         self.value_line_edit.setMinimumWidth(150)
-        self.setMinimumHeight(80)
-        self.setMinimumWidth(400)
+
         # layout
         layout = QFormLayout()
         layout.addRow(self.tip_label)

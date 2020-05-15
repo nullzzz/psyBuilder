@@ -110,7 +110,8 @@ class AttributeDialog(Dialog):
         """
         # hide or show add button
         self.add_button.hide()
-        self.setMinimumHeight(0)
+        self.setMinimumHeight(180)
+        self.setMinimumWidth(500)
         if type:
             self.setMinimumHeight(600)
             self.add_button.show()
