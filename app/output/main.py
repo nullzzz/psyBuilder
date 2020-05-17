@@ -59,12 +59,12 @@ class Output(DockWidget):
                 else:
                     # for linux at least for Unbuntu
                     os.system("paplay /usr/share/sounds/freedesktop/stereo/bell.oga")
-                    pass
             except:
                 pass
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
         # to the bottom
         self.scroll_bar.setSliderPosition(self.scroll_bar.maximum())
+
 
     def clear(self):
         """

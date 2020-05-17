@@ -24,8 +24,7 @@ stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO
 
 def throwCompileErrorInfo(inputStr):
     Func.printOut(inputStr, 3)
-    raise Exception(inputStr)
-
+    raise Exception("compile failed: see info above for details")
 
 
 def debugPrint(inputStr: str):
@@ -589,9 +588,9 @@ def trans2relativePath(fullFileName:str):
     beSavedDir = os.path.dirname(Info.FILE_NAME)
     try:
         commonPath = os.path.commonpath([fullFileName,beSavedDir])
-
-        if len(commonPath) > 0 and commonPath != beSavedDir:
-            throwCompileErrorInfo(f"All experimental materials should be putt under the folder: {beSavedDir}")
+        # re.sub(r'[\\/]', r'\\', filename)
+        if len(commonPath) > 0 and re.sub(r'[\\/]', r'\\', commonPath) != re.sub(r'[\\/]', r'\\', beSavedDir):
+            raise Exception
 
         fullFileName = fullFileName[len(commonPath):]
     except:
@@ -5716,4 +5715,4 @@ def compileCode(isDummyCompile):
 
 
     if not isDummyPrint:
-        Func.printOut(f"Compile successful!:{compile_file_name}")  # print info to the output panel
+        Func.printOut(f"Compile successful!:{compile_file_name}",1)  # print info to the output panel
