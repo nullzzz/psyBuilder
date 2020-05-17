@@ -585,17 +585,18 @@ def parseEndActionStr(endActionStr):
 
 
 def trans2relativePath(fullFileName:str):
-    beSavedDir = os.path.dirname(Info.FILE_NAME)
-    try:
-        commonPath = os.path.commonpath([fullFileName,beSavedDir])
-        # re.sub(r'[\\/]', r'\\', filename)
-        if len(commonPath) > 0 and re.sub(r'[\\/]', r'\\', commonPath) != re.sub(r'[\\/]', r'\\', beSavedDir):
-            raise Exception
+    if fullFileName:
+        beSavedDir = os.path.dirname(Info.FILE_NAME)
+        try:
+            commonPath = os.path.commonpath([fullFileName,beSavedDir])
+            # re.sub(r'[\\/]', r'\\', filename)
+            if len(commonPath) > 0 and re.sub(r'[\\/]', r'\\', commonPath) != re.sub(r'[\\/]', r'\\', beSavedDir):
+                raise Exception
 
-        fullFileName = fullFileName[len(commonPath):]
-    except:
-        if not fullFileName.startswith("["):
-            throwCompileErrorInfo(f"All experimental materials should be put under the folder: {beSavedDir}")
+            fullFileName = fullFileName[len(commonPath):]
+        except:
+            if not fullFileName.startswith("["):
+                throwCompileErrorInfo(f"All experimental materials should be put under the folder: {beSavedDir}")
 
     return fullFileName
 
