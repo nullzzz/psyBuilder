@@ -1,4 +1,7 @@
 import datetime
+import platform
+
+from sys import stdout
 
 from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QTextEdit
@@ -45,9 +48,14 @@ class Output(DockWidget):
         elif information_type == 3:
             self.text_edit.append(f'<b style="color:rgb(255,84,80)">[error]</b> {information}')
             try:
-                # only windows support
-                import winsound
-                winsound.MessageBeep(winsound.MB_ICONHAND)
+                if platform.system() == 'Windows':
+                    # only windows support
+                    import winsound
+                    winsound.MessageBeep(winsound.MB_ICONHAND)
+                else:
+                    # if platform.system() == 'Darwin':
+                    stdout.write('\a')
+                    stdout.flush()
             except:
                 pass
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
