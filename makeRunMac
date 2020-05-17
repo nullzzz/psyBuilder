@@ -7,18 +7,27 @@ sudo rm -rf ./dist
 sudo rm -rf ./build
 
 
+#sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn run.py
 sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --add-binary='/System/Library/Frameworks/Tk.framework/Tk':'tk' --add-binary='/System/Library/Frameworks/Tcl.framework/Tcl':'tcl' --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn run.py
 
+echo "============================="
 echo "start to codesign the app"
+echo "============================="
 
 APP_PATH="./dist/run.app"
 sudo codesign --deep -f -s B406553BC6044A7B8EB4EA9D42CCE348677576AE "$APP_PATH"
 
-#echo "rename the run to runa"
-
+#echo "============================="
+#echo "rename the run to run0"
+#echo "============================="
+#
 #sudo mv ./dist/run.app/Contents/MacOS/run ./dist/run.app/Contents/MacOS/run0
-
+#
+#echo "====================================="
 #echo "copy the bash file run into run.app"
-
+#echo "====================================="
+#
 #sudo cp ./run ./dist/run.app/Contents/MacOS/
+#
+#sudo chmod +x ./dist/run.app
 

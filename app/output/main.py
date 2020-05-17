@@ -1,4 +1,5 @@
 import datetime
+import os
 import platform
 
 from sys import stdout
@@ -52,10 +53,13 @@ class Output(DockWidget):
                     # only windows support
                     import winsound
                     winsound.MessageBeep(winsound.MB_ICONHAND)
+                elif platform.system() == 'Darwin':
+                    # for mac ox
+                    os.system('afplay /System/Library/Sounds/Funk.aiff')
                 else:
-                    # if platform.system() == 'Darwin':
-                    stdout.write('\a')
-                    stdout.flush()
+                    # for linux at least for Unbuntu
+                    os.system("paplay /usr/share/sounds/freedesktop/stereo/bell.oga")
+                    pass
             except:
                 pass
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
