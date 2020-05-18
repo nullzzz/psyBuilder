@@ -2537,10 +2537,11 @@ def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
 
     # todo to be continued ...
 
-    # if getWidgetPos(cWidget.widget_id) == 0:
-    #     printPreRespCodesFirst = True
+    if getWidgetPos(cWidget.widget_id) == 0:
+        printPreRespCodesFirst = True
 
-    if printPreRespCodesFirst:
+
+    if printPreRespCodesFirst or len(allWidgetCodes.get(f"{preStimWId}_cRespCodes",[])) == 0:
         # draw previous widget's resp code first
         # step 2: print response codes of the previous widget if possible
         printInAllWidgetCodesByKey(f, allWidgetCodes, f"{preStimWId}_cRespCodes")
