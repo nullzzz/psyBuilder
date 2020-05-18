@@ -1128,7 +1128,7 @@ def getMaxLoopLevel() -> int:
 
 def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False, transformStrDict=None):
     if transformStrDict is None:
-        transformStrDict = {'≠': '~=', '≥': '>=', '≤': '<='}
+        transformStrDict = {'=': '==','≠': '~=', '≥': '>=', '≤': '<='}
 
     refPat = r'(\[[A-Za-z]+[a-zA-Z._0-9]*?\])'
     meanPat = r'\[([A-Za-z]+[a-zA-Z._0-9]*?)\]@mean'
