@@ -792,6 +792,14 @@ def parseTextContentStr(inputStr, isRef=False) -> str:
     return inputStr
 
 
+def printOutList(f,inputList:list):
+
+    for cRowStr in inputList:
+        printAutoInd(f, cRowStr)
+    
+    return
+
+
 # noinspection PyStringFormat
 def printAutoInd(f, inputStr, *argins):
     global cIndents, isPreLineSwitch, isDummyPrint
@@ -2488,7 +2496,11 @@ def makeCodes4IfWidget(cWidget, attributesSetDict,cLoopLevel ,allWidgetCodes):
 
 def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     # print comments to indicate the current frame order
-
+    cHeaderList = list()
+    printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    printAutoInd(cHeaderList, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+                 getWidgetName(cWidget.widget_id))
+    printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     # ====================
     # PRINT ALL CODES
     # ===================
@@ -2527,6 +2539,8 @@ def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
         # draw previous widget's resp code first
         # step 2: print response codes of the previous widget if possible
         printInAllWidgetCodesByKey(f, allWidgetCodes, f"{preStimWId}_cRespCodes")
+
+        printOutList(f,cHeaderList)
         # step 1: print stim codes of the current widget
         printInAllWidgetCodesByKey(f, allWidgetCodes, f"{cWidget.widget_id}_cStimCodes")
     else:
@@ -2536,6 +2550,8 @@ def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
         if preStimWId:
             # step 2: print response codes of the previous widget if possible
             printInAllWidgetCodesByKey(f, allWidgetCodes, f"{preStimWId}_cRespCodes")
+
+        printOutList(f, cHeaderList)
 
     # step 3: print flip codes of the current widget
     printInAllWidgetCodesByKey(f, allWidgetCodes, f"{cWidget.widget_id}_cFlipCodes")
