@@ -24,6 +24,7 @@ stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO
 
 def throwCompileErrorInfo(inputStr):
     Func.printOut(inputStr, 3)
+    raise Exception("compile failed: see info above for details")
 
 
 def debugPrint(inputStr: str):
@@ -397,6 +398,16 @@ def replaceDot(screenNameStr, newSplitStr="_") -> str:
     return newSplitStr.join(screenNameStr.split('.'))
 
 
+def genAppropriatePathSplitter(filename:str, isForWin:bool = False) -> str:
+
+    if isForWin:
+        filename = re.sub(r'[\\/]',r'\\',filename)
+    else:
+        filename = re.sub(r'[\\/]', r'/', filename)
+
+    return filename
+
+
 def makeInputDevIndexValueStr(devType: str, indexStr: str, isOrderNum=True) -> [str, int]:
     if Info.DEV_KEYBOARD == devType:
         devIndexesVarName = "kbIndices"
@@ -573,17 +584,36 @@ def parseEndActionStr(endActionStr):
     return endActionStr
 
 
-def parseFilenameStr(inputStr, isRef=False):
-    toBeSavedDir = ''
+def trans2relativePath(fullFileName:str):
+    if fullFileName:
+        beSavedDir = os.path.dirname(Info.FILE_NAME)
+        try:
+            commonPath = os.path.commonpath([fullFileName,beSavedDir])
+            # re.sub(r'[\\/]', r'\\', filename)
+            if len(commonPath) > 0 and re.sub(r'[\\/]', r'\\', commonPath) != re.sub(r'[\\/]', r'\\', beSavedDir):
+                raise Exception
 
-    if not isRef:
-        toBeSavedDir = os.path.dirname(Info.FILE_NAME)
+            fullFileName = fullFileName[len(commonPath):]
+        except:
+            if not fullFileName.startswith("["):
+                throwCompileErrorInfo(f"All experimental materials should be put under the folder: {beSavedDir}")
 
-        if len(toBeSavedDir) <= len(inputStr):
-            if inputStr[:len(toBeSavedDir)] == toBeSavedDir:
-                inputStr = inputStr[len(toBeSavedDir):]
+    return fullFileName
 
-    return inputStr, toBeSavedDir
+
+def formatPathSplitter(inputStr):
+
+    # toBeSavedDir = os.path.dirname(Info.FILE_NAME)
+    #
+    # if not isRef:
+    #
+    #     if len(toBeSavedDir) <= len(inputStr):
+    #         if inputStr[:len(toBeSavedDir)] == toBeSavedDir:
+    #             inputStr = inputStr[len(toBeSavedDir):]
+
+    inputStr = genAppropriatePathSplitter(inputStr, Info.PLATFORM == 'windows')
+
+    return inputStr
 
 
 def parsePhysicSize(inputStr: str) -> list:
@@ -3176,8 +3206,12 @@ def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allW
     cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
     # 2) handle file name:
-    cFilenameStr, isFileRef = getRefValue(cWidget, cProperties['File Name'], attributesSetDict)
-    cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr, isFileRef)
+    # cFilenameStr, isFileNameRef = getRefValue(cWidget, cProperties['File Name'], attributesSetDict)
+    cFileNameStr = trans2relativePath(cProperties['File Name'])
+    cFilenameStr, isFileNameRef, _ = getValueInContainRefExp(cWidget, cFileNameStr, attributesSetDict)
+
+    cFilenameStr = genAppropriatePathSplitter(cFilenameStr, Info.PLATFORM == 'windows')
+
 
     # # 3) check the Buffer Size parameter:
     # bufferSizeStr, isRef = getRefValue(cWidget, cWidget.getBufferSize(), attributesSetDict)
@@ -3216,7 +3250,7 @@ def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allW
     waitForStartStr = parseBooleanStr(*getRefValue(cWidget, cProperties['Wait For Start'], attributesSetDict))
 
     # read audio file
-    if isFileRef is False and cLoopLevel > 0:
+    if isFileNameRef is False and cLoopLevel > 0:
         printAutoInd(soundStimCodes, "if ~exist({0}_Dat,'var')", cPrefixStr)
         printAutoInd(soundStimCodes, "{0}_Dat = audioread(fullfile(cFolder,{1}) );", cPrefixStr,
                      addSingleQuotes(cFilenameStr))
@@ -3294,8 +3328,11 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
     # 2) handle file name:
-    cFilenameStr, isFileNameRef = getRefValue(cWidget, cProperties['File Name'], attributesSetDict)
-    cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr, isFileNameRef)
+    cFileNameStr = trans2relativePath(cProperties['File Name'])
+    cFilenameStr, isFileNameRef, _ = getValueInContainRefExp(cWidget, cFileNameStr, attributesSetDict)
+
+    # cFilenameStr, isFileNameRef = getRefValue(cWidget, cProperties['File Name'], attributesSetDict)
+    cFilenameStr = genAppropriatePathSplitter(cFilenameStr, Info.PLATFORM == 'windows')
 
     # 3) check the mirror up/down parameter:
     isMirrorUpDownStr = parseBooleanStr(cProperties['Mirror Up/Down'])
@@ -3512,8 +3549,11 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
 
     # 2) handle file name:
-    cFilenameStr, isFileRef = getRefValue(cWidget, cProperties['File Name'], attributesSetDict)
-    cFilenameStr, toBeSavedDir = parseFilenameStr(cFilenameStr, isFileRef)
+    cFileNameStr = trans2relativePath(cProperties['File Name'])
+    cFilenameStr, isFileNameRef, _ = getValueInContainRefExp(cWidget, cFileNameStr, attributesSetDict)
+
+    # cFilenameStr, isFileNameRef = getRefValue(cWidget, cProperties['File Name'], attributesSetDict)
+    cFilenameStr = genAppropriatePathSplitter(cFilenameStr, Info.PLATFORM == 'windows')
 
     # 2) handle aspect ration name:
     stretchModeStr, isRef = getRefValue(cWidget, cProperties['Aspect Ratio'], attributesSetDict)
@@ -4353,7 +4393,10 @@ def compileCode(isDummyCompile):
         printAutoInd(f, " ")
         printAutoInd(f, "flipComShiftDur  = winIFIs*0.5; % 0.5 IFI before flip to ensure flipping at right time")
 
-        printAutoInd(f, "%===== initialize output devices ========/")
+        isNoneScreenOutPutDevs = (iNetPort + iSerial+ iParal + iSound) > 4
+
+        if isNoneScreenOutPutDevs:
+            printAutoInd(f, "%===== initialize output devices ========/")
         # initialize TCPIP connections
         if iNetPort > 1:
             printAutoInd(f, "% open TCPIPs")
@@ -4426,7 +4469,10 @@ def compileCode(isDummyCompile):
             # printAutoInd(f, "%----------------------------\\\n")
             printAutoInd(f, "")
 
-        printAutoInd(f, "%========================================\\\n")
+        if isNoneScreenOutPutDevs:
+            printAutoInd(f, "%========================================\\\n")
+
+
 
         if isEyelink:
             # get sound dev for eye tracker feedback:
@@ -4657,7 +4703,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
         printAutoInd(f,
-                     "function [isTerminateStimEvent, secs] = checkRespAndSendTriggers(cWIdx, nextEvFlipReqTime, isOneTimeCheck)")
+                     "function [isTerminateStimEvent, secs] = checkRespAndSendTriggers(cWIdx, nextEvFlipReqTime, isOneTimeCheck) %#ok<INUSL>")
         # globalVarEventStr = ''.join(' ' + cWidgetName for cWidgetName in getAllEventWidgetNamesList() )
         printAutoInd(f, "global{0} abortKeyCode beChkedRespDevs cFrame\n", globalVarEventStr)
 
@@ -5226,7 +5272,7 @@ def compileCode(isDummyCompile):
                         "devType,index,isQueue,lastScrOnsettime,checkStatus,needTobeReset,right,wrong,noResp,respCodeDevType,"
                         "respCodeDevIdx,startRect,endRect,meanRect,isOval)")
         printAutoInd(f, "global beChkedRespDevs  %#ok<*REDEF>")
-        printAutoInd(f, "currently this method is not so beautiful, but it's faster than the struct function")
+        printAutoInd(f, "% currently this method is not so beautiful, but it's faster than the struct function")
         printAutoInd(f, "cIdx = numel(beChkedRespDevs) + 1;")
         printAutoInd(f, "beChkedRespDevs(cIdx).beUpdatedVar     = beUpdatedVar; %#ok<*STRNU>")
         printAutoInd(f, "beChkedRespDevs(cIdx).allowAble        = allowAble;")
@@ -5670,4 +5716,4 @@ def compileCode(isDummyCompile):
 
 
     if not isDummyPrint:
-        Func.printOut(f"Compile successful!:{compile_file_name}")  # print info to the output panel
+        Func.printOut(f"Compile successful!:{compile_file_name}",1)  # print info to the output panel

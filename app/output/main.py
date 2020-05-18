@@ -1,4 +1,8 @@
 import datetime
+import os
+import platform
+
+from sys import stdout
 
 from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QTextEdit
@@ -45,14 +49,22 @@ class Output(DockWidget):
         elif information_type == 3:
             self.text_edit.append(f'<b style="color:rgb(255,84,80)">[error]</b> {information}')
             try:
-                # only windows support
-                import winsound
-                winsound.MessageBeep(winsound.MB_ICONHAND)
+                if platform.system() == 'Windows':
+                    # only windows support
+                    import winsound
+                    winsound.MessageBeep(winsound.MB_ICONHAND)
+                elif platform.system() == 'Darwin':
+                    # for mac ox
+                    os.system('afplay /System/Library/Sounds/Funk.aiff')
+                else:
+                    # for linux at least for Unbuntu
+                    os.system("paplay /usr/share/sounds/freedesktop/stereo/bell.oga")
             except:
                 pass
         self.text_edit.append('<p style="font:5px;color:white">none</p>')
         # to the bottom
         self.scroll_bar.setSliderPosition(self.scroll_bar.maximum())
+
 
     def clear(self):
         """
