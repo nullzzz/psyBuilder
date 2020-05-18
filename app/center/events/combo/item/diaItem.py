@@ -246,10 +246,8 @@ class DiaItem(QGraphicsPolygonItem):
         return new
 
     def changeSomething(self):
-        cx:str = self.properties["Center X"]
-        cy:str = self.properties["Center Y"]
-        if cx.isdigit() and cy.isdigit():
-            self.setPos(int(cx), int(cy))
+        cx = self.properties["Center X"]
+        cy = self.properties["Center Y"]
 
         # fill color
         fill_color = self.pro_window.general.fill_color.getColor()
@@ -288,6 +286,8 @@ class DiaItem(QGraphicsPolygonItem):
                 path.lineTo(int(points[0][0]) - cx, int(points[0][1]) - cy)
 
         else:
+            if cx.isdigit() and cy.isdigit():
+                self.setPos(int(cx), int(cy))
             __w = self.properties["Width"]
             w = int(__w) if __w.isdigit() else 100
             __h = self.properties["Height"]
