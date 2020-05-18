@@ -3,7 +3,7 @@
 work_path=$(dirname $0)
 cd ${work_path}
 
-#sudo rm -rf ./dist
+sudo rm -rf ./forDist
 #sudo rm -rf ./build
 
 
@@ -24,7 +24,7 @@ echo "============================="
 
 sudo mkdir "./forDist"
 sudo cp -f -R $APP_PATH ./forDist/
-sudo cp -f ./doubleClickOnMeFirst ./forDist/
+#sudo cp -f ./doubleClickOnMeFirst ./forDist/
 
 sudo zip -r -X "PsyBuilderMac$(date +%Y%m%d%H%M%S).zip" ./forDist
 

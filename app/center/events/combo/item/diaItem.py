@@ -246,8 +246,10 @@ class DiaItem(QGraphicsPolygonItem):
         return new
 
     def changeSomething(self):
-        cx = self.properties["Center X"]
-        cy = self.properties["Center Y"]
+        cx:str = self.properties["Center X"]
+        cy:str = self.properties["Center Y"]
+        if cx.isdigit() and cy.isdigit():
+            self.setPos(int(cx), int(cy))
 
         # fill color
         fill_color = self.pro_window.general.fill_color.getColor()
