@@ -235,27 +235,38 @@ def isRgbaStr(inputStr):
 
 
 def isRectStr(inputStr):
+    if len(inputStr) == 0:
+        return None
     isRectFormat = re.fullmatch(r"^\d+,\d+,\d+,\d+$", inputStr)
     return isRectFormat
 
 
 def isRgbaWithBracketsStr(inputStr):
+    if len(inputStr) == 0:
+        return None
     isRgbaFormat = re.fullmatch(r"^\[\d+,\d+,\d+,\d+\]$", inputStr)
     return isRgbaFormat
 
 
 def isRectWithBracketsStr(inputStr):
+    if len(inputStr) == 0:
+        return None
     isRectFormat = re.fullmatch(r"^\[\d+,\d+,\d+,\d+\]$", inputStr)
     return isRectFormat
 
 
 def isRgbWithBracketsStr(inputStr):
+    if len(inputStr) == 0:
+        return None
     isRgbFormat = re.fullmatch(r'^\[\d+,\d+,\d+\]$', inputStr)
     return isRgbFormat
 
 
 def isNumStr(inputStr):
     if isinstance(inputStr, str):
+        if len(inputStr) == 0:
+            return False
+
         return re.fullmatch(r"([\d]*\.[\d$]+)|\d*", inputStr)
 
     return False
@@ -263,6 +274,9 @@ def isNumStr(inputStr):
 
 def isIntStr(inputStr):
     if isinstance(inputStr, str):
+        if len(inputStr) == 0:
+            return False
+
         return re.fullmatch(r"\d*", inputStr)
 
     return False
@@ -270,6 +284,8 @@ def isIntStr(inputStr):
 
 def isFloatStr(inputStr):
     if isinstance(inputStr, str):
+        if len(inputStr) == 0:
+            return False
         return re.fullmatch(r"([\d]*\.[\d$]+)", inputStr)
 
     return False
@@ -277,6 +293,9 @@ def isFloatStr(inputStr):
 
 def isPercentStr(inputStr):
     if isinstance(inputStr, str):
+        if len(inputStr) == 0:
+            return False
+
         return re.fullmatch(r"([\d]*\.[\d]+%$)|(\d*%$)", inputStr)
 
     return False
@@ -288,6 +307,8 @@ def isRefStr(inputStr):
     if isinstance(inputStr, str):
         # if isRgbWithBracketsStr(inputStr):
         #     return False
+        if len(inputStr) == 0:
+            return False
 
         # special chars lose their special meaning inside sets [], so . inside [] just means the char '.'
         if re.fullmatch(r'\[[A-Za-z]+[a-zA-Z._0-9]*\]', inputStr):
@@ -1146,7 +1167,7 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
 
     allRefs = re.findall(refPat, inputStr)
 
-    if len(allRefs) > 1:
+    if len(allRefs) > 0:
         for cRefs in allRefs:
             cRefsValue, isRefValue = getRefValue(cWidget, cRefs, attributesSetDict)
 
@@ -2291,8 +2312,10 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
 
         for cCase in caseWidgets:
             cSubWid = cCase['Sub Wid']
-            allWidgetCodes = genStimWidgetAllCodes(Info.WID_WIDGET[cSubWid], attributesSetDict, cLoopLevel,
-                                                   allWidgetCodes)
+
+            if cSubWid:
+                allWidgetCodes = genStimWidgetAllCodes(Info.WID_WIDGET[cSubWid], attributesSetDict, cLoopLevel,
+                                                       allWidgetCodes)
 
         # concatenate codes for switch widget
         allWidgetCodes = makeCodes4SwitchWidget(cWidget, attributesSetDict, allWidgetCodes)
@@ -2400,9 +2423,17 @@ def makeCodes4IfWidget(cWidget, attributesSetDict, allWidgetCodes):
             cTypeCodes = list()
 
             printAutoInd(cTypeCodes, "if {0}", condStr)
-            cTypeCodes.extend(allWidgetCodes[f"{trueWidget.widget_id}{cCodeType}"])
+            if trueWidget:
+                cTypeCodes.extend(allWidgetCodes[f"{trueWidget.widget_id}{cCodeType}"])
+            else:
+                cTypeCodes.extend(["% do nothing"])
+
             printAutoInd(cTypeCodes, "else")
-            cTypeCodes.extend(allWidgetCodes[f"{falseWidget.widget_id}{cCodeType}"])
+            if falseWidget:
+                cTypeCodes.extend(allWidgetCodes[f"{falseWidget.widget_id}{cCodeType}"])
+            else:
+                cTypeCodes.extend(["% do nothing"])
+
             printAutoInd(cTypeCodes, "end ")
 
             allWidgetCodes.update({f"{cWidget.widget_id}{cCodeType}": cTypeCodes})
