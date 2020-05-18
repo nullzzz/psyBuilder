@@ -5,9 +5,9 @@ from lib import VarComboBox
 
 
 # slider专属页面
-class SliderGeneral(QWidget):
+class ComboGeneral(QWidget):
     def __init__(self, parent=None):
-        super(SliderGeneral, self).__init__(parent)
+        super(ComboGeneral, self).__init__(parent)
 
         # 当前页面属性
         self.default_properties = {

@@ -7,7 +7,7 @@ from app.func import Func
 from lib import TabItemMainWindow
 from .item import *
 from .left.leftBox import LeftBox
-from .property import SliderProperty
+from .property import ComboProperty
 from .scene import Scene
 
 
@@ -16,7 +16,7 @@ class Combo(TabItemMainWindow):
         super(Combo, self).__init__(widget_id, widget_name)
         self.current_wid = widget_id
 
-        self.pro_window = SliderProperty()
+        self.pro_window = ComboProperty()
 
         self.scene = Scene()
         self.left_box = LeftBox()

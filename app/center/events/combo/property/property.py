@@ -3,18 +3,18 @@ from PyQt5.QtWidgets import (QWidget, QTabWidget, QPushButton, QVBoxLayout, QHBo
 
 from app.center.events.__tools__ import DurationPage
 from app.center.events.__tools__ import FramePage
-from app.center.events.combo.property.general import SliderGeneral
+from app.center.events.combo.property.general import ComboGeneral
 from app.func import Func
 
 
-class SliderProperty(QWidget):
+class ComboProperty(QWidget):
     def __init__(self, parent=None):
-        super(SliderProperty, self).__init__(parent)
+        super(ComboProperty, self).__init__(parent)
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.tab = QTabWidget()
 
-        self.general = SliderGeneral()
+        self.general = ComboGeneral()
         self.frame = FramePage()
         self.duration = DurationPage()
 

@@ -1,1 +1,1 @@
-from .property import SliderProperty
+from .property import ComboProperty
