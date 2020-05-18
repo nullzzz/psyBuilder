@@ -822,7 +822,7 @@ class Psy(QMainWindow):
             setting = Settings(file_path, Settings.IniFormat)
         except:
             return False
-        # restore data firstly
+        # 首先从文件中读取各种Info中的数据
         names = setting.value("Names", -1)
         Info.WidgetTypeCount = setting.value("WidgetTypeCount", -1)
         Info.WidgetNameCount = setting.value("WidgetNameCount", -1)
@@ -833,7 +833,9 @@ class Psy(QMainWindow):
         tracker_device_info = setting.value("TrackerDeviceInfo", -1)
 
         Info.COMBO_COUNT = setting.value("SliderCount", -1)
+        # 读取各种widget存储的数据
         widgets_data = setting.value("Widgets", -1)
+        # 读取结构数据
         structure = setting.value("Structure", -1)
         # tabs = setting.value("Tabs", -1)
         # any one equal -1, fail
@@ -860,13 +862,15 @@ class Psy(QMainWindow):
         self.device_cloud.quest.setProperties(quest_device_info)
         self.device_cloud.tracker.setProperties(tracker_device_info)
         # end restore device
-        # restore structure
+        # 恢复structure窗口
         self.structure.restore(structure)
-        # restore widgets according to structure, because some widget need to get attributes in __init__ function
+        # 根据structure中的结构恢复widget，因为部分widget在__init__函数中调用attribute，而这个函数依赖于structure结构得到其上下文属性
+        # 根据structure递归恢复widget
         root_widget_id, root_widget_name, children = structure
+        # 保存已经创建的widget，因为有些模块是引用其他模块，不用创建新的，而引用模块的名称都相同，只需要检测名称是否在这个字典里面就行
         created_widgets = {}
         self.restoreWidget(names, widgets_data, created_widgets, root_widget_id, root_widget_name, children)
-        # restore Info.Name
+        # 恢复Info.Name，不在刚开始就恢复的原因是：调用createWidget时会自动保存数据到Info.Names,但是按照structure创建不一定是对的
         Info.Names = names
         # restore tabs
         # self.center.restore(tabs)
@@ -886,8 +890,8 @@ class Psy(QMainWindow):
         # we just store origin widgets data.
         # create or map widget firstly
         if widget_name not in created_widgets:
+            # 如果模块还没有被创建，就先创建模块，然后恢复其数据
             # create widget
-
             widget = self.createWidget(widget_id, widget_name)
             # restore widget data
             widget_data = widgets_data[f"{names[widget_name][0]}&{widget_name}"]
@@ -895,13 +899,16 @@ class Psy(QMainWindow):
             # log in created widgets
             created_widgets[widget_name] = widget
         else:
+            # 如果已经创建了模块，则直接映射
             # widget has been created, map firstly
             widget = created_widgets[widget_name]
             Info.Widgets[widget_id] = widget
+            # 被引用模块我们称之为源模块，而源模块的widget id为names中保存的第一个widget id
+            # 但是我们在恢复时的创建是按structure结构来的，创建的并不一定是源模块，因此我们需要修改他的widget id让他成为源模块
             if widget_id == names[widget_name][0]:
                 # if this is origin widget, change widget's widget id
                 widget.changeWidgetId(widget_id)
-        # handle its children
+        # 递归处理子节点
         for child_widget_id, child_widget_name, child_children in children:
             self.restoreWidget(names, widgets_data, created_widgets, child_widget_id, child_widget_name, child_children)
 
