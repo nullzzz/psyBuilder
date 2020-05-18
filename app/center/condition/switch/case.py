@@ -106,7 +106,7 @@ class Case(QGroupBox):
     def getCase(self) -> dict:
         return {
             "Case Value": self.default_properties.get("Case value", ""),
-            **self.icon_choose.default_properties,
+            **self.icon_choose.getProperties(),
         }
 
     def getSubWid(self):
