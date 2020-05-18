@@ -188,7 +188,7 @@ class Loop(TabItemMainWindow):
     def getHiddenAttributes(self) -> list:
         """
         every widget has global attributes and own attributes,
-        we get global attributes through common function Func.getAttributes(widget_id) and
+        we get global attributes through common function Func.getWidgetAttributes(widget_id) and
         we get widget's own attributes through this function.
         @return: dict of attributes
         """

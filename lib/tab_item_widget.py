@@ -56,7 +56,7 @@ class TabItemWidget(QWidget):
         """
         You should finish the job.
         every widget has global attributes and own attributes,
-        we get global attributes through common function Func.getAttributes(widget_id) and
+        we get global attributes through common function Func.getWidgetAttributes(widget_id) and
         we get widget's own attributes through this function.
         Its values are also depended on device whether used.
         used:
