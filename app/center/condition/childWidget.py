@@ -146,12 +146,6 @@ class ChildWidget(QWidget):
         self.pro_window.close()
 
     def openProWindow(self):
-        if self.current_sub_wid != "":
-            try:
-                self.widget = Func.getWidget(self.current_sub_wid)
-                self.linkWidgetSignal()
-            except KeyError:
-                pass
         if self.event_type == Info.COMBO:
             self.widget.show()
         else:
@@ -161,9 +155,10 @@ class ChildWidget(QWidget):
         self.default_properties["Id Pool"] = self.pool
         self.default_properties["Sub Wid"] = self.current_sub_wid
         self.default_properties["Stim Type"] = self.event_type
-        self.default_properties["Event Name"] = self.event_name
+        self.default_properties["Event Name"] = self.name_line.text()
 
     def getProperties(self):
+        self.updateWidget()
         return self.default_properties
 
     # 加载外部属性
@@ -198,6 +193,7 @@ class ChildWidget(QWidget):
         获取子控件
         :return:
         """
+        self.updateWidget()
         return self.widget
 
     def getWidgetId(self) -> str:
@@ -207,6 +203,14 @@ class ChildWidget(QWidget):
         if self.widget:
             return self.widget.getUsingDeviceCount()
         return 0
+
+    def updateWidget(self):
+        if self.current_sub_wid != "":
+            try:
+                self.widget = Func.getWidget(self.current_sub_wid)
+                self.linkWidgetSignal()
+            except KeyError:
+                pass
 
 
 class IconLabel(QLabel):
