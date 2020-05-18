@@ -886,8 +886,8 @@ class Psy(QMainWindow):
         # we just store origin widgets data.
         # create or map widget firstly
         if widget_name not in created_widgets:
+            print(f"create {widget_name}")
             # create widget
-
             widget = self.createWidget(widget_id, widget_name)
             # restore widget data
             widget_data = widgets_data[f"{names[widget_name][0]}&{widget_name}"]

@@ -108,7 +108,7 @@ class IfBranch(TabItemWidget):
     def apply(self):
         self.updateInfo()
         self.propertiesChanged.emit(self.widget_id)
-        attributes = Func.getAttributes(self.widget_id)
+        attributes = Func.getWidgetAttributes(self.widget_id)
         self.setAttributes(attributes)
 
     def setProperties(self, properties: dict):

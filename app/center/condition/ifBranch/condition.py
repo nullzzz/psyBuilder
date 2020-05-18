@@ -97,7 +97,7 @@ class ConditionArea(QWidget):
                 self.conditions.pop()
                 self.form_layout.removeRow(i)
         for i, c in enumerate(self.conditions):
-            c.setProperties(self.default_properties.get(f"condition {i}", {}))
+            c.setProperties(self.default_properties.get(f"Condition {i}", {}))
 
     def setProperties(self, properties: dict):
         self.default_properties.update(properties)
