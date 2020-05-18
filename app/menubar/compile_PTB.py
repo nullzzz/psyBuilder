@@ -795,6 +795,8 @@ def parseTextContentStr(inputStr, isRef=False) -> str:
 def printOutList(f,inputList:list):
 
     for cRowStr in inputList:
+        cRowStr = "{{".join(cRowStr.split('{'))
+        cRowStr = "}}".join(cRowStr.split('}'))
         printAutoInd(f, cRowStr)
     
     return
@@ -1914,12 +1916,12 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
 
     cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_cRespCodes", [])
 
-    if getWidgetPos(cWidget.widget_id) > 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-        # Step 2: print out help info for the current widget
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, cWidgetPos + 1,
-                     getWidgetName(cWidget.widget_id))
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    # if getWidgetPos(cWidget.widget_id) > 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+    #     # Step 2: print out help info for the current widget
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, cWidgetPos + 1,
+    #                  getWidgetName(cWidget.widget_id))
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
     if isVideoRelatedWidget(cWidget):
         # printAutoInd(f, "% for first event, flip immediately.. ")
@@ -2051,12 +2053,12 @@ def flipAudio(cWidget, f, cLoopLevel, attributesSetDict, iSlave=1):
     # if Func.isWidgetType(cWidget.widget_id, Info.SOUND):
     isSyncToVbl = cWidget.getSyncToVbl()
 
-    if getWidgetPos(cWidget.widget_id) > 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-        # Step 2: print out help info for the current widget
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-                     getWidgetName(cWidget.widget_id))
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    # if getWidgetPos(cWidget.widget_id) > 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+    #     # Step 2: print out help info for the current widget
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+    #                  getWidgetName(cWidget.widget_id))
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
     if isSyncToVbl:
         # Flip the Screen
@@ -2381,11 +2383,11 @@ def makeCodes4SwitchWidget(cWidget, attributesSetDict, cLoopLevel, allWidgetCode
         switchExp = cWidget.getSwitch()
         switchExp, *_ = getValueInContainRefExp(cWidget, switchExp, attributesSetDict)
 
-        cHeaderList = list()
-        printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(cHeaderList, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-                     getWidgetName(cWidget.widget_id))
-        printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        # cHeaderList = list()
+        # printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        # printAutoInd(cHeaderList, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+        #              getWidgetName(cWidget.widget_id))
+        # printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
         # cases: list = [{'Case Value': '',
         #  'Id Pool': {'Image': 'Image.0', 'Video': '', 'Text': '', 'Sound': '', 'Slider': ''},
@@ -2403,11 +2405,11 @@ def makeCodes4SwitchWidget(cWidget, attributesSetDict, cLoopLevel, allWidgetCode
         for cCodeType in codeTypesList:
             cTypeCodes = list()
             # print out the frame header
-            if getWidgetPos(cWidget.widget_id) == 0 and cCodeType == '_cStimCodes':
-                cTypeCodes.extend(cHeaderList)
+            # if getWidgetPos(cWidget.widget_id) == 0 and cCodeType == '_cStimCodes':
+                # cTypeCodes.extend(cHeaderList)
 
-            if getWidgetPos(cWidget.widget_id) > 0 and cCodeType == '_cFlipCodes':
-                cTypeCodes.extend(cHeaderList)
+            # if getWidgetPos(cWidget.widget_id) > 0 and cCodeType == '_cFlipCodes':
+                # cTypeCodes.extend(cHeaderList)
 
             printAutoInd(cTypeCodes, "switch {0}", switchExp)
 
@@ -2443,21 +2445,21 @@ def makeCodes4IfWidget(cWidget, attributesSetDict,cLoopLevel ,allWidgetCodes):
         # if getWidgetPos(cWidget.widget_id) > 0 and not (isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # generate Event Header
 
-        cHeaderList = list()
-        printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(cHeaderList, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-                     getWidgetName(cWidget.widget_id))
-        printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        # cHeaderList = list()
+        # printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        # printAutoInd(cHeaderList, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+        #              getWidgetName(cWidget.widget_id))
+        # printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 
         for cCodeType in codeTypesList:
             cTypeCodes = list()
 
-            if getWidgetPos(cWidget.widget_id) == 0 and cCodeType == '_cStimCodes':
-                cTypeCodes.extend(cHeaderList)
+            # if getWidgetPos(cWidget.widget_id) == 0 and cCodeType == '_cStimCodes':
+                # cTypeCodes.extend(cHeaderList)
 
-            if getWidgetPos(cWidget.widget_id) > 0 and cCodeType == '_cFlipCodes':
-                cTypeCodes.extend(cHeaderList)
+            # if getWidgetPos(cWidget.widget_id) > 0 and cCodeType == '_cFlipCodes':
+                # cTypeCodes.extend(cHeaderList)
 
             cTypeCodes.extend([f"% {Func.getWidgetName(cWidget.widget_id)}{cCodeType}"])
 
@@ -2534,7 +2536,10 @@ def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
             printPreRespCodesFirst = True
 
     # todo to be continued ...
-    # else:
+
+    # if getWidgetPos(cWidget.widget_id) == 0:
+    #     printPreRespCodesFirst = True
+
     if printPreRespCodesFirst:
         # draw previous widget's resp code first
         # step 2: print response codes of the previous widget if possible
@@ -2922,12 +2927,12 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
     iVideoNum = 1
     # print(os.path.abspath(__file__))
 
-    if getWidgetPos(cWidget.widget_id) == 0  and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-        # Step 2: print out help info for the current widget
-        printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(sliderStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-                     getWidgetName(cWidget.widget_id))
-        printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    # if getWidgetPos(cWidget.widget_id) == 0  and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+    #     # Step 2: print out help info for the current widget
+    #     printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    #     printAutoInd(sliderStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+    #                  getWidgetName(cWidget.widget_id))
+    #     printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
     cSliderProperties = Func.getWidgetProperties(cWidget.widget_id)
     # ------------------------------------------------
@@ -3286,12 +3291,12 @@ def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allW
     else:
         cPrefixStr = getWidgetName(cWidget.widget_id) + '_' + cProperties['Name']
 
-    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-        # Step 2: print out help info for the current widget
-        printAutoInd(soundStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(soundStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-                     getWidgetName(cWidget.widget_id))
-        printAutoInd(soundStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    # if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+    #     # Step 2: print out help info for the current widget
+    #     printAutoInd(soundStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    #     printAutoInd(soundStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+    #                  getWidgetName(cWidget.widget_id))
+    #     printAutoInd(soundStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
@@ -3407,12 +3412,12 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_respCodes", [])
     beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
 
-    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-        # Step 2: print out help info for the current widget
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-                     getWidgetName(cWidget.widget_id))
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    # if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+    #     # Step 2: print out help info for the current widget
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+    #                  getWidgetName(cWidget.widget_id))
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
@@ -3628,12 +3633,12 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
 
     cBeFlipCodes = allWidgetCodes.get('codesBeFlip', [])
 
-    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-        # Step 2: print out help info for the current widget
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-                     cWidgetName)
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    # if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+    #     # Step 2: print out help info for the current widget
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+    #                  cWidgetName)
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
@@ -3886,12 +3891,12 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
 
-    if getWidgetPos(cWidget.widget_id) == 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-        # Step 2: print out help info for the current widget
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-                     getWidgetName(cWidget.widget_id))
-        printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    # if getWidgetPos(cWidget.widget_id) == 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+    #     # Step 2: print out help info for the current widget
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+    #                  getWidgetName(cWidget.widget_id))
+    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
     cProperties = Func.getWidgetProperties(cWidget.widget_id)
     # ------------------------------------------------
