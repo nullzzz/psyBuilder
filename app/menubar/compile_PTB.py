@@ -1906,7 +1906,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
 
     cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_cRespCodes", [])
 
-    if getWidgetPos(cWidget.widget_id) > 0:
+    if getWidgetPos(cWidget.widget_id) > 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # Step 2: print out help info for the current widget
         printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, cWidgetPos + 1,
@@ -2043,7 +2043,7 @@ def flipAudio(cWidget, f, cLoopLevel, attributesSetDict, iSlave=1):
     # if Func.isWidgetType(cWidget.widget_id, Info.SOUND):
     isSyncToVbl = cWidget.getSyncToVbl()
 
-    if getWidgetPos(cWidget.widget_id) > 0:
+    if getWidgetPos(cWidget.widget_id) > 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # Step 2: print out help info for the current widget
         printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
@@ -2304,7 +2304,7 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
         allWidgetCodes = genStimWidgetAllCodes(trueWidget, attributesSetDict, cLoopLevel, allWidgetCodes)
 
         # concatenate codes for IF widget
-        allWidgetCodes = makeCodes4IfWidget(cWidget, attributesSetDict, allWidgetCodes)
+        allWidgetCodes = makeCodes4IfWidget(cWidget, attributesSetDict,cLoopLevel, allWidgetCodes)
 
         return allWidgetCodes
 
@@ -2319,7 +2319,7 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
                                                        allWidgetCodes)
 
         # concatenate codes for switch widget
-        allWidgetCodes = makeCodes4SwitchWidget(cWidget, attributesSetDict, allWidgetCodes)
+        allWidgetCodes = makeCodes4SwitchWidget(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes)
 
         return allWidgetCodes
 
@@ -2366,12 +2366,18 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
     return allWidgetCodes
 
 
-def makeCodes4SwitchWidget(cWidget, attributesSetDict, allWidgetCodes):
+def makeCodes4SwitchWidget(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes):
     if getWidgetType(cWidget) == Info.SWITCH:
         codeTypesList = ['_cStimCodes', '_cFlipCodes', '_cStimTriggerCodes', '_cUpdateDurCodes', '_cRespCodes']
 
         switchExp = cWidget.getSwitch()
         switchExp, *_ = getValueInContainRefExp(cWidget, switchExp, attributesSetDict)
+
+        cHeaderList = list()
+        printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(cHeaderList, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+                     getWidgetName(cWidget.widget_id))
+        printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
         # cases: list = [{'Case Value': '',
         #  'Id Pool': {'Image': 'Image.0', 'Video': '', 'Text': '', 'Sound': '', 'Slider': ''},
@@ -2388,6 +2394,12 @@ def makeCodes4SwitchWidget(cWidget, attributesSetDict, allWidgetCodes):
 
         for cCodeType in codeTypesList:
             cTypeCodes = list()
+            # print out the frame header
+            if getWidgetPos(cWidget.widget_id) == 0 and cCodeType == '_cStimCodes':
+                cTypeCodes.extend(cHeaderList)
+
+            if getWidgetPos(cWidget.widget_id) > 0 and cCodeType == '_cFlipCodes':
+                cTypeCodes.extend(cHeaderList)
 
             printAutoInd(cTypeCodes, "switch {0}", switchExp)
 
@@ -2410,7 +2422,7 @@ def makeCodes4SwitchWidget(cWidget, attributesSetDict, allWidgetCodes):
     return allWidgetCodes
 
 
-def makeCodes4IfWidget(cWidget, attributesSetDict, allWidgetCodes):
+def makeCodes4IfWidget(cWidget, attributesSetDict,cLoopLevel ,allWidgetCodes):
     if getWidgetType(cWidget) == Info.IF:
         condStr = cWidget.getCondition()
         condStr, *_ = getValueInContainRefExp(cWidget, condStr, attributesSetDict)
@@ -2420,23 +2432,53 @@ def makeCodes4IfWidget(cWidget, attributesSetDict, allWidgetCodes):
         trueWidget = cWidget.getTrueWidget()
         falseWidget = cWidget.getFalseWidget()
 
+        # if getWidgetPos(cWidget.widget_id) > 0 and not (isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+        # generate Event Header
+
+        cHeaderList = list()
+        printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        printAutoInd(cHeaderList, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
+                     getWidgetName(cWidget.widget_id))
+        printAutoInd(cHeaderList, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
+
         for cCodeType in codeTypesList:
-            cTypeCodes = [f"% {Func.getWidgetName(cWidget.widget_id)}{cCodeType}"]
+            cTypeCodes = list()
+
+            if getWidgetPos(cWidget.widget_id) == 0 and cCodeType == '_cStimCodes':
+                cTypeCodes.extend(cHeaderList)
+
+            if getWidgetPos(cWidget.widget_id) > 0 and cCodeType == '_cFlipCodes':
+                cTypeCodes.extend(cHeaderList)
+
+            cTypeCodes.extend([f"% {Func.getWidgetName(cWidget.widget_id)}{cCodeType}"])
+
+            trueWidgetCodesList = list()
+            falseWidgetCodesList = list()
+
+            if trueWidget:
+                trueWidgetCodesList = allWidgetCodes[f"{trueWidget.widget_id}{cCodeType}"]
+
+            if falseWidget:
+                falseWidgetCodesList = allWidgetCodes[f"{falseWidget.widget_id}{cCodeType}"]
 
 
-            printAutoInd(cTypeCodes, "if {0}", condStr)
-            if trueWidget and len(allWidgetCodes[f"{trueWidget.widget_id}{cCodeType}"]) > 0:
-                cTypeCodes.extend(allWidgetCodes[f"{trueWidget.widget_id}{cCodeType}"])
+            if len(trueWidgetCodesList)>0:
+                printAutoInd(cTypeCodes, "if {0}", condStr)
+                cTypeCodes.extend(trueWidgetCodesList)
+
+                if len(falseWidgetCodesList) > 0:
+                    printAutoInd(cTypeCodes, "else")
             else:
-                cTypeCodes.extend(["% do nothing"])
+                if len(falseWidgetCodesList) > 0:
+                    printAutoInd(cTypeCodes, "if ~{0}", condStr)
 
-            printAutoInd(cTypeCodes, "else")
-            if falseWidget and len(allWidgetCodes[f"{falseWidget.widget_id}{cCodeType}"]) > 0:
-                cTypeCodes.extend(allWidgetCodes[f"{falseWidget.widget_id}{cCodeType}"])
-            else:
-                cTypeCodes.extend(["% do nothing"])
 
-            printAutoInd(cTypeCodes, "end ")
+            if len(falseWidgetCodesList) > 0:
+                cTypeCodes.extend(falseWidgetCodesList)
+
+            if len(trueWidgetCodesList) + len(falseWidgetCodesList)> 0:
+                printAutoInd(cTypeCodes, "end ")
 
 
             allWidgetCodes.update({f"{cWidget.widget_id}{cCodeType}": cTypeCodes})
@@ -2446,6 +2488,7 @@ def makeCodes4IfWidget(cWidget, attributesSetDict, allWidgetCodes):
 
 def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     # print comments to indicate the current frame order
+
     # ====================
     # PRINT ALL CODES
     # ===================
@@ -2863,7 +2906,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
     iVideoNum = 1
     # print(os.path.abspath(__file__))
 
-    if getWidgetPos(cWidget.widget_id) == 0:
+    if getWidgetPos(cWidget.widget_id) == 0  and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # Step 2: print out help info for the current widget
         printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         printAutoInd(sliderStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
@@ -3227,7 +3270,7 @@ def drawSoundWidget(cWidget, soundStimCodes, attributesSetDict, cLoopLevel, allW
     else:
         cPrefixStr = getWidgetName(cWidget.widget_id) + '_' + cProperties['Name']
 
-    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide:
+    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # Step 2: print out help info for the current widget
         printAutoInd(soundStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         printAutoInd(soundStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
@@ -3348,7 +3391,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_respCodes", [])
     beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
 
-    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and  (not isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # Step 2: print out help info for the current widget
         printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
@@ -3569,7 +3612,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
 
     cBeFlipCodes = allWidgetCodes.get('codesBeFlip', [])
 
-    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and (not isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
+    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # Step 2: print out help info for the current widget
         printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
@@ -3827,7 +3870,7 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
 
-    if getWidgetPos(cWidget.widget_id) == 0:
+    if getWidgetPos(cWidget.widget_id) == 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # Step 2: print out help info for the current widget
         printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
@@ -4720,7 +4763,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, 'else')
 
         printAutoInd(f, '% for attributes in cycle')
-        printAutoInd(f, "{0}", 'if isempty(beUpdatedVar{iRow})')
+        printAutoInd(f, "if {0}", 'isempty(beUpdatedVar{iRow})')
         printAutoInd(f, 'beUpdatedVar(iRow) = beUpdatedVar(iRow - 1);')
         printAutoInd(f, 'end ')
 
@@ -4772,10 +4815,10 @@ def compileCode(isDummyCompile):
 
         if outDevCountsDict[Info.DEV_PARALLEL_PORT] > 0:
             printAutoInd(f, "{0}", "% reset parallel port back to 0")
-            printAutoInd(f, "{0}", "if cRespDevs(iRespDev).needTobeReset && (secs - cRespDevs(iRespDev).startTime) > 0.01 % currently set to 10 ms")
+            printAutoInd(f, "if {0}", "cRespDevs(iRespDev).needTobeReset && (secs - cRespDevs(iRespDev).startTime) > 0.01 % currently set to 10 ms")
             printAutoInd(f, "{0}", "sendTriggerOrMsg(cRespDevs(iRespDev).respCodeDevType,cRespDevs(iRespDev).respCodeDevIdx, 0);")
             printAutoInd(f, "{0}", "cRespDevs(iRespDev).needTobeReset = false;")
-            printAutoInd(f, "{0}", "end \n")
+            printAutoInd(f, "end \n")
 
         printAutoInd(f, "% if RT window is not negative and cTime is out of RT Window")
         printAutoInd(f, "if cRespDevs(iRespDev).rtWindow > 0 && (secs - cRespDevs(iRespDev).startTime) > cRespDevs(iRespDev).rtWindow")
