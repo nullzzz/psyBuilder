@@ -1146,7 +1146,7 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
     medianPat = r'\[([A-Za-z]+[a-zA-Z._0-9]*?)\]@median'
     modePat = r'\[([A-Za-z]+[a-zA-Z._0-9]*?)\]@mode'
 
-    refedObList = list()
+    refedObNameList = list()
     isContainRef = 0
 
     for key, value in transformStrDict.items():
@@ -1182,7 +1182,7 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
         for cRefs in allRefs:
             cRefsValue, isRefValue = getRefValue(cWidget, cRefs, attributesSetDict)
 
-            refedObList.append("".join(cItem + '.' for cItem in cRefs.split('.')[0:-1])[0:-1])
+            refedObNameList.append("".join(cItem + '.' for cItem in re.sub(r'[\[\]]', '', cRefs).split('.')[0:-1])[0:-1])
 
             inputStr = inputStr.replace(cRefs, cRefsValue)
 
@@ -1195,7 +1195,7 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
         if len(allRefs)>1:
             inputStr = addSquBrackets(inputStr)
 
-    return inputStr, isContainRef, refedObList
+    return inputStr, isContainRef, refedObNameList
 
 
 def getWidgetIDInTimeline(widget_id: str) -> list:
@@ -2512,27 +2512,27 @@ def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
 
     if getWidgetType(cWidget) == Info.SWITCH:
         # switch expression
-        _, _, referObList = getValueInContainRefExp(cWidget, cWidget.getSwitch(), attributesSetDict)
+        _, _, referObNameList = getValueInContainRefExp(cWidget, cWidget.getSwitch(), attributesSetDict)
 
         # case values
         for cCaseDict in cWidget.getCases():
             cCaseValueStr = cCaseDict['Case Value']
             if len(cCaseValueStr) > 0:
-                _, _, cValueReferObList = getValueInContainRefExp(cWidget, cCaseValueStr, attributesSetDict)
-                referObList.extend(cValueReferObList)
+                _, _, cValueReferObNameList = getValueInContainRefExp(cWidget, cCaseValueStr, attributesSetDict)
+                referObNameList.extend(cValueReferObNameList)
 
-        if preStimWId and preStimWId in referObList:
+        if preStimWId and Func.getWidgetName(preStimWId) in referObNameList:
             printPreRespCodesFirst = True
 
     elif getWidgetType(cWidget) == Info.IF:
         condStr = cWidget.getCondition()
 
-        condStr, haveRef, referObList = getValueInContainRefExp(cWidget, condStr, attributesSetDict)
+        condStr, haveRef, referObNameList = getValueInContainRefExp(cWidget, condStr, attributesSetDict)
 
-        trueWidget = cWidget.getTrueWidget()
-        falseWidget = cWidget.getFalseWidget()
+        # trueWidget = cWidget.getTrueWidget()
+        # falseWidget = cWidget.getFalseWidget()
 
-        if preStimWId and preStimWId in referObList:
+        if preStimWId and Func.getWidgetName(preStimWId) in referObNameList:
             printPreRespCodesFirst = True
 
     # todo to be continued ...
