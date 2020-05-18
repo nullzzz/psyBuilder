@@ -1004,7 +1004,8 @@ def getWidgetEventPos(widget_id: str):
         parent_node = node.parent()
 
         # for subWidgets under IF or SWITCH, try to extract pos based on IF or SWITCH widget
-        if isSubWidgetOfIfOrSwitch(parent_node):
+        if isSubWidgetOfIfOrSwitch(widget_id):
+            widget_id = parent_node.widget_id
             parent_node = parent_node.parent()
 
         allIdList = []
@@ -2420,21 +2421,23 @@ def makeCodes4IfWidget(cWidget, attributesSetDict, allWidgetCodes):
         falseWidget = cWidget.getFalseWidget()
 
         for cCodeType in codeTypesList:
-            cTypeCodes = list()
+            cTypeCodes = [f"% {Func.getWidgetName(cWidget.widget_id)}{cCodeType}"]
+
 
             printAutoInd(cTypeCodes, "if {0}", condStr)
-            if trueWidget:
+            if trueWidget and len(allWidgetCodes[f"{trueWidget.widget_id}{cCodeType}"]) > 0:
                 cTypeCodes.extend(allWidgetCodes[f"{trueWidget.widget_id}{cCodeType}"])
             else:
                 cTypeCodes.extend(["% do nothing"])
 
             printAutoInd(cTypeCodes, "else")
-            if falseWidget:
+            if falseWidget and len(allWidgetCodes[f"{falseWidget.widget_id}{cCodeType}"]) > 0:
                 cTypeCodes.extend(allWidgetCodes[f"{falseWidget.widget_id}{cCodeType}"])
             else:
                 cTypeCodes.extend(["% do nothing"])
 
             printAutoInd(cTypeCodes, "end ")
+
 
             allWidgetCodes.update({f"{cWidget.widget_id}{cCodeType}": cTypeCodes})
 
@@ -3345,7 +3348,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_respCodes", [])
     beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
 
-    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide:
+    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and  (not isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # Step 2: print out help info for the current widget
         printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
@@ -3566,7 +3569,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
 
     cBeFlipCodes = allWidgetCodes.get('codesBeFlip', [])
 
-    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide:
+    if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and (not isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
         # Step 2: print out help info for the current widget
         printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
@@ -4719,7 +4722,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, '% for attributes in cycle')
         printAutoInd(f, "{0}", 'if isempty(beUpdatedVar{iRow})')
         printAutoInd(f, 'beUpdatedVar(iRow) = beUpdatedVar(iRow - 1);')
-        printAutoInd(f, 'end % if')
+        printAutoInd(f, 'end ')
 
         printAutoInd(f, 'end %  isstruct(beUpdatedVar)')
         printAutoInd(f, '')
