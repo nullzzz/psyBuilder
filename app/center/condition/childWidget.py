@@ -33,7 +33,7 @@ class ChildWidget(QWidget):
             "Video": "",
             "Text": "",
             "Sound": "",
-            "Slider": "",
+            "Combo": "",
         }
 
         self.default_properties: dict = {
