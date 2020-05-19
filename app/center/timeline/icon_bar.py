@@ -25,7 +25,7 @@ class WidgetIconItem(QListWidgetItem):
         elif widget_type == Info.QUEST_UPDATE:
             self.setText("Quest Update")
         elif widget_type == Info.LOOP:
-            self.setText("Looping")
+            self.setText("Loop")
 
 
 
