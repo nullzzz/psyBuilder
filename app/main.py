@@ -2,7 +2,6 @@ import os
 import re
 import sys
 import traceback
-import platform
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
