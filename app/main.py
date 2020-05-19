@@ -6,7 +6,7 @@ import platform
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox, QDialog
 
 from app.menubar.compile_PTB import compilePTB
 from lib import WaitDialog, Settings
@@ -21,10 +21,6 @@ from .deviceSystem import TianBianYiDuoYun
 from .func import Func
 from .info import Info
 from .menubar.aboutUs import AboutUs
-
-if platform.system() == 'Darwin':
-    from .menubar.aboutRunForMacOnly import AboutRunForMacOnly
-
 from .menubar.update import Update
 from .output import Output
 from .properties import Properties
@@ -194,21 +190,11 @@ class Psy(QMainWindow):
         # help menu
         help_menu = menubar.addMenu("&Help")
 
-        if platform.system() == 'Darwin':
-            about_run_for_mac_only_action = QAction("&About Run", self)
-
-        about_action = QAction("&About Us", self)
-        check_for_update = QAction("&Check for updates", self)
+        about_action = QAction(" &About Us", self)
+        check_for_update = QAction(" &Check for updates", self)
 
         self.about_us = AboutUs()
-
-        if platform.system() == 'Darwin':
-            self.about_run_for_mac_only = AboutRunForMacOnly()
-
         self.check_update = Update()
-
-        if platform.system() == 'Darwin':
-            about_run_for_mac_only_action.triggered.connect(self.about_run_for_mac_only.show)
 
         about_action.triggered.connect(self.about_us.show)
         check_for_update.triggered.connect(self.check_update.show)
