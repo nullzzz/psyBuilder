@@ -1,7 +1,7 @@
 import datetime
 
 from PyQt5.QtCore import pyqtSignal, Qt, QLineF, QPointF, QRectF
-from PyQt5.QtGui import QPen, QTransform, QColor, QImage, QPainter
+from PyQt5.QtGui import QPen, QTransform, QColor, QImage, QPainter, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem, QGraphicsRectItem
 
 from app.defi import *
@@ -11,7 +11,7 @@ from ...events.combo.item import *
 class Scene(QGraphicsScene):
     NormalMode, LineMode, LassoMode = range(3)
 
-    itemAdd = pyqtSignal(str)
+    itemAdd = pyqtSignal(str, bool)
     itemSelected = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -73,7 +73,7 @@ class Scene(QGraphicsScene):
             item.setAttributes(self.attributes)
 
             self.update()
-            self.itemAdd.emit(item.getName())
+            self.itemAdd.emit(item.getName(), True)
             action = Qt.MoveAction
             event.setDropAction(action)
             event.accept()
@@ -158,7 +158,7 @@ class Scene(QGraphicsScene):
             self.update()
             super(Scene, self).mouseMoveEvent(event)
 
-    def mouseReleaseEvent(self, mouseEvent):
+    def mouseReleaseEvent(self, e: QMouseEvent):
         if self.line and self.my_mode == self.LineMode:
             item = LineItem(LineItem.Line)
             l: QLineF = self.line.line()
@@ -170,7 +170,8 @@ class Scene(QGraphicsScene):
             item.setLineColor(self.line_color)
             item.setWidth(self.border_width)
             self.addItem(item)
-            self.itemAdd.emit(item.getName())
+
+            self.itemAdd.emit(item.getName(), False)
             self.update()
             self.removeItem(self.line)
             self.line = None
@@ -179,7 +180,7 @@ class Scene(QGraphicsScene):
             self.lasso = None
             self.itemSelected.emit()
             self.setMode(Scene.NormalMode)
-        super(Scene, self).mouseReleaseEvent(mouseEvent)
+        super(Scene, self).mouseReleaseEvent(e)
 
     def getInfo(self):
         item_info: dict = {}
@@ -244,7 +245,7 @@ class Scene(QGraphicsScene):
         new_item.updateInfo()
         new_item.setAttributes(self.attributes)
         self.update()
-        self.itemAdd.emit(new_item.getName())
+        self.itemAdd.emit(new_item.getName(), True)
 
         item.setSelected(False)
         new_item.setSelected(True)

@@ -70,11 +70,11 @@ class Mouse(Shower):
     def changeState(self, state):
         if Mouse.kb_id == "" or Mouse.kb_id == self.device_id:
             self.is_kb_queue.setCheckState(state)
-            self.port_tip.setText("")
+            self.port_tip.clear()
             if state == 0:
                 Mouse.kb_id = ""
             else:
                 Mouse.kb_id = self.device_id
         else:
-            self.port_tip.setText(f"{Mouse.kb_id}")
+            self.showTip(f"{Shower.id_2_name[Mouse.kb_id]}")
             self.is_kb_queue.setCheckState(0)

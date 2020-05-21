@@ -125,7 +125,7 @@ class RX(QWidget):
         item_name: str = name.lower()
 
         new_name, ok = QInputDialog.getText(self, "Change Device Name", "Device Name:", QLineEdit.Normal, item.text())
-        if ok and new_name != '' and re.fullmatch(r"[A-Za-z][\d\sA-Za-z]+", name):
+        if ok and new_name != '' and re.fullmatch(r"[A-Za-z][\d\sA-Za-z_]+", new_name):
             new_name: str
             if new_name.lower() in self.device_home.device_list and item_name != new_name.lower():
                 QMessageBox.warning(self, f"{new_name} is invalid!", "Device name must be unique and without spaces",
@@ -133,7 +133,6 @@ class RX(QWidget):
             else:
                 self.device_home.changeCurrentName(item_name, new_name)
                 self.describer.changeName(item_name, new_name)
-                # self.getInfo()
                 self.deviceNameChanged.emit(item.getDeviceId(), new_name)
 
     # 参数导出, 记录到Info

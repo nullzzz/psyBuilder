@@ -5,7 +5,7 @@ import traceback
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox, QDialog
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox
 
 from app.menubar.compile_PTB import compilePTB
 from lib import WaitDialog, Settings

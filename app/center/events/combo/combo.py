@@ -246,14 +246,17 @@ class Combo(TabItemMainWindow):
         if items:
             items[0].openPro()
 
-    def addItem(self, item_name: str):
+    def addItem(self, item_name: str, is_arrow: bool):
         """
         change item list when item added by drag and drop
+        :param is_arrow:
+        :type is_arrow:
         :param item_name:
         :return:
         """
-        self.pointer_bt.setChecked(True)
-        self.scene.setMode(Scene.NormalMode)
+        if is_arrow:
+            self.pointer_bt.setChecked(True)
+            self.scene.setMode(Scene.NormalMode)
         self.item_list.addItem(item_name)
 
     def changeItemList(self):

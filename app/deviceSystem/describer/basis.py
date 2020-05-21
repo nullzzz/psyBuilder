@@ -1,12 +1,16 @@
 import re
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QWidget, QLabel, QTextEdit, QFrame
 
 from app.defi import *
 
 
 class Shower(QWidget):
+    id_2_name = {
+
+    }
+
     def __init__(self, parent=None):
         super(Shower, self).__init__(parent)
         self.device_id = ""
@@ -23,12 +27,17 @@ class Shower(QWidget):
 
         self.port_tip = QLabel()
 
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.port_tip.clear)
+
     def describe(self, info: dict):
         self.device_id = info.get("Device Id")
         device_type = info.get("Device Type", "ERROR")
         device_name = info.get("Device Name", "ERROR")
         self.device_type.setText(device_type)
         self.device_name.setText(device_name)
+
+        Shower.id_2_name[self.device_id] = device_name
 
     def showAddressTip(self, port: str):
         """
@@ -41,6 +50,10 @@ class Shower(QWidget):
             self.port_tip.setText(tip)
         else:
             self.port_tip.clear()
+
+    def showTip(self, text):
+        self.port_tip.setText(f"<font color='#ff0000' face='Sans'>{text} has been selected.</font>")
+        self.timer.start(3000)
 
     def checkPort(self, port: str):
         flag: bool = True
@@ -95,7 +108,7 @@ class Shower(QWidget):
 
         elif device_type == DEV_PARALLEL_PORT:
             # Check whether a current_text string holds just a hexadecimal number
-            if re.match('\A[0-9a-fA-F]+\Z', port) is None:
+            if re.match(r'\A[0-9a-fA-F]+\Z', port) is None:
                 flag = False
                 tip = "Should be a hexadecimal"
 
@@ -108,6 +121,7 @@ class Shower(QWidget):
 
     def changeName(self, new_name: str):
         self.device_name.setText(new_name)
+        Shower.id_2_name[self.device_id] = new_name
 
     def getDeviceId(self):
         return self.device_id
