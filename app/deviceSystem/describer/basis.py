@@ -52,7 +52,7 @@ class Shower(QWidget):
             self.port_tip.clear()
 
     def showTip(self, text):
-        self.port_tip.setText(f"<font color='#ff0000' face='Sans'>{text} has been selected.</font>")
+        self.port_tip.setText(f"<font color='#ff0000' face='Sans'>{text} has been selected!<br> Only one device can be set to be queue.</font>")
         self.timer.start(3000)
 
     def checkPort(self, port: str):
