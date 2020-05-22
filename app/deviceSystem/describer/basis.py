@@ -1,7 +1,7 @@
 import re
 
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QWidget, QLabel, QTextEdit, QFrame
+from PyQt5.QtWidgets import QWidget, QLabel, QTextEdit, QFrame, QCheckBox
 
 from app.defi import *
 
@@ -10,6 +10,7 @@ class Shower(QWidget):
     id_2_name = {
 
     }
+    kb_id = ""
 
     def __init__(self, parent=None):
         super(Shower, self).__init__(parent)
@@ -17,6 +18,10 @@ class Shower(QWidget):
 
         self.device_type = QLabel("Unselected")
         self.device_name = QLabel("Unselected")
+
+        self.is_kb_queue = QCheckBox()
+        self.is_kb_queue.stateChanged.connect(self.changeState)
+
         # you can show tips here!
         self.index_tip = QTextEdit("")
         self.index_tip.viewport().setAutoFillBackground(False)
@@ -52,7 +57,7 @@ class Shower(QWidget):
             self.port_tip.clear()
 
     def showTip(self, text):
-        self.port_tip.setText(f"<font color='#ff0000' face='Sans'>{text} has been selected!<br> Only one device can be set to be queue.</font>")
+        self.port_tip.setText(f"<font color='#ff0000' face='Sans'>{text} has been selected!<br> Only one can be set to be queue.</font>")
         self.timer.start(3000)
 
     def checkPort(self, port: str):
@@ -125,3 +130,15 @@ class Shower(QWidget):
 
     def getDeviceId(self):
         return self.device_id
+
+    def changeState(self, state):
+        if Shower.kb_id == "" or Shower.kb_id == self.device_id or Shower.id_2_name.get(Shower.kb_id) is None:
+            self.is_kb_queue.setCheckState(state)
+            self.port_tip.clear()
+            if state == 0:
+                Shower.kb_id = ""
+            else:
+                Shower.kb_id = self.device_id
+        else:
+            self.showTip(f"{Shower.id_2_name.get(Shower.kb_id, '')}")
+            self.is_kb_queue.setCheckState(0)

@@ -12,8 +12,6 @@ class Keyboard(Shower):
         super(Keyboard, self).__init__(parent=parent)
         self.device_index = QLineEdit()
         self.device_index.setValidator(QRegExpValidator(QRegExp(r"\d+|auto")))
-        self.is_kb_queue = QCheckBox()
-        self.is_kb_queue.stateChanged.connect(self.changeState)
         self.setUI()
 
     def setUI(self):
@@ -24,11 +22,11 @@ class Keyboard(Shower):
         layout.addRow("Device Index:", self.device_index)
         layout.addRow("Is Kb Queue:", self.is_kb_queue)
 
-        vLayout = QVBoxLayout()
-        vLayout.addLayout(layout)
-        vLayout.addWidget(self.port_tip)
-        vLayout.addWidget(self.index_tip)
-        self.setLayout(vLayout)
+        v_layout = QVBoxLayout()
+        v_layout.addLayout(layout)
+        v_layout.addWidget(self.port_tip, 1)
+        v_layout.addWidget(self.index_tip)
+        self.setLayout(v_layout)
 
     def describe(self, info: dict):
         super().describe(info)
@@ -65,15 +63,3 @@ class Keyboard(Shower):
             "Is KB Queue": self.is_kb_queue.checkState(),
         }
         return properties
-
-    def changeState(self, state):
-        if Keyboard.kb_id == "" or Keyboard.kb_id == self.device_id:
-            self.is_kb_queue.setCheckState(state)
-            self.port_tip.clear()
-            if state == 0:
-                Keyboard.kb_id = ""
-            else:
-                Keyboard.kb_id = self.device_id
-        else:
-            self.showTip(f"{Shower.id_2_name[Keyboard.kb_id]}")
-            self.is_kb_queue.setCheckState(0)

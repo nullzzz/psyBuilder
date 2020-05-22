@@ -6,14 +6,10 @@ from app.deviceSystem.describer.basis import Shower
 
 
 class Mouse(Shower):
-    kb_id = ""
-
     def __init__(self, parent=None):
         super(Mouse, self).__init__(parent=parent)
         self.mouse_index = QLineEdit()
         self.mouse_index.setValidator(QRegExpValidator(QRegExp(r"\d+|auto")))
-        self.is_kb_queue = QCheckBox()
-        self.is_kb_queue.stateChanged.connect(self.changeState)
         self.setUI()
 
     def setUI(self):
@@ -24,12 +20,12 @@ class Mouse(Shower):
         layout.addRow("Device Index:", self.mouse_index)
         layout.addRow("Is Kb Queue:", self.is_kb_queue)
 
-        vLayout = QVBoxLayout()
-        vLayout.addLayout(layout)
-        vLayout.addWidget(self.port_tip)
-        vLayout.addWidget(self.index_tip)
+        v_layout = QVBoxLayout()
+        v_layout.addLayout(layout)
+        v_layout.addWidget(self.port_tip, 1)
+        v_layout.addWidget(self.index_tip)
 
-        self.setLayout(vLayout)
+        self.setLayout(v_layout)
 
     def describe(self, info: dict):
         super().describe(info)
@@ -66,15 +62,3 @@ class Mouse(Shower):
             "Is KB Queue": self.is_kb_queue.checkState(),
         }
         return properties
-
-    def changeState(self, state):
-        if Mouse.kb_id == "" or Mouse.kb_id == self.device_id:
-            self.is_kb_queue.setCheckState(state)
-            self.port_tip.clear()
-            if state == 0:
-                Mouse.kb_id = ""
-            else:
-                Mouse.kb_id = self.device_id
-        else:
-            self.showTip(f"{Shower.id_2_name[Mouse.kb_id]}")
-            self.is_kb_queue.setCheckState(0)
