@@ -33,15 +33,14 @@ class AboutUs(QWidget):
         info.setFrameShape(QFrame.NoFrame)
 
         # info.setTextBackgroundColor()
-        info.setHtml("<b>PsyBuilder (ver 0.1)</b> for Psychtoolbox 3 under MATLAB "
-                     "was developed by the group leaded by Prof. "
+        info.setHtml("<b>PsyBuilder (ver 0.1)</b> for Psychtoolbox3 under MATLAB "
+                     "was developed by Prof. "
                      "<a style='color: blue;' href=\"http://web.suda.edu.cn/yzhangpsy/index.html\">Yang Zhang</a> "
-                     "at Attention and Perception lab at Soochow university, Suzhou, China. "
-                     "<br><br><b>PsyBuilder 0.1</b> are provided as is, no warranty for their "
-                     "correctness or usefulness for any purpose is made or implied by "
+                     "(Attention and Perception lab, Soochow university, Suzhou, China) and his colleagues"
+                     "<br><br><b>PsyBuilder 0.1</b> are provided as is-no warranty is made or implied by "
                      "the authors of the software, or by anyone else. This software "
-                     "is designed for research purposes only and not to be used for "
-                     "any business purpose, such as, but not limited to, business training)."
+                     "is designed for research purposes only，not to be used for "
+                     "any business purpose, such as, but not limited to, business training."
                      )
 
         cP = info.palette()
@@ -53,14 +52,14 @@ class AboutUs(QWidget):
         info.setFixedHeight(QFontMetrics(info.font()).lineSpacing() * 11)
 
         author1 = self.getInfo("authorInfo01",
-                               "Yang Zhang (张阳), Ph.D, Prof.<br>Department of Psychology, Soochow University,Suzhou"
+                               "Yang Zhang (张阳), Ph.D., Prof.<br>Department of Psychology, Soochow University, Suzhou"
                                "<br><a href='mailto:yzhangpsy@suda.edu.cn?Subject= Inquire about the usage of PsyBuilder 0.1'>yzhangpsy@suda.edu.cn</a>")
         author2 = self.getInfo("authorInfo02",
-                               "Zhe Yang, Ph.D, Associate Prof. <br> Department of computer science, Soochow University,Suzhou")
+                               "Zhe Yang, Ph.D., Associate Prof. <br> Department of computer science, Soochow University, Suzhou")
 
-        author3 = self.getInfo("authorInfo03", "Chenzhi Feng, Ph.D, Prof. <br> Department of Psychology, Soochow University,Suzhou")
+        author3 = self.getInfo("authorInfo03", "Chenzhi Feng, Ph.D., Prof. <br> Department of Psychology, Soochow University, Suzhou")
 
-        author4 = self.getInfo("authorInfo_zhicheng", "Zhicheng Lin, Ph.D, Prof. <br> Applied Psychology,  Chinese University of Hong Kong,Shenzhen")
+        author4 = self.getInfo("authorInfo_zhicheng", "Zhicheng Lin, Ph.D., Prof. <br> Applied Psychology,  Chinese University of Hong Kong, Shenzhen")
         layout = QVBoxLayout()
         layout.addWidget(info, 2)
         layout.addLayout(author1, 1)
