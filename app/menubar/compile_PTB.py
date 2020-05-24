@@ -4117,6 +4117,22 @@ def compileCode(isDummyCompile):
                 printAutoInd(f, "global{0}{1} beChkedRespDevs abortKeyCode cFrame %#ok<*NUSED>\n", globalVarEventStr, globalVarAttStr)
 
             # get subject information
+        printAutoInd(f, "% running platform check: ")
+        if Info.PLATFORM == 'windows':
+            printAutoInd(f, "if ~IsWin")
+            printAutoInd(f, "error('Current platform is not Windows (you selected Windows in platform under building menu)!');")
+            printAutoInd(f, "end \n")
+
+        elif Info.PLATFORM == 'linux':
+            printAutoInd(f, "if ~IsLinux")
+            printAutoInd(f, "error('Current platform is not Linux (you selected Linux in platform under building menu)!');")
+            printAutoInd(f, "end \n")
+
+        elif Info.PLATFORM == 'mac':
+            printAutoInd(f, "if ~IsOSX")
+            printAutoInd(f, "error('Current platform is not Mac ox (you selected Mac in platform under building menu)!');")
+            printAutoInd(f, "end \n")
+
         printAutoInd(f, "%===== get subject information =========/", )
         printAutoInd(f, "cFolder = fileparts(mfilename('fullpath'));")
         printAutoInd(f, "subInfo = OpenExp_BCL('{0}', cFolder);", cFilenameOnly)
@@ -4858,7 +4874,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "% excluded the key presses before the onsettime of the current event")
         printAutoInd(f, "cValidRespKeys = keyCode(cRespDevs(iRespDev).allowAble)> cRespDevs(iRespDev).startTime;")
         printAutoInd(f, "else")
-        printAutoInd(f, "cValidRespKeys = keyCode(cRespDevs(iRespDev).allowAble);")
+        printAutoInd(f, "cValidRespKeys = ~~keyCode(cRespDevs(iRespDev).allowAble);")
         printAutoInd(f, "end \n")
 
         printAutoInd(f, "if any(cValidRespKeys)")
