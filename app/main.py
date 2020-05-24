@@ -739,6 +739,12 @@ class Psy(QMainWindow):
                 file_path = file_path + ".psy"
             # just store
             if self.store(file_path):
+                # change config
+                Settings("config.ini", Settings.IniFormat).setValue("file_path", file_path)
+                Settings("config.ini", Settings.IniFormat).setValue("file_directory", os.path.dirname(file_path))
+                Info.FILE_NAME = file_path
+                Info.FILE_DIRECTORY = os.path.dirname(file_path)
+
                 # add file_path into file_paths
                 file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
                 if file_path not in file_paths:
@@ -748,6 +754,8 @@ class Psy(QMainWindow):
                     file_paths.remove(file_path)
                     file_paths.insert(0, file_path)
                 Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
+
+
 
     def openFile(self):
         """
