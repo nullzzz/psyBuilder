@@ -1821,7 +1821,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
         cTimelineSet.add(iTimeline[1])
 
     printAutoInd(f, '% switch across timeline types')
-    printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
+    printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.Timeline{{{cLoopIterStr}}}")
 
     for iTimeline_id in cTimelineSet:
         if '' == iTimeline_id:
@@ -1834,7 +1834,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
     printAutoInd(f, 'otherwise ')
     printAutoInd(f, '% do nothing ')
-    printAutoInd(f, 'end%switch {0}', f"{cWidgetName}.attr.timeline{{{cLoopIterStr}}}")
+    printAutoInd(f, 'end%switch {0}', f"{cWidgetName}.attr.Timeline{{{cLoopIterStr}}}")
 
     printAutoInd(f, "opRowIdx = opRowIdx + 1; % increase the row num of outputVars by 1")
     printAutoInd(f, 'end % {0}', cLoopIterStr)
