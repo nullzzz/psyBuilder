@@ -2262,7 +2262,10 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
             printAutoInd(f, "isQueueStart = switchQueue_bcl({0}, isQueueStart);", queueDevIdxValueStr)
 
     if not isVideoRelatedWidget(cWidget):
-        printAutoInd(f, "checkRespAndSendTriggers({0}, nextEvFlipReqTime, false);\n", cWinIdx)
+        printAutoInd(f, "isTerminateStimEvent = checkRespAndSendTriggers({0}, nextEvFlipReqTime, false);\n", cWinIdx)
+        printAutoInd(f, "if isTerminateStimEvent")
+        printAutoInd(f, "nextEvFlipReqTime = 0;")
+        printAutoInd(f, "end ")
     # printAutoInd(f, "%=================================================\\\n")
 
     shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
