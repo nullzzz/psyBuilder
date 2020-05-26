@@ -94,9 +94,9 @@ class CycleTable(TableWidget):
         else:
             index = self.rowCount()
             self.insertRow(index)
-        # add items, weight, timeline and attributes
-        weight_item = RepetitionsItem(self.default_value[self.attributes[0]])
-        self.setItem(index, 0, weight_item)
+        # add items, repetitions, timeline and attributes
+        repetitions_item = RepetitionsItem(self.default_value[self.attributes[0]])
+        self.setItem(index, 0, repetitions_item)
         timeline_item = TimelineItem()
         self.setItem(index, 1, timeline_item)
         for col in range(2, len(self.attributes)):
@@ -188,8 +188,8 @@ class CycleTable(TableWidget):
             text = item.text()
             if type(item) == RepetitionsItem:
                 # only positive number
-                if not re.match(Info.WeightPattern[0], text):
-                    MessageBox.information(self, "warning", Info.WeightPattern[1])
+                if not re.match(Info.RepetitionsPattern[0], text):
+                    MessageBox.information(self, "warning", Info.RepetitionsPattern[1])
                     item.redo()
                 else:
                     item.save()
@@ -562,21 +562,21 @@ class CycleTable(TableWidget):
             for j in range(cols_count):
                 # we need format the data
                 pasted_cols[j].append(re.sub(r"\r", "", pasted_row[j]))
-        # if it affects the weight/timeline column, we need to check the value
+        # if it affects the repetitions/timeline column, we need to check the value
         end_row = start_row + len(rows) - 1
         end_col = start_col + cols_count - 1
         # add new row into table
         for i in range(self.rowCount(), end_row + 1):
             self.addRow()
         if not start_col:
-            # if it affect weight column, we only allow positive num
-            weight_values = pasted_cols[0]
-            for weight_value in weight_values:
-                if not re.match(Info.WeightPattern[0], weight_value):
-                    MessageBox.information(self, "warning", Info.WeightPattern[1])
+            # if it affect repetitions column, we only allow positive num
+            repetitions_values = pasted_cols[0]
+            for repetitions_value in repetitions_values:
+                if not re.match(Info.RepetitionsPattern[0], repetitions_value):
+                    MessageBox.information(self, "warning", Info.RepetitionsPattern[1])
                     return
         if (not start_col and cols_count > 1) or start_col == 1:
-            # if it affect weight column, we need to check the value
+            # if it affect repetitions column, we need to check the value
             timeline_col = 1
             if start_col == 1:
                 timeline_col = 0
@@ -648,7 +648,7 @@ class CycleTable(TableWidget):
             # get pos
             row = self.rowAt(e.pos().y())
             col = self.columnAt(e.pos().x())
-            # can't be weight and timeline
+            # can't be repetitions and timeline
             if row != -1 and col >= 2:
                 data = e.mimeData().data(Info.AttributesToWidget)
                 stream = QDataStream(data, QIODevice.ReadOnly)

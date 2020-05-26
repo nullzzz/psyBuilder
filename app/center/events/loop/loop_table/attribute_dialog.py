@@ -93,7 +93,7 @@ class AttributeDialog(Dialog):
             name = attribute_area.name()
             value = attribute_area.value()
             if name == "Repetitions" and not re.match(r"^\+?[1-9][0-9]*$", value):
-                # if Weight, value must be positive number
+                # if Repetitions, value must be positive number
                 MessageBox.information(self, "warning", "Only positive number is enabled.")
                 return
             self.attributesChanged.emit(self.col, name, value)
@@ -123,7 +123,7 @@ class AttributeDialog(Dialog):
         # add new one
         self.addAttribute(name=attribute_name, value=attribute_value)
         # if attribute != empty, it means that user want to change attribute
-        # however, we don't allow user to change timeline' default value and weight's value must be positive num
+        # however, we don't allow user to change timeline' default value and repetitions's value must be positive num
         self.change = False
         if attribute_name:
             self.change = True
