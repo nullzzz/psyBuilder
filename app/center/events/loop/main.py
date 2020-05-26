@@ -120,7 +120,10 @@ class Loop(TabItemMainWindow):
         timelines = []
         for row in range(0, self.cycle_table.rowCount()):
             timeline_name = self.cycle_table.item(row, 1).text()
-            timelines.append([timeline_name, self.cycle_table.timelines.setdefault(timeline_name, "")[0]])
+            if timeline_name:
+                timelines.append([timeline_name, self.cycle_table.timelines.setdefault(timeline_name, "")[0]])
+            else:
+                raise Exception(f"Timeline name should not be empty!:In {self.widget_name} at row {row +1}")
         return timelines
 
     def getAttributes(self, row: int) -> dict:
