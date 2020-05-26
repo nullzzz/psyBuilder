@@ -11,7 +11,7 @@ from lib import MessageBox, TableWidget
 from .attribute_dialog import AttributeDialog
 from .attribute_item import AttributeItem
 from .timeline_item import TimelineItem
-from .weight_item import WeightItem
+from .repetitions_item import RepetitionsItem
 
 
 class CycleTable(TableWidget):
@@ -95,7 +95,7 @@ class CycleTable(TableWidget):
             index = self.rowCount()
             self.insertRow(index)
         # add items, weight, timeline and attributes
-        weight_item = WeightItem(self.default_value[self.attributes[0]])
+        weight_item = RepetitionsItem(self.default_value[self.attributes[0]])
         self.setItem(index, 0, weight_item)
         timeline_item = TimelineItem()
         self.setItem(index, 1, timeline_item)
@@ -186,7 +186,7 @@ class CycleTable(TableWidget):
         # if text isn't changed, we ignore it
         if item.changed():
             text = item.text()
-            if type(item) == WeightItem:
+            if type(item) == RepetitionsItem:
                 # only positive number
                 if not re.match(Info.WeightPattern[0], text):
                     MessageBox.information(self, "warning", Info.WeightPattern[1])
@@ -694,7 +694,7 @@ class CycleTable(TableWidget):
             for row in range(self.rowCount()):
                 text = table[col][row]
                 if col == 0:
-                    item = WeightItem(text)
+                    item = RepetitionsItem(text)
                 elif col == 1:
                     item = TimelineItem()
                 else:
