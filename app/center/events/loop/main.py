@@ -50,7 +50,7 @@ class Loop(TabItemMainWindow):
                            self.cycle_table.addRowsActionFunc)
         tool_bar.addAction(Func.getImageObject("cycle/delete_row.png", 1, QSize(22, 22)), "Delete Rows",
                            self.cycle_table.deleteRowsActionFunc)
-        tool_bar.addAction(Func.getImageObject("cycle/add_column.png", 1, QSize(22, 22)), "Add Attribute",
+        tool_bar.addAction(Func.getImageObject("cycle/add_column.png", 1, QSize(22, 22)), "Add Variable",
                            self.cycle_table.addAttributeActionFunc)
         tool_bar.addAction(Func.getImageObject("cycle/add_columns.png", 1, QSize(22, 22)), "Add Variables",
                            self.cycle_table.addAttributesActionFunc)
