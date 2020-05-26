@@ -10,7 +10,7 @@ IMAGE = "Image"
 TEXT = "Text"
 SOUND = "Sound"
 VIDEO = "Video"
-COMBO = "Combo"
+COMBO = "Scene"
 
 DC = "DC"
 CALIBRATION = "Calibration"
@@ -37,7 +37,7 @@ DEV_KEYBOARD = "keyboard"
 DEV_MOUSE = "mouse"
 DEV_RESPONSE_BOX = "response box"
 DEV_GAMEPAD = "game pad"
-DEV_EYE_ACTION = "action"
+DEV_EYE_ACTION = "eye action"
 
 # item in slider
 ITEM_POLYGON = "polygon"

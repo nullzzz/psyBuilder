@@ -87,7 +87,7 @@ class DeviceHome(QListWidget):
         # 新建设备对象
         if device_type in ("network port", "parallel port", "serial port", "quest", "tracker"):
             device = OutputDevice(device_id, device_name)
-        elif device_type in ("game pad", "mouse", "keyboard", "response box", "action"):
+        elif device_type in ("game pad", "mouse", "keyboard", "response box", "eye action"):
             device = InputDevice(device_id, device_name)
 
         # 载入信息

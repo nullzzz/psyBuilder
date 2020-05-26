@@ -2262,10 +2262,10 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
             printAutoInd(f, "isQueueStart = switchQueue_bcl({0}, isQueueStart);", queueDevIdxValueStr)
 
     if not isVideoRelatedWidget(cWidget):
-        printAutoInd(f, "isTerminateStimEvent = checkRespAndSendTriggers({0}, nextEvFlipReqTime, false);\n", cWinIdx)
-        printAutoInd(f, "if isTerminateStimEvent")
-        printAutoInd(f, "nextEvFlipReqTime = 0;")
-        printAutoInd(f, "end ")
+        printAutoInd(f, "[~,~,nextEvFlipReqTime] = checkRespAndSendTriggers({0}, nextEvFlipReqTime, false);\n", cWinIdx)
+        # printAutoInd(f, "if isTerminateStimEvent")
+        # printAutoInd(f, "nextEvFlipReqTime = 0;")
+        # printAutoInd(f, "end ")
     # printAutoInd(f, "%=================================================\\\n")
 
     shortPulseDurParallelsDict = outPutTriggerCheck(cWidget)
@@ -4821,7 +4821,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
         printAutoInd(f,
-                     "function [isTerminateStimEvent, secs] = checkRespAndSendTriggers(cWIdx, nextEvFlipReqTime, isOneTimeCheck) %#ok<INUSL>")
+                     "function [isTerminateStimEvent, secs, nextEvFlipReqTime] = checkRespAndSendTriggers(cWIdx, nextEvFlipReqTime, isOneTimeCheck) %#ok<INUSL>")
         # globalVarEventStr = ''.join(' ' + cWidgetName for cWidgetName in getAllEventWidgetNamesList() )
         printAutoInd(f, "global{0} abortKeyCode beChkedRespDevs cFrame\n", globalVarEventStr)
 
@@ -4962,7 +4962,11 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "end % iUnique Dev\n")
 
         printAutoInd(f, "% after checking all respDev, break out the respCheck while loop")
-        printAutoInd(f, "if isTerminateStimEvent || isOneTimeCheck")
+        printAutoInd(f, "if isTerminateStimEvent ")
+        printAutoInd(f, "nextEvFlipReqTime = 0;")
+        printAutoInd(f, "break; ")
+        printAutoInd(f, "end \n")
+        printAutoInd(f, "if isOneTimeCheck ")
         printAutoInd(f, "break; ")
         printAutoInd(f, "end \n")
 

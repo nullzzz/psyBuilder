@@ -16,7 +16,7 @@ class RectProperty(QWidget):
 
         self.general = RectGeneral()
         self.default_properties = self.general.default_properties
-        self.tab.addTab(self.general, "general")
+        self.tab.addTab(self.general, "General")
 
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")

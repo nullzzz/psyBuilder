@@ -51,17 +51,21 @@ class Tracker(QWidget):
 
         self.send_port_tip = QLabel("Send Port:")
         self.send_port = QSpinBox()
+        self.send_port.setEnabled(False)
 
         self.receive_port_tip = QLabel("Receive Port:")
         self.receive_port = QSpinBox()
+        self.receive_port.setEnabled(False)
 
         # self.ipv46_address_tip = QLabel("Tobii Glasses IPv4/6 Address:")
         self.ipv46_address_tip = QLabel("IPv4/6 Address:")
         self.ipv46_address = QLineEdit("192.168.71.50")
+        self.ipv46_address.setEnabled(False)
 
         # self.UDP_port_tip = QLabel("Tobii Glasses UDP Port:")
         self.UDP_port_tip = QLabel("UDP Port:")
         self.UDP_port = QSpinBox()
+        self.UDP_port.setEnabled(False)
 
         # ******external device***********
         # 是否更新using external device id

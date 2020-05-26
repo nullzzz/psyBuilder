@@ -28,7 +28,7 @@ class SoundTab1(QWidget):
             "Screen Name": "screen_0"
         }
         self.file_name = VarLineEdit()
-        self.open_bt = QPushButton("open file")
+        self.open_bt = QPushButton("Open file")
         self.open_bt.clicked.connect(self.openFile)
 
         self.volume_control = QCheckBox("Volume Control (0~1):")  # Volume control

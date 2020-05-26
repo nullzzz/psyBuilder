@@ -50,9 +50,9 @@ class Keyboard(Shower):
         else:
             gpOrderStr = f"{order_num}th"
 
-        self.index_tip.setHtml("About Device Index ('auto' or an int):"
-                               "<br><b>Int: </b> any keyboard index (returned by GetKeyboardIndices in MATLAB)"
-                               f"<br><br><b>'auto':</b> will use the {gpOrderStr} value in keyboard indices for this keyboard (returned by GetKeyboardIndices in MATLAB)"
+        self.index_tip.setHtml("About Device Index (auto or a number):"
+                               "<br><br><b>Number (e.g., 1): </b> any keyboard index (returned by GetKeyboardIndices in MATLAB)"
+                               f"<br><br><b>auto:</b> will use the {gpOrderStr} value in keyboard indices for this keyboard (returned by GetKeyboardIndices in MATLAB)"
                                )
 
     def getInfo(self):

@@ -27,9 +27,9 @@ class VideoProperty(QWidget):
             "Duration": self.duration.default_properties
         }
 
-        self.tab.addTab(self.general, "general")
-        self.tab.addTab(self.frame, "frame")
-        self.tab.addTab(self.duration, "duration")
+        self.tab.addTab(self.general, "General")
+        self.tab.addTab(self.frame, "Frame")
+        self.tab.addTab(self.duration, "Duration")
         self.setUI()
 
     def setUI(self):

@@ -15,7 +15,7 @@ class SoundProperty(QWidget):
         self.below = QWidget()
 
         self.general = SoundGeneral()
-        self.tab.addTab(self.general, "general")
+        self.tab.addTab(self.general, "General")
 
         self.default_properties = self.general.default_properties
         # bottom

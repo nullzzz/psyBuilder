@@ -80,10 +80,12 @@ class Shower(QWidget):
                         flag = False
             else:
                 flag = False
+
             if flag is False:
                 tip = "Invalid IP address"
 
         elif device_type == DEV_SERIAL_PORT:
+
             if port.startswith("COM") and port[3:].isdigit():
                 # window
                 pass
@@ -92,6 +94,8 @@ class Shower(QWidget):
                 pass
             elif port.startswith("/dev/ttyS") and port[9:].isdigit():
                 # linux
+                pass
+            elif port.startswith("auto"):
                 pass
             else:
                 flag = False
@@ -106,6 +110,8 @@ class Shower(QWidget):
                 pass
             elif port.startswith("/dev/ttyS") and port[9:].isdigit():
                 # linux
+                pass
+            elif port.startswith("auto"):
                 pass
             else:
                 flag = False

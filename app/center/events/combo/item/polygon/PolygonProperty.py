@@ -15,7 +15,7 @@ class PolygonProperty(QWidget):
         self.below = QWidget()
 
         self.general = PolygonGeneral()
-        self.tab.addTab(self.general, "general")
+        self.tab.addTab(self.general, "General")
         self.default_properties = self.general.default_properties
         # bottom
         self.ok_bt = QPushButton("OK")

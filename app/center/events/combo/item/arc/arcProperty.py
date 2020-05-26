@@ -15,7 +15,7 @@ class ArcProperty(QWidget):
 
         self.general = ArcGeneral()
         self.default_properties = self.general.default_properties
-        self.tab.addTab(self.general, "general")
+        self.tab.addTab(self.general, "General")
 
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")

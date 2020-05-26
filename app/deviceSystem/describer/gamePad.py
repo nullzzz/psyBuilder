@@ -50,7 +50,7 @@ class GamePad(Shower):
         else:
             gpOrderStr = f"{order_num}th"
 
-        self.index_tip.setHtml("About Device Index ('auto' or an int):<br>"
+        self.index_tip.setHtml("About Device Index (auto or a number):<br>"
                                # "<br><b>Windows: </b>order number start from 0 (e.g., 0,1, for the first and second gampad)"
                                "<br><b>Windows: </b>any gamepad index (returned by GetGamepadIndices in MATLAB). At least it works on my computer (win 10) with logicool F310 and PTB(3.0.16), let us try.."
                                "<br><br><b>Mac OS or Linux: </b> any gamepad index (returned by GetGamepadIndices in MATLAB)"

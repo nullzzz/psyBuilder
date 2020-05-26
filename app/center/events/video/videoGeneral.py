@@ -20,7 +20,7 @@ class VideoTab1(QWidget):
         }
         # general
         self.file_name = VarLineEdit()
-        self.open_bt = QPushButton("open file")
+        self.open_bt = QPushButton("Open file")
         self.open_bt.clicked.connect(self.openFile)
 
         self.start_pos = VarLineEdit()

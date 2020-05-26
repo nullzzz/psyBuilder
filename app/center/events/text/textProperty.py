@@ -25,9 +25,9 @@ class TextProperty(QWidget):
             "Frame": self.frame.default_properties,
             "Duration": self.duration.default_properties
         }
-        self.tab.addTab(self.general, "general")
-        self.tab.addTab(self.frame, "frame")
-        self.tab.addTab(self.duration, "duration")
+        self.tab.addTab(self.general, "General")
+        self.tab.addTab(self.frame, "Frame")
+        self.tab.addTab(self.duration, "Duration")
         # bottom
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")

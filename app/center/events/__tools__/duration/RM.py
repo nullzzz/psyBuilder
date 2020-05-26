@@ -9,7 +9,7 @@ from app.center.events.__tools__.duration.device.control import DeviceHome
 class BiggerUP(QGroupBox):
     deviceChanged = pyqtSignal(list)
 
-    def __init__(self, title: str = "Stim Trigger", parent=None):
+    def __init__(self, title: str = "Stimulus Trigger", parent=None):
         super(BiggerUP, self).__init__(title, parent)
         self.home = DeviceHome()
         self.add_bt = QPushButton("Add")

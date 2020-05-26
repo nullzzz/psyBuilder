@@ -20,7 +20,7 @@ class VideoProperty(QWidget):
 
         self.default_properties = self.general.default_properties
 
-        self.tab.addTab(self.general, "general")
+        self.tab.addTab(self.general, "General")
         self.setButtons()
         self.setUI()
 

@@ -18,9 +18,9 @@ class ComboProperty(QWidget):
         self.frame = FramePage()
         self.duration = DurationPage()
 
-        self.tab.addTab(self.general, "general")
-        self.tab.addTab(self.frame, "frame")
-        self.tab.addTab(self.duration, "duration")
+        self.tab.addTab(self.general, "General")
+        self.tab.addTab(self.frame, "Frame")
+        self.tab.addTab(self.duration, "Duration")
 
         self.default_properties = {
             "General": self.general.default_properties,

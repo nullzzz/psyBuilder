@@ -42,9 +42,9 @@ class ImageProperty(QWidget):
         below_layout.addWidget(self.apply_bt, 1)
         below_layout.setContentsMargins(0, 0, 0, 0)
         tab = QTabWidget()
-        tab.addTab(self.general, "general")
-        tab.addTab(self.frame, "frame")
-        tab.addTab(self.duration, "duration")
+        tab.addTab(self.general, "General")
+        tab.addTab(self.frame, "Frame")
+        tab.addTab(self.duration, "Duration")
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(tab, 1)

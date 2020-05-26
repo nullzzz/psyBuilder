@@ -43,13 +43,13 @@ class Info(object):
     TEXT = "Text"
     SOUND = "Sound"
     VIDEO = "Video"
-    COMBO = "Combo"
+    COMBO = "Scene"
     BUG = "Bug"
 
     OPEN = "Open"
     DC = "DC"
     CALIBRATION = "Calibration"
-    ACTION = "Action"
+    ACTION = "EyeAction"
     STARTR = "StartR"
     ENDR = "EndR"
     LOG = "Logging"
@@ -72,7 +72,7 @@ class Info(object):
     DEV_MOUSE = "mouse"
     DEV_RESPONSE_BOX = "response box"
     DEV_GAMEPAD = "game pad"
-    DEV_EYE_ACTION = "action"
+    DEV_EYE_ACTION = "eye action"
 
     # FOR COMBO ITEMS:
     ITEM_POLYGON = "polygon"

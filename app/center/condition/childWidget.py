@@ -29,11 +29,11 @@ class ChildWidget(QWidget):
         self.current_sub_wid = ""
 
         self.pool = {
-            "Image": "",
-            "Video": "",
-            "Text": "",
-            "Sound": "",
-            "Combo": "",
+            Info.IMAGE: "",
+            Info.VIDEO: "",
+            Info.TEXT: "",
+            Info.SOUND: "",
+            Info.COMBO: "",
         }
 
         self.default_properties: dict = {

@@ -154,13 +154,13 @@ class Psy(QMainWindow):
         platform_menu.addAction(self.mac_action)
 
         # load image mode
-        image_load_menu = build_menu.addMenu("&image Load Mode")
+        image_load_menu = build_menu.addMenu("&Image Load Mode")
 
-        self.before_event_action = QAction("&before_event", self)
+        self.before_event_action = QAction("&Before_event", self)
         self.before_event_action.setChecked(True)
 
-        self.before_trial_action = QAction("&before_trial", self)
-        self.before_exp_action = QAction("&before_exp", self)
+        self.before_trial_action = QAction("&Before_trial", self)
+        self.before_exp_action = QAction("&Before_exp", self)
 
         # icon = QIcon(Func.getImage("common/dock_visible.png"))
 

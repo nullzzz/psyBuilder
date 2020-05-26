@@ -19,7 +19,7 @@ class DeviceHome(QListWidget):
             "keyboard": 0,
             "response box": 0,
             "game pad": 0,
-            "action": 0,
+            "eye action": 0,
             # simple_info device
             "serial port": 0,
             "parallel port": 0,
@@ -172,7 +172,7 @@ class DeviceHome(QListWidget):
             device = Quest(device_type, device_id)
         elif device_type == "tracker":
             device = Tracker(device_type, device_id)
-        elif device_type == "action":
+        elif device_type == "eye action":
             device = Action(device_type, device_id)
         elif device_type == "game pad":
             device = GamePad(device_type, device_id)

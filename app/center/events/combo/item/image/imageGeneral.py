@@ -28,7 +28,7 @@ class ImageGeneral(QWidget):
         # 打开文件
         self.file_name = VarLineEdit()
 
-        self.open_bt = QPushButton("open file")
+        self.open_bt = QPushButton("Open file")
         self.open_bt.clicked.connect(self.openFile)
 
         # 镜像模式
