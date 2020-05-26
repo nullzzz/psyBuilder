@@ -25,8 +25,8 @@ class CycleTable(TableWidget):
     def __init__(self):
         super(CycleTable, self).__init__(None)
         # col attributes and its default value
-        self.attributes = ["Weight", "Timeline"]
-        self.default_value = {"Weight": "1", "Timeline": ""}
+        self.attributes = ["Repetitions", "Timeline"]
+        self.default_value = {"Repetitions": "1", "Timeline": ""}
         self.alt_key = False
         self.drag_copy_row_col = [-2, -2]
         self.untitled_attribute_count = 1

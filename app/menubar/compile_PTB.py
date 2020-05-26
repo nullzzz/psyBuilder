@@ -1626,10 +1626,10 @@ def updateCycleOpDataRows(cCyleWdiget, opDataRowsInPy: int) -> int:
         # print(f"{cTLid}")
         cTLWidget = Info.WID_WIDGET[cTLid[1]]
 
-        if '' == cRowDict['Weight']:
+        if '' == cRowDict['Repetitions']:
             cRepeat = 1
         else:
-            cRepeat = dataStrConvert(cRowDict['Weight'])
+            cRepeat = dataStrConvert(cRowDict['Repetitions'])
 
         for iRep in range(cRepeat):
             opDataRowsInPy = updateTLOpDataRow(cTLWidget, opDataRowsInPy)
@@ -1766,10 +1766,10 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
                 {cAttributeName: [cLoopLevel, f"{cAttributeName}{{{cLoopIterStr}}}", cRefValueSet.union(preValueSet)]})
 
         # print out the design matrix of the current Cycle
-        if '' == cRowDict['Weight']:
+        if '' == cRowDict['Repetitions']:
             cRepeat = 1
         else:
-            cRepeat = dataStrConvert(cRowDict['Weight'])
+            cRepeat = dataStrConvert(cRowDict['Repetitions'])
 
         for iRep in range(cRepeat):
             printAutoInd(f, '{0}', "".join(
