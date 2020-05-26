@@ -1654,7 +1654,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
     # create the design matrix  (table) for the current cycle
     startExpStr = cWidgetName + '.var = cell2table({...'
-    printAutoInd(f, '% create the designMatrix of the current cycle (loop)')
+    printAutoInd(f, '% create the designMatrix for the current loop')
     printAutoInd(f, '{0}', startExpStr)
 
     endExpStr = "},'VariableNames',{"

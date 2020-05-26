@@ -206,7 +206,7 @@ class CycleTable(TableWidget):
                         if text not in self.timelines:
                             # if it is new timeline in this cycle, but may have existed in other cycles
                             if Func.checkWidgetNameExisted(widget_name=text):
-                                MessageBox.information(self, "warning", "Name already exists in other cycles.")
+                                MessageBox.information(self, "warning", "Name already exists in other loops.")
                                 item.redo()
                             else:
                                 # generate new timeline's widget_id
@@ -228,7 +228,7 @@ class CycleTable(TableWidget):
                                 # new timeline in this cycle
                                 if Func.checkWidgetNameExisted(widget_name=text):
                                     # valid
-                                    MessageBox.information(self, "warning", "Name already exists in other cycles.")
+                                    MessageBox.information(self, "warning", "Name already exists in other loops.")
                                     item.redo()
                                 else:
                                     # generate new timeline's widget_id
@@ -237,7 +237,7 @@ class CycleTable(TableWidget):
                                     self.timelines[text] = [widget_id, 1]
                                     # secondly check old current_text
                                     self.timelines[item.old_text][1] -= 1
-                                    if not self.timelines[item.old_text][1]:
+                                    if self.timelines[item.old_text][1] <= 0:
                                         # if user delete all this timeline, we delete data
                                         self.timelineDeleted.emit(self.timelines[item.old_text][0])
                                         del self.timelines[item.old_text]
