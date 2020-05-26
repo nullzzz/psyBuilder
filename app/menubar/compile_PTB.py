@@ -1648,12 +1648,12 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
     attributesSetDict.setdefault(f"{cWidgetName}.cLoop", [cLoopLevel, f"iLoop_{cLoopLevel}", {f"iLoop_{cLoopLevel}"}])
     attributesSetDict.setdefault(f"{cWidgetName}.rowNums",
-                                 [cLoopLevel, f"size({cWidgetName}.attr,1)", {f"size({cWidgetName}.attr,1)"}])
+                                 [cLoopLevel, f"size({cWidgetName}.var,1)", {f"size({cWidgetName}.var,1)"}])
 
     cLoopIterStr = attributesSetDict[f"{cWidgetName}.cLoop"][1]
 
     # create the design matrix  (table) for the current cycle
-    startExpStr = cWidgetName + '.attr = cell2table({...'
+    startExpStr = cWidgetName + '.var = cell2table({...'
     printAutoInd(f, '% create the designMatrix of the current cycle (loop)')
     printAutoInd(f, '{0}', startExpStr)
 
@@ -1668,7 +1668,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
             # get the referenced var value
             cValue, isRefValue, cRefValueSet = getRefValueSet(cWidget, value, attributesSetDict)
 
-            cKeyAttrName = f"{getWidgetName(cWidget.widget_id)}.attr.{key}"
+            cKeyAttrName = f"{getWidgetName(cWidget.widget_id)}.var.{key}"
 
             # handle the references and the values in special format (e.g., percent, duration)
             # --- replaced the percentageStr--------/
@@ -1752,7 +1752,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
             #     TO BE CONTINUING... FOR ALL OTHER Special Types
             # --------------------------------------\
 
-            cAttributeName = f"{cWidgetName}.attr.{key}"
+            cAttributeName = f"{cWidgetName}.var.{key}"
 
             if not isRefValue:
                 cRefValueSet = {cValue}
@@ -1793,12 +1793,12 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     printAutoInd(f, "% Shuffle the DesignMatrix")
     printAutoInd(f, 'cShuffledIdx = ShuffleCycleOrder({0},{1},{2},subInfo);',
                  attributesSetDict[f"{cWidgetName}.rowNums"][1], cycleOrderStr, cycleOrderByStr)
-    printAutoInd(f, '{0}.attr = {0}.attr(cShuffledIdx,:);', cWidgetName)
+    printAutoInd(f, '{0}.var = {0}.var(cShuffledIdx,:);', cWidgetName)
     printAutoInd(f, "\n")
 
     # cycling
-    printAutoInd(f, '% looping across each row of the {0}.attr:{1}', cWidgetName, cLoopIterStr)
-    printAutoInd(f, 'for {0} =1:size({1},1)', cLoopIterStr, f"{cWidgetName}.attr")
+    printAutoInd(f, '% looping across each row of the {0}.var:{1}', cWidgetName, cLoopIterStr)
+    printAutoInd(f, 'for {0} =1:size({1},1)', cLoopIterStr, f"{cWidgetName}.var")
 
     cLoopOpIdxStr = cLoopIterStr + "_cOpR"
 
@@ -1808,7 +1808,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
     cRowDict = cWidget.getAttributes(0)
     otVarStr = ''.join(cWidgetName + '_' + key + f"{{{cLoopOpIdxStr}}}," for key in cRowDict.keys())
-    otVarStr = f"[{otVarStr[0:-1]}] = deal({cWidgetName}.attr{{{cLoopIterStr},:}}{{:}});"
+    otVarStr = f"[{otVarStr[0:-1]}] = deal({cWidgetName}.var{{{cLoopIterStr},:}}{{:}});"
 
     printAutoInd(f, "{0}\n", otVarStr)
 
@@ -1821,7 +1821,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
         cTimelineSet.add(iTimeline[1])
 
     printAutoInd(f, '% switch across timeline types')
-    printAutoInd(f, 'switch {0}', f"{cWidgetName}.attr.Timeline{{{cLoopIterStr}}}")
+    printAutoInd(f, 'switch {0}', f"{cWidgetName}.var.Timeline{{{cLoopIterStr}}}")
 
     for iTimeline_id in cTimelineSet:
         if '' == iTimeline_id:
@@ -1834,7 +1834,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
     printAutoInd(f, 'otherwise ')
     printAutoInd(f, '% do nothing ')
-    printAutoInd(f, 'end%switch {0}', f"{cWidgetName}.attr.Timeline{{{cLoopIterStr}}}")
+    printAutoInd(f, 'end%switch {0}', f"{cWidgetName}.var.Timeline{{{cLoopIterStr}}}")
 
     printAutoInd(f, "opRowIdx = opRowIdx + 1; % increase the row num of outputVars by 1")
     printAutoInd(f, 'end % {0}', cLoopIterStr)

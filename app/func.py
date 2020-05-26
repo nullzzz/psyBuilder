@@ -416,7 +416,7 @@ class Func(object):
                 cycle_name = node.text(0)
                 col_attributes = cycle.getColumnAttributes()
                 for attribute in col_attributes:
-                    attributes[f"{cycle_name}.attr.{attribute}"] = depth
+                    attributes[f"{cycle_name}.var.{attribute}"] = depth
                 # we need first cycle's hidden attribute
                 if first:
                     first_cycle_hidden_attributes = Info.Widgets[node.widget_id].getHiddenAttributes()
