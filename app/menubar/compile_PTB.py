@@ -2757,7 +2757,7 @@ def printETLogWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
     shouldNotBeCitationCheck('Pause between messages', cWidget.getPauseBetweenMessages())
 
-    usedAttributesList = cProperties.get('Used attributes', [])
+    usedAttributesList = cProperties.get('Used Variables', [])
 
     printAutoInd(f, "Eyelink('Message', '!V TRIAL_VAR index %s', {0});", cOpRowIdxStr)
 
