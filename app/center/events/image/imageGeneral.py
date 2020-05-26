@@ -45,7 +45,7 @@ class ImageTab1(QWidget):
 
         # 透明度、Clear&Screen
         self.transparent = VarLineEdit("100%")
-        self.transparent.setReg(r"[0-9]%|[1-9][0-9]%|100%|\[\w+\]")
+        self.transparent.setReg((VarLineEdit.Percentage, VarLineEdit.FloatPercentage))
         self.clear_after = VarComboBox()
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 

@@ -15,6 +15,7 @@ class VarComboBox(QComboBox):
     Float = r"^(-?\d+)(\.\d+)?$"
     Integer = r"^-?\d+$"
     Percentage = r"^(100|[1-9]?\d?)%$|0$"
+    FloatPercentage = r"^(([1-9]{1}\d*)|(0{1}))(\.\d{0,2})?%$"
 
     def __init__(self, editable: bool = False, parent=None):
         super(VarComboBox, self).__init__(parent)
