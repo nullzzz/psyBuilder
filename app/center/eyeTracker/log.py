@@ -26,8 +26,8 @@ class Close(TabItemWidget):
         self.default_properties = {
             "Pause Between Messages": "1",
             "Automatically Log All Variables": 0,
-            "Used Attributes": [],
-            "Not Used Attributes": [],
+            "Used Variables": [],
+            "Not Used Variables": [],
             "EyeTracker Name": "",
         }
 
@@ -172,20 +172,20 @@ class Close(TabItemWidget):
         ua = []
         for i in range(self.select_attr.count()):
             ua.append(self.select_attr.item(i).text())
-        self.default_properties["Used Attributes"].extend(ua)
+        self.default_properties["Used Variables"].extend(ua)
         nua = []
         for i in range(self.all_attr.count()):
             nua.append(self.all_attr.item(i).text())
-        self.default_properties["Not Used Attributes"].extend(nua)
+        self.default_properties["Not Used Variables"].extend(nua)
 
     def loadSetting(self):
         self.pause_between_msg.setText(self.default_properties["Pause Between Messages"])
         self.automatically_log_all_variables.setCheckState(self.default_properties["Automatically Log All Variables"])
         self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
         self.select_attr.clear()
-        self.select_attr.addItems(self.default_properties["Used Attributes"])
+        self.select_attr.addItems(self.default_properties["Used Variables"])
         self.all_attr.clear()
-        self.all_attr.addItems(self.default_properties["Not Used Attributes"])
+        self.all_attr.addItems(self.default_properties["Not Used Variables"])
 
     def setAttributes(self, attributes):
         pass

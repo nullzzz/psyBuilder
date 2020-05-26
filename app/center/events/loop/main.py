@@ -52,9 +52,9 @@ class Loop(TabItemMainWindow):
                            self.cycle_table.deleteRowsActionFunc)
         tool_bar.addAction(Func.getImageObject("cycle/add_column.png", 1, QSize(22, 22)), "Add Attribute",
                            self.cycle_table.addAttributeActionFunc)
-        tool_bar.addAction(Func.getImageObject("cycle/add_columns.png", 1, QSize(22, 22)), "Add Attributes",
+        tool_bar.addAction(Func.getImageObject("cycle/add_columns.png", 1, QSize(22, 22)), "Add Variables",
                            self.cycle_table.addAttributesActionFunc)
-        tool_bar.addAction(Func.getImageObject("cycle/delete_column.png", 1, QSize(22, 22)), "Delete Attributes",
+        tool_bar.addAction(Func.getImageObject("cycle/delete_column.png", 1, QSize(22, 22)), "Delete Variables",
                            self.cycle_table.deleteAttributesActionFunc)
 
     def getColumnAttributes(self) -> list:

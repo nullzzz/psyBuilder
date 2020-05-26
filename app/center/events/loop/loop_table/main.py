@@ -72,7 +72,7 @@ class CycleTable(TableWidget):
         self.delete_rows_action = self.menu.addAction(Func.getImageObject("menu/delete_row.png", 1), "Delete Rows",
                                                       self.deleteRowsActionFunc, QKeySequence())
         self.delete_cols_action = self.menu.addAction(Func.getImageObject("menu/delete_col.png", 1),
-                                                      "Delete Attributes", self.deleteAttributesActionFunc,
+                                                      "Delete Variables", self.deleteAttributesActionFunc,
                                                       QKeySequence())
         # shortcut
         self.copy_shortcut = QShortcut(QKeySequence(QKeySequence.Copy), self)

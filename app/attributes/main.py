@@ -12,7 +12,7 @@ class Attributes(DockWidget):
     def __init__(self):
         super(Attributes, self).__init__()
         # title
-        self.setWindowTitle("Attributes")
+        self.setWindowTitle("Variables")
         # attributes table
         self.attributes_table = AttributesTable()
         self.setWidget(self.attributes_table)

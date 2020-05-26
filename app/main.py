@@ -973,7 +973,7 @@ class Psy(QMainWindow):
             icon = QIcon(Func.getImage("common/dock_visible.png"))
         else:
             icon = QIcon("")
-        if dock == "Attributes":
+        if dock == "Variables":
             self.attribute_action.setIcon(icon)
         elif dock == "Structure":
             self.structure_action.setIcon(icon)

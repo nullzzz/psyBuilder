@@ -24,7 +24,7 @@ class AttributeDialog(Dialog):
         self.change = False
         self.col = -1
         # title
-        self.setWindowTitle("Add Attributes")
+        self.setWindowTitle("Add Variables")
         self.setModal(True)
         # scroll area > container > some attribute areas
         scroll_area = QScrollArea()
