@@ -1086,10 +1086,10 @@ def getAllNestedVars(inputStr, opVars=None) -> set:
 
 def getCycleRealRows(widgetId: str) -> int:
     cCycle = Info.WID_WIDGET[widgetId]
-    weightList = cCycle.getAttributeValues(0)
+    repetitionsList = cCycle.getAttributeValues(0)
 
     sumValue = 0
-    for cWeightStr in weightList:
+    for cWeightStr in repetitionsList:
         sumValue = sumValue + dataStrConvert(cWeightStr)
 
     return sumValue
@@ -1654,7 +1654,7 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
     # create the design matrix  (table) for the current cycle
     startExpStr = cWidgetName + '.var = cell2table({...'
-    printAutoInd(f, '% create the designMatrix of the current cycle (loop)')
+    printAutoInd(f, '% create the designMatrix for the current loop')
     printAutoInd(f, '{0}', startExpStr)
 
     endExpStr = "},'VariableNames',{"
@@ -1781,13 +1781,13 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     cycleOrderStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrder(), attributesSetDict))
     cycleOrderByStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrderBy(), attributesSetDict))
 
-    #  to make sure the weight is one for counterbalance selection of order ----/
+    #  to make sure the repetitions is one for counterbalance selection of order ----/
     if cycleOrderStr == "'CounterBalance'":
         cCycleWeightList = cWidget.getAttributeValues(0)
         for cLineWeight in cCycleWeightList:
             if dataStrConvert(cLineWeight) != 1:
                 throwCompileErrorInfo(
-                    f"Found an incompatible error in Cycle {getWidgetName(cWidget.widget_id)}:\nFor CounterBalance selection, the timeline weight should be 1")
+                    f"Found an incompatible error in Cycle {getWidgetName(cWidget.widget_id)}:\nFor CounterBalance selection, the timeline repetitions should be 1")
     # ------------------------------------------------------------------------\
 
     printAutoInd(f, "% Shuffle the DesignMatrix")

@@ -11,7 +11,7 @@ from lib import MessageBox, TableWidget
 from .attribute_dialog import AttributeDialog
 from .attribute_item import AttributeItem
 from .timeline_item import TimelineItem
-from .weight_item import WeightItem
+from .repetitions_item import RepetitionsItem
 
 
 class CycleTable(TableWidget):
@@ -94,9 +94,9 @@ class CycleTable(TableWidget):
         else:
             index = self.rowCount()
             self.insertRow(index)
-        # add items, weight, timeline and attributes
-        weight_item = WeightItem(self.default_value[self.attributes[0]])
-        self.setItem(index, 0, weight_item)
+        # add items, repetitions, timeline and attributes
+        repetitions_item = RepetitionsItem(self.default_value[self.attributes[0]])
+        self.setItem(index, 0, repetitions_item)
         timeline_item = TimelineItem()
         self.setItem(index, 1, timeline_item)
         for col in range(2, len(self.attributes)):
@@ -186,10 +186,10 @@ class CycleTable(TableWidget):
         # if text isn't changed, we ignore it
         if item.changed():
             text = item.text()
-            if type(item) == WeightItem:
+            if type(item) == RepetitionsItem:
                 # only positive number
-                if not re.match(Info.WeightPattern[0], text):
-                    MessageBox.information(self, "warning", Info.WeightPattern[1])
+                if not re.match(Info.RepetitionsPattern[0], text):
+                    MessageBox.information(self, "warning", Info.RepetitionsPattern[1])
                     item.redo()
                 else:
                     item.save()
@@ -206,7 +206,7 @@ class CycleTable(TableWidget):
                         if text not in self.timelines:
                             # if it is new timeline in this cycle, but may have existed in other cycles
                             if Func.checkWidgetNameExisted(widget_name=text):
-                                MessageBox.information(self, "warning", "Name already exists in other cycles.")
+                                MessageBox.information(self, "warning", "Name already exists in other loops.")
                                 item.redo()
                             else:
                                 # generate new timeline's widget_id
@@ -228,7 +228,7 @@ class CycleTable(TableWidget):
                                 # new timeline in this cycle
                                 if Func.checkWidgetNameExisted(widget_name=text):
                                     # valid
-                                    MessageBox.information(self, "warning", "Name already exists in other cycles.")
+                                    MessageBox.information(self, "warning", "Name already exists in other loops.")
                                     item.redo()
                                 else:
                                     # generate new timeline's widget_id
@@ -237,7 +237,7 @@ class CycleTable(TableWidget):
                                     self.timelines[text] = [widget_id, 1]
                                     # secondly check old current_text
                                     self.timelines[item.old_text][1] -= 1
-                                    if not self.timelines[item.old_text][1]:
+                                    if self.timelines[item.old_text][1] <= 0:
                                         # if user delete all this timeline, we delete data
                                         self.timelineDeleted.emit(self.timelines[item.old_text][0])
                                         del self.timelines[item.old_text]
@@ -562,21 +562,21 @@ class CycleTable(TableWidget):
             for j in range(cols_count):
                 # we need format the data
                 pasted_cols[j].append(re.sub(r"\r", "", pasted_row[j]))
-        # if it affects the weight/timeline column, we need to check the value
+        # if it affects the repetitions/timeline column, we need to check the value
         end_row = start_row + len(rows) - 1
         end_col = start_col + cols_count - 1
         # add new row into table
         for i in range(self.rowCount(), end_row + 1):
             self.addRow()
         if not start_col:
-            # if it affect weight column, we only allow positive num
-            weight_values = pasted_cols[0]
-            for weight_value in weight_values:
-                if not re.match(Info.WeightPattern[0], weight_value):
-                    MessageBox.information(self, "warning", Info.WeightPattern[1])
+            # if it affect repetitions column, we only allow positive num
+            repetitions_values = pasted_cols[0]
+            for repetitions_value in repetitions_values:
+                if not re.match(Info.RepetitionsPattern[0], repetitions_value):
+                    MessageBox.information(self, "warning", Info.RepetitionsPattern[1])
                     return
         if (not start_col and cols_count > 1) or start_col == 1:
-            # if it affect weight column, we need to check the value
+            # if it affect repetitions column, we need to check the value
             timeline_col = 1
             if start_col == 1:
                 timeline_col = 0
@@ -648,7 +648,7 @@ class CycleTable(TableWidget):
             # get pos
             row = self.rowAt(e.pos().y())
             col = self.columnAt(e.pos().x())
-            # can't be weight and timeline
+            # can't be repetitions and timeline
             if row != -1 and col >= 2:
                 data = e.mimeData().data(Info.AttributesToWidget)
                 stream = QDataStream(data, QIODevice.ReadOnly)
@@ -694,7 +694,7 @@ class CycleTable(TableWidget):
             for row in range(self.rowCount()):
                 text = table[col][row]
                 if col == 0:
-                    item = WeightItem(text)
+                    item = RepetitionsItem(text)
                 elif col == 1:
                     item = TimelineItem()
                 else:

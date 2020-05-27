@@ -144,7 +144,7 @@ class Info(object):
     # name pattern
     WidgetPattern = [r"^[a-zA-Z][a-zA-Z0-9_]*$",
                      "Name must start with a letter and contain only letters, numbers, and _."]
-    WeightPattern = [r"^\+?[1-9][0-9]*$", "Only positive number is enabled."]
+    RepetitionsPattern = [r"^\+?[1-9][0-9]*$", "Only positive number is allowed."]
 
     ###########################################
     #           new version data              #
