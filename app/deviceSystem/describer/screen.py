@@ -38,7 +38,7 @@ class Screen(Shower):
 
     def setUI(self):
         layout = QFormLayout()
-        layout.setLabelAlignment(Qt.AlignRight)
+        layout.setLabelAlignment(Qt.AlignLeft)
         layout.addRow("Device Type:", self.device_type)
         layout.addRow("Device Name:", self.device_name)
         layout.addRow("Device Index:", self.device_index)

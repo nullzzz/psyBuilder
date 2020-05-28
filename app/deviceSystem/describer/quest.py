@@ -61,7 +61,7 @@ class Quest(QWidget):
         layout.addRow("Is Log10 Transform:", self.is_log10_transform)
         layout.addRow("Grain:", self.grain)
         layout.addRow("Range:", self.range)
-        layout.setLabelAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        layout.setLabelAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.setLayout(layout)
 
     def describe(self, info: dict):
