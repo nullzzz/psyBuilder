@@ -35,6 +35,7 @@ class ColComboBox(VarComboBox):
         self.init()
 
         self.setStyleSheet("background: {}".format(self.getRGB()))
+        self.setAttribute(Qt.WA_LayoutUsesWidgetRect)
         # 支持输入255,255,255及#ffffff格式rgb
         valid_rgb = QRegExp(
             r"((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{6}|"
