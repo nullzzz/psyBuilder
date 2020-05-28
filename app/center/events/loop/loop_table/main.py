@@ -211,7 +211,8 @@ class CycleTable(TableWidget):
                             else:
                                 # generate new timeline's widget_id
                                 widget_id = Func.generateWidgetId(Info.TIMELINE)
-                                self.timelineAdded.emit(widget_id, text, len(self.timelines))
+                                self.timelineAdded.emit(widget_id, text, -1)
+                                # self.timelineAdded.emit(widget_id, text, len(self.timelines))
                                 self.timelines[text] = [widget_id, 1]
                                 item.save()
                         else:
@@ -233,7 +234,7 @@ class CycleTable(TableWidget):
                                 else:
                                     # generate new timeline's widget_id
                                     widget_id = Func.generateWidgetId(Info.TIMELINE)
-                                    self.timelineAdded.emit(widget_id, text, len(self.timelines))
+                                    self.timelineAdded.emit(widget_id, text, -1)
                                     self.timelines[text] = [widget_id, 1]
                                     # secondly check old current_text
                                     self.timelines[item.old_text][1] -= 1
@@ -303,9 +304,9 @@ class CycleTable(TableWidget):
                     self.drag_copy_row_col = [row, col]
                     self.alt_key = True
                     self.setCursor(Qt.CrossCursor)
-        elif e.modifiers() == Qt.AltModifier | Qt.ControlModifier:
-            self.alt_key = False
-            self.unsetCursor()
+        # elif e.modifiers() == Qt.AltModifier | Qt.ControlModifier:
+        #     self.alt_key = False
+        #     self.unsetCursor()
 
     def mouseReleaseEvent(self, e):
         """
@@ -613,7 +614,7 @@ class CycleTable(TableWidget):
                         del self.timelines[timeline_name]
                 else:
                     widget_id = Func.generateWidgetId(Info.TIMELINE)
-                    self.timelineAdded.emit(widget_id, timeline_name, len(self.timelines))
+                    self.timelineAdded.emit(widget_id, timeline_name, -1)
                     self.timelines[timeline_name] = [widget_id, timeline_counter[timeline_name]]
         # add attributes and fill text
         for col in range(start_col, end_col + 1):

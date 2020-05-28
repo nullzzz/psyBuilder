@@ -117,14 +117,14 @@ class Loop(TabItemMainWindow):
         如果某行为空则改行对应的数据为[ '', '']
         :return:
         """
-        timelines = []
+        cTimelines = []
         for row in range(0, self.cycle_table.rowCount()):
             timeline_name = self.cycle_table.item(row, 1).text()
             if timeline_name:
-                timelines.append([timeline_name, self.cycle_table.timelines.setdefault(timeline_name, "")[0]])
+                cTimelines.append([timeline_name, self.cycle_table.timelines.setdefault(timeline_name, "")[0]])
             else:
                 raise Exception(f"Timeline name should not be empty!:In {self.widget_name} at row {row +1}")
-        return timelines
+        return cTimelines
 
     def getAttributes(self, row: int) -> dict:
         """
