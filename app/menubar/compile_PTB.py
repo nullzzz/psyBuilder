@@ -24,7 +24,7 @@ stimWidgetTypesList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO
 
 def throwCompileErrorInfo(inputStr):
     Func.printOut(inputStr, 3)
-    raise Exception("compile failed: see info above for details")
+    raise Exception("compile failed: see info above for details.")
 
 
 def debugPrint(inputStr: str):
@@ -4198,7 +4198,7 @@ def compileCode(isDummyCompile):
 
                 else:
                     throwCompileErrorInfo(
-                        f"Currently, only supports Eyelink!\n because we only have the Eyelink device!")
+                        f"Currently, only Eyelink action is supported\n because we only have an Eyelink 1000 for debug.")
         else:
             throwCompileErrorInfo(f"Currently number of eye tracker devs should be only one !")
 

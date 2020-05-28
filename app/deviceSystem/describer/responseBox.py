@@ -11,7 +11,7 @@ class ResponseBox(Shower):
         self.device_index.textEdited.connect(self.showAddressTip)
 
         self.index_tip.setHtml("About Device Port:"
-                               "<br><br>Currently, only Cedrus's response box devices are supported, because we only have this device"
+                               "<br><br>Currently, only response pads from Cedrus are supported."
                                "<br><br><b>Windows: </b> serial port name: e.g., <br>'COM2' for auto"
                                "<br><br><b>Mac OS: </b> serial port name: e.g., <br>'/dev/cu.usbserial-FTDI125ZX9' for auto"
                                "<br><br><b>Linux: </b> serial port name: e.g., <br>'/dev/ttyS0' for auto"

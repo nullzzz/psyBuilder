@@ -21,7 +21,7 @@ class Action(Shower):
                 self.tracker.addItem(v)
         self.index_tip.setHtml("About eye action:"
                                "<br><br>Currently, only Eyelink action is supported, "
-                               "because we only have a Eyelink 1000 for debug.<br>"
+                               "because we only have an Eyelink 1000 for debug.<br>"
                                "<br>Eyetracker manufacturers are welcome to contact us for adding support.")
         self.setUI()
 

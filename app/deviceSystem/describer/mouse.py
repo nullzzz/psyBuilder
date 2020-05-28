@@ -49,9 +49,10 @@ class Mouse(Shower):
         else:
             gpOrderStr = f"{order_num}th"
 
-        self.index_tip.setHtml("About Device Index(auto or a number):<br>"
-                               "<br><b>Number (e.g., 0): </b> any mouse index (returned by GetMouseIndices in MATLAB)"
-                               f"<br><br><b>auto:</b> will use the {gpOrderStr} value in mouse indices for this mouse (returned by GetMouseIndices in MATLAB)"
+        self.index_tip.setHtml("About Device Index:<br>"
+                               # f"<br><br>Either “auto” (default to the {gpOrderStr} value returned by GetMouseIndices in MATLAB) or an integer that represents the mouse."
+                               f'<br><br>Either "auto" (default to the {gpOrderStr} value returned by GetMouseIndices in MATLAB) or an integer that represents the mouse.'
+                               # f"<br><br><b>auto:</b> will use the {gpOrderStr} value in mouse indices for this mouse (returned by GetMouseIndices in MATLAB)"
                                )
 
     def getInfo(self):

@@ -87,7 +87,7 @@ class ImageGeneral(QWidget):
         layout1.addWidget(l0, 1, 2)
         layout1.addWidget(self.rotate, 1, 3, 1, 2)
 
-        l_tra = QLabel("Transparent(%):")
+        l_tra = QLabel("Transparency(%):")
         l_tra.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1.addWidget(l_tra, 2, 2)

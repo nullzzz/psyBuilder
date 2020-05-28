@@ -58,7 +58,7 @@ class Quest(QWidget):
         layout.addRow("Method:", self.method)
         layout.addRow("Minimum Test Value:", self.minimum)
         layout.addRow("Maximum Test Value:", self.maximum)
-        layout.addRow("Is Log10 Transform:", self.is_log10_transform)
+        layout.addRow("Is Log10 Transformed:", self.is_log10_transform)
         layout.addRow("Grain:", self.grain)
         layout.addRow("Range:", self.range)
         layout.setLabelAlignment(Qt.AlignLeft | Qt.AlignVCenter)

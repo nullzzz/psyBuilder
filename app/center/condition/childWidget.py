@@ -54,7 +54,7 @@ class ChildWidget(QWidget):
 
     def setUI(self):
         grid_layout = QGridLayout()
-        event_tip = QLabel("Stim Type:")
+        event_tip = QLabel("Stimulus Type:")
         event_tip.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
         name_tip = QLabel("Event Name:")
         name_tip.setAlignment(Qt.AlignVCenter | Qt.AlignRight)

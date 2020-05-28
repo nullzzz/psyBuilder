@@ -15,8 +15,7 @@ class Sound(Shower):
         self.sampling_rate.setValidator(QRegExpValidator(QRegExp(r"\d+|auto")))
 
         self.index_tip.setHtml("About Device Index:"
-                               "<br>any sound device index returned by PsychPortAudio('GetDevices') in MATLAB"
-                               f"<br><br><b>'auto':</b>automatically get an optimized sound device index"
+                               "<br><br>Either \"auto\" (default to the optimized sound device index) or an integer that represents the sound device, as returned by PsychPortAudio('GetDevices') in MATLAB."
                                )
         self.setUI()
 

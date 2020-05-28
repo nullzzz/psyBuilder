@@ -88,7 +88,7 @@ class VideoGeneral(QWidget):
         l3 = QLabel("Playback Rate:")
         l4 = QLabel("Aspect Ratio:")
 
-        l5 = QLabel("Transparent (%):")
+        l5 = QLabel("Transparency (%):")
 
         l_x_pos = QLabel("Center X:")
         l_y_pos = QLabel("Center Y:")

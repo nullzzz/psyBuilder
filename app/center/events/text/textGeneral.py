@@ -92,10 +92,10 @@ class TextTab1(QWidget):
         l02 = QLabel("Fore Color:")
         l12 = QLabel("Back Color:")
 
-        l20 = QLabel("Dont Clear After:")
+        l20 = QLabel("Don’t Clear After:")
         l22 = QLabel("Screen Name:")
 
-        l30 = QLabel("Transparent:")
+        l30 = QLabel("Transparency:")
         l32 = QLabel("Wrapat Chars:")
 
         l40 = QLabel("Flip Horizontal:")
