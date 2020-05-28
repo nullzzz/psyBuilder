@@ -1137,14 +1137,24 @@ def getMaxLoopLevel() -> int:
     return maxLoopLevel
 
 
+
 def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False, transformStrDict=None):
     if transformStrDict is None:
         transformStrDict = {'=': '==','≠': '~=', '≥': '>=', '≤': '<='}
 
+    refWithBracketPat = r'(\(\[[A-Za-z]+[a-zA-Z._0-9]*?\]\))'
     refPat = r'(\[[A-Za-z]+[a-zA-Z._0-9]*?\])'
     meanPat = r'\[([A-Za-z]+[a-zA-Z._0-9]*?)\]@mean'
     medianPat = r'\[([A-Za-z]+[a-zA-Z._0-9]*?)\]@median'
     modePat = r'\[([A-Za-z]+[a-zA-Z._0-9]*?)\]@mode'
+
+    leftPat = r'--impossibleValeForLeftBracket--'
+    rightPat = r'--impossibleValeForLeftBracket--'
+
+    inputStr = inputStr.replace('(', leftPat)
+    inputStr = inputStr.replace(')', rightPat)
+
+
 
     refedObNameList = list()
     isContainRef = 0
@@ -1157,51 +1167,99 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
     if isOutStr and isMatlabStr is False:
         inputStr = addSingleQuotes(inputStr)
 
+    rawInputStr = inputStr
+    # stage 1: parse @mean @median or @mode
     if isMatlabStr or isOutStr:
-
-        rawInputStr = inputStr
 
         inputStr = re.sub(meanPat, r"',num2str(mean([\1])),'", inputStr)
         inputStr = re.sub(medianPat, r"',num2str(median([\1])),'", inputStr)
         inputStr = re.sub(modePat, r"',num2str(mode([\1])),'", inputStr)
 
         # in case the citation located in the begin or the end of inputStr
-        if rawInputStr != inputStr:
-            if inputStr.startswith("'',num2str(m"):
-                inputStr = "'" + inputStr[3:]
-            if inputStr.endswith(")),''"):
-                inputStr = inputStr[0:-3] + "'"
+        # if rawInputStr != inputStr:
+        #     if inputStr.startswith("'',num2str(m"):
+        #         inputStr = "'" + inputStr[3:]
+        #     if inputStr.endswith(")),''"):
+        #         inputStr = inputStr[0:-3] + "'"
     else:
         inputStr = re.sub(meanPat, r'mean([\1])', inputStr)
         inputStr = re.sub(medianPat, r'median([\1])', inputStr)
         inputStr = re.sub(modePat, r'mode([\1])', inputStr)
 
+    # stage 2: parse refs in @ mean, mode, or median
+    allRefs = re.findall(refWithBracketPat, inputStr)
+    if len(allRefs) > 0:
+        for cRefs in allRefs:
+            cRefsWithoutBracket = cRefs[1:-1]
+            cRefsValue, isRefValue = getRefValue(cWidget, cRefsWithoutBracket, attributesSetDict, True)
+
+            if not isRefStr(cRefsValue):
+                refedObNameList.append("".join(cItem + '.' for cItem in re.sub(r'[\[\]]', '', cRefsWithoutBracket).split('.')[0:-1])[0:-1])
+
+                inputStr = inputStr.replace(cRefs, cRefsValue)
+
+                isContainRef = isContainRef + isRefValue
+
+    # stage 3: parse all other refs
+    rawInputStr = inputStr
     allRefs = re.findall(refPat, inputStr)
 
     if len(allRefs) > 0:
         for cRefs in allRefs:
-            cRefsValue, isRefValue = getRefValue(cWidget, cRefs, attributesSetDict)
+            cRefsValue, isRefValue = getRefValue(cWidget, cRefs, attributesSetDict, True)
 
-            refedObNameList.append("".join(cItem + '.' for cItem in re.sub(r'[\[\]]', '', cRefs).split('.')[0:-1])[0:-1])
 
-            inputStr = inputStr.replace(cRefs, cRefsValue)
+            if not isRefStr(cRefsValue):
 
-            isContainRef = isContainRef + isRefValue
+                refedObNameList.append("".join(cItem + '.' for cItem in re.sub(r'[\[\]]', '', cRefs).split('.')[0:-1])[0:-1])
+
+                if isMatlabStr or isOutStr:
+                    # inputStr = re.sub(meanPat, r"',num2str(mean([\1])),'", inputStr)
+                    inputStr = inputStr.replace(cRefs, f"',num2str({cRefsValue}),'")
+                else:
+                    inputStr = inputStr.replace(cRefs, cRefsValue)
+
+                isContainRef = isContainRef + isRefValue
+
+
+
+    if isMatlabStr or isOutStr:
+        # in case the citation located in the begin or the end of inputStr
+        if rawInputStr != inputStr:
+            if inputStr.startswith("'',"):
+                inputStr = inputStr[3:]
+            if inputStr.endswith(",''"):
+                inputStr = inputStr[0:-3]
+
+        # for whole citation, there no need to add square brackets
+        if isContainRef>1:
+            inputStr = addSquBrackets(inputStr)
 
     isContainRef = isContainRef != 0
 
-    if isMatlabStr or isOutStr:
-        # for whole citation, there no need to add square brackets
-        if len(allRefs)>1:
-            inputStr = addSquBrackets(inputStr)
 
-    return inputStr, isContainRef, refedObNameList
+    inputStr = inputStr.replace(leftPat, '(')
+    inputStr = inputStr.replace(rightPat, ')')
+
+
+    return repr(inputStr)[1:-1], isContainRef, refedObNameList
 
 
 def getWidgetIDInTimeline(widget_id: str) -> list:
     wid_name_list = Func.getWidgetIDInTimeline(widget_id)
 
     return list(wId for wId, wName in wid_name_list)
+
+
+# def getRefValue2(cWidget, inputStr, attributesSetDict, allowUnlistedAttr=False) -> list:
+#     isUnlistedRef = False
+#
+#     inputStr, isRefValue = getRefValue(cWidget, inputStr, attributesSetDict, allowUnlistedAttr)
+#
+#     if isRefValue(inputStr):
+#         isUnlistedRef = True
+#
+#     return [inputStr, isRefValue, isUnlistedRef]
 
 
 def getRefValue(cWidget, inputStr, attributesSetDict, allowUnlistedAttr=False) -> list:
@@ -1218,7 +1276,9 @@ def getRefValue(cWidget, inputStr, attributesSetDict, allowUnlistedAttr=False) -
             if inputStr in attributesSetDict:
                 inputStr = attributesSetDict[inputStr][1]
             else:
-                if allowUnlistedAttr is False:
+                if allowUnlistedAttr:
+                    inputStr = addSquBrackets(inputStr)
+                else:
                     throwCompileErrorInfo(
                         f"The cited attribute '{inputStr}' \nis not available for {getWidgetName(cWidget.widget_id)}")
 
