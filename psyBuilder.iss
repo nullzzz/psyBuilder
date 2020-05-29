@@ -40,8 +40,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode
 
 [Files]
-Source: "C:\Users\Administrator\PycharmProjects\ptbGui\dist\run\run.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Administrator\PycharmProjects\ptbGui\dist\run\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\Administrator\PycharmProjects\ptbGui\dist\psyBuilder\psyBuilder.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Administrator\PycharmProjects\ptbGui\dist\psyBuilder\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

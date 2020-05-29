@@ -81,7 +81,7 @@ class ImageTab1(QWidget):
         layout2.setVerticalSpacing(10)
         layout2.setLabelAlignment(Qt.AlignRight)
         layout2.addRow("Transparency:", self.transparent)
-        layout2.addRow("Don’t Clear After:", self.clear_after)
+        layout2.addRow("Don't Clear After:", self.clear_after)
         layout2.addRow("Screen Name:", self.screen_name)
 
         group2.setLayout(layout2)

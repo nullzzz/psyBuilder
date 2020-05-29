@@ -3,8 +3,8 @@ cd  %~dp0
 rd /S/Q .\build
 rd /S/Q .\dist
 
-pyinstaller -i .\source\images\common\psybuilder.ico -w --clean --add-data source;source --add-data yanglabMFuns;yanglabMFuns --noconfirm --k=asdgaFgWE1e42a --hidden-import pkg_resources.py2_warn run.py
-rem # mac ox: pyinstaller -i ./source/images/common/psybuilder.ico -w --noconfirm --k=asdgaFgWE1e42a --hidden-import pkg_resources.py2_warn run.py
+pyinstaller -i .\source\images\common\psybuilder.ico -w --clean --add-data source;source --add-data yanglabMFuns;yanglabMFuns --noconfirm --k=asdgaFgWE1e42a --hidden-import pkg_resources.py2_warn psyBuilder.py
+rem # mac ox: pyinstaller -i ./source/images/common/psybuilder.ico -w --noconfirm --k=asdgaFgWE1e42a --hidden-import pkg_resources.py2_warn psyBuilder.py
 
 
 cd "C:\Program Files (x86)\Inno Setup 6\"

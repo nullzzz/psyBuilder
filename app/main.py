@@ -296,6 +296,7 @@ class Psy(QMainWindow):
         # copy widget
         new_widget = Info.Widgets[origin_widget_id].clone(new_widget_id, new_widget_name)
         Info.Widgets[new_widget_id] = new_widget
+        Info.Names[new_widget_name] = [new_widget_id]
         # link signals
         self.linkWidgetSignals(new_widget_id, new_widget)
         return new_widget
