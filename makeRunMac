@@ -7,20 +7,20 @@ sudo rm -rf ./dist
 sudo rm -rf ./build
 
 
-#sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn run.py
-sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --add-binary='/System/Library/Frameworks/Tk.framework/Tk':'tk' --add-binary='/System/Library/Frameworks/Tcl.framework/Tcl':'tcl' --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn run.py
+#sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn psyBuilder.py
+sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --add-binary='/System/Library/Frameworks/Tk.framework/Tk':'tk' --add-binary='/System/Library/Frameworks/Tcl.framework/Tcl':'tcl' --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn psyBuilder.py
 
 echo "============================="
 echo "start to codesign the app"
 echo "============================="
 
-APP_PATH="./dist/run.app"
+APP_PATH="./dist/psyBuilder.app"
 sudo codesign --deep -f -s B406553BC6044A7B8EB4EA9D42CCE348677576AE "$APP_PATH"
 
 echo "============================="
 echo "create PsyBuilder via platypus"
 echo "============================="
-platypus -P ./PsyBuilder.platypus -a PsyBuilder -o None -y -i ./source/images/common/icon.icns -I org.Zy.PsyBuilder -B -f ./dist/run.app ./psyBuilder ..
+platypus -P ./PsyBuilder.platypus -a PsyBuilder -o None -y -i ./source/images/common/icon.icns -I org.Zy.PsyBuilder -B -f ./dist/psyBuilder.app ./psyBuilder ..
 #
 #sudo mv ./dist/run.app/Contents/MacOS/run ./dist/run.app/Contents/MacOS/run0
 #
@@ -46,6 +46,10 @@ echo "============================="
 # sudo mkdir "./forDist"
 # sudo cp -f -R $APP_PATH ./forDist/
 #sudo cp -f ./doubleClickOnMeFirst ./forDist/
-
 sudo zip -r -X "PsyBuilder$(date +%Y%m%d%H%M%S)Mac.zip" $APP_PATH
 
+
+echo "============================="
+echo " make dmg for PsyBuilder"
+echo "============================="
+sudo dropdmg --config-name "psyBuilder" PsyBuilder.app
