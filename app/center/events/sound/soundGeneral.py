@@ -126,7 +126,7 @@ class SoundTab1(QWidget):
 
         l6 = QLabel("Sound Device:")
         l7 = QLabel("Wait For Start:")
-        l8 = QLabel("Don’t Clear After:")
+        l8 = QLabel("Don't Clear After:")
 
         l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)

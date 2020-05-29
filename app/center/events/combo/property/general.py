@@ -29,7 +29,7 @@ class ComboGeneral(QWidget):
     def setUI(self):
         layout = QFormLayout()
         layout.addRow("Screen Name:", self.screen_name)
-        layout.addRow("Don’t Clear After:", self.clear_after)
+        layout.addRow("Don't Clear After:", self.clear_after)
 
         self.setLayout(layout)
 

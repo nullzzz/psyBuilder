@@ -94,7 +94,7 @@ class TextTab1(QWidget):
         l02 = QLabel("Foreground Color:")
         l12 = QLabel("Background Color:")
 
-        l20 = QLabel("Don’t Clear After:")
+        l20 = QLabel("Don't Clear After:")
         l22 = QLabel("Screen Name:")
 
         l30 = QLabel("Transparency:")

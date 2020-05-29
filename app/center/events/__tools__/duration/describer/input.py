@@ -30,7 +30,7 @@ class RespTrigger(QWidget):
         layout.addWidget(self.right, 1, 1, 1, 1)
         layout.addWidget(QLabel("Wrong:"), 1, 2, 1, 1)
         layout.addWidget(self.wrong, 1, 3, 1, 1)
-        layout.addWidget(QLabel("No resp:"), 1, 4, 1, 1)
+        layout.addWidget(QLabel("None:"), 1, 4, 1, 1)
         layout.addWidget(self.ignore, 1, 5, 1, 1)
         layout.addWidget(QLabel("Device:"), 1, 6, 1, 1)
         layout.addWidget(self.resp_trigger_out, 1, 7, 1, 1)

@@ -62,7 +62,7 @@ class VideoTab1(QWidget):
         l3 = QLabel("Playback Rate:")
         l4 = QLabel("Aspect Ratio:")
         l5 = QLabel("Screen Name:")
-        l6 = QLabel("Dont Clear After:")
+        l6 = QLabel("Don't Clear After:")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
