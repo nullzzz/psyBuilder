@@ -33,7 +33,7 @@ class Action(Shower):
         layout.setLabelAlignment(Qt.AlignLeft)
         layout.addRow("Device Type:", self.device_type)
         layout.addRow("Device Name:", self.device_name)
-        layout.addRow("EyeTracker Name:", self.tracker)
+        layout.addRow("Eye Tracker Name:", self.tracker)
 
         vLayout = QVBoxLayout()
         vLayout.addLayout(layout)

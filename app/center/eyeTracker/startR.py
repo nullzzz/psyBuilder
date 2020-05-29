@@ -17,7 +17,7 @@ class StartR(TabItemWidget):
         self.default_properties = {
             "Status Message": "",
             "Sync To Next Event Flip": "No",
-            "EyeTracker Name": "",
+            "Eye Tracker Name": "",
         }
         self.status_message = VarLineEdit()
         self.sync_to_next_event_flip = VarComboBox()
@@ -53,7 +53,7 @@ class StartR(TabItemWidget):
         layout1.addWidget(self.status_message, 2, 1, 1, 1)
         layout1.addWidget(QLabel("Sync to Next Event Flip:"), 3, 0, 1, 1)
         layout1.addWidget(self.sync_to_next_event_flip, 3, 1, 1, 1)
-        layout1.addWidget(QLabel("EyeTracker Name:"), 4, 0, 1, 1)
+        layout1.addWidget(QLabel("Eye Tracker Name:"), 4, 0, 1, 1)
         layout1.addWidget(self.tracker_name, 4, 1, 1, 1)
 
         layout2 = QHBoxLayout()
@@ -108,7 +108,7 @@ class StartR(TabItemWidget):
     def updateInfo(self):
         self.default_properties["Status Message"] = self.status_message.text()
         self.default_properties["Sync To Next Event Flip"] = self.sync_to_next_event_flip.currentText()
-        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
+        self.default_properties["Eye Tracker Name"] = self.tracker_name.currentText()
 
     def setProperties(self, properties: dict):
         self.default_properties.update(properties)
@@ -117,7 +117,7 @@ class StartR(TabItemWidget):
     def loadSetting(self):
         self.status_message.setText(self.default_properties["Status Message"])
         self.sync_to_next_event_flip.setCurrentText(self.default_properties["Sync To Next Event Flip"])
-        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
+        self.tracker_name.setCurrentText(self.default_properties["Eye Tracker Name"])
 
     def getProperties(self) -> dict:
         """

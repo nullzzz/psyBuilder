@@ -24,6 +24,7 @@ class VideoTab1(QWidget):
         self.open_bt.clicked.connect(self.openFile)
 
         self.start_pos = VarLineEdit()
+
         self.end_pos = VarLineEdit()
 
         # 倍速
@@ -45,7 +46,9 @@ class VideoTab1(QWidget):
     def setUI(self):
         self.start_pos.setText("00")
         self.start_pos.setMinimumWidth(120)
+        self.start_pos.setToolTip("In milliseconds")
         self.end_pos.setText("9999999")
+        self.end_pos.setToolTip("In milliseconds")
 
         self.playback_rate.addItems(("1.0", "1.25", "1.5", "1.75", "2.0", "-1.0"))
         self.playback_rate.currentTextChanged.connect(self.changeRateTip)
@@ -54,8 +57,8 @@ class VideoTab1(QWidget):
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
         l0 = QLabel("File Name:")
-        l1 = QLabel("Start Position:")
-        l2 = QLabel("End Position:")
+        l1 = QLabel("Start Timepoint:")
+        l2 = QLabel("End Timepoint:")
         l3 = QLabel("Playback Rate:")
         l4 = QLabel("Aspect Ratio:")
         l5 = QLabel("Screen Name:")

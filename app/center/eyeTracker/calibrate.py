@@ -19,7 +19,7 @@ class EyeCalibrate(TabItemWidget):
             "Calibration Beep": "Yes",
             "Target Color": "(foreground)",
             "Target Style": "default",
-            "EyeTracker Name": "",
+            "Eye Tracker Name": "",
         }
 
         self.calibration_type = VarComboBox()
@@ -60,7 +60,7 @@ class EyeCalibrate(TabItemWidget):
         l2 = QLabel("Calibration Beep:")
         l3 = QLabel("Target Color:")
         l4 = QLabel("Target Style:")
-        l5 = QLabel("EyeTracker Name:")
+        l5 = QLabel("Eye Tracker Name:")
 
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -135,7 +135,7 @@ class EyeCalibrate(TabItemWidget):
         self.default_properties["Calibration Beep"] = self.calibration_beep.currentText()
         self.default_properties["Target Color"] = self.target_color.getRGB()
         self.default_properties["Target Style"] = self.target_style.currentText()
-        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
+        self.default_properties["Eye Tracker Name"] = self.tracker_name.currentText()
 
     def setProperties(self, properties: dict):
         self.default_properties.update(properties)
@@ -146,7 +146,7 @@ class EyeCalibrate(TabItemWidget):
         self.calibration_beep.setCurrentText(self.default_properties["Calibration Beep"])
         self.target_color.setCurrentText(self.default_properties["Target Color"])
         self.target_style.setCurrentText(self.default_properties["Target Style"])
-        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
+        self.tracker_name.setCurrentText(self.default_properties["Eye Tracker Name"])
 
     def getProperties(self) -> dict:
         self.refresh()

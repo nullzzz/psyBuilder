@@ -39,7 +39,7 @@ class ImageGeneral(QWidget):
         self.rotate = VarComboBox(True)
         self.rotate.addItems(("0", "90", "180", "270", "360"))
         self.rotate.setReg(VarComboBox.Integer)
-
+        self.rotate.setItemData(0,"0 to 360, in degrees",Qt.ToolTipRole)
         # 拉伸模式
         self.stretch = QCheckBox("Stretch")
         self.stretch_mode = VarComboBox()
@@ -84,10 +84,11 @@ class ImageGeneral(QWidget):
         l0 = QLabel("Rotate (0~360):")
         l0.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
+
         layout1.addWidget(l0, 1, 2)
         layout1.addWidget(self.rotate, 1, 3, 1, 2)
 
-        l_tra = QLabel("Transparency(%):")
+        l_tra = QLabel("Transparency (%):")
         l_tra.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1.addWidget(l_tra, 2, 2)

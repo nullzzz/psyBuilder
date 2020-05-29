@@ -28,7 +28,7 @@ class TextDisplay(TabItemMainWindow):
 
     def setUI(self):
         self.setWindowTitle("Text")
-        self.text_label.setText("Your text will show here")
+        self.text_label.setText("Your text will appear here")
         self.text_label.setAlignment(Qt.AlignCenter)
         self.setCentralWidget(self.text_label)
         tool = QToolBar()

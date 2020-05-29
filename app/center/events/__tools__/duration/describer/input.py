@@ -25,7 +25,7 @@ class RespTrigger(QWidget):
 
     def setUI(self):
         layout = QGridLayout()
-        layout.addWidget(QLabel("Resp Trigger"), 0, 0, 1, 2)
+        layout.addWidget(QLabel("Response Trigger"), 0, 0, 1, 2)
         layout.addWidget(QLabel("Right:"), 1, 0, 1, 1)
         layout.addWidget(self.right, 1, 1, 1, 1)
         layout.addWidget(QLabel("Wrong:"), 1, 2, 1, 1)

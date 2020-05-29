@@ -14,7 +14,7 @@ class EndR(TabItemWidget):
         self.tip2.setReadOnly(True)
 
         self.default_properties = {"Statue Message": "",
-                                   "EyeTracker Name": "", }
+                                   "Eye Tracker Name": "", }
 
         self.status_message = VarLineEdit()
 
@@ -48,7 +48,7 @@ class EndR(TabItemWidget):
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
         layout1.addWidget(QLabel("Statue Message:"), 2, 0, 1, 1)
         layout1.addWidget(self.status_message, 2, 1, 1, 1)
-        layout1.addWidget(QLabel("EyeTracker Name:"), 3, 0, 1, 1)
+        layout1.addWidget(QLabel("Eye Tracker Name:"), 3, 0, 1, 1)
         layout1.addWidget(self.tracker_name, 3, 1, 1, 1)
 
         layout2 = QHBoxLayout()
@@ -102,7 +102,7 @@ class EndR(TabItemWidget):
 
     def updateInfo(self):
         self.default_properties["Statue Message"] = self.status_message.text()
-        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
+        self.default_properties["Eye Tracker Name"] = self.tracker_name.currentText()
 
     def setProperties(self, properties: dict):
         self.default_properties.update(properties)
@@ -110,7 +110,7 @@ class EndR(TabItemWidget):
 
     def loadSetting(self):
         self.status_message.setText(self.default_properties["Statue Message"])
-        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
+        self.tracker_name.setCurrentText(self.default_properties["Eye Tracker Name"])
 
     def getProperties(self) -> dict:
         """

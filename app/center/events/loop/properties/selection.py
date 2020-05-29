@@ -9,9 +9,9 @@ class Selection(QWidget):
 
         self.order_combo = QComboBox(self.order)
         self.order_combo.addItem("Sequential")
-        self.order_combo.addItem("Random")
+        self.order_combo.addItem("Random without Replacement")
         self.order_combo.addItem("Random with Replacement")
-        self.order_combo.addItem("CounterBalance")
+        self.order_combo.addItem("Counter Balance")
 
         self.no_repeat_after = QComboBox(self.order)
         self.no_repeat_after.addItem("N/A")

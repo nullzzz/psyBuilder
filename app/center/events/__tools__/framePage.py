@@ -53,7 +53,7 @@ class FramePage(QWidget):
         l45 = QLabel("Enable:")
         l5 = QLabel("Border Color:")
         l6 = QLabel("Border Width:")
-        l7 = QLabel("Back Color:")
+        l7 = QLabel("Background Color:")
         l8 = QLabel("Transparency:")
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)

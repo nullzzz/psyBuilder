@@ -83,8 +83,8 @@ class VideoGeneral(QWidget):
         self._height.setReg(r"\d+%?")
 
         l0 = QLabel("File Name:")
-        l1 = QLabel("Start Position:")
-        l2 = QLabel("End Position:")
+        l1 = QLabel("Start Position (ms):")
+        l2 = QLabel("End Position (ms):")
         l3 = QLabel("Playback Rate:")
         l4 = QLabel("Aspect Ratio:")
 
@@ -117,10 +117,10 @@ class VideoGeneral(QWidget):
 
         layout.addWidget(l1, 1, 0, 1, 1)
         layout.addWidget(self.start_pos, 1, 1, 1, 1)
-        layout.addWidget(QLabel("ms"), 1, 2, 1, 1)
+        # layout.addWidget(QLabel("ms"), 1, 2, 1, 1)
         layout.addWidget(l2, 2, 0, 1, 1)
         layout.addWidget(self.end_pos, 2, 1, 1, 1)
-        layout.addWidget(QLabel("ms"), 2, 2, 1, 1)
+        # layout.addWidget(QLabel("ms"), 2, 2, 1, 1)
 
         layout.addWidget(l3, 3, 0, 1, 1)
         layout.addWidget(self.playback_rate, 3, 1, 1, 1)

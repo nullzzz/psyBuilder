@@ -390,7 +390,7 @@ class CycleTable(TableWidget):
         """
 
         rows, ok = QInputDialog(flags=Qt.WindowCloseButtonHint).getInt(self, "Add Rows",
-                                                                       "Enter the number of rows to be added: ", 1, 1,
+                                                                       "How many rows to add? ", 1, 1,
                                                                        100, 1)
         if ok:
             # if user press ok

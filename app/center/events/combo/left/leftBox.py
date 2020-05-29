@@ -31,7 +31,7 @@ class LeftBox(QToolBox):
         dot_motion = Item(Info.ITEM_DOT_MOTION, LeftBox.Dot)
         # dot_motion.setEnabled(False)
 
-        self.addItem(self.basic, "Basic Geometries")
+        self.addItem(self.basic, "Geometries")
         self.addItem(self.stimuli, "Stimuli")
 
         self.setSizePolicy(QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Ignored))

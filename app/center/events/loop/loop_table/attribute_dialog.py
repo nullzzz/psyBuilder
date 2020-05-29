@@ -32,7 +32,7 @@ class AttributeDialog(Dialog):
         container = QWidget()
         # form layout to set attribute ares
         self.layout = QFormLayout()
-        self.layout.addRow(QLabel("Set attribute and default value."))
+        self.layout.addRow(QLabel("Set variable and default value."))
         self.addAttribute()
         container.setLayout(self.layout)
         scroll_area.setWidget(container)
@@ -76,10 +76,10 @@ class AttributeDialog(Dialog):
                 name = attribute_area.name()
                 if name:
                     if name in self.exist_attribute:
-                        MessageBox.information(self, "warning", f"Attribute {name} already exists.")
+                        MessageBox.information(self, "warning", f"Variable {name} already exists.")
                         return
                     elif name in new_attributes:
-                        MessageBox.information(self, "warning", f"Duplicate attribute {name}.")
+                        MessageBox.information(self, "warning", f"Duplicate variable {name}.")
                         return
                     elif not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
                         MessageBox.information(self, "warning",
@@ -156,6 +156,6 @@ class AttributeDialog(Dialog):
         # only pattern now
         name = attribute_area.name()
         if name and not re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-            attribute_area.showTip("Name must start with a letter and contain only letters, numbers, _")
+            attribute_area.showTip("Variable name must start with a letter and contain only letters, numbers, _")
         else:
             attribute_area.hideTip()
