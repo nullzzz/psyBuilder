@@ -1,11 +1,12 @@
 import os
+import platform
 import re
 import sys
 import traceback
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox, QActionGroup
 
 from app.menubar.compile_PTB import compilePTB
 from lib import WaitDialog, Settings
@@ -77,31 +78,64 @@ class Psy(QMainWindow):
         file_menu.addAction("Save As", self.saveAsFile, QKeySequence(QKeySequence.SaveAs))
         file_menu.addSeparator()
         open_mode_menu: QMenu = file_menu.addMenu("Open Mode")
+
         self.default_mode_action = open_mode_menu.addAction("Default Mode", lambda: self.changeOpenMode("default mode"))
-        self.open_blank_file_action = open_mode_menu.addAction("Open Blank File",
-                                                               lambda: self.changeOpenMode("open blank file"))
+        self.open_blank_file_action = open_mode_menu.addAction("Open Blank File", lambda: self.changeOpenMode("open blank file"))
+
+        self.default_mode_action.setCheckable(True)
+        self.open_blank_file_action.setCheckable(True)
+
+        self.open_mode_group = QActionGroup(self)
+        self.open_mode_group.setExclusive(True)
+
+        self.open_mode_group.addAction(self.default_mode_action)
+        self.open_mode_group.addAction(self.open_blank_file_action)
+
+        # self.default_mode_action.setChecked(True)
+
         open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
         self.changeOpenMode(open_mode)
+
+        if "default mode" == open_mode:
+            self.default_mode_action.setChecked(True)
+        else:
+            self.open_blank_file_action.setChecked(True)
+
+
         file_menu.addSeparator()
         file_menu.addAction("Exit", sys.exit, QKeySequence("Ctrl+Q"))
         # view menu
         view_menu = menubar.addMenu("&View")
-        self.attribute_action = QAction("&Attribute", self)
+        self.variable_action = QAction("&Variable", self)
         self.structure_action = QAction("&Structure", self)
         self.property_action = QAction("&Property", self)
         self.output_action = QAction("&Output", self)
 
-        self.attribute_action.setData("attribute")
+        self.variable_action.setData("variable")
         self.structure_action.setData("structure")
         self.output_action.setData("output")
         self.property_action.setData("property")
 
-        self.attribute_action.triggered.connect(self.setDockView)
+        self.variable_action.setCheckable(True)
+        self.structure_action.setCheckable(True)
+        self.output_action.setCheckable(True)
+        self.property_action.setCheckable(True)
+
+        self.view_layout_group = QActionGroup(self)
+        self.view_layout_group.setExclusive(False)
+
+        self.view_layout_group.addAction(self.variable_action)
+        self.view_layout_group.addAction(self.structure_action)
+        self.view_layout_group.addAction(self.output_action)
+        self.view_layout_group.addAction(self.property_action)
+
+
+        self.variable_action.triggered.connect(self.setDockView)
         self.structure_action.triggered.connect(self.setDockView)
         self.output_action.triggered.connect(self.setDockView)
         self.property_action.triggered.connect(self.setDockView)
 
-        view_menu.addAction(self.attribute_action)
+        view_menu.addAction(self.variable_action)
         view_menu.addAction(self.structure_action)
         view_menu.addAction(self.property_action)
         view_menu.addAction(self.output_action)
@@ -130,47 +164,70 @@ class Psy(QMainWindow):
         platform_menu = build_menu.addMenu("&Platform")
 
         self.linux_action = QAction("&Linux", self)
-        self.linux_action.setChecked(True)
 
         self.windows_action = QAction("&Windows", self)
+
         self.mac_action = QAction("&Mac", self)
 
-        icon = QIcon(Func.getImage("common/dock_visible.png"))
+        # icon = QIcon(Func.getImage("common/dock_visible.png"))
 
-        self.linux_action.setIcon(icon)
+        # self.linux_action.setIcon(icon)
+        # self.linux_action.setIconVisibleInMenu(False)
+        self.linux_action.setCheckable(True)
 
-        self.windows_action.setIcon(icon)
-        self.windows_action.setIconVisibleInMenu(False)
+        # self.windows_action.setIcon(icon)
+        # self.windows_action.setIconVisibleInMenu(False)
+        self.windows_action.setCheckable(True)
 
-        self.mac_action.setIcon(icon)
-        self.mac_action.setIconVisibleInMenu(False)
+        # self.mac_action.setIcon(icon)
+        # self.mac_action.setIconVisibleInMenu(False)
+        self.mac_action.setCheckable(True)
 
         self.linux_action.triggered.connect(self.changePlatform)
         self.windows_action.triggered.connect(self.changePlatform)
         self.mac_action.triggered.connect(self.changePlatform)
 
+
         platform_menu.addAction(self.linux_action)
         platform_menu.addAction(self.windows_action)
         platform_menu.addAction(self.mac_action)
+
+        self.platform_action_group = QActionGroup(self)
+        self.platform_action_group.setExclusive(True)
+
+        self.platform_action_group.addAction(self.linux_action)
+        self.platform_action_group.addAction(self.windows_action)
+        self.platform_action_group.addAction(self.mac_action)
+
+
+        if platform.system() == 'Windows':
+            self.windows_action.setChecked(True)
+        elif platform.system() == 'Darwin':
+            self.mac_action.setChecked(True)
+        else:
+            self.linux_action.setChecked(True)
+
 
         # load image mode
         image_load_menu = build_menu.addMenu("&Image Load Mode")
 
         self.before_event_action = QAction("&Before_event", self)
-        self.before_event_action.setChecked(True)
-
         self.before_trial_action = QAction("&Before_trial", self)
         self.before_exp_action = QAction("&Before_exp", self)
 
         # icon = QIcon(Func.getImage("common/dock_visible.png"))
 
-        self.before_event_action.setIcon(icon)
+        # self.before_event_action.setIcon(icon)
+        # self.before_event_action.setIconVisibleInMenu(False)
+        self.before_event_action.setCheckable(True)
 
-        self.before_trial_action.setIcon(icon)
-        self.before_trial_action.setIconVisibleInMenu(False)
+        # self.before_trial_action.setIcon(icon)
+        # self.before_trial_action.setIconVisibleInMenu(False)
+        self.before_trial_action.setCheckable(True)
 
-        self.before_exp_action.setIcon(icon)
-        self.before_exp_action.setIconVisibleInMenu(False)
+        # self.before_exp_action.setIcon(icon)
+        # self.before_exp_action.setIconVisibleInMenu(False)
+        self.before_exp_action.setCheckable(True)
 
         self.before_event_action.triggered.connect(self.changeImageLoadMode)
         self.before_trial_action.triggered.connect(self.changeImageLoadMode)
@@ -179,6 +236,15 @@ class Psy(QMainWindow):
         image_load_menu.addAction(self.before_event_action)
         image_load_menu.addAction(self.before_trial_action)
         image_load_menu.addAction(self.before_exp_action)
+
+        self.image_load_group = QActionGroup(self)
+        self.image_load_group.setExclusive(True)
+
+        self.image_load_group.addAction(self.before_event_action)
+        self.image_load_group.addAction(self.before_trial_action)
+        self.image_load_group.addAction(self.before_exp_action)
+
+        self.before_event_action.setChecked(True)
 
         # compile
         compile_action = QAction("&Compile", self)
@@ -200,6 +266,7 @@ class Psy(QMainWindow):
 
         help_menu.addAction(about_action)
         help_menu.addAction(check_for_update)
+
 
     def initDockWidget(self):
         """
@@ -229,6 +296,7 @@ class Psy(QMainWindow):
         self.structure.itemDoubleClicked.connect(self.handleItemDoubleClicked)
         self.structure.itemDeleted.connect(self.handleItemDeleted)
         self.structure.itemNameChanged.connect(self.handleItemNameChanged)
+
         self.attributes.visibilityChanged.connect(self.checkVisible)
         self.structure.visibilityChanged.connect(self.checkVisible)
         self.properties.visibilityChanged.connect(self.checkVisible)
@@ -939,7 +1007,7 @@ class Psy(QMainWindow):
         :return:
         """
         dock = self.sender().data()
-        if dock == "attribute":
+        if dock == "variable":
             self.attributes.setVisible(self.attributes.isHidden())
         elif dock == "structure":
             self.structure.setVisible(self.structure.isHidden())
@@ -954,14 +1022,16 @@ class Psy(QMainWindow):
         """
         # config
         Settings("config.ini", Settings.IniFormat).setValue("open_mode", mode)
+
+        # print(f"line 1005: {mode}")
         # menu
-        checked_icon = Func.getImageObject("menu/checked", 1)
-        if "default mode" == mode:
-            self.default_mode_action.setIcon(checked_icon)
-            self.open_blank_file_action.setIcon(QIcon(""))
-        else:
-            self.default_mode_action.setIcon(QIcon(""))
-            self.open_blank_file_action.setIcon(checked_icon)
+        # checked_icon = Func.getImageObject("menu/checked", 1)
+        # if "default mode" == mode:
+        #     self.default_mode_action.setIcon(checked_icon)
+        #     self.open_blank_file_action.setIcon(QIcon(""))
+        # else:
+        #     self.default_mode_action.setIcon(QIcon(""))
+        #     self.open_blank_file_action.setIcon(checked_icon)
 
     def checkVisible(self, is_visible):
         """
@@ -970,42 +1040,53 @@ class Psy(QMainWindow):
         :return:
         """
         dock = self.sender().windowTitle()
-        if is_visible:
-            icon = QIcon(Func.getImage("common/dock_visible.png"))
-        else:
-            icon = QIcon("")
+        # if is_visible:
+        #     icon = QIcon(Func.getImage("common/dock_visible.png"))
+        # else:
+        #     icon = QIcon("")
         if dock == "Variables":
-            self.attribute_action.setIcon(icon)
+            # self.variable_action.setIcon(icon)
+            self.variable_action.setChecked(is_visible)
         elif dock == "Structure":
-            self.structure_action.setIcon(icon)
+            # self.structure_action.setIcon(icon)
+            self.structure_action.setChecked(is_visible)
         elif dock == "Properties":
-            self.property_action.setIcon(icon)
+            # self.property_action.setIcon(icon)
+            self.property_action.setChecked(is_visible)
         elif dock == "Output":
-            self.output_action.setIcon(icon)
+            # self.output_action.setIcon(icon)
+            self.output_action.setChecked(is_visible)
 
     def changePlatform(self, c):
         if isinstance(c, bool):
-            self.linux_action.setIconVisibleInMenu(self.sender() is self.linux_action)
-            self.windows_action.setIconVisibleInMenu(self.sender() is self.windows_action)
-            self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
+
+            # self.linux_action.setChecked(self.sender() is self.linux_action)
+            # self.windows_action.setChecked(self.sender() is self.windows_action)
+            # self.mac_action.setChecked(self.sender() is self.mac_action)
+            # self.linux_action.setIconVisibleInMenu(self.sender() is self.linux_action)
+            # self.windows_action.setIconVisibleInMenu(self.sender() is self.windows_action)
+            # self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
             Info.PLATFORM = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
-            platform = c if c else "linux"
-            self.linux_action.setIconVisibleInMenu(platform == "linux")
-            self.windows_action.setIconVisibleInMenu(platform == "windows")
-            self.mac_action.setIconVisibleInMenu(platform == "mac")
+            compile_platform = c if c else "linux"
+            self.linux_action.setChecked(compile_platform.lower() == "linux")
+            self.windows_action.setChecked(compile_platform.lower() == "windows")
+            self.mac_action.setChecked(compile_platform.lower() == "mac")
+            # self.linux_action.setIconVisibleInMenu(platform.lower() == "linux")
+            # self.windows_action.setIconVisibleInMenu(platform.lower() == "windows")
+            # self.mac_action.setIconVisibleInMenu(platform.lower() == "mac")
 
     def changeImageLoadMode(self, c):
         if isinstance(c, bool):
-            self.before_event_action.setIconVisibleInMenu(self.sender() is self.before_event_action)
-            self.before_trial_action.setIconVisibleInMenu(self.sender() is self.before_trial_action)
-            self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
+            # self.before_event_action.setIconVisibleInMenu(self.sender() is self.before_event_action)
+            # self.before_trial_action.setIconVisibleInMenu(self.sender() is self.before_trial_action)
+            # self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
             Info.ImageLoadMode = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
             imageLoadMode = c if c else "before_event"
-            self.before_event_action.setIconVisibleInMenu(imageLoadMode == "before_event")
-            self.before_trial_action.setIconVisibleInMenu(imageLoadMode == "before_trial")
-            self.before_exp_action.setIconVisibleInMenu(imageLoadMode == "before_exp")
+            self.before_event_action.setChecked(imageLoadMode.lower() == "before_event")
+            self.before_trial_action.setChecked(imageLoadMode.lower() == "before_trial")
+            self.before_exp_action.setChecked(imageLoadMode.lower() == "before_exp")
 
     def compile(self):
         if not Info.FILE_NAME:
@@ -1049,7 +1130,15 @@ class Psy(QMainWindow):
         # output
         # self.output.clear()
         # Info's data
-        Info.PLATFORM = "linux"
+
+
+        if platform.system() == 'Windows':
+            Info.PLATFORM = "windows"
+        elif platform.system() == 'Darwin':
+            Info.PLATFORM = "mac"
+        else:
+            Info.PLATFORM = "linux"
+
         Info.IMAGE_LOAD_MODE = "before_event"
         Info.INPUT_DEVICE_INFO.clear()
         Info.OUTPUT_DEVICE_INFO.clear()
