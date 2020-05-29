@@ -21,6 +21,8 @@ class VideoProperty(QWidget):
         self.default_properties = self.general.default_properties
 
         self.tab.addTab(self.general, "General")
+        self.tab.setTabBarAutoHide(True)
+
         self.setButtons()
         self.setUI()
 

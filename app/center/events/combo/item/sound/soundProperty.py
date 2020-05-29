@@ -16,6 +16,7 @@ class SoundProperty(QWidget):
 
         self.general = SoundGeneral()
         self.tab.addTab(self.general, "General")
+        self.tab.setTabBarAutoHide(True)
 
         self.default_properties = self.general.default_properties
         # bottom

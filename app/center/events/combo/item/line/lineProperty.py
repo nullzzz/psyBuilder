@@ -17,6 +17,7 @@ class LineProperty(QWidget):
         self.general = LineGeneral()
         self.default_properties = self.general.default_properties
         self.tab.addTab(self.general, "General")
+        self.tab.setTabBarAutoHide(True)
 
         # bottom
         self.ok_bt = QPushButton("OK")

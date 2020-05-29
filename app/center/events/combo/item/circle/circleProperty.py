@@ -17,6 +17,7 @@ class CircleProperty(QWidget):
         self.general = CircleGeneral()
         self.default_properties = self.general.default_properties
         self.tab.addTab(self.general, "General")
+        self.tab.setTabBarAutoHide(True)
 
         self.ok_bt = QPushButton("OK")
         self.cancel_bt = QPushButton("Cancel")

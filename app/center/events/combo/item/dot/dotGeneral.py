@@ -128,7 +128,7 @@ class DotGeneral(QWidget):
 
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("Fill & Frame")
+        group2 = QGroupBox("Fill && Frame")
         layout2 = QFormLayout()
         layout2.setRowWrapPolicy(QFormLayout.DontWrapRows)
         layout2.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
