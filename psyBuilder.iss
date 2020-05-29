@@ -5,7 +5,7 @@
 #define MyAppVersion "0.1"
 #define MyAppPublisher "Attention and Perception lab"
 #define MyAppURL "http://web.suda.edu.cn/yzhangpsy/projects.html"
-#define MyAppExeName "run.exe"
+#define MyAppExeName "psyBuilder.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.

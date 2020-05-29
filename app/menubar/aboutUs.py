@@ -39,7 +39,7 @@ class AboutUs(QWidget):
                      "(Attention and Perception lab, Soochow university, Suzhou, China) and his colleagues."
                      "<br><br><b>PsyBuilder 0.1</b> is provided as is-no warranty is made or implied by "
                      "the authors of the software, or by anyone else. This software "
-                     "is designed for research purposes only，not to be used for "
+                     "is designed for research purposes only, not to be used for "
                      "any business purpose, such as, but not limited to, business training."
                      )
 
