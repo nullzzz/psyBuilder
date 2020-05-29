@@ -26,7 +26,7 @@ sudo mkdir "./forDist"
 sudo cp -f -R $APP_PATH ./forDist/
 #sudo cp -f ./doubleClickOnMeFirst ./forDist/
 
-sudo zip -r -X "PsyBuilderMac$(date +%Y%m%d%H%M%S).zip" ./forDist
+sudo zip -r -X "PsyBuilder$(date +%Y%m%d%H%M%S)Mac.zip" ./forDist
 
 
 

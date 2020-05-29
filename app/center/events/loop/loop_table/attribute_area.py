@@ -20,7 +20,7 @@ class AttributeArea(QGroupBox):
         # layout
         layout = QFormLayout()
         layout.addRow(self.tip_label)
-        layout.addRow("Name: ", self.name_line_edit)
+        layout.addRow("Variable Name: ", self.name_line_edit)
         layout.addRow("Default Value: ", self.value_line_edit)
 
         self.setLayout(layout)

@@ -28,7 +28,7 @@ class Close(TabItemWidget):
             "Automatically Log All Variables": 0,
             "Used Variables": [],
             "Not Used Variables": [],
-            "EyeTracker Name": "",
+            "Eye Tracker Name": "",
         }
 
         self.automatically_log_all_variables = QCheckBox("Automatically log all variables")
@@ -67,15 +67,15 @@ class Close(TabItemWidget):
         self.tip1.setText("Data Logging")
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
-        self.tip2.setText("Writes information into the EDF file")
+        self.tip2.setText("Save to the EDF file")
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
-        layout1.addWidget(QLabel("Pause between messages(ms):"), 2, 0, 1, 1)
+        layout1.addWidget(QLabel("Pause between messages (ms):"), 2, 0, 1, 1)
         layout1.addWidget(self.pause_between_msg, 2, 1, 1, 1)
         layout1.addWidget(self.automatically_log_all_variables, 3, 1, 1, 1)
-        layout1.addWidget(QLabel("EyeTracker Name:"), 4, 0, 1, 1)
+        layout1.addWidget(QLabel("Eye Tracker Name:"), 4, 0, 1, 1)
         layout1.addWidget(self.tracker_name, 4, 1, 1, 1)
 
         lay_bt = QVBoxLayout()
@@ -168,7 +168,7 @@ class Close(TabItemWidget):
     def updateInfo(self):
         self.default_properties["Pause Between Messages"] = self.pause_between_msg.text()
         self.default_properties["Automatically Log All Variables"] = self.automatically_log_all_variables.checkState()
-        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
+        self.default_properties["Eye Tracker Name"] = self.tracker_name.currentText()
         ua = []
         for i in range(self.select_attr.count()):
             ua.append(self.select_attr.item(i).text())
@@ -181,7 +181,7 @@ class Close(TabItemWidget):
     def loadSetting(self):
         self.pause_between_msg.setText(self.default_properties["Pause Between Messages"])
         self.automatically_log_all_variables.setCheckState(self.default_properties["Automatically Log All Variables"])
-        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
+        self.tracker_name.setCurrentText(self.default_properties["Eye Tracker Name"])
         self.select_attr.clear()
         self.select_attr.addItems(self.default_properties["Used Variables"])
         self.all_attr.clear()

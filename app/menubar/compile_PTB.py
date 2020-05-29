@@ -1842,12 +1842,12 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
     cycleOrderByStr = dataStrConvert(*getRefValue(cWidget, cWidget.getOrderBy(), attributesSetDict))
 
     #  to make sure the repetitions is one for counterbalance selection of order ----/
-    if cycleOrderStr == "'CounterBalance'":
+    if cycleOrderStr == "'Counter Balance'":
         cCycleWeightList = cWidget.getAttributeValues(0)
         for cLineWeight in cCycleWeightList:
             if dataStrConvert(cLineWeight) != 1:
                 throwCompileErrorInfo(
-                    f"Found an incompatible error in Cycle {getWidgetName(cWidget.widget_id)}:\nFor CounterBalance selection, the timeline repetitions should be 1")
+                    f"Found an incompatible error in Cycle {getWidgetName(cWidget.widget_id)}:\nFor Counter Balance selection, the timeline repetitions should be 1")
     # ------------------------------------------------------------------------\
 
     printAutoInd(f, "% Shuffle the DesignMatrix")
@@ -5328,13 +5328,13 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "case 'Sequential'")
             printAutoInd(f, "% do nothing")
 
-            printAutoInd(f, "case 'Random'")
+            printAutoInd(f, "case 'Random without Replacement'")
             printAutoInd(f, "cShuffledIdx = Shuffle(cShuffledIdx);")
 
             printAutoInd(f, "case 'Random with Replacement'")
             printAutoInd(f, "cShuffledIdx = Randi(nRows,[nRows,1]);")
 
-            printAutoInd(f, "case 'CounterBalance'")
+            printAutoInd(f, "case 'Counter Balance'")
             printAutoInd(f, "switch orderByStr")
             printAutoInd(f, "case 'N/A'")
 
@@ -5365,7 +5365,7 @@ def compileCode(isDummyCompile):
 
             printAutoInd(f, "otherwise")
             printAutoInd(f,
-                         "error('order methods should be of {{''Sequential'',''Random'',''Random with Replacement'',''CounterBalance''}}');")
+                         "error('order methods should be of {{''Sequential'',''Random without Replacement'',''Random with Replacement'',''Counter Balance''}}');")
             printAutoInd(f, "end%switch ")
 
             printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)

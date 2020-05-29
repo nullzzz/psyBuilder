@@ -35,7 +35,7 @@ class ComboProperty(QWidget):
 
     # 生成主界面
     def setUI(self):
-        self.setWindowTitle("slider property")
+        self.setWindowTitle("Scene property")
         self.resize(600, 800)
         below_layout = QHBoxLayout()
         below_layout.addStretch(10)

@@ -31,6 +31,7 @@ class DotProperty(QWidget):
     def setUI(self):
         self.setWindowTitle("Property")
         self.resize(600, 800)
+        self.tab.setTabBarAutoHide(True)
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.tab, 6)
         main_layout.addWidget(self.below, 1)

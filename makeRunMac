@@ -17,9 +17,10 @@ echo "============================="
 APP_PATH="./dist/run.app"
 sudo codesign --deep -f -s B406553BC6044A7B8EB4EA9D42CCE348677576AE "$APP_PATH"
 
-#echo "============================="
-#echo "rename the run to run0"
-#echo "============================="
+echo "============================="
+echo "create PsyBuilder via platypus"
+echo "============================="
+platypus -P ./PsyBuilder.platypus -a PsyBuilder -o None -y -i ./source/images/common/icon.icns -I org.Zy.PsyBuilder -B -f ./dist/run.app ./psyBuilder ..
 #
 #sudo mv ./dist/run.app/Contents/MacOS/run ./dist/run.app/Contents/MacOS/run0
 #
@@ -30,4 +31,21 @@ sudo codesign --deep -f -s B406553BC6044A7B8EB4EA9D42CCE348677576AE "$APP_PATH"
 #sudo cp ./run ./dist/run.app/Contents/MacOS/
 #
 #sudo chmod +x ./dist/run.app
+
+echo "============================="
+echo " codesign PsyBuilder"
+echo "============================="
+
+APP_PATH="./PsyBuilder.app"
+sudo codesign --deep -f -s B406553BC6044A7B8EB4EA9D42CCE348677576AE "$APP_PATH"
+
+echo "============================="
+echo " make zip for PsyBuilder"
+echo "============================="
+
+# sudo mkdir "./forDist"
+# sudo cp -f -R $APP_PATH ./forDist/
+#sudo cp -f ./doubleClickOnMeFirst ./forDist/
+
+sudo zip -r -X "PsyBuilder$(date +%Y%m%d%H%M%S)Mac.zip" $APP_PATH
 

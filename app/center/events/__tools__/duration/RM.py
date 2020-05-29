@@ -13,7 +13,7 @@ class BiggerUP(QGroupBox):
         super(BiggerUP, self).__init__(title, parent)
         self.home = DeviceHome()
         self.add_bt = QPushButton("Add")
-        self.del_bt = QPushButton("Del")
+        self.del_bt = QPushButton("Delete")
         self.del_bt.setEnabled(False)
 
         self.describer = Describer(0)
@@ -76,7 +76,7 @@ class BiggerDown(QGroupBox):
         super(BiggerDown, self).__init__(title, parent)
         self.home = DeviceHome()
         self.add_bt = QPushButton("Add")
-        self.del_bt = QPushButton("Del")
+        self.del_bt = QPushButton("Delete")
         self.del_bt.setEnabled(False)
 
         self.default_properties: dict = {}

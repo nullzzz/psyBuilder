@@ -54,7 +54,7 @@ class QuestUpdate(TabItemWidget):
         self.tip1.setText("Updating Quest")
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
-        self.tip2.setText("Updates the Quest test value based on a response")
+        self.tip2.setText("Updates the Quest test value based on a previous response")
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)

@@ -22,7 +22,7 @@ class EyeDC(TabItemWidget):
             "Target Style": "default",
             "Show Display With Drift Correction Target": 0,
             "Fixation Triggered": 0,
-            "EyeTracker Name": "",
+            "Eye Tracker Name": "",
         }
         self.x_pos = VarLineEdit()
         self.x_pos.installEventFilter(self)
@@ -71,7 +71,7 @@ class EyeDC(TabItemWidget):
         l2 = QLabel("Center Y:")
         l3 = QLabel("Target Color:")
         l4 = QLabel("Target Style:")
-        l5 = QLabel("EyeTracker Name:")
+        l5 = QLabel("Eye Tracker Name:")
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -166,7 +166,7 @@ class EyeDC(TabItemWidget):
         self.default_properties[
             "Show Display With Drift Correction"] = self.show_display_with_drift_correction_target.checkState()
         self.default_properties["Fixation Triggered"] = self.fixation_triggered.checkState()
-        self.default_properties["EyeTracker Name"] = self.tracker_name.currentText()
+        self.default_properties["Eye Tracker Name"] = self.tracker_name.currentText()
 
     def setProperties(self, properties: dict):
         self.default_properties.update(properties)
@@ -180,7 +180,7 @@ class EyeDC(TabItemWidget):
         self.show_display_with_drift_correction_target.setCheckState(
             self.default_properties["Show Display With Drift Correction Target"])
         self.fixation_triggered.setCheckState(self.default_properties["Fixation Triggered"])
-        self.tracker_name.setCurrentText(self.default_properties["EyeTracker Name"])
+        self.tracker_name.setCurrentText(self.default_properties["Eye Tracker Name"])
 
     def getProperties(self) -> dict:
         """

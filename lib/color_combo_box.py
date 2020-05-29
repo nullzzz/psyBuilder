@@ -11,27 +11,27 @@ class ColComboBox(VarComboBox):
     colorChanged = pyqtSignal(str)
 
     color_map: dict = {
-        "white": "255,255,255",
-        "gray": "128,128,128",
-        "black": "0,0,0",
-        "red": "255,0,0",
-        "orange": "255,165,0",
-        "yellow": "255,255,0",
-        "green": "0,255,0",
-        "blue": "0,0,255",
-        "purple": "128,0,128",
-        "transparent": "0,0,0,0"
+        "White": "255,255,255",
+        "Gray": "128,128,128",
+        "Black": "0,0,0",
+        "Red": "255,0,0",
+        "Orange": "255,165,0",
+        "Yellow": "255,255,0",
+        "Green": "0,255,0",
+        "Blue": "0,0,255",
+        "Purple": "128,0,128",
+        "Transparent": "0,0,0,0"
     }
-    default_color = ("white", "gray", "black",
-                     "red", "orange", "yellow",
-                     "green", "blue", "purple")
+    default_color = ("White", "Gray", "Black",
+                     "Red", "Orange", "Yellow",
+                     "Green", "Blue", "Purple")
 
     def __init__(self, widget=None):
         super(ColComboBox, self).__init__(True, widget)
         self.setEditable(True)
         self.is_valid: int = 1
-        self.default_color = ("white", "gray", "black", "red",
-                              "orange", "yellow", "green", "blue", "purple")
+        self.default_color = ("White", "Gray", "Black", "Red",
+                              "Orange", "Yellow", "Green", "Blue", "Purple")
         self.init()
 
         self.setStyleSheet("background: {}".format(self.getRGB()))
@@ -39,7 +39,7 @@ class ColComboBox(VarComboBox):
         # 支持输入255,255,255及#ffffff格式rgb
         valid_rgb = QRegExp(
             r"((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?),){2}((2[0-4][0-9]|25[0-5]|[01]?[0-9][0-9]?))|#[0-9A-Fa-f]{6}|"
-            r"white|gray|black|red|orange|yellow|green|blue|purple|\[[\w_\.]+\]")
+            r"White|Gray|Black|Red|Orange|Yellow|Green|Blue|Purple|\[[\w_\.]+\]")
         self.setValidator(QRegExpValidator(valid_rgb, self))
         self.setInsertPolicy(QComboBox.NoInsert)
 
@@ -53,7 +53,7 @@ class ColComboBox(VarComboBox):
         self.setItemIcon(0, QIcon(Func.getImage("operate/more_color.png")))
 
     def addTransparent(self):
-        color_name = "transparent"
+        color_name = "Transparent"
         color = QColor(color_name)
         self.insertItem(1, color_name)
         self.setItemData(1, color, Qt.DecorationRole)

@@ -23,7 +23,7 @@ class DurationPage(QWidget):
 
     def setUI(self):
         layout0 = QFormLayout()
-        layout0.addRow("Duration(ms):", self.duration)
+        layout0.addRow("Duration (ms):", self.duration)
 
         layout = QVBoxLayout()
         layout.addLayout(layout0, 0)

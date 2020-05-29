@@ -15,13 +15,14 @@ class Properties(QDialog):
         # title
         self.setWindowIcon(QIcon(Func.getImage("common/icon.png")))
         self.setWindowFlag(Qt.WindowStaysOnTopHint)
-        self.setWindowTitle("properties")
+        self.setWindowTitle("Properties")
         # data
         self.properties = {"order_combo": 0, "no_repeat_after": 0, "order_by_combo": 0}
         # tabs
         self.tab = QTabWidget(self)
         self.selection = Selection()
         self.tab.addTab(self.selection, 'Selection')
+        self.tab.setTabBarAutoHide(True)
         self.setButtons()
         # layout
         layout = QVBoxLayout()

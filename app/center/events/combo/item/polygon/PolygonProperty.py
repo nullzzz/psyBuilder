@@ -16,6 +16,8 @@ class PolygonProperty(QWidget):
 
         self.general = PolygonGeneral()
         self.tab.addTab(self.general, "General")
+        self.tab.setTabBarAutoHide(True)
+
         self.default_properties = self.general.default_properties
         # bottom
         self.ok_bt = QPushButton("OK")

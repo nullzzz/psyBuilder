@@ -54,8 +54,8 @@ class TextGeneral(QWidget):
         l00 = QLabel("Left X:")
         l01 = QLabel("Top  Y:")
 
-        l10 = QLabel("Fore Color:")
-        l11 = QLabel("Back Color:")
+        l10 = QLabel("Foreground Color:")
+        l11 = QLabel("Background Color:")
 
         l20 = QLabel("Transparent:")
         l21 = QLabel("Right to Left:")

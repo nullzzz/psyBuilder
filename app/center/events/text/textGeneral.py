@@ -50,7 +50,9 @@ class TextTab1(QWidget):
         self.word_wrap = VarLineEdit("80")
         self.word_wrap.setReg(VarLineEdit.Integer)
         self.word_wrap.textChanged.connect(self.changeWrap)
+        self.word_wrap.setToolTip("Maximal number of characters for each line")
         self.text_edit.setLineWrapColumnOrWidth(80)
+
 
         self.flip_horizontal = VarComboBox()
         self.flip_horizontal.addItems(("No", "Yes"))
@@ -89,10 +91,10 @@ class TextTab1(QWidget):
         l00 = QLabel("Alignment X:")
         l10 = QLabel("Alignment Y:")
 
-        l02 = QLabel("Fore Color:")
-        l12 = QLabel("Back Color:")
+        l02 = QLabel("Foreground Color:")
+        l12 = QLabel("Background Color:")
 
-        l20 = QLabel("Don’t Clear After:")
+        l20 = QLabel("Don't Clear After:")
         l22 = QLabel("Screen Name:")
 
         l30 = QLabel("Transparency:")
