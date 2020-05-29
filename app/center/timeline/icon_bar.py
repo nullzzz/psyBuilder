@@ -99,4 +99,4 @@ class IconBar(QTabWidget):
         self.addTab(self.events, "Events")
         self.addTab(self.eye_tracker, "Eye Tracker")
         self.addTab(self.quest, "Quest")
-        self.addTab(self.condition, "Condition")
+        self.addTab(self.condition, "Conditional")

@@ -105,7 +105,7 @@ class SoundTab1(QWidget):
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        group1 = QGroupBox()
+        group1 = QGroupBox("File && Effects")
         layout1 = QGridLayout()
         layout1.addWidget(l0, 0, 0, 1, 1)
         layout1.addWidget(self.file_name, 0, 1, 1, 2)
@@ -132,7 +132,7 @@ class SoundTab1(QWidget):
         l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l8.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        group2 = QGroupBox()
+        group2 = QGroupBox("Control && Device")
         layout2 = QGridLayout()
 
         self.bias_time.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)

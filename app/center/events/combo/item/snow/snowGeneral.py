@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QLabel, QCompleter
+from PyQt5.QtWidgets import QGridLayout, QLabel, QCompleter, QGroupBox, QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 
 from lib import VarComboBox, VarLineEdit
@@ -61,24 +61,35 @@ class SnowGeneral(QWidget):
         l6.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l7.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        layout = QGridLayout()
-        layout.addWidget(l1, 0, 0)
-        layout.addWidget(self.cx_pos, 0, 1)
-        layout.addWidget(l2, 0, 2)
-        layout.addWidget(self.cy_pos, 0, 3)
-        layout.addWidget(l3, 1, 0)
-        layout.addWidget(self._width, 1, 1)
-        layout.addWidget(l4, 1, 2)
-        layout.addWidget(self._height, 1, 3)
-        layout.addWidget(l5, 2, 0)
-        layout.addWidget(self.scale, 2, 1)
-        layout.addWidget(l6, 2, 2)
-        layout.addWidget(self.rotation, 2, 3)
-        layout.addWidget(l7, 3, 0)
-        layout.addWidget(self.transparency, 3, 1)
+        group1 = QGroupBox("Geometry")
+        layout1 = QGridLayout()
+        layout1.addWidget(l1, 0, 0)
+        layout1.addWidget(self.cx_pos, 0, 1)
+        layout1.addWidget(l2, 0, 2)
+        layout1.addWidget(self.cy_pos, 0, 3)
+        layout1.addWidget(l3, 1, 0)
+        layout1.addWidget(self._width, 1, 1)
+        layout1.addWidget(l4, 1, 2)
+        layout1.addWidget(self._height, 1, 3)
 
+        group1.setLayout(layout1)
+
+        group2 = QGroupBox("Effects")
+        layout2 = QGridLayout()
+        layout2.addWidget(l5, 0, 0)
+        layout2.addWidget(self.scale, 0, 1)
+        layout2.addWidget(l6, 0, 2)
+        layout2.addWidget(self.rotation, 0, 3)
+        layout2.addWidget(l7, 1, 0)
+        layout2.addWidget(self.transparency, 1, 1)
+
+        # self.setLayout(layout2)
+        group2.setLayout(layout2)
+
+        layout = QVBoxLayout()
+        layout.addWidget(group1)
+        layout.addWidget(group2)
         self.setLayout(layout)
-
     # 设置可选属性
     def setAttributes(self, attributes):
         self.cx_pos.setCompleter(QCompleter(attributes))

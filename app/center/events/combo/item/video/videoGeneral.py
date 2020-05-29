@@ -108,7 +108,7 @@ class VideoGeneral(QWidget):
         l_width.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_height.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        group1 = QGroupBox("Effects")
+        group1 = QGroupBox("File && Effects")
 
         layout = QGridLayout()
         layout.addWidget(l0, 0, 0, 1, 1)
