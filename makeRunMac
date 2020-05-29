@@ -49,10 +49,15 @@ echo "============================="
 # sudo mkdir "./forDist"
 # sudo cp -f -R $APP_PATH ./forDist/
 #sudo cp -f ./doubleClickOnMeFirst ./forDist/
-sudo zip -r -X "PsyBuilder$(date +%Y%m%d%H%M%S)Mac.zip" $APP_PATH
+
+# sudo zip -r -X "PsyBuilder$(date +%Y%m%d%H%M%S)Mac.zip" $APP_PATH
 
 
 echo "============================="
 echo " make dmg for PsyBuilder"
 echo "============================="
 sudo dropdmg --config-name "psyBuilder" PsyBuilder.app
+
+sudo mv -f ./PsyBuilder.dmg ./"PsyBuilder$(date +%Y%m%d%H%M%S).dmg"
+
+sudo rm -rf ./PsyBuilder.app
