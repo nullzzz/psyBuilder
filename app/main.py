@@ -169,19 +169,27 @@ class Psy(QMainWindow):
 
         self.mac_action = QAction("&Mac", self)
 
-        # icon = QIcon(Func.getImage("common/dock_visible.png"))
+        self.is_windows = platform.system() == 'Windows'
 
-        # self.linux_action.setIcon(icon)
-        # self.linux_action.setIconVisibleInMenu(False)
-        self.linux_action.setCheckable(True)
+        icon = QIcon(Func.getImage("common/dock_visible.png"))
 
-        # self.windows_action.setIcon(icon)
-        # self.windows_action.setIconVisibleInMenu(False)
-        self.windows_action.setCheckable(True)
+        if self.is_windows:
+            self.linux_action.setIcon(icon)
+            self.linux_action.setIconVisibleInMenu(False)
+        else:
+            self.linux_action.setCheckable(True)
 
-        # self.mac_action.setIcon(icon)
-        # self.mac_action.setIconVisibleInMenu(False)
-        self.mac_action.setCheckable(True)
+        if self.is_windows:
+            self.windows_action.setIcon(icon)
+            self.windows_action.setIconVisibleInMenu(True)
+        else:
+            self.windows_action.setCheckable(True)
+
+        if self.is_windows:
+            self.mac_action.setIcon(icon)
+            self.mac_action.setIconVisibleInMenu(False)
+        else:
+            self.mac_action.setCheckable(True)
 
         self.linux_action.triggered.connect(self.changePlatform)
         self.windows_action.triggered.connect(self.changePlatform)
@@ -192,16 +200,18 @@ class Psy(QMainWindow):
         platform_menu.addAction(self.windows_action)
         platform_menu.addAction(self.mac_action)
 
-        self.platform_action_group = QActionGroup(self)
-        self.platform_action_group.setExclusive(True)
+        if self.is_windows:
+            self.platform_action_group = QActionGroup(self)
+            self.platform_action_group.setExclusive(True)
 
-        self.platform_action_group.addAction(self.linux_action)
-        self.platform_action_group.addAction(self.windows_action)
-        self.platform_action_group.addAction(self.mac_action)
+            self.platform_action_group.addAction(self.linux_action)
+            self.platform_action_group.addAction(self.windows_action)
+            self.platform_action_group.addAction(self.mac_action)
 
 
         if platform.system() == 'Windows':
-            self.windows_action.setChecked(True)
+            pass
+            # self.windows_action.setChecked(True)
         elif platform.system() == 'Darwin':
             self.mac_action.setChecked(True)
         else:
@@ -216,18 +226,23 @@ class Psy(QMainWindow):
         self.before_exp_action = QAction("&Before_exp", self)
 
         # icon = QIcon(Func.getImage("common/dock_visible.png"))
+        if self.is_windows:
+            self.before_event_action.setIcon(icon)
+            # self.before_event_action.setIconVisibleInMenu(False)
+        else:
+            self.before_event_action.setCheckable(True)
 
-        # self.before_event_action.setIcon(icon)
-        # self.before_event_action.setIconVisibleInMenu(False)
-        self.before_event_action.setCheckable(True)
+        if self.is_windows:
+            self.before_trial_action.setIcon(icon)
+            self.before_trial_action.setIconVisibleInMenu(False)
+        else:
+            self.before_trial_action.setCheckable(True)
 
-        # self.before_trial_action.setIcon(icon)
-        # self.before_trial_action.setIconVisibleInMenu(False)
-        self.before_trial_action.setCheckable(True)
-
-        # self.before_exp_action.setIcon(icon)
-        # self.before_exp_action.setIconVisibleInMenu(False)
-        self.before_exp_action.setCheckable(True)
+        if self.is_windows:
+            self.before_exp_action.setIcon(icon)
+            self.before_exp_action.setIconVisibleInMenu(False)
+        else:
+            self.before_exp_action.setCheckable(True)
 
         self.before_event_action.triggered.connect(self.changeImageLoadMode)
         self.before_trial_action.triggered.connect(self.changeImageLoadMode)
@@ -237,14 +252,15 @@ class Psy(QMainWindow):
         image_load_menu.addAction(self.before_trial_action)
         image_load_menu.addAction(self.before_exp_action)
 
-        self.image_load_group = QActionGroup(self)
-        self.image_load_group.setExclusive(True)
+        if self.is_windows:
+            self.image_load_group = QActionGroup(self)
+            self.image_load_group.setExclusive(True)
 
-        self.image_load_group.addAction(self.before_event_action)
-        self.image_load_group.addAction(self.before_trial_action)
-        self.image_load_group.addAction(self.before_exp_action)
+            self.image_load_group.addAction(self.before_event_action)
+            self.image_load_group.addAction(self.before_trial_action)
+            self.image_load_group.addAction(self.before_exp_action)
 
-        self.before_event_action.setChecked(True)
+            self.before_event_action.setChecked(True)
 
         # compile
         compile_action = QAction("&Compile", self)
@@ -1059,34 +1075,41 @@ class Psy(QMainWindow):
 
     def changePlatform(self, c):
         if isinstance(c, bool):
-
-            # self.linux_action.setChecked(self.sender() is self.linux_action)
-            # self.windows_action.setChecked(self.sender() is self.windows_action)
-            # self.mac_action.setChecked(self.sender() is self.mac_action)
-            # self.linux_action.setIconVisibleInMenu(self.sender() is self.linux_action)
-            # self.windows_action.setIconVisibleInMenu(self.sender() is self.windows_action)
-            # self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
+            if self.is_windows:
+                self.linux_action.setIconVisibleInMenu(self.sender() is self.linux_action)
+                self.windows_action.setIconVisibleInMenu(self.sender() is self.windows_action)
+                self.mac_action.setIconVisibleInMenu(self.sender() is self.mac_action)
             Info.PLATFORM = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
             compile_platform = c if c else "linux"
-            self.linux_action.setChecked(compile_platform.lower() == "linux")
-            self.windows_action.setChecked(compile_platform.lower() == "windows")
-            self.mac_action.setChecked(compile_platform.lower() == "mac")
-            # self.linux_action.setIconVisibleInMenu(platform.lower() == "linux")
-            # self.windows_action.setIconVisibleInMenu(platform.lower() == "windows")
-            # self.mac_action.setIconVisibleInMenu(platform.lower() == "mac")
+            if self.is_windows:
+                self.linux_action.setIconVisibleInMenu(platform.lower() == "linux")
+                self.windows_action.setIconVisibleInMenu(platform.lower() == "windows")
+                self.mac_action.setIconVisibleInMenu(platform.lower() == "mac")
+            else:
+                self.linux_action.setChecked(compile_platform.lower() == "linux")
+                self.windows_action.setChecked(compile_platform.lower() == "windows")
+                self.mac_action.setChecked(compile_platform.lower() == "mac")
+
 
     def changeImageLoadMode(self, c):
         if isinstance(c, bool):
-            # self.before_event_action.setIconVisibleInMenu(self.sender() is self.before_event_action)
-            # self.before_trial_action.setIconVisibleInMenu(self.sender() is self.before_trial_action)
-            # self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
+            if self.is_windows:
+                self.before_event_action.setIconVisibleInMenu(self.sender() is self.before_event_action)
+                self.before_trial_action.setIconVisibleInMenu(self.sender() is self.before_trial_action)
+                self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
             Info.ImageLoadMode = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
             imageLoadMode = c if c else "before_event"
-            self.before_event_action.setChecked(imageLoadMode.lower() == "before_event")
-            self.before_trial_action.setChecked(imageLoadMode.lower() == "before_trial")
-            self.before_exp_action.setChecked(imageLoadMode.lower() == "before_exp")
+
+            if self.is_windows:
+                self.before_event_action.setIconVisibleInMenu(imageLoadMode.lower() == "before_event")
+                self.before_trial_action.setIconVisibleInMenu(imageLoadMode.lower() == "before_trial")
+                self.before_exp_action.setIconVisibleInMenu(imageLoadMode.lower() == "before_exp")
+            else:
+                self.before_event_action.setChecked(imageLoadMode.lower() == "before_event")
+                self.before_trial_action.setChecked(imageLoadMode.lower() == "before_trial")
+                self.before_exp_action.setChecked(imageLoadMode.lower() == "before_exp")
 
     def compile(self):
         if not Info.FILE_NAME:

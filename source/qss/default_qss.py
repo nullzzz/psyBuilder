@@ -1,3 +1,4 @@
+import platform
 import re
 
 from app.info import Info
@@ -211,9 +212,22 @@ QToolBar#CycleToolBar {
 }
 """
 
+if platform.system() == 'Windows':
+    menuCheck = f"""
+QMenu::indicator:exclusive:checked {{
+    image: url({imageURL("/common/dock_visible.png")});
+}}
+
+QMenu::indicator:exclusive:unchecked{{
+image: none;
+}}
+"""
+else:
+    menuCheck = ""
+
 # other
 other = f"""
 ColComboBox::drop-down {{image: url({imageURL("/common/color_down_arrow.png")});}}
 """
 
-default_qss = dock_widget + tab_bar + center + structure + timeline + cycle + other
+default_qss = dock_widget + tab_bar + center + structure + timeline + cycle + other + menuCheck
