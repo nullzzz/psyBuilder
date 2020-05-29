@@ -55,24 +55,24 @@ class Properties(QDialog):
 
     def apply(self):
         self.properties['order_combo'] = self.selection.order_combo.currentIndex()
-        self.properties['no_repeat_after'] = self.selection.no_repeat_after.currentIndex()
+        # self.properties['no_repeat_after'] = self.selection.no_repeat_after.currentIndex()
         self.properties['order_by_combo'] = self.selection.order_by_combo.currentIndex()
         self.propertiesChanged.emit()
 
     def cancel(self):
         self.selection.order_combo.setCurrentIndex(self.properties['order_combo'])
-        self.selection.no_repeat_after.setCurrentIndex(self.properties['no_repeat_after'])
+        # self.selection.no_repeat_after.setCurrentIndex(self.properties['no_repeat_after'])
         self.selection.order_by_combo.setCurrentIndex(self.properties['order_by_combo'])
         self.close()
 
     def getProperties(self):
         properties = {}
         properties['order_combo'] = self.selection.order_combo.currentText()
-        properties['no_repeat_after'] = self.selection.no_repeat_after.currentText()
+        # properties['no_repeat_after'] = self.selection.no_repeat_after.currentText()
         properties['order_by_combo'] = self.selection.order_by_combo.currentText()
         return properties
 
     def setProperties(self, properties):
         self.selection.order_combo.setCurrentText(properties['order_combo'])
-        self.selection.no_repeat_after.setCurrentText(properties['no_repeat_after'])
+        # self.selection.no_repeat_after.setCurrentText(properties['no_repeat_after'])
         self.selection.order_by_combo.setCurrentText(properties['order_by_combo'])
