@@ -37,7 +37,7 @@ class AboutUs(QWidget):
                      "was developed by Prof. "
                      "<a style='color: blue;' href=\"http://web.suda.edu.cn/yzhangpsy/index.html\">Yang Zhang</a> "
                      "(Attention and Perception lab, Soochow university, Suzhou, China) and his colleagues."
-                     "<br><br><b>PsyBuilder 0.1</b> is provided as is-no warranty is made or implied by "
+                     "<br><br><b>PsyBuilder 0.1</b> is provided as is—no warranty is made or implied by "
                      "the authors of the software, or by anyone else. This software "
                      "is designed for research purposes only, not to be used for "
                      "any business purpose, such as, but not limited to, business training."
@@ -54,8 +54,7 @@ class AboutUs(QWidget):
         author1 = self.getInfo("authorInfo01",
                                "Yang Zhang (张阳), Ph.D., Prof.<br>Department of Psychology, Soochow University, Suzhou"
                                "<br><a href='mailto:yzhangpsy@suda.edu.cn?Subject= Inquire about the usage of PsyBuilder 0.1'>yzhangpsy@suda.edu.cn</a>")
-        author2 = self.getInfo("authorInfo02",
-                               "Zhe Yang, Ph.D., Associate Prof. <br> Department of computer science, Soochow University, Suzhou")
+        author2 = self.getInfo("authorInfo02", "Zhe Yang, Ph.D., Associate Prof. <br> Department of computer science, Soochow University, Suzhou")
 
         author3 = self.getInfo("authorInfo03", "Chenzhi Feng, Ph.D., Prof. <br> Department of Psychology, Soochow University, Suzhou")
 

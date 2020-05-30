@@ -200,7 +200,7 @@ class Psy(QMainWindow):
         platform_menu.addAction(self.windows_action)
         platform_menu.addAction(self.mac_action)
 
-        if self.is_windows:
+        if not self.is_windows:
             self.platform_action_group = QActionGroup(self)
             self.platform_action_group.setExclusive(True)
 
@@ -208,14 +208,10 @@ class Psy(QMainWindow):
             self.platform_action_group.addAction(self.windows_action)
             self.platform_action_group.addAction(self.mac_action)
 
-
-        if platform.system() == 'Windows':
-            pass
-            # self.windows_action.setChecked(True)
-        elif platform.system() == 'Darwin':
-            self.mac_action.setChecked(True)
-        else:
-            self.linux_action.setChecked(True)
+            if self.is_windows == 'Darwin':
+                self.mac_action.setChecked(True)
+            else:
+                self.linux_action.setChecked(True)
 
 
         # load image mode
@@ -252,7 +248,7 @@ class Psy(QMainWindow):
         image_load_menu.addAction(self.before_trial_action)
         image_load_menu.addAction(self.before_exp_action)
 
-        if self.is_windows:
+        if not self.is_windows:
             self.image_load_group = QActionGroup(self)
             self.image_load_group.setExclusive(True)
 
