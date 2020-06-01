@@ -84,34 +84,35 @@ class Psy(QMainWindow):
         self.default_mode_action = open_mode_menu.addAction("Default Mode", lambda: self.changeOpenMode("default mode"))
         self.open_blank_file_action = open_mode_menu.addAction("Open Blank File", lambda: self.changeOpenMode("open blank file"))
 
-        self.default_mode_action.setCheckable(True)
-        self.open_blank_file_action.setCheckable(True)
+        if self.is_windows:
+            checked_icon = Func.getImageObject("menu/checked", 1)
+            self.default_mode_action.setIcon(checked_icon)
+            self.open_blank_file_action.setIcon(checked_icon)
 
-        if not self.is_windows:
+            self.default_mode_action.setIconVisibleInMenu(True)
+            self.open_blank_file_action.setIconVisibleInMenu(False)
+        else:
+            self.default_mode_action.setCheckable(True)
+            self.open_blank_file_action.setCheckable(True)
+
             self.open_mode_group = QActionGroup(self)
             self.open_mode_group.setExclusive(True)
 
             self.open_mode_group.addAction(self.default_mode_action)
             self.open_mode_group.addAction(self.open_blank_file_action)
 
-        # self.default_mode_action.setChecked(True)
 
         open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
         self.changeOpenMode(open_mode)
-
-        if "default mode" == open_mode:
-            self.default_mode_action.setChecked(True)
-        else:
-            self.open_blank_file_action.setChecked(True)
 
 
         file_menu.addSeparator()
         file_menu.addAction("Exit", sys.exit, QKeySequence("Ctrl+Q"))
         # view menu
         view_menu = menubar.addMenu("&View")
-        self.variable_action = QAction("&Variable", self)
+        self.variable_action = QAction("&Variables", self)
         self.structure_action = QAction("&Structure", self)
-        self.property_action = QAction("&Property", self)
+        self.property_action = QAction("&Properties", self)
         self.output_action = QAction("&Output", self)
 
         self.variable_action.setData("variable")
@@ -119,19 +120,24 @@ class Psy(QMainWindow):
         self.output_action.setData("output")
         self.property_action.setData("property")
 
-        self.variable_action.setCheckable(True)
-        self.structure_action.setCheckable(True)
-        self.output_action.setCheckable(True)
-        self.property_action.setCheckable(True)
+        if self.is_windows:
+            self.variable_action.setIcon(checked_icon)
+            self.structure_action.setIcon(checked_icon)
+            self.output_action.setIcon(checked_icon)
+            self.property_action.setIcon(checked_icon)
+        else:
+            self.variable_action.setCheckable(True)
+            self.structure_action.setCheckable(True)
+            self.output_action.setCheckable(True)
+            self.property_action.setCheckable(True)
 
-        self.view_layout_group = QActionGroup(self)
-        self.view_layout_group.setExclusive(False)
+            self.view_layout_group = QActionGroup(self)
+            self.view_layout_group.setExclusive(False)
 
-        self.view_layout_group.addAction(self.variable_action)
-        self.view_layout_group.addAction(self.structure_action)
-        self.view_layout_group.addAction(self.output_action)
-        self.view_layout_group.addAction(self.property_action)
-
+            self.view_layout_group.addAction(self.variable_action)
+            self.view_layout_group.addAction(self.structure_action)
+            self.view_layout_group.addAction(self.output_action)
+            self.view_layout_group.addAction(self.property_action)
 
         self.variable_action.triggered.connect(self.setDockView)
         self.structure_action.triggered.connect(self.setDockView)
@@ -172,24 +178,20 @@ class Psy(QMainWindow):
 
         self.mac_action = QAction("&Mac", self)
 
-        # self.is_windows = platform.system() == 'Windows'
-
-        icon = QIcon(Func.getImage("common/dock_visible.png"))
-
         if self.is_windows:
-            self.linux_action.setIcon(icon)
+            self.linux_action.setIcon(checked_icon)
             self.linux_action.setIconVisibleInMenu(False)
         else:
             self.linux_action.setCheckable(True)
 
         if self.is_windows:
-            self.windows_action.setIcon(icon)
+            self.windows_action.setIcon(checked_icon)
             self.windows_action.setIconVisibleInMenu(True)
         else:
             self.windows_action.setCheckable(True)
 
         if self.is_windows:
-            self.mac_action.setIcon(icon)
+            self.mac_action.setIcon(checked_icon)
             self.mac_action.setIconVisibleInMenu(False)
         else:
             self.mac_action.setCheckable(True)
@@ -224,21 +226,20 @@ class Psy(QMainWindow):
         self.before_trial_action = QAction("&Before_trial", self)
         self.before_exp_action = QAction("&Before_exp", self)
 
-        # icon = QIcon(Func.getImage("common/dock_visible.png"))
         if self.is_windows:
-            self.before_event_action.setIcon(icon)
+            self.before_event_action.setIcon(checked_icon)
             # self.before_event_action.setIconVisibleInMenu(False)
         else:
             self.before_event_action.setCheckable(True)
 
         if self.is_windows:
-            self.before_trial_action.setIcon(icon)
+            self.before_trial_action.setIcon(checked_icon)
             self.before_trial_action.setIconVisibleInMenu(False)
         else:
             self.before_trial_action.setCheckable(True)
 
         if self.is_windows:
-            self.before_exp_action.setIcon(icon)
+            self.before_exp_action.setIcon(checked_icon)
             self.before_exp_action.setIconVisibleInMenu(False)
         else:
             self.before_exp_action.setCheckable(True)
@@ -1021,14 +1022,14 @@ class Psy(QMainWindow):
         :param checked:
         :return:
         """
-        dock = self.sender().data()
-        if dock == "variable":
+        # dock = self.sender().data()
+        if self.sender() is self.variable_action:
             self.attributes.setVisible(self.attributes.isHidden())
-        elif dock == "structure":
+        elif self.sender() is self.structure_action:
             self.structure.setVisible(self.structure.isHidden())
-        elif dock == "property":
+        elif self.sender() is self.property_action:
             self.properties.setVisible(self.properties.isHidden())
-        elif dock == "output":
+        elif self.sender() is self.output_action:
             self.output.setVisible(self.output.isHidden())
 
     def changeOpenMode(self, mode: str):
@@ -1040,14 +1041,18 @@ class Psy(QMainWindow):
 
         if self.is_windows:
             # menu
-            checked_icon = Func.getImageObject("menu/checked", 1)
-
             if "default mode" == mode:
-                self.default_mode_action.setIcon(checked_icon)
-                self.open_blank_file_action.setIcon(QIcon(""))
+                self.default_mode_action.setIconVisibleInMenu(True)
+                self.open_blank_file_action.setIconVisibleInMenu(False)
             else:
-                self.default_mode_action.setIcon(QIcon(""))
-                self.open_blank_file_action.setIcon(checked_icon)
+                self.default_mode_action.setIconVisibleInMenu(False)
+                self.open_blank_file_action.setIconVisibleInMenu(True)
+        else:
+            # for mac and linux using group actions in exclusive mode
+            if "default mode" == mode:
+                self.default_mode_action.setChecked(True)
+            else:
+                self.open_blank_file_action.setChecked(True)
 
     def checkVisible(self, is_visible):
         """
@@ -1055,23 +1060,26 @@ class Psy(QMainWindow):
         :param is_visible:
         :return:
         """
-        dock = self.sender().windowTitle()
-        # if is_visible:
-        #     icon = QIcon(Func.getImage("common/dock_visible.png"))
-        # else:
-        #     icon = QIcon("")
-        if dock == "Variables":
-            # self.variable_action.setIcon(icon)
-            self.variable_action.setChecked(is_visible)
-        elif dock == "Structure":
-            # self.structure_action.setIcon(icon)
-            self.structure_action.setChecked(is_visible)
-        elif dock == "Properties":
-            # self.property_action.setIcon(icon)
-            self.property_action.setChecked(is_visible)
-        elif dock == "Output":
-            # self.output_action.setIcon(icon)
-            self.output_action.setChecked(is_visible)
+        # dock = self.sender().windowTitle()
+
+        if self.is_windows:
+            if self.sender() is self.attributes:
+                self.variable_action.setIconVisibleInMenu(is_visible)
+            elif self.sender() is self.structure:
+                self.structure_action.setIconVisibleInMenu(is_visible)
+            elif self.sender() is self.properties:
+                self.property_action.setIconVisibleInMenu(is_visible)
+            elif self.sender() is self.output:
+                self.output_action.setIconVisibleInMenu(is_visible)
+        else:
+            if self.sender() is self.attributes:
+                self.variable_action.setChecked(is_visible)
+            elif self.sender() is self.structure:
+                self.structure_action.setChecked(is_visible)
+            elif self.sender() is self.properties:
+                self.property_action.setChecked(is_visible)
+            elif self.sender() is self.output:
+                self.output_action.setChecked(is_visible)
 
     def changePlatform(self, c):
         if isinstance(c, bool):

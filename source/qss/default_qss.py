@@ -215,7 +215,7 @@ QToolBar#CycleToolBar {
 if platform.system() == 'Windows':
     menuCheck = f"""
 QMenu::indicator:exclusive:checked {{
-    image: url({imageURL("/common/dock_visible.png")});
+    image: url({imageURL("/menu/checked.png")});
 }}
 
 QMenu::indicator:exclusive:unchecked{{

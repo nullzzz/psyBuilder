@@ -68,18 +68,23 @@ class FileButtonArea(QFrame):
         icon.setStyleSheet("background:transparent;")
         # menu
         self.menu = QMenu()
-        # Func.getImageObject("menu/checked", 1)
+        #
         self.default_mode_action = self.menu.addAction("Default Mode", lambda: self.changeOpenMode("default mode"))
         self.open_blank_file_action = self.menu.addAction("Open Blank File", lambda: self.changeOpenMode("open blank file"))
 
-        self.default_mode_action.setCheckable(True)
-        self.open_blank_file_action.setCheckable(True)
+        if platform.system() == 'Windows':
+            self.default_mode_action.setIcon(Func.getImageObject("menu/checked", 1))
+            self.open_blank_file_action.setIcon(Func.getImageObject("menu/checked", 1))
+        else:
+            self.default_mode_action.setCheckable(True)
+            self.open_blank_file_action.setCheckable(True)
 
-        self.open_mode_group = QActionGroup(self)
-        self.open_mode_group.setExclusive(True)
+            self.open_mode_group = QActionGroup(self)
+            self.open_mode_group.setExclusive(True)
 
-        self.open_mode_group.addAction(self.default_mode_action)
-        self.open_mode_group.addAction(self.open_blank_file_action)
+            self.open_mode_group.addAction(self.default_mode_action)
+            self.open_mode_group.addAction(self.open_blank_file_action)
+
 
         open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
         self.changeOpenMode(open_mode)
@@ -151,11 +156,12 @@ class FileButtonArea(QFrame):
         Settings("config.ini", Settings.IniFormat).setValue("open_mode", mode)
         # menu
 
-        if "default mode" == mode:
-            self.default_mode_action.setChecked(True)
+        if platform.system() == 'Windows':
+            isSetIcoVisible = ("default mode" == mode)
+            self.default_mode_action.setIconVisibleInMenu(isSetIcoVisible)
+            self.open_blank_file_action.setIconVisibleInMenu(not isSetIcoVisible)
         else:
-            self.open_blank_file_action.setChecked(True)
-
-        # isSetIcoVisible = ("default mode" == mode)
-        # self.default_mode_action.setIconVisibleInMenu(isSetIcoVisible)
-        # self.open_blank_file_action.setIconVisibleInMenu(not isSetIcoVisible)
+            if "default mode" == mode:
+                self.default_mode_action.setChecked(True)
+            else:
+                self.open_blank_file_action.setChecked(True)
