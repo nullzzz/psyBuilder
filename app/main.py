@@ -33,6 +33,8 @@ class Psy(QMainWindow):
         # title and icon
         self.setWindowTitle("PsyBuilder 0.1")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
+        # get current system type
+        self.is_windows = platform.system() == 'Windows'
         # init menu bar
         self.initMenubar()
         # init dock widget
@@ -85,11 +87,12 @@ class Psy(QMainWindow):
         self.default_mode_action.setCheckable(True)
         self.open_blank_file_action.setCheckable(True)
 
-        self.open_mode_group = QActionGroup(self)
-        self.open_mode_group.setExclusive(True)
+        if not self.is_windows:
+            self.open_mode_group = QActionGroup(self)
+            self.open_mode_group.setExclusive(True)
 
-        self.open_mode_group.addAction(self.default_mode_action)
-        self.open_mode_group.addAction(self.open_blank_file_action)
+            self.open_mode_group.addAction(self.default_mode_action)
+            self.open_mode_group.addAction(self.open_blank_file_action)
 
         # self.default_mode_action.setChecked(True)
 
@@ -169,7 +172,7 @@ class Psy(QMainWindow):
 
         self.mac_action = QAction("&Mac", self)
 
-        self.is_windows = platform.system() == 'Windows'
+        # self.is_windows = platform.system() == 'Windows'
 
         icon = QIcon(Func.getImage("common/dock_visible.png"))
 
@@ -208,7 +211,7 @@ class Psy(QMainWindow):
             self.platform_action_group.addAction(self.windows_action)
             self.platform_action_group.addAction(self.mac_action)
 
-            if self.is_windows == 'Darwin':
+            if platform.system() == 'Darwin':
                 self.mac_action.setChecked(True)
             else:
                 self.linux_action.setChecked(True)
@@ -1035,15 +1038,16 @@ class Psy(QMainWindow):
         # config
         Settings("config.ini", Settings.IniFormat).setValue("open_mode", mode)
 
-        # print(f"line 1005: {mode}")
-        # menu
-        # checked_icon = Func.getImageObject("menu/checked", 1)
-        # if "default mode" == mode:
-        #     self.default_mode_action.setIcon(checked_icon)
-        #     self.open_blank_file_action.setIcon(QIcon(""))
-        # else:
-        #     self.default_mode_action.setIcon(QIcon(""))
-        #     self.open_blank_file_action.setIcon(checked_icon)
+        if self.is_windows:
+            # menu
+            checked_icon = Func.getImageObject("menu/checked", 1)
+
+            if "default mode" == mode:
+                self.default_mode_action.setIcon(checked_icon)
+                self.open_blank_file_action.setIcon(QIcon(""))
+            else:
+                self.default_mode_action.setIcon(QIcon(""))
+                self.open_blank_file_action.setIcon(checked_icon)
 
     def checkVisible(self, is_visible):
         """
