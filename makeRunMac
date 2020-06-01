@@ -11,19 +11,19 @@ sudo rm -rf ./PsyBuilder.dmg
 
 
 #sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn psyBuilder.py
-sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --add-binary='/System/Library/Frameworks/Tk.framework/Tk':'tk' --add-binary='/System/Library/Frameworks/Tcl.framework/Tcl':'tcl' --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn psyBuilder.py
+sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --add-binary='/System/Library/Frameworks/Tk.framework/Tk':'tk' --add-binary='/System/Library/Frameworks/Tcl.framework/Tcl':'tcl' --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn PsyBuilder.py
 
 echo "============================="
 echo "start to codesign the app"
 echo "============================="
 
-APP_PATH="./dist/psyBuilder.app"
+APP_PATH="./dist/PsyBuilder.app"
 sudo codesign --deep -f -s B406553BC6044A7B8EB4EA9D42CCE348677576AE "$APP_PATH"
 
 echo "============================="
 echo "create PsyBuilder via platypus"
 echo "============================="
-platypus -P ./PsyBuilder.platypus -a PsyBuilder -o None -y -i ./source/images/common/icon.icns -I org.Zy.PsyBuilder -B -f ./dist/psyBuilder.app ./PsyBuilder ..
+platypus -P ./PsyBuilder.platypus -a PsyBuilder -o None -y -i ./source/images/common/icon.icns -I org.Zy.PsyBuilder -B -f ./dist/PsyBuilder.app ./PsyBuilder ..
 #
 #sudo mv ./dist/run.app/Contents/MacOS/run ./dist/run.app/Contents/MacOS/run0
 #

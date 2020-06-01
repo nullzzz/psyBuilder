@@ -5,7 +5,7 @@
 #define MyAppVersion "0.1"
 #define MyAppPublisher "Attention and Perception lab"
 #define MyAppURL "http://web.suda.edu.cn/yzhangpsy/projects.html"
-#define MyAppExeName "psyBuilder.exe"
+#define MyAppExeName "PsyBuilder.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -26,7 +26,7 @@ LicenseFile=C:\Users\Administrator\PycharmProjects\ptbGui\license.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 PrivilegesRequired=lowest
 OutputDir=C:\Users\Administrator\PycharmProjects
-OutputBaseFilename=psyBuilder
+OutputBaseFilename=PsyBuilder
 SetupIconFile=C:\Users\Administrator\PycharmProjects\ptbGui\source\images\common\psybuilder.ico
 Compression=lzma
 SolidCompression=yes
@@ -40,8 +40,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode
 
 [Files]
-Source: "C:\Users\Administrator\PycharmProjects\ptbGui\dist\psyBuilder\psyBuilder.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Administrator\PycharmProjects\ptbGui\dist\psyBuilder\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\Administrator\PycharmProjects\ptbGui\dist\PsyBuilder\PsyBuilder.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Administrator\PycharmProjects\ptbGui\dist\PsyBuilder\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
