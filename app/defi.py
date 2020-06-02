@@ -37,7 +37,7 @@ DEV_KEYBOARD = "keyboard"
 DEV_MOUSE = "mouse"
 DEV_RESPONSE_BOX = "response box"
 DEV_GAMEPAD = "game pad"
-DEV_EYE_ACTION = "eye action"
+DEV_EYE_ACTION = "eye tracker"
 
 # item in slider
 ITEM_POLYGON = "polygon"

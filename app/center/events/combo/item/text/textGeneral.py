@@ -28,7 +28,7 @@ class TextGeneral(QWidget):
 
         self.fore_color = ColComboBox()
         self.back_color = ColComboBox()
-        self.fore_color.setCurrentText("black")
+        self.fore_color.setCurrentText("Black")
 
         self.transparent = VarLineEdit("100%")
         self.transparent.setReg(VarLineEdit.Percentage)

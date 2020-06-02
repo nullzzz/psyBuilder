@@ -50,7 +50,7 @@ class Describer(QStackedWidget):
                     d = Quest()
                 elif device_id.startswith("tracker"):
                     d = Tracker()
-                elif device_id.startswith("eye action"):
+                elif device_id.startswith("eye tracker"):
                     d = Action()
                 elif device_id.startswith("keyboard"):
                     d = Keyboard()
@@ -86,5 +86,5 @@ class Describer(QStackedWidget):
         for k, v in self.id_widget.items():
             if k.startswith("tracker"):
                 v.updateExternalDeviceInformation()
-            elif k.startswith("eye action"):
+            elif k.startswith("eye tracker"):
                 v.updateExternalDeviceInformation()

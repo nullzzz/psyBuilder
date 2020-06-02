@@ -395,7 +395,7 @@ class Combo(TabItemMainWindow):
 
     def createColorMenu(self, slot, default_color):
         colors = (Qt.black, Qt.white, Qt.red, Qt.blue, Qt.yellow)
-        names = ("black", "white", "red", "blue", "yellow")
+        names = ("Black", "White", "Red", "Blue", "Yellow")
 
         color_menu = QMenu(self)
         more_action = QAction('More..', self)

@@ -40,7 +40,7 @@ class TextTab1(QWidget):
 
         self.fore_color = ColComboBox()
         self.back_color = ColComboBox()
-        self.fore_color.setCurrentText("black")
+        self.fore_color.setCurrentText("Black")
         self.fore_color.colorChanged.connect(self.changeColor)
         self.back_color.colorChanged.connect(self.changeColor)
 
