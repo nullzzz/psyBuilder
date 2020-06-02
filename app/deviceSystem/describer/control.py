@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QStackedWidget, QGridLayout
 
 from app.deviceSystem.describer import *
 from app.deviceSystem.describer.basis import Shower
+from app.info import Info
 
 
 class DefaultShow(QWidget):
@@ -36,29 +37,29 @@ class Describer(QStackedWidget):
             if device_id in self.id_widget.keys():
                 self.setCurrentWidget(self.id_widget.get(device_id))
             else:
-                if device_id.startswith("screen"):
+                if device_id.startswith(Info.DEV_SCREEN):
                     d = Screen()
-                elif device_id.startswith("sound"):
+                elif device_id.startswith(Info.DEV_SOUND):
                     d = Sound()
-                elif device_id.startswith("network port"):
+                elif device_id.startswith(Info.DEV_NETWORK_PORT):
                     d = Net()
-                elif device_id.startswith("parallel port"):
+                elif device_id.startswith(Info.DEV_PARALLEL_PORT):
                     d = Parallel()
-                elif device_id.startswith("serial port"):
+                elif device_id.startswith(Info.DEV_SERIAL_PORT):
                     d = Serial()
-                elif device_id.startswith("quest"):
+                elif device_id.startswith(Info.DEV_QUEST):
                     d = Quest()
-                elif device_id.startswith("tracker"):
+                elif device_id.startswith(Info.DEV_TRACKER):
                     d = Tracker()
-                elif device_id.startswith("eye tracker"):
+                elif device_id.startswith(Info.DEV_EYE_ACTION):
                     d = Action()
-                elif device_id.startswith("keyboard"):
+                elif device_id.startswith(Info.DEV_KEYBOARD):
                     d = Keyboard()
-                elif device_id.startswith("mouse"):
+                elif device_id.startswith(Info.DEV_MOUSE):
                     d = Mouse()
-                elif device_id.startswith("response box"):
+                elif device_id.startswith(Info.DEV_RESPONSE_BOX):
                     d = ResponseBox()
-                elif device_id.startswith("game pad"):
+                elif device_id.startswith(Info.DEV_GAMEPAD):
                     d = GamePad()
                 device_info["Device Id"] = device_id
                 d.describe(device_info)
@@ -84,7 +85,7 @@ class Describer(QStackedWidget):
 
     def updateSimpleInfo(self):
         for k, v in self.id_widget.items():
-            if k.startswith("tracker"):
+            if k.startswith(Info.DEV_TRACKER):
                 v.updateExternalDeviceInformation()
-            elif k.startswith("eye tracker"):
+            elif k.startswith(Info.DEV_EYE_ACTION):
                 v.updateExternalDeviceInformation()

@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QListWidget
 from app.center.events.__tools__.duration.device.input import InputDevice
 from app.center.events.__tools__.duration.device.output import OutputDevice
 from app.func import Func
+from app.info import Info
 
 
 class DeviceHome(QListWidget):
@@ -85,9 +86,9 @@ class DeviceHome(QListWidget):
         self.device_ids.append(device_id)
         device_type = device_id.split(".")[0]
         # 新建设备对象
-        if device_type in ("network port", "parallel port", "serial port", "quest", "tracker"):
+        if device_type in (Info.DEV_NETWORK_PORT, Info.DEV_PARALLEL_PORT, Info.DEV_SERIAL_PORT, Info.DEV_QUEST, Info.DEV_TRACKER):
             device = OutputDevice(device_id, device_name)
-        elif device_type in ("game pad", "mouse", "keyboard", "response box", "eye tracker"):
+        elif device_type in (Info.DEV_GAMEPAD,Info.DEV_MOUSE,Info.DEV_KEYBOARD,Info.DEV_RESPONSE_BOX,Info.DEV_EYE_ACTION):
             device = InputDevice(device_id, device_name)
 
         # 载入信息
