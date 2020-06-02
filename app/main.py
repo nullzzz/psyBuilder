@@ -603,8 +603,13 @@ class Psy(QMainWindow):
         """
         When item is deleted, handle related affairs
         """
+
+        if Func.getWidgetParent(widget_id) is None:
+            return
+
         # close tab
         self.center.closeTab(widget_id)
+
         # delete node in structure (we need delete data in Kernel.Nodes and Kernel.Names) and item in timeline or timeline in cycle
         widget_name = Func.getWidgetName(widget_id)
         if sender_widget != Info.CycleSend and widget_id == self.attributes.current_widget_id:
