@@ -13,7 +13,7 @@ class EndR(TabItemWidget):
         self.tip1.setReadOnly(True)
         self.tip2.setReadOnly(True)
 
-        self.default_properties = {"Statue Message": "",
+        self.default_properties = {"Status Message": "",
                                    "Eye Tracker Name": "", }
 
         self.status_message = VarLineEdit()
@@ -39,14 +39,14 @@ class EndR(TabItemWidget):
         # self.tip1.setFocusPolicy(Qt.NoFocus)
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
-        self.tip2.setText("Ends recording of eye tracking data")
+        # self.tip2.setText("Ends recording of eye tracking data")
         # self.tip2.setFocusPolicy(Qt.NoFocus)
         self.status_message.setMaximumWidth(300)
 
         layout1 = QGridLayout()
         layout1.addWidget(self.tip1, 0, 0, 1, 4)
         layout1.addWidget(self.tip2, 1, 0, 1, 4)
-        layout1.addWidget(QLabel("Statue Message:"), 2, 0, 1, 1)
+        layout1.addWidget(QLabel("Status Message:"), 2, 0, 1, 1)
         layout1.addWidget(self.status_message, 2, 1, 1, 1)
         layout1.addWidget(QLabel("Eye Tracker Name:"), 3, 0, 1, 1)
         layout1.addWidget(self.tracker_name, 3, 1, 1, 1)

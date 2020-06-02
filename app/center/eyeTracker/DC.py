@@ -34,7 +34,7 @@ class EyeDC(TabItemWidget):
 
         self.show_display_with_drift_correction_target = QCheckBox("Show Display With Drift-Correction Target")
         self.show_display_with_drift_correction_target.stateChanged.connect(self.statueChanged)
-        self.fixation_triggered = QCheckBox("Fixation Triggered (No Spacebar Press Required)")
+        self.fixation_triggered = QCheckBox("Fixation Trigger")
         self.fixation_triggered.stateChanged.connect(self.statueChanged)
 
         self.using_tracker_id = ""
@@ -58,7 +58,7 @@ class EyeDC(TabItemWidget):
         self.tip1.setText("Drift Correction")
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0; border-style:outset; background-color: transparent;")
-        self.tip2.setText("Perform drift correction")
+        # self.tip2.setText("Perform drift correction")
         self.target_style.addItems(
             ["default", "large filled", "small filled", "large open", "small open", "large cross", "small cross"])
         self.target_color.setEnabled(False)

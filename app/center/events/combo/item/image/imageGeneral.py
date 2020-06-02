@@ -68,7 +68,7 @@ class ImageGeneral(QWidget):
 
     def setGeneral(self):
         # 打开文件按钮布局
-        group1 = QGroupBox("File && Effects")
+        group1 = QGroupBox("File")
 
         layout1 = QGridLayout()
         layout1.addWidget(QLabel("File Name"), 0, 0, 1, 1)
@@ -88,7 +88,7 @@ class ImageGeneral(QWidget):
         layout1.addWidget(l0, 1, 2)
         layout1.addWidget(self.rotate, 1, 3, 1, 2)
 
-        l_tra = QLabel("Transparency (%):")
+        l_tra = QLabel("Transparency:")
         l_tra.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         layout1.addWidget(l_tra, 2, 2)

@@ -50,7 +50,7 @@ class EyeCalibrate(TabItemWidget):
         self.tip1.setText("Calibration")
         self.tip1.setFont(QFont("Timers", 20, QFont.Bold))
         self.tip2.setStyleSheet("border-width:0;border-style:outset;background-color:transparent;")
-        self.tip2.setText("Calibration")
+        # self.tip2.setText("Calibration")
         self.calibration_type.addItems(["HV9", "HV13", "HV5", "HV3"])
         self.calibration_beep.addItems(["Yes", "No"])
         self.target_style.addItems(

@@ -37,7 +37,7 @@ class Close(TabItemWidget):
         self.all_attr = QListWidget()
         self.all_attr.addItems(Func.getWidgetAttributes(self.widget_id))
         self.all_attr.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.refresh_bt = QPushButton("refresh")
+        self.refresh_bt = QPushButton("Refresh")
         self.refresh_bt.clicked.connect(self.refreshAttr)
         self.select_attr = QListWidget()
         self.select_attr.setSelectionMode(QAbstractItemView.ExtendedSelection)

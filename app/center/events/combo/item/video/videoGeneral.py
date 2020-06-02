@@ -88,7 +88,7 @@ class VideoGeneral(QWidget):
         l3 = QLabel("Playback Rate:")
         l4 = QLabel("Aspect Ratio:")
 
-        l5 = QLabel("Transparency (%):")
+        l5 = QLabel("Transparency:")
 
         l_x_pos = QLabel("Center X:")
         l_y_pos = QLabel("Center Y:")
@@ -108,7 +108,7 @@ class VideoGeneral(QWidget):
         l_width.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l_height.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        group1 = QGroupBox("File && Effects")
+        group1 = QGroupBox("File")
 
         layout = QGridLayout()
         layout.addWidget(l0, 0, 0, 1, 1)

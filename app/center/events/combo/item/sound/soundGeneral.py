@@ -85,7 +85,7 @@ class SoundGeneral(QWidget):
         l4.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l5.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        group1 = QGroupBox("File && Effects")
+        group1 = QGroupBox("File")
         layout1 = QGridLayout()
         layout1.addWidget(l0, 0, 0, 1, 1)
         layout1.addWidget(self.file_name, 0, 1, 1, 2)

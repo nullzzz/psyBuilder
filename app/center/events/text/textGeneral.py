@@ -100,8 +100,8 @@ class TextTab1(QWidget):
         l30 = QLabel("Transparency:")
         l32 = QLabel("Wrapat Chars:")
 
-        l40 = QLabel("Flip Horizontal:")
-        l42 = QLabel("Flip Vertical:")
+        l40 = QLabel("Horizontal Flip:")
+        l42 = QLabel("Vertical Flip:")
 
         l50 = QLabel("Font Family:")
         l52 = QLabel("Style:")

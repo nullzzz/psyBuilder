@@ -72,7 +72,7 @@ class DotGeneral(QWidget):
         l21 = QLabel("Dot Num.:")
         l30 = QLabel("Dot Type:")
         l31 = QLabel("Dot Size:")
-        l40 = QLabel("Direction:")
+        l40 = QLabel("Direction (in degrees):")
         l41 = QLabel("Speed (pixes/s):")
         l50 = QLabel("Dot Color:")
         l51 = QLabel("Coherence (%):")

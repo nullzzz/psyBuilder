@@ -50,8 +50,8 @@ class SnowGeneral(QWidget):
         l3 = QLabel("Width:")
         l4 = QLabel("Height:")
         l5 = QLabel("Scale:")
-        l6 = QLabel("Rotation°:")
-        l7 = QLabel("Transparency (%)")
+        l6 = QLabel("Rotation (in degrees):")
+        l7 = QLabel("Transparency")
 
         l1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         l2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
