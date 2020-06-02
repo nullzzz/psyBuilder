@@ -614,7 +614,10 @@ class Psy(QMainWindow):
         widget_name = Func.getWidgetName(widget_id)
         if sender_widget != Info.CycleSend and widget_id == self.attributes.current_widget_id:
             # we may need to clear attributes and properties if we delete showing widget
-            self.attributes.showAttributes(Func.getWidgetParent(widget_id))
+            try:
+                self.attributes.showAttributes(Func.getWidgetParent(widget_id))
+            except:
+                self.attributes.clear()
             self.properties.clear()
         if sender_widget == Info.StructureSend:
             # delete item in timeline or timeline in cycle
