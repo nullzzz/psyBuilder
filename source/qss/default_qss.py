@@ -211,6 +211,8 @@ QToolBar#CycleToolBar {
     spacing: 2px;
 }
 """
+QComboBoxStyle = ""
+QLineEditStyle = ""
 
 if platform.system() == 'Windows':
     menuCheck = f"""
@@ -224,10 +226,22 @@ image: none;
 """
 else:
     menuCheck = ""
+    QComboBoxStyle = f"""
+QComboBox {{  
+font-family: "Helvetica";
+font-size: 12pt;
+}}
+"""
 
+    QLineEditStyle = f"""
+QLineEdit {{  
+font-family: "Helvetica";
+font-size: 12pt;
+}}
+"""
 # other
 other = f"""
 ColComboBox::drop-down {{image: url({imageURL("/common/color_down_arrow.png")});}}
 """
 
-default_qss = dock_widget + tab_bar + center + structure + timeline + cycle + other + menuCheck
+default_qss = dock_widget + tab_bar + center + structure + timeline + cycle + other + menuCheck +QComboBoxStyle +QLineEditStyle
