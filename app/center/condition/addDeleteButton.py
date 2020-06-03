@@ -40,29 +40,35 @@ class AddDeleteButton(QLabel):
     def becomeDisabled(self):
         if self.button_type == 'add':
             cPixmap = QPixmap(Func.getImage("operate/add_disabled.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
 
             self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
         elif self.button_type == 'delete':
             cPixmap = QPixmap(Func.getImage("operate/add_disabled.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
             # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
             self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
 
     def becomeEnabled(self):
         if self.button_type == 'add':
             cPixmap = QPixmap(Func.getImage("operate/add.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
             # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
             self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
         elif self.button_type == 'delete':
             cPixmap = QPixmap(Func.getImage("operate/delete.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
             # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
             self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
 
     def becomePressed(self):
         if self.button_type == 'add':
             cPixmap = QPixmap(Func.getImage("operate/add_press.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
             # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
             self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
         elif self.button_type == 'del':
             cPixmap = QPixmap(Func.getImage("operate/delete_press.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
             # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
             self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
