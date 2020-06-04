@@ -9,12 +9,13 @@ class ResponseBox(Shower):
         super(ResponseBox, self).__init__(parent=parent)
         self.device_index = QLineEdit()
         self.device_index.textEdited.connect(self.showAddressTip)
-
+        self.device_index.setToolTip("The serial port address corresponding to the Cedrus response pad.")
         self.index_tip.setHtml("About Device Port:"
-                               "<br><br>Currently, only response pads from Cedrus are supported."
-                               "<br><br><b>Windows: </b> serial port name: e.g., <br>'COM2' for auto"
-                               "<br><br><b>Mac OS: </b> serial port name: e.g., <br>'/dev/cu.usbserial-FTDI125ZX9' for auto"
-                               "<br><br><b>Linux: </b> serial port name: e.g., <br>'/dev/ttyS0' for auto"
+                               "<br><br>Currently, only response pads from Cedrus are supported. "
+                               "Input \"auto\" for the default serial port name."
+                               "<br><br><b>Windows:</b> 'COM2', etc."
+                               "<br><br><b>Mac OS: </b> '/dev/cu.usbserial-FTDI125ZX9', etc."
+                               "<br><br><b>Linux: </b> '/dev/ttyS0', etc."
                                )
         self.setUI()
 

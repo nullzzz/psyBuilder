@@ -31,6 +31,7 @@ class GamePad(Shower):
     def describe(self, info: dict):
         super().describe(info)
         self.device_index.setText(info.get("Device Index", "auto"))
+
         kb_queue = info.get("Is KB Queue", 0)
         if kb_queue == 2:
             if GamePad.kb_id == self.device_id or GamePad.kb_id == "":
@@ -50,11 +51,14 @@ class GamePad(Shower):
         else:
             gpOrderStr = f"{order_num}th"
 
-        self.index_tip.setHtml('About Device Index (Either "auto" or an integer):<br>'
-                               # "<br><b>Windows: </b>order number start from 0 (e.g., 0,1, for the first and second gampad)"
-                               "<br><b>Windows: </b>any gamepad index (returned by GetGamepadIndices in MATLAB). At least it works on my computer (win 10) with logicool F310 and PTB(3.0.16), let us try..."
-                               "<br><br><b>Mac OS or Linux: </b> any gamepad index (returned by GetGamepadIndices in MATLAB)"
-                               f"<br><br><b>\"auto\":</b> will use the {gpOrderStr} value in gamepad indices for this gamepad (returned by GetGamepadIndices in MATLAB)"
+        self.device_index.setToolTip(
+            f"Either \"auto\" (default to the {gpOrderStr} value returned by GetGamepadIndices in MATLAB)")
+
+        self.index_tip.setHtml('About Device Index:<br>'
+                               f"<br>Either \"auto\" (default to the {gpOrderStr} value returned by GetGamepadIndices in MATLAB)"
+                               " or an integer that represents the gamepad."
+                               "<br><br>Note: On Windows, although the document from PsychToolbox says that the \"GetGamepadIndices\""
+                               " does not work on Windows, it does work on my own computer (win 10) with logicool F310 and PTB(3.0.16), so let us try..."
                                )
 
     def getInfo(self):
