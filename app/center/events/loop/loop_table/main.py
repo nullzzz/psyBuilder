@@ -10,8 +10,8 @@ from app.info import Info
 from lib import MessageBox, TableWidget
 from .attribute_dialog import AttributeDialog
 from .attribute_item import AttributeItem
-from .timeline_item import TimelineItem
 from .repetitions_item import RepetitionsItem
+from .timeline_item import TimelineItem
 
 
 class CycleTable(TableWidget):
@@ -287,6 +287,8 @@ class CycleTable(TableWidget):
         """
         when user change some attribute
         """
+        if col in (0, 1):
+            return
         self.changeAttributeColumn(col, attribute_name, attribute_value)
 
     def mouseMoveEvent(self, e):
