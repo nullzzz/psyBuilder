@@ -38,7 +38,7 @@ class TextGeneral(QWidget):
         self.style_box = VarComboBox(True)
         self.style_box.addItems(
             ("normal_0", "bold_1", "italic_2", "underline_4", "outline_8", "overline_16", "condense_32", "extend_64"))
-        self.style_box.setToolTip("! not all platform support all style ! See detail by running 'Screen 'TextStyle?'' in matlab ")
+        self.style_box.setToolTip("! not all platform support all style. See detail by running 'Screen 'TextStyle?'' in MATLAB.")
         self.font_size_box = VarComboBox(True)
         self.font_size_box.setReg(VarComboBox.Integer)
         for i in range(12, 72, 2):

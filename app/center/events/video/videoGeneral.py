@@ -57,8 +57,8 @@ class VideoTab1(QWidget):
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 
         l0 = QLabel("File Name:")
-        l1 = QLabel("Start Timepoint:")
-        l2 = QLabel("End Timepoint:")
+        l1 = QLabel("Start Timepoint (ms):")
+        l2 = QLabel("End Timepoint (ms):")
         l3 = QLabel("Playback Rate:")
         l4 = QLabel("Aspect Ratio:")
         l5 = QLabel("Screen Name:")
@@ -78,10 +78,10 @@ class VideoTab1(QWidget):
 
         layout.addWidget(l1, 1, 0, 1, 1)
         layout.addWidget(self.start_pos, 1, 1, 1, 1)
-        layout.addWidget(QLabel("ms"), 1, 2, 1, 1)
+        # layout.addWidget(QLabel("ms"), 1, 2, 1, 1)
         layout.addWidget(l2, 2, 0, 1, 1)
         layout.addWidget(self.end_pos, 2, 1, 1, 1)
-        layout.addWidget(QLabel("ms"), 2, 2, 1, 1)
+        # layout.addWidget(QLabel("ms"), 2, 2, 1, 1)
 
         layout.addWidget(l3, 3, 0, 1, 1)
         layout.addWidget(self.playback_rate, 3, 1, 1, 1)

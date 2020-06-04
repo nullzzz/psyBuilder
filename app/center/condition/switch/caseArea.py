@@ -25,7 +25,7 @@ class CaseArea(QScrollArea):
 
         self.attributes: list = []
 
-        self.case_default = Case(title='Default')
+        self.case_default = Case(title='Otherwise')
 
         self.case_list: list = [Case(title='Case 1'), Case(title='Case 2'), self.case_default]
         self.case_list[0].addCase.connect(self.insertCase)

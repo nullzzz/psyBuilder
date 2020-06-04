@@ -9,7 +9,7 @@ from app.info import Info
 class DefaultShow(QWidget):
     def __init__(self, parent=None):
         super(DefaultShow, self).__init__(parent)
-        self.label = QLabel("Device information will show here.")
+        self.label = QLabel("Device information will appear here.")
         self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         layout = QGridLayout()
         layout.addWidget(self.label)

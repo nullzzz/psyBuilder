@@ -41,7 +41,7 @@ class VideoDisplay(TabItemMainWindow):
 
     def setUI(self):
         self.setWindowTitle("Video")
-        self.label.setText("Your video will show here")
+        self.label.setText("Your video will appear here")
         self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.setCentralWidget(self.label)
 

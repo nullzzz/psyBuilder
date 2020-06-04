@@ -9,7 +9,7 @@ class ResponseBox(Shower):
         super(ResponseBox, self).__init__(parent=parent)
         self.device_index = QLineEdit()
         self.device_index.textEdited.connect(self.showAddressTip)
-        self.device_index.setToolTip("The serial port address corresponding to the Cedrus response pad.")
+        self.device_index.setToolTip("The serial port address corresponding to the Cedrus response pad")
         self.index_tip.setHtml("About Device Port:"
                                "<br><br>Currently, only response pads from Cedrus are supported. "
                                "Input \"auto\" for the default serial port name."
