@@ -448,8 +448,8 @@ class Psy(QMainWindow):
         # do job
         # add node in origin parent node firstly, because some widgets need to get attributes in __init__ function.
         show = True
-        # if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
-        #     show = False
+        if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
+            show = False
         self.structure.addNode(parent_widget_id, widget_id, widget_name, index, show)
         # create widget secondly
         self.createWidget(widget_id, widget_name)
