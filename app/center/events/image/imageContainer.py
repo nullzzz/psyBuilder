@@ -34,7 +34,7 @@ class ImageContainer(QFrame):
 
         if self.pix is None:
             painter = QPainter(self)
-            painter.drawText(100, 100, "Your image will appear here.")
+            painter.drawText(100, 100, "Your image will appear here")
         else:
             palette: QPalette = self.palette()
             palette.setColor(QPalette.Background, self.back_color)

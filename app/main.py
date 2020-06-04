@@ -878,37 +878,37 @@ class Psy(QMainWindow):
         """
         store data to file
         """
-        try:
-            setting = Settings(file_path, Settings.IniFormat)
-            # some data in Info save to file directly
-            setting.setValue("Names", Info.Names)
-            setting.setValue("WidgetTypeCount", Info.WidgetTypeCount)
-            setting.setValue("WidgetNameCount", Info.WidgetNameCount)
-            setting.setValue("InputDeviceInfo", Info.INPUT_DEVICE_INFO)
-            setting.setValue("OutputDeviceInfo", Info.OUTPUT_DEVICE_INFO)
-            setting.setValue("QuestDeviceInfo", Info.QUEST_DEVICE_INFO)
-            setting.setValue("TrackerDeviceInfo", Info.TRACKER_DEVICE_INFO)
-            setting.setValue("SliderCount", Info.COMBO_COUNT)
-            # Info.Widgets: we just need to save origin widget
-            widgets_data = {}
-            for name in Info.Names:
-                widget_id = Info.Names[name][0]
-                widget = Info.Widgets[widget_id]
-                widget_data = widget.store()
-                widgets_data[f"{widget_id}&{name}"] = widget_data
-            setting.setValue("Widgets", widgets_data)
-            # structure
-            structure = self.structure.store()
-            setting.setValue("Structure", structure)
-            # tabs
-            # tabs = self.center.store()
-            # setting.setValue("Tabs", tabs)
-            if show:
-                Func.printOut(f"File '{file_path}' saved successfully.", 1)
-            return True
-        except Exception as e:
-            Func.printOut(f"Due to error {e}. File {file_path} saving failed.", 2)
-            return False
+        # try:
+        setting = Settings(file_path, Settings.IniFormat)
+        # some data in Info save to file directly
+        setting.setValue("Names", Info.Names)
+        setting.setValue("WidgetTypeCount", Info.WidgetTypeCount)
+        setting.setValue("WidgetNameCount", Info.WidgetNameCount)
+        setting.setValue("InputDeviceInfo", Info.INPUT_DEVICE_INFO)
+        setting.setValue("OutputDeviceInfo", Info.OUTPUT_DEVICE_INFO)
+        setting.setValue("QuestDeviceInfo", Info.QUEST_DEVICE_INFO)
+        setting.setValue("TrackerDeviceInfo", Info.TRACKER_DEVICE_INFO)
+        setting.setValue("SliderCount", Info.COMBO_COUNT)
+        # Info.Widgets: we just need to save origin widget
+        widgets_data = {}
+        for name in Info.Names:
+            widget_id = Info.Names[name][0]
+            widget = Info.Widgets[widget_id]
+            widget_data = widget.store()
+            widgets_data[f"{widget_id}&{name}"] = widget_data
+        setting.setValue("Widgets", widgets_data)
+        # structure
+        structure = self.structure.store()
+        setting.setValue("Structure", structure)
+        # tabs
+        # tabs = self.center.store()
+        # setting.setValue("Tabs", tabs)
+        if show:
+            Func.printOut(f"File '{file_path}' saved successfully.", 1)
+        return True
+        # except Exception as e:
+        #     Func.printOut(f"Due to error {e}. File {file_path} saving failed.", 2)
+        #     return False
 
     def restore(self, file_path: str, show=True) -> bool:
         """

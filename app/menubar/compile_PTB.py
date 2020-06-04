@@ -728,7 +728,7 @@ def parseRTWindowStr(inputStr):
 
 
 def parseAspectRationStr(inputStr, isRef=False):
-    # ""、Both、LeftRight、UpDown、[attr]
+    # ""、Both、Horizontal、Vertical、[attr]
     if not isRef:
         if isinstance(inputStr, str):
             if inputStr == "Default":
@@ -746,14 +746,14 @@ def parseAspectRationStr(inputStr, isRef=False):
 
 
 def parseStretchModeStr(inputStr, isRef=False):
-    # ""、Both、LeftRight、UpDown、[attr]
+    # ""、Both、Horizontal、Vertical、[attr]
     if not isRef:
         if isinstance(inputStr, str):
             if inputStr == "Both":
                 inputStr = "3"
-            elif inputStr == "LeftRight":
+            elif inputStr == "Horizontal":
                 inputStr = "1"
-            elif inputStr == "UpDown":
+            elif inputStr == "Vertical":
                 inputStr = "2"
             else:
                 inputStr = "0"
@@ -925,6 +925,7 @@ def getAllEventWidgetNamesList(includedType: int = 1) -> list:
         allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]
 
     for cWidgetId, cWidget in Info.WID_NODE.items():
+        # print(f"line 928: {cWidgetId}")
         if not isSubWidgetOfIfOrSwitch(cWidgetId) and getWidgetType(cWidgetId) in allEventWidgetTypes:
             cAllEventWidgetNameList.append(getWidgetName(cWidgetId))
 
@@ -3507,7 +3508,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
 
     # 5) check the stretch mode parameter:
     if cProperties['Stretch']:
-        # ""、Both、LeftRight、UpDown、[attr]
+        # ""、Both、Horizontal、UpDown、[attr]
         stretchModeStr = parseStretchModeStr(*getRefValue(cWidget, cProperties['Stretch Mode'], attributesSetDict))
     else:
         stretchModeStr = "0"

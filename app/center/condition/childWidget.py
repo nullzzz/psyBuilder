@@ -132,7 +132,7 @@ class ChildWidget(QWidget):
         """
         if event_type == "":
             event_type = self.event_type
-        name = f"U_{event_type}_{int(time.time() % 10007)}"
+        name = self.current_sub_wid.replace(".", "_")
         return name
 
     def ok(self):
