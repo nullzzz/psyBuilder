@@ -168,6 +168,15 @@ class CycleTable(TableWidget):
         # data
         del self.default_value[self.attributes.pop(col)]
 
+    def renameItem(self, old_timeline_name: str, new_timeline_name: str):
+        """
+        rename timeline
+        """
+        self.timelines[new_timeline_name] = self.timelines[old_timeline_name]
+        for row in range(self.rowCount()):
+            if self.item(row, 1).text() == old_timeline_name:
+                self.item(row, 1).setText(new_timeline_name)
+
     def deleteTimeline(self, timeline: str):
         """
         delete timeline in this cycle

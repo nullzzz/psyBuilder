@@ -669,8 +669,8 @@ class Psy(QMainWindow):
         parent_widget_id = Func.getWidgetParent(widget_id)
         if sender_widget == Info.StructureSend:
             # we need change item's name if signal comes from structure
-            timeline = Info.Widgets[parent_widget_id]
-            timeline.renameItem(old_widget_name, new_widget_name)
+            widget = Info.Widgets[parent_widget_id]
+            widget.renameItem(old_widget_name, new_widget_name)
         # change node's name in structure and reference parent's child
         # get it's old name to get its reference
         change_widget_ids = [widget_id]
