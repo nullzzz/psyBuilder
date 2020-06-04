@@ -5,7 +5,7 @@ import sys
 import traceback
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QKeySequence
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox, QActionGroup
 
 from app.menubar.compile_PTB import compilePTB
@@ -82,7 +82,8 @@ class Psy(QMainWindow):
         open_mode_menu: QMenu = file_menu.addMenu("Open Mode")
 
         self.default_mode_action = open_mode_menu.addAction("Default Mode", lambda: self.changeOpenMode("default mode"))
-        self.open_blank_file_action = open_mode_menu.addAction("Open Blank File", lambda: self.changeOpenMode("open blank file"))
+        self.open_blank_file_action = open_mode_menu.addAction("Open Blank File",
+                                                               lambda: self.changeOpenMode("open blank file"))
 
         if self.is_windows:
             checked_icon = Func.getImageObject("menu/checked", 1)
@@ -100,7 +101,6 @@ class Psy(QMainWindow):
 
             self.open_mode_group.addAction(self.default_mode_action)
             self.open_mode_group.addAction(self.open_blank_file_action)
-
 
         open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
         self.changeOpenMode(open_mode)
@@ -197,7 +197,6 @@ class Psy(QMainWindow):
         self.windows_action.triggered.connect(self.changePlatform)
         self.mac_action.triggered.connect(self.changePlatform)
 
-
         platform_menu.addAction(self.linux_action)
         platform_menu.addAction(self.windows_action)
         platform_menu.addAction(self.mac_action)
@@ -214,7 +213,6 @@ class Psy(QMainWindow):
                 self.mac_action.setChecked(True)
             else:
                 self.linux_action.setChecked(True)
-
 
         # load image mode
         image_load_menu = build_menu.addMenu("&Image Load Mode")
@@ -279,7 +277,6 @@ class Psy(QMainWindow):
 
         help_menu.addAction(about_action)
         help_menu.addAction(check_for_update)
-
 
     def initDockWidget(self):
         """
@@ -843,8 +840,6 @@ class Psy(QMainWindow):
                     file_paths.insert(0, file_path)
                 Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
 
-
-
     def openFile(self):
         """
         open file through restart software
@@ -880,37 +875,37 @@ class Psy(QMainWindow):
         """
         store data to file
         """
-        try:
-            setting = Settings(file_path, Settings.IniFormat)
-            # some data in Info save to file directly
-            setting.setValue("Names", Info.Names)
-            setting.setValue("WidgetTypeCount", Info.WidgetTypeCount)
-            setting.setValue("WidgetNameCount", Info.WidgetNameCount)
-            setting.setValue("InputDeviceInfo", Info.INPUT_DEVICE_INFO)
-            setting.setValue("OutputDeviceInfo", Info.OUTPUT_DEVICE_INFO)
-            setting.setValue("QuestDeviceInfo", Info.QUEST_DEVICE_INFO)
-            setting.setValue("TrackerDeviceInfo", Info.TRACKER_DEVICE_INFO)
-            setting.setValue("SliderCount", Info.COMBO_COUNT)
-            # Info.Widgets: we just need to save origin widget
-            widgets_data = {}
-            for name in Info.Names:
-                widget_id = Info.Names[name][0]
-                widget = Info.Widgets[widget_id]
-                widget_data = widget.store()
-                widgets_data[f"{widget_id}&{name}"] = widget_data
-            setting.setValue("Widgets", widgets_data)
-            # structure
-            structure = self.structure.store()
-            setting.setValue("Structure", structure)
-            # tabs
-            # tabs = self.center.store()
-            # setting.setValue("Tabs", tabs)
-            if show:
-                Func.printOut(f"File '{file_path}' saved successfully.", 1)
-            return True
-        except Exception as e:
-            Func.printOut(f"Due to error {e}. File {file_path} saving failed.", 2)
-            return False
+        # try:
+        setting = Settings(file_path, Settings.IniFormat)
+        # some data in Info save to file directly
+        setting.setValue("Names", Info.Names)
+        setting.setValue("WidgetTypeCount", Info.WidgetTypeCount)
+        setting.setValue("WidgetNameCount", Info.WidgetNameCount)
+        setting.setValue("InputDeviceInfo", Info.INPUT_DEVICE_INFO)
+        setting.setValue("OutputDeviceInfo", Info.OUTPUT_DEVICE_INFO)
+        setting.setValue("QuestDeviceInfo", Info.QUEST_DEVICE_INFO)
+        setting.setValue("TrackerDeviceInfo", Info.TRACKER_DEVICE_INFO)
+        setting.setValue("SliderCount", Info.COMBO_COUNT)
+        # Info.Widgets: we just need to save origin widget
+        widgets_data = {}
+        for name in Info.Names:
+            widget_id = Info.Names[name][0]
+            widget = Info.Widgets[widget_id]
+            widget_data = widget.store()
+            widgets_data[f"{widget_id}&{name}"] = widget_data
+        setting.setValue("Widgets", widgets_data)
+        # structure
+        structure = self.structure.store()
+        setting.setValue("Structure", structure)
+        # tabs
+        # tabs = self.center.store()
+        # setting.setValue("Tabs", tabs)
+        if show:
+            Func.printOut(f"File '{file_path}' saved successfully.", 1)
+        return True
+        # except Exception as e:
+        #     Func.printOut(f"Due to error {e}. File {file_path} saving failed.", 2)
+        #     return False
 
     def restore(self, file_path: str, show=True) -> bool:
         """
@@ -1163,7 +1158,6 @@ class Psy(QMainWindow):
         # output
         # self.output.clear()
         # Info's data
-
 
         if platform.system() == 'Windows':
             Info.PLATFORM = "windows"
