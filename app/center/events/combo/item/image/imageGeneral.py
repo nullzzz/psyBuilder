@@ -43,7 +43,7 @@ class ImageGeneral(QWidget):
         # 拉伸模式
         self.stretch = QCheckBox("Stretch")
         self.stretch_mode = VarComboBox()
-        self.stretch_mode.addItems(("Both", "LeftRight", "UpDown"))
+        self.stretch_mode.addItems(("Both", "Horizontal", "Vertical"))
 
         # 背景色、透明度
         self.transparent = VarComboBox(True)
