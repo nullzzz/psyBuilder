@@ -54,7 +54,7 @@ class AttributeArea(QGroupBox):
             self.value_line_edit.setText("")
             self.value_line_edit.setEnabled(True)
         else:
-            self.value_line_edit.setText("You can't change the default variable.")
+            self.value_line_edit.setText("You are not allowed to change the default variable.")
             self.value_line_edit.setEnabled(False)
 
     def showTip(self, tip: str):

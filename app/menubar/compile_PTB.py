@@ -4290,11 +4290,11 @@ def compileCode(isDummyCompile):
 
                 # printAutoInd(f, "% get the first stimulus intensity")
                 if quest['Method'] == 'quantile':
-                    printAutoInd(f, "quest({0}).method = 1; % 1,2,3 for quantile, mean, and mode respectively", iQuest)
+                    printAutoInd(f, "quest({0}).method = 1; % 1,2,3 for quantile, mean, and mode, respectively", iQuest)
                 elif quest['Method'] == 'mean':
-                    printAutoInd(f, "quest({0}).method = 2; % 1,2,3 for quantile, mean, and mode respectively", iQuest)
+                    printAutoInd(f, "quest({0}).method = 2; % 1,2,3 for quantile, mean, and mode, respectively", iQuest)
                 elif quest['Method'] == 'mode':
-                    printAutoInd(f, "quest({0}).method = 3; % 1,2,3 for quantile, mean, and mode respectively", iQuest)
+                    printAutoInd(f, "quest({0}).method = 3; % 1,2,3 for quantile, mean, and mode, respectively", iQuest)
                 else:
                     throwCompileErrorInfo("quest method should be of {'quantile', 'mean', or 'mode'}!!")
 
@@ -4928,7 +4928,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "% send no response trigger")
             printAutoInd(f, "sendTriggerOrMsg(cRespDevs(iRespDev).respCodeDevType, cRespDevs(iRespDev).respCodeDevIdx, cRespDevs(iRespDev).noResp);")
 
-        printAutoInd(f, "% 0, 1, 2 for off, press check and release check respectively")
+        printAutoInd(f, "% 0, 1, 2 for off, press check and release check, respectively")
         printAutoInd(f, "cRespDevs(iRespDev).checkStatus = 0;")
         printAutoInd(f, "end \n")
 
@@ -5415,7 +5415,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "% subfun {0}: getQuestValue", iSubFunNum)
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             printAutoInd(f, "function quest = getQuestValue(quest)")
-            printAutoInd(f, "% 1,2,3 for quantile, mean, and mode respectively")
+            printAutoInd(f, "% 1,2,3 for quantile, mean, and mode, respectively")
             printAutoInd(f, "switch quest.method")
             printAutoInd(f, "case 1")
             printAutoInd(f, "quest = QuestQuantile(quest);")
@@ -5424,7 +5424,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "case 3")
             printAutoInd(f, "quest = QuestMode(quest);")
             printAutoInd(f, "otherwise")
-            printAutoInd(f, "error('Quest method should be of [1,2,3] for Quantile, mean, and mode respectively');")
+            printAutoInd(f, "error('Quest method should be of [1,2,3] for Quantile, mean, and mode, respectively');")
             printAutoInd(f, "end%switch ")
             printAutoInd(f, "if quest.isLog10Trans")
             printAutoInd(f, "quest.cValue = 10^quest.cValue;")
@@ -5489,7 +5489,7 @@ def compileCode(isDummyCompile):
         if isEyelink:
             printAutoInd(f,"global tracker2PtbTimeCoefs")
 
-        printAutoInd(f,"% respDevType 1,2,3,4,82 for keyboard, mouse, gamepad, response box and Eyelink eye action respectively")
+        printAutoInd(f,"% respDevType 1,2,3,4,82 for keyboard, mouse, gamepad, response box and Eyelink eye action, respectively")
         printAutoInd(f, "fEventOr1stRelease = [];")
         printAutoInd(f, "switch respDevType")
 
@@ -5514,7 +5514,7 @@ def compileCode(isDummyCompile):
 
         printAutoInd(f, "cDataType = Eyelink('GetNextDataType');")
         printAutoInd(f,
-                     "% 3:9 for startBlink, endBlink, startSacc, end Sacc, startFix, endFix, and fixUpdate respectively")
+                     "% 3:9 for startBlink, endBlink, startSacc, end Sacc, startFix, endFix, and fixUpdate, respectively")
         printAutoInd(f, "if ismember(cDataType, 3:9)")
         printAutoInd(f, "fEventOr1stRelease = Eyelink('GetFloatData', cDataType);")
         printAutoInd(f, "keyCode = bitget(cDataType,1:9);")

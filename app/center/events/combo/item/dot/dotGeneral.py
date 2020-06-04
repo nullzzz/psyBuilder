@@ -43,7 +43,7 @@ class DotGeneral(QWidget):
 
         self.move_direction = VarLineEdit("0")
         self.move_direction.setReg(VarLineEdit.Float)
-        self.move_direction.setToolTip("0 to 180 in degrees")
+        self.move_direction.setToolTip("0 to 180 degrees")
         self.speed = VarLineEdit("20")
         self.speed.setReg(VarLineEdit.Float)
 
@@ -72,7 +72,7 @@ class DotGeneral(QWidget):
         l21 = QLabel("Dot Num.:")
         l30 = QLabel("Dot Type:")
         l31 = QLabel("Dot Size:")
-        l40 = QLabel("Direction (in degrees):")
+        l40 = QLabel("Direction (degrees):")
         l41 = QLabel("Speed (pixes/s):")
         l50 = QLabel("Dot Color:")
         l51 = QLabel("Coherence (%):")

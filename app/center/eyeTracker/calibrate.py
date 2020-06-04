@@ -25,7 +25,7 @@ class EyeCalibrate(TabItemWidget):
         self.calibration_type = VarComboBox()
         self.calibration_beep = VarComboBox()
         self.target_color = ColComboBox()
-        self.target_color.setCurrentText("gray")
+        self.target_color.setCurrentText("Gray")
 
         self.target_style = VarComboBox()
 

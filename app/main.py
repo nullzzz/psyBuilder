@@ -105,7 +105,6 @@ class Psy(QMainWindow):
         open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
         self.changeOpenMode(open_mode)
 
-
         file_menu.addSeparator()
         file_menu.addAction("Exit", sys.exit, QKeySequence("Ctrl+Q"))
         # view menu
@@ -173,9 +172,7 @@ class Psy(QMainWindow):
         platform_menu = build_menu.addMenu("&Platform")
 
         self.linux_action = QAction("&Linux", self)
-
         self.windows_action = QAction("&Windows", self)
-
         self.mac_action = QAction("&Mac", self)
 
         if self.is_windows:
@@ -1107,7 +1104,6 @@ class Psy(QMainWindow):
                 self.linux_action.setChecked(compile_platform.lower() == "linux")
                 self.windows_action.setChecked(compile_platform.lower() == "windows")
                 self.mac_action.setChecked(compile_platform.lower() == "mac")
-
 
     def changeImageLoadMode(self, c):
         if isinstance(c, bool):

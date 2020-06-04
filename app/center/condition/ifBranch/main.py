@@ -56,12 +56,12 @@ class IfBranch(TabItemWidget):
         layout1.addWidget(self.condition_area)
         condition_group.setLayout(layout1)
 
-        true_group = QGroupBox("True")
+        true_group = QGroupBox("If True")
         layout2 = QVBoxLayout()
         layout2.addWidget(self.true_icon_choose)
         true_group.setLayout(layout2)
 
-        false_group = QGroupBox("False")
+        false_group = QGroupBox("If False")
         layout3 = QVBoxLayout()
         layout3.addWidget(self.false_icon_choose)
         false_group.setLayout(layout3)
