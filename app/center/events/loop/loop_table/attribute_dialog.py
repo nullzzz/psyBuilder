@@ -127,6 +127,9 @@ class AttributeDialog(Dialog):
         self.change = False
         if attribute_name:
             self.change = True
+            self.setWindowTitle("change Variable")
+        else:
+            self.setWindowTitle("add Variable(s)")
         self.col = col
         if self.col != -1:
             if attribute_name == "Timeline":
