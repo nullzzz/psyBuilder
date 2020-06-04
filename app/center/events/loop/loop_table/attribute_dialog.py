@@ -112,9 +112,11 @@ class AttributeDialog(Dialog):
         self.add_button.hide()
         self.setMinimumHeight(180)
         self.setMinimumWidth(500)
+        self.setWindowTitle("Add Variable")
         if type:
             self.setMinimumHeight(600)
             self.add_button.show()
+            self.setWindowTitle("Add Variables")
         # clear attribute areas existed
         while self.layout.rowCount():
             self.layout.removeRow(0)
@@ -127,9 +129,7 @@ class AttributeDialog(Dialog):
         self.change = False
         if attribute_name:
             self.change = True
-            self.setWindowTitle("change Variable")
-        else:
-            self.setWindowTitle("add Variable(s)")
+            self.setWindowTitle("Change Variable")
         self.col = col
         if self.col != -1:
             if attribute_name == "Timeline":
