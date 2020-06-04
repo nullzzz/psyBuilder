@@ -146,6 +146,7 @@ class ChildWidget(QWidget):
         self.pro_window.close()
 
     def openProWindow(self):
+        self.updateWidget()
         if self.event_type == Info.COMBO:
             self.widget.show()
         else:
@@ -205,7 +206,7 @@ class ChildWidget(QWidget):
         return 0
 
     def updateWidget(self):
-        if self.current_sub_wid != "":
+        if self.current_sub_wid != "" and self.widget is None:
             try:
                 self.widget = Func.getWidget(self.current_sub_wid)
                 self.linkWidgetSignal()

@@ -79,7 +79,6 @@ class Case(QGroupBox):
     def setProperties(self, properties: dict):
         case_value = properties.get("Case Value")
         self.values.setCurrentText(case_value)
-
         properties.pop("Case Value")
         self.icon_choose.setProperties(properties)
 
@@ -105,7 +104,7 @@ class Case(QGroupBox):
 
     def getCase(self) -> dict:
         return {
-            "Case Value": self.default_properties.get("Case value", ""),
+            "Case Value": self.default_properties.get("Case Value", ""),
             **self.icon_choose.getProperties(),
         }
 
