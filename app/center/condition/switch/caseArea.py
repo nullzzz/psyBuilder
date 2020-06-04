@@ -34,7 +34,7 @@ class CaseArea(QScrollArea):
         self.case_list[1].delCase.connect(self.delCase)
 
         self.default_properties: dict = {
-            "Default": self.case_default.default_properties,
+            "Otherwise": self.case_default.default_properties,
             "Case 1": self.case_list[0].default_properties,
             "Case 2": self.case_list[1].default_properties,
         }
@@ -144,6 +144,9 @@ class CaseArea(QScrollArea):
             for i in range(new_cnt - old_cnt):
                 self.delCase(old_cnt - 1)
         for case in self.case_list:
+            cCaseKey = case.title()
+            # if "Otherwise" == cCaseKey:
+            #     cCaseKey = "Default"
             case.setProperties(self.default_properties.get(case.title(), {}))
 
     def setAttributes(self, attributes: list):
