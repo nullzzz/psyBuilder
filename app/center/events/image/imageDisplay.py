@@ -222,7 +222,7 @@ class ImageDisplay(TabItemMainWindow):
         上下拉伸返回1
         左右拉伸返回2
         全拉伸返回3
-        :return: ""、Both、LeftRight、UpDown、[attr]
+        :return: ""、Both、LeftRight、Vertical、[attr]
         """
         if self.default_properties.get("General").get("Stretch"):
             return self.default_properties.get("General").get("Stretch Mode")

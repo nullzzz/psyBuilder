@@ -92,6 +92,12 @@ class Loop(TabItemMainWindow):
         """
         self.cycle_table.deleteAttribute(col)
 
+    def renameItem(self, old_widget_name: str, new_widget_name: str):
+        """
+        rename timeline
+        """
+        self.cycle_table.renameItem(old_widget_name, new_widget_name)
+
     """
     API
     """
@@ -123,7 +129,7 @@ class Loop(TabItemMainWindow):
             if timeline_name:
                 cTimelines.append([timeline_name, self.cycle_table.timelines.setdefault(timeline_name, "")[0]])
             else:
-                raise Exception(f"Timeline name should not be empty!:In {self.widget_name} at row {row +1}")
+                raise Exception(f"Timeline name should not be empty!:In {self.widget_name} at row {row + 1}")
         return cTimelines
 
     def getAttributes(self, row: int) -> dict:
