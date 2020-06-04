@@ -95,6 +95,10 @@ class StructureTree(QTreeWidget):
         if parent_widget_id != Info.ERROR_WIDGET_ID:
             parent_node: StructureNode = Info.Nodes[parent_widget_id]
             node = StructureNode(parent=parent_node, widget_id=widget_id)
+
+            if Func.getWidgetType(parent_widget_id) in [Info.IF, Info.SWITCH]:
+                show = False
+
             node.setHidden(not show)
             node.setText(0, widget_name)
             # add node
@@ -291,8 +295,8 @@ class StructureTree(QTreeWidget):
         :return:
         """
         show = True
-        # if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
-        #     show = False
+        if Func.isWidgetType(parent_widget_id, Info.IF) or Func.isWidgetType(parent_widget_id, Info.SWITCH):
+            show = False
         # add node
         self.addNode(parent_widget_id, widget_id, widget_name, -1, show)
         # add children
