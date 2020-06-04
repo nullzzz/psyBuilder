@@ -14,24 +14,29 @@ class Screen(Shower):
         self.device_index.textEdited.connect(self.showAddressTip)
         self.bg_color = ColComboBox()
         self.mu_sample = QLineEdit()
+        self.mu_sample.setToolTip("A value greater than zero enables automatic hardware anti-aliasing\n "
+                                  "of the display. For each pixel, 'multi Sample' color samples are computed \n"
+                                  "and combined into a single output pixel color.")
         self.resolution = QLineEdit("auto")
         self.resolution.setValidator(QRegExpValidator(QRegExp(r"\d+x\d+|auto")))
-        self.resolution.setToolTip("e.g., 1920x1080")
+        self.resolution.setToolTip("WidthxHeight e.g., 1920x1080")
         self.refresh_rate = QLineEdit("auto")
-        self.resolution.setToolTip("e.g., 60")
+        self.refresh_rate.setToolTip("Refresh rate of the monitor e.g., 60")
         self.physic_size = QLineEdit()
+        self.physic_size.setToolTip("Physical size of the monitor e.g., 50x30")
         self.viewing_distance = QLineEdit()
+        self.viewing_distance.setToolTip("For Eyetracker Only: e.g., 50")
 
         self.device_index.setValidator(QRegExpValidator(QRegExp(r"\d+")))
         self.mu_sample.setValidator(QRegExpValidator(QRegExp(r"\d+")))
         self.physic_size.setValidator(QRegExpValidator(QRegExp(r"\d+\.\d+|\d+\.\d+x\d+\.\d+|NaN")))
         self.viewing_distance.setValidator(QRegExpValidator(QRegExp(r"\d+\.\d+|\d+\.\d+,\d+\.\d+|NaN")))
 
-        self.index_tip.setHtml("About parameters:"
-                               "<br><br><b>Device index</b>: Screen index as returned by Screen('screens') in MATLAB."
-                               "<br><br><b>Resolution</b>: WidthxHeight e.g., 1024x768"
-                               "<br><br><b>physic size</b> (for Eyetracker Only) mm: WdithxHeight, e.g., 30x50"
-                               "<br><br><b>Viewing distance</b> (for Eyetracker Only) mm: e.g., 50"
+        self.index_tip.setHtml("About the \"x\" in Resolution and Physic size:"
+                               # "<br><br><b>Device index</b>: Screen index as returned by Screen('screens') in MATLAB."
+                               # "<br><br><b>Resolution</b>: WidthxHeight e.g., 1024x768"
+                               # "<br><br><b>physic size</b> (for Eyetracker Only) mm: WdithxHeight, e.g., 30x50"
+                               # "<br><br><b>Viewing distance</b> (for Eyetracker Only) mm: e.g., 50"
                                "<br><br><b>!x is the char before y</b>")
 
         self.setUI()

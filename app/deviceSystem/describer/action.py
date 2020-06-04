@@ -19,10 +19,10 @@ class Action(Shower):
         for k, v in Action.simple_info.items():
             if k.startswith(Info.DEV_TRACKER):
                 self.tracker.addItem(v)
-        self.index_tip.setHtml("About eye action:"
-                               "<br><br>Currently, only Eyelink action is supported, "
-                               "because we only have an Eyelink 1000 for debug.<br>"
-                               "<br>Eyetracker manufacturers are welcome to contact us for adding support.")
+        self.index_tip.setHtml("About eye tracker:"
+                               "<br><br>Currently, only Eyelink trackers are supported, "
+                               "because we only have an Eyelink 1000 for debugging.<br>")
+                               # "<br>Eyetracker manufacturers are welcome to contact us for adding support.")
         self.setUI()
 
         self.using_tracker_id = ""
@@ -37,6 +37,7 @@ class Action(Shower):
 
         vLayout = QVBoxLayout()
         vLayout.addLayout(layout)
+        vLayout.addWidget(self.port_tip)
         vLayout.addWidget(self.index_tip)
 
         self.setLayout(vLayout)

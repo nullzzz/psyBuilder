@@ -23,7 +23,7 @@ class GamePad(Shower):
 
         v_layout = QVBoxLayout()
         v_layout.addLayout(layout)
-        v_layout.addWidget(self.port_tip, 1)
+        v_layout.addWidget(self.port_tip)
         v_layout.addWidget(self.index_tip)
 
         self.setLayout(v_layout)
@@ -52,9 +52,9 @@ class GamePad(Shower):
 
         self.index_tip.setHtml('About Device Index (Either "auto" or an integer):<br>'
                                # "<br><b>Windows: </b>order number start from 0 (e.g., 0,1, for the first and second gampad)"
-                               "<br><b>Windows: </b>any gamepad index (returned by GetGamepadIndices in MATLAB). At least it works on my computer (win 10) with logicool F310 and PTB(3.0.16), let us try.."
+                               "<br><b>Windows: </b>any gamepad index (returned by GetGamepadIndices in MATLAB). At least it works on my computer (win 10) with logicool F310 and PTB(3.0.16), let us try..."
                                "<br><br><b>Mac OS or Linux: </b> any gamepad index (returned by GetGamepadIndices in MATLAB)"
-                               f"<br><br><b>'auto':</b> will use the {gpOrderStr} value in gamepad indices for this gamepad (returned by GetGamepadIndices in MATLAB)"
+                               f"<br><br><b>\"auto\":</b> will use the {gpOrderStr} value in gamepad indices for this gamepad (returned by GetGamepadIndices in MATLAB)"
                                )
 
     def getInfo(self):

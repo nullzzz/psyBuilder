@@ -72,7 +72,7 @@ class Info(object):
     DEV_MOUSE = "mouse"
     DEV_RESPONSE_BOX = "response box"
     DEV_GAMEPAD = "game pad"
-    DEV_EYE_ACTION = "eye action"
+    DEV_EYE_ACTION = "eye tracker"
 
     # FOR COMBO ITEMS:
     ITEM_POLYGON = "polygon"

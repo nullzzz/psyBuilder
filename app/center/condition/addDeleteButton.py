@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLabel
 
@@ -14,7 +14,7 @@ class AddDeleteButton(QLabel):
         self.can_emit = True
 
         self.becomeEnabled()
-        self.setFixedSize(32, 32)
+        self.setFixedSize(20, 20)
 
     def mousePressEvent(self, QMouseEvent):
         if self.can_emit:
@@ -39,18 +39,36 @@ class AddDeleteButton(QLabel):
 
     def becomeDisabled(self):
         if self.button_type == 'add':
-            self.setPixmap(QPixmap(Func.getImage("operate/add_disabled.png")))
+            cPixmap = QPixmap(Func.getImage("operate/add_disabled.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
+
+            self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
         elif self.button_type == 'delete':
-            self.setPixmap(QPixmap(Func.getImage("operate/delete_disabled.png")))
+            cPixmap = QPixmap(Func.getImage("operate/add_disabled.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
+            # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
+            self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
 
     def becomeEnabled(self):
         if self.button_type == 'add':
-            self.setPixmap(QPixmap(Func.getImage("operate/add.png")))
+            cPixmap = QPixmap(Func.getImage("operate/add.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
+            # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
+            self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
         elif self.button_type == 'delete':
-            self.setPixmap(QPixmap(Func.getImage("operate/delete.png")))
+            cPixmap = QPixmap(Func.getImage("operate/delete.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
+            # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
+            self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
 
     def becomePressed(self):
         if self.button_type == 'add':
-            self.setPixmap(QPixmap(Func.getImage("operate/add_press.png")))
+            cPixmap = QPixmap(Func.getImage("operate/add_press.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
+            # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
+            self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))
         elif self.button_type == 'del':
-            self.setPixmap(QPixmap(Func.getImage("operate/delete_press.png")))
+            cPixmap = QPixmap(Func.getImage("operate/delete_press.png"))
+            # cPixmap.setTransformationMode(Qt.SmoothTransformation)
+            # cPixmap.scaled(20, 20, Qt.KeepAspectRatio)
+            self.setPixmap(cPixmap.scaled(20,20,Qt.KeepAspectRatio))

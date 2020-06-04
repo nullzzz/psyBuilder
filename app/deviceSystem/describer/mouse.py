@@ -22,7 +22,7 @@ class Mouse(Shower):
 
         v_layout = QVBoxLayout()
         v_layout.addLayout(layout)
-        v_layout.addWidget(self.port_tip, 1)
+        v_layout.addWidget(self.port_tip)
         v_layout.addWidget(self.index_tip)
 
         self.setLayout(v_layout)
