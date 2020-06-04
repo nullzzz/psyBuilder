@@ -925,6 +925,7 @@ def getAllEventWidgetNamesList(includedType: int = 1) -> list:
         allEventWidgetTypes = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO, Info.IF, Info.SWITCH]
 
     for cWidgetId, cWidget in Info.WID_NODE.items():
+        # print(f"line 928: {cWidgetId}")
         if not isSubWidgetOfIfOrSwitch(cWidgetId) and getWidgetType(cWidgetId) in allEventWidgetTypes:
             cAllEventWidgetNameList.append(getWidgetName(cWidgetId))
 

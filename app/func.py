@@ -276,6 +276,7 @@ class Func(object):
         @param widget_id:
         @return:
         """
+        # print(widget_id)
         parentWd = Info.Nodes[widget_id].parent()
         if parentWd:
             return parentWd.widget_id
