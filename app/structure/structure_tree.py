@@ -73,13 +73,9 @@ class StructureTree(QTreeWidget):
         @return:
         """
         item = self.currentItem()
-        if item:
-            self.rename_action.setEnabled(False)
-            self.delete_action.setEnabled(False)
-            if item.widget_id:
-                self.delete_action.setEnabled(True)
-                if not Func.isWidgetType(item.widget_id, Info.TIMELINE):
-                    self.rename_action.setEnabled(True)
+        if item and item.widget_id != f"{Info.TIMELINE}.{0}":
+            self.rename_action.setEnabled(True)
+            self.delete_action.setEnabled(True)
             self.menu.exec(self.mapToGlobal(e.pos()))
 
     def addNode(self, parent_widget_id: str, widget_id: str, widget_name: str, index: int, show=True):
@@ -241,7 +237,7 @@ class StructureTree(QTreeWidget):
         """
         # get current item
         item = self.currentItem()
-        if type(item) == StructureNode and not Func.isWidgetType(item.widget_id, Info.TIMELINE):
+        if type(item) == StructureNode and item.widget_id != f"{Info.TIMELINE}.{0}":
             self.editItem(item, 0)
 
     def getStructure(self, widget_id: str, widget_name: str):

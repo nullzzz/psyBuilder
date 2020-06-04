@@ -5,7 +5,7 @@ import sys
 import traceback
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QKeySequence
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QFileDialog, QMenu, QMessageBox, QActionGroup
 
 from app.menubar.compile_PTB import compilePTB
@@ -82,7 +82,8 @@ class Psy(QMainWindow):
         open_mode_menu: QMenu = file_menu.addMenu("Open Mode")
 
         self.default_mode_action = open_mode_menu.addAction("Default Mode", lambda: self.changeOpenMode("default mode"))
-        self.open_blank_file_action = open_mode_menu.addAction("Open Blank File", lambda: self.changeOpenMode("open blank file"))
+        self.open_blank_file_action = open_mode_menu.addAction("Open Blank File",
+                                                               lambda: self.changeOpenMode("open blank file"))
 
         if self.is_windows:
             checked_icon = Func.getImageObject("menu/checked", 1)
@@ -100,7 +101,6 @@ class Psy(QMainWindow):
 
             self.open_mode_group.addAction(self.default_mode_action)
             self.open_mode_group.addAction(self.open_blank_file_action)
-
 
         open_mode = Settings("config.ini", Settings.IniFormat).value("open_mode", "default mode")
         self.changeOpenMode(open_mode)
@@ -197,7 +197,6 @@ class Psy(QMainWindow):
         self.windows_action.triggered.connect(self.changePlatform)
         self.mac_action.triggered.connect(self.changePlatform)
 
-
         platform_menu.addAction(self.linux_action)
         platform_menu.addAction(self.windows_action)
         platform_menu.addAction(self.mac_action)
@@ -214,7 +213,6 @@ class Psy(QMainWindow):
                 self.mac_action.setChecked(True)
             else:
                 self.linux_action.setChecked(True)
-
 
         # load image mode
         image_load_menu = build_menu.addMenu("&Image Load Mode")
@@ -279,7 +277,6 @@ class Psy(QMainWindow):
 
         help_menu.addAction(about_action)
         help_menu.addAction(check_for_update)
-
 
     def initDockWidget(self):
         """
@@ -672,8 +669,8 @@ class Psy(QMainWindow):
         parent_widget_id = Func.getWidgetParent(widget_id)
         if sender_widget == Info.StructureSend:
             # we need change item's name if signal comes from structure
-            timeline = Info.Widgets[parent_widget_id]
-            timeline.renameItem(old_widget_name, new_widget_name)
+            widget = Info.Widgets[parent_widget_id]
+            widget.renameItem(old_widget_name, new_widget_name)
         # change node's name in structure and reference parent's child
         # get it's old name to get its reference
         change_widget_ids = [widget_id]
@@ -845,8 +842,6 @@ class Psy(QMainWindow):
                     file_paths.remove(file_path)
                     file_paths.insert(0, file_path)
                 Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
-
-
 
     def openFile(self):
         """
@@ -1166,7 +1161,6 @@ class Psy(QMainWindow):
         # output
         # self.output.clear()
         # Info's data
-
 
         if platform.system() == 'Windows':
             Info.PLATFORM = "windows"
