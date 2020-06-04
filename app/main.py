@@ -636,7 +636,10 @@ class Psy(QMainWindow):
         @param widget_name: root node's widget name
         @return:
         """
-        if Func.isWidgetType(widget_id, Info.LOOP) or Func.isWidgetType(widget_id, Info.TIMELINE):
+        if Func.isWidgetType(widget_id, Info.LOOP) \
+                or Func.isWidgetType(widget_id, Info.TIMELINE) \
+                or Func.isWidgetType(widget_id, Info.IF) \
+                or Func.isWidgetType(widget_id, Info.SWITCH):
             for child_widget_id, child_widget_name in Func.getWidgetChildren(widget_id):
                 self.deleteNodeRecursive(child_widget_id, child_widget_name)
         # delete data (Kernel.Nodes, Kernel.Widgets, Kernel.Name)
