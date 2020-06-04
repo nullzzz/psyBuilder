@@ -17,11 +17,11 @@ class Screen(Shower):
         self.mu_sample.setToolTip("Number of samples are computed and combined into a single output pixel. \n A value greater than zero enables automatic hardware anti-aliasing of the display.")
         self.resolution = QLineEdit("auto")
         self.resolution.setValidator(QRegExpValidator(QRegExp(r"\d+x\d+|auto")))
-        self.resolution.setToolTip("WidthxHeight (e.g., 1920x1080, \"x\" is the letter in Alphabet)")
+        self.resolution.setToolTip("WidthxHeight (e.g., 1920x1080, \"x\" is the letter in the alphabet)")
         self.refresh_rate = QLineEdit("auto")
         self.refresh_rate.setToolTip("Refresh rate of the monitor (e.g., 60)")
         self.physic_size = QLineEdit()
-        self.physic_size.setToolTip("Physical size of the monitor (e.g., 50x30, \"x\" is the letter in Alphabet)")
+        self.physic_size.setToolTip("Physical size of the monitor (e.g., 50x30, \"x\" is the letter in the alphabet)")
         self.viewing_distance = QLineEdit()
         self.viewing_distance.setToolTip("For Eyetracker Only (e.g., 50)")
 
