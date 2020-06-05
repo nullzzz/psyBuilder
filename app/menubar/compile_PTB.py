@@ -3016,8 +3016,9 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
     itemIds = getSliderItemIds(cWidget)
     itemIds.reverse()  # reverse the key id order
     # itemIds = itemIds[-1::-1] # reverse the key id order in ascend
-    printAutoInd(sliderStimCodes, "% prepare audio materials for widget {0}", getWidgetName(cWidget.widget_id))
+
     if isContainItemType(itemIds, Info.ITEM_SOUND):
+        printAutoInd(sliderStimCodes, "% prepare audio materials for widget {0}", getWidgetName(cWidget.widget_id))
         printAutoInd(sliderStimCodes,
                      "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur({1}));",
                      cWinStr, cWinIdx)
@@ -3313,8 +3314,12 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
 
     # sortedZIdx = sorted(range(len(zVlaues)), key=zVlaues.__getitem__)
 
-    if isVideoRelatedWidget(cWidget) is not True:
+    if not isVideoRelatedWidget(cWidget):
         clearAfter = getClearAfterInfo(cWidget, attributesSetDict)
+
+        # for no video scene, extend the content of cVSLCodes
+        sliderStimCodes.extend(cVSLCodes)
+        cVSLCodes = []
 
         printAutoInd(sliderStimCodes, "Screen('DrawingFinished',{0},{1});", cWinStr, clearAfter)
         # printAutoInd(sliderStimCodes, "% check the 'esc' key to abort the exp")
