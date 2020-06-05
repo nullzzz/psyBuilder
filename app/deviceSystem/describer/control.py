@@ -32,6 +32,7 @@ class Describer(QStackedWidget):
         if device_info == {}:
             self.removeWidget(self.id_widget.get(device_id))
             self.id_widget.pop(device_id)
+
             Shower.id_2_name.pop(device_id)
         else:
             if device_id in self.id_widget.keys():

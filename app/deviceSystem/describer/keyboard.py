@@ -50,7 +50,7 @@ class Keyboard(Shower):
         else:
             gpOrderStr = f"{order_num}th"
 
-        self.device_index.setToolTip(f'Either "auto" (default to the {gpOrderStr} value returned by GetKeyboardIndices in MATLAB) or an integer that represents the keyboard')
+        self.device_index.setToolTip(f'Either "auto" (default to the {gpOrderStr} value returned by \nGetKeyboardIndices in MATLAB) or an integer that represents the keyboard')
 
         self.index_tip.setHtml("About Device Index:"
                                f'<br><br>Either "auto" (default to the {gpOrderStr} value returned by GetKeyboardIndices in MATLAB) or an integer that represents the keyboard.'

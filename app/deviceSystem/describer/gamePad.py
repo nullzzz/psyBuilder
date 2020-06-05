@@ -52,7 +52,7 @@ class GamePad(Shower):
             gpOrderStr = f"{order_num}th"
 
         self.device_index.setToolTip(
-            f"Either \"auto\" (default to the {gpOrderStr} value returned by GetGamepadIndices in MATLAB)")
+            f"Either \"auto\" (default to the {gpOrderStr} value returned by GetGamepadIndices \nin MATLAB) or an integer that represents the gamepad")
 
         self.index_tip.setHtml('About Device Index:<br>'
                                f"<br>Either \"auto\" (default to the {gpOrderStr} value returned by GetGamepadIndices in MATLAB)"
