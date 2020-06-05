@@ -1,10 +1,11 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QCheckBox, QSpinBox, QGridLayout, QLineEdit, QComboBox
+from PyQt5.QtWidgets import QLabel, QCheckBox, QSpinBox, QGridLayout, QLineEdit, QComboBox
 
+from app.deviceSystem.describer.basis import Shower
 from app.info import Info
 
 
-class Tracker(QWidget):
+class Tracker(Shower):
     simple_info = {}
 
     def __init__(self, parent=None):
@@ -18,7 +19,9 @@ class Tracker(QWidget):
         # self.tracker_type.addItems(("Simple dummy", "Advanced dummy(mouse simulation)", "EyeLink", "SMI",
         #                             "EyeTribe", "OpenGaze", "Tobii", "Tobii-legacy", "Tobii Pro Glasses 2"))
         self.tracker_type.addItem("EyeLink")
-        self.tracker_type.setItemData(0,"Currently, only Eyelink action is supported, because we only have an Eyelink 1000 for debug.\nEyetracker manufacturers are welcome to contact us for adding support.",Qt.ToolTipRole)
+        self.tracker_type.setItemData(0,
+                                      "Currently, only Eyelink action is supported, because we only have an Eyelink 1000 for debug.\nEyetracker manufacturers are welcome to contact us for adding support.",
+                                      Qt.ToolTipRole)
         self.tracker_type.currentIndexChanged.connect(self.typeChanged)
 
         self.calibrate_tracker = QCheckBox("Calibrate Tracker")
@@ -149,8 +152,7 @@ class Tracker(QWidget):
         self.UDP_port.setEnabled(index == 8)
 
     def describe(self, info: dict):
-        device_name = info.get("Device Name")
-        self.device_name.setText(device_name)
+        super(Tracker, self).describe(info)
         self.tracker_type.setCurrentText(info.get("Select Tracker Type", "Simple dummy"))
         self.tracker_datafile.setText(info.get("Eye Tracker Datafile", "automatic"))
         self.calibrate_tracker.setCheckState(info.get("Calibrate Tracker", "") == "Yes")

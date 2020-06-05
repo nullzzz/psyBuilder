@@ -1,10 +1,11 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QComboBox
 
+from app.deviceSystem.describer.basis import Shower
 from app.info import Info
 
 
-class Quest(QWidget):
+class Quest(Shower):
     def __init__(self, parent=None):
         super(Quest, self).__init__(parent)
 
@@ -65,8 +66,7 @@ class Quest(QWidget):
         self.setLayout(layout)
 
     def describe(self, info: dict):
-        device_name = info.get("Device Name")
-        self.device_name.setText(device_name)
+        super(Quest, self).describe(info)
         self.guess_threshold.setText(info.get("Guess Threshold", ""))
         self.std_dev.setText(info.get("Std. Dev.", ""))
         self.desired_proportion.setText(info.get("Desired Proportion", ""))
