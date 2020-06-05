@@ -20,8 +20,9 @@ class Update(QDialog):
 
         layout = QVBoxLayout()
         layout.addWidget(self.label)
+        self.label.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
-        self.setFixedSize(400, 300)
+        self.setFixedSize(400, 100)
 
     def show(self):
         self.getLatestVersion()

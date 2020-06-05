@@ -267,7 +267,7 @@ class Psy(QMainWindow):
         help_menu = menubar.addMenu("&Help")
 
         about_action = QAction(" &About Us", self)
-        check_for_update = QAction(" &Check for updates", self)
+        check_for_update = QAction(" &Check for Updates", self)
 
         self.about_us = AboutUs()
         self.check_update = Update()
