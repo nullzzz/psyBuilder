@@ -53,7 +53,7 @@ class Keyboard(Shower):
         self.device_index.setToolTip(f'Either "auto" (default to the {gpOrderStr} value returned by GetKeyboardIndices in MATLAB) or an integer that represents the keyboard')
 
         self.index_tip.setHtml("About Device Index:"
-                               f'<br><br>Either "auto" (default to the {gpOrderStr} value returned by GetKeyboardIndices in MATLAB) or an integer that represents the keyboard'
+                               f'<br><br>Either "auto" (default to the {gpOrderStr} value returned by GetKeyboardIndices in MATLAB) or an integer that represents the keyboard.'
                                )
 
     def getInfo(self):

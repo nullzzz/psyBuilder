@@ -12,25 +12,25 @@ class Quest(Shower):
         self.device_type = QLabel(Info.DEV_QUEST)
         self.device_name = QLabel("Unselected")
         self.guess_threshold = QLineEdit()
-        self.guess_threshold.setToolTip("Used For Starting Test Value")
+        self.guess_threshold.setToolTip("Used for starting test value")
 
         self.std_dev = QLineEdit()
-        self.std_dev.setToolTip("Of Estimated Threshold")
+        self.std_dev.setToolTip("Of estimated threshold")
 
         self.desired_proportion = QLineEdit()
-        self.desired_proportion.setToolTip("Of Correct Responses")
+        self.desired_proportion.setToolTip("Of correct responses")
 
         self.steepness = QLineEdit()
-        self.steepness.setToolTip("Of The Weibull Psychometric Function")
+        self.steepness.setToolTip("Of the weibull psychometric function")
 
         self.proportion = QLineEdit()
-        self.proportion.setToolTip("Of Random Responses At Maximum Stimulus Intensity")
+        self.proportion.setToolTip("Of random responses at maximum stimulus intensity")
 
         self.chance_level = QLineEdit()
 
         self.method = QComboBox()
         self.method.addItems(("quantile", "mean", "mode"))
-        self.method.setToolTip("To Determine Optimal Test Value")
+        self.method.setToolTip("Method to determine optimal test value")
 
         self.minimum = QLineEdit()
         self.maximum = QLineEdit()
@@ -39,10 +39,10 @@ class Quest(Shower):
         self.is_log10_transform.addItems(("Yes", "No"))
 
         self.grain = QLineEdit()
-        self.grain.setToolTip("Step Size of The Internal Table")
+        self.grain.setToolTip("Step size of the internal table")
 
         self.range = QLineEdit()
-        self.range.setToolTip("Intensity Difference Between The Largest and Smallest Intensity")
+        self.range.setToolTip("Intensity difference between the largest and smallest intensity")
 
         self.setUI()
 

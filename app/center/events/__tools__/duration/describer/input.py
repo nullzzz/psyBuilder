@@ -153,7 +153,7 @@ class RespInfo(QWidget):
         elif device_type == Info.DEV_KEYBOARD:
             self.allowable.setToolTip("See detail info in MATLAB by running the command KbName([1:255])")
         elif device_type == Info.DEV_GAMEPAD:
-            self.allowable.setToolTip("1:8 for the keys in Gamepad (! not all gamepad gave 8 keys)")
+            self.allowable.setToolTip("1 to 8 for the keys in Gamepad (Note, not all gamepad have 8 keys)")
 
         self.correct = VarLineEdit()
 

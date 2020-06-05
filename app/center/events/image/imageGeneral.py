@@ -67,7 +67,7 @@ class ImageTab1(QWidget):
 
         layout1.addWidget(self.mirrorUD, 1, 0)
         layout1.addWidget(self.mirrorLR, 2, 0)
-        l0 = QLabel("Rotate:0-360°")
+        l0 = QLabel("Rotation (0 to 360 degrees)")
         l0.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         layout1.addWidget(l0, 1, 2)
         layout1.addWidget(self.rotate, 1, 3)
