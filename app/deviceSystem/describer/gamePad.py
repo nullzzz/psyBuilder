@@ -57,7 +57,7 @@ class GamePad(Shower):
         self.index_tip.setHtml('About Device Index:<br>'
                                f"<br>Either \"auto\" (default to the {gpOrderStr} value returned by GetGamepadIndices in MATLAB)"
                                " or an integer that represents the gamepad."
-                               "<br><br>Note: Despite the documentation in Psychtoolbox indicates otherwise, GetGamepadIndices"
+                               "<br><br>Note: Despite the documentation in Psychtoolbox indicating otherwise, GetGamepadIndices"
                                " can work in Windows computers (as tested in the following setup: Windows 10, Logicool F310, Psychtoolbox 3.0.16)."
                                )
 

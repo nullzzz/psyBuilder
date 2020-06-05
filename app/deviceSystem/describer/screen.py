@@ -23,7 +23,7 @@ class Screen(Shower):
         self.physic_size = QLineEdit()
         self.physic_size.setToolTip("Physical size of the monitor (e.g., 50x30, \"x\" is the letter in the alphabet)")
         self.viewing_distance = QLineEdit()
-        self.viewing_distance.setToolTip("For Eyetracker Only (e.g., 50)")
+        self.viewing_distance.setToolTip("For eyetracker only (e.g., 50)")
 
         self.device_index.setValidator(QRegExpValidator(QRegExp(r"\d+")))
         self.mu_sample.setValidator(QRegExpValidator(QRegExp(r"\d+")))

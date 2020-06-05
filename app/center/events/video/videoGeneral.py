@@ -46,9 +46,9 @@ class VideoTab1(QWidget):
     def setUI(self):
         self.start_pos.setText("00")
         self.start_pos.setMinimumWidth(120)
-        self.start_pos.setToolTip("In milliseconds")
+        self.start_pos.setToolTip("In ms")
         self.end_pos.setText("9999999")
-        self.end_pos.setToolTip("In milliseconds")
+        self.end_pos.setToolTip("In ms")
 
         self.playback_rate.addItems(("1.0", "1.25", "1.5", "1.75", "2.0", "-1.0"))
         self.playback_rate.currentTextChanged.connect(self.changeRateTip)
