@@ -112,6 +112,7 @@ class RX(QWidget):
 
     def cancel(self):
         self.device_home.loadSetting()
+        self.repaint()
 
     def apply(self):
         self.getInfo()
