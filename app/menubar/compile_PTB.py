@@ -4842,7 +4842,7 @@ def compileCode(isDummyCompile):
 
         printAutoInd(f, "resultVarNames = {0};", allStr4Cell)
         printAutoInd(f, f"for iVar = 1:numel(resultVarNames)")
-        printAutoInd(f, "{0}", "eval([resultVarNames{iVar},' = updateResultVar(',resultVarNames{iVar},'opRowIdx);']);")
+        printAutoInd(f, "{0}", "eval([resultVarNames{iVar},' = updateResultVar(',resultVarNames{iVar},', opRowIdx);']);")
         printAutoInd(f, f"end % for iVar")
 
         printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
