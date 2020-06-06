@@ -201,7 +201,9 @@ class Psy(QMainWindow):
         platform_menu.addAction(self.windows_action)
         platform_menu.addAction(self.mac_action)
 
-        if not self.is_windows:
+        if self.is_windows:
+            self.windows_action.trigger()
+        else:
             self.platform_action_group = QActionGroup(self)
             self.platform_action_group.setExclusive(True)
 
@@ -247,7 +249,9 @@ class Psy(QMainWindow):
         image_load_menu.addAction(self.before_trial_action)
         image_load_menu.addAction(self.before_exp_action)
 
-        if not self.is_windows:
+        if self.is_windows:
+            self.before_event_action.trigger()
+        else:
             self.image_load_group = QActionGroup(self)
             self.image_load_group.setExclusive(True)
 
@@ -1106,7 +1110,7 @@ class Psy(QMainWindow):
                 self.before_event_action.setIconVisibleInMenu(self.sender() is self.before_event_action)
                 self.before_trial_action.setIconVisibleInMenu(self.sender() is self.before_trial_action)
                 self.before_exp_action.setIconVisibleInMenu(self.sender() is self.before_exp_action)
-            Info.ImageLoadMode = self.sender().text().lstrip("&").lower()
+            Info.IMAGE_LOAD_MODE = self.sender().text().lstrip("&").lower()
         elif isinstance(c, str):
             imageLoadMode = c if c else "before_event"
 
