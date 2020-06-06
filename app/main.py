@@ -213,6 +213,7 @@ class Psy(QMainWindow):
 
             if platform.system() == 'Darwin':
                 self.mac_action.setChecked(True)
+                # because setChecked can not trigger the action
                 self.mac_action.trigger()
             else:
                 self.linux_action.setChecked(True)
