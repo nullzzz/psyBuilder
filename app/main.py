@@ -213,8 +213,10 @@ class Psy(QMainWindow):
 
             if platform.system() == 'Darwin':
                 self.mac_action.setChecked(True)
+                self.mac_action.trigger()
             else:
                 self.linux_action.setChecked(True)
+                self.linux_action.trigger()
 
         # load image mode
         image_load_menu = build_menu.addMenu("&Image Load Mode")
@@ -260,6 +262,7 @@ class Psy(QMainWindow):
             self.image_load_group.addAction(self.before_exp_action)
 
             self.before_event_action.setChecked(True)
+            self.before_event_action.trigger()
 
         # compile
         compile_action = QAction("&Compile", self)
