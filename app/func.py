@@ -374,7 +374,7 @@ class Func(object):
         get widget's attributes through its widget id
 
         """
-        attributes = {"subName": 0, "subNum": 0, "sessionNum": 0, "subSex": 0, "subHandness": 0, "subAge": 0}
+        attributes = {"subName": 0, "subNum": 0, "sessionNum": 0, "subGender": 0, "subHandness": 0, "subAge": 0}
 
         # 添加quest设备全局参数
         if len(Info.QUEST_DEVICE_INFO.items()) > 1:

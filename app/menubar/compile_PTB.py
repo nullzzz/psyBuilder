@@ -4133,7 +4133,8 @@ def compileCode(isDummyCompile):
     attributesSetDict = {'sessionNum': [0, 'subInfo.session', {'subInfo.session'}],
                          'subAge': [0, 'subInfo.age', {'subInfo.age'}],
                          'subName': [0, 'subInfo.name', {'subInfo.name'}],
-                         'subSex': [0, 'subInfo.sex', {'subInfo.sex'}], 'subNum': [0, 'subInfo.num', {'subInfo.num'}],
+                         'subGender': [0, 'subInfo.gender', {'subInfo.gender'}],
+                         'subNum': [0, 'subInfo.num', {'subInfo.num'}],
                          'subHandness': [0, 'subInfo.hand', {'subInfo.hand'}]}
     spFormatVarDict = dict()
     # -------------------------------------------\
