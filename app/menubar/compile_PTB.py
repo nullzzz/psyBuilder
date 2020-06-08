@@ -5889,7 +5889,7 @@ def compileCode(isDummyCompile):
             iSubFunNum += 1
 
     # copy yanglab's supplementary files
-    copyYanglabFile('subjectinfo.p')
+    copyYanglabFile('subjectInfo.p')
     # copyYanglabFile('OpenExp_BCL.p')
     copyYanglabFile('OverwriteOrNot.p')
 
