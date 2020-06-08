@@ -37,7 +37,7 @@ class ImageTab1(QWidget):
         self.rotate.setReg(VarLineEdit.Integer)
 
         # 拉伸模式
-        self.stretch = QCheckBox("Stretch")
+        self.stretch = QCheckBox("Stretching")
         self.stretch_mode = VarComboBox()
         self.stretch_mode.addItems(("Both", "Horizontal", "Vertical"))
         self.stretch.stateChanged.connect(self.stretchChecked)
@@ -67,7 +67,7 @@ class ImageTab1(QWidget):
 
         layout1.addWidget(self.mirrorUD, 1, 0)
         layout1.addWidget(self.mirrorLR, 2, 0)
-        l0 = QLabel("Rotation (0 to 360 degrees)")
+        l0 = QLabel("Rotation (0 to 360 degrees):")
         l0.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         layout1.addWidget(l0, 1, 2)
         layout1.addWidget(self.rotate, 1, 3)

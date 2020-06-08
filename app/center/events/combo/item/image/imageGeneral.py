@@ -41,7 +41,7 @@ class ImageGeneral(QWidget):
         self.rotate.setReg(VarComboBox.Integer)
         self.rotate.setItemData(0,"0 to 360 degrees",Qt.ToolTipRole)
         # 拉伸模式
-        self.stretch = QCheckBox("Stretch")
+        self.stretch = QCheckBox("Stretching")
         self.stretch_mode = VarComboBox()
         self.stretch_mode.addItems(("Both", "Horizontal", "Vertical"))
 
