@@ -5895,8 +5895,8 @@ def compileCode(isDummyCompile):
     copyYanglabFile('OverwriteOrNot.p')
 
     if Info.PLATFORM == 'windows':
-        copyYanglabFile('ShowHideWinTaskbar.p')
-        copyYanglabFile('ShowHideWinStartButtonMex.mexw64')
+        copyYanglabFile('ShowHideWinTaskbar.m')
+        # copyYanglabFile('ShowHideWinStartButtonMex.mexw64')
         copyYanglabFile('ShowHideWinTaskbarAndButtonMex.mexw64')
 
     if outDevCountsDict[Info.DEV_PARALLEL_PORT] > 0 and Info.PLATFORM == 'linux':
