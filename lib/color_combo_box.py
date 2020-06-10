@@ -43,6 +43,8 @@ class ColComboBox(VarComboBox):
         self.setValidator(QRegExpValidator(valid_rgb, self))
         self.setInsertPolicy(QComboBox.NoInsert)
 
+        self.rgb = "255,255,255"
+
     # 添加默认颜色，白灰黑、红橙黄绿蓝紫
     def init(self):
         for i, color_name in enumerate(ColComboBox.default_color):
@@ -170,12 +172,14 @@ class ColComboBox(VarComboBox):
             color = self.itemData(index, Qt.DecorationRole)
             if isinstance(color, QColor):
                 return QColor(color)
-        return None
+        r, g, b = [int(x) for x in self.rgb.split(",")]
+        return QColor(r, g, b)
 
     def getRGB(self) -> str:
         color_name = self.currentText()
         if color_name.startswith("["):
-            pass
+            color_name = self.rgb
         elif color_name.startswith("#"):
             color_name = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
-        return self.color_map.get(color_name, color_name)
+        self.rgb = self.color_map.get(color_name, color_name)
+        return self.rgb

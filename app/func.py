@@ -41,9 +41,12 @@ class Func(object):
         return ""
 
     @staticmethod
-    def getCurrentScreenRes(screen_id: str) -> tuple:
+    def getCurrentScreenRes(screen_id: str, need_color: bool = False) -> tuple:
         if screen_id == "":
-            return 640, 480
+            if need_color:
+                return 640, 480, "255,255,255"
+            else:
+                return 640, 480
         resolution = Info.OUTPUT_DEVICE_INFO[screen_id].get('Resolution', "auto")
         wh = resolution.lower().split('x')
 
@@ -54,7 +57,11 @@ class Func(object):
             scr_rect = QDesktopWidget().screenGeometry()
             width = scr_rect.width()
             height = scr_rect.height()
-        return width, height
+        if need_color:
+            color = Info.OUTPUT_DEVICE_INFO[screen_id].get("Back Color", "255,255,255")
+            return width, height, color
+        else:
+            return width, height
 
     ###########################################
     #           compile version func              #
@@ -66,7 +73,7 @@ class Func(object):
         :param image_name:
         :return:
         """
-        return os.path.join(Info.ImagePath, *(re.split(r'[\\/]',image_name)))
+        return os.path.join(Info.ImagePath, *(re.split(r'[\\/]', image_name)))
 
     @staticmethod
     def getWidgetPosition(widget_id: str) -> int:
@@ -440,7 +447,7 @@ class Func(object):
                      1: icon
         @return: Qt image object
         """
-        path = os.path.join(Info.ImagePath,  *(re.split(r'[\\/]',image_path)) )
+        path = os.path.join(Info.ImagePath, *(re.split(r'[\\/]', image_path)))
         if not type:
             if size:
                 return QPixmap(path).scaled(size, transformMode=Qt.SmoothTransformation)

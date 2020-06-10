@@ -18,6 +18,8 @@ class Scene(QGraphicsScene):
         super(Scene, self).__init__(parent)
         self.my_mode = Scene.NormalMode
 
+        self.frame_enable = False
+
         self.attributes: list = []
         self.line = None
         self.lasso = None
@@ -253,6 +255,17 @@ class Scene(QGraphicsScene):
     def setBorderRect(self, rect: QRectF) -> None:
         self.border: QGraphicsRectItem
         self.border.setRect(QRectF(0, 0, rect.width(), rect.height()))
+
+    def setBorder(self, bw: int, bc: QColor):
+        pen = self.border.pen()
+        pen.setWidth(bw)
+        pen.setColor(bc)
+        self.border.setPen(pen)
+        self.border.update()
+        if bw == 0:
+            self.border.hide()
+        else:
+            self.border.show()
 
     def screenshot(self):
         try:
