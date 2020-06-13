@@ -274,7 +274,7 @@ class Psy(QMainWindow):
         # help menu
         help_menu = menubar.addMenu("&Help")
 
-        brief_tutorial_action = QAction(" &Brief Tutorial", self)
+        brief_tutorial_action = QAction(" &Tutorial", self)
         about_action = QAction(" &About Us", self)
         check_for_update = QAction(" &Check for Updates", self)
 
