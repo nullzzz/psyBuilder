@@ -256,7 +256,17 @@ class Scene(QGraphicsScene):
         self.border: QGraphicsRectItem
         self.border.setRect(QRectF(0, 0, rect.width(), rect.height()))
 
-    def setBorder(self, bw: int, bc: QColor):
+    def setFrame(self, frame_info):
+        back_color = frame_info.back_color.getColor()
+        self.scene.setBackgroundBrush(back_color)
+
+        width = self.pro_window.frame.border_width.text()
+        border_color = self.pro_window.frame.border_color.getColor()
+
+        if width.isdigit():
+            border_width = int(width)
+        else:
+            border_width = 2
         pen = self.border.pen()
         pen.setWidth(bw)
         pen.setColor(bc)

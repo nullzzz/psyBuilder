@@ -52,9 +52,9 @@ class ImageGeneral(QWidget):
         self.transparent.setReg(VarComboBox.Percentage)
 
         self.x_pos = VarLineEdit()
-        self.x_pos.setReg(VarLineEdit.Integer)
+        self.x_pos.setRegularExpress(VarLineEdit.Integer)
         self.y_pos = VarLineEdit()
-        self.y_pos.setReg(VarLineEdit.Integer)
+        self.y_pos.setRegularExpress(VarLineEdit.Integer)
         self._width = VarComboBox(True)
         self._width.addItems(("25%", "50%", "75%", "100%"))
         self._width.setCurrentText("100%")

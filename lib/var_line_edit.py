@@ -7,11 +7,16 @@ from PyQt5.QtWidgets import QLineEdit
 from app.info import Info
 from .message_box import MessageBox
 
+######################################
+# created by yu
+# this is a custom single line input widget
+######################################
+
 
 class VarLineEdit(QLineEdit):
     focusLost = pyqtSignal()
 
-    Attribute = r"^\[[_\d\.\w]+\]$"
+    Variable = r"^\[[_\d\.\w]+\]$"
     Float = r"^(-?\d+)(\.\d+)?$"
     Integer = r"^-?\d+$"
     Percentage = r"^(100|[1-9]?\d?)%$|0$"
@@ -20,11 +25,13 @@ class VarLineEdit(QLineEdit):
     def __init__(self, *__args):
         super(VarLineEdit, self).__init__(*__args)
         self.setAcceptDrops(True)
-        self.textChanged.connect(self.findVar)
-        self.focusLost.connect(self.checkValidity)
-        self.valid_data: str = self.text()
 
-        self.suffix: str = ""
+        self.textChanged.connect(self.matchVariable)
+        self.focusLost.connect(self.checkValidity)
+
+        self.is_variable = False
+        self.valid_data: str = self.text()
+        self.non_variable: str = self.text()
         self.reg_exp: str = ""
 
     def dragEnterEvent(self, e):
@@ -39,41 +46,54 @@ class VarLineEdit(QLineEdit):
         text = f"[{stream.readQString()}]"
         self.setText(text)
 
-    # 检查变量
-    def findVar(self, text: str):
-        if text.startswith("[") and text.endswith("]"):
+    def matchVariable(self, text: str):
+        """
+        match variable from the input text
+        :param text:
+        :type text: str
+        :return: None
+        :rtype:
+        """
+        if re.fullmatch(VarLineEdit.Variable, text):
             self.setStyleSheet("color: blue")
             self.setFont(QFont("Timers", 9, QFont.Bold))
+            self.is_variable = True
         else:
             self.setStyleSheet("color: black")
             self.setFont(QFont("宋体", 9, QFont.Normal))
+            self.is_variable = False
 
-    def setSuffix(self, suffix: str):
-        self.suffix = suffix
-
-    def setReg(self, reg_exp: str or list or tuple):
+    def setRegularExpress(self, reg_exp):
         if isinstance(reg_exp, str):
-            self.reg_exp = f"{reg_exp}|{VarLineEdit.Attribute}"
-        elif isinstance(reg_exp, list) or isinstance(reg_exp, tuple):
-            self.reg_exp = f"{'|'.join(reg_exp)}|{VarLineEdit.Attribute}"
+            self.reg_exp = f"{reg_exp}|{VarLineEdit.Variable}"
+        else:
+            self.reg_exp = f"{'|'.join(reg_exp)}|{VarLineEdit.Variable}"
         self.setValidator(QRegExpValidator(QRegExp(self.reg_exp), self))
-
-    def addSuffix(self, text: str):
-        if text != "" and not text.endswith(self.suffix):
-            self.setText(text.replace(self.suffix, "") + self.suffix)
-            self.cursorForward(False)
 
     def focusOutEvent(self, e):
         self.focusLost.emit()
         QLineEdit.focusOutEvent(self, e)
 
     def checkValidity(self):
-        cur = self.text()
-        if self.reg_exp != "" and re.fullmatch(self.reg_exp, cur) is None:
+        text = self.text()
+        if self.reg_exp != "" and re.fullmatch(self.reg_exp, text) is None:
             self.setText(self.valid_data)
-            MessageBox.warning(self, "Invalid", f"Invalid Parameter '{cur}'\nFormat must conform to\n{self.reg_exp}")
+            MessageBox.warning(self, "Invalid", f"Invalid Parameter '{text}'\nFormat must conform to\n{self.reg_exp}")
         else:
-            self.valid_data = cur
+            self.valid_data = text
+            if not self.is_variable:
+                self.non_variable = text
+
+    def getNonVariableData(self):
+        """
+        This function may unworkable when load a psy file
+        Because  the non variable is not stored.
+        Maybe we can change the variable format from [subName] to [subName]@100
+        In the future.
+        :return: the last non variable data
+        :rtype: str
+        """
+        return self.non_variable
 
     def setColor(self, rgb):
         self.setStyleSheet("background: {}".format(rgb))

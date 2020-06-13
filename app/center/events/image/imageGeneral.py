@@ -34,7 +34,7 @@ class ImageTab1(QWidget):
 
         # Rotate
         self.rotate = VarLineEdit("0")
-        self.rotate.setReg(VarLineEdit.Integer)
+        self.rotate.setRegularExpress(VarLineEdit.Integer)
 
         # 拉伸模式
         self.stretch = QCheckBox("Stretching")
@@ -45,7 +45,7 @@ class ImageTab1(QWidget):
 
         # 透明度、Clear&Screen
         self.transparent = VarLineEdit("100%")
-        self.transparent.setReg((VarLineEdit.Percentage, VarLineEdit.FloatPercentage))
+        self.transparent.setRegularExpress((VarLineEdit.Percentage, VarLineEdit.FloatPercentage))
         self.clear_after = VarComboBox()
         self.clear_after.addItems(("clear_0", "notClear_1", "doNothing_2"))
 

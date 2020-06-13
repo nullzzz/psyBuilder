@@ -22,16 +22,16 @@ class TextGeneral(QWidget):
         }
 
         self.left_x = VarLineEdit()
-        self.left_x.setReg(VarLineEdit.Integer)
+        self.left_x.setRegularExpress(VarLineEdit.Integer)
         self.top_y = VarLineEdit()
-        self.top_y.setReg(VarLineEdit.Integer)
+        self.top_y.setRegularExpress(VarLineEdit.Integer)
 
         self.fore_color = ColComboBox()
         self.back_color = ColComboBox()
         self.fore_color.setCurrentText("Black")
 
         self.transparent = VarLineEdit("100%")
-        self.transparent.setReg(VarLineEdit.Percentage)
+        self.transparent.setRegularExpress(VarLineEdit.Percentage)
 
         self.font_box = QFontComboBox()
 

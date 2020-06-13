@@ -84,9 +84,9 @@ class SoundTab1(QWidget):
         self.setGeneral()
 
     def setGeneral(self):
-        self.start_offset.setReg(VarLineEdit.Integer)
-        self.stop_offset.setReg(VarLineEdit.Integer)
-        self.repetitions.setReg(r"(\d+)|(\d*\.?\d{,2})")
+        self.start_offset.setRegularExpress(VarLineEdit.Integer)
+        self.stop_offset.setRegularExpress(VarLineEdit.Integer)
+        self.repetitions.setRegularExpress(r"(\d+)|(\d*\.?\d{,2})")
 
         self.stream_refill.addItems(["0", "1", "2"])
         self.volume.setEnabled(False)

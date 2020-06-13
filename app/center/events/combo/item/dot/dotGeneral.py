@@ -42,16 +42,16 @@ class DotGeneral(QWidget):
         self.dot_size = VarLineEdit("5")
 
         self.move_direction = VarLineEdit("0")
-        self.move_direction.setReg(VarLineEdit.Float)
+        self.move_direction.setRegularExpress(VarLineEdit.Float)
         self.move_direction.setToolTip("0 to 180 degrees")
         self.speed = VarLineEdit("20")
-        self.speed.setReg(VarLineEdit.Float)
+        self.speed.setRegularExpress(VarLineEdit.Float)
 
         self.dot_color = ColComboBox()
         self.dot_color.setCurrentText("0,0,0")
 
         self.coherence = VarLineEdit("100")
-        self.coherence.setReg(VarLineEdit.Float)
+        self.coherence.setRegularExpress(VarLineEdit.Float)
         # down
 
         self.fill_color = ColComboBox()
@@ -59,7 +59,7 @@ class DotGeneral(QWidget):
         self.border_color = ColComboBox()
         self.border_color.addTransparent()
         self.border_width = VarLineEdit("0")
-        self.border_width.setReg(VarLineEdit.Integer)
+        self.border_width.setRegularExpress(VarLineEdit.Integer)
 
         self.setUI()
 

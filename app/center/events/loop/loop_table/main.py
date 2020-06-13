@@ -67,7 +67,7 @@ class CycleTable(TableWidget):
                                                 self.pasteActionFunc, QKeySequence())
         self.insert_row_action = self.menu.addAction(Func.getImageObject("menu/insert_row.png", 1), "Insert Row",
                                                      self.insertRowsActionFunc, QKeySequence())
-        self.insert_col_action = self.menu.addAction(Func.getImageObject("menu/insert_col.png", 1), "Insert Attribute",
+        self.insert_col_action = self.menu.addAction(Func.getImageObject("menu/insert_col.png", 1), "Insert Variable",
                                                      self.insertAttributesActionFunc, QKeySequence())
         self.delete_rows_action = self.menu.addAction(Func.getImageObject("menu/delete_row.png", 1), "Delete Rows",
                                                       self.deleteRowsActionFunc, QKeySequence())

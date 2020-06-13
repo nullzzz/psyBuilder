@@ -317,10 +317,6 @@ class Combo(TabItemMainWindow):
             self.h = height
         self.scene.setBorderRect(QRectF(0, 0, width, height))
 
-        if not self.scene.frame_enable:
-            r, g, b = [int(x) for x in color.split(",")]
-            self.scene.setBackgroundBrush(QColor(r, g, b))
-
     def setAttributes(self, attributes):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
@@ -454,17 +450,26 @@ class Combo(TabItemMainWindow):
     def apply(self):
         if frame_enable := self.pro_window.frame.enable.currentText() == "Yes":
             self.scene.frame_enable = True
+            frame_info = self.default_properties.get("Properties", {}).get("Frame", {})
+
+            _cx = self.pro_window.frame.x_pos.currentText()
+            _cy = self.pro_window.frame.y_pos.currentText()
+            cx = 0
+            if _cx.isdigit():
+                cx = int(_cx)
+            cy = 0
+            if _cy.isdigit():
+                cy = int(_cy)
+
             back_color = self.pro_window.frame.back_color.getColor()
-            self.scene.setBackgroundBrush(back_color)
-
-            width = self.pro_window.frame.border_width.text()
-            border_color = self.pro_window.frame.border_color.getColor()
-
-            if width.isdigit():
-                border_width = int(width)
+            bw = self.pro_window.frame.border_width.text()
+            if bw.isdigit():
+                border_width = int(bw)
             else:
                 border_width = 2
-            self.scene.setBorder(border_width, border_color)
+            border_color = self.pro_window.frame.border_color.getColor()
+
+            self.scene.setFrame(frame_info)
 
         self.getInfo()
         # 发送信号

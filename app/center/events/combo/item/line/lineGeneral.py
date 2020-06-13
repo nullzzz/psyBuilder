@@ -29,7 +29,7 @@ class LineGeneral(QWidget):
         self.border_color = ColComboBox()
         self.border_color.setCurrentText("0,0,0")
         self.border_width = VarLineEdit()
-        self.border_width.setReg(r"\d+")
+        self.border_width.setRegularExpress(r"\d+")
         self.border_width.setText("2")
         self.setUI()
 

@@ -46,9 +46,9 @@ class TextTab1(QWidget):
 
         self.clear_after = VarComboBox()
         self.transparent = VarLineEdit("100%")
-        self.transparent.setReg(VarLineEdit.Percentage)
+        self.transparent.setRegularExpress(VarLineEdit.Percentage)
         self.word_wrap = VarLineEdit("80")
-        self.word_wrap.setReg(VarLineEdit.Integer)
+        self.word_wrap.setRegularExpress(VarLineEdit.Integer)
         self.word_wrap.textChanged.connect(self.changeWrap)
         self.word_wrap.setToolTip("Maximal number of characters for each line")
         self.text_edit.setLineWrapColumnOrWidth(80)

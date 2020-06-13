@@ -37,10 +37,10 @@ class FramePage(QWidget):
         self.enable.currentTextChanged.connect(self.operationAble)
         self.border_color = ColComboBox()
         self.border_width = VarLineEdit("0")
-        self.border_width.setReg(VarComboBox.Integer)
+        self.border_width.setRegularExpress(VarComboBox.Integer)
         self.back_color = ColComboBox()
         self.transparent = VarLineEdit("100%")
-        self.transparent.setReg(VarComboBox.Percentage)
+        self.transparent.setRegularExpress(VarComboBox.Percentage)
         self.enable.addItems(("No", "Yes"))
         self.setUI()
 

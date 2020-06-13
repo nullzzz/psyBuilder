@@ -13,9 +13,9 @@ class Point:
         self.x_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.y_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.x = VarLineEdit(x)
-        self.x.setReg(VarLineEdit.Integer)
+        self.x.setRegularExpress(VarLineEdit.Integer)
         self.y = VarLineEdit(y)
-        self.y.setReg(VarLineEdit.Integer)
+        self.y.setRegularExpress(VarLineEdit.Integer)
 
     def getX(self):
         return self.x.text()
