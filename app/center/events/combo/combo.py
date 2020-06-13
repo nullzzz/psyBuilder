@@ -448,7 +448,8 @@ class Combo(TabItemMainWindow):
         self.pro_window.loadSetting()
 
     def apply(self):
-        if frame_enable := self.pro_window.frame.enable.currentText() == "Yes":
+        frame_enable = self.pro_window.frame.enable.currentText()
+        if frame_enable == "Yes":
             self.scene.frame_enable = True
             frame_info = self.default_properties.get("Properties", {}).get("Frame", {})
 

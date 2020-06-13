@@ -22,7 +22,7 @@ class Update(QDialog):
         layout.addWidget(self.label)
         self.label.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
-        self.setFixedSize(400, 100)
+        self.setFixedSize(400, 50)
 
     def show(self):
         self.getLatestVersion()

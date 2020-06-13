@@ -274,15 +274,18 @@ class Psy(QMainWindow):
         # help menu
         help_menu = menubar.addMenu("&Help")
 
+        brief_tutorial_action = QAction(" &Brief Tutorial", self)
         about_action = QAction(" &About Us", self)
         check_for_update = QAction(" &Check for Updates", self)
 
         self.about_us = AboutUs()
         self.check_update = Update()
 
+        brief_tutorial_action.triggered.connect(self.openPDFfile)
         about_action.triggered.connect(self.about_us.show)
         check_for_update.triggered.connect(self.check_update.show)
 
+        help_menu.addAction(brief_tutorial_action)
         help_menu.addAction(about_action)
         help_menu.addAction(check_for_update)
 
@@ -1202,3 +1205,8 @@ class Psy(QMainWindow):
     #     self.animation.setStartValue(0)
     #     self.animation.setEndValue(1)
     #     self.animation.start()
+
+    def openPDFfile(self):
+        import subprocess
+
+        subprocess.Popen(Func.getImage("pdfs/A Brief tutorial.pdf"), shell=True)
