@@ -132,7 +132,7 @@ class ImageDisplay(TabItemMainWindow):
                 mode = self.pro_window.general.stretch_mode.currentText()
                 if mode == "Both":
                     pix = pix.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-                elif mode == "LeftRight":
+                elif mode == "Horizontal":
                     pix = pix.scaledToWidth(w, Qt.FastTransformation)
                 else:
                     pix = pix.scaledToHeight(h, Qt.FastTransformation)

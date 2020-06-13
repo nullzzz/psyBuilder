@@ -42,8 +42,8 @@ class Combo(TabItemMainWindow):
         open_action = QAction(QIcon(Func.getImage("menu/setting.png")), "Setting", self)
         open_action.triggered.connect(self.openSettingWindow)
 
-        save_action = QAction(QIcon(Func.getImage("operate/screenshot.png")), "Screenshot(beta)", self)
-        save_action.triggered.connect(self.scene.screenshot)
+        # save_action = QAction(QIcon(Func.getImage("operate/screenshot.png")), "Screenshot(beta)", self)
+        # save_action.triggered.connect(self.scene.screenshot)
 
         front_action = QAction(QIcon(Func.getImage("operate/sendtoback.png")), "Bring to Front", self)
         front_action.setToolTip("Bring item to front")
@@ -78,7 +78,7 @@ class Combo(TabItemMainWindow):
 
         setting = QToolBar()
         setting.addAction(open_action)
-        setting.addAction(save_action)
+        # setting.addAction(save_action)
         setting.addSeparator()
         setting.addAction(delete_action)
         setting.addAction(copy_action)
