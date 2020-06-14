@@ -62,7 +62,7 @@ class Screen(Shower):
     def describe(self, info: dict):
         super().describe(info)
         self.device_index.setText(info.get("Device Index", "0"))
-        self.bg_color.setCurrentText(info.get("Back Color", "0,0,0"))
+        self.bg_color.setCurrentText(info.get("Back Color", "255,255,255"))
         self.mu_sample.setText(info.get("Multi Sample", ""))
         self.resolution.setText(info.get("Resolution", "auto"))
         self.refresh_rate.setText(info.get("Refresh Rate", "auto"))

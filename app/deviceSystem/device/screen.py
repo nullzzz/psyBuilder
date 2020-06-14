@@ -17,7 +17,7 @@ class Screen(Device):
         Screen.index += 1
 
         # screen 专属
-        self.back_color = "0,0,0"
+        self.back_color = "255,255,255"
         self.sample = "0"
         self.resolution = "auto"
         self.refresh_rate = "auto"
@@ -71,7 +71,7 @@ class Screen(Device):
     def loadSetting(self):
         self.setName(self.default_properties["Device Name"])
         self.setIndex(self.default_properties["Device Index"])
-        self.setColor(self.default_properties.get("Back Color", "0,0,0"))
+        self.setColor(self.default_properties.get("Back Color", "255,255,255"))
         self.setSample(self.default_properties.get("Multi Sample", "0"))
         self.setResolution(self.default_properties.get("Resolution", "auto"))
         self.setRefreshRate(self.default_properties.get("Refresh Rate", "auto"))
