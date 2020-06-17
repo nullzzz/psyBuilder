@@ -1209,4 +1209,10 @@ class Psy(QMainWindow):
     def openPDFfile(self):
         import subprocess
 
-        subprocess.Popen(Func.getImage("pdfs/A Brief tutorial.pdf"), shell=True)
+        if platform.system() == 'Darwin':
+            subprocess.run("open " + os.path.join(Info.ImagePath,"pdfs", "A\ Brief\ tutorial.pdf"), shell=True)
+        elif platform.system() == 'Windows':
+            subprocess.Popen(Func.getImage("pdfs/A Brief tutorial.pdf"), shell=True)
+        else:
+            subprocess.run("xdg-open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ tutorial.pdf"), shell=True)
+
