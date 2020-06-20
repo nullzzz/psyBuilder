@@ -1210,9 +1210,9 @@ class Psy(QMainWindow):
         import subprocess
 
         if platform.system() == 'Darwin':
-            subprocess.run("open " + os.path.join(Info.ImagePath,"pdfs", "A\ Brief\ tutorial.pdf"), shell=True)
+            subprocess.run("open " + os.path.join(Info.ImagePath,"pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)
         elif platform.system() == 'Windows':
-            subprocess.Popen(Func.getImage("pdfs/A Brief tutorial.pdf"), shell=True)
+            subprocess.Popen(Func.getImage("pdfs/A Brief Tutorial.pdf"), shell=True)
         else:
-            subprocess.run("xdg-open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ tutorial.pdf"), shell=True)
+            subprocess.run("xdg-open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)
 
