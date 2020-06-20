@@ -3,3 +3,6 @@ PyOpenGL==3.1.5
 PyQt5-sip==12.7.2
 PyQt5-stubs==5.14.2.0
 qimage2ndarray==1.8.3
+
+
+pip3 install pyinstaller==3.6 pycrypto==2.6.1 cython==3.0a5 numpy==1.18.5 PyQt5==5.15.0 qimage2ndarray==1.8.3
