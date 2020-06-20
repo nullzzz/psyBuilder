@@ -13,7 +13,7 @@ class WaitDialog(QDialog):
         self.angle = 0
         self._timer = QTimer(self, timeout=self.update)
         self._timer.start(1)
-        self.setStyleSheet("background:transparent")
+        # self.setStyleSheet("background:transparent")
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setModal(True)
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint | Qt.CustomizeWindowHint)
@@ -28,16 +28,18 @@ class WaitDialog(QDialog):
         side = 36
         painter.scale(side / 150.0, side / 150.0)
         painter.rotate(self.angle)
+
         painter.save()
         painter.setPen(Qt.NoPen)
         color = self.Color.toRgb()
         # color.setRgb(255,255,255)
         for i in range(11):
-            color.setAlphaF(1.0 * i / 10)
+            color.setAlphaF(i / 10.0)
             painter.setBrush(color)
             painter.drawEllipse(30, -10, 20, 20)
             painter.rotate(36)
         painter.restore()
+
         self.angle += self.Delta if self.Clockwise else -self.Delta
         self.angle %= 360
 
