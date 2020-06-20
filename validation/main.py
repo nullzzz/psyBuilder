@@ -1,7 +1,9 @@
 import hashlib
 import os
+import platform
 import sys
 import uuid
+import pyperclip
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -15,7 +17,10 @@ class ValidationWindow(QFrame):
         super(ValidationWindow, self).__init__()
         # title
         self.setWindowTitle("Welcome to PsyBuilder")
-        self.setFixedSize(820, 450)
+        if platform.system() =="Linux":
+            self.setFixedSize(1240, 450)
+        else:
+            self.setFixedSize(820, 450)
         self.setStyleSheet("background:rgb(245,245,245)")
         self.setStyleSheet("""
         QLabel {
@@ -44,7 +49,7 @@ class ValidationWindow(QFrame):
                              f"For a validation code, send the above code<br>"
                              f" with your full name and affiliation to:<br>"
                              f"<a href='mailto:zhangyang873@gmail.com?Subject=Inquire For Validation Code'> zhangyang873@gmail.com")
-            # pyperclip.copy(self.hard_code)
+            pyperclip.copy(self.hard_code)
             self.show()
         else:
             self.start()

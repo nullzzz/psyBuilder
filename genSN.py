@@ -1,5 +1,6 @@
 import hashlib
 # import os
+import platform
 import sys
 
 from PyQt5.QtGui import QIcon
@@ -19,7 +20,11 @@ class genKeyWindow(QFrame):
 
         self.setWindowTitle("KeyGen for PsyBuilder")
         self.setWindowIcon(QIcon(r"source/images/common/icon.png"))
-        self.setFixedSize(300, 120)
+
+        if platform.system() =="Linux":
+            self.setFixedSize(600, 200)
+        else:
+            self.setFixedSize(300, 120)
 
         self.input = QLineEdit()
         self.input.setPlaceholderText("Input your hardware sn here")

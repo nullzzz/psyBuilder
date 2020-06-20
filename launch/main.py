@@ -1,4 +1,5 @@
 import os
+import platform
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QApplication
@@ -15,7 +16,10 @@ class LaunchWindow(QWidget):
         super(LaunchWindow, self).__init__()
         # title
         self.setWindowTitle("Welcome to PsyBuilder")
-        self.setFixedSize(820, 450)
+        if platform.system() =="Linux":
+            self.setFixedSize(820, 500)
+        else:
+            self.setFixedSize(820, 450)
         self.setStyleSheet("background:rgb(245,245,245)")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         # widget file_table and file frame
