@@ -144,63 +144,72 @@ QTreeView::branch:open:has-children:has-siblings {{
 """
 
 # widgets' qss
-timeline = """
-/* IconBar */
-QTabWidget::pane#IconBar {
-    min-height:75px;
-    max-height:75px;
-}
+if platform.system()=="Linux":
+    tl_min_height = 75
+    tl_max_height = 75
+    tl_min_width = 150
+else:
+    tl_min_height = 75
+    tl_max_height = 75
+    tl_min_width = 100
 
-QListView#IconList{
+timeline = f"""
+/* IconBar */
+QTabWidget::pane#IconBar {{
+    min-height:{tl_min_height}px;
+    max-height:{tl_max_height}px;
+}}
+
+QListView#IconList{{
     border: 1px solid rgb(201,201,201);
     border-top: none;
     show-decoration-selected: 1;
     font-size: 12px;
     min-height:75px;
     max-height:75px;
-}
+}}
 
-QListView#IconList::Item{
+QListView#IconList::Item{{
     border-top: 10px solid transparent;
     border-bottom: 1px solid transparent;
     min-height: 64px;
     max-height: 64px;
-    min-width: 100px;
-}
+    min-width: {tl_min_width}px;
+}}
 
-QListView#IconList::Item:hover{
+QListView#IconList::Item:hover{{
     padding-top: 9px;
     background: transparent;
     border-radius:2px;
     border: 1px solid rgb(110, 110, 110);
-}
+}}
 
-QListView#IconList::Item:selected{
+QListView#IconList::Item:selected{{
     padding-top: 9px;
     background: rgb(186,215,251);
     border-radius:2px;
     border: 1px solid rgb(110, 110, 110);
-}
+}}
 
 /* Timeline Area */
-QFrame#TimelineArea {
+QFrame#TimelineArea {{
     background:white;
     border: 1px solid rgb(201,201,201);
-}
+}}
 
-QLabel#TimelineItem{
+QLabel#TimelineItem{{
     background-color: transparent;
-}
+}}
 
-QLabel#TimelineItem:hover{
+QLabel#TimelineItem:hover{{
     border: 1px solid rgb(110,110,110);
     border-radius: 2px;
     padding: 2px;
-}
+}}
 
-QTableWidget#TimelineTable {
+QTableWidget#TimelineTable {{
     selection-background-color:rgb(186,215,251);
-}
+}}
 """
 
 cycle = """
