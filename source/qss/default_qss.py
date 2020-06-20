@@ -145,13 +145,21 @@ QTreeView::branch:open:has-children:has-siblings {{
 
 # widgets' qss
 if platform.system()=="Linux":
-    tl_min_height = 75
-    tl_max_height = 75
-    tl_min_width = 150
+    tl_item_min_height = 120
+    tl_min_height = 150
+    tl_item_max_height = 120
+    tl_max_height = 150
+    tl_item_min_width = 120
+
+    tl_item_list_font_size = 24
 else:
+    tl_item_min_height = 64
     tl_min_height = 75
+    tl_item_max_height = 64
     tl_max_height = 75
-    tl_min_width = 100
+    tl_item_min_width = 100
+
+    tl_item_list_font_size = 12
 
 timeline = f"""
 /* IconBar */
@@ -164,17 +172,17 @@ QListView#IconList{{
     border: 1px solid rgb(201,201,201);
     border-top: none;
     show-decoration-selected: 1;
-    font-size: 12px;
-    min-height:75px;
-    max-height:75px;
+    font-size: {tl_item_list_font_size}px;
+    min-height:{tl_min_height}px;
+    max-height:{tl_max_height}px;
 }}
 
 QListView#IconList::Item{{
     border-top: 10px solid transparent;
     border-bottom: 1px solid transparent;
-    min-height: 64px;
-    max-height: 64px;
-    min-width: {tl_min_width}px;
+    min-height: {tl_item_min_height}px;
+    max-height: {tl_item_max_height}px;
+    min-width: {tl_item_min_width}px;
 }}
 
 QListView#IconList::Item:hover{{
@@ -211,14 +219,20 @@ QTableWidget#TimelineTable {{
     selection-background-color:rgb(186,215,251);
 }}
 """
+if platform.system()=="Linux":
+    loop_min_height = 70
+    loop_max_height = 70
+else:
+    loop_min_height = 35
+    loop_max_height = 35
 
-cycle = """
-QToolBar#CycleToolBar {
+cycle = f"""
+QToolBar#CycleToolBar {{
     border: 1px solid rgb(201,201,201);
-    min-height: 35px;
-    max-height: 35px;
+    min-height: {loop_min_height}px;
+    max-height: {loop_max_height}px;
     spacing: 2px;
-}
+}}
 """
 QComboBoxStyle = ""
 QLineEditStyle = ""

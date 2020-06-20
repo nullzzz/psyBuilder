@@ -17,7 +17,7 @@ class TimelineTable(TableWidget):
     # timeline initial length of arrow
     InitialArrowLength = 10
     Height = 100
-    Width = 100
+    Width = 150
     #
     top_row = 0
     item_row = 1
