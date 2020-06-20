@@ -15,7 +15,7 @@ class WaitDialog(QDialog):
         self._timer.start(1)
         # self.setStyleSheet("background:transparent")
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setModal(True)
+        # self.setModal(True)
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint | Qt.CustomizeWindowHint)
         self.setFixedHeight(36)
         self.setFixedWidth(36)
