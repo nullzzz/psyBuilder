@@ -18,7 +18,7 @@ class TimelineItem(QLabel):
     clicked = pyqtSignal(str)
     doubleClicked = pyqtSignal(str)
     if platform.system() == "Linux":
-        IconSize = 64
+        IconSize = 80
     else:
         IconSize = 48
     # 500ms

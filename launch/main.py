@@ -2,7 +2,7 @@ import os
 import platform
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QApplication
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QApplication, QDesktopWidget
 
 from app import Psy
 from app.func import Func
@@ -17,7 +17,7 @@ class LaunchWindow(QWidget):
         # title
         self.setWindowTitle("Welcome to PsyBuilder")
         if platform.system() =="Linux":
-            self.setFixedSize(820, 500)
+            self.setMinimumSize(820, 500)
         else:
             self.setFixedSize(820, 450)
         self.setStyleSheet("background:rgb(245,245,245)")
@@ -41,8 +41,16 @@ class LaunchWindow(QWidget):
         else:
             layout.addWidget(self.file_button_area, 1, Qt.AlignHCenter)
         self.setLayout(layout)
+
+        self.moveToCenter()
         # data
         self.opening = False
+
+    def moveToCenter(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def loadFilePaths(self):
         """
@@ -52,6 +60,7 @@ class LaunchWindow(QWidget):
         file_paths = Settings("config.ini", Settings.IniFormat).value("file_paths", [])
         for file_path in file_paths:
             self.file_path_table.addFilePath(-1, file_path)
+
 
     def startPsy(self):
         """

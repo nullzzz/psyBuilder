@@ -4,7 +4,7 @@ import platform
 import sys
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QLineEdit,QFormLayout, QApplication, QPushButton, QFrame
+from PyQt5.QtWidgets import QLineEdit, QFormLayout, QApplication, QPushButton, QFrame, QDesktopWidget
 
 
 class genKeyWindow(QFrame):
@@ -22,9 +22,9 @@ class genKeyWindow(QFrame):
         self.setWindowIcon(QIcon(r"source/images/common/icon.png"))
 
         if platform.system() =="Linux":
-            self.setFixedSize(600, 200)
+            self.setMinimumSize(400, 200)
         else:
-            self.setFixedSize(300, 120)
+            self.setFixedSize(400, 120)
 
         self.input = QLineEdit()
         self.input.setPlaceholderText("Input your hardware sn here")
@@ -55,7 +55,13 @@ class genKeyWindow(QFrame):
         self.setLayout(layout)
 
         self.input.setPlaceholderText("Input your hardware sn here")
+        self.moveToCenter()
 
+    def moveToCenter(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     @staticmethod
     def confuse(cpu_id: str):

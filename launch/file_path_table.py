@@ -1,4 +1,5 @@
 import os
+import platform
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QTextEdit, QApplication
@@ -65,10 +66,13 @@ class FilePathTable(TableWidget):
         self.horizontalHeader().setVisible(False)
         self.horizontalScrollBar().setVisible(False)
         self.verticalHeader().setVisible(False)
+
+        # self.setMinimumHeight(40)
         # one column
         self.setColumnCount(2)
         self.setColumnWidth(0, 298)
         self.setColumnWidth(1, 20)
+
 
     def addFilePath(self, index: int, file_path: str):
         """
@@ -82,7 +86,10 @@ class FilePathTable(TableWidget):
         if index == -1:
             index = self.rowCount()
         self.insertRow(index)
-        self.setRowHeight(index, 50)
+        if platform.system()=="Linux":
+            self.setRowHeight(index, 65)
+        else:
+            self.setRowHeight(index, 50)
         # insert line edit into table
         file = FilePath(file_path)
         self.setCellWidget(index, 0, file)

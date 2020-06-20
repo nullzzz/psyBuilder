@@ -1,3 +1,4 @@
+import re
 import urllib.request as request
 
 from PyQt5.QtCore import Qt
@@ -22,7 +23,8 @@ class Update(QDialog):
         layout.addWidget(self.label)
         self.label.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
-        self.setFixedSize(400, 50)
+        self.setMinimumSize(400, 100)
+        # self.setFixedSize(600, 100)
 
     def show(self):
         self.getLatestVersion()
@@ -32,8 +34,19 @@ class Update(QDialog):
         version_info = "The current version is the latest version."
         #############
         # get latest version information
-        # url = ""
-        # res = request.urlopen(url)
-        # version_info = res.read().decode('utf-8')
+        url = "https://yzhangpsy.myds.me:8001"
+        try:
+            res = request.urlopen(url)
+            versionList = re.findall(r'Current version of PsyBuilder (\d+\.\d+)', res.read().decode('utf-8'))
+
+            if len(versionList) > 0:
+                version_str = versionList[0]
+                version_info = f"The latest version is {version_str}, click <a href ='https://yzhangpsy.myds.me:8001'>me</a> to update."
+            else:
+                version_info = "Failed to consult PsyBuilder website, please try it later."
+
+        except:
+            version_info = "Failed to consult PsyBuilder website, please try it later."
+            pass
         #############
         self.label.setText(version_info)

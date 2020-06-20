@@ -7,7 +7,7 @@ import pyperclip
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QApplication, QPushButton, QLabel, QFrame
+from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QApplication, QPushButton, QLabel, QFrame, QDesktopWidget
 
 
 class ValidationWindow(QFrame):
@@ -18,7 +18,7 @@ class ValidationWindow(QFrame):
         # title
         self.setWindowTitle("Welcome to PsyBuilder")
         if platform.system() =="Linux":
-            self.setFixedSize(1240, 450)
+            self.setMinimumSize(820, 450)
         else:
             self.setFixedSize(820, 450)
         self.setStyleSheet("background:rgb(245,245,245)")
@@ -45,22 +45,30 @@ class ValidationWindow(QFrame):
         self.local_code = self.getLocalCode()
         if self.confuse_code != self.local_code and self.local_code != "psy":
         # if self.confuse_code != self.local_code:
-            self.tip.setText(f"<b>{self.hard_code}<\b><br>"
+            self.tip.setText(f"<b>{self.hard_code}<\b><br><br>"
                              f"For a validation code, send the above code<br>"
                              f" with your full name and affiliation to:<br>"
-                             f"<a href='mailto:zhangyang873@gmail.com?Subject=Inquire For Validation Code'> zhangyang873@gmail.com")
+                             f"<a href='mailto:zhangyang873@gmail.com?Subject=Inquire For Validation Code'> zhangyang873@gmail.com</a>")
             pyperclip.copy(self.hard_code)
             self.show()
         else:
             self.start()
 
     def setUI(self):
-        self.setFixedSize(500, 450)
+        self.setMinimumSize(500, 450)
         layout = QVBoxLayout()
         layout.addWidget(self.tip)
         layout.addWidget(self.input)
         layout.addWidget(self.check_bt)
         self.setLayout(layout)
+        self.moveToCenter()
+
+    def moveToCenter(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
 
     def checkCode(self):
         input_code = self.input.text()
