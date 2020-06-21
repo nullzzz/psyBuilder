@@ -3,7 +3,6 @@ import os
 import platform
 import sys
 import uuid
-import pyperclip
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -49,7 +48,7 @@ class ValidationWindow(QFrame):
                              f"For a validation code, send the above code<br>"
                              f" with your full name and affiliation to:<br>"
                              f"<a href='mailto:zhangyang873@gmail.com?Subject=Inquire For Validation Code'> zhangyang873@gmail.com</a>")
-            pyperclip.copy(self.hard_code)
+            # pyperclip.copy(self.hard_code)
             self.show()
         else:
             self.start()
