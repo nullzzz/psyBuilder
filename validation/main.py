@@ -1,6 +1,5 @@
 import hashlib
 import os
-import platform
 import sys
 import uuid
 

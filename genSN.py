@@ -1,6 +1,4 @@
 import hashlib
-# import os
-import platform
 import sys
 
 from PyQt5.QtGui import QIcon

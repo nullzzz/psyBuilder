@@ -1,6 +1,5 @@
 import os
 import re
-import platform
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtWidgets import QTextEdit, QApplication, QFileDialog, QLabel, QMenu, QGridLayout, \

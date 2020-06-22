@@ -1,8 +1,5 @@
 import datetime
 import os
-import platform
-
-from sys import stdout
 
 from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QTextEdit
