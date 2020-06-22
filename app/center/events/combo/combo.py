@@ -27,12 +27,14 @@ class Combo(TabItemMainWindow):
         width, height = Func.getCurrentScreenRes(self.pro_window.getScreenId())
         self.view.setMaximumSize(width, height)
         self.scene.setSceneRect(QRectF(0, 0, width, height))
-        self.w = width
-        self.h = height
+        self.w: int = width
+        self.h: int = height
+        self.screen_color: QColor = QColor(Qt.white)
 
+        self.properties = self.pro_window.default_properties
         self.default_properties: dict = {
             "Items": {},
-            "Properties": self.pro_window.default_properties
+            "Properties": self.properties
         }
         self.initMenu()
         self.linkSignal()
@@ -180,7 +182,7 @@ class Combo(TabItemMainWindow):
         self.pro_window.apply_bt.clicked.connect(self.apply)
 
     def setUI(self):
-        self.setWindowTitle("slider")
+        self.setWindowTitle("combo")
         layout = QHBoxLayout()
         layout.addWidget(self.left_box, 0, Qt.AlignLeft)
         layout.addWidget(self.view, 1, Qt.AlignHCenter | Qt.AlignVCenter)
@@ -310,14 +312,17 @@ class Combo(TabItemMainWindow):
         self.scene.refresh()
 
         width, height, color = Func.getCurrentScreenRes(self.pro_window.getScreenId(), True)
+        r, g, b = [int(x) for x in color.split(",")]
+        self.screen_color = QColor(r, g, b)
         if width != self.w or height != self.h:
             self.setMaximumSize(width, height)
             self.scene.setSceneRect(QRectF(0, 0, width, height))
             self.w = width
             self.h = height
         self.scene.setBorderRect(QRectF(0, 0, width, height))
+        self.setFrame()
 
-    def setAttributes(self, attributes):
+    def setAttributes(self, attributes: list):
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
         self.scene.setAttributes(format_attributes)
@@ -448,33 +453,55 @@ class Combo(TabItemMainWindow):
         self.pro_window.loadSetting()
 
     def apply(self):
-        frame_enable = self.pro_window.frame.enable.currentText()
-        if frame_enable == "Yes":
-            self.scene.frame_enable = True
-            frame_info = self.default_properties.get("Properties", {}).get("Frame", {})
-
-            _cx = self.pro_window.frame.x_pos.currentText()
-            _cy = self.pro_window.frame.y_pos.currentText()
-            cx = 0
-            if _cx.isdigit():
-                cx = int(_cx)
-            cy = 0
-            if _cy.isdigit():
-                cy = int(_cy)
-
-            back_color = self.pro_window.frame.back_color.getColor()
-            bw = self.pro_window.frame.border_width.text()
-            if bw.isdigit():
-                border_width = int(bw)
-            else:
-                border_width = 2
-            border_color = self.pro_window.frame.border_color.getColor()
-
-            self.scene.setFrame(frame_info)
-
         self.getInfo()
         # 发送信号
         self.propertiesChanged.emit(self.widget_id)
+        self.setFrame()
+
+    def setFrame(self):
+        ###################
+        # parse parameters
+        ###################
+        x1, y1, w, h = 0, 0, self.w, self.h
+        bkc = self.screen_color
+        bw = 0
+        bc = QColor(Qt.black)
+
+        cx_str: str = self.properties["Frame"]["Center X"]
+        if cx_str.endswith("%"):
+            x1 = self.w * int(cx_str.rstrip("%")) / 100
+        elif cx_str.isdigit():
+            x1 = int(cx_str)
+        cy_str: str = self.properties["Frame"]["Center Y"]
+        if cy_str.endswith("%"):
+            y1 = h * int(cy_str.rstrip("%")) / 100
+        elif cy_str.isdigit():
+            y1 = int(cy_str)
+
+        w_str: str = self.properties["Frame"]["Width"]
+        if w_str.endswith("%"):
+            w = self.w * int(w_str.rstrip("%")) / 100
+        elif w_str.isdigit():
+            w = int(w_str)
+
+        h_str: str = self.properties["Frame"]["Height"]
+        if h_str.endswith("%"):
+            h = self.h * int(h_str.rstrip("%")) / 100
+        elif w_str.isdigit():
+            h = int(h_str)
+
+        x1 -= w / 2
+        y1 -= h / 2
+
+        frame_enable = self.pro_window.frame.enable.currentText()
+        if frame_enable == "Yes":
+            bkc = self.pro_window.frame.back_color.getColor()
+            bw_str = self.pro_window.frame.border_width.text()
+            print(bw_str)
+            if bw_str.isdigit():
+                bw = int(bw_str)
+            bc = self.pro_window.frame.border_color.getColor()
+        self.scene.setFrame(x1, y1, w, h, bkc, bc, bw)
 
     """
      Functions that must be complete in new version

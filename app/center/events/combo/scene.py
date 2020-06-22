@@ -2,7 +2,7 @@ import datetime
 
 from PyQt5.QtCore import pyqtSignal, Qt, QLineF, QPointF, QRectF
 from PyQt5.QtGui import QPen, QTransform, QColor, QImage, QPainter, QMouseEvent
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsLineItem, QGraphicsItem, QGraphicsRectItem, QGraphicsPolygonItem
 
 from app.defi import *
 from ...events.combo.item import *
@@ -33,6 +33,9 @@ class Scene(QGraphicsScene):
 
         self.border: QGraphicsRectItem = QGraphicsRectItem()
         self.addItem(self.border)
+
+        self.frame: QGraphicsRectItem = QGraphicsRectItem()
+        self.addItem(self.frame)
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasFormat("application/x-icon-and-text"):
@@ -187,14 +190,14 @@ class Scene(QGraphicsScene):
     def getInfo(self):
         item_info: dict = {}
         for item in self.items():
-            if item is not self.border:
+            if item is not self.border and item is not self.frame:
                 item.setPosition()
                 item_info[item.getName()] = item.getInfo()
         return item_info
 
     def refresh(self):
         for item in self.items():
-            if item is not self.border:
+            if item is not self.border and item is not self.frame:
                 item.setAttributes(self.attributes)
 
     def setProperties(self, properties: dict):
@@ -235,7 +238,7 @@ class Scene(QGraphicsScene):
     def setAttributes(self, attributes: list):
         self.attributes = attributes
         for item in self.items():
-            if item is not self.border:
+            if item is not self.border and item is not self.frame:
                 item.setAttributes(attributes)
 
     def copyItem(self, item: QGraphicsItem):
@@ -256,8 +259,16 @@ class Scene(QGraphicsScene):
         self.border: QGraphicsRectItem
         self.border.setRect(QRectF(0, 0, rect.width(), rect.height()))
 
-    def setFrame(self, frame_info: dict):
-        pass
+    def setFrame(self, x1: int, y1: int, w: int, h: int, bk_color: QColor, bc: QColor, bw: int = 0):
+        self.frame.setRect(QRectF(x1, y1, w, h))
+        self.frame.setBrush(bk_color)
+        if bw:
+            pen = self.frame.pen()
+            pen.setWidth(bw)
+            pen.setColor(bc)
+            self.frame.setPen(pen)
+
+        self.border.update()
 
     def screenshot(self):
         try:
