@@ -1,5 +1,3 @@
-import platform
-
 from PyQt5.QtCore import (QSize, Qt, pyqtSignal, QMimeData, QDataStream, QIODevice, QByteArray, QPoint, QRect,
                           pyqtProperty, QPropertyAnimation)
 from PyQt5.QtGui import QDrag
@@ -17,7 +15,7 @@ class TimelineItem(QLabel):
     # when item clicked, emit its widget id
     clicked = pyqtSignal(str)
     doubleClicked = pyqtSignal(str)
-    if platform.system() == "Linux":
+    if Info.OS_TYPE ==2:
         IconSize = 80
     else:
         IconSize = 48

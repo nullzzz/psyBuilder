@@ -1,5 +1,3 @@
-import platform
-
 from PyQt5.QtCore import QDataStream, QByteArray, QIODevice, QMimeData, QPoint, QSize
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListView, QListWidget, QListWidgetItem, QTabWidget, QFrame
@@ -103,7 +101,7 @@ class IconBar(QTabWidget):
         self.addTab(self.quest, "Quest")
         self.addTab(self.condition, "Conditional")
 
-        if platform.system() =="Linux":
+        if Info.OS_TYPE ==2:
             self.setStyleSheet("QTabBar::tab {width: 200px; font-size:24px;}")
         #     cFont = QFont()
         #     cFont.setPointSize(8)

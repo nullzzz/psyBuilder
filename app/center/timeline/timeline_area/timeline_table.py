@@ -1,5 +1,3 @@
-import platform
-
 from PyQt5.QtCore import Qt, pyqtSignal, QRect
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu, QShortcut
@@ -19,7 +17,7 @@ class TimelineTable(TableWidget):
     # timeline initial length of arrow
     InitialArrowLength = 10
     Height = 100
-    if platform.system()=="Linux":
+    if Info.OS_TYPE==2:
         Width = 150
     else:
         Width = 100

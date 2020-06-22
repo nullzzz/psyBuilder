@@ -1,5 +1,4 @@
 import os
-import platform
 import re
 import sys
 import traceback
@@ -34,7 +33,7 @@ class Psy(QMainWindow):
         self.setWindowTitle("PsyBuilder 0.1")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         # get current system type
-        self.is_windows = platform.system() == 'Windows'
+        self.is_windows = Info.OS_TYPE == 0
         # init menu bar
         self.initMenubar()
         # init dock widget
@@ -211,7 +210,7 @@ class Psy(QMainWindow):
             self.platform_action_group.addAction(self.windows_action)
             self.platform_action_group.addAction(self.mac_action)
 
-            if platform.system() == 'Darwin':
+            if Info.OS_TYPE ==1:
                 self.mac_action.setChecked(True)
                 # because setChecked can not trigger the action
                 self.mac_action.trigger()
@@ -1103,9 +1102,9 @@ class Psy(QMainWindow):
         elif isinstance(c, str):
             compile_platform = c if c else "linux"
             if self.is_windows:
-                self.linux_action.setIconVisibleInMenu(platform.lower() == "linux")
-                self.windows_action.setIconVisibleInMenu(platform.lower() == "windows")
-                self.mac_action.setIconVisibleInMenu(platform.lower() == "mac")
+                self.linux_action.setIconVisibleInMenu(compile_platform.lower() == "linux")
+                self.windows_action.setIconVisibleInMenu(compile_platform.lower() == "windows")
+                self.mac_action.setIconVisibleInMenu(compile_platform.lower() == "mac")
             else:
                 self.linux_action.setChecked(compile_platform.lower() == "linux")
                 self.windows_action.setChecked(compile_platform.lower() == "windows")
@@ -1173,9 +1172,9 @@ class Psy(QMainWindow):
         # self.output.clear()
         # Info's data
 
-        if platform.system() == 'Windows':
+        if Info.OS_TYPE == 0:
             Info.PLATFORM = "windows"
-        elif platform.system() == 'Darwin':
+        elif Info.OS_TYPE ==1:
             Info.PLATFORM = "mac"
         else:
             Info.PLATFORM = "linux"
@@ -1209,9 +1208,9 @@ class Psy(QMainWindow):
     def openPDFfile(self):
         import subprocess
 
-        if platform.system() == 'Darwin':
+        if Info.OS_TYPE ==1:
             subprocess.run("open " + os.path.join(Info.ImagePath,"pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)
-        elif platform.system() == 'Windows':
+        elif Info.OS_TYPE ==0:
             subprocess.Popen(Func.getImage("pdfs/A Brief Tutorial.pdf"), shell=True)
         else:
             subprocess.run("xdg-open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)

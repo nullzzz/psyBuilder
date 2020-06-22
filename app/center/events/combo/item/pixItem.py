@@ -30,10 +30,10 @@ class PixItem(QGraphicsPixmapItem):
 
         if self.item_type == self.Image:
             self.pro_window = ImageProperty()
-            self.setPixmap(QPixmap(Func.getImage("widgets/image.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImage("widgets/Image.png")).scaled(100, 100))
         elif self.item_type == self.Video:
             self.pro_window = VideoProperty()
-            self.setPixmap(QPixmap(Func.getImage("widgets/video.png")).scaled(100, 100))
+            self.setPixmap(QPixmap(Func.getImage("widgets/Video.png")).scaled(100, 100))
         elif self.item_type == self.Sound:
             self.pro_window = SoundProperty()
             self.setPixmap(QPixmap(Func.getImage("widgets/sound_item.png")).scaled(100, 100))

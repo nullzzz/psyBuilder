@@ -1,12 +1,10 @@
 import datetime
 import os
-import platform
-
-from sys import stdout
 
 from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QTextEdit
 
+from app.info import Info
 from lib import DockWidget
 
 
@@ -49,11 +47,11 @@ class Output(DockWidget):
         elif information_type == 3:
             self.text_edit.append(f'<b style="color:rgb(255,84,80)">[error]</b> {information}')
             try:
-                if platform.system() == 'Windows':
+                if Info.OS_TYPE ==0:
                     # only windows support
                     import winsound
                     winsound.MessageBeep(winsound.MB_ICONHAND)
-                elif platform.system() == 'Darwin':
+                elif Info.OS_TYPE ==1:
                     # for mac ox
                     os.system('afplay /System/Library/Sounds/Funk.aiff')
                 else:

@@ -1,4 +1,3 @@
-import platform
 import re
 
 from app.info import Info
@@ -144,7 +143,7 @@ QTreeView::branch:open:has-children:has-siblings {{
 """
 
 # widgets' qss
-if platform.system()=="Linux":
+if Info.OS_TYPE==2:
     tl_item_min_height = 120
     tl_min_height = 150
     tl_item_max_height = 120
@@ -219,7 +218,7 @@ QTableWidget#TimelineTable {{
     selection-background-color:rgb(186,215,251);
 }}
 """
-if platform.system()=="Linux":
+if Info.OS_TYPE==2:
     loop_min_height = 70
     loop_max_height = 70
 else:
@@ -237,7 +236,7 @@ QToolBar#CycleToolBar {{
 QComboBoxStyle = ""
 QLineEditStyle = ""
 
-if platform.system() == 'Windows':
+if Info.OS_TYPE ==0:
     menuCheck = f"""
 QMenu::indicator:exclusive:checked {{
     image: url({imageURL("/menu/checked.png")});
