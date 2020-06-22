@@ -1,4 +1,5 @@
 import os
+import platform
 import sys
 from .modifiedData import *
 
@@ -12,6 +13,14 @@ class Info(object):
     ###########################################
     # last modified date
     LAST_MODIFY_DATE = CREATED_PSY_DATE
+
+    # GUI running platform: 0,1,2 for Windows, Darwin, and Linux respectively
+    if platform.system()== "Windows":
+        OS_TYPE: int = 0
+    elif platform.system()== "Darwin":
+        OS_TYPE: int = 1
+    else:
+        OS_TYPE: int = 2
     # 编译平台：linux\windows\mac
     PLATFORM: str = "linux"
 

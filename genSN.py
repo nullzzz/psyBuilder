@@ -6,6 +6,8 @@ import sys
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QLineEdit, QFormLayout, QApplication, QPushButton, QFrame, QDesktopWidget
 
+from app.info import Info
+
 
 class genKeyWindow(QFrame):
 
@@ -21,7 +23,7 @@ class genKeyWindow(QFrame):
         self.setWindowTitle("KeyGen for PsyBuilder")
         self.setWindowIcon(QIcon(r"source/images/common/icon.png"))
 
-        if platform.system() =="Linux":
+        if Info.OS_TYPE ==2:
             self.setMinimumSize(400, 200)
         else:
             self.setFixedSize(400, 120)

@@ -103,7 +103,7 @@ class IconBar(QTabWidget):
         self.addTab(self.quest, "Quest")
         self.addTab(self.condition, "Conditional")
 
-        if platform.system() =="Linux":
+        if Info.OS_TYPE ==2:
             self.setStyleSheet("QTabBar::tab {width: 200px; font-size:24px;}")
         #     cFont = QFont()
         #     cFont.setPointSize(8)

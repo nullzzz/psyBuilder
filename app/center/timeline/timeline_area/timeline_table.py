@@ -19,7 +19,7 @@ class TimelineTable(TableWidget):
     # timeline initial length of arrow
     InitialArrowLength = 10
     Height = 100
-    if platform.system()=="Linux":
+    if Info.OS_TYPE==2:
         Width = 150
     else:
         Width = 100

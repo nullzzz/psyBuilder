@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QTextEdit, QApplication, QFileDialog, QLabel, QMenu,
     QFrame, QActionGroup
 
 from app.func import Func
+from app.info import Info
 from lib import HoverButton, Settings
 
 
@@ -21,7 +22,7 @@ class Version(QTextEdit):
         """)
         # set text
         self.setAlignment(Qt.AlignHCenter)
-        if platform.system()=='Darwin':
+        if Info.OS_TYPE==1:
             cFontTypeStr = "Gen Shin Gothic"
         else:
             cFontTypeStr = "Gen Shin Gothic Light"
@@ -72,7 +73,7 @@ class FileButtonArea(QFrame):
         self.default_mode_action = self.menu.addAction("Default Mode", lambda: self.changeOpenMode("default mode"))
         self.open_blank_file_action = self.menu.addAction("Open Blank File", lambda: self.changeOpenMode("open blank file"))
 
-        if platform.system() == 'Windows':
+        if Info.OS_TYPE ==0:
             self.default_mode_action.setIcon(Func.getImageObject("menu/checked", 1))
             self.open_blank_file_action.setIcon(Func.getImageObject("menu/checked", 1))
         else:
@@ -156,7 +157,7 @@ class FileButtonArea(QFrame):
         Settings("config.ini", Settings.IniFormat).setValue("open_mode", mode)
         # menu
 
-        if platform.system() == 'Windows':
+        if Info.OS_TYPE ==0:
             isSetIcoVisible = ("default mode" == mode)
             self.default_mode_action.setIconVisibleInMenu(isSetIcoVisible)
             self.open_blank_file_action.setIconVisibleInMenu(not isSetIcoVisible)

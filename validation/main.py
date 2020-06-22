@@ -8,6 +8,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QApplication, QPushButton, QLabel, QFrame, QDesktopWidget
 
+from app.info import Info
+
 
 class ValidationWindow(QFrame):
     FILE_NAME = "__KEY__"
@@ -16,7 +18,7 @@ class ValidationWindow(QFrame):
         super(ValidationWindow, self).__init__()
         # title
         self.setWindowTitle("Welcome to PsyBuilder")
-        if platform.system() =="Linux":
+        if Info.OS_TYPE ==2:
             self.setMinimumSize(820, 450)
         else:
             self.setFixedSize(820, 450)

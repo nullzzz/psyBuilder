@@ -25,7 +25,7 @@ class Update(QDialog):
         layout.addWidget(self.label)
         self.label.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
-        if platform.system()=="Windows":
+        if Info.OS_TYPE==0:
             self.setMinimumSize(400, 60)
         else:
             self.setMinimumSize(400, 100)
@@ -43,9 +43,9 @@ class Update(QDialog):
         try:
             res = request.urlopen(url)
 
-            if platform.system() == "Windows":
+            if Info.OS_TYPE ==0:
                 versionList = re.findall(r'PsyBuilder(\d+)Win', res.read().decode('utf-8'))
-            elif platform.system() == "Darwin":
+            elif Info.OS_TYPE ==1:
                 versionList = re.findall(r'PsyBuilder(\d+).dmg', res.read().decode('utf-8'))
             else:
                 versionList = re.findall(r'PsyBuilder(\d+)Linux', res.read().decode('utf-8'))

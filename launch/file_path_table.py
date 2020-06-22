@@ -4,6 +4,7 @@ import platform
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QTextEdit, QApplication
 
+from app.info import Info
 from lib import TableWidget, HoverButton
 
 
@@ -86,7 +87,7 @@ class FilePathTable(TableWidget):
         if index == -1:
             index = self.rowCount()
         self.insertRow(index)
-        if platform.system()=="Linux":
+        if Info.OS_TYPE==2:
             self.setRowHeight(index, 65)
         else:
             self.setRowHeight(index, 50)

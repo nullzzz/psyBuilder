@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QApplication, QDesktopWidget
 
 from app import Psy
 from app.func import Func
+from app.info import Info
 from lib import MessageBox, Settings
 from .file_button_area import FileButtonArea
 from .file_path_table import FilePathTable
@@ -16,7 +17,7 @@ class LaunchWindow(QWidget):
         super(LaunchWindow, self).__init__()
         # title
         self.setWindowTitle("Welcome to PsyBuilder")
-        if platform.system() =="Linux":
+        if Info.OS_TYPE ==2:
             self.setMinimumSize(820, 500)
         else:
             self.setFixedSize(820, 450)
