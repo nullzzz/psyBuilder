@@ -1,5 +1,3 @@
-import platform
-
 from PyQt5.QtCore import Qt, pyqtSignal, QRect
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QLabel, QAbstractItemView, QMenu, QShortcut

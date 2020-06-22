@@ -1,5 +1,3 @@
-import platform
-
 from PyQt5.QtCore import QDataStream, QByteArray, QIODevice, QMimeData, QPoint, QSize
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListView, QListWidget, QListWidgetItem, QTabWidget, QFrame

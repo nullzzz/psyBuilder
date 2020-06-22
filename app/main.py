@@ -1,5 +1,4 @@
 import os
-import platform
 import re
 import sys
 import traceback
@@ -34,7 +33,7 @@ class Psy(QMainWindow):
         self.setWindowTitle("PsyBuilder 0.1")
         self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
         # get current system type
-        self.is_windows = Info.OS_TYPE ==0
+        self.is_windows = Info.OS_TYPE == 0
         # init menu bar
         self.initMenubar()
         # init dock widget
@@ -1103,9 +1102,9 @@ class Psy(QMainWindow):
         elif isinstance(c, str):
             compile_platform = c if c else "linux"
             if self.is_windows:
-                self.linux_action.setIconVisibleInMenu(platform.lower() == "linux")
-                self.windows_action.setIconVisibleInMenu(platform.lower() == "windows")
-                self.mac_action.setIconVisibleInMenu(platform.lower() == "mac")
+                self.linux_action.setIconVisibleInMenu(compile_platform.lower() == "linux")
+                self.windows_action.setIconVisibleInMenu(compile_platform.lower() == "windows")
+                self.mac_action.setIconVisibleInMenu(compile_platform.lower() == "mac")
             else:
                 self.linux_action.setChecked(compile_platform.lower() == "linux")
                 self.windows_action.setChecked(compile_platform.lower() == "windows")
@@ -1209,7 +1208,7 @@ class Psy(QMainWindow):
     def openPDFfile(self):
         import subprocess
 
-        if Info.OS_TYPE ==2:
+        if Info.OS_TYPE ==1:
             subprocess.run("open " + os.path.join(Info.ImagePath,"pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)
         elif Info.OS_TYPE ==0:
             subprocess.Popen(Func.getImage("pdfs/A Brief Tutorial.pdf"), shell=True)

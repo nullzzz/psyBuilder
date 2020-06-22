@@ -1,4 +1,3 @@
-import platform
 import re
 
 from app.info import Info
