@@ -1,3 +1,4 @@
+import platform
 import re
 import urllib.request as request
 
@@ -6,13 +7,14 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QLabel, QVBoxLayout, QDialog
 
 from app.func import Func
+from app.info import Info
 
 
 class Update(QDialog):
     def __init__(self, parent=None):
         super(Update, self).__init__(parent=parent)
 
-        self.setWindowTitle("Checking new version...")
+        self.setWindowTitle("Quick Update")
         self.setWindowModality(Qt.WindowModal)
         self.setWindowIcon(QIcon(Func.getImage("common/icon.png")))
 
@@ -23,7 +25,10 @@ class Update(QDialog):
         layout.addWidget(self.label)
         self.label.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
-        self.setMinimumSize(400, 100)
+        if platform.system()=="Windows":
+            self.setMinimumSize(400, 60)
+        else:
+            self.setMinimumSize(400, 100)
         # self.setFixedSize(600, 100)
 
     def show(self):
@@ -37,11 +42,24 @@ class Update(QDialog):
         url = "https://yzhangpsy.myds.me:8001"
         try:
             res = request.urlopen(url)
-            versionList = re.findall(r'Current version of PsyBuilder (\d+\.\d+)', res.read().decode('utf-8'))
 
-            if len(versionList) > 0:
-                version_str = versionList[0]
-                version_info = f"The latest version is {version_str}, click <a href ='https://yzhangpsy.myds.me:8001'>me</a> to update."
+            if platform.system() == "Windows":
+                versionList = re.findall(r'PsyBuilder(\d+)Win', res.read().decode('utf-8'))
+            elif platform.system() == "Darwin":
+                versionList = re.findall(r'PsyBuilder(\d+).dmg', res.read().decode('utf-8'))
+            else:
+                versionList = re.findall(r'PsyBuilder(\d+)Linux', res.read().decode('utf-8'))
+
+            if versionList:
+
+                max_date_Str = max(versionList)
+
+                if Info.LAST_MODIFY_DATE < float(max_date_Str):
+                    version_info = f"An update is available(release time: {max_date_Str})<br>Click<a href ='https://yzhangpsy.myds.me:8001'> me</a> to get the update."
+                else:
+                    version_info = f"You are running the latest version of PsyBuilder ({Info.LAST_MODIFY_DATE}) \n Please check back again for updates at a later time."
+
+
             else:
                 version_info = "Failed to consult PsyBuilder website, please try it later."
 

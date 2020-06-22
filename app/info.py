@@ -1,5 +1,6 @@
 import os
 import sys
+from .modifiedData import *
 
 
 class Info(object):
@@ -9,6 +10,8 @@ class Info(object):
     ###########################################
     #           old info/data                 #
     ###########################################
+    # last modified date
+    LAST_MODIFY_DATE = CREATED_PSY_DATE
     # 编译平台：linux\windows\mac
     PLATFORM: str = "linux"
 
@@ -204,3 +207,4 @@ class Info(object):
         SWITCH: 0,
         TIMELINE: 0,
     }
+
