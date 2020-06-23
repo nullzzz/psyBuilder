@@ -9,10 +9,18 @@ create_psy_builder_date=$(date +%Y%m%d%H%M%S)
 
 echo CREATED_PSY_DATE = $create_psy_builder_date > ./app/modifiedData.py
 
+
+
+echo \#!/bin/sh > ./runMeAfterMakeDebLinux
+echo work_path=\$\(dirname \$0\) >> ./runMeAfterMakeDebLinux
+echo cd \${work_path} >> ./runMeAfterMakeDebLinux
+echo cd .. >> ./runMeAfterMakeDebLinux
+echo mv -f ./PsyBuilder_0.1-ubuntu_all.deb ./PsyBuilder$create_psy_builder_date.deb >> ./runMeAfterMakeDebLinux
+
+sudo chmod 777 ./runMeAfterMakeDebLinux
+
 sudo rm -rf ./dist
 sudo rm -rf ./build
-sudo rm -rf ./PsyBuilder.app
-sudo rm -rf ./PsyBuilder.dmg
 
 pwd
 
@@ -23,9 +31,9 @@ pyinstaller -i ./source/images/common/icon.png -w --clean --add-data source:sour
 
 
 
-echo "============================="
-echo " make zip for PsyBuilder"
-echo "============================="
+#echo "============================="
+#echo " make zip for PsyBuilder"
+#echo "============================="
 
 # sudo mkdir "./forDist"
 # sudo cp -f -R $APP_PATH ./forDist/
