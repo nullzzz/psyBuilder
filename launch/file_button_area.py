@@ -56,10 +56,10 @@ class FileButtonArea(QFrame):
     def __init__(self):
         super(FileButtonArea, self).__init__()
         self.setObjectName("FileButtonArea")
-        self.setStyleSheet("""
-        QFrame#FileButtonArea {
-            border-image: url(source/images/common/background.png);
-        }
+        self.setStyleSheet(f"""
+        QFrame#FileButtonArea {{
+            border-image: url({Func.getImageForStyleSheet("common/background.png")});
+        }}
         """)
         self.setFixedWidth(500)
         # widget

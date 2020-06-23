@@ -75,6 +75,17 @@ class Func(object):
         """
         return os.path.join(Info.ImagePath, *(re.split(r'[\\/]', image_name)))
 
+
+    @staticmethod
+    def getImageForStyleSheet(image_name: str) -> str:
+        """
+        返回指定name的图片路径
+        :param image_name:
+        :return:
+        """
+        cImage_path = Func.getImage(image_name)
+        return "/".join(re.split(r'[\\/]', cImage_path))
+
     @staticmethod
     def getWidgetPosition(widget_id: str) -> int:
         return Func.getWidgetIndex(widget_id)

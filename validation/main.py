@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QApplication, QPushButton, QLabel, QFrame, QDesktopWidget
 
+from app.func import Func
 from app.info import Info
 
 
@@ -22,12 +23,13 @@ class ValidationWindow(QFrame):
         else:
             self.setFixedSize(820, 450)
         self.setStyleSheet("background:rgb(245,245,245)")
-        self.setStyleSheet("""
-        QLabel {
-            border-image: url(source/images/common/background.png);
-        }
+        self.setStyleSheet(f"""
+        QLabel {{
+            border-image: url({Func.getImageForStyleSheet("common/background.png")});
+        }}
         """)
-        self.setWindowIcon(QIcon("source/images/common/icon.png"))
+
+        self.setWindowIcon(Func.getImageObject("common/icon.png", type=1))
 
         self.tip = QLabel()
         self.tip.setTextInteractionFlags(Qt.TextSelectableByMouse)
