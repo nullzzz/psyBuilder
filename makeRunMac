@@ -3,9 +3,11 @@
 work_path=$(dirname $0)
 cd ${work_path}
 
-createPsyBuilderDate=$(date +%Y%m%d%H%M%S)
+create_psy_builder_date=$(date +%Y%m%d%H%M%S)
 
-echo CREATED_PSY_DATE = $(createPsyBuilderDate) > ./app/modifiedData.py
+
+
+echo CREATED_PSY_DATE = $create_psy_builder_date > ./app/modifiedData.py
 
 sudo rm -rf ./dist
 sudo rm -rf ./build
@@ -62,6 +64,6 @@ echo " make dmg for PsyBuilder"
 echo "============================="
 sudo dropdmg --config-name "psyBuilder" PsyBuilder.app
 
-sudo mv -f ./PsyBuilder.dmg ./"PsyBuilder$(createPsyBuilderDate).dmg"
+sudo mv -f ./PsyBuilder.dmg ./"PsyBuilder$create_psy_builder_date.dmg"
 
 sudo rm -rf ./PsyBuilder.app

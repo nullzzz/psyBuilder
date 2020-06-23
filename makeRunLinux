@@ -1,0 +1,34 @@
+#!/bin/sh
+
+work_path=$(dirname $0)
+cd ${work_path}
+
+create_psy_builder_date=$(date +%Y%m%d%H%M%S)
+
+
+
+echo CREATED_PSY_DATE = $create_psy_builder_date > ./app/modifiedData.py
+
+sudo rm -rf ./dist
+sudo rm -rf ./build
+sudo rm -rf ./PsyBuilder.app
+sudo rm -rf ./PsyBuilder.dmg
+
+pwd
+
+pyinstaller -i ./source/images/common/icon.png -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn PsyBuilder.py
+#sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --add-binary='/System/Library/Frameworks/Tk.framework/Tk':'tk' --add-binary='/System/Library/Frameworks/Tcl.framework/Tcl':'tcl' --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn PsyBuilder.py
+
+#sudo mv ./dist/run.app/Contents/MacOS/run ./dist/run.app/Contents/MacOS/run0
+
+
+
+echo "============================="
+echo " make zip for PsyBuilder"
+echo "============================="
+
+# sudo mkdir "./forDist"
+# sudo cp -f -R $APP_PATH ./forDist/
+#sudo cp -f ./doubleClickOnMeFirst ./forDist/
+
+# sudo zip -r -X "PsyBuilder$(date +%Y%m%d%H%M%S)Mac.zip" $APP_PATH
