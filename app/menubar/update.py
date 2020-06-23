@@ -47,7 +47,7 @@ class Update(QDialog):
             elif Info.OS_TYPE ==1:
                 versionList = re.findall(r'PsyBuilder(\d+).dmg', res.read().decode('utf-8'))
             else:
-                versionList = re.findall(r'PsyBuilder(\d+)Linux', res.read().decode('utf-8'))
+                versionList = re.findall(r'PsyBuilder(\d+).deb', res.read().decode('utf-8'))
 
             if versionList:
 
