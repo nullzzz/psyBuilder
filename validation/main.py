@@ -112,17 +112,24 @@ class ValidationWindow(QFrame):
             uids = re.findall(r'UUID="([0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+)"', os.popen(command).read())
 
             if uids:
-                hardware_id = "".join(x for x in uids)
+                hardware_id = uids[0]
+                # hardware_id = "".join(x for x in uids)
                 hardware_id = hardware_id.replace("-", "")
+
             else:
                 hardware_id = ""
+
+            mac_addr = os.popen('cat /var/lib/dbus/machine-id').read().replace("\n", "")
+
+            cpu_id = hardware_id + mac_addr
+            
         else:
             hardware_id = os.popen(command).read().replace("\n", "").replace(" ", "").replace("|", "")
             hardware_id = hardware_id.replace('SerialNumber', '').replace('UUID', '').replace('=', '').replace('-', '')
 
-        mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
+            mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
 
-        cpu_id = hardware_id + mac_addr
+            cpu_id = hardware_id + mac_addr
 
         rand_order = (244, 281, 32, 40, 22, 123, 99, 174, 294, 261, 175, 34, 152, 92, 170, 91, 146, 119, 190, 112, 127,
                       241, 165, 35, 6, 265, 121, 271, 228, 160, 236, 55, 148, 3, 96, 166, 136, 269, 68, 16, 140, 135,
