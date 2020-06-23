@@ -96,40 +96,60 @@ class ValidationWindow(QFrame):
 
     @staticmethod
     def getHardCode():
-        os_type = sys.platform.lower()
-
         if Info.OS_TYPE == 0:
             # for windows
             command = "wmic bios get serialnumber"
-        elif Info.OS_TYPE == 2:
-            # hard driver uuid for linux
-            command = "blkid | grep UUID= | awk '{print $2}'"
-        elif Info.OS_TYPE == 1:
-            # for mac os
-            command = "ioreg -l | grep IOPlatformSerialNumber | awk '{print $4}'"
 
-        if Info.OS_TYPE == 2:
-            uids = re.findall(r'UUID="([0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+)"', os.popen(command).read())
-
-            if uids:
-                hardware_id = uids[0]
-                # hardware_id = "".join(x for x in uids)
-                hardware_id = hardware_id.replace("-", "")
-
-            else:
-                hardware_id = ""
-
-            mac_addr = os.popen('cat /var/lib/dbus/machine-id').read().replace("\n", "")
-
-            cpu_id = hardware_id + mac_addr
-            
-        else:
             hardware_id = os.popen(command).read().replace("\n", "").replace(" ", "").replace("|", "")
             hardware_id = hardware_id.replace('SerialNumber', '').replace('UUID', '').replace('=', '').replace('-', '')
 
             mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
 
             cpu_id = hardware_id + mac_addr
+
+        elif Info.OS_TYPE == 2:
+            # hard driver uuid for linux
+            command = "blkid | grep UUID= | awk '{print $2}'"
+
+            uids = re.findall(r'UUID="([0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+)"',
+                              os.popen(command).read().lower())
+
+            if uids:
+                hardware_id = uids[0]
+                hardware_id = hardware_id.replace("-", "")
+            else:
+                hardware_id = ""
+
+            mac_addr = os.popen('cat /var/lib/dbus/machine-id').read().replace("\n", "")
+
+            cpu_id = hardware_id + mac_addr
+
+        elif Info.OS_TYPE == 1:
+            # for mac os
+            command = "ioreg -l | grep IOPlatformUUID | awk '{print $4}'"
+            uids = re.findall(r'UUID="([0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+)"',
+                              os.popen(command).read().lower())
+
+            if uids:
+                hardware_id = uids[0]
+                hardware_id = hardware_id.replace("-", "")
+            else:
+                # For mac os early than 10.4
+                command = "ioreg -l | grep IOPlatformSerialNumber | awk '{print $4}'"
+                uids = re.findall(r'"([0-9a-z]+)"', os.popen(command).read().lower())
+
+                if uids:
+                    hardware_id = uids[0]
+                else:
+                    hardware_id = ""
+
+            if hardware_id:
+                mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
+            else:
+                mac_addr=""
+
+            cpu_id = hardware_id + mac_addr
+
 
         rand_order = (244, 281, 32, 40, 22, 123, 99, 174, 294, 261, 175, 34, 152, 92, 170, 91, 146, 119, 190, 112, 127,
                       241, 165, 35, 6, 265, 121, 271, 228, 160, 236, 55, 148, 3, 96, 166, 136, 269, 68, 16, 140, 135,
