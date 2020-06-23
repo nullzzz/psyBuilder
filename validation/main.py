@@ -126,18 +126,16 @@ class ValidationWindow(QFrame):
 
         elif Info.OS_TYPE == 1:
             # for mac os
-            command = "ioreg -l | grep IOPlatformUUID | awk '{print $4}'"
-            uids = re.findall(r'UUID="([0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+)"',
-                              os.popen(command).read().lower())
-
+            # For mac os early than 10.4
+            command = "ioreg -l | grep IOPlatformSerialNumber | awk '{print $4}'"
+            uids = re.findall(r'"([0-9a-z]+)"', os.popen(command).read().lower())
             if uids:
                 hardware_id = uids[0]
                 hardware_id = hardware_id.replace("-", "")
             else:
-                # For mac os early than 10.4
-                command = "ioreg -l | grep IOPlatformSerialNumber | awk '{print $4}'"
-                uids = re.findall(r'"([0-9a-z]+)"', os.popen(command).read().lower())
-
+                command = "ioreg -l | grep IOPlatformUUID | awk '{print $4}'"
+                uids = re.findall(r'UUID="([0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+-[0-9a-f]+)"',
+                                  os.popen(command).read().lower())
                 if uids:
                     hardware_id = uids[0]
                 else:
