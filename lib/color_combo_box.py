@@ -3,7 +3,6 @@ from PyQt5.QtGui import QColor, QIcon, QRegExpValidator, QFont
 from PyQt5.QtWidgets import QComboBox, QColorDialog
 
 from app.func import Func
-from .message_box import MessageBox
 from .var_combo_box import VarComboBox
 
 
