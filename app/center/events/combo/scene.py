@@ -260,17 +260,18 @@ class Scene(QGraphicsScene):
         self.border.setRect(QRectF(0, 0, rect.width(), rect.height()))
 
     def setFrame(self, x1: int, y1: int, w: int, h: int, bk_color: QColor, bc: QColor, bw: int = 0):
-        isEnable = False
-        if isEnable:
-            self.frame.setRect(QRectF(x1, y1, w, h))
-            self.frame.setBrush(bk_color)
-            if bw:
-                pen = self.frame.pen()
-                pen.setWidth(bw)
-                pen.setColor(bc)
-                self.frame.setPen(pen)
+        self.frame.setRect(QRectF(x1, y1, w, h))
+        self.frame.setBrush(bk_color)
+        if bw:
+            pen = self.frame.pen()
+            pen.setWidth(bw)
+            pen.setColor(bc)
+            self.frame.setPen(pen)
 
-            self.border.update()
+        self.border.update()
+
+    def downFrame(self, z: float):
+        self.frame.setZValue(z)
 
     def screenshot(self):
         try:

@@ -220,9 +220,16 @@ class Combo(TabItemMainWindow):
         overlap_items = selected_item.collidingItems()
         z_value = 0
         for item in overlap_items:
-            if item.zValue() <= z_value:
-                z_value = item.zValue() - 0.1
+            if isinstance(item, DiaItem) \
+                    or isinstance(item, DotItem) \
+                    or isinstance(item, LineItem) \
+                    or isinstance(item, OtherItem) \
+                    or isinstance(item, PixItem) \
+                    or isinstance(item, TextItem):
+                if item.zValue() <= z_value:
+                    z_value = item.zValue() - 0.1
         selected_item.setZValue(z_value)
+        self.scene.downFrame(z_value - 0.1)
 
     def selectItem(self, item_name: str):
         """
@@ -459,53 +466,48 @@ class Combo(TabItemMainWindow):
         self.setFrame()
 
     def setFrame(self):
+        ###################
+        # parse parameters
+        ###################
+        x1, y1, w, h = 0, 0, self.w, self.h
+        bkc = self.screen_color
+        bw = 0
+        bc = QColor(Qt.black)
 
-        isEnable = False
+        cx_str: str = self.properties["Frame"]["Center X"]
+        if cx_str.endswith("%"):
+            x1 = self.w * int(cx_str.rstrip("%")) / 100
+        elif cx_str.isdigit():
+            x1 = int(cx_str)
+        cy_str: str = self.properties["Frame"]["Center Y"]
+        if cy_str.endswith("%"):
+            y1 = h * int(cy_str.rstrip("%")) / 100
+        elif cy_str.isdigit():
+            y1 = int(cy_str)
 
-        if isEnable:
-            ###################
-            # parse parameters
-            ###################
-            x1, y1, w, h = 0, 0, self.w, self.h
-            bkc = self.screen_color
-            bw = 0
-            bc = QColor(Qt.black)
+        w_str: str = self.properties["Frame"]["Width"]
+        if w_str.endswith("%"):
+            w = self.w * int(w_str.rstrip("%")) / 100
+        elif w_str.isdigit():
+            w = int(w_str)
 
-            cx_str: str = self.properties["Frame"]["Center X"]
-            if cx_str.endswith("%"):
-                x1 = self.w * int(cx_str.rstrip("%")) / 100
-            elif cx_str.isdigit():
-                x1 = int(cx_str)
-            cy_str: str = self.properties["Frame"]["Center Y"]
-            if cy_str.endswith("%"):
-                y1 = h * int(cy_str.rstrip("%")) / 100
-            elif cy_str.isdigit():
-                y1 = int(cy_str)
+        h_str: str = self.properties["Frame"]["Height"]
+        if h_str.endswith("%"):
+            h = self.h * int(h_str.rstrip("%")) / 100
+        elif w_str.isdigit():
+            h = int(h_str)
 
-            w_str: str = self.properties["Frame"]["Width"]
-            if w_str.endswith("%"):
-                w = self.w * int(w_str.rstrip("%")) / 100
-            elif w_str.isdigit():
-                w = int(w_str)
+        x1 -= w / 2
+        y1 -= h / 2
 
-            h_str: str = self.properties["Frame"]["Height"]
-            if h_str.endswith("%"):
-                h = self.h * int(h_str.rstrip("%")) / 100
-            elif w_str.isdigit():
-                h = int(h_str)
-
-            x1 -= w / 2
-            y1 -= h / 2
-
-            frame_enable = self.pro_window.frame.enable.currentText()
-            if frame_enable == "Yes":
-                bkc = self.pro_window.frame.back_color.getColor()
-                bw_str = self.pro_window.frame.border_width.text()
-                print(bw_str)
-                if bw_str.isdigit():
-                    bw = int(bw_str)
-                bc = self.pro_window.frame.border_color.getColor()
-            self.scene.setFrame(x1, y1, w, h, bkc, bc, bw)
+        frame_enable = self.pro_window.frame.enable.currentText()
+        if frame_enable == "Yes":
+            bkc = self.pro_window.frame.back_color.getColor()
+            bw_str = self.pro_window.frame.border_width.text()
+            if bw_str.isdigit():
+                bw = int(bw_str)
+            bc = self.pro_window.frame.border_color.getColor()
+        self.scene.setFrame(x1, y1, w, h, bkc, bc, bw)
 
     """
      Functions that must be complete in new version
