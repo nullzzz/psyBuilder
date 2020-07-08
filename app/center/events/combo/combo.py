@@ -40,6 +40,7 @@ class Combo(TabItemMainWindow):
         self.linkSignal()
         self.setUI()
 
+
     def initMenu(self):
         open_action = QAction(QIcon(Func.getImage("menu/setting.png")), "Setting", self)
         open_action.triggered.connect(self.openSettingWindow)
@@ -326,7 +327,7 @@ class Combo(TabItemMainWindow):
             self.scene.setSceneRect(QRectF(0, 0, width, height))
             self.w = width
             self.h = height
-        self.scene.setBorderRect(QRectF(0, 0, width, height))
+        self.scene.setBorderRect(QRectF(0, 0, width, height),self.screen_color)
         self.setFrame()
 
     def setAttributes(self, attributes: list):
@@ -470,9 +471,9 @@ class Combo(TabItemMainWindow):
         # parse parameters
         ###################
         x1, y1, w, h = 0, 0, self.w, self.h
-        bkc = self.screen_color
-        bw = 0
-        bc = QColor(Qt.black)
+        frame_fill_color = self.screen_color
+        frame_line_width = 0
+        frame_line_color = QColor(Qt.black)
 
         cx_str: str = self.properties["Frame"]["Center X"]
         if cx_str.endswith("%"):
@@ -502,12 +503,22 @@ class Combo(TabItemMainWindow):
 
         frame_enable = self.pro_window.frame.enable.currentText()
         if frame_enable == "Yes":
-            bkc = self.pro_window.frame.back_color.getColor()
+            frame_fill_color = self.pro_window.frame.back_color.getColor()
+
             bw_str = self.pro_window.frame.border_width.text()
             if bw_str.isdigit():
-                bw = int(bw_str)
-            bc = self.pro_window.frame.border_color.getColor()
-        self.scene.setFrame(x1, y1, w, h, bkc, bc, bw)
+                frame_line_width = int(bw_str)
+
+            frame_line_color = self.pro_window.frame.border_color.getColor()
+
+            if frame_line_width == 0:
+                frame_line_color = Qt.transparent
+
+        else:
+            frame_fill_color = Qt.transparent
+            frame_line_color = Qt.transparent
+
+        self.scene.setFrame(x1, y1, w, h, frame_fill_color, frame_line_color, frame_line_width)
 
     """
      Functions that must be complete in new version

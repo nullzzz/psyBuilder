@@ -118,6 +118,12 @@ class RX(QWidget):
         self.getInfo()
         self.deviceOK.emit()
 
+        if self.device_type == OUTPUT_DEVICE and self.device_home.currentItem() and DEV_SCREEN == self.device_home.currentItem().device_type:
+            for wid, cWidget in Info.WID_WIDGET.items():
+                if Func.isWidgetType(wid, Info.COMBO) and cWidget.isVisible():
+                    cWidget.refresh()
+                    break
+
     def changeItem(self, device_id: str, info: dict):
         self.describer.describe(device_id, info)
 
