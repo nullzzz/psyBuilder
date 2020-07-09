@@ -3340,11 +3340,9 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
             printAutoInd(sliderStimCodes, "{0}_dots  = initialDotPos({1}, {2}, {3}, {4}, {5}, {6}, {7});",
                          cItemId, nDots, cDirection, cCoherence, isOval, cWidth, cHeight)
 
-            # dotsData = makeDotPos(nDots, direction, pixsPerSec, coherence, isOval, w, h, dur, ifi)
-
             printAutoInd(cVSLCodes,
-                         "Screen('DrawDots', {0}, {1}_dots(1:2,:,), {2}, {3}, [], {3});",
-                         cWinStr, cItemId, cColor, cDotType)
+                         "Screen('DrawDots', {0}, {1}_dots(1:2,:), {2}, {3}, [], {4});",
+                         cWinStr, cItemId, dotSize, cDotColor, dotType)
 
         elif Info.ITEM_TEXT == cItemType:
             cVSLCodes = drawTextForSlider(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, cItemProperties,
