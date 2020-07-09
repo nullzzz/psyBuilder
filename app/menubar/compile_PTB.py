@@ -11,6 +11,7 @@ cIndents = 0
 isPreLineSwitch = 0
 haveGaborStim = False
 haveSnowStim = False
+haveDotMotion = False
 enabledKBKeysSet = set()
 isDummyPrint = False
 spFormatVarDict = dict()
@@ -1992,7 +1993,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         # printAutoInd(f, " ")
         allWidgetCodes = genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes)
         printAutoInd(f, "%initialise video flip ")
-        printAutoInd(f, "isFirstVideoFrame = true;")
+        printAutoInd(f, "iFrame = 1;")
         printAutoInd(f, "secs              = GetSecs;")
         printAutoInd(f, "afVideoFipReqTime = GetSecs; % temp value but ensure larger than secs\n")
 
@@ -2027,7 +2028,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
 
         printAutoInd(f,f"[isTerminateStimEvent, secs]= checkRespAndSendTriggers({cWinIdx}, afVideoFipReqTime, true); ")
 
-        printAutoInd(f, "if isFirstVideoFrame ")
+        printAutoInd(f, "if iFrame == 1 ")
 
         if cWidgetPos == 0:
             printAutoInd(f, "{0}.onsettime({1})= Screen('Flip',{2},nextEvFlipReqTime,{3});", cWidgetName, cOpRowIdxStr,
@@ -2039,7 +2040,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         allWidgetCodes = genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, 'afVideoFipReqTime')
 
         printAutoInd(f, "nextEvFlipReqTime = afVideoFipReqTime; % after the first flip, update nextEvFlipReqTime")
-        printAutoInd(f, "isFirstVideoFrame = false; ")
+        # printAutoInd(f, "isFirstVideoFrame = false; ")
         printAutoInd(f, "else ")
         printAutoInd(f, "Screen('Flip', {0}, 0, {1}); %", cWinStr, clearAfter)
         printAutoInd(f, "end \n")
@@ -2054,6 +2055,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         printAutoInd(f, "break;")
         printAutoInd(f, "end")
         # print response check section
+        printAutoInd(f, "iFrame = iFrame + 1; ")
         printAutoInd(f, "end % while\n")
 
         printAutoInd(cRespCodes, "% close opened movie prts and visual textures")
@@ -3293,6 +3295,56 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
                          cWinStr, cItemId, cWidth, cHeight, centerX, centerY,
                          cRotation,
                          cTransparency)
+
+        elif Info.ITEM_DOT_MOTION == cItemType:
+            haveDotMotion = True
+
+            centerX, isCenterXRef = getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict)
+            centerX = dataStrConvert(centerX, isCenterXRef)
+
+            centerY, isCenterYRef = getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict)
+            centerY = dataStrConvert(centerY, isCenterYRef)
+
+            cWidth, isWidthRef = getRefValue(cWidget, cItemProperties['Width'], attributesSetDict)
+            cWidth = dataStrConvert(cWidth, isWidthRef)
+
+            cHeight, isHeightRef = getRefValue(cWidget, cItemProperties['Height'], attributesSetDict)
+            cHeight = dataStrConvert(cHeight, isHeightRef)
+
+
+
+            nDots, isnDotsRef = getRefValue(cWidget, cItemProperties['Dot Num'], attributesSetDict)
+            nDots = dataStrConvert(nDots, isnDotsRef)
+
+            dotSize, isDotSizeRef = getRefValue(cWidget, cItemProperties['Dot Size'], attributesSetDict)
+            dotSize = dataStrConvert(dotSize, isDotSizeRef)
+
+            dotType, isDotTypeRef = getRefValue(cWidget, cItemProperties['Dot Type'], attributesSetDict)
+            dotType = dataStrConvert(dotType, isDotTypeRef)
+
+            cDirection, isDirectionRef = getRefValue(cWidget, cItemProperties['Move Direction'], attributesSetDict)
+            cDirection = dataStrConvert(cDirection, isDirectionRef)
+
+            cSpeed, isSpeedRef = getRefValue(cWidget, cItemProperties['Speed'], attributesSetDict)
+            cSpeed = dataStrConvert(cSpeed, isSpeedRef)
+
+            cCoherence, isCoherenceRef = getRefValue(cWidget, cItemProperties['Coherence'], attributesSetDict)
+            cCoherence = dataStrConvert(cCoherence, isCoherenceRef)
+
+            cDotColor, isDotColorRef = getRefValue(cWidget, cItemProperties['Dot Color'], attributesSetDict)
+            cDotColor = dataStrConvert(cDotColor, isDotColorRef)
+
+            isOval = parseBooleanStr(*getRefValue(cWidget, cItemProperties['Is Oval'], attributesSetDict))
+
+            # dotsData = initialDotPos(nDots, direction, coherence, isOval, w, h)
+            printAutoInd(sliderStimCodes, "{0}_dots  = initialDotPos({1}, {2}, {3}, {4}, {5}, {6}, {7});",
+                         cItemId, nDots, cDirection, cCoherence, isOval, cWidth, cHeight)
+
+            # dotsData = makeDotPos(nDots, direction, pixsPerSec, coherence, isOval, w, h, dur, ifi)
+
+            printAutoInd(cVSLCodes,
+                         "Screen('DrawDots', {0}, {1}_dots(1:2,:,), {2}, {3}, [], {3});",
+                         cWinStr, cItemId, cColor, cDotType)
 
         elif Info.ITEM_TEXT == cItemType:
             cVSLCodes = drawTextForSlider(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, cItemProperties,
@@ -5886,6 +5938,40 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             printAutoInd(f, "function stim = makeSnow_bcl(stimWidth, stimHeight, scaleEf)")
             printAutoInd(f, " stim = rand(round([stimHeight, stimWidth]/scaleEf)) * 255;")
+            printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
+            iSubFunNum += 1
+
+        if haveDotMotion:
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "% subfun {0}: initialDotPos", iSubFunNum)
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "function dotsData = initialDotPos(nDots,direction,coherence,isOval,w,h)")
+            printAutoInd(f, "nCohDots = round(nDots*coherence/100);")
+            printAutoInd(f, "dotsData = zeros(4, nDots); %  rows: x, y, direction, isShow \n")
+            printAutoInd(f, "dotsData(1,:) = rand(1,nDots)*w - w/2;")
+            printAutoInd(f, "dotsData(2,:) = rand(1,nDots)*h - h/2;")
+            printAutoInd(f, "dotsData(3,:) = [repmat(direction*pi/180,1,nCohDots),rand(1,nDots - nCohDots)*2*pi];\n")
+            printAutoInd(f, "if isOval")
+            printAutoInd(f, "dotsData(4,:) = dotsData(1,:).^2/(w/2) + dotsData(2,:).^2/(h/2) <= 1; ")
+            printAutoInd(f, "else")
+            printAutoInd(f, "dotsData(4,:) = 1;")
+            printAutoInd(f, "end ")
+
+            printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
+            iSubFunNum += 1
+
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "% subfun {0}: updateDotPos", iSubFunNum)
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "function dotsData = updateDotPos(dotsData,speed,dur,isOval,w,h)")
+            printAutoInd(f, "dotsData(1,:) = rem(dotsData(1,:) + speed*dur*cos(dotsData(3,:)) + w/2, w) - w/2;")
+            printAutoInd(f, "dotsData(2,:) = rem(dotsData(2,:) + speed*dur*sin(dotsData(3,:)) + h/2, h) - h/2;\n")
+            printAutoInd(f, "if isOval")
+            printAutoInd(f, "dotsData(4,:) = dotsData(1,:).^2/(w/2) + dotsData(2,:).^2/(h/2) <= 1; ")
+            printAutoInd(f, "else")
+            printAutoInd(f, "dotsData(4,:) = 1;")
+            printAutoInd(f, "end ")
+
             printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
             iSubFunNum += 1
 

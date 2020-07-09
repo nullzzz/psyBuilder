@@ -144,3 +144,4 @@ __KEY__
 !/build/
 !/dist/
 !/app/info.pyd
+!/app/modifiedData.py
