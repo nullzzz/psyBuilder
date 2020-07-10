@@ -327,13 +327,21 @@ def isContainCycleTL(widgetId) -> bool:
     return False
 
 
-def isVideoRelatedWidget(cWidget) -> bool:
+def sliceFlipWidgetType(cWidget) -> int:
+    sliceFlipType = 0
+
     if Func.isWidgetType(cWidget.widget_id, Info.VIDEO):
-        return True
+        sliceFlipType += 1
+
     elif Func.isWidgetType(cWidget.widget_id, Info.COMBO):
-        return isContainItemType(getSliderItemIds(cWidget), Info.ITEM_VIDEO)
-    else:
-        return False
+
+        if isContainItemType(getSliderItemIds(cWidget), Info.ITEM_VIDEO):
+            sliceFlipType += 1
+
+        if isContainItemType(getSliderItemIds(cWidget), Info.ITEM_DOT_MOTION):
+            sliceFlipType += 2
+
+    return sliceFlipType
 
 
 def isContainItemType(itemIds: list, itemType: str) -> bool:
@@ -1985,14 +1993,14 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     #                  getWidgetName(cWidget.widget_id))
     #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
-    if isVideoRelatedWidget(cWidget):
+    if sliceFlipWidgetType(cWidget):
         # printAutoInd(f, "% for first event, flip immediately.. ")
 
         allWidgetCodes = printBeforeFlipCodes(f, allWidgetCodes)
 
         # printAutoInd(f, " ")
         allWidgetCodes = genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes)
-        printAutoInd(f, "%initialise video flip ")
+        printAutoInd(f, "% initialise video flip ")
         printAutoInd(f, "iFrame = 1;")
         printAutoInd(f, "secs              = GetSecs;")
         printAutoInd(f, "afVideoFipReqTime = GetSecs; % temp value but ensure larger than secs\n")
@@ -2324,7 +2332,7 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         if len(queueDevIdxValueStr) > 0:
             printAutoInd(f, "isQueueStart = switchQueue_bcl({0}, isQueueStart);", queueDevIdxValueStr)
 
-    if not isVideoRelatedWidget(cWidget):
+    if not sliceFlipWidgetType(cWidget):
         printAutoInd(f, "[~,~,nextEvFlipReqTime] = checkRespAndSendTriggers({0}, nextEvFlipReqTime, false);\n", cWinIdx)
         # printAutoInd(f, "if isTerminateStimEvent")
         # printAutoInd(f, "nextEvFlipReqTime = 0;")
@@ -2408,7 +2416,7 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
 
     # for video related widget, will run step 4-6 (do nothing) in dummy as we already did this in Step3:
     # if is a video related widget, will do this within flip loop
-    if not isVideoRelatedWidget(cWidget):
+    if not sliceFlipWidgetType(cWidget):
         # step 3: generate sending trigger codes
         allWidgetCodes = genStimTriggers(cWidget, cStimTriggerCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
 
@@ -3364,7 +3372,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
 
     # sortedZIdx = sorted(range(len(zVlaues)), key=zVlaues.__getitem__)
 
-    if not isVideoRelatedWidget(cWidget):
+    if not sliceFlipWidgetType(cWidget):
         clearAfter = getClearAfterInfo(cWidget, attributesSetDict)
 
         # for no video scene, extend the content of cVSLCodes
