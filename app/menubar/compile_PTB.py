@@ -1463,6 +1463,10 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
                     updateSpFormatVarDict(cItemProperties['Center X'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Center Y'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Aspect Ratio'], 'aspectRatio', cSpecialFormatVarDict)
+                elif cItemType == Info.ITEM_TEXT:
+                    updateSpFormatVarDict(cItemProperties['Transparent'], 'percent', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Style'], 'fontStyle', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Right To Left'], 'rightToLeft', cSpecialFormatVarDict)
 
             getSpecialRespsFormatAtts(cWidget.getInputDevice(), cSpecialFormatVarDict)
 
