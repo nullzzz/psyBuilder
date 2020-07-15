@@ -128,23 +128,23 @@ class DotGeneral(QWidget):
 
         group1.setLayout(layout1)
 
-        group2 = QGroupBox("Fill && Frame")
-        layout2 = QFormLayout()
-        layout2.setRowWrapPolicy(QFormLayout.DontWrapRows)
-        layout2.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
-        layout2.setLabelAlignment(Qt.AlignLeft)
-
-        self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
-        self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
-
-        layout2.addRow(l6, self.fill_color)
-        layout2.addRow(l7, self.border_color)
-        layout2.addRow(l8, self.border_width)
-        group2.setLayout(layout2)
+        # group2 = QGroupBox("Fill && Frame")
+        # layout2 = QFormLayout()
+        # layout2.setRowWrapPolicy(QFormLayout.DontWrapRows)
+        # layout2.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
+        # layout2.setLabelAlignment(Qt.AlignLeft)
+        #
+        # self.fill_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        # self.border_color.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        #
+        # layout2.addRow(l6, self.fill_color)
+        # layout2.addRow(l7, self.border_color)
+        # layout2.addRow(l8, self.border_width)
+        # group2.setLayout(layout2)
 
         layout = QVBoxLayout()
         layout.addWidget(group1)
-        layout.addWidget(group2)
+        # layout.addWidget(group2)
         self.setLayout(layout)
 
     # 设置可选属性
@@ -159,9 +159,9 @@ class DotGeneral(QWidget):
         self.speed.setCompleter(QCompleter(attributes))
         self.dot_color.setCompleter(QCompleter(attributes))
         self.coherence.setCompleter(QCompleter(attributes))
-        self.fill_color.setCompleter(QCompleter(attributes))
-        self.border_color.setCompleter(QCompleter(attributes))
-        self.border_width.setCompleter(QCompleter(attributes))
+        # self.fill_color.setCompleter(QCompleter(attributes))
+        # self.border_color.setCompleter(QCompleter(attributes))
+        # self.border_width.setCompleter(QCompleter(attributes))
 
     def updateInfo(self):
         self.default_properties['Center X'] = self.cx_pos.text()
@@ -177,9 +177,9 @@ class DotGeneral(QWidget):
         self.default_properties['Dot Color'] = self.dot_color.getRGB()
         self.default_properties['Coherence'] = self.coherence.text()
 
-        self.default_properties['Fill Color'] = self.fill_color.getRGB()
-        self.default_properties["Border Color"] = self.border_color.getRGB()
-        self.default_properties["Border Width"] = self.border_width.text()
+        # self.default_properties['Fill Color'] = self.fill_color.getRGB()
+        # self.default_properties["Border Color"] = self.border_color.getRGB()
+        # self.default_properties["Border Width"] = self.border_width.text()
 
     def setProperties(self, properties: dict):
         self.default_properties.update(properties)
@@ -197,17 +197,17 @@ class DotGeneral(QWidget):
         if not self._height.text().startswith("["):
             self._height.setText(str(int(h)))
 
-    def setFillColor(self, rgb: str):
-        if not self.fill_color.currentText().startswith("["):
-            self.fill_color.setCurrentText(rgb)
-
-    def setBorderColor(self, rgb: str):
-        if not self.border_color.currentText().startswith("["):
-            self.border_color.setCurrentText(rgb)
-
-    def setBorderWidth(self, width: str):
-        if not self.border_width.text().startswith("["):
-            self.border_width.setText(width)
+    # def setFillColor(self, rgb: str):
+    #     if not self.fill_color.currentText().startswith("["):
+    #         self.fill_color.setCurrentText(rgb)
+    #
+    # def setBorderColor(self, rgb: str):
+    #     if not self.border_color.currentText().startswith("["):
+    #         self.border_color.setCurrentText(rgb)
+    #
+    # def setBorderWidth(self, width: str):
+    #     if not self.border_width.text().startswith("["):
+    #         self.border_width.setText(width)
 
     # 加载参数设置
     def loadSetting(self):
@@ -225,6 +225,7 @@ class DotGeneral(QWidget):
 
         self.dot_color.setCurrentText(self.default_properties["Dot Color"])
         self.coherence.setText(self.default_properties["Coherence"])
-        self.fill_color.setCurrentText(self.default_properties["Fill Color"])
-        self.border_color.setCurrentText(self.default_properties["Border Color"])
-        self.border_width.setText(self.default_properties["Border Width"])
+
+        # self.fill_color.setCurrentText(self.default_properties["Fill Color"])
+        # self.border_color.setCurrentText(self.default_properties["Border Color"])
+        # self.border_width.setText(self.default_properties["Border Width"])

@@ -11,6 +11,7 @@ cIndents = 0
 isPreLineSwitch = 0
 haveGaborStim = False
 haveSnowStim = False
+haveDotMotion = False
 enabledKBKeysSet = set()
 isDummyPrint = False
 spFormatVarDict = dict()
@@ -44,6 +45,9 @@ def pyStr2MatlabStr(inputStr):
         # inputStr = re.sub(r"\\\%","%",inputStr)
     return inputStr
 
+
+def bitget(number:int, pos:int = 0) -> int:
+    return (number >> pos) & 1
 
 # def dataStrConvert(dataStr, isRef=False, transMATStr=False, transPercent=True) -> str or float or int:
 def dataStrConvert(dataStr, isRef=False, transMATStr=False, transPercent=True):
@@ -262,6 +266,18 @@ def isRgbWithBracketsStr(inputStr):
     return isRgbFormat
 
 
+def isLegalMatlabStr(inputStr) -> bool:
+    isLegal = True
+    if inputStr.startswith("'") and inputStr.endswith("'"):
+        inputStr = inputStr[1:-1]
+
+    inputStr = re.sub("''", "", inputStr)
+
+    if len(re.findall("'",inputStr))>0:
+        isLegal = False
+
+    return isLegal
+
 def isNumStr(inputStr):
     if isinstance(inputStr, str):
         if len(inputStr) == 0:
@@ -326,13 +342,43 @@ def isContainCycleTL(widgetId) -> bool:
     return False
 
 
-def isVideoRelatedWidget(cWidget) -> bool:
+def getSpOutDevTypeNum(devType:str) -> int:
+    cOutDevNum = 0
+
+    output_devices = Info.OUTPUT_DEVICE_INFO
+
+    for outDev_Id, cDevice in output_devices.items():
+
+        if cDevice['Device Type'] == devType:
+            cOutDevNum += 1
+
+    return cOutDevNum
+
+
+
+
+    return
+
+
+def getFlipType(cWidget) -> int:
+    """
+    :arg
+    :argout: 0,1,2 for none, video related widget , and dot motion respectively
+    """
+    sliceFlipType = 0
+
     if Func.isWidgetType(cWidget.widget_id, Info.VIDEO):
-        return True
+        sliceFlipType += 1
+
     elif Func.isWidgetType(cWidget.widget_id, Info.COMBO):
-        return isContainItemType(getSliderItemIds(cWidget), Info.ITEM_VIDEO)
-    else:
-        return False
+
+        if isContainItemType(getSliderItemIds(cWidget), Info.ITEM_VIDEO):
+            sliceFlipType += 1
+
+        if isContainItemType(getSliderItemIds(cWidget), Info.ITEM_DOT_MOTION):
+            sliceFlipType += 2
+
+    return sliceFlipType
 
 
 def isContainItemType(itemIds: list, itemType: str) -> bool:
@@ -648,6 +694,44 @@ def parseStartEndTimeStr(inputStr, isRef=False) -> str:
     return inputStr
 
 
+def parseColorStr(inputStr, isRef = False) -> str:
+    # color_map: dict = {
+    #     "White": "255,255,255",
+    #     "Gray": "128,128,128",
+    #     "Black": "0,0,0",
+    #     "Red": "255,0,0",
+    #     "Orange": "255,165,0",
+    #     "Yellow": "255,255,0",
+    #     "Green": "0,255,0",
+    #     "Blue": "0,0,255",
+    #     "Purple": "128,0,128",
+    #     "Transparent": "0,0,0,0"}
+
+    if not isRef:
+        if inputStr == "White":
+            inputStr == "255,255,255"
+        if inputStr == "Gray":
+            inputStr == "128,128,128"
+        if inputStr == "Black":
+            inputStr == "0,0,0"
+        if inputStr == "Red":
+            inputStr == "255,0,0"
+        if inputStr == "Orange":
+            inputStr == "255,165,0"
+        if inputStr == "Green":
+            inputStr == "0,255,0"
+        if inputStr == "Blue":
+            inputStr == "0,0,255"
+        if inputStr == "Purple":
+            inputStr == "128,0,128"
+        if inputStr == "Transparent":
+            inputStr = "0,0,0,0"
+
+        inputStr = dataStrConvert(inputStr,isRef)
+
+    return inputStr
+
+
 def parseFontStyleStr(inputStr):
     if isinstance(inputStr, str):
         inputStr = removeSingleQuotes(inputStr)
@@ -786,7 +870,6 @@ def parseTextContentStr(inputStr, isRef=False) -> str:
             # inputStr = "double(" + inputStr + ")"
             inputStr = "[" + "".join(f"{ord(value)} " for value in inputStr) + "]"
         else:
-            # cinputStr = '\\n'.join(inputStr.split('\n')) have down in pyStr2MatlabStr
             inputStr = addSingleQuotes(pyStr2MatlabStr(inputStr))
 
     return inputStr
@@ -1165,8 +1248,19 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
 
     isMatlabStr = inputStr.startswith("'") and inputStr.endswith("'")
 
-    if isOutStr and isMatlabStr is False:
+    if isMatlabStr:
+        # remove the single quotes
+        inputStr = inputStr[1:-1]
+
+    if isOutStr or isMatlabStr:
+        if not isLegalMatlabStr(inputStr):
+            throwCompileErrorInfo(f"{inputStr} : you need to use two single quotes to get a single quote inside a string!")
+
+        # inputStr = inputStr.replace("'", "''")
         inputStr = addSingleQuotes(inputStr)
+
+    # if isOutStr and isMatlabStr is False:
+    #     inputStr = addSingleQuotes(inputStr)
 
     rawInputStr = inputStr
     # stage 1: parse @mean @median or @mode
@@ -1373,6 +1467,11 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
             updateSpFormatVarDict(cProperties['Flip Horizontal'], 'flipHorizontal', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Flip Vertical'], 'flipVertical', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Right To Left'], 'rightToLeft', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Fore Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Back Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Border Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Frame Fill Color'], 'color', cSpecialFormatVarDict)
+
             updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', cSpecialFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Text'], 'textContent', cSpecialFormatVarDict)
@@ -1388,6 +1487,10 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
             updateSpFormatVarDict(cProperties['Center Y'], 'percent', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Clear After'], 'clearAfter', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Aspect Ratio'], 'aspectRatio', cSpecialFormatVarDict)
+
+            updateSpFormatVarDict(cProperties['Border Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Frame Fill Color'], 'color', cSpecialFormatVarDict)
+
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
 
             getSpecialRespsFormatAtts(cWidget.getInputDevice(), cSpecialFormatVarDict)
@@ -1408,6 +1511,10 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
             updateSpFormatVarDict(cProperties['Clear After'], 'clearAfter', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Stretch Mode'], 'stretchMode', cSpecialFormatVarDict)
+
+            updateSpFormatVarDict(cProperties['Border Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Frame Fill Color'], 'color', cSpecialFormatVarDict)
+
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
 
             getSpecialRespsFormatAtts(cWidget.getInputDevice(), cSpecialFormatVarDict)
@@ -1415,6 +1522,8 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
         elif Func.isWidgetType(widgetId, Info.COMBO):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Properties']['Clear After'], 'clearAfter', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Properties']['Border Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Properties']['Frame Fill Color'], 'color', cSpecialFormatVarDict)
 
             cItems = cProperties['Items']
             itemIds = getSliderItemIds(cWidget)
@@ -1440,6 +1549,17 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
                     updateSpFormatVarDict(cItemProperties['Center X'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Center Y'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Aspect Ratio'], 'aspectRatio', cSpecialFormatVarDict)
+                elif cItemType == Info.ITEM_TEXT:
+                    updateSpFormatVarDict(cItemProperties['Transparent'], 'percent', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Style'], 'fontStyle', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Right To Left'], 'rightToLeft', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Fore Color'], 'color', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Back Color'], 'color', cSpecialFormatVarDict)
+                elif cItemType == Info.ITEM_GABOR:
+                    updateSpFormatVarDict(cItemProperties['Back Color'], 'color', cSpecialFormatVarDict)
+                elif cItemType == Info.ITEM_DOT_MOTION:
+                    updateSpFormatVarDict(cItemProperties['Dot Color'], 'color', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Is Oval'], 'boolean', cSpecialFormatVarDict)
 
             getSpecialRespsFormatAtts(cWidget.getInputDevice(), cSpecialFormatVarDict)
 
@@ -1589,6 +1709,7 @@ def getSliderItemIds(cWidget, itemType='') -> list:
 
 
 def getSliderItemTypeNums(cWidget, itemType: str) -> int:
+
     itemNums = 0
 
     if Func.isWidgetType(cWidget.widget_id, Info.COMBO):
@@ -1810,6 +1931,14 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
                     cValue = parseRectStr(cValue, isRefValue)
                     cRowDict[key] = cValue
 
+                elif 'color' == spFormatVarDict[cKeyAttrName]:
+                    cValue = parseColorStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif 'boolean' == spFormatVarDict[cKeyAttrName]:
+                    cValue = parseBooleanStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
             #     TO BE CONTINUING... FOR ALL OTHER Special Types
             # --------------------------------------\
 
@@ -1984,85 +2113,107 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     #                  getWidgetName(cWidget.widget_id))
     #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
-    if isVideoRelatedWidget(cWidget):
-        # printAutoInd(f, "% for first event, flip immediately.. ")
+    flipType = getFlipType(cWidget)
+    # 0,1,2 for none, video related widget , and dot motion respectively
+    if flipType:
+        # slicing flip
 
         allWidgetCodes = printBeforeFlipCodes(f, allWidgetCodes)
 
-        # printAutoInd(f, " ")
         allWidgetCodes = genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes)
-        printAutoInd(f, "%initialise video flip ")
-        printAutoInd(f, "isFirstVideoFrame = true;")
+        printAutoInd(f, "% initialise video flip ")
+        printAutoInd(f, "iFrame = 1;")
         printAutoInd(f, "secs              = GetSecs;")
         printAutoInd(f, "afVideoFipReqTime = GetSecs; % temp value but ensure larger than secs\n")
 
-        cVideoItemNums = getSliderItemTypeNums(cWidget, Info.ITEM_VIDEO)
-        if cVideoItemNums <= 1:
-            printAutoInd(f, "{0}_tPtr = 1;", cWidgetName)
-            printAutoInd(f, "{0}_CPt  =-1;\n", cWidgetName)
+        if bitget(flipType,0):
+            ''' 
+            have video widgets 
+            '''
+            cVideoItemNums = getSliderItemTypeNums(cWidget, Info.ITEM_VIDEO)
 
-            # printAutoInd(f, "while {0}_tPtr > 0 && {0}_CPt < {0}_eMTime", cWidgetName)
-            printAutoInd(f, "while secs < afVideoFipReqTime", cWidgetName)
+            if cVideoItemNums > 1:
+                printAutoInd(f, "{0}_beClosedMIdx = true(1,{1});", cWidgetName, cVideoItemNums)
+
+            if cVideoItemNums <= 1:
+                printAutoInd(f, "{0}_tPtr = 1;", cWidgetName)
+                printAutoInd(f, "{0}_CPt  =-1;\n", cWidgetName)
+
+                # printAutoInd(f, "while {0}_tPtr > 0 && {0}_CPt < {0}_eMTime", cWidgetName)
+                printAutoInd(f, "while secs < afVideoFipReqTime", cWidgetName)
+            else:
+                printAutoInd(f, "{0}_tPtrs = repmat(1,1,{1});", cWidgetName, cVideoItemNums)
+                printAutoInd(f, "{0}_CPts  = repmat(-1,1,{1});", cWidgetName, cVideoItemNums)
+
+                printAutoInd(f, "while any( {0}_tPtrs > 0 && ({0}_CPts./{0}_eMTimes) < 1 )", cWidgetName)
         else:
-            printAutoInd(f, "{0}_tPtrs = repmat(1,1,{1});", cWidgetName, cVideoItemNums)
-            printAutoInd(f, "{0}_CPts = repmat(-1,1,{1});", cWidgetName, cVideoItemNums)
+            ''' 
+            have no video widget & have dot motion slider only
+            '''
+            printAutoInd(f, "while secs < afVideoFipReqTime", cWidgetName)
 
-            printAutoInd(f, "while any( {0}_tPtrs > 0 && ({0}_CPts./{0}_eMTimes) < 1 )", cWidgetName)
-
-            # printAutoInd(f, "if ~isFirstVideoFrame")
-            # if cVideoItemNums <= 1:
-            #     printAutoInd(f, "Screen('Close',{0}_tPtr);", cWidgetName)
-            # else:
-            #     printAutoInd(f, "Screen('Close',{0}_tPtrs);", cWidgetName)
-            # printAutoInd(f, "end")
-
-        '''
-        draw all visual stim looply over here: print cVSLCodes
-        '''
-
+        ''' draw all visual stim looply over here: print cVSLCodes '''
         allWidgetCodes = printInAllWidgetCodesByKey(f, allWidgetCodes, 'forVideoSliderLoopCodes')
-
-        # printAutoInd(f, "% check the 'esc' key to abort the exp")
-        # printAutoInd(f, "detectAbortKey(abortKeyCode);\n")
 
         printAutoInd(f,f"[isTerminateStimEvent, secs]= checkRespAndSendTriggers({cWinIdx}, afVideoFipReqTime, true); ")
 
-        printAutoInd(f, "if isFirstVideoFrame ")
+        printAutoInd(f, "if iFrame == 1 ")
 
         if cWidgetPos == 0:
-            printAutoInd(f, "{0}.onsettime({1})= Screen('Flip',{2},nextEvFlipReqTime,{3});", cWidgetName, cOpRowIdxStr,
-                         cWinStr, clearAfter)
+            printAutoInd(f, "lastFrameOnsettime = Screen('Flip',{0},nextEvFlipReqTime,{1});", cWinStr, clearAfter)
         else:
-            printAutoInd(f, "{0}.onsettime({1})= Screen('Flip',{2},nextEvFlipReqTime,{3});", cWidgetName, cOpRowIdxStr,
-                         cWinStr, clearAfter)
+            printAutoInd(f, "lastFrameOnsettime = Screen('Flip',{0},nextEvFlipReqTime,{1});", cWinStr, clearAfter)
+
+        printAutoInd(f, "{0}.onsettime({1}) = lastFrameOnsettime;", cWidgetName, cOpRowIdxStr)
+
         allWidgetCodes = genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes)
         allWidgetCodes = genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, 'afVideoFipReqTime')
 
         printAutoInd(f, "nextEvFlipReqTime = afVideoFipReqTime; % after the first flip, update nextEvFlipReqTime")
-        printAutoInd(f, "isFirstVideoFrame = false; ")
+        # printAutoInd(f, "isFirstVideoFrame = false; ")
         printAutoInd(f, "else ")
-        printAutoInd(f, "Screen('Flip', {0}, 0, {1}); %", cWinStr, clearAfter)
+        printAutoInd(f, "lastFrameOnsettime = Screen('Flip', {0}, 0, {1}); %", cWinStr, clearAfter)
         printAutoInd(f, "end \n")
 
-        if cVideoItemNums <= 1:
-            printAutoInd(f, "Screen('Close',{0}_tPtr);\n", cWidgetName)
-        else:
-            printAutoInd(f, "Screen('Close',{0}_tPtrs);\n", cWidgetName)
+        '''
+        only for video related widget, the video texture need to be closed 
+        '''
+        if bitget(flipType, 0):
+            # single video without dot motion
+            if cVideoItemNums <= 1 and bitget(flipType, 1) == 0:
+                printAutoInd(f, "Screen('Close',{0}_tPtr);\n", cWidgetName)
+            # single video with dot motion
+            elif cVideoItemNums <= 1 and bitget(flipType, 1):
+                printAutoInd(f, "if {0}_beClosedMIdx", cWidgetName)
+                printAutoInd(f, "Screen('Close',{0}_tPtr);", cWidgetName)
+                printAutoInd(f, "end \n")
+            # multiple videos
+            elif cVideoItemNums > 1:
+                printAutoInd(f, "Screen('Close',{0}_tPtrs({0}_beClosedMIdx));", cWidgetName)
+
 
         printAutoInd(f, "if isTerminateStimEvent")
         printAutoInd(f, "nextEvFlipReqTime = 0;")
         printAutoInd(f, "break;")
         printAutoInd(f, "end")
         # print response check section
+        printAutoInd(f, "iFrame = iFrame + 1; ")
         printAutoInd(f, "end % while\n")
 
-        printAutoInd(cRespCodes, "% close opened movie prts and visual textures")
-        if cVideoItemNums <= 1:
-            printAutoInd(cRespCodes, "Screen('CloseMovie', {0}_mPtr);", cWidgetName)
-            printAutoInd(cRespCodes, "Screen('Close',{0}_tPtr); % close the last video frame", cWidgetName)
-        else:
-            printAutoInd(cRespCodes, "Screen('CloseMovie', {0}_mPtrs);", cWidgetName)
-            printAutoInd(cRespCodes, "Screen('Close',TPtrs); % close the last video frame")
+
+        """
+        --------------------------
+        # close opened movies
+        ---------------------------
+        """
+        if bitget(flipType,0):
+            printAutoInd(cRespCodes, "% close opened movie prts and visual textures")
+            if cVideoItemNums <= 1:
+                printAutoInd(cRespCodes, "Screen('CloseMovie', {0}_mPtr);", cWidgetName)
+                printAutoInd(cRespCodes, "Screen('Close',{0}_tPtr); % close the last video frame", cWidgetName)
+            else:
+                printAutoInd(cRespCodes, "Screen('CloseMovie', {0}_mPtrs);", cWidgetName)
+                printAutoInd(cRespCodes, "Screen('Close',TPtrs); % close the last video frame")
 
         cAfEndVideoFlipCodes = allWidgetCodes.get('codesAfEndVideoFip', [])
 
@@ -2073,7 +2224,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         allWidgetCodes.update({f"{cWidget.widget_id}_cRespCodes": cRespCodes})
 
     else:
-        # Flip the Screen
+        # Flip once the Screen
         if cWidgetPos == 0:
             # printAutoInd(f, "% for first event, flip immediately.. ")
             # f"{getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
@@ -2322,7 +2473,7 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         if len(queueDevIdxValueStr) > 0:
             printAutoInd(f, "isQueueStart = switchQueue_bcl({0}, isQueueStart);", queueDevIdxValueStr)
 
-    if not isVideoRelatedWidget(cWidget):
+    if not getFlipType(cWidget):
         printAutoInd(f, "[~,~,nextEvFlipReqTime] = checkRespAndSendTriggers({0}, nextEvFlipReqTime, false);\n", cWinIdx)
         # printAutoInd(f, "if isTerminateStimEvent")
         # printAutoInd(f, "nextEvFlipReqTime = 0;")
@@ -2406,7 +2557,7 @@ def genStimWidgetAllCodes(cWidget, attributesSetDict, cLoopLevel, allWidgetCodes
 
     # for video related widget, will run step 4-6 (do nothing) in dummy as we already did this in Step3:
     # if is a video related widget, will do this within flip loop
-    if not isVideoRelatedWidget(cWidget):
+    if not getFlipType(cWidget):
         # step 3: generate sending trigger codes
         allWidgetCodes = genStimTriggers(cWidget, cStimTriggerCodes, cLoopLevel, attributesSetDict, allWidgetCodes)
 
@@ -2592,9 +2743,6 @@ def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
         condStr = cWidget.getCondition()
 
         condStr, haveRef, referObNameList = getValueInContainRefExp(cWidget, condStr, attributesSetDict)
-
-        # trueWidget = cWidget.getTrueWidget()
-        # falseWidget = cWidget.getFalseWidget()
 
         if preStimWId and Func.getWidgetName(preStimWId) in referObNameList:
             printPreRespCodesFirst = True
@@ -2984,21 +3132,14 @@ def printETEndRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
 
 
 def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes):
-    global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint, haveGaborStim, haveSnowStim
+    global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint, haveGaborStim, haveSnowStim, haveDotMotion
 
     cVSLCodes = allWidgetCodes.get('forVideoSliderLoopCodes', [])
     beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
 
     iVideoNum = 1
-    # print(os.path.abspath(__file__))
 
-    # if getWidgetPos(cWidget.widget_id) == 0  and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-    #     # Step 2: print out help info for the current widget
-    #     printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    #     printAutoInd(sliderStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-    #                  getWidgetName(cWidget.widget_id))
-    #     printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-
+    cWidgetName = getWidgetName(cWidget.widget_id)
     cSliderProperties = Func.getWidgetProperties(cWidget.widget_id)
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
@@ -3018,9 +3159,8 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
     # itemIds = itemIds[-1::-1] # reverse the key id order in ascend
 
     if isContainItemType(itemIds, Info.ITEM_SOUND):
-        printAutoInd(sliderStimCodes, "% prepare audio materials for widget {0}", getWidgetName(cWidget.widget_id))
-        printAutoInd(sliderStimCodes,
-                     "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur({1}));",
+        printAutoInd(sliderStimCodes, "% prepare audio materials for widget {0}", cWidgetName)
+        printAutoInd(sliderStimCodes, "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur({1}));",
                      cWinStr, cWinIdx)
     # loop twice, once for audio and once for all visual stimuli
     iSoundSlave = 1
@@ -3029,23 +3169,28 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
         cItemProperties = cItems[cItemId]
 
         if getItemType(cItemId) == Info.ITEM_SOUND:
-            printAutoInd(sliderStimCodes, "% create item: {0} in {1}", cItemId, getWidgetName(cWidget.widget_id))
+            printAutoInd(sliderStimCodes, "% create item: {0} in {1}", cItemId, cWidgetName)
             if iSoundSlave == 1:
-                printAutoInd(sliderStimCodes,
-                             "% schedule start of audio at exactly the predicted time of the next flip")
+                printAutoInd(sliderStimCodes, "% schedule start of audio at exactly the predicted time of the next flip")
 
             allWidgetCodes = drawSoundWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes,
                                              cItemProperties, iSoundSlave)
             iSoundSlave += 1
         else:
             pass
+
+
     # remove sound items
     itemIds = [cItemId for cItemId in itemIds if getItemType(cItemId) != Info.ITEM_SOUND]
-    '''
-    loop to handle all visual stimuli
-    '''
-    cWidgetName = getWidgetName(cWidget.widget_id)
 
+
+    # draw background frame effects
+    drawFrameEffect(cWidget, cVSLCodes, cSliderProperties['Properties'], attributesSetDict)
+    '''
+    --------------------------------------
+    loop to handle all visual stimuli
+    --------------------------------------
+    '''
     printAutoInd(cVSLCodes, "% draw item {0} in {1}", itemIds, cWidgetName)
 
     for cItemId in itemIds:
@@ -3060,6 +3205,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
         # printAutoInd(cVSLCodes, "% draw item {0} in {1}", cItemId, cWidgetName)
 
         cItemId = cWidgetName + '_' + cItemId
+        cItemId = re.sub(r'[ .]+','_',cItemId)
 
         if cItemType == Info.ITEM_LINE:
             borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Color'], attributesSetDict))
@@ -3294,6 +3440,59 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
                          cRotation,
                          cTransparency)
 
+        elif Info.ITEM_DOT_MOTION == cItemType:
+            haveDotMotion = True
+
+            centerX, isCenterXRef = getRefValue(cWidget, cItemProperties['Center X'], attributesSetDict)
+            centerX = dataStrConvert(centerX, isCenterXRef)
+
+            centerY, isCenterYRef = getRefValue(cWidget, cItemProperties['Center Y'], attributesSetDict)
+            centerY = dataStrConvert(centerY, isCenterYRef)
+
+            cWidth, isWidthRef = getRefValue(cWidget, cItemProperties['Width'], attributesSetDict)
+            cWidth = dataStrConvert(cWidth, isWidthRef)
+
+            cHeight, isHeightRef = getRefValue(cWidget, cItemProperties['Height'], attributesSetDict)
+            cHeight = dataStrConvert(cHeight, isHeightRef)
+
+
+
+            nDots, isnDotsRef = getRefValue(cWidget, cItemProperties['Dot Num'], attributesSetDict)
+            nDots = dataStrConvert(nDots, isnDotsRef)
+
+            dotSize, isDotSizeRef = getRefValue(cWidget, cItemProperties['Dot Size'], attributesSetDict)
+            dotSize = dataStrConvert(dotSize, isDotSizeRef)
+
+            dotType, isDotTypeRef = getRefValue(cWidget, cItemProperties['Dot Type'], attributesSetDict)
+            dotType = dataStrConvert(dotType, isDotTypeRef)
+
+            cDirection, isDirectionRef = getRefValue(cWidget, cItemProperties['Move Direction'], attributesSetDict)
+            cDirection = dataStrConvert(cDirection, isDirectionRef)
+
+            cSpeed, isSpeedRef = getRefValue(cWidget, cItemProperties['Speed'], attributesSetDict)
+            cSpeed = dataStrConvert(cSpeed, isSpeedRef)
+
+            cCoherence, isCoherenceRef = getRefValue(cWidget, cItemProperties['Coherence'], attributesSetDict)
+            cCoherence = dataStrConvert(cCoherence, isCoherenceRef)
+
+            cDotColor, isDotColorRef = getRefValue(cWidget, cItemProperties['Dot Color'], attributesSetDict)
+            cDotColor = dataStrConvert(cDotColor, isDotColorRef)
+
+            isOval = parseBooleanStr(*getRefValue(cWidget, cItemProperties['Is Oval'], attributesSetDict))
+
+            printAutoInd(sliderStimCodes, "{0}_xys  = initialDotPos({1}, {2}, {3}, {4}, {5}, {6});",
+                         cItemId, nDots, cDirection, cCoherence, isOval, cWidth, cHeight)
+
+            printAutoInd(sliderStimCodes, "{0}_cxy  = repmat([{1};{2}],1,{3});",
+                         cItemId, centerX, centerY, nDots)
+
+            printAutoInd(cVSLCodes, "Screen('DrawDots', {0}, {1}_xys(1:2,:) + {1}_cxy, {2}, {3}, [], {4});", cWinStr, cItemId, dotSize, cDotColor, dotType)
+            printAutoInd(cVSLCodes, "if iFrame > 1")
+            printAutoInd(cVSLCodes, "{0}_xys = updateDotPos({0}_dots,{1},predictedDurToNextFlip(winIFIs({2}),lastFrameOnsettime),{3},{4},{5}); ",
+                                    cItemId, cSpeed, cWinIdx, isOval,cWidth, cHeight)
+
+            printAutoInd(cVSLCodes, "end \n")
+
         elif Info.ITEM_TEXT == cItemType:
             cVSLCodes = drawTextForSlider(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, cItemProperties,
                                           cVSLCodes)
@@ -3314,7 +3513,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
 
     # sortedZIdx = sorted(range(len(zVlaues)), key=zVlaues.__getitem__)
 
-    if not isVideoRelatedWidget(cWidget):
+    if not getFlipType(cWidget):
         clearAfter = getClearAfterInfo(cWidget, attributesSetDict)
 
         # for no video scene, extend the content of cVSLCodes
@@ -3482,13 +3681,6 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_respCodes", [])
     beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
 
-    # if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-    #     # Step 2: print out help info for the current widget
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-    #                  getWidgetName(cWidget.widget_id))
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
@@ -3532,6 +3724,9 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                  cHeight, cWinIdx)
 
     if isNotInSlide:
+        # draw background frame effects
+        drawFrameEffect(cWidget, f, cProperties, attributesSetDict)
+        """
         # before we draw the image， we draw the frame rect first:
         borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border Color'], attributesSetDict))
         borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
@@ -3541,6 +3736,8 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
         # get enable parameter
         cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
         isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+        shouldNotBeCitationCheck('Enable', isBkFrameEnable)
+
 
         if isBkFrameEnable == '1':
             if isNotInSlide:
@@ -3565,6 +3762,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                     printAutoInd(cVSLCodes, "Screen('FrameRect',{0},{1},{2}_fRect,{3});", cWinStr,
                                  addedTransparentToRGBStr(frameFillColor, frameTransparent), cPrefixStr,
                                  borderWidth)
+        """
 
     # make texture
     if isFileNameRef is False and cLoopLevel > 0:
@@ -3700,15 +3898,9 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
         cItemOrWidgetNameStr = cProperties['Name']
 
     cVideoItemNums = getSliderItemTypeNums(cWidget, Info.ITEM_VIDEO)
+    cDotMotionItemNums = getSliderItemTypeNums(cWidget,Info.ITEM_DOT_MOTION)
 
     cBeFlipCodes = allWidgetCodes.get('codesBeFlip', [])
-
-    # if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-    #     # Step 2: print out help info for the current widget
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-    #                  cWidgetName)
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
@@ -3748,6 +3940,9 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                  cWidth, cHeight, cWinIdx)
 
     if isNotInSlide:
+        # draw background frame effects
+        drawFrameEffect(cWidget, f, cProperties, attributesSetDict)
+        """
         # before we draw the image， we draw the frame rect first:
         borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border Color'], attributesSetDict))
         borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
@@ -3757,6 +3952,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
         # get enable parameter
         cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
         isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+        shouldNotBeCitationCheck('Enable', isBkFrameEnable)
 
         if isBkFrameEnable == '1':
             # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
@@ -3769,6 +3965,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                 printAutoInd(f, "Screen('FrameRect',{0},{1},{2}_fRect,{3});", cWinStr,
                              addedTransparentToRGBStr(frameFillColor, frameTransparent), cItemOrWidgetNameStr,
                              borderWidth)
+        """
 
     # make texture
     if isNotInSlide:
@@ -3799,7 +3996,9 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
 
     if cVideoItemNums <= 1:
         '''
+        ----------------------------------------------------------
         for video widget or slider containing only one video item
+        ----------------------------------------------------------
         '''
         cBeFlipCodes.append(f"{cWidgetName}_sMTime = {startPositionStr}/1000; ")
         cBeFlipCodes.append(f"{cWidgetName}_eMTime = {endPositionStr}/1000; ")
@@ -3827,15 +4026,31 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                 f"{cWidgetName}_eMTime = min([{cWidgetName}_eMTime, {cWidgetName}_mDur, cDurs({cWinIdx}) - {cWidgetName}_sMTime]);")
 
         printAutoInd(cVSLCodes, "if {0}_tPtr > 0 && {0}_CPt < {0}_eMTime", cWidgetName)
-        printAutoInd(cVSLCodes, "[{0}_tPtr,{0}_CPt] = Screen('GetMovieImage', {1}, {0}_mPtr, 1); %", cWidgetName,
-                     cWinStr)
-        printAutoInd(cVSLCodes, "Screen('DrawTexture', {0}, {1}_tPtr, [], {2}_dRect);", cWinStr, cWidgetName,
-                     cItemOrWidgetNameStr)
+
+        if cDotMotionItemNums  > 0:
+            # slider with dot motion items
+            printAutoInd(cVSLCodes, "[{0}_temp_tPtr,{0}_temp_CPt] = Screen('GetMovieImage', {1}, {0}_mPtr, 0); %", cWidgetName, cWinStr)
+
+            printAutoInd(cVSLCodes, "if {0}_temp_tPtr > 0 ", cWidgetName)
+            printAutoInd(cVSLCodes, "{0}_tPtr = {0}_temp_tPtr;", cWidgetName)
+            printAutoInd(cVSLCodes, "{0}_CPt  = {0}_temp_CPt; \n", cWidgetName)
+
+            printAutoInd(cVSLCodes, "Screen('DrawTexture', {0}, {1}_tPtr, [], {2}_dRect);", cWinStr, cWidgetName, cItemOrWidgetNameStr)
+            printAutoInd(cVSLCodes, "{0}_beClosedMIdx = true; % whether close the current movie texture", cWidgetName)
+            printAutoInd(cVSLCodes, "else ")
+            printAutoInd(cVSLCodes, "{0}_beClosedMIdx = false; % whether close the current movie texture", cWidgetName)
+            printAutoInd(cVSLCodes, "end \n")
+        else:
+            # slider without  dot motion item and have only one video item | video widget
+            printAutoInd(cVSLCodes, "[{0}_tPtr,{0}_CPt] = Screen('GetMovieImage', {1}, {0}_mPtr, 1); %", cWidgetName, cWinStr)
+            printAutoInd(cVSLCodes, "Screen('DrawTexture', {0}, {1}_tPtr, [], {2}_dRect);", cWinStr, cWidgetName, cItemOrWidgetNameStr)
         printAutoInd(cVSLCodes, "end ")
 
     else:
         '''
+        ------------------------------------------------
         for slider containing more than one video items
+        ------------------------------------------------
         '''
         if Info.PLATFORM == 'linux':
             cBeFlipCodes.append(
@@ -3848,25 +4063,28 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                 f"[{cWidgetName}Ptrs{iVideoNum},{cWidgetName}_mDurs{iVideoNum}, ~,{cWidgetName}_ImgWs{iVideoNum}, {cWidgetName}_ImgHs{iVideoNum}] = Screen('OpenMovie',{cWinStr}, fullfile(cFolder,{addSingleQuotes(cFilenameStr)}) );")
 
         cBeFlipCodes.append(f"{cWidgetName}_sMTimes{iVideoNum} = {endPositionStr}/1000; ")
-        cBeFlipCodes.append(
-            f"Screen('SetMovieTimeIndex', {cWidgetName}Ptrs{iVideoNum}, {cWidgetName}_sMTimes{iVideoNum}); % skip the first n seconds")
+        cBeFlipCodes.append(f"Screen('SetMovieTimeIndex', {cWidgetName}Ptrs{iVideoNum}, {cWidgetName}_sMTimes{iVideoNum}); % skip the first n seconds")
         cBeFlipCodes.append(f"{cWidgetName}_eMTimes{iVideoNum} = {endPositionStr}/1000; ")
         cBeFlipCodes.append(f"Screen('PlayMovie', {cWidgetName}Ptrs{iVideoNum}, {playbackRateStr});")
-        cBeFlipCodes.append(
-            f"{cItemOrWidgetNameStr}_dRect = makeImDestRect({cItemOrWidgetNameStr}_fRect, [{cWidgetName}_ImgWs{iVideoNum}, {cWidgetName}_ImgHs{iVideoNum}], {stretchModeStr});\n")
+        cBeFlipCodes.append(f"{cItemOrWidgetNameStr}_dRect = makeImDestRect({cItemOrWidgetNameStr}_fRect, [{cWidgetName}_ImgWs{iVideoNum}, {cWidgetName}_ImgHs{iVideoNum}], {stretchModeStr});\n")
 
         if re.fullmatch(r"\d+,\d+", durStr):
-            cBeFlipCodes.append(
-                f"{cWidgetName}_eMTimes{iVideoNum} = min([{cWidgetName}_eMTimes{iVideoNum}, {cWidgetName}_mDurs{iVideoNum}, getDurValue([{durStr}],winIFIs({cWinIdx})) - {cWidgetName}_sMTimes{iVideoNum}]);")
+            cBeFlipCodes.append(f"{cWidgetName}_eMTimes{iVideoNum} = min([{cWidgetName}_eMTimes{iVideoNum}, {cWidgetName}_mDurs{iVideoNum}, getDurValue([{durStr}],winIFIs({cWinIdx})) - {cWidgetName}_sMTimes{iVideoNum}]);")
         else:
-            cBeFlipCodes.append(
-                f"{cWidgetName}_eMTimes{iVideoNum} = min([{cWidgetName}_eMTimes{iVideoNum}, {cWidgetName}_mDurs{iVideoNum}, getDurValue({durStr},winIFIs({cWinIdx})) - {cWidgetName}_sMTimes{iVideoNum}]);")
+            cBeFlipCodes.append(f"{cWidgetName}_eMTimes{iVideoNum} = min([{cWidgetName}_eMTimes{iVideoNum}, {cWidgetName}_mDurs{iVideoNum}, getDurValue({durStr},winIFIs({cWinIdx})) - {cWidgetName}_sMTimes{iVideoNum}]);")
 
         printAutoInd(cVSLCodes, "if {0}_tPtrs({1}) > 0 && {0}_CPts({1}) < {0}_eMTimes({1})", cWidgetName, iVideoNum)
-        printAutoInd(cVSLCodes, "[{0}_tPtrs({1}),{0}_CPts({1})] = Screen('GetMovieImage',{2} , {0}Ptrs({1}), 1); %",
-                     cWidgetName, iVideoNum, cWinStr)
-        printAutoInd(cVSLCodes, "Screen('DrawTexture', {0}, {1}_tPtrs({1}), [], {2}_dRect);", cWinStr, iVideoNum,
-                     cItemOrWidgetNameStr)
+
+        printAutoInd(cVSLCodes, "[{0}_temp_tPtr, {0}_temp_CPt] = Screen('GetMovieImage',{2}, {0}Ptrs({1}), 0);", cWidgetName, iVideoNum, cWinStr)
+        printAutoInd(cVSLCodes, "if {0}_temp_tPtr > 0 ", cWidgetName)
+        printAutoInd(cVSLCodes, "{0}_tPtrs({1}) = {0}_temp_tPtr;", cWidgetName, iVideoNum)
+        printAutoInd(cVSLCodes, "{0}_CPts({1})  = {0}_temp_CPt; \n", cWidgetName, iVideoNum)
+        printAutoInd(cVSLCodes, "Screen('DrawTexture', {0}, {1}_tPtrs({1}), [], {2}_dRect);", cWinStr, iVideoNum, cItemOrWidgetNameStr)
+        printAutoInd(cVSLCodes, "{0}_beClosedMIdx({2}) = true; % whether close the current movie texture", cWidgetName, iVideoNum)
+        printAutoInd(cVSLCodes, "else ")
+        printAutoInd(cVSLCodes, "{0}_beClosedMIdx({2}) = false; % whether close the current movie texture", cWidgetName, iVideoNum)
+        printAutoInd(cVSLCodes, "end \n")
+
         printAutoInd(cVSLCodes, "end ")
 
     if isNotInSlide:
@@ -3896,7 +4114,6 @@ def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, cProperties, cV
     # 2) handle the current_text content
     inputStr, isContainRef, _ = getValueInContainRefExp(cWidget, cProperties['Text'], attributesSetDict, True, dict())
     cTextContentStr = parseTextContentStrNew(inputStr)
-    # cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
 
     # 3) check the alignment X parameter:
     leftX = dataStrConvert(*getRefValue(cWidget, cProperties['Left X'], attributesSetDict))
@@ -3961,13 +4178,6 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
 
-    # if getWidgetPos(cWidget.widget_id) == 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-    #     # Step 2: print out help info for the current widget
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-    #                  getWidgetName(cWidget.widget_id))
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-
     cProperties = Func.getWidgetProperties(cWidget.widget_id)
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
@@ -3978,7 +4188,6 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
     # 2) handle the current_text content
     inputStr, isContainRef, _ = getValueInContainRefExp(cWidget, cProperties['Text'], attributesSetDict, True, dict())
     cTextContentStr = parseTextContentStrNew(inputStr)
-    # cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
 
     # 3) check the alignment X parameter:
     alignmentX = dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
@@ -4046,27 +4255,31 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
     if isChangeFontPars:
         printAutoInd(f, "")
 
-    # before we draw the formattedtext， we draw the frame rect first:
-    borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border Color'], attributesSetDict))
-    borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
-    frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Fill Color'], attributesSetDict))
-    # if f"preFrameFillColor" not in historyPropDict:
-    frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Transparent'], attributesSetDict))
-
-    cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
-    isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
-
-    if isBkFrameEnable == '1':
-        # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
-        if frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]:
-            printAutoInd(f, "Screen('FillRect',{0},{1},{2});", cWinStr,
-                         addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr)
-
-        # draw the frame only when the frame color is different from the frame fill color
-        if borderColor != frameFillColor:
-            printAutoInd(f, "Screen('FrameRect',{0},{1},{2},{3});", cWinStr,
-                         addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr, borderWidth)
-
+    drawFrameEffect(cWidget, f, cProperties, attributesSetDict)
+    """
+        # before we draw the formatted text， we draw the frame rect first:
+        borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border Color'], attributesSetDict))
+        borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
+        frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Fill Color'], attributesSetDict))
+        # if f"preFrameFillColor" not in historyPropDict:
+        frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Transparent'], attributesSetDict))
+    
+    
+        cRefedValue, isFrameRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
+        isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isFrameRef), isFrameRef)
+        shouldNotBeCitationCheck('Enable', isBkFrameEnable)
+    
+        if isBkFrameEnable == '1':
+            # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
+            if frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]:
+                printAutoInd(f, "Screen('FillRect',{0},{1},{2});", cWinStr,
+                             addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr)
+    
+            # draw the frame only when the frame color is different from the frame fill color
+            if borderColor != frameFillColor:
+                printAutoInd(f, "Screen('FrameRect',{0},{1},{2},{3});", cWinStr,
+                             addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr, borderWidth)
+    """
     #  print out the current_text
     printAutoInd(f, "DrawFormattedText({0},{1},{2},{3},{4},{5},{6},{7},[],{8},{9});",
                  cWinStr,
@@ -4088,6 +4301,41 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
 
     return 0
 
+
+def drawFrameEffect(cWidget,f, cProperties,attributesSetDict):
+    global historyPropDict
+
+    cWidgetName = getWidgetName(cWidget.widget_id)
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
+    #
+    borderColor = dataStrConvert(*getRefValue(cWidget,cProperties['Border Color'], attributesSetDict))
+    borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
+    frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Fill Color'], attributesSetDict))
+    frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Transparent'], attributesSetDict))
+    # # get enable parameter
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
+    isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+    shouldNotBeCitationCheck('Enable', isBkFrameEnable)
+
+    isAnyFrameCode = frameFillColor != historyPropDict[f"{cScreenName}_bkColor"] or borderColor != frameFillColor
+
+    if isBkFrameEnable == '1':
+
+        if isAnyFrameCode:
+            printAutoInd(f, "% draw background frame ")
+
+        if frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]:
+            printAutoInd(f, "Screen('FillRect',{0},{1}, {2}_fRect);", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent), cWidgetName)
+
+        # draw the frame only when the frame color is different from the frame fill color
+        if borderColor != frameFillColor:
+            printAutoInd(f, "Screen('FrameRect',{0},{1},{2}_fRect,{3});", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent), cWidgetName, borderWidth)
+
+        if isAnyFrameCode:
+            printAutoInd(f, "\n")
+    return 0
 
 def compilePTB():
     global cInfoDict
@@ -4434,6 +4682,11 @@ def compileCode(isDummyCompile):
         iSerial = 1
         iSound = 1
 
+        soundDevSlavesDict = getMaxSlaveSoundDevs()
+
+        if len(soundDevSlavesDict)>0 and getSpOutDevTypeNum(Info.DEV_SOUND)<1:
+            throwCompileErrorInfo("Looks like at least one sound device need to be setup for your experiment\n please define it in the output under Device menu!")
+
         for outDev_Id, cDevice in output_devices.items():
 
             if cDevice['Device Type'] == Info.DEV_SCREEN:
@@ -4482,7 +4735,7 @@ def compileCode(isDummyCompile):
 
             elif cDevice['Device Type'] == Info.DEV_SOUND:
 
-                soundDevSlavesDict = getMaxSlaveSoundDevs()
+                # soundDevSlavesDict = getMaxSlaveSoundDevs()
                 cSoundDevNameStr = cDevice['Device Name']
 
                 if soundDevSlavesDict.get(cSoundDevNameStr, 0) > 0:
@@ -5886,6 +6139,48 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             printAutoInd(f, "function stim = makeSnow_bcl(stimWidth, stimHeight, scaleEf)")
             printAutoInd(f, " stim = rand(round([stimHeight, stimWidth]/scaleEf)) * 255;")
+            printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
+            iSubFunNum += 1
+
+        if haveDotMotion:
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "% subfun {0}: initialDotPos", iSubFunNum)
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "function dotsData = initialDotPos(nDots,direction,coherence,isOval,w,h)")
+            printAutoInd(f, "nCohDots = round(nDots*coherence/100);")
+            printAutoInd(f, "dotsData = zeros(4, nDots); %  rows: x, y, direction, isShow \n")
+            printAutoInd(f, "dotsData(1,:) = rand(1,nDots)*w - w/2;")
+            printAutoInd(f, "dotsData(2,:) = rand(1,nDots)*h - h/2;")
+            printAutoInd(f, "dotsData(3,:) = [repmat(direction*pi/180,1,nCohDots),rand(1,nDots - nCohDots)*2*pi];\n")
+            printAutoInd(f, "if isOval")
+            printAutoInd(f, "dotsData(4,:) = dotsData(1,:).^2/(w/2) + dotsData(2,:).^2/(h/2) <= 1; ")
+            printAutoInd(f, "else")
+            printAutoInd(f, "dotsData(4,:) = 1;")
+            printAutoInd(f, "end ")
+
+            printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
+            iSubFunNum += 1
+
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "% subfun {0}: updateDotPos", iSubFunNum)
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "function dotsData = updateDotPos(dotsData,speed,dur,isOval,w,h)")
+            printAutoInd(f, "dotsData(1,:) = rem(dotsData(1,:) + speed*dur*cos(dotsData(3,:)) + w/2, w) - w/2;")
+            printAutoInd(f, "dotsData(2,:) = rem(dotsData(2,:) + speed*dur*sin(dotsData(3,:)) + h/2, h) - h/2;\n")
+            printAutoInd(f, "if isOval")
+            printAutoInd(f, "dotsData(4,:) = dotsData(1,:).^2/(w/2) + dotsData(2,:).^2/(h/2) <= 1; ")
+            printAutoInd(f, "else")
+            printAutoInd(f, "dotsData(4,:) = 1;")
+            printAutoInd(f, "end ")
+
+            printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
+            iSubFunNum += 1
+
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "% subfun {0}: predictedDurToNextFlip", iSubFunNum)
+            printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            printAutoInd(f, "function dotMDur = predictedDurToNextFlip(cIfi,lastFrameOnsettime)")
+            printAutoInd(f, "dotMDur = ceil((GetSecs - lastFrameOnsettime)/cIfi)*cIfi;")
             printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
             iSubFunNum += 1
 

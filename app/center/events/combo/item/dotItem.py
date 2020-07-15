@@ -251,23 +251,23 @@ class DotItem(QGraphicsItem):
 
     def paint(self, painter, option, widget=None):
         # draw border
-        if self.border_width:
-            pen = QPen()
-            pen.setColor(self.border_color)
-            pen.setWidth(self.border_width)
-            painter.setPen(pen)
-            if self.is_oval:
-                painter.drawEllipse(self.rect)
-            else:
-                painter.drawRect(self.rect)
-
-        painter.setPen(Qt.NoPen)
-        # draw fill color
-        painter.setBrush(QBrush(self.fill_color))
-        if self.is_oval:
-            painter.drawEllipse(self.rect)
-        else:
-            painter.drawRect(self.rect)
+        # if self.border_width:
+        #     pen = QPen()
+        #     pen.setColor(self.border_color)
+        #     pen.setWidth(self.border_width)
+        #     painter.setPen(pen)
+        #     if self.is_oval:
+        #         painter.drawEllipse(self.rect)
+        #     else:
+        #         painter.drawRect(self.rect)
+        #
+        # painter.setPen(Qt.NoPen)
+        # # draw fill color
+        # painter.setBrush(QBrush(self.fill_color))
+        # if self.is_oval:
+        #     painter.drawEllipse(self.rect)
+        # else:
+        #     painter.drawRect(self.rect)
 
         # draw dots
         painter.setBrush(QBrush(self.dot_color))
@@ -308,28 +308,32 @@ class DotItem(QGraphicsItem):
         super(DotItem, self).setZValue(z)
 
     def setItemColor(self, color: QColor):
-        self.fill_color = color
-        old_rgb = self.properties["Fill Color"]
-        if not old_rgb.startswith("["):
-            rgb = f"{color.red()},{color.green()},{color.blue()}"
-            self.properties["Back Color"] = rgb
-            self.pro_window.general.setFillColor(rgb)
+        pass
+        # self.fill_color = color
+        # old_rgb = self.properties["Fill Color"]
+        # if not old_rgb.startswith("["):
+        #     rgb = f"{color.red()},{color.green()},{color.blue()}"
+        #     self.properties["Back Color"] = rgb
+        #     self.pro_window.general.setFillColor(rgb)
 
     def setWidth(self, width: int):
-        self.border_width = width
-        self.update()
+        pass
 
-        old_width = self.properties["Border Width"]
-        if not old_width.startswith("["):
-            self.properties["Border Width"] = str(width)
-            self.pro_window.general.setBorderWidth(str(width))
+        # self.border_width = width
+        # self.update()
+        #
+        # old_width = self.properties["Border Width"]
+        # if not old_width.startswith("["):
+        #     self.properties["Border Width"] = str(width)
+        #     self.pro_window.general.setBorderWidth(str(width))
 
     def setLineColor(self, color: QColor):
-        self.border_color = color
-        self.update()
-
-        old_rgb = self.properties["Border Color"]
-        if not old_rgb.startswith("["):
-            rgb = f"{color.red()},{color.green()},{color.blue()}"
-            self.properties["Border Color"] = rgb
-            self.pro_window.general.setBorderColor(rgb)
+        pass
+        # self.border_color = color
+        # self.update()
+        #
+        # old_rgb = self.properties["Border Color"]
+        # if not old_rgb.startswith("["):
+        #     rgb = f"{color.red()},{color.green()},{color.blue()}"
+        #     self.properties["Border Color"] = rgb
+        #     self.pro_window.general.setBorderColor(rgb)

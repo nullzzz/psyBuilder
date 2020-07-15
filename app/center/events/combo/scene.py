@@ -202,8 +202,13 @@ class Scene(QGraphicsScene):
 
     def setProperties(self, properties: dict):
         self.clear()
+
         self.border: QGraphicsRectItem = QGraphicsRectItem()
         self.addItem(self.border)
+
+        self.frame: QGraphicsRectItem = QGraphicsRectItem()
+        self.addItem(self.frame)
+
         for k, v in properties.items():
             k: str
             if k.startswith(ITEM_IMAGE):
@@ -255,22 +260,31 @@ class Scene(QGraphicsScene):
         item.setSelected(False)
         new_item.setSelected(True)
 
-    def setBorderRect(self, rect: QRectF) -> None:
+    def setBorderRect(self, rect: QRectF, scr_color:QColor = Qt.transparent) -> None:
         self.border: QGraphicsRectItem
         self.border.setRect(QRectF(0, 0, rect.width(), rect.height()))
+        self.border.setBrush(scr_color)
+        self.border.update()
+
 
     def setFrame(self, x1: int, y1: int, w: int, h: int, bk_color: QColor, bc: QColor, bw: int = 0):
-        isEnable = False
-        if isEnable:
-            self.frame.setRect(QRectF(x1, y1, w, h))
-            self.frame.setBrush(bk_color)
-            if bw:
-                pen = self.frame.pen()
-                pen.setWidth(bw)
-                pen.setColor(bc)
-                self.frame.setPen(pen)
+        # import sip
+        # self.frame: QGraphicsRectItem
 
-            self.border.update()
+        # if self.frame not in self.items():
+        #     self.addItem(self.frame)
+        self.frame.setRect(QRectF(x1, y1, w, h))
+        self.frame.setBrush(bk_color)
+        # if bw:
+        pen = self.frame.pen()
+        pen.setWidth(bw)
+        pen.setColor(bc)
+        self.frame.setPen(pen)
+
+        # self.border.update()
+
+    def downFrame(self, z: float):
+        self.frame.setZValue(z)
 
     def screenshot(self):
         try:
