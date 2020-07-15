@@ -14,7 +14,6 @@ class TextDisplay(TabItemMainWindow):
         super(TextDisplay, self).__init__(widget_id, widget_name)
 
         self.text_label = SmartTextEdit()
-        # self.text_label.textChanged.connect(self.apply)
         # self.setAcceptDrops(True)
 
         self.pro_window = TextProperty()
@@ -32,6 +31,8 @@ class TextDisplay(TabItemMainWindow):
         self.text_label.setText("Your text will appear here")
         self.text_label.setAlignment(Qt.AlignCenter)
         self.setCentralWidget(self.text_label)
+        self.text_label.textChanged.connect(self.updateTextInRealtime)
+
         tool = QToolBar()
         open_pro = QAction(QIcon(Func.getImage("menu/setting.png")), "setting", self)
         open_pro.triggered.connect(self.openSettingWindow)
@@ -51,6 +52,9 @@ class TextDisplay(TabItemMainWindow):
     #     text = f"[{stream.readQString()}]"
     #     self.text_label.cursor().setPos(e.pos())
     #     self.text_label.insertPlainText(text)
+
+    def updateTextInRealtime(self):
+        self.pro_window.general.text_edit.setHtml(self.text_label.toHtml())
 
     def openSettingWindow(self):
         self.pro_window.general.text_edit.setHtml(self.text_label.toHtml())
