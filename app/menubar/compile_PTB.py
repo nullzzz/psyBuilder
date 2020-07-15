@@ -266,6 +266,18 @@ def isRgbWithBracketsStr(inputStr):
     return isRgbFormat
 
 
+def isLegalMatlabStr(inputStr) -> bool:
+    isLegal = True
+    if inputStr.startswith("'") and inputStr.endswith("'"):
+        inputStr = inputStr[1:-1]
+
+    inputStr = re.sub("''", "", inputStr)
+
+    if len(re.findall("'",inputStr))>0:
+        isLegal = False
+
+    return isLegal
+
 def isNumStr(inputStr):
     if isinstance(inputStr, str):
         if len(inputStr) == 0:
@@ -328,6 +340,24 @@ def isContainCycleTL(widgetId) -> bool:
         if Func.isWidgetType(cWidgetId, Info.LOOP):
             return True
     return False
+
+
+def getSpOutDevTypeNum(devType:str) -> int:
+    cOutDevNum = 0
+
+    output_devices = Info.OUTPUT_DEVICE_INFO
+
+    for outDev_Id, cDevice in output_devices.items():
+
+        if cDevice['Device Type'] == devType:
+            cOutDevNum += 1
+
+    return cOutDevNum
+
+
+
+
+    return
 
 
 def getFlipType(cWidget) -> int:
@@ -660,6 +690,44 @@ def parsePhysicSize(inputStr: str) -> list:
 def parseStartEndTimeStr(inputStr, isRef=False) -> str:
     if not isRef:
         inputStr = inputStr
+
+    return inputStr
+
+
+def parseColorStr(inputStr, isRef = False) -> str:
+    # color_map: dict = {
+    #     "White": "255,255,255",
+    #     "Gray": "128,128,128",
+    #     "Black": "0,0,0",
+    #     "Red": "255,0,0",
+    #     "Orange": "255,165,0",
+    #     "Yellow": "255,255,0",
+    #     "Green": "0,255,0",
+    #     "Blue": "0,0,255",
+    #     "Purple": "128,0,128",
+    #     "Transparent": "0,0,0,0"}
+
+    if not isRef:
+        if inputStr == "White":
+            inputStr == "255,255,255"
+        if inputStr == "Gray":
+            inputStr == "128,128,128"
+        if inputStr == "Black":
+            inputStr == "0,0,0"
+        if inputStr == "Red":
+            inputStr == "255,0,0"
+        if inputStr == "Orange":
+            inputStr == "255,165,0"
+        if inputStr == "Green":
+            inputStr == "0,255,0"
+        if inputStr == "Blue":
+            inputStr == "0,0,255"
+        if inputStr == "Purple":
+            inputStr == "128,0,128"
+        if inputStr == "Transparent":
+            inputStr = "0,0,0,0"
+
+        inputStr = dataStrConvert(inputStr,isRef)
 
     return inputStr
 
@@ -1185,7 +1253,10 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
         inputStr = inputStr[1:-1]
 
     if isOutStr or isMatlabStr:
-        inputStr = inputStr.replace("'", "''")
+        if not isLegalMatlabStr(inputStr):
+            throwCompileErrorInfo(f"{inputStr} : you need to use two single quotes to get a single quote inside a string!")
+
+        # inputStr = inputStr.replace("'", "''")
         inputStr = addSingleQuotes(inputStr)
 
     # if isOutStr and isMatlabStr is False:
@@ -1396,6 +1467,11 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
             updateSpFormatVarDict(cProperties['Flip Horizontal'], 'flipHorizontal', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Flip Vertical'], 'flipVertical', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Right To Left'], 'rightToLeft', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Fore Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Back Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Border Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Frame Fill Color'], 'color', cSpecialFormatVarDict)
+
             updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', cSpecialFormatVarDict)
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Text'], 'textContent', cSpecialFormatVarDict)
@@ -1411,6 +1487,10 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
             updateSpFormatVarDict(cProperties['Center Y'], 'percent', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Clear After'], 'clearAfter', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Aspect Ratio'], 'aspectRatio', cSpecialFormatVarDict)
+
+            updateSpFormatVarDict(cProperties['Border Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Frame Fill Color'], 'color', cSpecialFormatVarDict)
+
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
 
             getSpecialRespsFormatAtts(cWidget.getInputDevice(), cSpecialFormatVarDict)
@@ -1431,6 +1511,10 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
             updateSpFormatVarDict(cProperties['Clear After'], 'clearAfter', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Enable'], 'enableFrame', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Stretch Mode'], 'stretchMode', cSpecialFormatVarDict)
+
+            updateSpFormatVarDict(cProperties['Border Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Frame Fill Color'], 'color', cSpecialFormatVarDict)
+
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
 
             getSpecialRespsFormatAtts(cWidget.getInputDevice(), cSpecialFormatVarDict)
@@ -1438,6 +1522,8 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
         elif Func.isWidgetType(widgetId, Info.COMBO):
             updateSpFormatVarDict(cWidget.getDuration(), 'dur', cSpecialFormatVarDict)
             updateSpFormatVarDict(cProperties['Properties']['Clear After'], 'clearAfter', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Properties']['Border Color'], 'color', cSpecialFormatVarDict)
+            updateSpFormatVarDict(cProperties['Properties']['Frame Fill Color'], 'color', cSpecialFormatVarDict)
 
             cItems = cProperties['Items']
             itemIds = getSliderItemIds(cWidget)
@@ -1467,6 +1553,13 @@ def getSpecialFormatAtts(cSpecialFormatVarDict: dict = None, wIdAndWidgetDict: d
                     updateSpFormatVarDict(cItemProperties['Transparent'], 'percent', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Style'], 'fontStyle', cSpecialFormatVarDict)
                     updateSpFormatVarDict(cItemProperties['Right To Left'], 'rightToLeft', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Fore Color'], 'color', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Back Color'], 'color', cSpecialFormatVarDict)
+                elif cItemType == Info.ITEM_GABOR:
+                    updateSpFormatVarDict(cItemProperties['Back Color'], 'color', cSpecialFormatVarDict)
+                elif cItemType == Info.ITEM_DOT_MOTION:
+                    updateSpFormatVarDict(cItemProperties['Dot Color'], 'color', cSpecialFormatVarDict)
+                    updateSpFormatVarDict(cItemProperties['Is Oval'], 'boolean', cSpecialFormatVarDict)
 
             getSpecialRespsFormatAtts(cWidget.getInputDevice(), cSpecialFormatVarDict)
 
@@ -1836,6 +1929,14 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
                 elif 'meanRect' == spFormatVarDict[cKeyAttrName]:
                     cValue = parseRectStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif 'color' == spFormatVarDict[cKeyAttrName]:
+                    cValue = parseColorStr(cValue, isRefValue)
+                    cRowDict[key] = cValue
+
+                elif 'boolean' == spFormatVarDict[cKeyAttrName]:
+                    cValue = parseBooleanStr(cValue, isRefValue)
                     cRowDict[key] = cValue
 
             #     TO BE CONTINUING... FOR ALL OTHER Special Types
@@ -2643,9 +2744,6 @@ def printGeneratedCodes(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCode
 
         condStr, haveRef, referObNameList = getValueInContainRefExp(cWidget, condStr, attributesSetDict)
 
-        # trueWidget = cWidget.getTrueWidget()
-        # falseWidget = cWidget.getFalseWidget()
-
         if preStimWId and Func.getWidgetName(preStimWId) in referObNameList:
             printPreRespCodesFirst = True
 
@@ -3034,21 +3132,14 @@ def printETEndRWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes)
 
 
 def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes):
-    global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint, haveGaborStim, haveSnowStim
+    global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint, haveGaborStim, haveSnowStim, haveDotMotion
 
     cVSLCodes = allWidgetCodes.get('forVideoSliderLoopCodes', [])
     beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
 
     iVideoNum = 1
-    # print(os.path.abspath(__file__))
 
-    # if getWidgetPos(cWidget.widget_id) == 0  and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-    #     # Step 2: print out help info for the current widget
-    #     printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    #     printAutoInd(sliderStimCodes, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-    #                  getWidgetName(cWidget.widget_id))
-    #     printAutoInd(sliderStimCodes, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-
+    cWidgetName = getWidgetName(cWidget.widget_id)
     cSliderProperties = Func.getWidgetProperties(cWidget.widget_id)
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
@@ -3068,9 +3159,8 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
     # itemIds = itemIds[-1::-1] # reverse the key id order in ascend
 
     if isContainItemType(itemIds, Info.ITEM_SOUND):
-        printAutoInd(sliderStimCodes, "% prepare audio materials for widget {0}", getWidgetName(cWidget.widget_id))
-        printAutoInd(sliderStimCodes,
-                     "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur({1}));",
+        printAutoInd(sliderStimCodes, "% prepare audio materials for widget {0}", cWidgetName)
+        printAutoInd(sliderStimCodes, "predictedVisOnset = PredictVisualOnsetForTime({0}, cDurs({1}) + lastScrOnsettime({1}) - flipComShiftDur({1}));",
                      cWinStr, cWinIdx)
     # loop twice, once for audio and once for all visual stimuli
     iSoundSlave = 1
@@ -3079,23 +3169,28 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
         cItemProperties = cItems[cItemId]
 
         if getItemType(cItemId) == Info.ITEM_SOUND:
-            printAutoInd(sliderStimCodes, "% create item: {0} in {1}", cItemId, getWidgetName(cWidget.widget_id))
+            printAutoInd(sliderStimCodes, "% create item: {0} in {1}", cItemId, cWidgetName)
             if iSoundSlave == 1:
-                printAutoInd(sliderStimCodes,
-                             "% schedule start of audio at exactly the predicted time of the next flip")
+                printAutoInd(sliderStimCodes, "% schedule start of audio at exactly the predicted time of the next flip")
 
             allWidgetCodes = drawSoundWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, allWidgetCodes,
                                              cItemProperties, iSoundSlave)
             iSoundSlave += 1
         else:
             pass
+
+
     # remove sound items
     itemIds = [cItemId for cItemId in itemIds if getItemType(cItemId) != Info.ITEM_SOUND]
-    '''
-    loop to handle all visual stimuli
-    '''
-    cWidgetName = getWidgetName(cWidget.widget_id)
 
+
+    # draw background frame effects
+    drawFrameEffect(cWidget, cVSLCodes, cSliderProperties['Properties'], attributesSetDict)
+    '''
+    --------------------------------------
+    loop to handle all visual stimuli
+    --------------------------------------
+    '''
     printAutoInd(cVSLCodes, "% draw item {0} in {1}", itemIds, cWidgetName)
 
     for cItemId in itemIds:
@@ -3110,6 +3205,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
         # printAutoInd(cVSLCodes, "% draw item {0} in {1}", cItemId, cWidgetName)
 
         cItemId = cWidgetName + '_' + cItemId
+        cItemId = re.sub(r'[ .]+','_',cItemId)
 
         if cItemType == Info.ITEM_LINE:
             borderColor = dataStrConvert(*getRefValue(cWidget, cItemProperties['Border Color'], attributesSetDict))
@@ -3384,19 +3480,17 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
 
             isOval = parseBooleanStr(*getRefValue(cWidget, cItemProperties['Is Oval'], attributesSetDict))
 
-            # dotsData = initialDotPos(nDots, direction, coherence, isOval, w, h)
-            printAutoInd(sliderStimCodes, "{0}_dots  = initialDotPos({1}, {2}, {3}, {4}, {5}, {6}, {7});",
+            printAutoInd(sliderStimCodes, "{0}_xys  = initialDotPos({1}, {2}, {3}, {4}, {5}, {6});",
                          cItemId, nDots, cDirection, cCoherence, isOval, cWidth, cHeight)
 
-            printAutoInd(sliderStimCodes, "{0}_dots_CXY  = repmat([{1};{2}],1,{3});",
-                         cItemId, cWidth, cHeight, nDots)
+            printAutoInd(sliderStimCodes, "{0}_cxy  = repmat([{1};{2}],1,{3});",
+                         cItemId, centerX, centerY, nDots)
 
-            printAutoInd(cVSLCodes, "Screen('DrawDots', {0}, {1}_dots(1:2,:) + {1}_dots_CXY, {2}, {3}, [], {4});", cWinStr, cItemId, dotSize, cDotColor, dotType)
+            printAutoInd(cVSLCodes, "Screen('DrawDots', {0}, {1}_xys(1:2,:) + {1}_cxy, {2}, {3}, [], {4});", cWinStr, cItemId, dotSize, cDotColor, dotType)
             printAutoInd(cVSLCodes, "if iFrame > 1")
-            printAutoInd(cVSLCodes, "{0}_dots = updateDotPos({0}_dots,{1},predictedDurToNextFlip(winIFIs({2}),lastFrameOnsettime),{3},{4},{5}) ",
-                                    cWinStr, cSpeed, cWinIdx, isOval,cWidth, cHeight)
+            printAutoInd(cVSLCodes, "{0}_xys = updateDotPos({0}_dots,{1},predictedDurToNextFlip(winIFIs({2}),lastFrameOnsettime),{3},{4},{5}); ",
+                                    cItemId, cSpeed, cWinIdx, isOval,cWidth, cHeight)
 
-            # printAutoInd(cVSLCodes, "ceil((GetSecs - lastFrameOnsettime)/winIFIs({0}))*winIFIs({0})",cWinIdx)
             printAutoInd(cVSLCodes, "end \n")
 
         elif Info.ITEM_TEXT == cItemType:
@@ -3587,13 +3681,6 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     cRespCodes = allWidgetCodes.get(f"{cWidget.widget_id}_respCodes", [])
     beClosedTxAFCycleList = allWidgetCodes.get(f"beClosedTextures_{cLoopLevel}", [])
 
-    # if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-    #     # Step 2: print out help info for the current widget
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-    #                  getWidgetName(cWidget.widget_id))
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
@@ -3637,6 +3724,9 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                  cHeight, cWinIdx)
 
     if isNotInSlide:
+        # draw background frame effects
+        drawFrameEffect(cWidget, f, cProperties, attributesSetDict)
+        """
         # before we draw the image， we draw the frame rect first:
         borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border Color'], attributesSetDict))
         borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
@@ -3646,6 +3736,8 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
         # get enable parameter
         cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
         isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+        shouldNotBeCitationCheck('Enable', isBkFrameEnable)
+
 
         if isBkFrameEnable == '1':
             if isNotInSlide:
@@ -3670,6 +3762,7 @@ def drawImageWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                     printAutoInd(cVSLCodes, "Screen('FrameRect',{0},{1},{2}_fRect,{3});", cWinStr,
                                  addedTransparentToRGBStr(frameFillColor, frameTransparent), cPrefixStr,
                                  borderWidth)
+        """
 
     # make texture
     if isFileNameRef is False and cLoopLevel > 0:
@@ -3809,13 +3902,6 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
 
     cBeFlipCodes = allWidgetCodes.get('codesBeFlip', [])
 
-    # if getWidgetPos(cWidget.widget_id) == 0 and isNotInSlide and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-    #     # Step 2: print out help info for the current widget
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-    #                  cWidgetName)
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
     # -------------------------------------------------
@@ -3854,6 +3940,9 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                  cWidth, cHeight, cWinIdx)
 
     if isNotInSlide:
+        # draw background frame effects
+        drawFrameEffect(cWidget, f, cProperties, attributesSetDict)
+        """
         # before we draw the image， we draw the frame rect first:
         borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border Color'], attributesSetDict))
         borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
@@ -3863,6 +3952,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
         # get enable parameter
         cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
         isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+        shouldNotBeCitationCheck('Enable', isBkFrameEnable)
 
         if isBkFrameEnable == '1':
             # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
@@ -3875,6 +3965,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
                 printAutoInd(f, "Screen('FrameRect',{0},{1},{2}_fRect,{3});", cWinStr,
                              addedTransparentToRGBStr(frameFillColor, frameTransparent), cItemOrWidgetNameStr,
                              borderWidth)
+        """
 
     # make texture
     if isNotInSlide:
@@ -4023,7 +4114,6 @@ def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, cProperties, cV
     # 2) handle the current_text content
     inputStr, isContainRef, _ = getValueInContainRefExp(cWidget, cProperties['Text'], attributesSetDict, True, dict())
     cTextContentStr = parseTextContentStrNew(inputStr)
-    # cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
 
     # 3) check the alignment X parameter:
     leftX = dataStrConvert(*getRefValue(cWidget, cProperties['Left X'], attributesSetDict))
@@ -4088,13 +4178,6 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
 
     cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
 
-    # if getWidgetPos(cWidget.widget_id) == 0 and not(isSubWidgetOfIfOrSwitch(cWidget.widget_id)):
-    #     # Step 2: print out help info for the current widget
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    #     printAutoInd(f, '%loop:{0}, event{1}: {2}', cLoopLevel, getWidgetEventPos(cWidget.widget_id) + 1,
-    #                  getWidgetName(cWidget.widget_id))
-    #     printAutoInd(f, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-
     cProperties = Func.getWidgetProperties(cWidget.widget_id)
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
@@ -4105,7 +4188,6 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
     # 2) handle the current_text content
     inputStr, isContainRef, _ = getValueInContainRefExp(cWidget, cProperties['Text'], attributesSetDict, True, dict())
     cTextContentStr = parseTextContentStrNew(inputStr)
-    # cTextContentStr = parseTextContentStr(*getRefValue(cWidget, cProperties['Text'], attributesSetDict))
 
     # 3) check the alignment X parameter:
     alignmentX = dataStrConvert(*getRefValue(cWidget, cProperties['Alignment X'], attributesSetDict))
@@ -4173,27 +4255,31 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
     if isChangeFontPars:
         printAutoInd(f, "")
 
-    # before we draw the formattedtext， we draw the frame rect first:
-    borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border Color'], attributesSetDict))
-    borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
-    frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Fill Color'], attributesSetDict))
-    # if f"preFrameFillColor" not in historyPropDict:
-    frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Transparent'], attributesSetDict))
-
-    cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
-    isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
-
-    if isBkFrameEnable == '1':
-        # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
-        if frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]:
-            printAutoInd(f, "Screen('FillRect',{0},{1},{2});", cWinStr,
-                         addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr)
-
-        # draw the frame only when the frame color is different from the frame fill color
-        if borderColor != frameFillColor:
-            printAutoInd(f, "Screen('FrameRect',{0},{1},{2},{3});", cWinStr,
-                         addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr, borderWidth)
-
+    drawFrameEffect(cWidget, f, cProperties, attributesSetDict)
+    """
+        # before we draw the formatted text， we draw the frame rect first:
+        borderColor = dataStrConvert(*getRefValue(cWidget, cProperties['Border Color'], attributesSetDict))
+        borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
+        frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Fill Color'], attributesSetDict))
+        # if f"preFrameFillColor" not in historyPropDict:
+        frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Transparent'], attributesSetDict))
+    
+    
+        cRefedValue, isFrameRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
+        isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isFrameRef), isFrameRef)
+        shouldNotBeCitationCheck('Enable', isBkFrameEnable)
+    
+        if isBkFrameEnable == '1':
+            # if (frameFillColor == historyPropDict[cScreenName]) and (frameTransparent in [1,255]):
+            if frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]:
+                printAutoInd(f, "Screen('FillRect',{0},{1},{2});", cWinStr,
+                             addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr)
+    
+            # draw the frame only when the frame color is different from the frame fill color
+            if borderColor != frameFillColor:
+                printAutoInd(f, "Screen('FrameRect',{0},{1},{2},{3});", cWinStr,
+                             addedTransparentToRGBStr(frameFillColor, frameTransparent), frameRectStr, borderWidth)
+    """
     #  print out the current_text
     printAutoInd(f, "DrawFormattedText({0},{1},{2},{3},{4},{5},{6},{7},[],{8},{9});",
                  cWinStr,
@@ -4215,6 +4301,41 @@ def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
 
     return 0
 
+
+def drawFrameEffect(cWidget,f, cProperties,attributesSetDict):
+    global historyPropDict
+
+    cWidgetName = getWidgetName(cWidget.widget_id)
+    cScreenName, cWinIdx, cWinStr = getScreenInfo(cWidget, attributesSetDict)
+    #
+    borderColor = dataStrConvert(*getRefValue(cWidget,cProperties['Border Color'], attributesSetDict))
+    borderWidth = dataStrConvert(*getRefValue(cWidget, cProperties['Border Width'], attributesSetDict))
+    frameFillColor = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Fill Color'], attributesSetDict))
+    frameTransparent = dataStrConvert(*getRefValue(cWidget, cProperties['Frame Transparent'], attributesSetDict))
+    # # get enable parameter
+    cRefedValue, isRef = getRefValue(cWidget, cProperties['Enable'], attributesSetDict)
+    isBkFrameEnable = parseBooleanStr(dataStrConvert(cRefedValue, isRef), isRef)
+    shouldNotBeCitationCheck('Enable', isBkFrameEnable)
+
+    isAnyFrameCode = frameFillColor != historyPropDict[f"{cScreenName}_bkColor"] or borderColor != frameFillColor
+
+    if isBkFrameEnable == '1':
+
+        if isAnyFrameCode:
+            printAutoInd(f, "% draw background frame ")
+
+        if frameFillColor != historyPropDict[f"{cScreenName}_bkColor"]:
+            printAutoInd(f, "Screen('FillRect',{0},{1}, {2}_fRect);", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent), cWidgetName)
+
+        # draw the frame only when the frame color is different from the frame fill color
+        if borderColor != frameFillColor:
+            printAutoInd(f, "Screen('FrameRect',{0},{1},{2}_fRect,{3});", cWinStr,
+                         addedTransparentToRGBStr(frameFillColor, frameTransparent), cWidgetName, borderWidth)
+
+        if isAnyFrameCode:
+            printAutoInd(f, "\n")
+    return 0
 
 def compilePTB():
     global cInfoDict
@@ -4561,6 +4682,11 @@ def compileCode(isDummyCompile):
         iSerial = 1
         iSound = 1
 
+        soundDevSlavesDict = getMaxSlaveSoundDevs()
+
+        if len(soundDevSlavesDict)>0 and getSpOutDevTypeNum(Info.DEV_SOUND)<1:
+            throwCompileErrorInfo("Looks like at least one sound device need to be setup for your experiment\n please define it in the output under Device menu!")
+
         for outDev_Id, cDevice in output_devices.items():
 
             if cDevice['Device Type'] == Info.DEV_SCREEN:
@@ -4609,7 +4735,7 @@ def compileCode(isDummyCompile):
 
             elif cDevice['Device Type'] == Info.DEV_SOUND:
 
-                soundDevSlavesDict = getMaxSlaveSoundDevs()
+                # soundDevSlavesDict = getMaxSlaveSoundDevs()
                 cSoundDevNameStr = cDevice['Device Name']
 
                 if soundDevSlavesDict.get(cSoundDevNameStr, 0) > 0:

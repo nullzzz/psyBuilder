@@ -42,6 +42,7 @@ class FramePage(QWidget):
         self.transparent = VarLineEdit("100%")
         self.transparent.setRegularExpress(VarComboBox.Percentage)
         self.enable.addItems(("No", "Yes"))
+        self.enable.setAcceptDrops(False)
         self.setUI()
 
     # 生成frame页面

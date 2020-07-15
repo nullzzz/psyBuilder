@@ -14,6 +14,7 @@ class TextDisplay(TabItemMainWindow):
         super(TextDisplay, self).__init__(widget_id, widget_name)
 
         self.text_label = SmartTextEdit()
+        # self.text_label.textChanged.connect(self.apply)
         # self.setAcceptDrops(True)
 
         self.pro_window = TextProperty()
