@@ -1336,7 +1336,7 @@ def getValueInContainRefExp(cWidget, inputStr, attributesSetDict, isOutStr=False
     inputStr = inputStr.replace(leftPat, '(')
     inputStr = inputStr.replace(rightPat, ')')
 
-
+    # repr(inputStr)[1:-1]
     return repr(inputStr)[1:-1], isContainRef, refedObNameList
 
 
@@ -2160,11 +2160,11 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         printAutoInd(f, "if iFrame == 1 ")
 
         if cWidgetPos == 0:
-            printAutoInd(f, "lastFrameOnsettime = Screen('Flip',{0},nextEvFlipReqTime,{1});", cWinStr, clearAfter)
+            printAutoInd(f, "nearestPrevFrameOnsettime = Screen('Flip',{0},nextEvFlipReqTime,{1});", cWinStr, clearAfter)
         else:
-            printAutoInd(f, "lastFrameOnsettime = Screen('Flip',{0},nextEvFlipReqTime,{1});", cWinStr, clearAfter)
+            printAutoInd(f, "nearestPrevFrameOnsettime = Screen('Flip',{0},nextEvFlipReqTime,{1});", cWinStr, clearAfter)
 
-        printAutoInd(f, "{0}.onsettime({1}) = lastFrameOnsettime;", cWidgetName, cOpRowIdxStr)
+        printAutoInd(f, "{0}.onsettime({1}) = nearestPrevFrameOnsettime;", cWidgetName, cOpRowIdxStr)
 
         allWidgetCodes = genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes)
         allWidgetCodes = genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, 'afVideoFipReqTime')
@@ -2172,7 +2172,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         printAutoInd(f, "nextEvFlipReqTime = afVideoFipReqTime; % after the first flip, update nextEvFlipReqTime")
         # printAutoInd(f, "isFirstVideoFrame = false; ")
         printAutoInd(f, "else ")
-        printAutoInd(f, "lastFrameOnsettime = Screen('Flip', {0}, 0, {1}); %", cWinStr, clearAfter)
+        printAutoInd(f, "nearestPrevFrameOnsettime = Screen('Flip', {0}, 0, {1}); %", cWinStr, clearAfter)
         printAutoInd(f, "end \n")
 
         '''
@@ -2207,13 +2207,13 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         ---------------------------
         """
         if bitget(flipType,0):
-            printAutoInd(cRespCodes, "% close opened movie prts and visual textures")
+            printAutoInd(cRespCodes, "% close the movie prts and visual textures")
             if cVideoItemNums <= 1:
                 printAutoInd(cRespCodes, "Screen('CloseMovie', {0}_mPtr);", cWidgetName)
-                printAutoInd(cRespCodes, "Screen('Close',{0}_tPtr); % close the last video frame", cWidgetName)
+                # printAutoInd(cRespCodes, "Screen('Close',{0}_tPtr); % close the last video frame", cWidgetName)
             else:
                 printAutoInd(cRespCodes, "Screen('CloseMovie', {0}_mPtrs);", cWidgetName)
-                printAutoInd(cRespCodes, "Screen('Close',TPtrs); % close the last video frame")
+                # printAutoInd(cRespCodes, "Screen('Close',TPtrs); % close the last video frame")
 
         cAfEndVideoFlipCodes = allWidgetCodes.get('codesAfEndVideoFip', [])
 
@@ -2808,7 +2808,7 @@ def genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, nextEventF
 
     # updated the screen flip times in matlab
     # printAutoInd(f, "%%%")
-    printAutoInd(f, "% get cDur and the next event flip time")
+    printAutoInd(f, "% get cDur and the required flip time of the next event")
     # printAutoInd(f, "%%%")
     if Func.isWidgetType(cWidget.widget_id, Info.SOUND):
         if re.fullmatch(r"\d+,\d+", durStr):
@@ -2913,7 +2913,7 @@ def genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
                      getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr)
     else:
-        printAutoInd(f, "lastScrOnsettime({0}) = {1}.onsettime({2}); %temp save the last screen onsettimes\n",
+        printAutoInd(f, "lastScrOnsettime({0}) = {1}.onsettime({2}); % temp save the last screen onsettimes\n",
                      cWinIdx,
                      getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr)
@@ -3486,9 +3486,9 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
             printAutoInd(sliderStimCodes, "{0}_cxy  = repmat([{1};{2}],1,{3});",
                          cItemId, centerX, centerY, nDots)
 
-            printAutoInd(cVSLCodes, "Screen('DrawDots', {0}, {1}_xys(1:2,:) + {1}_cxy, {2}, {3}, [], {4});", cWinStr, cItemId, dotSize, cDotColor, dotType)
+            printAutoInd(cVSLCodes, "Screen('DrawDots', {0}, {1}_xys(1:2,{1}_xys(4,:)) + {1}_cxy, {2}, {3}, [], {4});", cWinStr, cItemId, dotSize, cDotColor, dotType)
             printAutoInd(cVSLCodes, "if iFrame > 1")
-            printAutoInd(cVSLCodes, "{0}_xys = updateDotPos({0}_dots,{1},predictedDurToNextFlip(winIFIs({2}),lastFrameOnsettime),{3},{4},{5}); ",
+            printAutoInd(cVSLCodes, "{0}_xys = updateDotPos({0}_xys,{1},predictedDurToNextFlip(winIFIs({2}),nearestPrevFrameOnsettime),{3},{4},{5}); ",
                                     cItemId, cSpeed, cWinIdx, isOval,cWidth, cHeight)
 
             printAutoInd(cVSLCodes, "end \n")
@@ -3992,7 +3992,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
     else:
         cBeFlipCodes.append(f"% Really start to handle movie item: {cItemOrWidgetNameStr} in slider {cWidgetName}")
 
-    printAutoInd(cVSLCodes, "% get and draw each video frame of ", cItemOrWidgetNameStr)
+    printAutoInd(cVSLCodes, "% get and draw each video frame of {0}", cItemOrWidgetNameStr)
 
     if cVideoItemNums <= 1:
         '''
@@ -4012,8 +4012,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
             cBeFlipCodes.append(
                 f"[{cWidgetName}_mPtr,{cWidgetName}_mDur, ~,{cItemOrWidgetNameStr}_ImgW, {cItemOrWidgetNameStr}_ImgH] = Screen('OpenMovie',{cWinStr}, fullfile(cFolder,{addSingleQuotes(cFilenameStr)}) );")
 
-        cBeFlipCodes.append(
-            f"Screen('SetMovieTimeIndex', {cWidgetName}_mPtr, {cWidgetName}_sMTime); % skip the first n seconds")
+        cBeFlipCodes.append( f"Screen('SetMovieTimeIndex', {cWidgetName}_mPtr, {cWidgetName}_sMTime); % skip the first n seconds")
         cBeFlipCodes.append(f"Screen('PlayMovie', {cWidgetName}Ptr, {playbackRateStr});")
         cBeFlipCodes.append(
             f"{cItemOrWidgetNameStr}_dRect = makeImDestRect({cItemOrWidgetNameStr}_fRect, [{cItemOrWidgetNameStr}_ImgW, {cItemOrWidgetNameStr}_ImgH], {stretchModeStr});\n")
@@ -4036,9 +4035,9 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
             printAutoInd(cVSLCodes, "{0}_CPt  = {0}_temp_CPt; \n", cWidgetName)
 
             printAutoInd(cVSLCodes, "Screen('DrawTexture', {0}, {1}_tPtr, [], {2}_dRect);", cWinStr, cWidgetName, cItemOrWidgetNameStr)
-            printAutoInd(cVSLCodes, "{0}_beClosedMIdx = true; % whether close the current movie texture", cWidgetName)
+            printAutoInd(cVSLCodes, "{0}_beClosedMIdx = true; % whether to close the current movie texture or not", cWidgetName)
             printAutoInd(cVSLCodes, "else ")
-            printAutoInd(cVSLCodes, "{0}_beClosedMIdx = false; % whether close the current movie texture", cWidgetName)
+            printAutoInd(cVSLCodes, "{0}_beClosedMIdx = false; % whether to close the current movie texture or not", cWidgetName)
             printAutoInd(cVSLCodes, "end \n")
         else:
             # slider without  dot motion item and have only one video item | video widget
@@ -6153,7 +6152,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "dotsData(2,:) = rand(1,nDots)*h - h/2;")
             printAutoInd(f, "dotsData(3,:) = [repmat(direction*pi/180,1,nCohDots),rand(1,nDots - nCohDots)*2*pi];\n")
             printAutoInd(f, "if isOval")
-            printAutoInd(f, "dotsData(4,:) = dotsData(1,:).^2/(w/2) + dotsData(2,:).^2/(h/2) <= 1; ")
+            printAutoInd(f, "dotsData(4,:) = (dotsData(1,:)/w).^2 + (dotsData(2,:)/h).^2 <= 0.25; ")
             printAutoInd(f, "else")
             printAutoInd(f, "dotsData(4,:) = 1;")
             printAutoInd(f, "end ")
@@ -6179,8 +6178,8 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             printAutoInd(f, "% subfun {0}: predictedDurToNextFlip", iSubFunNum)
             printAutoInd(f, "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            printAutoInd(f, "function dotMDur = predictedDurToNextFlip(cIfi,lastFrameOnsettime)")
-            printAutoInd(f, "dotMDur = ceil((GetSecs - lastFrameOnsettime)/cIfi)*cIfi;")
+            printAutoInd(f, "function dotMDur = predictedDurToNextFlip(cIfi,nearestPrevFrameOnsettime)")
+            printAutoInd(f, "dotMDur = ceil((GetSecs - nearestPrevFrameOnsettime)/cIfi)*cIfi;")
             printAutoInd(f, "end %  end of subfun{0}\n", iSubFunNum)
             iSubFunNum += 1
 
