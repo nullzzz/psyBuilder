@@ -195,6 +195,9 @@ class TextTab1(QWidget):
                 break
 
     def changeColor(self, color: str):
+        oldCursor = self.text_edit.textCursor()
+        self.text_edit.selectAll()
+
         r, g, b = 255, 255, 255
         if "," in color:
             r, g, b = [int(x) for x in color.split(",")]
@@ -203,7 +206,12 @@ class TextTab1(QWidget):
         elif self.sender() is self.back_color:
             self.text_edit.setTextBackgroundColor(QColor(r, g, b))
 
+        self.text_edit.setTextCursor(oldCursor)
+
     def changeAlign(self, align_mode: str):
+        oldCursor = self.text_edit.textCursor()
+        self.text_edit.selectAll()
+
         # html中要小写
         self.align_mode = align_mode.lower()
         if align_mode == "center":
@@ -215,11 +223,19 @@ class TextTab1(QWidget):
         elif align_mode == "justify":
             self.text_edit.setAlignment(Qt.AlignJustify)
 
+        self.text_edit.setTextCursor(oldCursor)
     def changeWrap(self, chars: str):
+        oldCursor = self.text_edit.textCursor()
+        self.text_edit.selectAll()
+
         if chars.isdigit():
             self.text_edit.setLineWrapColumnOrWidth(int(chars))
 
+        self.text_edit.setTextCursor(oldCursor)
     def changeFont(self):
+        oldCursor = self.text_edit.textCursor()
+        self.text_edit.selectAll()
+
         family = self.font_box.currentFont().family()
 
         size = self.font_size_box.currentText()
@@ -255,6 +271,7 @@ class TextTab1(QWidget):
 
         self.text_edit.setCurrentFont(font)
 
+        self.text_edit.setTextCursor(oldCursor)
     def setAttributes(self, attributes):
         self.lighter.updateRule(attributes)
         self.align_x.setCompleter(QCompleter(attributes))
