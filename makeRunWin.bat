@@ -17,6 +17,7 @@ echo ===================================
 echo cythonize compile_PTB
 echo ===================================
 cythonize -i -3 .\app\menubar\compile_PTB.py
+del /F/S/Q .\app\menubar\compile_PTB.pyd
 rename .\app\menubar\compile_PTB.cp38-win_amd64.pyd compile_PTB.pyd
 echo ===================================
 echo compile PsyBuilder
