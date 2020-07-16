@@ -106,7 +106,7 @@ class ValidationWindow(QFrame):
             mac_addrs = re.findall(r'([0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2})',
                               os.popen('ipconfig /all').read().lower())
 
-            if len(mac_addrs)>1:
+            if len(mac_addrs)>0:
                 mac_addr = mac_addrs[0]
             else:
                 mac_addr = ""
