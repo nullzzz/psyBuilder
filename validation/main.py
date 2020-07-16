@@ -111,6 +111,8 @@ class ValidationWindow(QFrame):
             else:
                 mac_addr = ""
 
+            mac_addr = mac_addr.replace("-", "")
+
             # mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
 
             cpu_id = hardware_id + mac_addr
