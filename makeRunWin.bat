@@ -14,6 +14,11 @@ rd /S/Q .\dist
 
 
 echo ===================================
+echo cythonize compile_PTB
+echo ===================================
+cythonize -i -3 .\app\menubar\compile_PTB.py
+rename .\app\menubar\compile_PTB.cp38-win_amd64.pyd compile_PTB.pyd
+echo ===================================
 echo compile PsyBuilder
 echo ===================================
 
