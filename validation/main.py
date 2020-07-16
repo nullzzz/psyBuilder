@@ -104,18 +104,20 @@ class ValidationWindow(QFrame):
             hardware_id = hardware_id.replace('SerialNumber', '').replace('UUID', '').replace('=', '').replace('-', '')
 
             mac_addrs = re.findall(r'([0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2})',
-                              os.popen('ipconfig /all').read().lower())
+                                   os.popen('ipconfig /all').read().lower())
 
-            if len(mac_addrs)>1:
-                mac_addr = mac_addrs[0]
-            else:
-                mac_addr = ""
+            mac_addrs = [tempMac.replace('-',"") for tempMac in mac_addrs]
 
-            mac_addr = mac_addr.replace("-", "")
+            mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
 
-            # mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
+            if len(mac_addrs)>0:
+                if mac_addr not in mac_addrs:
+                    mac_addr = ""
 
             cpu_id = hardware_id + mac_addr
+
+            if len(cpu_id) == 0:
+                cpu_id = uuid.UUID(int=uuid.getnode()).hex[-12:]
 
         elif Info.OS_TYPE == 2:
             # hard driver uuid for linux
