@@ -103,7 +103,15 @@ class ValidationWindow(QFrame):
             hardware_id = os.popen(command).read().replace("\n", "").replace(" ", "").replace("|", "")
             hardware_id = hardware_id.replace('SerialNumber', '').replace('UUID', '').replace('=', '').replace('-', '')
 
-            mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
+            mac_addrs = re.findall(r'([0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2}-[0-9a-f]{2})',
+                              os.popen('ipconfig /all').read().lower())
+
+            if len(mac_addrs)>1:
+                mac_addr = mac_addrs[0]
+            else:
+                mac_addr = ""
+
+            # mac_addr = uuid.UUID(int=uuid.getnode()).hex[-12:]
 
             cpu_id = hardware_id + mac_addr
 
