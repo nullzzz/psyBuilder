@@ -6152,7 +6152,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "dotsData(2,:) = rand(1,nDots)*h - h/2;")
             printAutoInd(f, "dotsData(3,:) = [repmat(direction*pi/180,1,nCohDots),rand(1,nDots - nCohDots)*2*pi];\n")
             printAutoInd(f, "if isOval")
-            printAutoInd(f, "dotsData(4,:) = dotsData(1,:).^2/(w/2) + dotsData(2,:).^2/(h/2) <= 1; ")
+            printAutoInd(f, "dotsData(4,:) = dotsData(1,:).^2/w + dotsData(2,:).^2/h <= 0.25; ")
             printAutoInd(f, "else")
             printAutoInd(f, "dotsData(4,:) = 1;")
             printAutoInd(f, "end ")
