@@ -3486,9 +3486,9 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
             printAutoInd(sliderStimCodes, "{0}_cxy  = repmat([{1};{2}],1,{3});",
                          cItemId, centerX, centerY, nDots)
 
-            printAutoInd(cVSLCodes, "Screen('DrawDots', {0}, {1}_xys(1:2,:) + {1}_cxy, {2}, {3}, [], {4});", cWinStr, cItemId, dotSize, cDotColor, dotType)
+            printAutoInd(cVSLCodes, "Screen('DrawDots', {0}, {1}_xys(1:2,{1}_xys(4,:)) + {1}_cxy, {2}, {3}, [], {4});", cWinStr, cItemId, dotSize, cDotColor, dotType)
             printAutoInd(cVSLCodes, "if iFrame > 1")
-            printAutoInd(cVSLCodes, "{0}_xys = updateDotPos({0}_dots,{1},predictedDurToNextFlip(winIFIs({2}),nearestPrevFrameOnsettime),{3},{4},{5}); ",
+            printAutoInd(cVSLCodes, "{0}_xys = updateDotPos({0}_xys,{1},predictedDurToNextFlip(winIFIs({2}),nearestPrevFrameOnsettime),{3},{4},{5}); ",
                                     cItemId, cSpeed, cWinIdx, isOval,cWidth, cHeight)
 
             printAutoInd(cVSLCodes, "end \n")
