@@ -24,6 +24,9 @@ sudo rm -rf ./build
 
 pwd
 
+cythonize -i -3 ./app/menubar/compile_PTB.py
+mv -f ./app/menubar/compile_PTB.cpython-38-x86_64-linux-gnu.so ./app/menubar/compile_PTB.so
+
 pyinstaller -i ./source/images/common/icon.png -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn PsyBuilder.py
 #sudo pyinstaller -i ./source/images/common/icon.icns -w --clean --add-data source:source --add-data yanglabMFuns:yanglabMFuns --add-binary='/System/Library/Frameworks/Tk.framework/Tk':'tk' --add-binary='/System/Library/Frameworks/Tcl.framework/Tcl':'tcl' --noconfirm --k=as2gaFgWE1weA2a --hidden-import pkg_resources.py2_warn PsyBuilder.py
 
