@@ -4453,7 +4453,7 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "cFolder = fileparts(mfilename('fullpath'));")
         printAutoInd(f, "% get subject information", )
         printAutoInd(f, "subInfo = subjectInfo('{0}');", cFilenameOnly)
-        printAutoInd(f, "subInfo.filename = [{0},'_',subInfo.num,'_',subInfo.session];\n", cFilenameOnly)
+        # printAutoInd(f, "subInfo.filename = [{0},'_',subInfo.num,'_',subInfo.session];\n", cFilenameOnly)
         # printAutoInd(f, "subInfo = subjectInfo('{0}', cFolder);", cFilenameOnly)
         # printAutoInd(f, "close(gcf);")
         # printAutoInd(f, "%=====================================\\\n")
@@ -6185,9 +6185,9 @@ def compileCode(isDummyCompile):
             iSubFunNum += 1
 
     # copy yanglab's supplementary files
-    copyYanglabFile('subjectInfo.p')
+    copyYanglabFile('subjectInfo.m')
     # copyYanglabFile('OpenExp_BCL.p')
-    copyYanglabFile('OverwriteOrNot.p')
+    copyYanglabFile('OverwriteOrNot.m')
 
     if Info.PLATFORM == 'windows':
         copyYanglabFile('ShowHideWinTaskbar.m')
