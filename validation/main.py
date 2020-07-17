@@ -46,8 +46,8 @@ class ValidationWindow(QFrame):
         self.confuse_code: str = self.confuse(self.hard_code)
 
         self.local_code = self.getLocalCode()
-        if self.confuse_code != self.local_code and self.local_code != "psy":
-            # if self.confuse_code != self.local_code:
+        # if self.confuse_code != self.local_code and self.local_code != "psy":
+        if self.confuse_code != self.local_code:
             self.tip.setText(f"<b>{self.hard_code}<\b><br><br>"
                              f"For a validation code, send the above code<br>"
                              f" with your full name and affiliation to:<br>"
