@@ -144,9 +144,9 @@ else
         output.hand ='right_hand';
     end
     
-    output.num = get(handles.num,'String');
-    output.session = get(handles.session,'String');
-    output.outputFilename = [handles.expName,'_',output.num,'_',output.session];
+    output.num      = get(handles.num,'String');
+    output.session  = get(handles.session,'String');
+    output.filename = [handles.expName,'_',output.num,'_',output.session];
     
     
     % guidata(hObject,handles);
