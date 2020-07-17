@@ -6195,7 +6195,7 @@ def compileCode(isDummyCompile):
         copyYanglabFile('ShowHideWinTaskbarAndButtonMex.mexw64')
 
     if outDevCountsDict[Info.DEV_PARALLEL_PORT] > 0 and Info.PLATFORM == 'linux':
-        copyYanglabFile('lptOut.p')
+        copyYanglabFile('lptOut.m')
         copyYanglabFile('lptoutMex.mexa64')
 
 
