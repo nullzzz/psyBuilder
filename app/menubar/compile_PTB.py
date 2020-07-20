@@ -6168,7 +6168,7 @@ def compileCode(isDummyCompile):
             printAutoInd(f, "dotsData(1,:) = rem(dotsData(1,:) + speed*dur*cos(dotsData(3,:)) + w/2, w) - w/2;")
             printAutoInd(f, "dotsData(2,:) = rem(dotsData(2,:) + speed*dur*sin(dotsData(3,:)) + h/2, h) - h/2;\n")
             printAutoInd(f, "if isOval")
-            printAutoInd(f, "dotsData(4,:) = dotsData(1,:).^2/(w/2) + dotsData(2,:).^2/(h/2) <= 1; ")
+            printAutoInd(f, "dotsData(4,:) = (dotsData(1,:)/w).^2 + (dotsData(2,:)/w).^2 <= 0.25; ")
             printAutoInd(f, "else")
             printAutoInd(f, "dotsData(4,:) = 1;")
             printAutoInd(f, "end ")
