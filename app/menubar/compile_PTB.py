@@ -90,6 +90,7 @@ def dataStrConvert(dataStr, isRef=False, transMATStr=False, transPercent=True):
 
             elif isRefStr(dataStr):
                 outData = dataStr  # maybe a bug
+
             elif isVectWithBracketsStr(dataStr):
                 outData = dataStr
 
