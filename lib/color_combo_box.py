@@ -177,7 +177,8 @@ class ColComboBox(VarComboBox):
     def getRGB(self) -> str:
         color_name = self.currentText()
         if color_name.startswith("["):
-            color_name = self.rgb
+            # color_name = self.rgb
+            pass
         elif color_name.startswith("#"):
             color_name = f"{int(color_name[1:3], 16)},{int(color_name[3:5], 16)},{int(color_name[5:], 16)}"
         self.rgb = self.color_map.get(color_name, color_name)

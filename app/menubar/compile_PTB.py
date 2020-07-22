@@ -769,31 +769,49 @@ def parseFontStyleStr(inputStr):
     return inputStr
 
 
-def parseKbCorRespStr(kbCorRespStr, isRefValue, devType) -> str:
+def parseRespKeyCodesStr(kbCorRespStr, isRefValue, devType) -> str:
     if isRefValue:
         kbCorRespCodesStr = kbCorRespStr
     else:
         if len(kbCorRespStr) > 0:
-            if devType == Info.DEV_KEYBOARD:
-                splittedStrs = re.split(r'({\w*})', kbCorRespStr)
-                kbNameList = []
-                for item in splittedStrs:
-                    if item.startswith('{') and item.endswith('}'):
-                        item = item[1:-1]
-                        kbNameList.append(item)
-                    else:
-                        for char in item:
-                            kbNameList.append(char)
 
+            haveRightBreaket = re.findall(r'{]}}',kbCorRespStr)
+
+            if haveRightBreaket:
+                kbCorRespStr = re.sub(r'{]}}','',kbCorRespStr)
+
+            splittedStrList = re.split(r'({.*?})', kbCorRespStr)
+            splittedStrList = [tempItem for tempItem in splittedStrList if tempItem != ""]
+
+            if haveRightBreaket:
+                splittedStrList.append("{]}}")
+
+
+            kbNameList = []
+            for item in splittedStrList:
+                if item.startswith('{') and item.endswith('}'):
+                    item = item[1:-1]
+                    kbNameList.append(item)
+                else:
+                    for char in item:
+                        kbNameList.append(char)
+
+
+            if devType == Info.DEV_KEYBOARD:
                 kbCorRespCodes = keyNameToCodes(kbNameList)
             else:
-                kbCorRespCodes = kbCorRespStr
+                kbCorRespCodes = kbNameList
 
-            kbCorRespCodesStr = "".join(f"{value}, " for value in kbCorRespCodes[0:-1])
-            kbCorRespCodesStr = "[" + kbCorRespCodesStr + f"{kbCorRespCodes[-1]}" + "]"
+
+            if len(kbCorRespCodes) > 1:
+                kbCorRespCodesStr = "".join(f"{value}, " for value in kbCorRespCodes[0:-1])
+                kbCorRespCodesStr = "[" + kbCorRespCodesStr + f"{kbCorRespCodes[-1]}" + "]"
+            else:
+                kbCorRespCodesStr = f"{kbCorRespCodes[0]}"
 
         else:
-            kbCorRespCodesStr = "[0]"
+            kbCorRespCodesStr = "0"
+            # kbCorRespCodesStr = "[0]"
 
     return kbCorRespCodesStr
 
@@ -1904,19 +1922,19 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
                     cRowDict[key] = cValue
 
                 elif 'kbCorrectResp' == spFormatVarDict[cKeyAttrName]:
-                    cValue = parseKbCorRespStr(cValue, isRefValue, Info.DEV_KEYBOARD)
+                    cValue = parseRespKeyCodesStr(cValue, isRefValue, Info.DEV_KEYBOARD)
                     cRowDict[key] = cValue
 
                 elif 'noKbDevCorrectResp' == spFormatVarDict[cKeyAttrName]:
-                    cValue = parseKbCorRespStr(cValue, isRefValue, 'noneKbDevs')
+                    cValue = parseRespKeyCodesStr(cValue, isRefValue, 'noneKbDevs')
                     cRowDict[key] = cValue
 
                 elif 'kbAllowKeys' == spFormatVarDict[cKeyAttrName]:
-                    cValue = parseKbCorRespStr(cValue, isRefValue, Info.DEV_KEYBOARD)
+                    cValue = parseRespKeyCodesStr(cValue, isRefValue, Info.DEV_KEYBOARD)
                     cRowDict[key] = cValue
 
                 elif 'noKbAllowKeys' == spFormatVarDict[cKeyAttrName]:
-                    cValue = parseKbCorRespStr(cValue, isRefValue, 'noneKbDevs')
+                    cValue = parseRespKeyCodesStr(cValue, isRefValue, 'noneKbDevs')
                     cRowDict[key] = cValue
 
                 elif 'textContent' == spFormatVarDict[cKeyAttrName]:
@@ -2178,7 +2196,7 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
             printAutoInd(f, "nearestPrevFrameOnsettime = Screen('Flip',{0},nextEvFlipReqTime,{1});", cWinStr,
                          clearAfter)
 
-        printAutoInd(f, "{0}.onsettime({1}) = nearestPrevFrameOnsettime;", cWidgetName, cOpRowIdxStr)
+        printAutoInd(f, "{0}({1}).onsettime = nearestPrevFrameOnsettime;", cWidgetName, cOpRowIdxStr)
 
         allWidgetCodes = genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes)
         allWidgetCodes = genUpdateWidgetDur(cWidget, f, attributesSetDict, allWidgetCodes, 'afVideoFipReqTime')
@@ -2240,11 +2258,11 @@ def flipScreen(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
         if cWidgetPos == 0:
             # printAutoInd(f, "% for first event, flip immediately.. ")
             # f"{getWidgetName(cWidget.widget_id)}_onsettime({cOpRowIdxStr})"
-            printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},nextEvFlipReqTime,{3}); %#ok<*STRNU>\n",
+            printAutoInd(f, "{0}({1}).onsettime = Screen('Flip',{2},nextEvFlipReqTime,{3}); %#ok<*STRNU>\n",
                          cWidgetName,
                          cOpRowIdxStr, cWinStr, clearAfter)
         else:
-            printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},nextEvFlipReqTime,{3}); %#ok<*STRNU>\n",
+            printAutoInd(f, "{0}({1}).onsettime = Screen('Flip',{2},nextEvFlipReqTime,{3}); %#ok<*STRNU>\n",
                          cWidgetName,
                          cOpRowIdxStr, cWinStr, clearAfter)
 
@@ -2293,25 +2311,25 @@ def flipAudio(cWidget, f, cLoopLevel, attributesSetDict, iSlave=1):
 
             printAutoInd(f, "PsychPortAudio('Start', {0}, {1}, predictedVisOnset, 0); %\n", cSoundIdxStr,
                          repetitionsStr)
-            printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip', {2}, {3}); %\n", getWidgetName(cWidget.widget_id),
+            printAutoInd(f, "{0}({1}).onsettime = Screen('Flip', {2}, {3}); %\n", getWidgetName(cWidget.widget_id),
                          cOpRowIdxStr, cWinStr, clearAfter)
         else:
             printAutoInd(f, "predictedVisOnset = PredictVisualOnsetForTime({0}, nextEvFlipReqTime);", cWinStr)
             printAutoInd(f, "% schedule start of audio at exactly the predicted time caused by the next flip")
             printAutoInd(f, "PsychPortAudio('Start', {0}, {1}, predictedVisOnset, 0); %\n",
                          cSoundIdxStr, repetitionsStr)
-            printAutoInd(f, "{0}.onsettime({1}) = Screen('Flip',{2},nextEvFlipReqTime, {3}); %#ok<*STRNU>\n",
+            printAutoInd(f, "{0}({1}).onsettime = Screen('Flip',{2},nextEvFlipReqTime, {3}); %#ok<*STRNU>\n",
                          getWidgetName(cWidget.widget_id), cOpRowIdxStr, cWinStr, clearAfter)
     else:
         if getWidgetPos(cWidget.widget_id) == 0:
             printAutoInd(f, "% for first event, play the audio immediately.. ")
             printAutoInd(f,
-                         "{0}.onsettime({1}) = PsychPortAudio('Start', {2}, {3}, 0, 1); % wait for start and get the real start time\n",
+                         "{0}({1}).onsettime = PsychPortAudio('Start', {2}, {3}, 0, 1); % wait for start and get the real start time\n",
                          getWidgetName(cWidget.widget_id), cOpRowIdxStr, cSoundIdxStr, repetitionsStr)
         else:
             printAutoInd(f, "% for multiple screens, use the maximum of the predicted onsettime")
             printAutoInd(f,
-                         "{0}.onsettime({1}) = PsychPortAudio('Start', {2}, {3}, max(cDurs + lastScrOnsettime), 1); % % wait for start and get the real start time\n",
+                         "{0}({1}).onsettime = PsychPortAudio('Start', {2}, {3}, max(cDurs + lastScrOnsettime), 1); % % wait for start and get the real start time\n",
                          getWidgetName(cWidget.widget_id), cOpRowIdxStr, cSoundIdxStr, repetitionsStr)
 
 
@@ -2376,7 +2394,7 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
             # get allowable keys
             allowableKeysStr, isRefValue, cRefValueSet = getRefValueSet(cWidget, cProperties.get('Allowable'),
                                                                         attributesSetDict)
-            allowableKeysStr = parseKbCorRespStr(allowableKeysStr, isRefValue, cProperties['Device Type'])
+            allowableKeysStr = parseRespKeyCodesStr(allowableKeysStr, isRefValue, cProperties['Device Type'])
 
             # update the allowableKeysList
             if cProperties['Device Type'] != Info.DEV_RESPONSE_BOX:
@@ -2389,7 +2407,7 @@ def genCheckResponse(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
 
             # get corRespCode
             corRespStr, isRefValue = getRefValue(cWidget, cProperties['Correct'], attributesSetDict)
-            corRespStr = parseKbCorRespStr(corRespStr, isRefValue, cProperties['Device Type'])
+            corRespStr = parseRespKeyCodesStr(corRespStr, isRefValue, cProperties['Device Type'])
 
             if corRespStr.find(',') == -1:
                 corRespStr = removeSquBrackets(corRespStr)
@@ -2915,11 +2933,11 @@ def genStimTriggers(cWidget, f, cLoopLevel, attributesSetDict, allWidgetCodes):
     # updated the screen flip times in matlab
     if Info.SOUND == cWidgetType:
         printAutoInd(f, "% for event type of sound, make it to all lastScrOnsetime")
-        printAutoInd(f, "lastScrOnsettime(:) = {0}.onsettime({1}); % temp save the last screen onsettimes\n",
+        printAutoInd(f, "lastScrOnsettime(:) = {0}({1}).onsettime; % temp save the last screen onsettimes\n",
                      getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr)
     else:
-        printAutoInd(f, "lastScrOnsettime({0}) = {1}.onsettime({2}); % temp save the last screen onsettimes\n",
+        printAutoInd(f, "lastScrOnsettime({0}) = {1}({2}).onsettime; % temp save the last screen onsettimes\n",
                      cWinIdx,
                      getWidgetName(cWidget.widget_id),
                      cOpRowIdxStr)
@@ -4395,7 +4413,7 @@ def compileCode(isDummyCompile):
 
     # eventWidgetList = [Info.TEXT, Info.IMAGE, Info.SOUND, Info.COMBO, Info.VIDEO,Info.IF, Info.SWITCH]
 
-    enabledKBKeysSet.add(parseKbCorRespStr('{escape}', False, Info.DEV_KEYBOARD)[1:-1])
+    enabledKBKeysSet.add(parseRespKeyCodesStr('{escape}', False, Info.DEV_KEYBOARD))
 
     # attributesSetDict 0,1,2 for looplevel, becitedStr,all possible values
     attributesSetDict = {'sessionNum': [0, 'subInfo.session', {'subInfo.session'}],

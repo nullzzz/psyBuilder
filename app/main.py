@@ -290,9 +290,9 @@ class Psy(QMainWindow):
 
         demo_menu = help_menu.addMenu(" &Demos")
 
-        demos_stroop_action = QAction(" &Stroop", self)
-        demos_cueing_action = QAction(" &Cue Target", self)
-        demos_coherence_motion_action = QAction(" &Coherence Motion", self)
+        demos_stroop_action = QAction(" &Stroop Task", self)
+        demos_cueing_action = QAction(" &Cue Target task (have not Done)", self)
+        demos_coherence_motion_action = QAction(" &Coherence Motion (have not Done)", self)
 
         # self.openDemoStroop = openDe
 

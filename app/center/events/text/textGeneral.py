@@ -201,6 +201,7 @@ class TextTab1(QWidget):
         r, g, b = 255, 255, 255
         if "," in color:
             r, g, b = [int(x) for x in color.split(",")]
+
         if self.sender() is self.fore_color:
             self.text_edit.setTextColor(QColor(r, g, b))
         elif self.sender() is self.back_color:
