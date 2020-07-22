@@ -374,8 +374,6 @@ def getSpOutDevTypeNum(devType: str) -> int:
 
     return cOutDevNum
 
-    return
-
 
 def getFlipType(cWidget) -> int:
     """
