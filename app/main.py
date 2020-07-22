@@ -210,7 +210,7 @@ class Psy(QMainWindow):
             self.platform_action_group.addAction(self.windows_action)
             self.platform_action_group.addAction(self.mac_action)
 
-            if Info.OS_TYPE ==1:
+            if Info.OS_TYPE == 1:
                 self.mac_action.setChecked(True)
                 # because setChecked can not trigger the action
                 self.mac_action.trigger()
@@ -303,8 +303,6 @@ class Psy(QMainWindow):
         demo_menu.addAction(demos_stroop_action)
         demo_menu.addAction(demos_cueing_action)
         demo_menu.addAction(demos_coherence_motion_action)
-
-
 
     def initDockWidget(self):
         """
@@ -871,14 +869,15 @@ class Psy(QMainWindow):
                     file_paths.insert(0, file_path)
                 Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
 
-    def openFile(self, filename:str = ''):
+    def openFile(self, filename: str = ''):
         """
         open file through restart software
         """
-        if len(filename)>0:
+        if len(filename) > 0:
             file_path = filename
         else:
-            file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.path.dirname(os.path.abspath(__file__)),
+            file_path, _ = QFileDialog().getOpenFileName(self, "Choose file",
+                                                         os.path.dirname(os.path.abspath(__file__)),
                                                          "Psy File (*.psy)")
 
         if file_path and file_path != Info.FILE_NAME:
@@ -931,7 +930,10 @@ class Psy(QMainWindow):
         setting.setValue("Widgets", widgets_data)
         # structure
         structure = self.structure.store()
-        setting.setValue("Structure", structure)
+        if structure:
+            setting.setValue("Structure", structure)
+        else:
+            setting.setValue("Structure", 0)
         # tabs
         # tabs = self.center.store()
         # setting.setValue("Tabs", tabs)
@@ -991,24 +993,22 @@ class Psy(QMainWindow):
         self.device_cloud.tracker.setProperties(tracker_device_info)
         # end restore device
         # 恢复structure窗口
-        self.structure.restore(structure)
-        # 根据structure中的结构恢复widget，因为部分widget在__init__函数中调用attribute，而这个函数依赖于structure结构得到其上下文属性
-        # 根据structure递归恢复widget
-        root_widget_id, root_widget_name, children = structure
-        # 保存已经创建的widget，因为有些模块是引用其他模块，不用创建新的，而引用模块的名称都相同，只需要检测名称是否在这个字典里面就行
-        created_widgets = {}
-        self.restoreWidget(names, widgets_data, created_widgets, root_widget_id, root_widget_name, children)
-        # 恢复Info.Name，不在刚开始就恢复的原因是：调用createWidget时会自动保存数据到Info.Names,但是按照structure创建不一定是对的
-        Info.Names = names
-        # restore tabs
-        # self.center.restore(tabs)
-        self.center.openTab(f"{Info.TIMELINE}.0")
+        if isinstance(structure, list):
+            self.structure.restore(structure)
+            # 根据structure中的结构恢复widget，因为部分widget在__init__函数中调用attribute，而这个函数依赖于structure结构得到其上下文属性
+            # 根据structure递归恢复widget
+            root_widget_id, root_widget_name, children = structure
+            # 保存已经创建的widget，因为有些模块是引用其他模块，不用创建新的，而引用模块的名称都相同，只需要检测名称是否在这个字典里面就行
+            created_widgets = {}
+            self.restoreWidget(names, widgets_data, created_widgets, root_widget_id, root_widget_name, children)
+            # 恢复Info.Name，不在刚开始就恢复的原因是：调用createWidget时会自动保存数据到Info.Names,但是按照structure创建不一定是对的
+            Info.Names = names
+            # restore tabs
+            # self.center.restore(tabs)
+            self.center.openTab(f"{Info.TIMELINE}.0")
         if show:
             Func.printOut(f"File '{file_path}' loaded successfully.", 1)
         return True
-        # except Exception as e:
-        #     Func.print(f"Due to error '{e}', the file {file_path} failed to load.", 2)
-        #     return False
 
     def restoreWidget(self, names: dict, widgets_data: dict, created_widgets: dict, widget_id: str, widget_name: str,
                       children: list):
@@ -1047,7 +1047,7 @@ class Psy(QMainWindow):
         """
         self.clear()
         self.restore(Info.VarEnvFile, False)
-        # self.initInitialTimeline()
+        self.initInitialTimeline()
 
     def setDockView(self, checked):
         """
@@ -1196,7 +1196,7 @@ class Psy(QMainWindow):
 
         if Info.OS_TYPE == 0:
             Info.PLATFORM = "windows"
-        elif Info.OS_TYPE ==1:
+        elif Info.OS_TYPE == 1:
             Info.PLATFORM = "mac"
         else:
             Info.PLATFORM = "linux"
@@ -1230,13 +1230,12 @@ class Psy(QMainWindow):
     def openPDFfile(self):
         import subprocess
 
-        if Info.OS_TYPE ==1:
-            subprocess.run("open " + os.path.join(Info.ImagePath,"pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)
-        elif Info.OS_TYPE ==0:
+        if Info.OS_TYPE == 1:
+            subprocess.run("open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)
+        elif Info.OS_TYPE == 0:
             subprocess.Popen(Func.getImage("pdfs/A Brief Tutorial.pdf"), shell=True)
         else:
             subprocess.run("xdg-open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)
-
 
     def openDemosCoherenceMotion(self):
         self.openFile(os.path.join(Info.ImagePath, "demos", "coherenceMotion.psy"))
