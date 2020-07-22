@@ -147,17 +147,18 @@ def addCurlyBrackets(inputStr):
 # add single quotes
 def addSingleQuotes(inputStr: str) -> str:
     if inputStr.startswith("'") and inputStr.endswith("'"):
-        outputStr = inputStr
+        if inputStr.startswith("''") and inputStr.endswith("''"):
+            inputStr = f"'{inputStr}'"
 
-
-    outputStr = f"'{inputStr}'"
-    return outputStr
+    else:
+        inputStr = f"'{inputStr}'"
+    return inputStr
 
 
 # add square brackets
 def addSquBrackets(inputStr: str) -> str:
-    outputStr = f"[{inputStr}]"
-    return outputStr
+    inputStr = f"[{inputStr}]"
+    return inputStr
 
 
 def removeSingleQuotes(inputStr: str) -> str:

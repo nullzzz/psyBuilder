@@ -288,6 +288,24 @@ class Psy(QMainWindow):
         help_menu.addAction(about_action)
         help_menu.addAction(check_for_update)
 
+        demo_menu = help_menu.addMenu(" &Demos")
+
+        demos_stroop_action = QAction(" &Stroop", self)
+        demos_cueing_action = QAction(" &Cue Target", self)
+        demos_coherence_motion_action = QAction(" &Coherence Motion", self)
+
+        # self.openDemoStroop = openDe
+
+        demos_stroop_action.triggered.connect(self.openDemosStroop)
+        demos_cueing_action.triggered.connect(self.openDemosCueing)
+        demos_coherence_motion_action.triggered.connect(self.openDemosCoherenceMotion)
+
+        demo_menu.addAction(demos_stroop_action)
+        demo_menu.addAction(demos_cueing_action)
+        demo_menu.addAction(demos_coherence_motion_action)
+
+
+
     def initDockWidget(self):
         """
         init dock widgets, including linking signals
@@ -853,12 +871,16 @@ class Psy(QMainWindow):
                     file_paths.insert(0, file_path)
                 Settings("config.ini", Settings.IniFormat).setValue("file_paths", file_paths)
 
-    def openFile(self):
+    def openFile(self, filename:str = ''):
         """
         open file through restart software
         """
-        file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.path.dirname(os.path.abspath(__file__)),
-                                                     "Psy File (*.psy)")
+        if len(filename)>0:
+            file_path = filename
+        else:
+            file_path, _ = QFileDialog().getOpenFileName(self, "Choose file", os.path.dirname(os.path.abspath(__file__)),
+                                                         "Psy File (*.psy)")
+
         if file_path and file_path != Info.FILE_NAME:
             # store current state
             self.store(Info.TempFile, False)
@@ -1025,7 +1047,7 @@ class Psy(QMainWindow):
         """
         self.clear()
         self.restore(Info.VarEnvFile, False)
-        self.initInitialTimeline()
+        # self.initInitialTimeline()
 
     def setDockView(self, checked):
         """
@@ -1215,3 +1237,12 @@ class Psy(QMainWindow):
         else:
             subprocess.run("xdg-open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)
 
+
+    def openDemosCoherenceMotion(self):
+        self.openFile(os.path.join(Info.ImagePath, "demos", "coherenceMotion.psy"))
+
+    def openDemosCueing(self):
+        self.openFile(os.path.join(Info.ImagePath, "demos", "cueing.psy"))
+
+    def openDemosStroop(self):
+        self.openFile(os.path.join(Info.ImagePath, "demos", "stroop.psy"))

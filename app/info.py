@@ -132,8 +132,8 @@ class Info(object):
     TempFile = "temp.ini"
 
     # image path
-    ImagePath = os.path.join(BasePath, "source", "images")
     # ImagePath = "source/images"
+    ImagePath = os.path.join(BasePath, "source", "images")
 
     # widget type
     ERROR_WIDGET_ID = ""
