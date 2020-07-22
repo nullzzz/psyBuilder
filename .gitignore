@@ -145,3 +145,4 @@ __KEY__
 !/dist/
 !/app/info.pyd
 !/app/modifiedData.py
+!/app/modifiedData.py
