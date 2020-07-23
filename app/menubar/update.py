@@ -1,3 +1,4 @@
+import platform
 import re
 import urllib.request as request
 
@@ -42,9 +43,9 @@ class Update(QDialog):
         try:
             res = request.urlopen(url)
 
-            if Info.OS_TYPE ==0:
+            if platform.system() == "Windows":
                 versionList = re.findall(r'PsyBuilder(\d+)Win', res.read().decode('utf-8'))
-            elif Info.OS_TYPE ==1:
+            elif platform.system() == "Darwin":
                 versionList = re.findall(r'PsyBuilder(\d+).dmg', res.read().decode('utf-8'))
             else:
                 versionList = re.findall(r'PsyBuilder(\d+).deb', res.read().decode('utf-8'))
