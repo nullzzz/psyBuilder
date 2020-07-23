@@ -3218,7 +3218,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
         cItems = cSliderProperties['Items']
         cItemType = getItemType(cItemId)
         cItemProperties = cItems[cItemId]
-        # isItemRef = False
+        isItemRef = False
 
         if cItemType in [Info.ITEM_GABOR, Info.ITEM_IMAGE, Info.ITEM_SNOW, Info.ITEM_TEXT, Info.ITEM_VIDEO]:
             printAutoInd(sliderStimCodes, "% prepare materials for item {0} in {1}", cItemId, cWidgetName)
