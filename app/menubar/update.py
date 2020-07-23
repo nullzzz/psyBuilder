@@ -25,7 +25,7 @@ class Update(QDialog):
         layout.addWidget(self.label)
         self.label.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
-        if Info.OS_TYPE==0:
+        if Info.OS_TYPE == 0:
             self.setMinimumSize(400, 60)
         else:
             self.setMinimumSize(400, 100)
