@@ -238,33 +238,33 @@ def isSingleQuotedStr(inputStr):
 
 
 def isRgbStr(inputStr):
-    isRgbFormat = re.fullmatch(r"^\d+,\d+,\d+$", inputStr)
+    isRgbFormat = re.fullmatch(r'^\d+,\d+,\d+$', inputStr)
     return isRgbFormat
 
 
 def isRgbaStr(inputStr):
-    isRgbaFormat = re.fullmatch(r"^\d+,\d+,\d+,\d+$", inputStr)
+    isRgbaFormat = re.fullmatch(r'^\d+,\d+,\d+,\d+$', inputStr)
     return isRgbaFormat
 
 
 def isRectStr(inputStr):
     if len(inputStr) == 0:
         return None
-    isRectFormat = re.fullmatch(r"^\d+,\d+,\d+,\d+$", inputStr)
+    isRectFormat = re.fullmatch(r'^\d+,\d+,\d+,\d+$', inputStr)
     return isRectFormat
 
 
 def isRgbaWithBracketsStr(inputStr):
     if len(inputStr) == 0:
         return None
-    isRgbaFormat = re.fullmatch(r"^\[\d+,\d+,\d+,\d+\]$", inputStr)
+    isRgbaFormat = re.fullmatch(r'^\[\d+,\d+,\d+,\d+\]$', inputStr)
     return isRgbaFormat
 
 
 def isRectWithBracketsStr(inputStr):
     if len(inputStr) == 0:
         return None
-    isRectFormat = re.fullmatch(r"^\[\d+,\d+,\d+,\d+\]$", inputStr)
+    isRectFormat = re.fullmatch(r'^\[\d+,\d+,\d+,\d+\]$', inputStr)
     return isRectFormat
 
 
@@ -280,7 +280,7 @@ def isVectWithBracketsStr(inputStr):
         return False
 
     if inputStr.startswith("[") and inputStr.endswith("]"):
-        return re.sub(r"[,.]","",inputStr[1:-1]).isdigit()
+        return re.sub(r"[,.]", "", inputStr[1:-1]).isdigit()
     else:
         return False
 
@@ -676,8 +676,8 @@ def trans2relativePath(fullFileName: str):
 
             fullFileName = fullFileName[len(commonPath):]
         except:
-            if not fullFileName.startswith("["):
-                throwCompileErrorInfo(f"All experimental materials should be put under the folder: {beSavedDir}")
+            if not isRefStr(fullFileName):
+                throwCompileErrorInfo(f"All experimental materials should be put in the folder: {beSavedDir}")
 
     return fullFileName
 
@@ -721,23 +721,23 @@ def parseColorStr(inputStr, isRef=False) -> str:
     #     "Transparent": "0,0,0,0"}
 
     if not isRef:
-        if inputStr == "White":
-            inputStr == "255,255,255"
-        if inputStr == "Gray":
-            inputStr == "128,128,128"
-        if inputStr == "Black":
-            inputStr == "0,0,0"
-        if inputStr == "Red":
-            inputStr == "255,0,0"
-        if inputStr == "Orange":
-            inputStr == "255,165,0"
-        if inputStr == "Green":
-            inputStr == "0,255,0"
-        if inputStr == "Blue":
-            inputStr == "0,0,255"
-        if inputStr == "Purple":
-            inputStr == "128,0,128"
-        if inputStr == "Transparent":
+        if inputStr.capitalize() == "White":
+            inputStr = "255,255,255"
+        if inputStr.capitalize() == "Gray":
+            inputStr = "128,128,128"
+        if inputStr.capitalize() == "Black":
+            inputStr = "0,0,0"
+        if inputStr.capitalize() == "Red":
+            inputStr = "255,0,0"
+        if inputStr.capitalize() == "Orange":
+            inputStr = "255,165,0"
+        if inputStr.capitalize() == "Green":
+            inputStr = "0,255,0"
+        if inputStr.capitalize() == "Blue":
+            inputStr = "0,0,255"
+        if inputStr.capitalize() == "Purple":
+            inputStr = "128,0,128"
+        if inputStr.capitalize() == "Transparent":
             inputStr = "0,0,0,0"
 
         inputStr = dataStrConvert(inputStr, isRef)
@@ -773,17 +773,16 @@ def parseRespKeyCodesStr(kbCorRespStr, isRefValue, devType) -> str:
     else:
         if len(kbCorRespStr) > 0:
 
-            haveRightBreaket = re.findall(r'{]}}',kbCorRespStr)
+            haveRightBreaket = re.findall(r'{]}}', kbCorRespStr)
 
             if haveRightBreaket:
-                kbCorRespStr = re.sub(r'{]}}','',kbCorRespStr)
+                kbCorRespStr = re.sub(r'{]}}', '', kbCorRespStr)
 
             splittedStrList = re.split(r'({.*?})', kbCorRespStr)
             splittedStrList = [tempItem for tempItem in splittedStrList if tempItem != ""]
 
             if haveRightBreaket:
                 splittedStrList.append("{]}}")
-
 
             kbNameList = []
             for item in splittedStrList:
@@ -794,12 +793,10 @@ def parseRespKeyCodesStr(kbCorRespStr, isRefValue, devType) -> str:
                     for char in item:
                         kbNameList.append(char)
 
-
             if devType == Info.DEV_KEYBOARD:
                 kbCorRespCodes = keyNameToCodes(kbNameList)
             else:
                 kbCorRespCodes = kbNameList
-
 
             if len(kbCorRespCodes) > 1:
                 kbCorRespCodesStr = "".join(f"{value}, " for value in kbCorRespCodes[0:-1])
@@ -993,15 +990,16 @@ def printAutoInd(f, inputStr, *argins):
 
 
 def haveTrackerType(trackerType: str = 'EyeLink') -> bool:
-    eyetracker_devices = Info.TRACKER_DEVICE_INFO
+    eye_tracker_devices = Info.TRACKER_DEVICE_INFO
 
-    haveTrackerType = False
+    exist_eye_tracker_type = False
 
-    for cEyeTracker, cEyeTrackerProperty in eyetracker_devices.items():
+    for cEyeTracker, cEyeTrackerProperty in eye_tracker_devices.items():
         if cEyeTrackerProperty.get('Select Tracker Type') == trackerType:
-            haveTrackerType = True
+            exist_eye_tracker_type = True
+            break
 
-    return haveTrackerType
+    return exist_eye_tracker_type
 
 
 def getAllEventWidgetsList(includedType: int = 1) -> list:
@@ -1149,24 +1147,24 @@ def getWidgetEventPos(widget_id: str):
         return None
 
 
-def getNextStimWID(WID: str) -> None or str:
-    nextStimWID = getNextWID(WID)
+def getNextStimWID(widget_id: str) -> None or str:
+    nextStimWID = getNextWID(widget_id)
 
-    while nextStimWID and getNextWID(WID) not in stimWidgetTypesList:
-        nextStimWID = getNextWID(WID)
+    while nextStimWID and getNextWID(widget_id) not in stimWidgetTypesList:
+        nextStimWID = getNextWID(widget_id)
 
     return nextStimWID
 
 
-def getNextWID(WID: str) -> None or str:
-    if isSubWidgetOfIfOrSwitch(WID):
-        return Func.getNextWidgetId(Func.getParentWid(WID))
+def getNextWID(widget_id: str) -> None or str:
+    if isSubWidgetOfIfOrSwitch(widget_id):
+        return Func.getNextWidgetId(Func.getParentWid(widget_id))
     else:
-        return Func.getNextWidgetId(WID)
+        return Func.getNextWidgetId(widget_id)
 
 
-def getPreStimWID(WID: str) -> None or str:
-    preWID = getPreWID(WID)
+def getPreStimWID(widget_id: str) -> None or str:
+    preWID = getPreWID(widget_id)
 
     while preWID and getWidgetType(preWID) not in stimWidgetTypesList:
         preWID = getPreWID(preWID)
@@ -1174,11 +1172,11 @@ def getPreStimWID(WID: str) -> None or str:
     return preWID
 
 
-def getPreWID(WID: str) -> None or str:
-    if isSubWidgetOfIfOrSwitch(WID):
-        return Func.getPreviousWidgetId(Func.getParentWid(WID))
+def getPreWID(widget_id: str) -> None or str:
+    if isSubWidgetOfIfOrSwitch(widget_id):
+        return Func.getPreviousWidgetId(Func.getParentWid(widget_id))
     else:
-        return Func.getPreviousWidgetId(WID)
+        return Func.getPreviousWidgetId(widget_id)
 
 
 def getAllNestedVars(inputStr, opVars=None) -> set:
@@ -1991,7 +1989,8 @@ def printCycleWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes):
 
         for iRep in range(cRepeat):
             printAutoInd(f, '{0}', "".join(
-                addCurlyBrackets(dataStrConvert(*getRefValue(cWidget, value, attributesSetDict,True), False, False)) + " "
+                addCurlyBrackets(
+                    dataStrConvert(*getRefValue(cWidget, value, attributesSetDict, True), False, False)) + " "
                 for key, value in cRowDict.items()) + ";...")
 
     printAutoInd(f, '{0}\n', endExpStr)
@@ -3219,7 +3218,7 @@ def drawSliderWidget(cWidget, sliderStimCodes, attributesSetDict, cLoopLevel, al
         cItems = cSliderProperties['Items']
         cItemType = getItemType(cItemId)
         cItemProperties = cItems[cItemId]
-        isItemRef = False
+        # isItemRef = False
 
         if cItemType in [Info.ITEM_GABOR, Info.ITEM_IMAGE, Info.ITEM_SNOW, Info.ITEM_TEXT, Info.ITEM_VIDEO]:
             printAutoInd(sliderStimCodes, "% prepare materials for item {0} in {1}", cItemId, cWidgetName)
@@ -4138,7 +4137,7 @@ def drawVideoWidget(cWidget, f, attributesSetDict, cLoopLevel, allWidgetCodes, c
 def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, cProperties, cVSLCodes):
     global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
 
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
 
     # ------------------------------------------------
     # Step 1: draw the stimuli for the current widget
@@ -4211,7 +4210,7 @@ def drawTextForSlider(cWidget, f, attributesSetDict, cLoopLevel, cProperties, cV
 def drawTextWidget(cWidget, f, attributesSetDict, cLoopLevel):
     global enabledKBKeysSet, inputDevNameIdxDict, outputDevNameIdxDict, historyPropDict, isDummyPrint
 
-    cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
+    # cOpRowIdxStr = f"iLoop_{cLoopLevel}_cOpR"  # define the output var's row num
 
     cProperties = Func.getWidgetProperties(cWidget.widget_id)
     # ------------------------------------------------
@@ -5124,7 +5123,8 @@ def compileCode(isDummyCompile):
         printAutoInd(f, "end % main function \n\n\n\n\n\n\n")
 
         outDevCountsDict = getOutputDevCountsDict()
-        nOutPortsNums = outDevCountsDict[Info.DEV_PARALLEL_PORT] + outDevCountsDict[Info.DEV_NETWORK_PORT] + \
+        nOutPortsNums = outDevCountsDict[Info.DEV_PARALLEL_PORT] + \
+                        outDevCountsDict[Info.DEV_NETWORK_PORT] + \
                         outDevCountsDict[Info.DEV_SERIAL_PORT]
 
         iSubFunNum = 1
