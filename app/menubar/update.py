@@ -61,10 +61,9 @@ class Update(QDialog):
 
 
             else:
-                version_info = "Failed to consult PsyBuilder website, please try it later."
+                version_info = "Failed to get PsyBuilder version info, please try it later."
 
         except:
             version_info = "Failed to consult PsyBuilder website, please try it later."
-            pass
         #############
         self.label.setText(version_info)
