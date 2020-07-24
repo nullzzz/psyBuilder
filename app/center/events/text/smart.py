@@ -1,11 +1,10 @@
 import sys
 
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt, QDataStream, QIODevice
-from PyQt5.QtGui import QFont, QDropEvent
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QCompleter, QApplication, QTextEdit
 
-from app.info import Info
 
 """
 https://doc.qt.io/qt-5/qtwidgets-tools-customcompleter-example.html
