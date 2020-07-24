@@ -1,8 +1,9 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtCore import Qt, QIODevice, QDataStream
+from PyQt5.QtGui import QColor, QFont, QDropEvent
 from PyQt5.QtWidgets import QGridLayout, QLabel, QGroupBox, QVBoxLayout, QWidget, QTextEdit, \
     QFontComboBox, QCompleter, QComboBox
 
+from app.info import Info
 from .lighter import AttributeHighlighter
 from .smart import SmartTextEdit
 from app.func import Func
@@ -27,6 +28,8 @@ class TextTab1(QWidget):
 
         self.text_edit = SmartTextEdit()
         self.text_edit.setLineWrapMode(QTextEdit.FixedColumnWidth)
+        # self.setAcceptDrops(True)
+
         self.lighter = AttributeHighlighter(self.text_edit.document())
 
         self.align_mode = "center"
@@ -176,6 +179,19 @@ class TextTab1(QWidget):
         layout.addWidget(group1, 1)
         layout.addWidget(group2, 2)
         self.setLayout(layout)
+
+    def dragEnterEvent(self, e):
+        if e.mimeData().hasFormat(Info.AttributesToWidget):
+            e.accept()
+        else:
+            e.ignore()
+
+    def dropEvent(self, e: QDropEvent):
+        data = e.mimeData().data(Info.AttributesToWidget)
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        text = f"[{stream.readQString()}]"
+        self.text_edit.cursor().setPos(e.pos())
+        self.text_edit.insertPlainText(text)
 
     def refresh(self):
         self.screen_info = Func.getDeviceInfo("screen")

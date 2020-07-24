@@ -1,8 +1,9 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt, QIODevice, QDataStream
+from PyQt5.QtGui import QIcon, QDropEvent
 from PyQt5.QtWidgets import QToolBar, QAction
 
 from app.func import Func
+from app.info import Info
 from lib import TabItemMainWindow
 from .lighter import AttributeHighlighter
 from .smart import SmartTextEdit
@@ -14,7 +15,7 @@ class TextDisplay(TabItemMainWindow):
         super(TextDisplay, self).__init__(widget_id, widget_name)
 
         self.text_label = SmartTextEdit()
-        # self.setAcceptDrops(True)
+        self.setAcceptDrops(True)
 
         self.pro_window = TextProperty()
         self.default_properties = self.pro_window.default_properties
@@ -40,18 +41,18 @@ class TextDisplay(TabItemMainWindow):
 
         self.addToolBar(Qt.TopToolBarArea, tool)
 
-    # def dragEnterEvent(self, e):
-    #     if e.mimeData().hasFormat('3'):
-    #         e.accept()
-    #     else:
-    #         e.ignore()
-    #
-    # def dropEvent(self, e: QDropEvent):
-    #     data = e.mimeData().data('3')
-    #     stream = QDataStream(data, QIODevice.ReadOnly)
-    #     text = f"[{stream.readQString()}]"
-    #     self.text_label.cursor().setPos(e.pos())
-    #     self.text_label.insertPlainText(text)
+    def dragEnterEvent(self, e):
+        if e.mimeData().hasFormat(Info.AttributesToWidget):
+            e.accept()
+        else:
+            e.ignore()
+
+    def dropEvent(self, e: QDropEvent):
+        data = e.mimeData().data(Info.AttributesToWidget)
+        stream = QDataStream(data, QIODevice.ReadOnly)
+        text = f"[{stream.readQString()}]"
+        self.text_label.cursor().setPos(e.pos())
+        self.text_label.insertPlainText(text)
 
     def updateTextInRealtime(self):
         self.pro_window.general.text_edit.setHtml(self.text_label.toHtml())

@@ -1,9 +1,11 @@
 import sys
 
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt, QDataStream, QIODevice
+from PyQt5.QtGui import QFont, QDropEvent
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QCompleter, QApplication, QTextEdit
+
+from app.info import Info
 
 """
 https://doc.qt.io/qt-5/qtwidgets-tools-customcompleter-example.html
@@ -32,8 +34,21 @@ class SmartTextEdit(QTextEdit):
         self.completer.setWidget(self)
         self.completer.activated.connect(self.insertCompletion)
 
-        # self.setAcceptDrops(False)
-
+    #     self.setAcceptDrops(True)
+    #
+    # def dragEnterEvent(self, e):
+    #     if e.mimeData().hasFormat(Info.AttributesToWidget):
+    #         e.accept()
+    #     else:
+    #         e.ignore()
+    #
+    # def dropEvent(self, e: QDropEvent):
+    #     data = e.mimeData().data(Info.AttributesToWidget)
+    #     stream = QDataStream(data, QIODevice.ReadOnly)
+    #     text = f"[{stream.readQString()}]"
+    #     self.cursor().setPos(e.pos())
+    #     self.insertPlainText(text)
+    #
     def insertCompletion(self, completion):
         if completion == self.completer.completionPrefix():
             return
