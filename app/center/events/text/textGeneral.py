@@ -290,6 +290,7 @@ class TextTab1(QWidget):
 
         self.text_edit.setTextCursor(oldCursor)
     def setAttributes(self, attributes):
+        self.text_edit.setModelList(attributes)
         self.lighter.updateRule(attributes)
         self.align_x.setCompleter(QCompleter(attributes))
         self.align_y.setCompleter(QCompleter(attributes))

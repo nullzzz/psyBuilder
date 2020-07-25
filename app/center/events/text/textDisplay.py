@@ -84,6 +84,7 @@ class TextDisplay(TabItemMainWindow):
         self.lighter.updateRule(attributes)
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
+        self.text_label.setModelList(format_attributes)
 
     def setProperties(self, properties: dict):
         self.pro_window.setProperties(properties)
