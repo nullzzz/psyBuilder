@@ -18,9 +18,6 @@ class SmartCompleter(QCompleter):
         self.setCompletionMode(QCompleter.PopupCompletion)
         self.setCaseSensitivity(Qt.CaseSensitive)
 
-        # current_model = QStringListModel()
-        # current_model.setStringList(words)
-        # self.setModel(current_model)
         self.setModelList(words)
 
         self.highlighted.connect(self.func)
@@ -33,7 +30,7 @@ class SmartCompleter(QCompleter):
     def setModelList(self, words: list):
         current_model = QStringListModel()
         words.extend(["@mean", "@mode", "@median"])
-        current_model.setStringList(words)
+        current_model.setStringList(set(words))
         self.setModel(current_model)
         
     
@@ -79,9 +76,6 @@ class SmartTextEdit(QTextEdit):
 
         text_cursor.select(QTextCursor.Document)
 
-        # text_cursor.select(QTextCursor.WordUnderCursor)
-        # text_cursor.select(QTextCursor.LineUnderCursor)
-        # print(f"{QTextCursor.WordUnderCursor}:{QTextCursor.LineUnderCursor}")
         selected_text = text_cursor.selectedText()
 
         if cursor_position > 2:
@@ -89,6 +83,8 @@ class SmartTextEdit(QTextEdit):
 
             if "]@" == selected_text:
                 selected_text = "@"
+            elif "@" == selected_text[1]:
+                selected_text = ""
             else:
                 selected_text = selected_text[1]
         elif cursor_position == 0:
@@ -106,26 +102,8 @@ class SmartTextEdit(QTextEdit):
 
     def keyPressEvent(self, e: QtGui.QKeyEvent) -> None:
 
-
-        # if key == Qt.Key_Left:
-        #
-        #     text_cursor = self.textCursor()
-        #     print(f"before:{text_cursor.position()}")
-        #     text_cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor)
-        #     self.setTextCursor(text_cursor)
-        #     text_cursor = self.textCursor()
-        #     print(f"after:{text_cursor.position()}")
-
         if self.completer.popup().isVisible():
             key = e.key()
-
-            # if key == Qt.Key_Left:
-            #     print(f"left arrow")
-            #     text_cursor = self.textCursor()
-            #     text_cursor.movePosition(QTextCursor.Left,QTextCursor.MoveAnchor,1)
-            #     self.setTextCursor(text_cursor)
-
-
             if key in (Qt.Key_Enter, Qt.Key_Return, Qt.Key_Escape, Qt.Key_Tab,Qt.Key_Backtab):
                 e.ignore()
                 return
@@ -133,9 +111,6 @@ class SmartTextEdit(QTextEdit):
         super().keyPressEvent(e)
 
         text_before_cursor = self.textBeforeCursor()
-
-
-        # print(f"{text_before_cursor} <> {self.completer.completionPrefix() }<> {self.completer.currentCompletion()}")
 
         # completionPrefix: This property holds the completion prefix used to provide completions.
         # currentCompletion : Returns the current completion string. This includes the completionPrefix.

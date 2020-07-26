@@ -25,7 +25,10 @@ class TextDisplay(TabItemMainWindow):
         self.pro_window.ok_bt.clicked.connect(self.ok)
         self.pro_window.cancel_bt.clicked.connect(self.cancel)
         self.pro_window.apply_bt.clicked.connect(self.apply)
+
         self.setUI()
+
+        self.setAttributesForTextLabel(Func.getWidgetAttributes(widget_id))
 
     def setUI(self):
         self.setWindowTitle("Text")
@@ -84,6 +87,11 @@ class TextDisplay(TabItemMainWindow):
         self.lighter.updateRule(attributes)
         format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.pro_window.setAttributes(format_attributes)
+        # self.text_label.setModelList(format_attributes)
+
+    def setAttributesForTextLabel(self, attributes):
+        self.lighter.updateRule(attributes)
+        format_attributes = ["[{}]".format(attribute) for attribute in attributes]
         self.text_label.setModelList(format_attributes)
 
     def setProperties(self, properties: dict):
