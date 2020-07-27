@@ -778,6 +778,10 @@ class Psy(QMainWindow):
             self.attributes.showAttributes(widget_id)
             self.properties.showProperties(widget_id)
 
+            # force refresh the widget attributes
+            if Func.isWidgetType(widget_id, Info.TEXT):
+                Func.getWidget(widget_id).setAttributesForTextLabel()
+
     def handleTabClosed(self, widget_id: str):
         """
 

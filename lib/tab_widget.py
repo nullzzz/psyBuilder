@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QKeySequence, QIcon
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTabWidget, QWidget, QShortcut, QMenu
 
 from app.func import Func
