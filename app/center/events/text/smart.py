@@ -29,8 +29,9 @@ class SmartCompleter(QCompleter):
         
     def setModelList(self, words: list):
         current_model = QStringListModel()
-        words.extend(["@mean", "@mode", "@median"])
-        current_model.setStringList(set(words))
+        if "@mean" not in words:
+            words.extend(["@mean", "@mode", "@median"])
+        current_model.setStringList(tuple(words))
         self.setModel(current_model)
         
     
