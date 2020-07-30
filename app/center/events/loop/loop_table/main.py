@@ -694,6 +694,8 @@ class CycleTable(TableWidget):
         """
         self.attributes = data["attributes"]
         self.default_value = data["default_value"]
+        self.attribute_dialog.updateExistAttributes(self.default_value)
+            # = AttributeDialog(self.default_value)
         self.untitled_attribute_count = data["untitled_attribute_count"]
         self.timelines = data["timelines"]
         table = data["table"]

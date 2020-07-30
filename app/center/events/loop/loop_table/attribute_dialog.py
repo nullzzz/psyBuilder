@@ -56,6 +56,10 @@ class AttributeDialog(Dialog):
         vertical_layout.addLayout(button_layout)
         self.setLayout(vertical_layout)
 
+    def updateExistAttributes(self,newAttributes: dict):
+        self.exist_attribute = newAttributes
+
+
     def addAttribute(self, checked=False, name="", value=""):
         """
         add new attribute area into widget
