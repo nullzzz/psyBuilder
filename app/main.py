@@ -273,18 +273,21 @@ class Psy(QMainWindow):
         # help menu
         help_menu = menubar.addMenu("&Help")
 
-        brief_tutorial_action = QAction(" &Tutorial", self)
+        brief_tutorial_action = QAction(" &Tutorial CN", self)
+        brief_tutorial_EN_action = QAction(" &Tutorial EN", self)
         about_action = QAction(" &About Us", self)
         check_for_update = QAction(" &Check for Updates", self)
 
         self.about_us = AboutUs()
         self.check_update = Update()
 
-        brief_tutorial_action.triggered.connect(self.openPDFfile)
+        brief_tutorial_action.triggered.connect(self.openPDFfileCN)
+        brief_tutorial_EN_action.triggered.connect(self.openPDFfile)
         about_action.triggered.connect(self.about_us.show)
         check_for_update.triggered.connect(self.check_update.show)
 
         help_menu.addAction(brief_tutorial_action)
+        help_menu.addAction(brief_tutorial_EN_action)
         help_menu.addAction(about_action)
         help_menu.addAction(check_for_update)
 
@@ -1240,6 +1243,16 @@ class Psy(QMainWindow):
             subprocess.Popen(Func.getImage("pdfs/A Brief Tutorial.pdf"), shell=True)
         else:
             subprocess.run("xdg-open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ Tutorial.pdf"), shell=True)
+
+    def openPDFfileCN(self):
+        import subprocess
+
+        if Info.OS_TYPE == 1:
+            subprocess.run("open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ Tutorial\ CN.pdf"), shell=True)
+        elif Info.OS_TYPE == 0:
+            subprocess.Popen(Func.getImage("pdfs/A Brief Tutorial CN.pdf"), shell=True)
+        else:
+            subprocess.run("xdg-open " + os.path.join(Info.ImagePath, "pdfs", "A\ Brief\ Tutorial\ CN.pdf"), shell=True)
 
     def openDemosCoherenceMotion(self):
         self.openFile(os.path.join(Info.ImagePath, "demos", "coherenceMotion.psy"))
